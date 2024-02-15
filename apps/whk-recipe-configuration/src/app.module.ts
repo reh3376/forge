@@ -1,5 +1,11 @@
 import { Module } from "@nestjs/common";
 import { UserModule } from "./user/user.module";
+import { ParameterTypeModule } from "./parameterType/parameterType.module";
+import { TestParameterModule } from "./testParameter/testParameter.module";
+import { RecipeParameterModule } from "./recipeParameter/recipeParameter.module";
+import { InstructionModule } from "./instruction/instruction.module";
+import { OperationStepModule } from "./operationStep/operationStep.module";
+import { OperationModule } from "./operation/operation.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -18,6 +24,12 @@ import { AuthModule } from "./auth/auth.module";
     ACLModule,
     AuthModule,
     UserModule,
+    ParameterTypeModule,
+    TestParameterModule,
+    RecipeParameterModule,
+    InstructionModule,
+    OperationStepModule,
+    OperationModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
