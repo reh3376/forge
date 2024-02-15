@@ -4,15 +4,16 @@ import {
   Show,
   SimpleShowLayout,
   ShowProps,
+  ReferenceField,
   TextField,
   DateField,
   BooleanField,
-  ReferenceField,
   ReferenceManyField,
   Datagrid,
 } from "react-admin";
 
 import { EQUIPMENTPHASE_TITLE_FIELD } from "./EquipmentPhaseTitle";
+import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 
@@ -20,6 +21,9 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
+        <ReferenceField label="Bom" source="bom.id" reference="Bom">
+          <TextField source={BOM_TITLE_FIELD} />
+        </ReferenceField>
         <TextField label="Bom ID" source="bomId" />
         <TextField label="Class Name" source="className" />
         <DateField source="createdAt" label="Created At" />

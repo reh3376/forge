@@ -11,11 +11,12 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { Bom } from "../../bom/base/Bom";
 import {
-  IsString,
-  IsOptional,
-  IsDate,
   ValidateNested,
+  IsOptional,
+  IsString,
+  IsDate,
   IsBoolean,
   IsInt,
 } from "class-validator";
@@ -27,6 +28,15 @@ import { TestParameter } from "../../testParameter/base/TestParameter";
 
 @ObjectType()
 class EquipmentPhase {
+  @ApiProperty({
+    required: false,
+    type: () => Bom,
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  bom?: Bom | null;
+
   @ApiProperty({
     required: false,
     type: String,

@@ -1,9 +1,11 @@
+import { Bom } from "../bom/Bom";
 import { Instruction } from "../instruction/Instruction";
 import { Operation } from "../operation/Operation";
 import { PhaseParameter } from "../phaseParameter/PhaseParameter";
 import { TestParameter } from "../testParameter/TestParameter";
 
 export type EquipmentPhase = {
+  bom?: Bom | null;
   bomId: string | null;
   className: string | null;
   createdAt: Date | null;

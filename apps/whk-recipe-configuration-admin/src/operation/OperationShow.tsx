@@ -14,6 +14,7 @@ import {
 
 import { OPERATION_TITLE_FIELD } from "./OperationTitle";
 import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
+import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 
 export const OperationShow = (props: ShowProps): React.ReactElement => {
@@ -97,6 +98,9 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
           label="EquipmentPhases"
         >
           <Datagrid rowClick="show">
+            <ReferenceField label="Bom" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
             <TextField label="Bom ID" source="bomId" />
             <TextField label="Class Name" source="className" />
             <DateField source="createdAt" label="Created At" />

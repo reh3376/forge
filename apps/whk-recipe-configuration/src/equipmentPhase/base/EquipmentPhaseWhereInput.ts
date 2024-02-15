@@ -11,9 +11,10 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { InstructionListRelationFilter } from "../../instruction/base/InstructionListRelationFilter";
@@ -25,6 +26,18 @@ import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestPara
 
 @InputType()
 class EquipmentPhaseWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  bom?: BomWhereUniqueInput;
+
   @ApiProperty({
     required: false,
     type: StringNullableFilter,

@@ -4,15 +4,16 @@ import {
   Edit,
   SimpleForm,
   EditProps,
+  ReferenceInput,
+  SelectInput,
   TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
   BooleanInput,
-  ReferenceInput,
-  SelectInput,
   NumberInput,
 } from "react-admin";
 
+import { BomTitle } from "../bom/BomTitle";
 import { InstructionTitle } from "../instruction/InstructionTitle";
 import { OperationTitle } from "../operation/OperationTitle";
 import { PhaseParameterTitle } from "../phaseParameter/PhaseParameterTitle";
@@ -22,6 +23,9 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
   return (
     <Edit {...props}>
       <SimpleForm>
+        <ReferenceInput source="bom.id" reference="Bom" label="Bom">
+          <SelectInput optionText={BomTitle} />
+        </ReferenceInput>
         <TextInput label="Bom ID" source="bomId" />
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />

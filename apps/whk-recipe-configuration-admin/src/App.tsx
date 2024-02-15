@@ -41,6 +41,10 @@ import { RecipeList } from "./recipe/RecipeList";
 import { RecipeCreate } from "./recipe/RecipeCreate";
 import { RecipeEdit } from "./recipe/RecipeEdit";
 import { RecipeShow } from "./recipe/RecipeShow";
+import { BomList } from "./bom/BomList";
+import { BomCreate } from "./bom/BomCreate";
+import { BomEdit } from "./bom/BomEdit";
+import { BomShow } from "./bom/BomShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -129,6 +133,13 @@ const App = (): React.ReactElement => {
           edit={RecipeEdit}
           create={RecipeCreate}
           show={RecipeShow}
+        />
+        <Resource
+          name="Bom"
+          list={BomList}
+          edit={BomEdit}
+          create={BomCreate}
+          show={BomShow}
         />
       </Admin>
     </div>

@@ -359,6 +359,12 @@ export class TestParameterControllerBase {
     const results = await this.service.findEquipmentPhases(params.id, {
       ...query,
       select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
         bomId: true,
         className: true,
         createdAt: true,

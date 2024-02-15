@@ -471,6 +471,12 @@ export class OperationControllerBase {
     const results = await this.service.findOperationSteps(params.id, {
       ...query,
       select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
         bomId: true,
         className: true,
         createdAt: true,

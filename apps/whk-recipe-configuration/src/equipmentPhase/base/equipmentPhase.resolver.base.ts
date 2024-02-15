@@ -30,6 +30,7 @@ import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindM
 import { Instruction } from "../../instruction/base/Instruction";
 import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { Bom } from "../../bom/base/Bom";
 import { Operation } from "../../operation/base/Operation";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { EquipmentPhaseService } from "../equipmentPhase.service";
@@ -101,6 +102,12 @@ export class EquipmentPhaseResolverBase {
       data: {
         ...args.data,
 
+        bom: args.data.bom
+          ? {
+              connect: args.data.bom,
+            }
+          : undefined,
+
         operations: {
           connect: args.data.operations,
         },
@@ -129,6 +136,12 @@ export class EquipmentPhaseResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          bom: args.data.bom
+            ? {
+                connect: args.data.bom,
+              }
+            : undefined,
 
           operations: {
             connect: args.data.operations,
@@ -210,6 +223,25 @@ export class EquipmentPhaseResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Bom, {
+    nullable: true,
+    name: "bom",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async getBom(@graphql.Parent() parent: EquipmentPhase): Promise<Bom | null> {
+    const result = await this.service.getBom(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

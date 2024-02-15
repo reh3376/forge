@@ -4,13 +4,14 @@ import {
   List,
   Datagrid,
   ListProps,
+  ReferenceField,
   TextField,
   DateField,
   BooleanField,
-  ReferenceField,
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
+import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 
@@ -24,6 +25,9 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
       pagination={<Pagination />}
     >
       <Datagrid rowClick="show">
+        <ReferenceField label="Bom" source="bom.id" reference="Bom">
+          <TextField source={BOM_TITLE_FIELD} />
+        </ReferenceField>
         <TextField label="Bom ID" source="bomId" />
         <TextField label="Class Name" source="className" />
         <DateField source="createdAt" label="Created At" />

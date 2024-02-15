@@ -231,6 +231,12 @@ export class InstructionControllerBase {
     const results = await this.service.findEquipmentPhase(params.id, {
       ...query,
       select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
         bomId: true,
         className: true,
         createdAt: true,
