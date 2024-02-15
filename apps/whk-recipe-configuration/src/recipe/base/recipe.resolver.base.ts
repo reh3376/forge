@@ -26,6 +26,8 @@ import { RecipeFindUniqueArgs } from "./RecipeFindUniqueArgs";
 import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
 import { DeleteRecipeArgs } from "./DeleteRecipeArgs";
+import { ProductionOrderQueueFindManyArgs } from "../../productionOrderQueue/base/ProductionOrderQueueFindManyArgs";
+import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
 import { Operation } from "../../operation/base/Operation";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -153,6 +155,31 @@ export class RecipeResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderQueue], {
+    name: "productionOrderQueues",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderQueues(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: ProductionOrderQueueFindManyArgs
+  ): Promise<ProductionOrderQueue[]> {
+    const results = await this.service.findProductionOrderQueues(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

@@ -21,6 +21,7 @@ import {
 } from "class-validator";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { Type } from "class-transformer";
+import { ProductionOrderQueueUpdateManyWithoutRecipesInput } from "./ProductionOrderQueueUpdateManyWithoutRecipesInput";
 
 @InputType()
 class RecipeUpdateInput {
@@ -101,6 +102,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   operation?: OperationWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderQueueUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderQueueUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ProductionOrderQueueUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  productionOrderQueues?: ProductionOrderQueueUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

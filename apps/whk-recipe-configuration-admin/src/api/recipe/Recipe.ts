@@ -1,4 +1,5 @@
 import { Operation } from "../operation/Operation";
+import { ProductionOrderQueue } from "../productionOrderQueue/ProductionOrderQueue";
 
 export type Recipe = {
   active: boolean | null;
@@ -10,6 +11,7 @@ export type Recipe = {
   itemDescription: string | null;
   mashBill: string | null;
   operation?: Operation | null;
+  productionOrderQueues?: Array<ProductionOrderQueue>;
   revision: number | null;
   schemaVersion: string | null;
   updatedAt: Date;

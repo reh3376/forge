@@ -9,6 +9,7 @@ import { OperationModule } from "./operation/operation.module";
 import { ProcedureModule } from "./procedure/procedure.module";
 import { RecipeModule } from "./recipe/recipe.module";
 import { BomModule } from "./bom/bom.module";
+import { ProductionOrderQueueModule } from "./productionOrderQueue/productionOrderQueue.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -40,6 +41,7 @@ import { AuthModule } from "./auth/auth.module";
     ProcedureModule,
     RecipeModule,
     BomModule,
+    ProductionOrderQueueModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

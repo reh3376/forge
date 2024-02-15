@@ -8,11 +8,14 @@ import {
   TextInput,
   ReferenceInput,
   SelectInput,
+  ReferenceArrayInput,
+  SelectArrayInput,
   NumberInput,
   DateTimeInput,
 } from "react-admin";
 
 import { OperationTitle } from "../operation/OperationTitle";
+import { ProductionOrderQueueTitle } from "../productionOrderQueue/ProductionOrderQueueTitle";
 
 export const RecipeCreate = (props: CreateProps): React.ReactElement => {
   return (
@@ -35,6 +38,14 @@ export const RecipeCreate = (props: CreateProps): React.ReactElement => {
         >
           <SelectInput optionText={OperationTitle} />
         </ReferenceInput>
+        <ReferenceArrayInput
+          source="productionOrderQueues"
+          reference="ProductionOrderQueue"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={ProductionOrderQueueTitle} />
+        </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <DateTimeInput label="Updated By" source="updatedBy" />

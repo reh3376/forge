@@ -45,6 +45,10 @@ import { BomList } from "./bom/BomList";
 import { BomCreate } from "./bom/BomCreate";
 import { BomEdit } from "./bom/BomEdit";
 import { BomShow } from "./bom/BomShow";
+import { ProductionOrderQueueList } from "./productionOrderQueue/ProductionOrderQueueList";
+import { ProductionOrderQueueCreate } from "./productionOrderQueue/ProductionOrderQueueCreate";
+import { ProductionOrderQueueEdit } from "./productionOrderQueue/ProductionOrderQueueEdit";
+import { ProductionOrderQueueShow } from "./productionOrderQueue/ProductionOrderQueueShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -140,6 +144,13 @@ const App = (): React.ReactElement => {
           edit={BomEdit}
           create={BomCreate}
           show={BomShow}
+        />
+        <Resource
+          name="ProductionOrderQueue"
+          list={ProductionOrderQueueList}
+          edit={ProductionOrderQueueEdit}
+          create={ProductionOrderQueueCreate}
+          show={ProductionOrderQueueShow}
         />
       </Admin>
     </div>
