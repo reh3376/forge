@@ -16,6 +16,7 @@ import {
   EquipmentPhase, // @ts-ignore
   Instruction, // @ts-ignore
   PhaseParameter, // @ts-ignore
+  Bom, // @ts-ignore
   Operation, // @ts-ignore
   TestParameter,
 } from "@prisma/client";
@@ -75,6 +76,14 @@ export class EquipmentPhaseServiceBase {
         where: { id: parentId },
       })
       .phaseParameters(args);
+  }
+
+  async getBom(parentId: string): Promise<Bom | null> {
+    return this.prisma.equipmentPhase
+      .findUnique({
+        where: { id: parentId },
+      })
+      .bom();
   }
 
   async getOperations(parentId: string): Promise<Operation | null> {

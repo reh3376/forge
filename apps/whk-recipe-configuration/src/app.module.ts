@@ -8,6 +8,7 @@ import { EquipmentPhaseModule } from "./equipmentPhase/equipmentPhase.module";
 import { OperationModule } from "./operation/operation.module";
 import { ProcedureModule } from "./procedure/procedure.module";
 import { RecipeModule } from "./recipe/recipe.module";
+import { BomModule } from "./bom/bom.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -38,6 +39,7 @@ import { AuthModule } from "./auth/auth.module";
     OperationModule,
     ProcedureModule,
     RecipeModule,
+    BomModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

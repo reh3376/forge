@@ -115,6 +115,8 @@ model Instruction {
 }
 
 model EquipmentPhase {
+  bom                    Bom?             @relation(fields: [bomId], references: [id])
+  bomId                  String?
   bomId                  String?
   className              String?
   createdAt              DateTime?        @default(now())
@@ -193,6 +195,25 @@ model Recipe {
   schemaVersion   String?    @default("0001-b")
   updatedAt       DateTime   @updatedAt
   updatedBy       DateTime?
+}
+
+model Bom {
+  batches         Json?
+  bomItems        Json
+  bomName         String
+  bomRevision     Int?             @default(0)
+  className       String?
+  createdAt       DateTime         @default(now())
+  createdBy       String           @unique
+  editedAt        DateTime         @updatedAt
+  editedBy        String?          @unique
+  equipmentPhases EquipmentPhase[]
+  id              String           @id @default(auto())
+  operationSteps  Json?
+  schemaVersion   String?          @default("0001-alpha")
+  wipItemId       String?
+
+  @@map("boms")
 }
 
 enum EnumPhaseParameterSetpointType {

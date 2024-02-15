@@ -1,9 +1,11 @@
+import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
 import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
 import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
 import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhereUniqueInput";
 
 export type EquipmentPhaseCreateInput = {
+  bom?: BomWhereUniqueInput | null;
   bomId?: string | null;
   className?: string | null;
   createdBy: string;

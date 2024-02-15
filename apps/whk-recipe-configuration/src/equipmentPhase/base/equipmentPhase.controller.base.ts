@@ -58,6 +58,12 @@ export class EquipmentPhaseControllerBase {
       data: {
         ...data,
 
+        bom: data.bom
+          ? {
+              connect: data.bom,
+            }
+          : undefined,
+
         operations: {
           connect: data.operations,
         },
@@ -69,6 +75,12 @@ export class EquipmentPhaseControllerBase {
           : undefined,
       },
       select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
         bomId: true,
         className: true,
         createdAt: true,
@@ -119,6 +131,12 @@ export class EquipmentPhaseControllerBase {
     return this.service.equipmentPhases({
       ...args,
       select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
         bomId: true,
         className: true,
         createdAt: true,
@@ -168,6 +186,12 @@ export class EquipmentPhaseControllerBase {
     const result = await this.service.equipmentPhase({
       where: params,
       select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
         bomId: true,
         className: true,
         createdAt: true,
@@ -227,6 +251,12 @@ export class EquipmentPhaseControllerBase {
         data: {
           ...data,
 
+          bom: data.bom
+            ? {
+                connect: data.bom,
+              }
+            : undefined,
+
           operations: {
             connect: data.operations,
           },
@@ -238,6 +268,12 @@ export class EquipmentPhaseControllerBase {
             : undefined,
         },
         select: {
+          bom: {
+            select: {
+              id: true,
+            },
+          },
+
           bomId: true,
           className: true,
           createdAt: true,
@@ -295,6 +331,12 @@ export class EquipmentPhaseControllerBase {
       return await this.service.deleteEquipmentPhase({
         where: params,
         select: {
+          bom: {
+            select: {
+              id: true,
+            },
+          },
+
           bomId: true,
           className: true,
           createdAt: true,

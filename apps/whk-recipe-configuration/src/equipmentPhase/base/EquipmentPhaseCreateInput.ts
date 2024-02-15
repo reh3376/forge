@@ -11,21 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
-  IsString,
-  IsOptional,
   ValidateNested,
+  IsOptional,
+  IsString,
   IsBoolean,
   IsInt,
 } from "class-validator";
-import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { Type } from "class-transformer";
+import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @InputType()
 class EquipmentPhaseCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  bom?: BomWhereUniqueInput | null;
+
   @ApiProperty({
     required: false,
     type: String,
