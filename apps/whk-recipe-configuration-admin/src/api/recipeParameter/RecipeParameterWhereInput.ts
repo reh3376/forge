@@ -3,7 +3,6 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { ParameterTypeWhereUniqueInput } from "../parameterType/ParameterTypeWhereUniqueInput";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
@@ -18,7 +17,6 @@ export type RecipeParameterWhereInput = {
   editedBy?: StringNullableFilter;
   id?: StringFilter;
   itemId?: StringFilter;
-  parameterType?: ParameterTypeWhereUniqueInput;
   recipeParamDescription?: StringNullableFilter;
   recipeParamName?: StringFilter;
   recipeParamRevision?: StringNullableFilter;

@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   Show,
   SimpleShowLayout,
@@ -7,10 +6,7 @@ import {
   BooleanField,
   TextField,
   DateField,
-  ReferenceField,
 } from "react-admin";
-
-import { PARAMETERTYPE_TITLE_FIELD } from "../parameterType/ParameterTypeTitle";
 
 export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
   return (
@@ -25,13 +21,6 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
         <TextField label="Item ID" source="itemId" />
-        <ReferenceField
-          label="Parameter Type"
-          source="parametertype.id"
-          reference="ParameterType"
-        >
-          <TextField source={PARAMETERTYPE_TITLE_FIELD} />
-        </ReferenceField>
         <TextField
           label="Recipe Param Description"
           source="recipeParamDescription"

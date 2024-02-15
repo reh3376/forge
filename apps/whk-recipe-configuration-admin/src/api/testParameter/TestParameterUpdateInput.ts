@@ -1,3 +1,4 @@
+import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
 import { InputJsonValue } from "../../types";
 
 export type TestParameterUpdateInput = {
@@ -6,6 +7,7 @@ export type TestParameterUpdateInput = {
   className?: string;
   createdBy?: string;
   editedBy?: string | null;
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
   isDefinition?: boolean | null;
   itemId?: string;
   schemaVersion?: string | null;

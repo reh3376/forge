@@ -16,9 +16,8 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
-import { OperationStepListRelationFilter } from "../../operationStep/base/OperationStepListRelationFilter";
-import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
 class InstructionWhereInput {
@@ -57,6 +56,18 @@ class InstructionWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhase?: EquipmentPhaseListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -87,29 +98,6 @@ class InstructionWhereInput {
     nullable: true,
   })
   instructionRevision?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationStepListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => OperationStepListRelationFilter)
-  @IsOptional()
-  @Field(() => OperationStepListRelationFilter, {
-    nullable: true,
-  })
-  operationStep?: OperationStepListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  routes?: JsonFilter;
 
   @ApiProperty({
     required: false,

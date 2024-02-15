@@ -15,14 +15,12 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
-import { OperationStepCreateNestedManyWithoutOperationsInput } from "./OperationStepCreateNestedManyWithoutOperationsInput";
+import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { Type } from "class-transformer";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 
 @InputType()
 class OperationCreateInput {
@@ -44,6 +42,14 @@ class OperationCreateInput {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  description!: string;
 
   @ApiProperty({
     required: false,
@@ -73,53 +79,47 @@ class OperationCreateInput {
   })
   @IsString()
   @Field(() => String)
-  operationDescription!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  operationName!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  operationRevision!: number;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  operationSequenceNumber!: number;
+  name!: string;
 
   @ApiProperty({
     required: false,
-    type: () => OperationStepCreateNestedManyWithoutOperationsInput,
+    type: () => EquipmentPhaseCreateNestedManyWithoutOperationsInput,
   })
   @ValidateNested()
-  @Type(() => OperationStepCreateNestedManyWithoutOperationsInput)
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutOperationsInput)
   @IsOptional()
-  @Field(() => OperationStepCreateNestedManyWithoutOperationsInput, {
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutOperationsInput, {
     nullable: true,
   })
-  operationSteps?: OperationStepCreateNestedManyWithoutOperationsInput;
+  operationSteps?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureWhereUniqueInput,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => ProcedureWhereUniqueInput, {
     nullable: true,
   })
-  route?: InputJsonValue;
+  procedure?: ProcedureWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Field(() => Number)
+  procedureSequenceIndex!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Field(() => Number)
+  revision!: number;
 
   @ApiProperty({
     required: false,

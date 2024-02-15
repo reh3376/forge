@@ -6,9 +6,13 @@ import {
   EditProps,
   BooleanInput,
   TextInput,
+  ReferenceArrayInput,
+  SelectArrayInput,
   SelectInput,
   NumberInput,
 } from "react-admin";
+
+import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 
 export const TestParameterEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -19,6 +23,14 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Edited By" source="editedBy" />
+        <ReferenceArrayInput
+          source="equipmentPhases"
+          reference="EquipmentPhase"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={EquipmentPhaseTitle} />
+        </ReferenceArrayInput>
         <BooleanInput label="Is Definition" source="isDefinition" />
         <TextInput label="Item ID" source="itemId" />
         <TextInput label="Schema Version" source="schemaVersion" />

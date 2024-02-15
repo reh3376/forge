@@ -10,7 +10,6 @@ export type RecipeParameterOrderByInput = {
   editedBy?: SortOrder;
   id?: SortOrder;
   itemId?: SortOrder;
-  parameterTypeId?: SortOrder;
   recipeParamDescription?: SortOrder;
   recipeParamName?: SortOrder;
   recipeParamRevision?: SortOrder;

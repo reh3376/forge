@@ -15,14 +15,12 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
-import { OperationStepUpdateManyWithoutOperationsInput } from "./OperationStepUpdateManyWithoutOperationsInput";
+import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { Type } from "class-transformer";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 
 @InputType()
 class OperationUpdateInput {
@@ -57,6 +55,17 @@ class OperationUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
+  description?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
   editedBy?: string | null;
 
   @ApiProperty({
@@ -79,62 +88,53 @@ class OperationUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  operationDescription?: string;
+  name?: string;
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  operationName?: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationRevision?: number;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationSequenceNumber?: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationStepUpdateManyWithoutOperationsInput,
+    type: () => EquipmentPhaseUpdateManyWithoutOperationsInput,
   })
   @ValidateNested()
-  @Type(() => OperationStepUpdateManyWithoutOperationsInput)
+  @Type(() => EquipmentPhaseUpdateManyWithoutOperationsInput)
   @IsOptional()
-  @Field(() => OperationStepUpdateManyWithoutOperationsInput, {
+  @Field(() => EquipmentPhaseUpdateManyWithoutOperationsInput, {
     nullable: true,
   })
-  operationSteps?: OperationStepUpdateManyWithoutOperationsInput;
+  operationSteps?: EquipmentPhaseUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureWhereUniqueInput,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => ProcedureWhereUniqueInput, {
     nullable: true,
   })
-  route?: InputJsonValue;
+  procedure?: ProcedureWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  procedureSequenceIndex?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number;
 
   @ApiProperty({
     required: false,

@@ -26,9 +26,9 @@ import { Operation } from "./Operation";
 import { OperationFindManyArgs } from "./OperationFindManyArgs";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { OperationUpdateInput } from "./OperationUpdateInput";
-import { OperationStepFindManyArgs } from "../../operationStep/base/OperationStepFindManyArgs";
-import { OperationStep } from "../../operationStep/base/OperationStep";
-import { OperationStepWhereUniqueInput } from "../../operationStep/base/OperationStepWhereUniqueInput";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -52,19 +52,33 @@ export class OperationControllerBase {
     @common.Body() data: OperationCreateInput
   ): Promise<Operation> {
     return await this.service.createOperation({
-      data: data,
+      data: {
+        ...data,
+
+        procedure: data.procedure
+          ? {
+              connect: data.procedure,
+            }
+          : undefined,
+      },
       select: {
         active: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
-        operationDescription: true,
-        operationName: true,
-        operationRevision: true,
-        operationSequenceNumber: true,
-        route: true,
+        name: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedureSequenceIndex: true,
+        revision: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -91,14 +105,20 @@ export class OperationControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
-        operationDescription: true,
-        operationName: true,
-        operationRevision: true,
-        operationSequenceNumber: true,
-        route: true,
+        name: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedureSequenceIndex: true,
+        revision: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -126,14 +146,20 @@ export class OperationControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
-        operationDescription: true,
-        operationName: true,
-        operationRevision: true,
-        operationSequenceNumber: true,
-        route: true,
+        name: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedureSequenceIndex: true,
+        revision: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -165,19 +191,33 @@ export class OperationControllerBase {
     try {
       return await this.service.updateOperation({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          procedure: data.procedure
+            ? {
+                connect: data.procedure,
+              }
+            : undefined,
+        },
         select: {
           active: true,
           createdAt: true,
           createdBy: true,
+          description: true,
           editedBy: true,
           globalUuid: true,
           id: true,
-          operationDescription: true,
-          operationName: true,
-          operationRevision: true,
-          operationSequenceNumber: true,
-          route: true,
+          name: true,
+
+          procedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          procedureSequenceIndex: true,
+          revision: true,
           schemaVersion: true,
           updatedAt: true,
         },
@@ -213,14 +253,20 @@ export class OperationControllerBase {
           active: true,
           createdAt: true,
           createdBy: true,
+          description: true,
           editedBy: true,
           globalUuid: true,
           id: true,
-          operationDescription: true,
-          operationName: true,
-          operationRevision: true,
-          operationSequenceNumber: true,
-          route: true,
+          name: true,
+
+          procedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          procedureSequenceIndex: true,
+          revision: true,
           schemaVersion: true,
           updatedAt: true,
         },
@@ -237,17 +283,17 @@ export class OperationControllerBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/operationSteps")
-  @ApiNestedQuery(OperationStepFindManyArgs)
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "OperationStep",
+    resource: "EquipmentPhase",
     action: "read",
     possession: "any",
   })
   async findOperationSteps(
     @common.Req() request: Request,
     @common.Param() params: OperationWhereUniqueInput
-  ): Promise<OperationStep[]> {
-    const query = plainToClass(OperationStepFindManyArgs, request.query);
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
     const results = await this.service.findOperationSteps(params.id, {
       ...query,
       select: {
@@ -255,9 +301,11 @@ export class OperationControllerBase {
         className: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        name: true,
 
         operations: {
           select: {
@@ -265,14 +313,16 @@ export class OperationControllerBase {
           },
         },
 
-        operationStepDescription: true,
-        operationStepName: true,
-        operationStepRevision: true,
+        operationSequenceIndex: true,
         operationStepSequence: true,
-        recipeId: true,
+        revision: true,
         schemaVersion: true,
-        sequenceOperation: true,
-        tests: true,
+
+        testParameters: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -291,7 +341,7 @@ export class OperationControllerBase {
   })
   async connectOperationSteps(
     @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: OperationStepWhereUniqueInput[]
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       operationSteps: {
@@ -313,7 +363,7 @@ export class OperationControllerBase {
   })
   async updateOperationSteps(
     @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: OperationStepWhereUniqueInput[]
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       operationSteps: {
@@ -335,7 +385,7 @@ export class OperationControllerBase {
   })
   async disconnectOperationSteps(
     @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: OperationStepWhereUniqueInput[]
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       operationSteps: {

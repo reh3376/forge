@@ -18,25 +18,26 @@ model User {
   username  String   @unique
 }
 
-model ParameterType {
-  createdAt              DateTime                      @default(now())
-  createdBy              String                        @unique
-  editedBy               String?                       @unique
-  id                     String                        @id @default(cuid())
+model PhaseParameter {
+  createdAt              DateTime                       @default(now())
+  createdBy              String                         @unique
+  editedBy               String?                        @unique
+  equipmentPhase         EquipmentPhase?                @relation(fields: [equipmentPhaseId], references: [id])
+  equipmentPhaseId       String?
+  id                     String                         @id @default(cuid())
   itemId                 String?
   recipeId               String?
-  recipeParameters       RecipeParameter[]
-  schemaVersion          String?                       @default("0001-alpha")
+  schemaVersion          String?                        @default("0001-alpha")
   setpointBooleanValue   Boolean?
   setpointLowerLimit     Float?
   setpointNumericalValue Float?
-  setpointType           EnumParameterTypeSetpointType
+  setpointType           EnumPhaseParameterSetpointType
   setpointUpperLimit     Float?
   typeDescription        String
   typeName               String
-  typeRevision           Int                           @default(0)
+  typeRevision           Int                            @default(0)
   typeUnits              String
-  updatedAt              DateTime                      @updatedAt
+  updatedAt              DateTime                       @updatedAt
 }
 
 model TestParameter {
@@ -47,6 +48,7 @@ model TestParameter {
   createdBy                String                             @unique
   editedAt                 DateTime?                          @updatedAt
   editedBy                 String?                            @unique
+  equipmentPhases          EquipmentPhase[]
   id                       String                             @id @default(auto())
   isDefinition             Boolean?                           @default(false)
   itemId                   String
@@ -77,8 +79,6 @@ model RecipeParameter {
   editedBy                   String?                               @unique
   id                         String                                @id @default(cuid())
   itemId                     String
-  parameterType              ParameterType?                        @relation(fields: [parameterTypeId], references: [id])
-  parameterTypeId            String?
   recipeParamDescription     String?
   recipeParamName            String
   recipeParamRevision        String?
@@ -94,62 +94,77 @@ model RecipeParameter {
 }
 
 model Instruction {
-  active              Boolean?        @default(false)
-  createdAt           DateTime        @default(now())
-  createdBy           String          @unique
-  editedBy            String?         @unique
+  active              Boolean?         @default(false)
+  createdAt           DateTime         @default(now())
+  createdBy           String           @unique
+  editedBy            String?          @unique
+  equipmentPhase      EquipmentPhase[]
   filePath            String
-  id                  String          @id @default(cuid())
-  instructionRevision Int             @default(0)
-  operationStep       OperationStep[]
-  routes              Json?
-  schemaVersion       String          @default("0001-alpha")
-  updatedAt           DateTime        @updatedAt
+  id                  String           @id @default(cuid())
+  instructionRevision Int              @default(0)
+  schemaVersion       String           @default("0001-alpha")
+  updatedAt           DateTime         @updatedAt
 }
 
-model OperationStep {
-  bomId                    String?
-  className                String?
-  createdAt                DateTime?     @default(now())
-  createdBy                String        @unique
-  editedAt                 DateTime?     @updatedAt
-  editedBy                 String?       @unique
-  id                       String        @id @default(auto())
-  instructions             Instruction[]
-  operations               Operation     @relation(fields: [operationId], references: [id])
-  operationId              String
-  operationStepDescription String?
-  operationStepName        String
-  operationStepRevision    Int?          @default(0)
-  operationStepSequence    Int?
-  recipeId                 String?
-  schemaVersion            String?
-  sequenceOperation        Boolean?
-  tests                    Json?
+model EquipmentPhase {
+  bomId                  String?
+  className              String?
+  createdAt              DateTime?        @default(now())
+  createdBy              String           @unique
+  description            String?
+  editedAt               DateTime?        @updatedAt
+  editedBy               String?          @unique
+  id                     String           @id @default(auto())
+  instructions           Instruction[]
+  name                   String
+  operations             Operation        @relation(fields: [operationId], references: [id])
+  operationId            String
+  operationSequenceIndex Boolean?
+  operationStepSequence  Int?
+  phaseParameters        PhaseParameter[]
+  revision               Int?             @default(0)
+  schemaVersion          String?          @default("0001-b")
+  testParameters         TestParameter?   @relation(fields: [testParameterId], references: [id])
+  testParameterId        String?
 
-  @@map("operationSteps")
+  @@map("equipmentPhases")
 }
 
 model Operation {
-  active                  Boolean?        @default(true)
-  createdAt               DateTime?       @default(now())
-  createdBy               String          @unique
-  editedBy                String?         @unique
-  globalUuid              String?         @default(uuid())
-  id                      String          @id @default(auto())
-  operationDescription    String
-  operationName           String
-  operationRevision       Int             @default(0)
-  operationSequenceNumber Int             @unique @default(0)
-  operationSteps          OperationStep[]
-  route                   Json?
-  schemaVersion           String?         @default("0001-alpha")
-  updatedAt               DateTime?       @updatedAt
+  active                 Boolean?         @default(true)
+  createdAt              DateTime?        @default(now())
+  createdBy              String           @unique
+  description            String
+  editedBy               String?          @unique
+  globalUuid             String?          @default(uuid())
+  id                     String           @id @default(auto())
+  name                   String
+  operationSteps         EquipmentPhase[]
+  procedure              Procedure?       @relation(fields: [procedureId], references: [id])
+  procedureId            String?
+  procedureSequenceIndex Int              @unique @default(0)
+  revision               Int              @default(0)
+  schemaVersion          String?          @default("0001-b")
+  updatedAt              DateTime?        @updatedAt
 
   @@map("Operations")
 }
 
-enum EnumParameterTypeSetpointType {
+model Procedure {
+  active        Boolean?    @default(true)
+  createdAt     DateTime    @default(now())
+  createdBy     String      @unique
+  description   String?
+  id            String      @id @default(cuid())
+  name          String?
+  operations    Operation[]
+  revision      Int?        @default(0)
+  schemaVersion String?     @default("0001-b")
+  updatedAt     DateTime    @updatedAt
+  updatedBy     String?     @unique
+}
+
+enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
 }

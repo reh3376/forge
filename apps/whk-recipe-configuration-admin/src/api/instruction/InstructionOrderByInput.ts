@@ -8,7 +8,6 @@ export type InstructionOrderByInput = {
   filePath?: SortOrder;
   id?: SortOrder;
   instructionRevision?: SortOrder;
-  routes?: SortOrder;
   schemaVersion?: SortOrder;
   updatedAt?: SortOrder;
 };

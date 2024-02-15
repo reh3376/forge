@@ -1,14 +1,17 @@
 import { Module } from "@nestjs/common";
 import { UserModule } from "./user/user.module";
-import { ParameterTypeModule } from "./parameterType/parameterType.module";
+import { PhaseParameterModule } from "./phaseParameter/phaseParameter.module";
 import { TestParameterModule } from "./testParameter/testParameter.module";
 import { RecipeParameterModule } from "./recipeParameter/recipeParameter.module";
 import { InstructionModule } from "./instruction/instruction.module";
-import { OperationStepModule } from "./operationStep/operationStep.module";
+import { EquipmentPhaseModule } from "./equipmentPhase/equipmentPhase.module";
 import { OperationModule } from "./operation/operation.module";
+import { ProcedureModule } from "./procedure/procedure.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
+import { MqttModule } from "./kafka/mqtt.module";
+import { KafkaModule } from "./kafka/kafka.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { ServeStaticOptionsService } from "./serveStaticOptions.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -23,13 +26,16 @@ import { AuthModule } from "./auth/auth.module";
   imports: [
     ACLModule,
     AuthModule,
+    KafkaModule,
+    MqttModule,
     UserModule,
-    ParameterTypeModule,
+    PhaseParameterModule,
     TestParameterModule,
     RecipeParameterModule,
     InstructionModule,
-    OperationStepModule,
+    EquipmentPhaseModule,
     OperationModule,
+    ProcedureModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

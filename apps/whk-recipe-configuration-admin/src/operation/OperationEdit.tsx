@@ -6,12 +6,15 @@ import {
   EditProps,
   BooleanInput,
   TextInput,
-  NumberInput,
   ReferenceArrayInput,
   SelectArrayInput,
+  ReferenceInput,
+  SelectInput,
+  NumberInput,
 } from "react-admin";
 
-import { OperationStepTitle } from "../operationStep/OperationStepTitle";
+import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
+import { ProcedureTitle } from "../procedure/ProcedureTitle";
 
 export const OperationEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -19,32 +22,31 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
         <TextInput label="Created By" source="createdBy" />
+        <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
         <TextInput label="globalUuid" source="globalUuid" />
-        <TextInput
-          label="Operation Description"
-          source="operationDescription"
-        />
-        <TextInput label="Operation Name" source="operationName" />
-        <NumberInput
-          step={1}
-          label="Operation Revision"
-          source="operationRevision"
-        />
-        <NumberInput
-          step={1}
-          label="Operation Sequence Number"
-          source="operationSequenceNumber"
-        />
+        <TextInput label="Name" source="name" />
         <ReferenceArrayInput
           source="operationSteps"
-          reference="OperationStep"
+          reference="EquipmentPhase"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
-          <SelectArrayInput optionText={OperationStepTitle} />
+          <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
-        <div />
+        <ReferenceInput
+          source="procedure.id"
+          reference="Procedure"
+          label="Procedure"
+        >
+          <SelectInput optionText={ProcedureTitle} />
+        </ReferenceInput>
+        <NumberInput
+          step={1}
+          label="Procedure Sequence Index"
+          source="procedureSequenceIndex"
+        />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
       </SimpleForm>
     </Edit>

@@ -26,8 +26,8 @@ import { InstructionFindUniqueArgs } from "./InstructionFindUniqueArgs";
 import { CreateInstructionArgs } from "./CreateInstructionArgs";
 import { UpdateInstructionArgs } from "./UpdateInstructionArgs";
 import { DeleteInstructionArgs } from "./DeleteInstructionArgs";
-import { OperationStepFindManyArgs } from "../../operationStep/base/OperationStepFindManyArgs";
-import { OperationStep } from "../../operationStep/base/OperationStep";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { InstructionService } from "../instruction.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Instruction)
@@ -145,17 +145,17 @@ export class InstructionResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [OperationStep], { name: "operationStep" })
+  @graphql.ResolveField(() => [EquipmentPhase], { name: "equipmentPhase" })
   @nestAccessControl.UseRoles({
-    resource: "OperationStep",
+    resource: "EquipmentPhase",
     action: "read",
     possession: "any",
   })
-  async findOperationStep(
+  async findEquipmentPhase(
     @graphql.Parent() parent: Instruction,
-    @graphql.Args() args: OperationStepFindManyArgs
-  ): Promise<OperationStep[]> {
-    const results = await this.service.findOperationStep(parent.id, args);
+    @graphql.Args() args: EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
+    const results = await this.service.findEquipmentPhase(parent.id, args);
 
     if (!results) {
       return [];

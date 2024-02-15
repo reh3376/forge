@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import {
   Show,
   SimpleShowLayout,
@@ -6,7 +7,13 @@ import {
   BooleanField,
   TextField,
   DateField,
+  ReferenceManyField,
+  Datagrid,
+  ReferenceField,
 } from "react-admin";
+
+import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
+import { TESTPARAMETER_TITLE_FIELD } from "./TestParameterTitle";
 
 export const TestParameterShow = (props: ShowProps): React.ReactElement => {
   return (
@@ -50,6 +57,47 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
           label="Test Setpoint Numerical Value"
           source="testSetpointValue"
         />
+        <ReferenceManyField
+          reference="EquipmentPhase"
+          target="testParameterId"
+          label="EquipmentPhases"
+        >
+          <Datagrid rowClick="show">
+            <TextField label="Bom ID" source="bomId" />
+            <TextField label="Class Name" source="className" />
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <TextField label="Description" source="description" />
+            <DateField source="editedAt" label="Edited At" />
+            <TextField label="Edited By" source="editedBy" />
+            <TextField label="ID" source="id" />
+            <TextField label="Name" source="name" />
+            <ReferenceField
+              label="Operation"
+              source="operation.id"
+              reference="Operation"
+            >
+              <TextField source={OPERATION_TITLE_FIELD} />
+            </ReferenceField>
+            <BooleanField
+              label="Operation Sequence Index"
+              source="operationSequenceIndex"
+            />
+            <TextField
+              label="Operation Step Sequence"
+              source="operationStepSequence"
+            />
+            <TextField label="Revision" source="revision" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <ReferenceField
+              label="Test Parameters"
+              source="testparameter.id"
+              reference="TestParameter"
+            >
+              <TextField source={TESTPARAMETER_TITLE_FIELD} />
+            </ReferenceField>
+          </Datagrid>
+        </ReferenceManyField>
       </SimpleShowLayout>
     </Show>
   );

@@ -26,9 +26,9 @@ import { Instruction } from "./Instruction";
 import { InstructionFindManyArgs } from "./InstructionFindManyArgs";
 import { InstructionWhereUniqueInput } from "./InstructionWhereUniqueInput";
 import { InstructionUpdateInput } from "./InstructionUpdateInput";
-import { OperationStepFindManyArgs } from "../../operationStep/base/OperationStepFindManyArgs";
-import { OperationStep } from "../../operationStep/base/OperationStep";
-import { OperationStepWhereUniqueInput } from "../../operationStep/base/OperationStepWhereUniqueInput";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -61,7 +61,6 @@ export class InstructionControllerBase {
         filePath: true,
         id: true,
         instructionRevision: true,
-        routes: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -92,7 +91,6 @@ export class InstructionControllerBase {
         filePath: true,
         id: true,
         instructionRevision: true,
-        routes: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -124,7 +122,6 @@ export class InstructionControllerBase {
         filePath: true,
         id: true,
         instructionRevision: true,
-        routes: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -165,7 +162,6 @@ export class InstructionControllerBase {
           filePath: true,
           id: true,
           instructionRevision: true,
-          routes: true,
           schemaVersion: true,
           updatedAt: true,
         },
@@ -205,7 +201,6 @@ export class InstructionControllerBase {
           filePath: true,
           id: true,
           instructionRevision: true,
-          routes: true,
           schemaVersion: true,
           updatedAt: true,
         },
@@ -221,28 +216,30 @@ export class InstructionControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/operationStep")
-  @ApiNestedQuery(OperationStepFindManyArgs)
+  @common.Get("/:id/equipmentPhase")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "OperationStep",
+    resource: "EquipmentPhase",
     action: "read",
     possession: "any",
   })
-  async findOperationStep(
+  async findEquipmentPhase(
     @common.Req() request: Request,
     @common.Param() params: InstructionWhereUniqueInput
-  ): Promise<OperationStep[]> {
-    const query = plainToClass(OperationStepFindManyArgs, request.query);
-    const results = await this.service.findOperationStep(params.id, {
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findEquipmentPhase(params.id, {
       ...query,
       select: {
         bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        name: true,
 
         operations: {
           select: {
@@ -250,14 +247,16 @@ export class InstructionControllerBase {
           },
         },
 
-        operationStepDescription: true,
-        operationStepName: true,
-        operationStepRevision: true,
+        operationSequenceIndex: true,
         operationStepSequence: true,
-        recipeId: true,
+        revision: true,
         schemaVersion: true,
-        sequenceOperation: true,
-        tests: true,
+
+        testParameters: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -268,18 +267,18 @@ export class InstructionControllerBase {
     return results;
   }
 
-  @common.Post("/:id/operationStep")
+  @common.Post("/:id/equipmentPhase")
   @nestAccessControl.UseRoles({
     resource: "Instruction",
     action: "update",
     possession: "any",
   })
-  async connectOperationStep(
+  async connectEquipmentPhase(
     @common.Param() params: InstructionWhereUniqueInput,
-    @common.Body() body: OperationStepWhereUniqueInput[]
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operationStep: {
+      equipmentPhase: {
         connect: body,
       },
     };
@@ -290,18 +289,18 @@ export class InstructionControllerBase {
     });
   }
 
-  @common.Patch("/:id/operationStep")
+  @common.Patch("/:id/equipmentPhase")
   @nestAccessControl.UseRoles({
     resource: "Instruction",
     action: "update",
     possession: "any",
   })
-  async updateOperationStep(
+  async updateEquipmentPhase(
     @common.Param() params: InstructionWhereUniqueInput,
-    @common.Body() body: OperationStepWhereUniqueInput[]
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operationStep: {
+      equipmentPhase: {
         set: body,
       },
     };
@@ -312,18 +311,18 @@ export class InstructionControllerBase {
     });
   }
 
-  @common.Delete("/:id/operationStep")
+  @common.Delete("/:id/equipmentPhase")
   @nestAccessControl.UseRoles({
     resource: "Instruction",
     action: "update",
     possession: "any",
   })
-  async disconnectOperationStep(
+  async disconnectEquipmentPhase(
     @common.Param() params: InstructionWhereUniqueInput,
-    @common.Body() body: OperationStepWhereUniqueInput[]
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operationStep: {
+      equipmentPhase: {
         disconnect: body,
       },
     };

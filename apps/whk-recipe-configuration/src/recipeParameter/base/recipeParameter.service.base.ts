@@ -10,12 +10,7 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-
-import {
-  Prisma,
-  RecipeParameter, // @ts-ignore
-  ParameterType,
-} from "@prisma/client";
+import { Prisma, RecipeParameter } from "@prisma/client";
 
 export class RecipeParameterServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -50,13 +45,5 @@ export class RecipeParameterServiceBase {
     args: Prisma.SelectSubset<T, Prisma.RecipeParameterDeleteArgs>
   ): Promise<RecipeParameter> {
     return this.prisma.recipeParameter.delete(args);
-  }
-
-  async getParameterType(parentId: string): Promise<ParameterType | null> {
-    return this.prisma.recipeParameter
-      .findUnique({
-        where: { id: parentId },
-      })
-      .parameterType();
   }
 }

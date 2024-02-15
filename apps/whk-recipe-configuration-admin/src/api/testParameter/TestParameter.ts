@@ -1,3 +1,4 @@
+import { EquipmentPhase } from "../equipmentPhase/EquipmentPhase";
 import { JsonValue } from "type-fest";
 
 export type TestParameter = {
@@ -8,6 +9,7 @@ export type TestParameter = {
   createdBy: string;
   editedAt: Date | null;
   editedBy: string | null;
+  equipmentPhases?: Array<EquipmentPhase>;
   id: string;
   isDefinition: boolean | null;
   itemId: string;

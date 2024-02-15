@@ -16,14 +16,12 @@ import {
   IsOptional,
   IsDate,
   IsString,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { OperationStep } from "../../operationStep/base/OperationStep";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { JsonValue } from "type-fest";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { Procedure } from "../../procedure/base/Procedure";
 
 @ObjectType()
 class Operation {
@@ -56,6 +54,14 @@ class Operation {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  description!: string;
 
   @ApiProperty({
     required: false,
@@ -93,50 +99,41 @@ class Operation {
   })
   @IsString()
   @Field(() => String)
-  operationDescription!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  operationName!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  operationRevision!: number;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  operationSequenceNumber!: number;
+  name!: string;
 
   @ApiProperty({
     required: false,
-    type: () => [OperationStep],
+    type: () => [EquipmentPhase],
   })
   @ValidateNested()
-  @Type(() => OperationStep)
+  @Type(() => EquipmentPhase)
   @IsOptional()
-  operationSteps?: Array<OperationStep>;
+  operationSteps?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: false,
+    type: () => Procedure,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => Procedure)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
+  procedure?: Procedure | null;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
   })
-  route!: JsonValue;
+  @IsInt()
+  @Field(() => Number)
+  procedureSequenceIndex!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Field(() => Number)
+  revision!: number;
 
   @ApiProperty({
     required: false,

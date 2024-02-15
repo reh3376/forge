@@ -1,4 +1,3 @@
-import { ParameterTypeWhereUniqueInput } from "../parameterType/ParameterTypeWhereUniqueInput";
 import { InputJsonValue } from "../../types";
 
 export type RecipeParameterUpdateInput = {
@@ -8,7 +7,6 @@ export type RecipeParameterUpdateInput = {
   createdBy?: string;
   editedBy?: string | null;
   itemId?: string;
-  parameterType?: ParameterTypeWhereUniqueInput | null;
   recipeParamDescription?: string | null;
   recipeParamName?: string;
   recipeParamRevision?: string | null;

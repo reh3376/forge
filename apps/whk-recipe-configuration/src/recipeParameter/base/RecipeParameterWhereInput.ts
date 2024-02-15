@@ -13,12 +13,11 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { IsOptional, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { ParameterTypeWhereUniqueInput } from "../../parameterType/base/ParameterTypeWhereUniqueInput";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
@@ -125,18 +124,6 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   itemId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ParameterTypeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ParameterTypeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ParameterTypeWhereUniqueInput, {
-    nullable: true,
-  })
-  parameterType?: ParameterTypeWhereUniqueInput;
 
   @ApiProperty({
     required: false,

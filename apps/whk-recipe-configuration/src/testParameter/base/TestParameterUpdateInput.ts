@@ -15,9 +15,12 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  ValidateNested,
   IsEnum,
   IsNumber,
 } from "class-validator";
+import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
+import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -80,6 +83,18 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,

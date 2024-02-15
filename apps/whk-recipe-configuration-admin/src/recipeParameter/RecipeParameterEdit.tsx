@@ -6,12 +6,9 @@ import {
   EditProps,
   BooleanInput,
   TextInput,
-  ReferenceInput,
   SelectInput,
   NumberInput,
 } from "react-admin";
-
-import { ParameterTypeTitle } from "../parameterType/ParameterTypeTitle";
 
 export const RecipeParameterEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -23,13 +20,6 @@ export const RecipeParameterEdit = (props: EditProps): React.ReactElement => {
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Edited By" source="editedBy" />
         <TextInput label="Item ID" source="itemId" />
-        <ReferenceInput
-          source="parameterType.id"
-          reference="ParameterType"
-          label="Parameter Type"
-        >
-          <SelectInput optionText={ParameterTypeTitle} />
-        </ReferenceInput>
         <TextInput
           label="Recipe Param Description"
           source="recipeParamDescription"

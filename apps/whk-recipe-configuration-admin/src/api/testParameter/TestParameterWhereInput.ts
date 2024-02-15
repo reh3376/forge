@@ -3,6 +3,7 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { EquipmentPhaseListRelationFilter } from "../equipmentPhase/EquipmentPhaseListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 
@@ -14,6 +15,7 @@ export type TestParameterWhereInput = {
   createdBy?: StringFilter;
   editedAt?: DateTimeNullableFilter;
   editedBy?: StringNullableFilter;
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
   id?: StringFilter;
   isDefinition?: BooleanNullableFilter;
   itemId?: StringFilter;
