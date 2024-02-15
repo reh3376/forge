@@ -16,12 +16,10 @@ import {
   IsString,
   IsOptional,
   IsDate,
-  ValidateNested,
   IsEnum,
   IsNumber,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { ParameterType } from "../../parameterType/base/ParameterType";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { IsJSONValue } from "../../validators";
@@ -110,15 +108,6 @@ class RecipeParameter {
   @IsString()
   @Field(() => String)
   itemId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ParameterType,
-  })
-  @ValidateNested()
-  @Type(() => ParameterType)
-  @IsOptional()
-  parameterType?: ParameterType | null;
 
   @ApiProperty({
     required: false,

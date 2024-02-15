@@ -49,15 +49,7 @@ export class RecipeParameterControllerBase {
     @common.Body() data: RecipeParameterCreateInput
   ): Promise<RecipeParameter> {
     return await this.service.createRecipeParameter({
-      data: {
-        ...data,
-
-        parameterType: data.parameterType
-          ? {
-              connect: data.parameterType,
-            }
-          : undefined,
-      },
+      data: data,
       select: {
         active: true,
         batch: true,
@@ -68,13 +60,6 @@ export class RecipeParameterControllerBase {
         editedBy: true,
         id: true,
         itemId: true,
-
-        parameterType: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeParamDescription: true,
         recipeParamName: true,
         recipeParamRevision: true,
@@ -117,13 +102,6 @@ export class RecipeParameterControllerBase {
         editedBy: true,
         id: true,
         itemId: true,
-
-        parameterType: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeParamDescription: true,
         recipeParamName: true,
         recipeParamRevision: true,
@@ -165,13 +143,6 @@ export class RecipeParameterControllerBase {
         editedBy: true,
         id: true,
         itemId: true,
-
-        parameterType: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeParamDescription: true,
         recipeParamName: true,
         recipeParamRevision: true,
@@ -211,15 +182,7 @@ export class RecipeParameterControllerBase {
     try {
       return await this.service.updateRecipeParameter({
         where: params,
-        data: {
-          ...data,
-
-          parameterType: data.parameterType
-            ? {
-                connect: data.parameterType,
-              }
-            : undefined,
-        },
+        data: data,
         select: {
           active: true,
           batch: true,
@@ -230,13 +193,6 @@ export class RecipeParameterControllerBase {
           editedBy: true,
           id: true,
           itemId: true,
-
-          parameterType: {
-            select: {
-              id: true,
-            },
-          },
-
           recipeParamDescription: true,
           recipeParamName: true,
           recipeParamRevision: true,
@@ -286,13 +242,6 @@ export class RecipeParameterControllerBase {
           editedBy: true,
           id: true,
           itemId: true,
-
-          parameterType: {
-            select: {
-              id: true,
-            },
-          },
-
           recipeParamDescription: true,
           recipeParamName: true,
           recipeParamRevision: true,

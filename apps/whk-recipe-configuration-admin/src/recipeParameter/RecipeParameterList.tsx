@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   List,
   Datagrid,
@@ -7,11 +6,8 @@ import {
   BooleanField,
   TextField,
   DateField,
-  ReferenceField,
 } from "react-admin";
-
 import Pagination from "../Components/Pagination";
-import { PARAMETERTYPE_TITLE_FIELD } from "../parameterType/ParameterTypeTitle";
 
 export const RecipeParameterList = (props: ListProps): React.ReactElement => {
   return (
@@ -32,13 +28,6 @@ export const RecipeParameterList = (props: ListProps): React.ReactElement => {
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
         <TextField label="Item ID" source="itemId" />
-        <ReferenceField
-          label="Parameter Type"
-          source="parametertype.id"
-          reference="ParameterType"
-        >
-          <TextField source={PARAMETERTYPE_TITLE_FIELD} />
-        </ReferenceField>
         <TextField
           label="Recipe Param Description"
           source="recipeParamDescription"

@@ -16,14 +16,11 @@ import {
   IsOptional,
   IsDate,
   IsString,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { OperationStep } from "../../operationStep/base/OperationStep";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { JsonValue } from "type-fest";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 
 @ObjectType()
 class Instruction {
@@ -66,6 +63,15 @@ class Instruction {
   editedBy!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhase?: Array<EquipmentPhase>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -88,25 +94,6 @@ class Instruction {
   @IsInt()
   @Field(() => Number)
   instructionRevision!: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => [OperationStep],
-  })
-  @ValidateNested()
-  @Type(() => OperationStep)
-  @IsOptional()
-  operationStep?: Array<OperationStep>;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  routes!: JsonValue;
 
   @ApiProperty({
     required: true,

@@ -1,16 +1,16 @@
-import { OperationStepCreateNestedManyWithoutOperationsInput } from "./OperationStepCreateNestedManyWithoutOperationsInput";
-import { InputJsonValue } from "../../types";
+import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
+import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 
 export type OperationCreateInput = {
   active?: boolean | null;
   createdBy: string;
+  description: string;
   editedBy?: string | null;
   globalUuid?: string | null;
-  operationDescription: string;
-  operationName: string;
-  operationRevision: number;
-  operationSequenceNumber: number;
-  operationSteps?: OperationStepCreateNestedManyWithoutOperationsInput;
-  route?: InputJsonValue;
+  name: string;
+  operationSteps?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
+  procedure?: ProcedureWhereUniqueInput | null;
+  procedureSequenceIndex: number;
+  revision: number;
   schemaVersion?: string | null;
 };

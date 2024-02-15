@@ -26,8 +26,9 @@ import { OperationFindUniqueArgs } from "./OperationFindUniqueArgs";
 import { CreateOperationArgs } from "./CreateOperationArgs";
 import { UpdateOperationArgs } from "./UpdateOperationArgs";
 import { DeleteOperationArgs } from "./DeleteOperationArgs";
-import { OperationStepFindManyArgs } from "../../operationStep/base/OperationStepFindManyArgs";
-import { OperationStep } from "../../operationStep/base/OperationStep";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { Procedure } from "../../procedure/base/Procedure";
 import { OperationService } from "../operation.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Operation)
@@ -94,7 +95,15 @@ export class OperationResolverBase {
   ): Promise<Operation> {
     return await this.service.createOperation({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        procedure: args.data.procedure
+          ? {
+              connect: args.data.procedure,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -111,7 +120,15 @@ export class OperationResolverBase {
     try {
       return await this.service.updateOperation({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          procedure: args.data.procedure
+            ? {
+                connect: args.data.procedure,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -145,16 +162,16 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [OperationStep], { name: "operationSteps" })
+  @graphql.ResolveField(() => [EquipmentPhase], { name: "operationSteps" })
   @nestAccessControl.UseRoles({
-    resource: "OperationStep",
+    resource: "EquipmentPhase",
     action: "read",
     possession: "any",
   })
   async findOperationSteps(
     @graphql.Parent() parent: Operation,
-    @graphql.Args() args: OperationStepFindManyArgs
-  ): Promise<OperationStep[]> {
+    @graphql.Args() args: EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
     const results = await this.service.findOperationSteps(parent.id, args);
 
     if (!results) {
@@ -162,5 +179,26 @@ export class OperationResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Procedure, {
+    nullable: true,
+    name: "procedure",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Procedure",
+    action: "read",
+    possession: "any",
+  })
+  async getProcedure(
+    @graphql.Parent() parent: Operation
+  ): Promise<Procedure | null> {
+    const result = await this.service.getProcedure(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

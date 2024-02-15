@@ -26,7 +26,6 @@ import { RecipeParameterFindUniqueArgs } from "./RecipeParameterFindUniqueArgs";
 import { CreateRecipeParameterArgs } from "./CreateRecipeParameterArgs";
 import { UpdateRecipeParameterArgs } from "./UpdateRecipeParameterArgs";
 import { DeleteRecipeParameterArgs } from "./DeleteRecipeParameterArgs";
-import { ParameterType } from "../../parameterType/base/ParameterType";
 import { RecipeParameterService } from "../recipeParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeParameter)
@@ -93,15 +92,7 @@ export class RecipeParameterResolverBase {
   ): Promise<RecipeParameter> {
     return await this.service.createRecipeParameter({
       ...args,
-      data: {
-        ...args.data,
-
-        parameterType: args.data.parameterType
-          ? {
-              connect: args.data.parameterType,
-            }
-          : undefined,
-      },
+      data: args.data,
     });
   }
 
@@ -118,15 +109,7 @@ export class RecipeParameterResolverBase {
     try {
       return await this.service.updateRecipeParameter({
         ...args,
-        data: {
-          ...args.data,
-
-          parameterType: args.data.parameterType
-            ? {
-                connect: args.data.parameterType,
-              }
-            : undefined,
-        },
+        data: args.data,
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -157,26 +140,5 @@ export class RecipeParameterResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ParameterType, {
-    nullable: true,
-    name: "parameterType",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ParameterType",
-    action: "read",
-    possession: "any",
-  })
-  async getParameterType(
-    @graphql.Parent() parent: RecipeParameter
-  ): Promise<ParameterType | null> {
-    const result = await this.service.getParameterType(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 }

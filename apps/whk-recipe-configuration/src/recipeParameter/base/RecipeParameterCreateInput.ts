@@ -15,12 +15,9 @@ import {
   IsBoolean,
   IsString,
   IsOptional,
-  ValidateNested,
   IsEnum,
   IsNumber,
 } from "class-validator";
-import { ParameterTypeWhereUniqueInput } from "../../parameterType/base/ParameterTypeWhereUniqueInput";
-import { Type } from "class-transformer";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { IsJSONValue } from "../../validators";
@@ -82,18 +79,6 @@ class RecipeParameterCreateInput {
   @IsString()
   @Field(() => String)
   itemId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ParameterTypeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ParameterTypeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ParameterTypeWhereUniqueInput, {
-    nullable: true,
-  })
-  parameterType?: ParameterTypeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

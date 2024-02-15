@@ -19,7 +19,6 @@ export const InstructionShow = (props: ShowProps): React.ReactElement => {
         <TextField label="File Path" source="filePath" />
         <TextField label="ID" source="id" />
         <TextField label="Instruction Revision" source="instructionRevision" />
-        <TextField label="Routes" source="routes" />
         <TextField label="Schema Version" source="schemaVersion" />
         <DateField source="updatedAt" label="Updated At" />
       </SimpleShowLayout>

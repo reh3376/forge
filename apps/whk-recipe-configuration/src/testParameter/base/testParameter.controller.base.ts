@@ -26,6 +26,9 @@ import { TestParameter } from "./TestParameter";
 import { TestParameterFindManyArgs } from "./TestParameterFindManyArgs";
 import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { TestParameterUpdateInput } from "./TestParameterUpdateInput";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -282,5 +285,123 @@ export class TestParameterControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/equipmentPhases")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findEquipmentPhases(
+    @common.Req() request: Request,
+    @common.Param() params: TestParameterWhereUniqueInput
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findEquipmentPhases(params.id, {
+      ...query,
+      select: {
+        bomId: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        name: true,
+
+        operations: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationSequenceIndex: true,
+        operationStepSequence: true,
+        revision: true,
+        schemaVersion: true,
+
+        testParameters: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectEquipmentPhases(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        connect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateEquipmentPhases(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        set: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectEquipmentPhases(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

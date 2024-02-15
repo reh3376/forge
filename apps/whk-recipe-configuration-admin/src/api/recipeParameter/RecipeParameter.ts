@@ -1,4 +1,3 @@
-import { ParameterType } from "../parameterType/ParameterType";
 import { JsonValue } from "type-fest";
 
 export type RecipeParameter = {
@@ -11,7 +10,6 @@ export type RecipeParameter = {
   editedBy: string | null;
   id: string;
   itemId: string;
-  parameterType?: ParameterType | null;
   recipeParamDescription: string | null;
   recipeParamName: string;
   recipeParamRevision: string | null;

@@ -16,10 +16,12 @@ import {
   IsString,
   IsOptional,
   IsDate,
+  ValidateNested,
   IsEnum,
   IsNumber,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
@@ -92,6 +94,15 @@ class TestParameter {
     nullable: true,
   })
   editedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: true,

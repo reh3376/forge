@@ -1,3 +1,4 @@
+import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
 import { InputJsonValue } from "../../types";
 
 export type TestParameterCreateInput = {
@@ -6,6 +7,7 @@ export type TestParameterCreateInput = {
   className: string;
   createdBy: string;
   editedBy?: string | null;
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutTestParametersInput;
   isDefinition?: boolean | null;
   itemId: string;
   schemaVersion?: string | null;

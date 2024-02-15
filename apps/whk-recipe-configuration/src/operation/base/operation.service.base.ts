@@ -14,7 +14,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Operation, // @ts-ignore
-  OperationStep,
+  EquipmentPhase, // @ts-ignore
+  Procedure,
 } from "@prisma/client";
 
 export class OperationServiceBase {
@@ -54,12 +55,20 @@ export class OperationServiceBase {
 
   async findOperationSteps(
     parentId: string,
-    args: Prisma.OperationStepFindManyArgs
-  ): Promise<OperationStep[]> {
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
     return this.prisma.operation
       .findUniqueOrThrow({
         where: { id: parentId },
       })
       .operationSteps(args);
+  }
+
+  async getProcedure(parentId: string): Promise<Procedure | null> {
+    return this.prisma.operation
+      .findUnique({
+        where: { id: parentId },
+      })
+      .procedure();
   }
 }

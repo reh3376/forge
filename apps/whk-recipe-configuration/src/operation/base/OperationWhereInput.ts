@@ -17,9 +17,9 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
-import { OperationStepListRelationFilter } from "../../operationStep/base/OperationStepListRelationFilter";
-import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
 class OperationWhereInput {
@@ -55,6 +55,17 @@ class OperationWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  description?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -98,63 +109,53 @@ class OperationWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  operationDescription?: StringFilter;
+  name?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  operationName?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  operationRevision?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  operationSequenceNumber?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationStepListRelationFilter,
+    type: () => EquipmentPhaseListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => OperationStepListRelationFilter)
+  @Type(() => EquipmentPhaseListRelationFilter)
   @IsOptional()
-  @Field(() => OperationStepListRelationFilter, {
+  @Field(() => EquipmentPhaseListRelationFilter, {
     nullable: true,
   })
-  operationSteps?: OperationStepListRelationFilter;
+  operationSteps?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,
-    type: JsonFilter,
+    type: () => ProcedureWhereUniqueInput,
   })
-  @Type(() => JsonFilter)
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
   @IsOptional()
-  @Field(() => JsonFilter, {
+  @Field(() => ProcedureWhereUniqueInput, {
     nullable: true,
   })
-  route?: JsonFilter;
+  procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: IntFilter,
+  })
+  @Type(() => IntFilter)
+  @IsOptional()
+  @Field(() => IntFilter, {
+    nullable: true,
+  })
+  procedureSequenceIndex?: IntFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntFilter,
+  })
+  @Type(() => IntFilter)
+  @IsOptional()
+  @Field(() => IntFilter, {
+    nullable: true,
+  })
+  revision?: IntFilter;
 
   @ApiProperty({
     required: false,

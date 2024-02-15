@@ -1,19 +1,19 @@
-import { OperationStep } from "../operationStep/OperationStep";
-import { JsonValue } from "type-fest";
+import { EquipmentPhase } from "../equipmentPhase/EquipmentPhase";
+import { Procedure } from "../procedure/Procedure";
 
 export type Operation = {
   active: boolean | null;
   createdAt: Date | null;
   createdBy: string;
+  description: string;
   editedBy: string | null;
   globalUuid: string | null;
   id: string;
-  operationDescription: string;
-  operationName: string;
-  operationRevision: number;
-  operationSequenceNumber: number;
-  operationSteps?: Array<OperationStep>;
-  route: JsonValue;
+  name: string;
+  operationSteps?: Array<EquipmentPhase>;
+  procedure?: Procedure | null;
+  procedureSequenceIndex: number;
+  revision: number;
   schemaVersion: string | null;
   updatedAt: Date | null;
 };
