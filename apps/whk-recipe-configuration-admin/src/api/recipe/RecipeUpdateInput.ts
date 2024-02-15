@@ -1,4 +1,5 @@
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
+import { ProductionOrderQueueUpdateManyWithoutRecipesInput } from "./ProductionOrderQueueUpdateManyWithoutRecipesInput";
 
 export type RecipeUpdateInput = {
   active?: boolean | null;
@@ -8,6 +9,7 @@ export type RecipeUpdateInput = {
   itemDescription?: string | null;
   mashBill?: string | null;
   operation?: OperationWhereUniqueInput | null;
+  productionOrderQueues?: ProductionOrderQueueUpdateManyWithoutRecipesInput;
   revision?: number | null;
   schemaVersion?: string | null;
   updatedBy?: Date | null;

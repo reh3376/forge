@@ -21,6 +21,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Operation } from "../../operation/base/Operation";
+import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
 
 @ObjectType()
 class Recipe {
@@ -111,6 +112,15 @@ class Recipe {
   @Type(() => Operation)
   @IsOptional()
   operation?: Operation | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderQueue],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderQueue)
+  @IsOptional()
+  productionOrderQueues?: Array<ProductionOrderQueue>;
 
   @ApiProperty({
     required: false,

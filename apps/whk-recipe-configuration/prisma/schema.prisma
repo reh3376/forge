@@ -181,20 +181,21 @@ model Procedure {
 }
 
 model Recipe {
-  active          Boolean?   @default(true)
-  createdAt       DateTime   @default(now())
-  createdBy       String
-  customer        String?
-  id              String     @id @default(cuid())
-  item            String?
-  itemDescription String?
-  mashBill        String?
-  operation       Operation? @relation(fields: [operationId], references: [id])
-  operationId     String?
-  revision        Int?       @default(0)
-  schemaVersion   String?    @default("0001-b")
-  updatedAt       DateTime   @updatedAt
-  updatedBy       DateTime?
+  active                Boolean?               @default(true)
+  createdAt             DateTime               @default(now())
+  createdBy             String
+  customer              String?
+  id                    String                 @id @default(cuid())
+  item                  String?
+  itemDescription       String?
+  mashBill              String?
+  operation             Operation?             @relation(fields: [operationId], references: [id])
+  operationId           String?
+  productionOrderQueues ProductionOrderQueue[]
+  revision              Int?                   @default(0)
+  schemaVersion         String?                @default("0001-b")
+  updatedAt             DateTime               @updatedAt
+  updatedBy             DateTime?
 }
 
 model Bom {
@@ -214,6 +215,22 @@ model Bom {
   wipItemId       String?
 
   @@map("boms")
+}
+
+model ProductionOrderQueue {
+  accountId     String
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  createdBy     String   @unique
+  id            String   @id @default(cuid())
+  queueIndex    Int?     @unique @default(autoincrement())
+  recipe        Recipe?  @relation(fields: [recipeId], references: [id])
+  recipeId      String?
+  revision      String   @default(autoincrement())
+  salesOrderId  String
+  schemaVersion String?  @default("0001-b")
+  updatedAt     DateTime @updatedAt
+  updatedBy     String?  @unique
 }
 
 enum EnumPhaseParameterSetpointType {
