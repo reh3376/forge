@@ -1,0 +1,30 @@
+import { BooleanFilter } from "../../util/BooleanFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { JsonFilter } from "../../util/JsonFilter";
+
+export type TestParameterWhereInput = {
+  active?: BooleanFilter;
+  batch?: StringNullableFilter;
+  className?: StringFilter;
+  createdAt?: DateTimeFilter;
+  createdBy?: StringFilter;
+  editedAt?: DateTimeNullableFilter;
+  editedBy?: StringNullableFilter;
+  id?: StringFilter;
+  isDefinition?: BooleanNullableFilter;
+  itemId?: StringFilter;
+  schemaVersion?: StringNullableFilter;
+  test?: JsonFilter;
+  testParamDescription?: StringNullableFilter;
+  testParamName?: StringFilter;
+  testParamRevision?: StringNullableFilter;
+  testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail";
+  testPass?: BooleanNullableFilter;
+  testResult?: StringNullableFilter;
+  testSetpointBooleanValue?: BooleanNullableFilter;
+  testSetpointType?: "Boolean" | "Numerical";
+};

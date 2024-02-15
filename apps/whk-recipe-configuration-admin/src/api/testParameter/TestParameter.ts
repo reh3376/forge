@@ -1,0 +1,27 @@
+import { JsonValue } from "type-fest";
+
+export type TestParameter = {
+  active: boolean;
+  batch: string | null;
+  className: string;
+  createdAt: Date;
+  createdBy: string;
+  editedAt: Date | null;
+  editedBy: string | null;
+  id: string;
+  isDefinition: boolean | null;
+  itemId: string;
+  schemaVersion: string | null;
+  test: JsonValue;
+  testParamDescription: string | null;
+  testParamName: string;
+  testParamRevision: string | null;
+  testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
+  testPass: boolean | null;
+  testResult: string | null;
+  testSetpointBooleanValue: boolean | null;
+  testSetpointLowerLimit: number | null;
+  testSetpointType?: "Boolean" | "Numerical" | null;
+  testSetpointUpperLimit: number | null;
+  testSetpointValue: number | null;
+};
