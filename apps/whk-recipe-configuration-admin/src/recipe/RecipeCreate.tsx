@@ -20,6 +20,14 @@ export const RecipeCreate = (props: CreateProps): React.ReactElement => {
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
         <TextInput label="Created By" source="createdBy" />
+        <TextInput label="Customer ID" source="customer" />
+        <TextInput label="Item" source="item" />
+        <TextInput
+          label="Item Description"
+          multiline
+          source="itemDescription"
+        />
+        <TextInput label="Mash Bill" source="mashBill" />
         <ReferenceInput
           source="operation.id"
           reference="Operation"
