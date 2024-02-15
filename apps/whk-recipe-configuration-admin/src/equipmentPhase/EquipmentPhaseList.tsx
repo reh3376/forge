@@ -6,8 +6,8 @@ import {
   ListProps,
   TextField,
   DateField,
-  ReferenceField,
   BooleanField,
+  ReferenceField,
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
@@ -32,6 +32,7 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Definition" source="isClassDefinition" />
         <TextField label="Name" source="name" />
         <ReferenceField
           label="Operation"

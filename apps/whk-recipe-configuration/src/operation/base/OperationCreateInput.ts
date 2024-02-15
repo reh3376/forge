@@ -14,13 +14,16 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
-  IsString,
   ValidateNested,
+  IsString,
   IsInt,
 } from "class-validator";
-import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
+import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
+import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
+import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { RecipeCreateNestedManyWithoutOperationsInput } from "./RecipeCreateNestedManyWithoutOperationsInput";
 
 @InputType()
 class OperationCreateInput {
@@ -34,6 +37,18 @@ class OperationCreateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: OperationWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -74,12 +89,35 @@ class OperationCreateInput {
   globalUuid?: string | null;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => OperationCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  operations?: OperationCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,
@@ -112,6 +150,18 @@ class OperationCreateInput {
   @IsInt()
   @Field(() => Number)
   procedureSequenceIndex!: number;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: true,

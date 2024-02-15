@@ -19,11 +19,13 @@ import {
   IsEnum,
   IsNumber,
 } from "class-validator";
-import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
@@ -50,6 +52,18 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   batch?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TestParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: TestParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -105,6 +119,17 @@ class TestParameterUpdateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
+  isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
   isDefinition?: boolean | null;
 
   @ApiProperty({
@@ -149,6 +174,18 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   testParamDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => TestParameterUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  testParameters?: TestParameterUpdateManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,

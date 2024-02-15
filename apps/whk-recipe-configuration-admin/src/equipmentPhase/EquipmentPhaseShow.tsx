@@ -6,8 +6,8 @@ import {
   ShowProps,
   TextField,
   DateField,
-  ReferenceField,
   BooleanField,
+  ReferenceField,
   ReferenceManyField,
   Datagrid,
 } from "react-admin";
@@ -28,6 +28,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Definition" source="isClassDefinition" />
         <TextField label="Name" source="name" />
         <ReferenceField
           label="Operation"

@@ -29,6 +29,9 @@ import { OperationUpdateInput } from "./OperationUpdateInput";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -55,6 +58,12 @@ export class OperationControllerBase {
       data: {
         ...data,
 
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
+
         procedure: data.procedure
           ? {
               connect: data.procedure,
@@ -63,12 +72,20 @@ export class OperationControllerBase {
       },
       select: {
         active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         procedure: {
@@ -103,12 +120,20 @@ export class OperationControllerBase {
       ...args,
       select: {
         active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         procedure: {
@@ -144,12 +169,20 @@ export class OperationControllerBase {
       where: params,
       select: {
         active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         procedure: {
@@ -194,6 +227,12 @@ export class OperationControllerBase {
         data: {
           ...data,
 
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
+
           procedure: data.procedure
             ? {
                 connect: data.procedure,
@@ -202,12 +241,20 @@ export class OperationControllerBase {
         },
         select: {
           active: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
           createdBy: true,
           description: true,
           editedBy: true,
           globalUuid: true,
           id: true,
+          isClassDefinition: true,
           name: true,
 
           procedure: {
@@ -251,12 +298,20 @@ export class OperationControllerBase {
         where: params,
         select: {
           active: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
           createdBy: true,
           description: true,
           editedBy: true,
           globalUuid: true,
           id: true,
+          isClassDefinition: true,
           name: true,
 
           procedure: {
@@ -279,6 +334,125 @@ export class OperationControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/operations")
+  @ApiNestedQuery(OperationFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "read",
+    possession: "any",
+  })
+  async findOperations(
+    @common.Req() request: Request,
+    @common.Param() params: OperationWhereUniqueInput
+  ): Promise<Operation[]> {
+    const query = plainToClass(OperationFindManyArgs, request.query);
+    const results = await this.service.findOperations(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedBy: true,
+        globalUuid: true,
+        id: true,
+        isClassDefinition: true,
+        name: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedureSequenceIndex: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/operations")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async connectOperations(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: OperationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      operations: {
+        connect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/operations")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async updateOperations(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: OperationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      operations: {
+        set: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/operations")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectOperations(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: OperationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      operations: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -305,6 +479,7 @@ export class OperationControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         operations: {
@@ -389,6 +564,113 @@ export class OperationControllerBase {
   ): Promise<void> {
     const data = {
       operationSteps: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipes")
+  @ApiNestedQuery(RecipeFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipes(
+    @common.Req() request: Request,
+    @common.Param() params: OperationWhereUniqueInput
+  ): Promise<Recipe[]> {
+    const query = plainToClass(RecipeFindManyArgs, request.query);
+    const results = await this.service.findRecipes(params.id, {
+      ...query,
+      select: {
+        active: true,
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipes(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        connect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipes(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        set: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipes(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
         disconnect: body,
       },
     };

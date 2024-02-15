@@ -5,27 +5,45 @@ import {
   SimpleForm,
   CreateProps,
   BooleanInput,
+  ReferenceInput,
+  SelectInput,
   TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
-  ReferenceInput,
-  SelectInput,
   NumberInput,
 } from "react-admin";
 
+import { OperationTitle } from "./OperationTitle";
 import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 import { ProcedureTitle } from "../procedure/ProcedureTitle";
+import { RecipeTitle } from "../recipe/RecipeTitle";
 
 export const OperationCreate = (props: CreateProps): React.ReactElement => {
   return (
     <Create {...props}>
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
+        <ReferenceInput
+          source="classId.id"
+          reference="Operation"
+          label="Class ID"
+        >
+          <SelectInput optionText={OperationTitle} />
+        </ReferenceInput>
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
         <TextInput label="globalUuid" source="globalUuid" />
+        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
+        <ReferenceArrayInput
+          source="operations"
+          reference="Operation"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={OperationTitle} />
+        </ReferenceArrayInput>
         <ReferenceArrayInput
           source="operationSteps"
           reference="EquipmentPhase"
@@ -46,6 +64,14 @@ export const OperationCreate = (props: CreateProps): React.ReactElement => {
           label="Procedure Sequence Index"
           source="procedureSequenceIndex"
         />
+        <ReferenceArrayInput
+          source="recipes"
+          reference="Recipe"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={RecipeTitle} />
+        </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
       </SimpleForm>

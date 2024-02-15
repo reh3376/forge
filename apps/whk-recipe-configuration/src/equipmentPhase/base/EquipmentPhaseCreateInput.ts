@@ -91,6 +91,17 @@ class EquipmentPhaseCreateInput {
   instructions?: InstructionCreateNestedManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })

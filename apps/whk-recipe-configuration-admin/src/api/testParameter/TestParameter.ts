@@ -4,6 +4,7 @@ import { JsonValue } from "type-fest";
 export type TestParameter = {
   active: boolean;
   batch: string | null;
+  classId?: TestParameter | null;
   className: string;
   createdAt: Date;
   createdBy: string;
@@ -11,11 +12,13 @@ export type TestParameter = {
   editedBy: string | null;
   equipmentPhases?: Array<EquipmentPhase>;
   id: string;
+  isClassDef: boolean | null;
   isDefinition: boolean | null;
   itemId: string;
   schemaVersion: string | null;
   test: JsonValue;
   testParamDescription: string | null;
+  testParameters?: Array<TestParameter>;
   testParamName: string;
   testParamRevision: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;

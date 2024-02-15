@@ -9,6 +9,7 @@ export type EquipmentPhaseOrderByInput = {
   editedAt?: SortOrder;
   editedBy?: SortOrder;
   id?: SortOrder;
+  isClassDefinition?: SortOrder;
   name?: SortOrder;
   operationId?: SortOrder;
   operationSequenceIndex?: SortOrder;

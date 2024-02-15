@@ -14,14 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsDate,
   IsString,
-  ValidateNested,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Procedure } from "../../procedure/base/Procedure";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Operation {
@@ -35,6 +36,15 @@ class Operation {
     nullable: true,
   })
   active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Operation,
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  classId?: Operation | null;
 
   @ApiProperty({
     required: false,
@@ -94,12 +104,32 @@ class Operation {
   id!: string;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Operation],
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  operations?: Array<Operation>;
 
   @ApiProperty({
     required: false,
@@ -126,6 +156,15 @@ class Operation {
   @IsInt()
   @Field(() => Number)
   procedureSequenceIndex!: number;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
 
   @ApiProperty({
     required: true,

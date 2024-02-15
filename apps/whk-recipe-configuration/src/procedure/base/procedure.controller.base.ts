@@ -237,12 +237,20 @@ export class ProcedureControllerBase {
       ...query,
       select: {
         active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         description: true,
         editedBy: true,
         globalUuid: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         procedure: {

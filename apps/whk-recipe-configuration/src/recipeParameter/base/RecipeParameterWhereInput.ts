@@ -13,13 +13,15 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
-import { IsOptional, IsEnum } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { RecipeParameterListRelationFilter } from "./RecipeParameterListRelationFilter";
+import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { JsonFilter } from "../../util/JsonFilter";
@@ -47,6 +49,18 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   batch?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeParameterWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -116,6 +130,17 @@ class RecipeParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -135,6 +160,18 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   recipeParamDescription?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeParameterListRelationFilter, {
+    nullable: true,
+  })
+  recipeParameters?: RecipeParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -62,4 +62,23 @@ export class TestParameterServiceBase {
       })
       .equipmentPhases(args);
   }
+
+  async findTestParameters(
+    parentId: string,
+    args: Prisma.TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    return this.prisma.testParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .testParameters(args);
+  }
+
+  async getClassId(parentId: string): Promise<TestParameter | null> {
+    return this.prisma.testParameter
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
+  }
 }

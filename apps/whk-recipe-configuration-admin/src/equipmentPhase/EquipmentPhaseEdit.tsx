@@ -7,9 +7,9 @@ import {
   TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
-  BooleanInput,
   NumberInput,
 } from "react-admin";
 
@@ -35,6 +35,7 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={InstructionTitle} />
         </ReferenceArrayInput>
+        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
         <ReferenceInput
           source="operations.id"

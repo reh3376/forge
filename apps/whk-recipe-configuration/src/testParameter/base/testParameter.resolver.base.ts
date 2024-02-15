@@ -94,7 +94,15 @@ export class TestParameterResolverBase {
   ): Promise<TestParameter> {
     return await this.service.createTestParameter({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        classId: args.data.classId
+          ? {
+              connect: args.data.classId,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -111,7 +119,15 @@ export class TestParameterResolverBase {
     try {
       return await this.service.updateTestParameter({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          classId: args.data.classId
+            ? {
+                connect: args.data.classId,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -162,5 +178,46 @@ export class TestParameterResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @graphql.Parent() parent: TestParameter,
+    @graphql.Args() args: TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    const results = await this.service.findTestParameters(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => TestParameter, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(
+    @graphql.Parent() parent: TestParameter
+  ): Promise<TestParameter | null> {
+    const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

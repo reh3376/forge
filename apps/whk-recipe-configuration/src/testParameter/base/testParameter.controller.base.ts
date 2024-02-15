@@ -52,16 +52,32 @@ export class TestParameterControllerBase {
     @common.Body() data: TestParameterCreateInput
   ): Promise<TestParameter> {
     return await this.service.createTestParameter({
-      data: data,
+      data: {
+        ...data,
+
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
+      },
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDef: true,
         isDefinition: true,
         itemId: true,
         schemaVersion: true,
@@ -102,12 +118,20 @@ export class TestParameterControllerBase {
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDef: true,
         isDefinition: true,
         itemId: true,
         schemaVersion: true,
@@ -147,12 +171,20 @@ export class TestParameterControllerBase {
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDef: true,
         isDefinition: true,
         itemId: true,
         schemaVersion: true,
@@ -197,16 +229,32 @@ export class TestParameterControllerBase {
     try {
       return await this.service.updateTestParameter({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
+        },
         select: {
           active: true,
           batch: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           createdAt: true,
           createdBy: true,
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDef: true,
           isDefinition: true,
           itemId: true,
           schemaVersion: true,
@@ -254,12 +302,20 @@ export class TestParameterControllerBase {
         select: {
           active: true,
           batch: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           createdAt: true,
           createdBy: true,
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDef: true,
           isDefinition: true,
           itemId: true,
           schemaVersion: true,
@@ -311,6 +367,7 @@ export class TestParameterControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         operations: {
@@ -395,6 +452,129 @@ export class TestParameterControllerBase {
   ): Promise<void> {
     const data = {
       equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/testParameters")
+  @ApiNestedQuery(TestParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @common.Req() request: Request,
+    @common.Param() params: TestParameterWhereUniqueInput
+  ): Promise<TestParameter[]> {
+    const query = plainToClass(TestParameterFindManyArgs, request.query);
+    const results = await this.service.findTestParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+        batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDef: true,
+        isDefinition: true,
+        itemId: true,
+        schemaVersion: true,
+        test: true,
+        testParamDescription: true,
+        testParamName: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectTestParameters(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateTestParameters(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        set: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectTestParameters(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
         disconnect: body,
       },
     };

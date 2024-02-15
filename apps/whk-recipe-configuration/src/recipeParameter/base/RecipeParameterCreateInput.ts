@@ -15,9 +15,13 @@ import {
   IsBoolean,
   IsString,
   IsOptional,
+  ValidateNested,
   IsEnum,
   IsNumber,
 } from "class-validator";
+import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
+import { Type } from "class-transformer";
+import { RecipeParameterCreateNestedManyWithoutRecipeParametersInput } from "./RecipeParameterCreateNestedManyWithoutRecipeParametersInput";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { IsJSONValue } from "../../validators";
@@ -44,6 +48,18 @@ class RecipeParameterCreateInput {
     nullable: true,
   })
   batch?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -73,6 +89,17 @@ class RecipeParameterCreateInput {
   editedBy?: string | null;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -90,6 +117,18 @@ class RecipeParameterCreateInput {
     nullable: true,
   })
   recipeParamDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterCreateNestedManyWithoutRecipeParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput)
+  @IsOptional()
+  @Field(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput, {
+    nullable: true,
+  })
+  recipeParameters?: RecipeParameterCreateNestedManyWithoutRecipeParametersInput;
 
   @ApiProperty({
     required: true,

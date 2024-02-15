@@ -37,6 +37,10 @@ import { ProcedureList } from "./procedure/ProcedureList";
 import { ProcedureCreate } from "./procedure/ProcedureCreate";
 import { ProcedureEdit } from "./procedure/ProcedureEdit";
 import { ProcedureShow } from "./procedure/ProcedureShow";
+import { RecipeList } from "./recipe/RecipeList";
+import { RecipeCreate } from "./recipe/RecipeCreate";
+import { RecipeEdit } from "./recipe/RecipeEdit";
+import { RecipeShow } from "./recipe/RecipeShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -118,6 +122,13 @@ const App = (): React.ReactElement => {
           edit={ProcedureEdit}
           create={ProcedureCreate}
           show={ProcedureShow}
+        />
+        <Resource
+          name="Recipe"
+          list={RecipeList}
+          edit={RecipeEdit}
+          create={RecipeCreate}
+          show={RecipeShow}
         />
       </Admin>
     </div>

@@ -6,10 +6,10 @@ import {
   ShowProps,
   BooleanField,
   TextField,
+  ReferenceField,
   DateField,
   ReferenceManyField,
   Datagrid,
-  ReferenceField,
 } from "react-admin";
 
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
@@ -21,12 +21,20 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
       <SimpleShowLayout>
         <BooleanField label="Active" source="active" />
         <TextField label="Batch" source="batch" />
+        <ReferenceField
+          label="Class ID"
+          source="testparameter.id"
+          reference="TestParameter"
+        >
+          <TextField source={TESTPARAMETER_TITLE_FIELD} />
+        </ReferenceField>
         <TextField label="Class Name" source="className" />
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Def" source="isClassDef" />
         <BooleanField label="Is Definition" source="isDefinition" />
         <TextField label="Item ID" source="itemId" />
         <TextField label="Schema Version" source="schemaVersion" />
@@ -71,6 +79,10 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
             <DateField source="editedAt" label="Edited At" />
             <TextField label="Edited By" source="editedBy" />
             <TextField label="ID" source="id" />
+            <BooleanField
+              label="Is Class Definition"
+              source="isClassDefinition"
+            />
             <TextField label="Name" source="name" />
             <ReferenceField
               label="Operation"
@@ -96,6 +108,60 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
             >
               <TextField source={TESTPARAMETER_TITLE_FIELD} />
             </ReferenceField>
+          </Datagrid>
+        </ReferenceManyField>
+        <ReferenceManyField
+          reference="TestParameter"
+          target="classId"
+          label="TestParameters"
+        >
+          <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
+            <TextField label="Batch" source="batch" />
+            <ReferenceField
+              label="Class ID"
+              source="testparameter.id"
+              reference="TestParameter"
+            >
+              <TextField source={TESTPARAMETER_TITLE_FIELD} />
+            </ReferenceField>
+            <TextField label="Class Name" source="className" />
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <DateField source="editedAt" label="Edited At" />
+            <TextField label="Edited By" source="editedBy" />
+            <TextField label="ID" source="id" />
+            <BooleanField label="Is Class Def" source="isClassDef" />
+            <BooleanField label="Is Definition" source="isDefinition" />
+            <TextField label="Item ID" source="itemId" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <TextField label="Test" source="test" />
+            <TextField
+              label="Test Param Description"
+              source="testParamDescription"
+            />
+            <TextField label="Test Param Name" source="testParamName" />
+            <TextField label="Test Param Revision" source="testParamRevision" />
+            <TextField label="Test Param Units" source="testParamUnits" />
+            <BooleanField label="Test Pass" source="testPass" />
+            <TextField label="Test Result" source="testResult" />
+            <BooleanField
+              label="Test Setpoint Boolean Value"
+              source="testSetpointBooleanValue"
+            />
+            <TextField
+              label="Test Setpoint Lower Limit"
+              source="testSetpointLowerLimit"
+            />
+            <TextField label="Test Setpoint Type" source="testSetpointType" />
+            <TextField
+              label="Test Setpoint Upper Limit"
+              source="testSetpointUpperLimit"
+            />
+            <TextField
+              label="Test Setpoint Numerical Value"
+              source="testSetpointValue"
+            />
           </Datagrid>
         </ReferenceManyField>
       </SimpleShowLayout>
