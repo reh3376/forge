@@ -43,6 +43,8 @@ model PhaseParameter {
 model TestParameter {
   active                   Boolean                            @default(true)
   batch                    String?
+  classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterTestParameters", fields: [classId], references: [id])
+  classId                  String?
   className                String
   createdAt                DateTime                           @default(now())
   createdBy                String                             @unique
@@ -50,11 +52,13 @@ model TestParameter {
   editedBy                 String?                            @unique
   equipmentPhases          EquipmentPhase[]
   id                       String                             @id @default(auto())
+  isClassDef               Boolean?                           @default(false)
   isDefinition             Boolean?                           @default(false)
   itemId                   String
   schemaVersion            String?
   test                     Json?
   testParamDescription     String?
+  testParameters           TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterTestParameters")
   testParamName            String
   testParamRevision        String?
   testParamUnits           EnumTestParameterTestParamUnits?
@@ -72,14 +76,18 @@ model TestParameter {
 model RecipeParameter {
   active                     Boolean                               @default(true)
   batch                      String?
+  classId                    RecipeParameter?                      @relation(name: "recipeParameters", fields: [classId], references: [id])
+  classId                    String?
   className                  String
   createdAt                  DateTime                              @default(now())
   createdBy                  String                                @unique
   editedAt                   DateTime?                             @updatedAt
   editedBy                   String?                               @unique
   id                         String                                @id @default(cuid())
+  isClassDefinition          Boolean?                              @default(false)
   itemId                     String
   recipeParamDescription     String?
+  recipeParameters           RecipeParameter[]                     @relation(name: "recipeParameters")
   recipeParamName            String
   recipeParamRevision        String?
   recipeParamUnits           EnumRecipeParameterRecipeParamUnits?
@@ -116,6 +124,7 @@ model EquipmentPhase {
   editedBy               String?          @unique
   id                     String           @id @default(auto())
   instructions           Instruction[]
+  isClassDefinition      Boolean?         @default(false)
   name                   String
   operations             Operation        @relation(fields: [operationId], references: [id])
   operationId            String
@@ -132,17 +141,22 @@ model EquipmentPhase {
 
 model Operation {
   active                 Boolean?         @default(true)
+  classId                Operation?       @relation(name: "OperationClassIdOperationOperations", fields: [classId], references: [id])
+  classId                String?
   createdAt              DateTime?        @default(now())
   createdBy              String           @unique
   description            String
   editedBy               String?          @unique
   globalUuid             String?          @default(uuid())
   id                     String           @id @default(auto())
+  isClassDefinition      Boolean?         @default(false)
   name                   String
+  operations             Operation[]      @relation(name: "OperationClassIdOperationOperations")
   operationSteps         EquipmentPhase[]
   procedure              Procedure?       @relation(fields: [procedureId], references: [id])
   procedureId            String?
   procedureSequenceIndex Int              @unique @default(0)
+  recipes                Recipe[]
   revision               Int              @default(0)
   schemaVersion          String?          @default("0001-b")
   updatedAt              DateTime?        @updatedAt
@@ -162,6 +176,19 @@ model Procedure {
   schemaVersion String?     @default("0001-b")
   updatedAt     DateTime    @updatedAt
   updatedBy     String?     @unique
+}
+
+model Recipe {
+  active        Boolean?   @default(true)
+  createdAt     DateTime   @default(now())
+  createdBy     String
+  id            String     @id @default(cuid())
+  operation     Operation? @relation(fields: [operationId], references: [id])
+  operationId   String?
+  revision      Int?       @default(0)
+  schemaVersion String?    @default("0001-b")
+  updatedAt     DateTime   @updatedAt
+  updatedBy     DateTime?
 }
 
 enum EnumPhaseParameterSetpointType {

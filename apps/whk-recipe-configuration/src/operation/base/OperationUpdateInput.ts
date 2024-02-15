@@ -14,13 +14,16 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
-  IsString,
   ValidateNested,
+  IsString,
   IsInt,
 } from "class-validator";
-import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
+import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
+import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
+import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { RecipeUpdateManyWithoutOperationsInput } from "./RecipeUpdateManyWithoutOperationsInput";
 
 @InputType()
 class OperationUpdateInput {
@@ -34,6 +37,18 @@ class OperationUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: OperationWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -81,6 +96,17 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -89,6 +115,18 @@ class OperationUpdateInput {
     nullable: true,
   })
   name?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => OperationUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  operations?: OperationUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,
@@ -124,6 +162,18 @@ class OperationUpdateInput {
     nullable: true,
   })
   procedureSequenceIndex?: number;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,

@@ -12,6 +12,7 @@ import {
   ReferenceField,
 } from "react-admin";
 
+import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 import { PROCEDURE_TITLE_FIELD } from "./ProcedureTitle";
 
 export const ProcedureShow = (props: ShowProps): React.ReactElement => {
@@ -35,12 +36,23 @@ export const ProcedureShow = (props: ShowProps): React.ReactElement => {
         >
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
+            <ReferenceField
+              label="Class ID"
+              source="operation.id"
+              reference="Operation"
+            >
+              <TextField source={OPERATION_TITLE_FIELD} />
+            </ReferenceField>
             <DateField source="createdAt" label="Created At" />
             <TextField label="Created By" source="createdBy" />
             <TextField label="Description" source="description" />
             <TextField label="Edited By" source="editedBy" />
             <TextField label="globalUuid" source="globalUuid" />
             <TextField label="ID" source="id" />
+            <BooleanField
+              label="Is Class Definition"
+              source="isClassDefinition"
+            />
             <TextField label="Name" source="name" />
             <ReferenceField
               label="Procedure"

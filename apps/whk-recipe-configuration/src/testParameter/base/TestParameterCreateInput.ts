@@ -19,11 +19,13 @@ import {
   IsEnum,
   IsNumber,
 } from "class-validator";
-import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
@@ -47,6 +49,18 @@ class TestParameterCreateInput {
     nullable: true,
   })
   batch?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TestParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: TestParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -86,6 +100,17 @@ class TestParameterCreateInput {
     nullable: true,
   })
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -137,6 +162,18 @@ class TestParameterCreateInput {
     nullable: true,
   })
   testParamDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterCreateNestedManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => TestParameterCreateNestedManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  testParameters?: TestParameterCreateNestedManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: true,

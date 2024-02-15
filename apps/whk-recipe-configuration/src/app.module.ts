@@ -7,6 +7,7 @@ import { InstructionModule } from "./instruction/instruction.module";
 import { EquipmentPhaseModule } from "./equipmentPhase/equipmentPhase.module";
 import { OperationModule } from "./operation/operation.module";
 import { ProcedureModule } from "./procedure/procedure.module";
+import { RecipeModule } from "./recipe/recipe.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -24,9 +25,9 @@ import { AuthModule } from "./auth/auth.module";
 @Module({
   controllers: [],
   imports: [
+    KafkaModule,
     ACLModule,
     AuthModule,
-    KafkaModule,
     MqttModule,
     UserModule,
     PhaseParameterModule,
@@ -36,6 +37,7 @@ import { AuthModule } from "./auth/auth.module";
     EquipmentPhaseModule,
     OperationModule,
     ProcedureModule,
+    RecipeModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

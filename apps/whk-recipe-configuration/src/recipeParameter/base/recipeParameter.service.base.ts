@@ -46,4 +46,23 @@ export class RecipeParameterServiceBase {
   ): Promise<RecipeParameter> {
     return this.prisma.recipeParameter.delete(args);
   }
+
+  async findRecipeParameters(
+    parentId: string,
+    args: Prisma.RecipeParameterFindManyArgs
+  ): Promise<RecipeParameter[]> {
+    return this.prisma.recipeParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipeParameters(args);
+  }
+
+  async getClassId(parentId: string): Promise<RecipeParameter | null> {
+    return this.prisma.recipeParameter
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
+  }
 }

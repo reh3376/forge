@@ -15,6 +15,7 @@ import {
   IsBoolean,
   IsString,
   IsOptional,
+  ValidateNested,
   IsDate,
   IsEnum,
   IsNumber,
@@ -46,6 +47,15 @@ class RecipeParameter {
     nullable: true,
   })
   batch!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  classId?: RecipeParameter | null;
 
   @ApiProperty({
     required: true,
@@ -102,6 +112,17 @@ class RecipeParameter {
   id!: string;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -119,6 +140,15 @@ class RecipeParameter {
     nullable: true,
   })
   recipeParamDescription!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeParameter],
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  recipeParameters?: Array<RecipeParameter>;
 
   @ApiProperty({
     required: true,

@@ -17,8 +17,8 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { InstructionListRelationFilter } from "../../instruction/base/InstructionListRelationFilter";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PhaseParameterListRelationFilter } from "../../phaseParameter/base/PhaseParameterListRelationFilter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
@@ -124,6 +124,17 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   instructions?: InstructionListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,

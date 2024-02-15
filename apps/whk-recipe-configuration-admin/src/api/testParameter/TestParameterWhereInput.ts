@@ -1,15 +1,18 @@
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../equipmentPhase/EquipmentPhaseListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
+import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 
 export type TestParameterWhereInput = {
   active?: BooleanFilter;
   batch?: StringNullableFilter;
+  classId?: TestParameterWhereUniqueInput;
   className?: StringFilter;
   createdAt?: DateTimeFilter;
   createdBy?: StringFilter;
@@ -17,11 +20,13 @@ export type TestParameterWhereInput = {
   editedBy?: StringNullableFilter;
   equipmentPhases?: EquipmentPhaseListRelationFilter;
   id?: StringFilter;
+  isClassDef?: BooleanNullableFilter;
   isDefinition?: BooleanNullableFilter;
   itemId?: StringFilter;
   schemaVersion?: StringNullableFilter;
   test?: JsonFilter;
   testParamDescription?: StringNullableFilter;
+  testParameters?: TestParameterListRelationFilter;
   testParamName?: StringFilter;
   testParamRevision?: StringNullableFilter;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail";

@@ -13,6 +13,7 @@ export type EquipmentPhase = {
   editedBy: string | null;
   id: string;
   instructions?: Array<Instruction>;
+  isClassDefinition: boolean | null;
   name: string;
   operations?: Operation;
   operationSequenceIndex: boolean | null;

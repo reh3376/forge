@@ -1,18 +1,23 @@
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
 import { InputJsonValue } from "../../types";
+import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
 
 export type TestParameterUpdateInput = {
   active?: boolean;
   batch?: string | null;
+  classId?: TestParameterWhereUniqueInput | null;
   className?: string;
   createdBy?: string;
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
+  isClassDef?: boolean | null;
   isDefinition?: boolean | null;
   itemId?: string;
   schemaVersion?: string | null;
   test?: InputJsonValue;
   testParamDescription?: string | null;
+  testParameters?: TestParameterUpdateManyWithoutTestParametersInput;
   testParamName?: string;
   testParamRevision?: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;

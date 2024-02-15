@@ -15,12 +15,14 @@ import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
+import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
@@ -47,6 +49,18 @@ class TestParameterWhereInput {
     nullable: true,
   })
   batch?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TestParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: TestParameterWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -135,6 +149,17 @@ class TestParameterWhereInput {
   @Field(() => BooleanNullableFilter, {
     nullable: true,
   })
+  isClassDef?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
   isDefinition?: BooleanNullableFilter;
 
   @ApiProperty({
@@ -180,6 +205,18 @@ class TestParameterWhereInput {
     nullable: true,
   })
   testParamDescription?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => TestParameterListRelationFilter, {
+    nullable: true,
+  })
+  testParameters?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

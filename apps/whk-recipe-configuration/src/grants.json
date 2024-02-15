@@ -238,5 +238,35 @@
     "resource": "Procedure",
     "action": "read:any",
     "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "read:any",
+    "attributes": "*"
   }
 ]

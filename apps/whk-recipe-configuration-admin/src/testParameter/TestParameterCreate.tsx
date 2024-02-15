@@ -6,12 +6,14 @@ import {
   CreateProps,
   BooleanInput,
   TextInput,
+  ReferenceInput,
+  SelectInput,
   ReferenceArrayInput,
   SelectArrayInput,
-  SelectInput,
   NumberInput,
 } from "react-admin";
 
+import { TestParameterTitle } from "./TestParameterTitle";
 import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 
 export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
@@ -20,6 +22,13 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
         <TextInput label="Batch" source="batch" />
+        <ReferenceInput
+          source="classId.id"
+          reference="TestParameter"
+          label="Class ID"
+        >
+          <SelectInput optionText={TestParameterTitle} />
+        </ReferenceInput>
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Edited By" source="editedBy" />
@@ -31,6 +40,7 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
+        <BooleanInput label="Is Class Def" source="isClassDef" />
         <BooleanInput label="Is Definition" source="isDefinition" />
         <TextInput label="Item ID" source="itemId" />
         <TextInput label="Schema Version" source="schemaVersion" />
@@ -39,6 +49,14 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
           label="Test Param Description"
           source="testParamDescription"
         />
+        <ReferenceArrayInput
+          source="testParameters"
+          reference="TestParameter"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={TestParameterTitle} />
+        </ReferenceArrayInput>
         <TextInput label="Test Param Name" source="testParamName" />
         <TextInput label="Test Param Revision" source="testParamRevision" />
         <SelectInput

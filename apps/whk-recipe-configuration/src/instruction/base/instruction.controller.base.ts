@@ -239,6 +239,7 @@ export class InstructionControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         operations: {

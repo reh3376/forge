@@ -15,9 +15,13 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  ValidateNested,
   IsEnum,
   IsNumber,
 } from "class-validator";
+import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
+import { Type } from "class-transformer";
+import { RecipeParameterUpdateManyWithoutRecipeParametersInput } from "./RecipeParameterUpdateManyWithoutRecipeParametersInput";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { IsJSONValue } from "../../validators";
@@ -47,6 +51,18 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   batch?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -83,6 +99,17 @@ class RecipeParameterUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -102,6 +129,18 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   recipeParamDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterUpdateManyWithoutRecipeParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterUpdateManyWithoutRecipeParametersInput)
+  @IsOptional()
+  @Field(() => RecipeParameterUpdateManyWithoutRecipeParametersInput, {
+    nullable: true,
+  })
+  recipeParameters?: RecipeParameterUpdateManyWithoutRecipeParametersInput;
 
   @ApiProperty({
     required: false,

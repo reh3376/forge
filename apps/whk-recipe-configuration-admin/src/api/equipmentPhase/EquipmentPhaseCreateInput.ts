@@ -10,6 +10,7 @@ export type EquipmentPhaseCreateInput = {
   description?: string | null;
   editedBy?: string | null;
   instructions?: InstructionCreateNestedManyWithoutEquipmentPhasesInput;
+  isClassDefinition?: boolean | null;
   name: string;
   operations: OperationWhereUniqueInput;
   operationSequenceIndex?: boolean | null;

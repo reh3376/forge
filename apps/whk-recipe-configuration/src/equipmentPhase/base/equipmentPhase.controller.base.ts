@@ -77,6 +77,7 @@ export class EquipmentPhaseControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         operations: {
@@ -126,6 +127,7 @@ export class EquipmentPhaseControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         operations: {
@@ -174,6 +176,7 @@ export class EquipmentPhaseControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         name: true,
 
         operations: {
@@ -243,6 +246,7 @@ export class EquipmentPhaseControllerBase {
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDefinition: true,
           name: true,
 
           operations: {
@@ -299,6 +303,7 @@ export class EquipmentPhaseControllerBase {
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDefinition: true,
           name: true,
 
           operations: {

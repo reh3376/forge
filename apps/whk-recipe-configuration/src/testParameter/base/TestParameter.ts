@@ -15,8 +15,8 @@ import {
   IsBoolean,
   IsString,
   IsOptional,
-  IsDate,
   ValidateNested,
+  IsDate,
   IsEnum,
   IsNumber,
 } from "class-validator";
@@ -48,6 +48,15 @@ class TestParameter {
     nullable: true,
   })
   batch!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  classId?: TestParameter | null;
 
   @ApiProperty({
     required: true,
@@ -121,6 +130,17 @@ class TestParameter {
   @Field(() => Boolean, {
     nullable: true,
   })
+  isClassDef!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
   isDefinition!: boolean | null;
 
   @ApiProperty({
@@ -162,6 +182,15 @@ class TestParameter {
     nullable: true,
   })
   testParamDescription!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  testParameters?: Array<TestParameter>;
 
   @ApiProperty({
     required: true,

@@ -10,6 +10,7 @@ export type EquipmentPhaseUpdateInput = {
   description?: string | null;
   editedBy?: string | null;
   instructions?: InstructionUpdateManyWithoutEquipmentPhasesInput;
+  isClassDefinition?: boolean | null;
   name?: string;
   operations?: OperationWhereUniqueInput;
   operationSequenceIndex?: boolean | null;

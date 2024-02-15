@@ -49,16 +49,32 @@ export class RecipeParameterControllerBase {
     @common.Body() data: RecipeParameterCreateInput
   ): Promise<RecipeParameter> {
     return await this.service.createRecipeParameter({
-      data: data,
+      data: {
+        ...data,
+
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
+      },
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         itemId: true,
         recipeParamDescription: true,
         recipeParamName: true,
@@ -95,12 +111,20 @@ export class RecipeParameterControllerBase {
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         itemId: true,
         recipeParamDescription: true,
         recipeParamName: true,
@@ -136,12 +160,20 @@ export class RecipeParameterControllerBase {
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         itemId: true,
         recipeParamDescription: true,
         recipeParamName: true,
@@ -182,16 +214,32 @@ export class RecipeParameterControllerBase {
     try {
       return await this.service.updateRecipeParameter({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
+        },
         select: {
           active: true,
           batch: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           createdAt: true,
           createdBy: true,
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDefinition: true,
           itemId: true,
           recipeParamDescription: true,
           recipeParamName: true,
@@ -235,12 +283,20 @@ export class RecipeParameterControllerBase {
         select: {
           active: true,
           batch: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           createdAt: true,
           createdBy: true,
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDefinition: true,
           itemId: true,
           recipeParamDescription: true,
           recipeParamName: true,
@@ -262,5 +318,124 @@ export class RecipeParameterControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeParameters")
+  @ApiNestedQuery(RecipeParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeParameters(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeParameterWhereUniqueInput
+  ): Promise<RecipeParameter[]> {
+    const query = plainToClass(RecipeParameterFindManyArgs, request.query);
+    const results = await this.service.findRecipeParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+        batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDefinition: true,
+        itemId: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamRevision: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        schemaVersion: true,
+        sequencerParameters: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeParameters")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeParameters(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeParameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeParameters")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeParameters(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeParameters: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeParameters")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeParameters(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeParameters: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

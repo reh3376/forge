@@ -14,12 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
+import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 
 @InputType()
 class OperationWhereInput {
@@ -33,6 +36,18 @@ class OperationWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -102,6 +117,17 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -110,6 +136,18 @@ class OperationWhereInput {
     nullable: true,
   })
   name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => OperationListRelationFilter)
+  @IsOptional()
+  @Field(() => OperationListRelationFilter, {
+    nullable: true,
+  })
+  operations?: OperationListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -145,6 +183,18 @@ class OperationWhereInput {
     nullable: true,
   })
   procedureSequenceIndex?: IntFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeListRelationFilter, {
+    nullable: true,
+  })
+  recipes?: RecipeListRelationFilter;
 
   @ApiProperty({
     required: false,
