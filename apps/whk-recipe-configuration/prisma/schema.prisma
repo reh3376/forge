@@ -179,16 +179,20 @@ model Procedure {
 }
 
 model Recipe {
-  active        Boolean?   @default(true)
-  createdAt     DateTime   @default(now())
-  createdBy     String
-  id            String     @id @default(cuid())
-  operation     Operation? @relation(fields: [operationId], references: [id])
-  operationId   String?
-  revision      Int?       @default(0)
-  schemaVersion String?    @default("0001-b")
-  updatedAt     DateTime   @updatedAt
-  updatedBy     DateTime?
+  active          Boolean?   @default(true)
+  createdAt       DateTime   @default(now())
+  createdBy       String
+  customer        String?
+  id              String     @id @default(cuid())
+  item            String?
+  itemDescription String?
+  mashBill        String?
+  operation       Operation? @relation(fields: [operationId], references: [id])
+  operationId     String?
+  revision        Int?       @default(0)
+  schemaVersion   String?    @default("0001-b")
+  updatedAt       DateTime   @updatedAt
+  updatedBy       DateTime?
 }
 
 enum EnumPhaseParameterSetpointType {

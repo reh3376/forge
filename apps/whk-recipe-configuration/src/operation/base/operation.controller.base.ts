@@ -593,7 +593,11 @@ export class OperationControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        customer: true,
         id: true,
+        item: true,
+        itemDescription: true,
+        mashBill: true,
 
         operation: {
           select: {
