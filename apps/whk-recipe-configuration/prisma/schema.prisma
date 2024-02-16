@@ -45,7 +45,7 @@ model PhaseParameter {
   typeUnits              String
   updatedAt              DateTime                       @updatedAt
 
-  @@unique([name, revision, equipmentPhase])
+  @@unique([name, revision, equipmentPhaseId])
 }
 
 model TestParameter {
@@ -58,7 +58,7 @@ model TestParameter {
   editedAt                 DateTime?                          @updatedAt
   editedBy                 String?                            @unique
   equipmentPhases          EquipmentPhase[]
-  id                       String                             @id @default(auto())
+  id                       String                             @id @default(cuid())
   isClassDef               Boolean?                           @default(false)
   isDefinition             Boolean?                           @default(false)
   name                     String
