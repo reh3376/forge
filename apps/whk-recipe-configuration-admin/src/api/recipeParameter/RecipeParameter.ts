@@ -1,20 +1,20 @@
-import { ParameterType } from "../parameterType/ParameterType";
 import { JsonValue } from "type-fest";
 
 export type RecipeParameter = {
   active: boolean;
   batch: string | null;
+  classId?: RecipeParameter | null;
   className: string;
   createdAt: Date;
   createdBy: string;
   editedAt: Date | null;
   editedBy: string | null;
   id: string;
+  isClassDefinition: boolean | null;
   itemId: string;
-  parameterType?: ParameterType | null;
   recipeParamDescription: string | null;
+  recipeParameters?: Array<RecipeParameter>;
   recipeParamName: string;
-  recipeParamRevision: string | null;
   recipeParamUnits?:
     | "Lbs"
     | "Gal"
@@ -30,6 +30,7 @@ export type RecipeParameter = {
   recipeSetpointLowerLimit: number | null;
   recipeSetpointType?: "Boolean" | "Numeric";
   recipeSetpointUpperLimit: number | null;
+  revision: number | null;
   schemaVersion: string | null;
   sequencerParameters: JsonValue;
 };

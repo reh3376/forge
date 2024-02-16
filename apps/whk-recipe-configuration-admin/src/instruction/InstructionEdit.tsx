@@ -6,12 +6,12 @@ import {
   EditProps,
   BooleanInput,
   TextInput,
-  NumberInput,
   ReferenceArrayInput,
   SelectArrayInput,
+  NumberInput,
 } from "react-admin";
 
-import { OperationStepTitle } from "../operationStep/OperationStepTitle";
+import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 
 export const InstructionEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -20,21 +20,17 @@ export const InstructionEdit = (props: EditProps): React.ReactElement => {
         <BooleanInput label="Active" source="active" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Edited By" source="editedBy" />
-        <TextInput label="File Path" source="filePath" />
-        <NumberInput
-          step={1}
-          label="Instruction Revision"
-          source="instructionRevision"
-        />
         <ReferenceArrayInput
-          source="operationStep"
-          reference="OperationStep"
+          source="equipmentPhase"
+          reference="EquipmentPhase"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
-          <SelectArrayInput optionText={OperationStepTitle} />
+          <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
-        <div />
+        <TextInput label="File Path" source="filePath" />
+        <TextInput label="Name" source="name" />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
       </SimpleForm>
     </Edit>

@@ -1,0 +1,32 @@
+import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { InstructionListRelationFilter } from "../instruction/InstructionListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { PhaseParameterListRelationFilter } from "../phaseParameter/PhaseParameterListRelationFilter";
+import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhereUniqueInput";
+
+export type EquipmentPhaseWhereInput = {
+  bom?: BomWhereUniqueInput;
+  bomId?: StringNullableFilter;
+  className?: StringNullableFilter;
+  createdAt?: DateTimeNullableFilter;
+  createdBy?: StringFilter;
+  description?: StringNullableFilter;
+  editedAt?: DateTimeNullableFilter;
+  editedBy?: StringNullableFilter;
+  id?: StringFilter;
+  instructions?: InstructionListRelationFilter;
+  isClassDefinition?: BooleanNullableFilter;
+  name?: StringFilter;
+  operations?: OperationWhereUniqueInput;
+  operationSequenceIndex?: BooleanNullableFilter;
+  operationStepSequence?: IntNullableFilter;
+  phaseParameters?: PhaseParameterListRelationFilter;
+  revision?: IntNullableFilter;
+  schemaVersion?: StringNullableFilter;
+  testParameters?: TestParameterWhereUniqueInput;
+};

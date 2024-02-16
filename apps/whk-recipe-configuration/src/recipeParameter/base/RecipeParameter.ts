@@ -11,17 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsString,
   IsOptional,
-  IsDate,
   ValidateNested,
+  IsDate,
   IsEnum,
   IsNumber,
+  IsInt,
 } from "class-validator";
+
 import { Type } from "class-transformer";
-import { ParameterType } from "../../parameterType/base/ParameterType";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { IsJSONValue } from "../../validators";
@@ -48,6 +50,15 @@ class RecipeParameter {
     nullable: true,
   })
   batch!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  classId?: RecipeParameter | null;
 
   @ApiProperty({
     required: true,
@@ -104,21 +115,23 @@ class RecipeParameter {
   id!: string;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   itemId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ParameterType,
-  })
-  @ValidateNested()
-  @Type(() => ParameterType)
-  @IsOptional()
-  parameterType?: ParameterType | null;
 
   @ApiProperty({
     required: false,
@@ -132,23 +145,21 @@ class RecipeParameter {
   recipeParamDescription!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => [RecipeParameter],
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  recipeParameters?: Array<RecipeParameter>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   recipeParamName!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeParamRevision!: string | null;
 
   @ApiProperty({
     required: false,
@@ -213,6 +224,17 @@ class RecipeParameter {
     nullable: true,
   })
   recipeSetpointUpperLimit!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
 
   @ApiProperty({
     required: false,

@@ -45,6 +45,9 @@ export class RecipeParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: RecipeParameterCreateInput,
+  })
   async createRecipeParameter(
     @common.Body() data: RecipeParameterCreateInput
   ): Promise<RecipeParameter> {
@@ -52,37 +55,38 @@ export class RecipeParameterControllerBase {
       data: {
         ...data,
 
-        parameterType: data.parameterType
+        classId: data.classId
           ? {
-              connect: data.parameterType,
+              connect: data.classId,
             }
           : undefined,
       },
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         itemId: true,
-
-        parameterType: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamRevision: true,
         recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        revision: true,
         schemaVersion: true,
         sequencerParameters: true,
       },
@@ -110,28 +114,29 @@ export class RecipeParameterControllerBase {
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         itemId: true,
-
-        parameterType: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamRevision: true,
         recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        revision: true,
         schemaVersion: true,
         sequencerParameters: true,
       },
@@ -158,28 +163,29 @@ export class RecipeParameterControllerBase {
       select: {
         active: true,
         batch: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDefinition: true,
         itemId: true,
-
-        parameterType: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamRevision: true,
         recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        revision: true,
         schemaVersion: true,
         sequencerParameters: true,
       },
@@ -204,6 +210,9 @@ export class RecipeParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: RecipeParameterUpdateInput,
+  })
   async updateRecipeParameter(
     @common.Param() params: RecipeParameterWhereUniqueInput,
     @common.Body() data: RecipeParameterUpdateInput
@@ -214,37 +223,38 @@ export class RecipeParameterControllerBase {
         data: {
           ...data,
 
-          parameterType: data.parameterType
+          classId: data.classId
             ? {
-                connect: data.parameterType,
+                connect: data.classId,
               }
             : undefined,
         },
         select: {
           active: true,
           batch: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           createdAt: true,
           createdBy: true,
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDefinition: true,
           itemId: true,
-
-          parameterType: {
-            select: {
-              id: true,
-            },
-          },
-
           recipeParamDescription: true,
           recipeParamName: true,
-          recipeParamRevision: true,
           recipeParamUnits: true,
           recipeSetpointBooleanValue: true,
           recipeSetpointLowerLimit: true,
           recipeSetpointType: true,
           recipeSetpointUpperLimit: true,
+          revision: true,
           schemaVersion: true,
           sequencerParameters: true,
         },
@@ -259,59 +269,122 @@ export class RecipeParameterControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: RecipeParameter })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeParameters")
+  @ApiNestedQuery(RecipeParameterFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
-    action: "delete",
+    action: "read",
     possession: "any",
   })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteRecipeParameter(
+  async findRecipeParameters(
+    @common.Req() request: Request,
     @common.Param() params: RecipeParameterWhereUniqueInput
-  ): Promise<RecipeParameter | null> {
-    try {
-      return await this.service.deleteRecipeParameter({
-        where: params,
-        select: {
-          active: true,
-          batch: true,
-          className: true,
-          createdAt: true,
-          createdBy: true,
-          editedAt: true,
-          editedBy: true,
-          id: true,
-          itemId: true,
+  ): Promise<RecipeParameter[]> {
+    const query = plainToClass(RecipeParameterFindManyArgs, request.query);
+    const results = await this.service.findRecipeParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+        batch: true,
 
-          parameterType: {
-            select: {
-              id: true,
-            },
+        classId: {
+          select: {
+            id: true,
           },
-
-          recipeParamDescription: true,
-          recipeParamName: true,
-          recipeParamRevision: true,
-          recipeParamUnits: true,
-          recipeSetpointBooleanValue: true,
-          recipeSetpointLowerLimit: true,
-          recipeSetpointType: true,
-          recipeSetpointUpperLimit: true,
-          schemaVersion: true,
-          sequencerParameters: true,
         },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
+
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDefinition: true,
+        itemId: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        revision: true,
+        schemaVersion: true,
+        sequencerParameters: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
     }
+    return results;
+  }
+
+  @common.Post("/:id/recipeParameters")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeParameters(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeParameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeParameters")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeParameters(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeParameters: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeParameters")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeParameters(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeParameters: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

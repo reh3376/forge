@@ -15,14 +15,11 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
-import { OperationStepUpdateManyWithoutInstructionsInput } from "./OperationStepUpdateManyWithoutInstructionsInput";
+import { EquipmentPhaseUpdateManyWithoutInstructionsInput } from "./EquipmentPhaseUpdateManyWithoutInstructionsInput";
 import { Type } from "class-transformer";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
 
 @InputType()
 class InstructionUpdateInput {
@@ -61,6 +58,18 @@ class InstructionUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutInstructionsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutInstructionsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutInstructionsInput, {
+    nullable: true,
+  })
+  equipmentPhase?: EquipmentPhaseUpdateManyWithoutInstructionsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -72,6 +81,17 @@ class InstructionUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
@@ -79,29 +99,7 @@ class InstructionUpdateInput {
   @Field(() => Number, {
     nullable: true,
   })
-  instructionRevision?: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationStepUpdateManyWithoutInstructionsInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationStepUpdateManyWithoutInstructionsInput)
-  @IsOptional()
-  @Field(() => OperationStepUpdateManyWithoutInstructionsInput, {
-    nullable: true,
-  })
-  operationStep?: OperationStepUpdateManyWithoutInstructionsInput;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  routes?: InputJsonValue;
+  revision?: number;
 
   @ApiProperty({
     required: false,

@@ -1,13 +1,18 @@
 import * as React from "react";
+
 import {
   List,
   Datagrid,
   ListProps,
   BooleanField,
-  DateField,
+  ReferenceField,
   TextField,
+  DateField,
 } from "react-admin";
+
 import Pagination from "../Components/Pagination";
+import { OPERATION_TITLE_FIELD } from "./OperationTitle";
+import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 
 export const OperationList = (props: ListProps): React.ReactElement => {
   return (
@@ -20,22 +25,33 @@ export const OperationList = (props: ListProps): React.ReactElement => {
     >
       <Datagrid rowClick="show">
         <BooleanField label="Active" source="active" />
+        <ReferenceField
+          label="Class ID"
+          source="operation.id"
+          reference="Operation"
+        >
+          <TextField source={OPERATION_TITLE_FIELD} />
+        </ReferenceField>
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
+        <TextField label="Description" source="description" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="globalUuid" source="globalUuid" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Definition" source="isClassDefinition" />
+        <TextField label="Name" source="name" />
+        <ReferenceField
+          label="Procedure"
+          source="procedure.id"
+          reference="Procedure"
+        >
+          <TextField source={PROCEDURE_TITLE_FIELD} />
+        </ReferenceField>
         <TextField
-          label="Operation Description"
-          source="operationDescription"
+          label="Procedure Sequence Index"
+          source="procedureSequenceIndex"
         />
-        <TextField label="Operation Name" source="operationName" />
-        <TextField label="Operation Revision" source="operationRevision" />
-        <TextField
-          label="Operation Sequence Number"
-          source="operationSequenceNumber"
-        />
-        <TextField label="Route" source="route" />
+        <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <DateField source="updatedAt" label="Updated At" />
       </Datagrid>
