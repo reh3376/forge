@@ -13,14 +13,17 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
-import { IsOptional, IsEnum } from "class-validator";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { StringFilter } from "../../util/StringFilter";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { JsonFilter } from "../../util/JsonFilter";
+import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
+import { JsonFilter } from "../../util/JsonFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
 @InputType()
@@ -38,25 +41,15 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: () => TestParameterWhereUniqueInput,
   })
-  @Type(() => StringNullableFilter)
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => TestParameterWhereUniqueInput, {
     nullable: true,
   })
-  batch?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  className?: StringFilter;
+  classId?: TestParameterWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -82,6 +75,17 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: DateTimeNullableFilter,
   })
   @Type(() => DateTimeNullableFilter)
@@ -104,6 +108,18 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -112,6 +128,17 @@ class TestParameterWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDef?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -133,7 +160,7 @@ class TestParameterWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  itemId?: StringFilter;
+  name?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -148,36 +175,15 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: JsonFilter,
+    type: () => TestParameterListRelationFilter,
   })
-  @Type(() => JsonFilter)
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
   @IsOptional()
-  @Field(() => JsonFilter, {
+  @Field(() => TestParameterListRelationFilter, {
     nullable: true,
   })
-  test?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  testParamDescription?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  testParamName?: StringFilter;
+  testParameters?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -214,14 +220,14 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: JsonFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => JsonFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => JsonFilter, {
     nullable: true,
   })
-  testResult?: StringNullableFilter;
+  testResult?: JsonFilter;
 
   @ApiProperty({
     required: false,

@@ -12,8 +12,20 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      LOG_LEVEL: ${LOG_LEVEL}
+      SERVICE_NAME: ${SERVICE_NAME}
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_ENABLE_SSL: ${KAFKA_ENABLE_SSL}
+      KAFKA_CLIENT_ID: ${KAFKA_CLIENT_ID}
+      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
+      JAEGER_AGENT_HOST: ${JAEGER_AGENT_HOST}
+      JAEGER_AGENT_PORT: ${JAEGER_AGENT_PORT}
+      OTEL_COLLECTOR_HOST: ${OTEL_COLLECTOR_HOST}
+      OTEL_COLLECTOR_PORT_GRPC: ${OTEL_COLLECTOR_PORT_GRPC}
+      OTEL_COLLECTOR_PORT_HTTP: ${OTEL_COLLECTOR_PORT_HTTP}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
     depends_on:
-      - migrate
+      - redis
     restart: on-failure
   migrate:
     build:
@@ -28,6 +40,30 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mqtt-broker:
+        condition: service_healthy
+  mqtt-broker:
+    image: emqx:5.4.0
+    ports:
+      - ${MQTT_PORT}:1883
+      - ${MQTT_WS_PORT}:8083
+      - ${MQTT_WEB_UI_PORT}:18083
+    healthcheck:
+      test:
+        - CMD
+        - /opt/emqx/bin/emqx
+        - ctl
+        - status
+      interval: 5s
+      timeout: 25s
+      retries: 5
+  redis:
+    container_name: ${REDIS_HOST}
+    image: redis:7
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis:/data
   db:
     image: postgres:12
     ports:
@@ -45,5 +81,63 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.2.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+  kafka:
+    image: confluentinc/cp-kafka:7.3.1
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 9997:9997
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_JMXPORT: 9997
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - ${JAEGER_AGENT_PORT}:${JAEGER_AGENT_PORT}
+      - 14268:14268
+      - 14250:14250
+  opentelemetry:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - ${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}
+      - ${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}
+      - 1888:1888
+      - 13133:13133
+      - 55670:55679
+    volumes:
+      - ./otel-config.yml:/etc/otel-config.yml
+    command:
+      - --config=/etc/otel-config.yml
+    depends_on:
+      - jaeger
 volumes:
+  redis:
+    driver: local
   postgres: ~

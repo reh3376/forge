@@ -6,12 +6,12 @@ import {
   ListProps,
   BooleanField,
   TextField,
-  DateField,
   ReferenceField,
+  DateField,
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
-import { PARAMETERTYPE_TITLE_FIELD } from "../parameterType/ParameterTypeTitle";
+import { RECIPEPARAMETER_TITLE_FIELD } from "./RecipeParameterTitle";
 
 export const RecipeParameterList = (props: ListProps): React.ReactElement => {
   return (
@@ -25,26 +25,26 @@ export const RecipeParameterList = (props: ListProps): React.ReactElement => {
       <Datagrid rowClick="show">
         <BooleanField label="Active" source="active" />
         <TextField label="Batch" source="batch" />
+        <ReferenceField
+          label="Class ID"
+          source="recipeparameter.id"
+          reference="RecipeParameter"
+        >
+          <TextField source={RECIPEPARAMETER_TITLE_FIELD} />
+        </ReferenceField>
         <TextField label="Class Name" source="className" />
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Definition" source="isClassDefinition" />
         <TextField label="Item ID" source="itemId" />
-        <ReferenceField
-          label="Parameter Type"
-          source="parametertype.id"
-          reference="ParameterType"
-        >
-          <TextField source={PARAMETERTYPE_TITLE_FIELD} />
-        </ReferenceField>
         <TextField
           label="Recipe Param Description"
           source="recipeParamDescription"
         />
         <TextField label="Recipe Param Name" source="recipeParamName" />
-        <TextField label="Recipe Param Revision" source="recipeParamRevision" />
         <TextField label="Recipe Param Units" source="recipeParamUnits" />
         <BooleanField
           label="Recipe Setpoint Boolean Value"
@@ -59,6 +59,7 @@ export const RecipeParameterList = (props: ListProps): React.ReactElement => {
           label="Recipe Setpoint Upper Limit"
           source="recipeSetpointUpperLimit"
         />
+        <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <TextField label="Sequencer Parameters" source="sequencerParameters" />
       </Datagrid>

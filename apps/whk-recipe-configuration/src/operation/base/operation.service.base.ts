@@ -14,7 +14,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Operation, // @ts-ignore
-  OperationStep,
+  EquipmentPhase, // @ts-ignore
+  Recipe, // @ts-ignore
+  Procedure,
 } from "@prisma/client";
 
 export class OperationServiceBase {
@@ -52,14 +54,52 @@ export class OperationServiceBase {
     return this.prisma.operation.delete(args);
   }
 
+  async findOperations(
+    parentId: string,
+    args: Prisma.OperationFindManyArgs
+  ): Promise<Operation[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .operations(args);
+  }
+
   async findOperationSteps(
     parentId: string,
-    args: Prisma.OperationStepFindManyArgs
-  ): Promise<OperationStep[]> {
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
     return this.prisma.operation
       .findUniqueOrThrow({
         where: { id: parentId },
       })
       .operationSteps(args);
+  }
+
+  async findRecipes(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipes(args);
+  }
+
+  async getClassId(parentId: string): Promise<Operation | null> {
+    return this.prisma.operation
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
+  }
+
+  async getProcedure(parentId: string): Promise<Procedure | null> {
+    return this.prisma.operation
+      .findUnique({
+        where: { id: parentId },
+      })
+      .procedure();
   }
 }

@@ -14,14 +14,19 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsString,
   IsEnum,
   IsNumber,
 } from "class-validator";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
+import { Type } from "class-transformer";
+import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
+import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
+import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
 @InputType()
@@ -39,25 +44,15 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => TestParameterWhereUniqueInput,
   })
-  @IsString()
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => TestParameterWhereUniqueInput, {
     nullable: true,
   })
-  batch?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  className?: string;
+  classId?: TestParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -79,7 +74,41 @@ class TestParameterUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
   editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -101,7 +130,7 @@ class TestParameterUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  itemId?: string;
+  name?: string;
 
   @ApiProperty({
     required: false,
@@ -116,35 +145,15 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterUpdateManyWithoutTestParametersInput,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutTestParametersInput)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => TestParameterUpdateManyWithoutTestParametersInput, {
     nullable: true,
   })
-  test?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamDescription?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamName?: string;
+  testParameters?: TestParameterUpdateManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,
@@ -181,14 +190,13 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
   })
-  @IsString()
+  @IsJSONValue()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  testResult?: string | null;
+  testResult?: InputJsonValue;
 
   @ApiProperty({
     required: false,
