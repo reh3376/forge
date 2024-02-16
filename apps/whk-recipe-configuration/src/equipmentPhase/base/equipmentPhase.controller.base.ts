@@ -84,7 +84,6 @@ export class EquipmentPhaseControllerBase {
           },
         },
 
-        bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,
@@ -140,7 +139,6 @@ export class EquipmentPhaseControllerBase {
           },
         },
 
-        bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,
@@ -195,7 +193,6 @@ export class EquipmentPhaseControllerBase {
           },
         },
 
-        bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,
@@ -280,7 +277,6 @@ export class EquipmentPhaseControllerBase {
             },
           },
 
-          bomId: true,
           className: true,
           createdAt: true,
           createdBy: true,

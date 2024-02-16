@@ -6,7 +6,6 @@ import { TestParameter } from "../testParameter/TestParameter";
 
 export type EquipmentPhase = {
   bom?: Bom | null;
-  bomId: string | null;
   className: string | null;
   createdAt: Date | null;
   createdBy: string;

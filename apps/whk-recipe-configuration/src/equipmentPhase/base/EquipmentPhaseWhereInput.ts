@@ -47,17 +47,6 @@ class EquipmentPhaseWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  bomId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
   className?: StringNullableFilter;
 
   @ApiProperty({

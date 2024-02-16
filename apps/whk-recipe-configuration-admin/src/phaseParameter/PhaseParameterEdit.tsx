@@ -24,7 +24,7 @@ export const PhaseParameterEdit = (props: EditProps): React.ReactElement => {
         <ReferenceInput
           source="classId.id"
           reference="PhaseParameter"
-          label="Class ID"
+          label="Classs"
         >
           <SelectInput optionText={PhaseParameterTitle} />
         </ReferenceInput>

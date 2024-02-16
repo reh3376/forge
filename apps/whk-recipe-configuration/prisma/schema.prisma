@@ -34,7 +34,7 @@ model PhaseParameter {
   name                   String
   phaseParameter         PhaseParameter[]               @relation(name: "phaseParameter")
   recipeId               String?
-  revision Int? @default( @autoincrement)
+  revision               Int?                           @default(0)
   schemaVersion          String?                        @default("0001-alpha")
   setpointBooleanValue   Boolean?
   setpointLowerLimit     Float?
@@ -124,7 +124,6 @@ model Instruction {
 model EquipmentPhase {
   bom                    Bom?             @relation(fields: [bomId], references: [id])
   bomId                  String?
-  bomId                  String?
   className              String?
   createdAt              DateTime?        @default(now())
   createdBy              String           @unique
@@ -182,7 +181,7 @@ model Procedure {
   id            String      @id @default(cuid())
   name          String?
   operations    Operation[]
-  revision Int? @default( @autoincrement)
+  revision      Int?        @default(0)
   schemaVersion String?     @default("0001-b")
   updatedAt     DateTime    @updatedAt
   updatedBy     String?     @unique

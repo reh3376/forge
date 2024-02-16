@@ -26,7 +26,6 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
         <ReferenceInput source="bom.id" reference="Bom" label="Bom">
           <SelectInput optionText={BomTitle} />
         </ReferenceInput>
-        <TextInput label="Bom ID" source="bomId" />
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" source="description" />
