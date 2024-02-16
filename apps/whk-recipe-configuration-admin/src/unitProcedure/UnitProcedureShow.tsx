@@ -4,12 +4,12 @@ import {
   Show,
   SimpleShowLayout,
   ShowProps,
-  DateField,
-  TextField,
   ReferenceField,
+  TextField,
+  DateField,
+  BooleanField,
   ReferenceManyField,
   Datagrid,
-  BooleanField,
 } from "react-admin";
 
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
@@ -20,10 +20,18 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
+        <ReferenceField
+          label="Class"
+          source="unitprocedure.id"
+          reference="UnitProcedure"
+        >
+          <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+        </ReferenceField>
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
         <TextField label="Description" source="description" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Def" source="isClassDef" />
         <TextField label="Name" source="name" />
         <ReferenceField
           label="Procedure"
@@ -76,6 +84,38 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
               <TextField source={UNITPROCEDURE_TITLE_FIELD} />
             </ReferenceField>
             <DateField source="updatedAt" label="Updated At" />
+          </Datagrid>
+        </ReferenceManyField>
+        <ReferenceManyField
+          reference="UnitProcedure"
+          target="classId"
+          label="Unit Procedures"
+        >
+          <Datagrid rowClick="show">
+            <ReferenceField
+              label="Class"
+              source="unitprocedure.id"
+              reference="UnitProcedure"
+            >
+              <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <TextField label="Description" source="description" />
+            <TextField label="ID" source="id" />
+            <BooleanField label="Is Class Def" source="isClassDef" />
+            <TextField label="Name" source="name" />
+            <ReferenceField
+              label="Procedure"
+              source="procedure.id"
+              reference="Procedure"
+            >
+              <TextField source={PROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <TextField label="Revision" source="revision" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <DateField source="updatedAt" label="Updated At" />
+            <TextField label="Updated By" source="updatedBy" />
           </Datagrid>
         </ReferenceManyField>
       </SimpleShowLayout>

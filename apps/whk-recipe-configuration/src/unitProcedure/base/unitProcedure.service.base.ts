@@ -64,6 +64,25 @@ export class UnitProcedureServiceBase {
       .operations(args);
   }
 
+  async findUnitProcedure(
+    parentId: string,
+    args: Prisma.UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    return this.prisma.unitProcedure
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .unitProcedure(args);
+  }
+
+  async getClassId(parentId: string): Promise<UnitProcedure | null> {
+    return this.prisma.unitProcedure
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
+  }
+
   async getProcedure(parentId: string): Promise<Procedure | null> {
     return this.prisma.unitProcedure
       .findUnique({

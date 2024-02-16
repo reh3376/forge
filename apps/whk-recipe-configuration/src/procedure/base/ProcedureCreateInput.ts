@@ -14,12 +14,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsString,
   IsInt,
-  ValidateNested,
 } from "class-validator";
-import { UnitProcedureCreateNestedManyWithoutProceduresInput } from "./UnitProcedureCreateNestedManyWithoutProceduresInput";
+import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
+import { ProcedureCreateNestedManyWithoutProceduresInput } from "./ProcedureCreateNestedManyWithoutProceduresInput";
+import { UnitProcedureCreateNestedManyWithoutProceduresInput } from "./UnitProcedureCreateNestedManyWithoutProceduresInput";
 
 @InputType()
 class ProcedureCreateInput {
@@ -33,6 +35,18 @@ class ProcedureCreateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: ProcedureWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -55,6 +69,17 @@ class ProcedureCreateInput {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -63,6 +88,18 @@ class ProcedureCreateInput {
     nullable: true,
   })
   name?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureCreateNestedManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureCreateNestedManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => ProcedureCreateNestedManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  procedures?: ProcedureCreateNestedManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,
