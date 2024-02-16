@@ -45,7 +45,7 @@ model PhaseParameter {
   typeUnits              String
   updatedAt              DateTime                       @updatedAt
 
-  @@unique([name, revision, equipmentPhase])
+  @@unique([name, revision, equipmentPhaseId])
 }
 
 model TestParameter {
@@ -58,7 +58,7 @@ model TestParameter {
   editedAt                 DateTime?                          @updatedAt
   editedBy                 String?                            @unique
   equipmentPhases          EquipmentPhase[]
-  id                       String                             @id @default(auto())
+  id                       String                             @id @default(cuid())
   isClassDef               Boolean?                           @default(false)
   isDefinition             Boolean?                           @default(false)
   name                     String
@@ -130,7 +130,7 @@ model EquipmentPhase {
   description            String?
   editedAt               DateTime?        @updatedAt
   editedBy               String?          @unique
-  id                     String           @id @default(auto())
+  id                     String           @id @default(cuid())
   instructions           Instruction[]
   isClassDefinition      Boolean?         @default(false)
   name                   String
@@ -156,7 +156,7 @@ model Operation {
   description            String
   editedBy               String?          @unique
   globalUuid             String?          @default(uuid())
-  id                     String           @id @default(auto())
+  id                     String           @id @default(cuid())
   isClassDefinition      Boolean?         @default(false)
   name                   String
   operations             Operation[]      @relation(name: "OperationClassIdOperationOperations")
@@ -220,7 +220,7 @@ model Bom {
   editedAt        DateTime         @updatedAt
   editedBy        String?          @unique
   equipmentPhases EquipmentPhase[]
-  id              String           @id @default(auto())
+  id              String           @id @default(cuid())
   operationSteps  Json?
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
