@@ -29,6 +29,14 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
+        <ReferenceArrayInput
+          source="equipmentPhases"
+          reference="EquipmentPhase"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={EquipmentPhaseTitle} />
+        </ReferenceArrayInput>
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
         <ReferenceArrayInput
@@ -38,14 +46,6 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
           <SelectArrayInput optionText={OperationTitle} />
-        </ReferenceArrayInput>
-        <ReferenceArrayInput
-          source="operationSteps"
-          reference="EquipmentPhase"
-          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
-          format={(value: any) => value && value.map((v: any) => v.id)}
-        >
-          <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
         <TextInput label="Path" source="path" />
         <ReferenceInput

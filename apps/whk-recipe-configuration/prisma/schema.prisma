@@ -129,7 +129,7 @@ model EquipmentPhase {
   createdBy              String
   description            String?
   editedAt               DateTime?        @updatedAt
-  editedBy               String?          @unique
+  editedBy               String?
   id                     String           @id @default(cuid())
   instructions           Instruction[]
   isClassDefinition      Boolean?         @default(false)
@@ -154,13 +154,12 @@ model Operation {
   createdAt              DateTime?        @default(now())
   createdBy              String
   description            String
-  editedBy               String?          @unique
-  globalUuid             String?          @default(uuid())
+  editedBy               String?
+  equipmentPhases        EquipmentPhase[]
   id                     String           @id @default(cuid())
   isClassDefinition      Boolean?         @default(false)
   name                   String
   operations             Operation[]      @relation(name: "OperationClassIdOperationOperations")
-  operationSteps         EquipmentPhase[]
   path                   String
   procedure              Procedure?       @relation(fields: [procedureId], references: [id])
   procedureId            String?
