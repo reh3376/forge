@@ -279,63 +279,6 @@ export class OperationControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Operation })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteOperation(
-    @common.Param() params: OperationWhereUniqueInput
-  ): Promise<Operation | null> {
-    try {
-      return await this.service.deleteOperation({
-        where: params,
-        select: {
-          active: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
-          createdAt: true,
-          createdBy: true,
-          description: true,
-          editedBy: true,
-          globalUuid: true,
-          id: true,
-          isClassDefinition: true,
-          name: true,
-
-          procedure: {
-            select: {
-              id: true,
-            },
-          },
-
-          procedureSequenceIndex: true,
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/operations")
   @ApiNestedQuery(OperationFindManyArgs)

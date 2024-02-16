@@ -25,7 +25,6 @@ import { ProcedureFindManyArgs } from "./ProcedureFindManyArgs";
 import { ProcedureFindUniqueArgs } from "./ProcedureFindUniqueArgs";
 import { CreateProcedureArgs } from "./CreateProcedureArgs";
 import { UpdateProcedureArgs } from "./UpdateProcedureArgs";
-import { DeleteProcedureArgs } from "./DeleteProcedureArgs";
 import { OperationFindManyArgs } from "../../operation/base/OperationFindManyArgs";
 import { Operation } from "../../operation/base/Operation";
 import { ProcedureService } from "../procedure.service";
@@ -113,27 +112,6 @@ export class ProcedureResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Procedure)
-  @nestAccessControl.UseRoles({
-    resource: "Procedure",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteProcedure(
-    @graphql.Args() args: DeleteProcedureArgs
-  ): Promise<Procedure | null> {
-    try {
-      return await this.service.deleteProcedure(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

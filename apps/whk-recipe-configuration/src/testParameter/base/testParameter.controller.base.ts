@@ -266,63 +266,6 @@ export class TestParameterControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: TestParameter })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "TestParameter",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteTestParameter(
-    @common.Param() params: TestParameterWhereUniqueInput
-  ): Promise<TestParameter | null> {
-    try {
-      return await this.service.deleteTestParameter({
-        where: params,
-        select: {
-          active: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
-          createdAt: true,
-          createdBy: true,
-          description: true,
-          editedAt: true,
-          editedBy: true,
-          id: true,
-          isClassDef: true,
-          isDefinition: true,
-          name: true,
-          schemaVersion: true,
-          testParamRevision: true,
-          testParamUnits: true,
-          testPass: true,
-          testResult: true,
-          testSetpointBooleanValue: true,
-          testSetpointLowerLimit: true,
-          testSetpointType: true,
-          testSetpointUpperLimit: true,
-          testSetpointValue: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/equipmentPhases")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)

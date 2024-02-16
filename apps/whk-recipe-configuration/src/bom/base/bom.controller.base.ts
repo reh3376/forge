@@ -188,49 +188,6 @@ export class BomControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Bom })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteBom(
-    @common.Param() params: BomWhereUniqueInput
-  ): Promise<Bom | null> {
-    try {
-      return await this.service.deleteBom({
-        where: params,
-        select: {
-          batches: true,
-          bomItems: true,
-          bomName: true,
-          bomRevision: true,
-          className: true,
-          createdAt: true,
-          createdBy: true,
-          editedAt: true,
-          editedBy: true,
-          id: true,
-          operationSteps: true,
-          schemaVersion: true,
-          wipItemId: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/equipmentPhases")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)

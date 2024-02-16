@@ -25,7 +25,6 @@ import { EquipmentPhaseFindManyArgs } from "./EquipmentPhaseFindManyArgs";
 import { EquipmentPhaseFindUniqueArgs } from "./EquipmentPhaseFindUniqueArgs";
 import { CreateEquipmentPhaseArgs } from "./CreateEquipmentPhaseArgs";
 import { UpdateEquipmentPhaseArgs } from "./UpdateEquipmentPhaseArgs";
-import { DeleteEquipmentPhaseArgs } from "./DeleteEquipmentPhaseArgs";
 import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
 import { Instruction } from "../../instruction/base/Instruction";
 import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
@@ -154,27 +153,6 @@ export class EquipmentPhaseResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => EquipmentPhase)
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteEquipmentPhase(
-    @graphql.Args() args: DeleteEquipmentPhaseArgs
-  ): Promise<EquipmentPhase | null> {
-    try {
-      return await this.service.deleteEquipmentPhase(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

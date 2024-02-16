@@ -25,7 +25,6 @@ import { PhaseParameterFindManyArgs } from "./PhaseParameterFindManyArgs";
 import { PhaseParameterFindUniqueArgs } from "./PhaseParameterFindUniqueArgs";
 import { CreatePhaseParameterArgs } from "./CreatePhaseParameterArgs";
 import { UpdatePhaseParameterArgs } from "./UpdatePhaseParameterArgs";
-import { DeletePhaseParameterArgs } from "./DeletePhaseParameterArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { PhaseParameterService } from "../phaseParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -140,27 +139,6 @@ export class PhaseParameterResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => PhaseParameter)
-  @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
-    action: "delete",
-    possession: "any",
-  })
-  async deletePhaseParameter(
-    @graphql.Args() args: DeletePhaseParameterArgs
-  ): Promise<PhaseParameter | null> {
-    try {
-      return await this.service.deletePhaseParameter(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

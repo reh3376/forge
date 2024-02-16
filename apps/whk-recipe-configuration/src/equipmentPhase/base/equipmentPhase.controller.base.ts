@@ -313,69 +313,6 @@ export class EquipmentPhaseControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: EquipmentPhase })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteEquipmentPhase(
-    @common.Param() params: EquipmentPhaseWhereUniqueInput
-  ): Promise<EquipmentPhase | null> {
-    try {
-      return await this.service.deleteEquipmentPhase({
-        where: params,
-        select: {
-          bom: {
-            select: {
-              id: true,
-            },
-          },
-
-          bomId: true,
-          className: true,
-          createdAt: true,
-          createdBy: true,
-          description: true,
-          editedAt: true,
-          editedBy: true,
-          id: true,
-          isClassDefinition: true,
-          name: true,
-
-          operations: {
-            select: {
-              id: true,
-            },
-          },
-
-          operationSequenceIndex: true,
-          operationStepSequence: true,
-          revision: true,
-          schemaVersion: true,
-
-          testParameters: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instructions")
   @ApiNestedQuery(InstructionFindManyArgs)

@@ -263,63 +263,6 @@ export class RecipeParameterControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: RecipeParameter })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteRecipeParameter(
-    @common.Param() params: RecipeParameterWhereUniqueInput
-  ): Promise<RecipeParameter | null> {
-    try {
-      return await this.service.deleteRecipeParameter({
-        where: params,
-        select: {
-          active: true,
-          batch: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
-          className: true,
-          createdAt: true,
-          createdBy: true,
-          editedAt: true,
-          editedBy: true,
-          id: true,
-          isClassDefinition: true,
-          itemId: true,
-          recipeParamDescription: true,
-          recipeParamName: true,
-          recipeParamUnits: true,
-          recipeSetpointBooleanValue: true,
-          recipeSetpointLowerLimit: true,
-          recipeSetpointType: true,
-          recipeSetpointUpperLimit: true,
-          revision: true,
-          schemaVersion: true,
-          sequencerParameters: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeParameters")
   @ApiNestedQuery(RecipeParameterFindManyArgs)

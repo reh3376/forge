@@ -25,7 +25,6 @@ import { RecipeParameterFindManyArgs } from "./RecipeParameterFindManyArgs";
 import { RecipeParameterFindUniqueArgs } from "./RecipeParameterFindUniqueArgs";
 import { CreateRecipeParameterArgs } from "./CreateRecipeParameterArgs";
 import { UpdateRecipeParameterArgs } from "./UpdateRecipeParameterArgs";
-import { DeleteRecipeParameterArgs } from "./DeleteRecipeParameterArgs";
 import { RecipeParameterService } from "../recipeParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeParameter)
@@ -127,27 +126,6 @@ export class RecipeParameterResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => RecipeParameter)
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteRecipeParameter(
-    @graphql.Args() args: DeleteRecipeParameterArgs
-  ): Promise<RecipeParameter | null> {
-    try {
-      return await this.service.deleteRecipeParameter(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
