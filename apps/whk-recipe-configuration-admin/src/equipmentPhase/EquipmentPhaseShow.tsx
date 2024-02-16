@@ -25,7 +25,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
         <ReferenceField label="Bom" source="bom.id" reference="Bom">
           <TextField source={BOM_TITLE_FIELD} />
         </ReferenceField>
-        <TextField label="Bom ID" source="bomId" />
         <TextField label="Class Name" source="className" />
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
@@ -67,7 +66,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
             <ReferenceField
-              label="Class ID"
+              label="Classs"
               source="phaseparameter.id"
               reference="PhaseParameter"
             >

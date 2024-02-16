@@ -11,7 +11,6 @@ import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhe
 
 export type EquipmentPhaseWhereInput = {
   bom?: BomWhereUniqueInput;
-  bomId?: StringNullableFilter;
   className?: StringNullableFilter;
   createdAt?: DateTimeNullableFilter;
   createdBy?: StringFilter;

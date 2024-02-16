@@ -208,7 +208,6 @@ export class InstructionControllerBase {
           },
         },
 
-        bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,

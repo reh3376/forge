@@ -23,11 +23,7 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
     <Edit {...props}>
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
-        <ReferenceInput
-          source="classId.id"
-          reference="Operation"
-          label="Class ID"
-        >
+        <ReferenceInput source="classId.id" reference="Operation" label="Class">
           <SelectInput optionText={OperationTitle} />
         </ReferenceInput>
         <TextInput label="Created By" source="createdBy" />

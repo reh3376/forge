@@ -24,7 +24,7 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
         <ReferenceInput
           source="classId.id"
           reference="TestParameter"
-          label="Class ID"
+          label="Class"
         >
           <SelectInput optionText={TestParameterTitle} />
         </ReferenceInput>
