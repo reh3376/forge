@@ -44,7 +44,7 @@ export const PhaseParameterCreate = (
         <TextInput label="Item ID" source="itemId" />
         <TextInput label="Name" source="name" />
         <ReferenceArrayInput
-          source="phaseParameter"
+          source="phaseParameters"
           reference="PhaseParameter"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}

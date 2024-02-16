@@ -310,19 +310,19 @@ export class PhaseParameterControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/phaseParameter")
+  @common.Get("/:id/phaseParameters")
   @ApiNestedQuery(PhaseParameterFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
   })
-  async findPhaseParameter(
+  async findPhaseParameters(
     @common.Req() request: Request,
     @common.Param() params: PhaseParameterWhereUniqueInput
   ): Promise<PhaseParameter[]> {
     const query = plainToClass(PhaseParameterFindManyArgs, request.query);
-    const results = await this.service.findPhaseParameter(params.id, {
+    const results = await this.service.findPhaseParameters(params.id, {
       ...query,
       select: {
         active: true,
@@ -369,18 +369,18 @@ export class PhaseParameterControllerBase {
     return results;
   }
 
-  @common.Post("/:id/phaseParameter")
+  @common.Post("/:id/phaseParameters")
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
   })
-  async connectPhaseParameter(
+  async connectPhaseParameters(
     @common.Param() params: PhaseParameterWhereUniqueInput,
     @common.Body() body: PhaseParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      phaseParameter: {
+      phaseParameters: {
         connect: body,
       },
     };
@@ -391,18 +391,18 @@ export class PhaseParameterControllerBase {
     });
   }
 
-  @common.Patch("/:id/phaseParameter")
+  @common.Patch("/:id/phaseParameters")
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
   })
-  async updatePhaseParameter(
+  async updatePhaseParameters(
     @common.Param() params: PhaseParameterWhereUniqueInput,
     @common.Body() body: PhaseParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      phaseParameter: {
+      phaseParameters: {
         set: body,
       },
     };
@@ -413,18 +413,18 @@ export class PhaseParameterControllerBase {
     });
   }
 
-  @common.Delete("/:id/phaseParameter")
+  @common.Delete("/:id/phaseParameters")
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
   })
-  async disconnectPhaseParameter(
+  async disconnectPhaseParameters(
     @common.Param() params: PhaseParameterWhereUniqueInput,
     @common.Body() body: PhaseParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      phaseParameter: {
+      phaseParameters: {
         disconnect: body,
       },
     };
