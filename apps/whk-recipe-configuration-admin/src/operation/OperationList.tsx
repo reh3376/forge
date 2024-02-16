@@ -26,7 +26,7 @@ export const OperationList = (props: ListProps): React.ReactElement => {
       <Datagrid rowClick="show">
         <BooleanField label="Active" source="active" />
         <ReferenceField
-          label="Class ID"
+          label="Class"
           source="operation.id"
           reference="Operation"
         >

@@ -216,7 +216,6 @@ export class BomControllerBase {
           },
         },
 
-        bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,
