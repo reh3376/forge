@@ -12,21 +12,29 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  IsString,
   IsBoolean,
   IsOptional,
   ValidateNested,
-  IsString,
   IsInt,
 } from "class-validator";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
-import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { RecipeCreateNestedManyWithoutOperationsInput } from "./RecipeCreateNestedManyWithoutOperationsInput";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
 class OperationCreateInput {
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  abbreviation!: string;
+
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -129,18 +137,6 @@ class OperationCreateInput {
   path!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => ProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  procedure?: ProcedureWhereUniqueInput | null;
-
-  @ApiProperty({
     required: true,
     type: Number,
   })
@@ -178,6 +174,18 @@ class OperationCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureWhereUniqueInput | null;
 }
 
 export { OperationCreateInput as OperationCreateInput };

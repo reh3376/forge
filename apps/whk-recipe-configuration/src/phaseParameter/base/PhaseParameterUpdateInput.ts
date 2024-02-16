@@ -231,17 +231,6 @@ class PhaseParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  typeRevision?: number;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -249,7 +238,7 @@ class PhaseParameterUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  typeUnits?: string;
+  units?: string;
 }
 
 export { PhaseParameterUpdateInput as PhaseParameterUpdateInput };

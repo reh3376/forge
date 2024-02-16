@@ -15,10 +15,10 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  ValidateNested,
   IsInt,
+  ValidateNested,
 } from "class-validator";
-import { OperationCreateNestedManyWithoutProceduresInput } from "./OperationCreateNestedManyWithoutProceduresInput";
+import { UnitProcedureCreateNestedManyWithoutProceduresInput } from "./UnitProcedureCreateNestedManyWithoutProceduresInput";
 import { Type } from "class-transformer";
 
 @InputType()
@@ -66,18 +66,6 @@ class ProcedureCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => OperationCreateNestedManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationCreateNestedManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => OperationCreateNestedManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  operations?: OperationCreateNestedManyWithoutProceduresInput;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
@@ -97,6 +85,18 @@ class ProcedureCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureCreateNestedManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureCreateNestedManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => UnitProcedureCreateNestedManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  unitProcedures?: UnitProcedureCreateNestedManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,

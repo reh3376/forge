@@ -20,7 +20,6 @@ export type PhaseParameterOrderByInput = {
   setpointNumericalValue?: SortOrder;
   setpointType?: SortOrder;
   setpointUpperLimit?: SortOrder;
-  typeRevision?: SortOrder;
-  typeUnits?: SortOrder;
+  units?: SortOrder;
   updatedAt?: SortOrder;
 };

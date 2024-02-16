@@ -6,7 +6,6 @@ import { EquipmentPhaseWhereUniqueInput } from "../equipmentPhase/EquipmentPhase
 import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
-import { IntFilter } from "../../util/IntFilter";
 
 export type PhaseParameterWhereInput = {
   active?: BooleanNullableFilter;
@@ -28,6 +27,5 @@ export type PhaseParameterWhereInput = {
   setpointNumericalValue?: FloatNullableFilter;
   setpointType?: "Boolean" | "Numeric";
   setpointUpperLimit?: FloatNullableFilter;
-  typeRevision?: IntFilter;
-  typeUnits?: StringFilter;
+  units?: StringFilter;
 };

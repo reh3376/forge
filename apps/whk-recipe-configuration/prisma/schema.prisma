@@ -41,8 +41,7 @@ model PhaseParameter {
   setpointNumericalValue Float?
   setpointType           EnumPhaseParameterSetpointType
   setpointUpperLimit     Float?
-  typeRevision           Int                            @default(0)
-  typeUnits              String
+  units                  String
   updatedAt              DateTime                       @updatedAt
 
   @@unique([name, revision, equipmentPhaseId])
@@ -60,9 +59,9 @@ model TestParameter {
   equipmentPhases          EquipmentPhase[]
   id                       String                             @id @default(cuid())
   isClassDef               Boolean?                           @default(false)
-  isDefinition             Boolean?                           @default(false)
   name                     String
   schemaVersion            String?
+  testDetails              String?
   testParameters           TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterTestParameters")
   testParamRevision        String?
   testParamUnits           EnumTestParameterTestParamUnits?
@@ -73,6 +72,7 @@ model TestParameter {
   testSetpointType         EnumTestParameterTestSetpointType?
   testSetpointUpperLimit   Float?
   testSetpointValue        Float?
+  tooltip                  String?
 
   @@map("TestParameters")
 }
@@ -148,6 +148,7 @@ model EquipmentPhase {
 }
 
 model Operation {
+  abbreviation           String
   active                 Boolean?         @default(true)
   classId                Operation?       @relation(name: "OperationClassIdOperationOperations", fields: [classIdId], references: [id])
   classIdId              String?
@@ -161,12 +162,12 @@ model Operation {
   name                   String
   operations             Operation[]      @relation(name: "OperationClassIdOperationOperations")
   path                   String
-  procedure              Procedure?       @relation(fields: [procedureId], references: [id])
-  procedureId            String?
   procedureSequenceIndex Int              @unique @default(0)
   recipes                Recipe[]
   revision               Int              @default(0)
   schemaVersion          String?          @default("0001-b")
+  unitProcedure          UnitProcedure?   @relation(fields: [unitProcedureId], references: [id])
+  unitProcedureId        String?
   updatedAt              DateTime?        @updatedAt
 
   @@unique([name, revision, active])
@@ -174,17 +175,17 @@ model Operation {
 }
 
 model Procedure {
-  active        Boolean?    @default(true)
-  createdAt     DateTime    @default(now())
-  createdBy     String
-  description   String?
-  id            String      @id @default(cuid())
-  name          String?
-  operations    Operation[]
-  revision      Int?        @default(0)
-  schemaVersion String?     @default("0001-b")
-  updatedAt     DateTime    @updatedAt
-  updatedBy     String?
+  active         Boolean?        @default(true)
+  createdAt      DateTime        @default(now())
+  createdBy      String
+  description    String?
+  id             String          @id @default(cuid())
+  name           String?
+  revision       Int?            @default(0)
+  schemaVersion  String?         @default("0001-b")
+  unitProcedures UnitProcedure[]
+  updatedAt      DateTime        @updatedAt
+  updatedBy      String?
 
   @@unique([name, revision, active])
 }
@@ -242,6 +243,23 @@ model ProductionOrderQueue {
   schemaVersion String?  @default("0001-b")
   updatedAt     DateTime @updatedAt
   updatedBy     String?
+}
+
+model UnitProcedure {
+  createdAt     DateTime    @default(now())
+  createdBy     String
+  description   String?
+  id            String      @id @default(cuid())
+  name          String
+  operations    Operation[]
+  procedure     Procedure   @relation(fields: [procedureId], references: [id])
+  procedureId   String
+  revision      Int?        @default(0)
+  schemaVersion String?     @default("0001-b")
+  updatedAt     DateTime    @updatedAt
+  updatedBy     String?
+
+  @@unique([name, revision])
 }
 
 enum EnumPhaseParameterSetpointType {

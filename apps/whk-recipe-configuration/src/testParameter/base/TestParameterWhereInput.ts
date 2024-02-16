@@ -142,17 +142,6 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -172,6 +161,17 @@ class TestParameterWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  testDetails?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -250,6 +250,17 @@ class TestParameterWhereInput {
     nullable: true,
   })
   testSetpointType?: "Boolean" | "Numerical";
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  tooltip?: StringNullableFilter;
 }
 
 export { TestParameterWhereInput as TestParameterWhereInput };

@@ -61,8 +61,7 @@ export const PhaseParameterList = (props: ListProps): React.ReactElement => {
         />
         <TextField label="Setpoint Type" source="setpointType" />
         <TextField label="Setpoint Upper Limit" source="setpointUpperLimit" />
-        <TextField label="Type Revision" source="typeRevision" />
-        <TextField label="Type Units" source="typeUnits" />
+        <TextField label="Units" source="units" />
         <DateField source="updatedAt" label="Updated At" />
       </Datagrid>
     </List>
