@@ -48,6 +48,9 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomCreateInput,
+  })
   async createBom(@common.Body() data: BomCreateInput): Promise<Bom> {
     return await this.service.createBom({
       data: data,
@@ -153,6 +156,9 @@ export class BomControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: BomUpdateInput,
   })
   async updateBom(
     @common.Param() params: BomWhereUniqueInput,
