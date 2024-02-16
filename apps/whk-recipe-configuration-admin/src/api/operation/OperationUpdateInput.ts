@@ -10,11 +10,11 @@ export type OperationUpdateInput = {
   createdBy?: string;
   description?: string;
   editedBy?: string | null;
-  globalUuid?: string | null;
   isClassDefinition?: boolean | null;
   name?: string;
   operations?: OperationUpdateManyWithoutOperationsInput;
   operationSteps?: EquipmentPhaseUpdateManyWithoutOperationsInput;
+  path?: string;
   procedure?: ProcedureWhereUniqueInput | null;
   procedureSequenceIndex?: number;
   recipes?: RecipeUpdateManyWithoutOperationsInput;

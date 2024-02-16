@@ -36,10 +36,10 @@ export const OperationList = (props: ListProps): React.ReactElement => {
         <TextField label="Created By" source="createdBy" />
         <TextField label="Description" source="description" />
         <TextField label="Edited By" source="editedBy" />
-        <TextField label="globalUuid" source="globalUuid" />
         <TextField label="ID" source="id" />
         <BooleanField label="Is Class Definition" source="isClassDefinition" />
         <TextField label="Name" source="name" />
+        <TextField label="Path" source="path" />
         <ReferenceField
           label="Procedure"
           source="procedure.id"

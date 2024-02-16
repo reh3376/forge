@@ -79,17 +79,6 @@ class OperationCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalUuid?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -130,6 +119,14 @@ class OperationCreateInput {
     nullable: true,
   })
   operationSteps?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  path!: string;
 
   @ApiProperty({
     required: false,
