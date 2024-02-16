@@ -98,6 +98,12 @@ export class UnitProcedureResolverBase {
       data: {
         ...args.data,
 
+        classId: args.data.classId
+          ? {
+              connect: args.data.classId,
+            }
+          : undefined,
+
         procedure: {
           connect: args.data.procedure,
         },
@@ -120,6 +126,12 @@ export class UnitProcedureResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          classId: args.data.classId
+            ? {
+                connect: args.data.classId,
+              }
+            : undefined,
 
           procedure: {
             connect: args.data.procedure,
@@ -175,6 +187,47 @@ export class UnitProcedureResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedure" })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProcedure(
+    @graphql.Parent() parent: UnitProcedure,
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProcedure(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => UnitProcedure, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(
+    @graphql.Parent() parent: UnitProcedure
+  ): Promise<UnitProcedure | null> {
+    const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
