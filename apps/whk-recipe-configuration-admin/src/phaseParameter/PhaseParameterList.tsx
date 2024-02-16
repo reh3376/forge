@@ -26,7 +26,7 @@ export const PhaseParameterList = (props: ListProps): React.ReactElement => {
       <Datagrid rowClick="show">
         <BooleanField label="Active" source="active" />
         <ReferenceField
-          label="Classs"
+          label="Class"
           source="phaseparameter.id"
           reference="PhaseParameter"
         >

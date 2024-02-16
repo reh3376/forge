@@ -24,7 +24,7 @@ export const RecipeParameterEdit = (props: EditProps): React.ReactElement => {
         <ReferenceInput
           source="classId.id"
           reference="RecipeParameter"
-          label="Class ID"
+          label="Class"
         >
           <SelectInput optionText={RecipeParameterTitle} />
         </ReferenceInput>
