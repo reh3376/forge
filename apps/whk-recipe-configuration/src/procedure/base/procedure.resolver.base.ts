@@ -93,7 +93,15 @@ export class ProcedureResolverBase {
   ): Promise<Procedure> {
     return await this.service.createProcedure({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        classId: args.data.classId
+          ? {
+              connect: args.data.classId,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -110,7 +118,15 @@ export class ProcedureResolverBase {
     try {
       return await this.service.updateProcedure({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          classId: args.data.classId
+            ? {
+                connect: args.data.classId,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -120,6 +136,26 @@ export class ProcedureResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Procedure], { name: "procedures" })
+  @nestAccessControl.UseRoles({
+    resource: "Procedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProcedures(
+    @graphql.Parent() parent: Procedure,
+    @graphql.Args() args: ProcedureFindManyArgs
+  ): Promise<Procedure[]> {
+    const results = await this.service.findProcedures(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -140,5 +176,26 @@ export class ProcedureResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Procedure, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Procedure",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(
+    @graphql.Parent() parent: Procedure
+  ): Promise<Procedure | null> {
+    const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

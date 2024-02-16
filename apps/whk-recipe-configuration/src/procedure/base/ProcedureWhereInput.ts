@@ -14,8 +14,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
@@ -31,6 +33,18 @@ class ProcedureWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: ProcedureWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -67,6 +81,17 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -75,6 +100,18 @@ class ProcedureWhereInput {
     nullable: true,
   })
   name?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => ProcedureListRelationFilter, {
+    nullable: true,
+  })
+  procedures?: ProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,

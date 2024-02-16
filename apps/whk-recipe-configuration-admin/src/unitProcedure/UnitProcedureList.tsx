@@ -1,13 +1,17 @@
 import * as React from "react";
+
 import {
   List,
   Datagrid,
   ListProps,
-  DateField,
-  TextField,
   ReferenceField,
+  TextField,
+  DateField,
+  BooleanField,
 } from "react-admin";
+
 import Pagination from "../Components/Pagination";
+import { UNITPROCEDURE_TITLE_FIELD } from "./UnitProcedureTitle";
 import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 
 export const UnitProcedureList = (props: ListProps): React.ReactElement => {
@@ -20,10 +24,18 @@ export const UnitProcedureList = (props: ListProps): React.ReactElement => {
       pagination={<Pagination />}
     >
       <Datagrid rowClick="show">
+        <ReferenceField
+          label="Class"
+          source="unitprocedure.id"
+          reference="UnitProcedure"
+        >
+          <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+        </ReferenceField>
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
         <TextField label="Description" source="description" />
         <TextField label="ID" source="id" />
+        <BooleanField label="Is Class Def" source="isClassDef" />
         <TextField label="Name" source="name" />
         <ReferenceField
           label="Procedure"

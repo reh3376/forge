@@ -11,16 +11,31 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationListRelationFilter } from "../../operation/base/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
 
 @InputType()
 class UnitProcedureWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: UnitProcedureWhereUniqueInput;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -53,6 +68,17 @@ class UnitProcedureWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDef?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -110,6 +136,18 @@ class UnitProcedureWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => UnitProcedureListRelationFilter, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,
