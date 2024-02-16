@@ -52,7 +52,7 @@ export class PhaseParameterServiceBase {
     return this.prisma.phaseParameter.delete(args);
   }
 
-  async findPhaseParameter(
+  async findPhaseParameters(
     parentId: string,
     args: Prisma.PhaseParameterFindManyArgs
   ): Promise<PhaseParameter[]> {
@@ -60,7 +60,7 @@ export class PhaseParameterServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .phaseParameter(args);
+      .phaseParameters(args);
   }
 
   async getClassId(parentId: string): Promise<PhaseParameter | null> {
