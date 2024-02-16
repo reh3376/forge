@@ -25,8 +25,6 @@ import { RecipeParameterFindManyArgs } from "./RecipeParameterFindManyArgs";
 import { RecipeParameterFindUniqueArgs } from "./RecipeParameterFindUniqueArgs";
 import { CreateRecipeParameterArgs } from "./CreateRecipeParameterArgs";
 import { UpdateRecipeParameterArgs } from "./UpdateRecipeParameterArgs";
-import { DeleteRecipeParameterArgs } from "./DeleteRecipeParameterArgs";
-import { ParameterType } from "../../parameterType/base/ParameterType";
 import { RecipeParameterService } from "../recipeParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeParameter)
@@ -96,9 +94,9 @@ export class RecipeParameterResolverBase {
       data: {
         ...args.data,
 
-        parameterType: args.data.parameterType
+        classId: args.data.classId
           ? {
-              connect: args.data.parameterType,
+              connect: args.data.classId,
             }
           : undefined,
       },
@@ -121,9 +119,9 @@ export class RecipeParameterResolverBase {
         data: {
           ...args.data,
 
-          parameterType: args.data.parameterType
+          classId: args.data.classId
             ? {
-                connect: args.data.parameterType,
+                connect: args.data.classId,
               }
             : undefined,
         },
@@ -138,41 +136,40 @@ export class RecipeParameterResolverBase {
     }
   }
 
-  @graphql.Mutation(() => RecipeParameter)
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeParameter], { name: "recipeParameters" })
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteRecipeParameter(
-    @graphql.Args() args: DeleteRecipeParameterArgs
-  ): Promise<RecipeParameter | null> {
-    try {
-      return await this.service.deleteRecipeParameter(args);
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ParameterType, {
-    nullable: true,
-    name: "parameterType",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ParameterType",
     action: "read",
     possession: "any",
   })
-  async getParameterType(
+  async findRecipeParameters(
+    @graphql.Parent() parent: RecipeParameter,
+    @graphql.Args() args: RecipeParameterFindManyArgs
+  ): Promise<RecipeParameter[]> {
+    const results = await this.service.findRecipeParameters(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => RecipeParameter, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(
     @graphql.Parent() parent: RecipeParameter
-  ): Promise<ParameterType | null> {
-    const result = await this.service.getParameterType(parent.id);
+  ): Promise<RecipeParameter | null> {
+    const result = await this.service.getClassId(parent.id);
 
     if (!result) {
       return null;

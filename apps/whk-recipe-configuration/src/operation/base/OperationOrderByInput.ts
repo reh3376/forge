@@ -39,6 +39,17 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  classId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   createdAt?: SortOrder;
 
   @ApiProperty({
@@ -51,6 +62,17 @@ class OperationOrderByInput {
     nullable: true,
   })
   createdBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  description?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -94,7 +116,7 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  operationDescription?: SortOrder;
+  isClassDefinition?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -105,7 +127,7 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  operationName?: SortOrder;
+  name?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -116,7 +138,7 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  operationRevision?: SortOrder;
+  procedureId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -127,7 +149,7 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  operationSequenceNumber?: SortOrder;
+  procedureSequenceIndex?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +160,7 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  route?: SortOrder;
+  revision?: SortOrder;
 
   @ApiProperty({
     required: false,

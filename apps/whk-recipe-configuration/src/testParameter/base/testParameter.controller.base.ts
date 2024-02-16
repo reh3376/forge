@@ -26,6 +26,9 @@ import { TestParameter } from "./TestParameter";
 import { TestParameterFindManyArgs } from "./TestParameterFindManyArgs";
 import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { TestParameterUpdateInput } from "./TestParameterUpdateInput";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -45,26 +48,41 @@ export class TestParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestParameterCreateInput,
+  })
   async createTestParameter(
     @common.Body() data: TestParameterCreateInput
   ): Promise<TestParameter> {
     return await this.service.createTestParameter({
-      data: data,
+      data: {
+        ...data,
+
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
+      },
       select: {
         active: true,
-        batch: true,
-        className: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -98,19 +116,23 @@ export class TestParameterControllerBase {
       ...args,
       select: {
         active: true,
-        batch: true,
-        className: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -143,19 +165,23 @@ export class TestParameterControllerBase {
       where: params,
       select: {
         active: true,
-        batch: true,
-        className: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
+        isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -187,6 +213,9 @@ export class TestParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestParameterUpdateInput,
+  })
   async updateTestParameter(
     @common.Param() params: TestParameterWhereUniqueInput,
     @common.Body() data: TestParameterUpdateInput
@@ -194,22 +223,34 @@ export class TestParameterControllerBase {
     try {
       return await this.service.updateTestParameter({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
+        },
         select: {
           active: true,
-          batch: true,
-          className: true,
+
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
           createdBy: true,
+          description: true,
           editedAt: true,
           editedBy: true,
           id: true,
+          isClassDef: true,
           isDefinition: true,
-          itemId: true,
+          name: true,
           schemaVersion: true,
-          test: true,
-          testParamDescription: true,
-          testParamName: true,
           testParamRevision: true,
           testParamUnits: true,
           testPass: true,
@@ -231,56 +272,247 @@ export class TestParameterControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: TestParameter })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/equipmentPhases")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "TestParameter",
-    action: "delete",
+    resource: "EquipmentPhase",
+    action: "read",
     possession: "any",
   })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteTestParameter(
+  async findEquipmentPhases(
+    @common.Req() request: Request,
     @common.Param() params: TestParameterWhereUniqueInput
-  ): Promise<TestParameter | null> {
-    try {
-      return await this.service.deleteTestParameter({
-        where: params,
-        select: {
-          active: true,
-          batch: true,
-          className: true,
-          createdAt: true,
-          createdBy: true,
-          editedAt: true,
-          editedBy: true,
-          id: true,
-          isDefinition: true,
-          itemId: true,
-          schemaVersion: true,
-          test: true,
-          testParamDescription: true,
-          testParamName: true,
-          testParamRevision: true,
-          testParamUnits: true,
-          testPass: true,
-          testResult: true,
-          testSetpointBooleanValue: true,
-          testSetpointLowerLimit: true,
-          testSetpointType: true,
-          testSetpointUpperLimit: true,
-          testSetpointValue: true,
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findEquipmentPhases(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
         },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
+
+        bomId: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDefinition: true,
+        name: true,
+
+        operations: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationSequenceIndex: true,
+        operationStepSequence: true,
+        revision: true,
+        schemaVersion: true,
+
+        testParameters: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
     }
+    return results;
+  }
+
+  @common.Post("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectEquipmentPhases(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        connect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateEquipmentPhases(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        set: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectEquipmentPhases(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/testParameters")
+  @ApiNestedQuery(TestParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @common.Req() request: Request,
+    @common.Param() params: TestParameterWhereUniqueInput
+  ): Promise<TestParameter[]> {
+    const query = plainToClass(TestParameterFindManyArgs, request.query);
+    const results = await this.service.findTestParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDef: true,
+        isDefinition: true,
+        name: true,
+        schemaVersion: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectTestParameters(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateTestParameters(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        set: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectTestParameters(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

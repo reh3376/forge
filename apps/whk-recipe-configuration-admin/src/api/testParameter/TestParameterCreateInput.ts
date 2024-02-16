@@ -1,21 +1,24 @@
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
+import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
+import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
 import { InputJsonValue } from "../../types";
 
 export type TestParameterCreateInput = {
   active: boolean;
-  batch?: string | null;
-  className: string;
+  classId?: TestParameterWhereUniqueInput | null;
   createdBy: string;
+  description?: string | null;
   editedBy?: string | null;
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutTestParametersInput;
+  isClassDef?: boolean | null;
   isDefinition?: boolean | null;
-  itemId: string;
+  name: string;
   schemaVersion?: string | null;
-  test?: InputJsonValue;
-  testParamDescription?: string | null;
-  testParamName: string;
+  testParameters?: TestParameterCreateNestedManyWithoutTestParametersInput;
   testParamRevision?: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
   testPass?: boolean | null;
-  testResult?: string | null;
+  testResult?: InputJsonValue;
   testSetpointBooleanValue?: boolean | null;
   testSetpointLowerLimit?: number | null;
   testSetpointType?: "Boolean" | "Numerical" | null;

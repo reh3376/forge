@@ -31,31 +31,31 @@
   },
   {
     "role": "user",
-    "resource": "ParameterType",
+    "resource": "PhaseParameter",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "ParameterType",
+    "resource": "PhaseParameter",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "ParameterType",
+    "resource": "PhaseParameter",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "ParameterType",
+    "resource": "PhaseParameter",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "ParameterType",
+    "resource": "PhaseParameter",
     "action": "read:any",
     "attributes": "*"
   },
@@ -151,31 +151,31 @@
   },
   {
     "role": "user",
-    "resource": "OperationStep",
+    "resource": "EquipmentPhase",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "OperationStep",
+    "resource": "EquipmentPhase",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "OperationStep",
+    "resource": "EquipmentPhase",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "OperationStep",
+    "resource": "EquipmentPhase",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "OperationStep",
+    "resource": "EquipmentPhase",
     "action": "read:any",
     "attributes": "*"
   },
@@ -206,6 +206,126 @@
   {
     "role": "user",
     "resource": "Operation",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Procedure",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Procedure",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Procedure",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Procedure",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Procedure",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Recipe",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Bom",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Bom",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Bom",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Bom",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Bom",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrderQueue",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrderQueue",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrderQueue",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrderQueue",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrderQueue",
     "action": "read:any",
     "attributes": "*"
   }

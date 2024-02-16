@@ -5,29 +5,52 @@ import {
   SimpleForm,
   CreateProps,
   BooleanInput,
-  TextInput,
+  ReferenceInput,
   SelectInput,
+  TextInput,
+  ReferenceArrayInput,
+  SelectArrayInput,
   NumberInput,
 } from "react-admin";
+
+import { TestParameterTitle } from "./TestParameterTitle";
+import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 
 export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
   return (
     <Create {...props}>
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
-        <TextInput label="Batch" source="batch" />
-        <TextInput label="Class Name" source="className" />
+        <ReferenceInput
+          source="classId.id"
+          reference="TestParameter"
+          label="Class ID"
+        >
+          <SelectInput optionText={TestParameterTitle} />
+        </ReferenceInput>
         <TextInput label="Created By" source="createdBy" />
+        <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
+        <ReferenceArrayInput
+          source="equipmentPhases"
+          reference="EquipmentPhase"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={EquipmentPhaseTitle} />
+        </ReferenceArrayInput>
+        <BooleanInput label="Is Class Def" source="isClassDef" />
         <BooleanInput label="Is Definition" source="isDefinition" />
-        <TextInput label="Item ID" source="itemId" />
+        <TextInput label="Name" source="name" />
         <TextInput label="Schema Version" source="schemaVersion" />
-        <div />
-        <TextInput
-          label="Test Param Description"
-          source="testParamDescription"
-        />
-        <TextInput label="Test Param Name" source="testParamName" />
+        <ReferenceArrayInput
+          source="testParameters"
+          reference="TestParameter"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={TestParameterTitle} />
+        </ReferenceArrayInput>
         <TextInput label="Test Param Revision" source="testParamRevision" />
         <SelectInput
           source="testParamUnits"
@@ -44,7 +67,7 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
           optionValue="value"
         />
         <BooleanInput label="Test Pass" source="testPass" />
-        <TextInput label="Test Result" source="testResult" />
+        <div />
         <BooleanInput
           label="Test Setpoint Boolean Value"
           source="testSetpointBooleanValue"
