@@ -21,7 +21,7 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
         <BooleanField label="Active" source="active" />
         <TextField label="Batch" source="batch" />
         <ReferenceField
-          label="Class ID"
+          label="Class"
           source="recipeparameter.id"
           reference="RecipeParameter"
         >
@@ -59,14 +59,14 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
         <TextField label="Sequencer Parameters" source="sequencerParameters" />
         <ReferenceManyField
           reference="RecipeParameter"
-          target="classId"
+          target="classIdId"
           label="RecipeParameters"
         >
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
             <TextField label="Batch" source="batch" />
             <ReferenceField
-              label="Class ID"
+              label="Class"
               source="recipeparameter.id"
               reference="RecipeParameter"
             >

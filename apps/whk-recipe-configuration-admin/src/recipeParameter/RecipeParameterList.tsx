@@ -26,7 +26,7 @@ export const RecipeParameterList = (props: ListProps): React.ReactElement => {
         <BooleanField label="Active" source="active" />
         <TextField label="Batch" source="batch" />
         <ReferenceField
-          label="Class ID"
+          label="Class"
           source="recipeparameter.id"
           reference="RecipeParameter"
         >
