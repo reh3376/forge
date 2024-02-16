@@ -155,7 +155,7 @@ model Operation {
   createdBy              String
   description            String
   editedBy               String?
-  id                     String           @id @default(auto())
+  id                     String           @id @default(cuid())
   isClassDefinition      Boolean?         @default(false)
   name                   String
   operations             Operation[]      @relation(name: "OperationClassIdOperationOperations")
