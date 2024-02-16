@@ -294,7 +294,6 @@ export class TestParameterControllerBase {
           },
         },
 
-        bomId: true,
         className: true,
         createdAt: true,
         createdBy: true,

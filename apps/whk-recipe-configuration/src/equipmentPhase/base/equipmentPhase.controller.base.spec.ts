@@ -18,7 +18,6 @@ import { EquipmentPhaseService } from "../equipmentPhase.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  bomId: "exampleBomId",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
@@ -34,7 +33,6 @@ const CREATE_INPUT = {
   schemaVersion: "exampleSchemaVersion",
 };
 const CREATE_RESULT = {
-  bomId: "exampleBomId",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
@@ -51,7 +49,6 @@ const CREATE_RESULT = {
 };
 const FIND_MANY_RESULT = [
   {
-    bomId: "exampleBomId",
     className: "exampleClassName",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
@@ -68,7 +65,6 @@ const FIND_MANY_RESULT = [
   },
 ];
 const FIND_ONE_RESULT = {
-  bomId: "exampleBomId",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
