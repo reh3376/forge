@@ -130,7 +130,7 @@ model EquipmentPhase {
   description            String?
   editedAt               DateTime?        @updatedAt
   editedBy               String?
-  id                     String           @id @default(auto())
+  id                     String           @id @default(cuid())
   instructions           Instruction[]
   isClassDefinition      Boolean?         @default(false)
   name                   String
