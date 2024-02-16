@@ -18,8 +18,8 @@ import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
@@ -95,6 +95,18 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -137,18 +149,6 @@ class OperationWhereInput {
     nullable: true,
   })
   operations?: OperationListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseListRelationFilter)
-  @IsOptional()
-  @Field(() => EquipmentPhaseListRelationFilter, {
-    nullable: true,
-  })
-  operationSteps?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -20,8 +20,8 @@ import {
 } from "class-validator";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
-import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
+import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { RecipeUpdateManyWithoutOperationsInput } from "./RecipeUpdateManyWithoutOperationsInput";
 
@@ -85,6 +85,18 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -116,18 +128,6 @@ class OperationUpdateInput {
     nullable: true,
   })
   operations?: OperationUpdateManyWithoutOperationsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseUpdateManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseUpdateManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseUpdateManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  operationSteps?: EquipmentPhaseUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,

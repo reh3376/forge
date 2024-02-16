@@ -154,6 +154,26 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [EquipmentPhase], { name: "equipmentPhases" })
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findEquipmentPhases(
+    @graphql.Parent() parent: Operation,
+    @graphql.Args() args: EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
+    const results = await this.service.findEquipmentPhases(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Operation], { name: "operations" })
   @nestAccessControl.UseRoles({
     resource: "Operation",
@@ -165,26 +185,6 @@ export class OperationResolverBase {
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
     const results = await this.service.findOperations(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [EquipmentPhase], { name: "operationSteps" })
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "read",
-    possession: "any",
-  })
-  async findOperationSteps(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: EquipmentPhaseFindManyArgs
-  ): Promise<EquipmentPhase[]> {
-    const results = await this.service.findOperationSteps(parent.id, args);
 
     if (!results) {
       return [];
