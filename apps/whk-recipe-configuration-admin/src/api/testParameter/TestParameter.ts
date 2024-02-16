@@ -1,24 +1,25 @@
+import { EquipmentPhase } from "../equipmentPhase/EquipmentPhase";
 import { JsonValue } from "type-fest";
 
 export type TestParameter = {
   active: boolean;
-  batch: string | null;
-  className: string;
+  classId?: TestParameter | null;
   createdAt: Date;
   createdBy: string;
+  description: string | null;
   editedAt: Date | null;
   editedBy: string | null;
+  equipmentPhases?: Array<EquipmentPhase>;
   id: string;
+  isClassDef: boolean | null;
   isDefinition: boolean | null;
-  itemId: string;
+  name: string;
   schemaVersion: string | null;
-  test: JsonValue;
-  testParamDescription: string | null;
-  testParamName: string;
+  testParameters?: Array<TestParameter>;
   testParamRevision: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
   testPass: boolean | null;
-  testResult: string | null;
+  testResult: JsonValue;
   testSetpointBooleanValue: boolean | null;
   testSetpointLowerLimit: number | null;
   testSetpointType?: "Boolean" | "Numerical" | null;

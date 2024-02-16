@@ -1,0 +1,26 @@
+import { SortOrder } from "../../util/SortOrder";
+
+export type PhaseParameterOrderByInput = {
+  active?: SortOrder;
+  classId?: SortOrder;
+  createdAt?: SortOrder;
+  createdBy?: SortOrder;
+  description?: SortOrder;
+  editedBy?: SortOrder;
+  equipmentPhaseId?: SortOrder;
+  id?: SortOrder;
+  isClassDef?: SortOrder;
+  itemId?: SortOrder;
+  name?: SortOrder;
+  recipeId?: SortOrder;
+  revision?: SortOrder;
+  schemaVersion?: SortOrder;
+  setpointBooleanValue?: SortOrder;
+  setpointLowerLimit?: SortOrder;
+  setpointNumericalValue?: SortOrder;
+  setpointType?: SortOrder;
+  setpointUpperLimit?: SortOrder;
+  typeRevision?: SortOrder;
+  typeUnits?: SortOrder;
+  updatedAt?: SortOrder;
+};

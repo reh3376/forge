@@ -1,13 +1,12 @@
-import { OperationStepUpdateManyWithoutInstructionsInput } from "./OperationStepUpdateManyWithoutInstructionsInput";
-import { InputJsonValue } from "../../types";
+import { EquipmentPhaseUpdateManyWithoutInstructionsInput } from "./EquipmentPhaseUpdateManyWithoutInstructionsInput";
 
 export type InstructionUpdateInput = {
   active?: boolean | null;
   createdBy?: string;
   editedBy?: string | null;
+  equipmentPhase?: EquipmentPhaseUpdateManyWithoutInstructionsInput;
   filePath?: string;
-  instructionRevision?: number;
-  operationStep?: OperationStepUpdateManyWithoutInstructionsInput;
-  routes?: InputJsonValue;
+  name?: string | null;
+  revision?: number;
   schemaVersion?: string;
 };

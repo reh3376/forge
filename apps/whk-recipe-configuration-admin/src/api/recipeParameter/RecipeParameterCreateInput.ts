@@ -1,17 +1,19 @@
-import { ParameterTypeWhereUniqueInput } from "../parameterType/ParameterTypeWhereUniqueInput";
+import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
+import { RecipeParameterCreateNestedManyWithoutRecipeParametersInput } from "./RecipeParameterCreateNestedManyWithoutRecipeParametersInput";
 import { InputJsonValue } from "../../types";
 
 export type RecipeParameterCreateInput = {
   active: boolean;
   batch?: string | null;
+  classId?: RecipeParameterWhereUniqueInput | null;
   className: string;
   createdBy: string;
   editedBy?: string | null;
+  isClassDefinition?: boolean | null;
   itemId: string;
-  parameterType?: ParameterTypeWhereUniqueInput | null;
   recipeParamDescription?: string | null;
+  recipeParameters?: RecipeParameterCreateNestedManyWithoutRecipeParametersInput;
   recipeParamName: string;
-  recipeParamRevision?: string | null;
   recipeParamUnits?:
     | "Lbs"
     | "Gal"
@@ -27,6 +29,7 @@ export type RecipeParameterCreateInput = {
   recipeSetpointLowerLimit?: number | null;
   recipeSetpointType: "Boolean" | "Numeric";
   recipeSetpointUpperLimit?: number | null;
+  revision?: number | null;
   schemaVersion?: string | null;
   sequencerParameters?: InputJsonValue;
 };
