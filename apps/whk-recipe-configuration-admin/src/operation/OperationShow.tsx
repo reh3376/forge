@@ -53,7 +53,7 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
         <DateField source="updatedAt" label="Updated At" />
         <ReferenceManyField
           reference="Operation"
-          target="classId"
+          target="classIdId"
           label="Operations"
         >
           <Datagrid rowClick="show">

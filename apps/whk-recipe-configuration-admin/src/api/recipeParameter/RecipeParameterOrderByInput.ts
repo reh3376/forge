@@ -3,7 +3,7 @@ import { SortOrder } from "../../util/SortOrder";
 export type RecipeParameterOrderByInput = {
   active?: SortOrder;
   batch?: SortOrder;
-  classId?: SortOrder;
+  classIdId?: SortOrder;
   className?: SortOrder;
   createdAt?: SortOrder;
   createdBy?: SortOrder;

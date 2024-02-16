@@ -50,7 +50,7 @@ class RecipeParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  classId?: SortOrder;
+  classIdId?: SortOrder;
 
   @ApiProperty({
     required: false,

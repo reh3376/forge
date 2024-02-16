@@ -26,7 +26,7 @@ export const RecipeParameterCreate = (
         <ReferenceInput
           source="classId.id"
           reference="RecipeParameter"
-          label="Class ID"
+          label="Class"
         >
           <SelectInput optionText={RecipeParameterTitle} />
         </ReferenceInput>
