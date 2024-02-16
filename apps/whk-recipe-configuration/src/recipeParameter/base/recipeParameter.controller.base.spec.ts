@@ -30,10 +30,10 @@ const CREATE_INPUT = {
   itemId: "exampleItemId",
   recipeParamDescription: "exampleRecipeParamDescription",
   recipeParamName: "exampleRecipeParamName",
-  recipeParamRevision: "exampleRecipeParamRevision",
   recipeSetpointBooleanValue: "true",
   recipeSetpointLowerLimit: 42.42,
   recipeSetpointUpperLimit: 42.42,
+  revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
 const CREATE_RESULT = {
@@ -49,10 +49,10 @@ const CREATE_RESULT = {
   itemId: "exampleItemId",
   recipeParamDescription: "exampleRecipeParamDescription",
   recipeParamName: "exampleRecipeParamName",
-  recipeParamRevision: "exampleRecipeParamRevision",
   recipeSetpointBooleanValue: "true",
   recipeSetpointLowerLimit: 42.42,
   recipeSetpointUpperLimit: 42.42,
+  revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
 const FIND_MANY_RESULT = [
@@ -69,10 +69,10 @@ const FIND_MANY_RESULT = [
     itemId: "exampleItemId",
     recipeParamDescription: "exampleRecipeParamDescription",
     recipeParamName: "exampleRecipeParamName",
-    recipeParamRevision: "exampleRecipeParamRevision",
     recipeSetpointBooleanValue: "true",
     recipeSetpointLowerLimit: 42.42,
     recipeSetpointUpperLimit: 42.42,
+    revision: 42,
     schemaVersion: "exampleSchemaVersion",
   },
 ];
@@ -89,10 +89,10 @@ const FIND_ONE_RESULT = {
   itemId: "exampleItemId",
   recipeParamDescription: "exampleRecipeParamDescription",
   recipeParamName: "exampleRecipeParamName",
-  recipeParamRevision: "exampleRecipeParamRevision",
   recipeSetpointBooleanValue: "true",
   recipeSetpointLowerLimit: 42.42,
   recipeSetpointUpperLimit: 42.42,
+  revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
 

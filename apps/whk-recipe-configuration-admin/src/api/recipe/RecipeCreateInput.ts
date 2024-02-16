@@ -4,13 +4,13 @@ import { ProductionOrderQueueCreateNestedManyWithoutRecipesInput } from "./Produ
 export type RecipeCreateInput = {
   active?: boolean | null;
   createdBy: string;
-  customer?: string | null;
-  item?: string | null;
+  customerId: string;
   itemDescription?: string | null;
+  itemId: string;
   mashBill?: string | null;
   operation?: OperationWhereUniqueInput | null;
   productionOrderQueues?: ProductionOrderQueueCreateNestedManyWithoutRecipesInput;
   revision?: number | null;
   schemaVersion?: string | null;
-  updatedBy?: Date | null;
+  updatedBy?: string | null;
 };

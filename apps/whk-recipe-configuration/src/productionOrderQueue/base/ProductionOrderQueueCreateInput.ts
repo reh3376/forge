@@ -72,11 +72,11 @@ class ProductionOrderQueueCreateInput {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @Field(() => String)
-  revision!: string;
+  @IsInt()
+  @Field(() => Number)
+  revision!: number;
 
   @ApiProperty({
     required: true,

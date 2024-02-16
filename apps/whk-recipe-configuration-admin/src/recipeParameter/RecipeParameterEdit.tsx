@@ -46,7 +46,6 @@ export const RecipeParameterEdit = (props: EditProps): React.ReactElement => {
           <SelectArrayInput optionText={RecipeParameterTitle} />
         </ReferenceArrayInput>
         <TextInput label="Recipe Param Name" source="recipeParamName" />
-        <TextInput label="Recipe Param Revision" source="recipeParamRevision" />
         <SelectInput
           source="recipeParamUnits"
           label="Recipe Param Units"
@@ -87,6 +86,7 @@ export const RecipeParameterEdit = (props: EditProps): React.ReactElement => {
           label="Recipe Setpoint Upper Limit"
           source="recipeSetpointUpperLimit"
         />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <div />
       </SimpleForm>

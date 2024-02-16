@@ -90,6 +90,17 @@ class InstructionWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  name?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: IntFilter,
   })
   @Type(() => IntFilter)
@@ -97,7 +108,7 @@ class InstructionWhereInput {
   @Field(() => IntFilter, {
     nullable: true,
   })
-  instructionRevision?: IntFilter;
+  revision?: IntFilter;
 
   @ApiProperty({
     required: false,

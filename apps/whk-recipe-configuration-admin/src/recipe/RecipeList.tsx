@@ -26,10 +26,10 @@ export const RecipeList = (props: ListProps): React.ReactElement => {
         <BooleanField label="Active" source="active" />
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
-        <TextField label="Customer ID" source="customer" />
+        <TextField label="Customer ID" source="customerId" />
         <TextField label="ID" source="id" />
-        <TextField label="Item" source="item" />
         <TextField label="Item Description" source="itemDescription" />
+        <TextField label="Item ID" source="itemId" />
         <TextField label="Mash Bill" source="mashBill" />
         <ReferenceField
           label="Operation"

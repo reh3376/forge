@@ -28,6 +28,28 @@ class PhaseParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  active?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  classId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   createdAt?: SortOrder;
 
   @ApiProperty({
@@ -40,6 +62,17 @@ class PhaseParameterOrderByInput {
     nullable: true,
   })
   createdBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  description?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -83,6 +116,17 @@ class PhaseParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  isClassDef?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   itemId?: SortOrder;
 
   @ApiProperty({
@@ -94,7 +138,29 @@ class PhaseParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  name?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   recipeId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  revision?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -161,28 +227,6 @@ class PhaseParameterOrderByInput {
     nullable: true,
   })
   setpointUpperLimit?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  typeDescription?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  typeName?: SortOrder;
 
   @ApiProperty({
     required: false,

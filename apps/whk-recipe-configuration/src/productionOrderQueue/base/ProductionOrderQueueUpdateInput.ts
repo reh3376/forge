@@ -81,14 +81,14 @@ class ProductionOrderQueueUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
+  @IsInt()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Number, {
     nullable: true,
   })
-  revision?: string;
+  revision?: number;
 
   @ApiProperty({
     required: false,

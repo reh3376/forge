@@ -171,17 +171,6 @@ class RecipeParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  recipeParamRevision?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   recipeParamUnits?: SortOrder;
 
   @ApiProperty({
@@ -227,6 +216,17 @@ class RecipeParameterOrderByInput {
     nullable: true,
   })
   recipeSetpointUpperLimit?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  revision?: SortOrder;
 
   @ApiProperty({
     required: false,

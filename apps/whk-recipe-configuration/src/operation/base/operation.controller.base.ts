@@ -599,10 +599,10 @@ export class OperationControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+        customerId: true,
         id: true,
-        item: true,
         itemDescription: true,
+        itemId: true,
         mashBill: true,
 
         operation: {

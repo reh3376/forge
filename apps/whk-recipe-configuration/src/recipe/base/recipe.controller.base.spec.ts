@@ -21,59 +21,59 @@ const CREATE_INPUT = {
   active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customer: "exampleCustomer",
+  customerId: "exampleCustomerId",
   id: "exampleId",
-  item: "exampleItem",
   itemDescription: "exampleItemDescription",
+  itemId: "exampleItemId",
   mashBill: "exampleMashBill",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
-  updatedBy: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
   active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customer: "exampleCustomer",
+  customerId: "exampleCustomerId",
   id: "exampleId",
-  item: "exampleItem",
   itemDescription: "exampleItemDescription",
+  itemId: "exampleItemId",
   mashBill: "exampleMashBill",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
-  updatedBy: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
     active: "true",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
-    customer: "exampleCustomer",
+    customerId: "exampleCustomerId",
     id: "exampleId",
-    item: "exampleItem",
     itemDescription: "exampleItemDescription",
+    itemId: "exampleItemId",
     mashBill: "exampleMashBill",
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
-    updatedBy: new Date(),
+    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
   active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customer: "exampleCustomer",
+  customerId: "exampleCustomerId",
   id: "exampleId",
-  item: "exampleItem",
   itemDescription: "exampleItemDescription",
+  itemId: "exampleItemId",
   mashBill: "exampleMashBill",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
-  updatedBy: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {
@@ -160,7 +160,6 @@ describe("Recipe", () => {
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        updatedBy: CREATE_RESULT.updatedBy.toISOString(),
       });
   });
 
@@ -173,7 +172,6 @@ describe("Recipe", () => {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
-          updatedBy: FIND_MANY_RESULT[0].updatedBy.toISOString(),
         },
       ]);
   });
@@ -197,7 +195,6 @@ describe("Recipe", () => {
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
-        updatedBy: FIND_ONE_RESULT.updatedBy.toISOString(),
       });
   });
 
@@ -211,7 +208,6 @@ describe("Recipe", () => {
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        updatedBy: CREATE_RESULT.updatedBy.toISOString(),
       })
       .then(function () {
         agent

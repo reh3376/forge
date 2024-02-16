@@ -53,15 +53,12 @@ class Recipe {
   createdBy!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  customer!: string | null;
+  @Field(() => String)
+  customerId!: string;
 
   @ApiProperty({
     required: true,
@@ -80,18 +77,15 @@ class Recipe {
   @Field(() => String, {
     nullable: true,
   })
-  item!: string | null;
+  itemDescription!: string | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemDescription!: string | null;
+  @Field(() => String)
+  itemId!: string;
 
   @ApiProperty({
     required: false,
@@ -154,14 +148,14 @@ class Recipe {
 
   @ApiProperty({
     required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: Date | null;
+  updatedBy!: string | null;
 }
 
 export { Recipe as Recipe };

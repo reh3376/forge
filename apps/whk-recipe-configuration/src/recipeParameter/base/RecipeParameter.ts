@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsString,
@@ -19,7 +20,9 @@ import {
   IsDate,
   IsEnum,
   IsNumber,
+  IsInt,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
@@ -160,17 +163,6 @@ class RecipeParameter {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeParamRevision!: string | null;
-
-  @ApiProperty({
-    required: false,
     enum: EnumRecipeParameterRecipeParamUnits,
   })
   @IsEnum(EnumRecipeParameterRecipeParamUnits)
@@ -232,6 +224,17 @@ class RecipeParameter {
     nullable: true,
   })
   recipeSetpointUpperLimit!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
 
   @ApiProperty({
     required: false,

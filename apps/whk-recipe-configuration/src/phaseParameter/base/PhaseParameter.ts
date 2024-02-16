@@ -13,14 +13,14 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsDate,
-  IsString,
+  IsBoolean,
   IsOptional,
   ValidateNested,
-  IsBoolean,
+  IsDate,
+  IsString,
+  IsInt,
   IsNumber,
   IsEnum,
-  IsInt,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -29,6 +29,26 @@ import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType
 
 @ObjectType()
 class PhaseParameter {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  classId?: PhaseParameter | null;
+
   @ApiProperty({
     required: true,
   })
@@ -44,6 +64,14 @@ class PhaseParameter {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  description!: string;
 
   @ApiProperty({
     required: false,
@@ -75,6 +103,17 @@ class PhaseParameter {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef!: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -83,6 +122,23 @@ class PhaseParameter {
     nullable: true,
   })
   itemId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PhaseParameter],
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  phaseParameter?: Array<PhaseParameter>;
 
   @ApiProperty({
     required: false,
@@ -94,6 +150,17 @@ class PhaseParameter {
     nullable: true,
   })
   recipeId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
 
   @ApiProperty({
     required: false,
@@ -159,22 +226,6 @@ class PhaseParameter {
     nullable: true,
   })
   setpointUpperLimit!: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  typeDescription!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  typeName!: string;
 
   @ApiProperty({
     required: true,

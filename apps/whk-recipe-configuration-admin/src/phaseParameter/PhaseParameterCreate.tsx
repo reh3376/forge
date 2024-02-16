@@ -4,13 +4,16 @@ import {
   Create,
   SimpleForm,
   CreateProps,
-  TextInput,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
-  BooleanInput,
+  TextInput,
+  ReferenceArrayInput,
+  SelectArrayInput,
   NumberInput,
 } from "react-admin";
 
+import { PhaseParameterTitle } from "./PhaseParameterTitle";
 import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 
 export const PhaseParameterCreate = (
@@ -19,7 +22,16 @@ export const PhaseParameterCreate = (
   return (
     <Create {...props}>
       <SimpleForm>
+        <BooleanInput label="Active" source="active" />
+        <ReferenceInput
+          source="classId.id"
+          reference="PhaseParameter"
+          label="Class ID"
+        >
+          <SelectInput optionText={PhaseParameterTitle} />
+        </ReferenceInput>
         <TextInput label="Created By" source="createdBy" />
+        <TextInput label="Description" multiline source="description" />
         <TextInput label="Edited By" source="editedBy" />
         <ReferenceInput
           source="equipmentPhase.id"
@@ -28,8 +40,19 @@ export const PhaseParameterCreate = (
         >
           <SelectInput optionText={EquipmentPhaseTitle} />
         </ReferenceInput>
+        <BooleanInput label="Is Class Def" source="isClassDef" />
         <TextInput label="Item ID" source="itemId" />
+        <TextInput label="Name" source="name" />
+        <ReferenceArrayInput
+          source="phaseParameter"
+          reference="PhaseParameter"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={PhaseParameterTitle} />
+        </ReferenceArrayInput>
         <TextInput label="Recipe ID" source="recipeId" />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <BooleanInput
           label="Setpoint Boolean Value"
@@ -51,12 +74,6 @@ export const PhaseParameterCreate = (
           optionValue="value"
         />
         <NumberInput label="Setpoint Upper Limit" source="setpointUpperLimit" />
-        <TextInput
-          label="Type Description"
-          multiline
-          source="typeDescription"
-        />
-        <TextInput label="Type Name" source="typeName" />
         <NumberInput step={1} label="Type Revision" source="typeRevision" />
         <TextInput label="Type Units" source="typeUnits" />
       </SimpleForm>

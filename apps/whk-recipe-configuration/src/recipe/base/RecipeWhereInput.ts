@@ -19,7 +19,6 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderQueueListRelationFilter } from "../../productionOrderQueue/base/ProductionOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
 @InputType()
 class RecipeWhereInput {
@@ -47,14 +46,14 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  customer?: StringNullableFilter;
+  customerId?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -76,18 +75,18 @@ class RecipeWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  item?: StringNullableFilter;
+  itemDescription?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  itemDescription?: StringNullableFilter;
+  itemId?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -148,14 +147,14 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeNullableFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => DateTimeNullableFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: DateTimeNullableFilter;
+  updatedBy?: StringNullableFilter;
 }
 
 export { RecipeWhereInput as RecipeWhereInput };

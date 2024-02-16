@@ -398,7 +398,8 @@ export class EquipmentPhaseControllerBase {
         editedBy: true,
         filePath: true,
         id: true,
-        instructionRevision: true,
+        name: true,
+        revision: true,
         schemaVersion: true,
         updatedAt: true,
       },
@@ -493,8 +494,17 @@ export class EquipmentPhaseControllerBase {
     const results = await this.service.findPhaseParameters(params.id, {
       ...query,
       select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
+        description: true,
         editedBy: true,
 
         equipmentPhase: {
@@ -504,16 +514,17 @@ export class EquipmentPhaseControllerBase {
         },
 
         id: true,
+        isClassDef: true,
         itemId: true,
+        name: true,
         recipeId: true,
+        revision: true,
         schemaVersion: true,
         setpointBooleanValue: true,
         setpointLowerLimit: true,
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
-        typeDescription: true,
-        typeName: true,
         typeRevision: true,
         typeUnits: true,
         updatedAt: true,

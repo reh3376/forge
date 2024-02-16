@@ -63,7 +63,6 @@ export class TestParameterControllerBase {
       },
       select: {
         active: true,
-        batch: true,
 
         classId: {
           select: {
@@ -71,19 +70,16 @@ export class TestParameterControllerBase {
           },
         },
 
-        className: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
         isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -117,7 +113,6 @@ export class TestParameterControllerBase {
       ...args,
       select: {
         active: true,
-        batch: true,
 
         classId: {
           select: {
@@ -125,19 +120,16 @@ export class TestParameterControllerBase {
           },
         },
 
-        className: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
         isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -170,7 +162,6 @@ export class TestParameterControllerBase {
       where: params,
       select: {
         active: true,
-        batch: true,
 
         classId: {
           select: {
@@ -178,19 +169,16 @@ export class TestParameterControllerBase {
           },
         },
 
-        className: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
         isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -240,7 +228,6 @@ export class TestParameterControllerBase {
         },
         select: {
           active: true,
-          batch: true,
 
           classId: {
             select: {
@@ -248,19 +235,16 @@ export class TestParameterControllerBase {
             },
           },
 
-          className: true,
           createdAt: true,
           createdBy: true,
+          description: true,
           editedAt: true,
           editedBy: true,
           id: true,
           isClassDef: true,
           isDefinition: true,
-          itemId: true,
+          name: true,
           schemaVersion: true,
-          test: true,
-          testParamDescription: true,
-          testParamName: true,
           testParamRevision: true,
           testParamUnits: true,
           testPass: true,
@@ -301,7 +285,6 @@ export class TestParameterControllerBase {
         where: params,
         select: {
           active: true,
-          batch: true,
 
           classId: {
             select: {
@@ -309,19 +292,16 @@ export class TestParameterControllerBase {
             },
           },
 
-          className: true,
           createdAt: true,
           createdBy: true,
+          description: true,
           editedAt: true,
           editedBy: true,
           id: true,
           isClassDef: true,
           isDefinition: true,
-          itemId: true,
+          name: true,
           schemaVersion: true,
-          test: true,
-          testParamDescription: true,
-          testParamName: true,
           testParamRevision: true,
           testParamUnits: true,
           testPass: true,
@@ -485,7 +465,6 @@ export class TestParameterControllerBase {
       ...query,
       select: {
         active: true,
-        batch: true,
 
         classId: {
           select: {
@@ -493,19 +472,16 @@ export class TestParameterControllerBase {
           },
         },
 
-        className: true,
         createdAt: true,
         createdBy: true,
+        description: true,
         editedAt: true,
         editedBy: true,
         id: true,
         isClassDef: true,
         isDefinition: true,
-        itemId: true,
+        name: true,
         schemaVersion: true,
-        test: true,
-        testParamDescription: true,
-        testParamName: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,

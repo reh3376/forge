@@ -1,25 +1,33 @@
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseWhereUniqueInput } from "../equipmentPhase/EquipmentPhaseWhereUniqueInput";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { IntFilter } from "../../util/IntFilter";
 
 export type PhaseParameterWhereInput = {
+  active?: BooleanNullableFilter;
+  classId?: PhaseParameterWhereUniqueInput;
   createdBy?: StringFilter;
+  description?: StringFilter;
   editedBy?: StringNullableFilter;
   equipmentPhase?: EquipmentPhaseWhereUniqueInput;
   id?: StringFilter;
+  isClassDef?: BooleanNullableFilter;
   itemId?: StringNullableFilter;
+  name?: StringFilter;
+  phaseParameter?: PhaseParameterListRelationFilter;
   recipeId?: StringNullableFilter;
+  revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
   setpointBooleanValue?: BooleanNullableFilter;
   setpointLowerLimit?: FloatNullableFilter;
   setpointNumericalValue?: FloatNullableFilter;
   setpointType?: "Boolean" | "Numeric";
   setpointUpperLimit?: FloatNullableFilter;
-  typeDescription?: StringFilter;
-  typeName?: StringFilter;
   typeRevision?: IntFilter;
   typeUnits?: StringFilter;
 };

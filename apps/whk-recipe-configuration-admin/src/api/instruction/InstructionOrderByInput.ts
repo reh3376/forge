@@ -7,7 +7,8 @@ export type InstructionOrderByInput = {
   editedBy?: SortOrder;
   filePath?: SortOrder;
   id?: SortOrder;
-  instructionRevision?: SortOrder;
+  name?: SortOrder;
+  revision?: SortOrder;
   schemaVersion?: SortOrder;
   updatedAt?: SortOrder;
 };

@@ -8,7 +8,8 @@ export type Instruction = {
   equipmentPhase?: Array<EquipmentPhase>;
   filePath: string;
   id: string;
-  instructionRevision: number;
+  name: string | null;
+  revision: number;
   schemaVersion: string;
   updatedAt: Date;
 };

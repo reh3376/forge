@@ -6,7 +6,7 @@ export type ProductionOrderQueueUpdateInput = {
   createdBy?: string;
   queueIndex?: number | null;
   recipe?: RecipeWhereUniqueInput | null;
-  revision?: string;
+  revision?: number;
   salesOrderId?: string;
   schemaVersion?: string | null;
   updatedBy?: string | null;

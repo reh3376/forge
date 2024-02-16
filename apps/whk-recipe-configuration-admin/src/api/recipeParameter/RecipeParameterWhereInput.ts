@@ -7,6 +7,7 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { RecipeParameterListRelationFilter } from "./RecipeParameterListRelationFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 
 export type RecipeParameterWhereInput = {
@@ -24,7 +25,6 @@ export type RecipeParameterWhereInput = {
   recipeParamDescription?: StringNullableFilter;
   recipeParameters?: RecipeParameterListRelationFilter;
   recipeParamName?: StringFilter;
-  recipeParamRevision?: StringNullableFilter;
   recipeParamUnits?:
     | "Lbs"
     | "Gal"
@@ -39,6 +39,7 @@ export type RecipeParameterWhereInput = {
   recipeSetpointLowerLimit?: FloatNullableFilter;
   recipeSetpointType?: "Boolean" | "Numeric";
   recipeSetpointUpperLimit?: FloatNullableFilter;
+  revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
   sequencerParameters?: JsonFilter;
 };

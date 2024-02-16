@@ -14,7 +14,6 @@ export type RecipeParameterUpdateInput = {
   recipeParamDescription?: string | null;
   recipeParameters?: RecipeParameterUpdateManyWithoutRecipeParametersInput;
   recipeParamName?: string;
-  recipeParamRevision?: string | null;
   recipeParamUnits?:
     | "Lbs"
     | "Gal"
@@ -30,6 +29,7 @@ export type RecipeParameterUpdateInput = {
   recipeSetpointLowerLimit?: number | null;
   recipeSetpointType?: "Boolean" | "Numeric";
   recipeSetpointUpperLimit?: number | null;
+  revision?: number | null;
   schemaVersion?: string | null;
   sequencerParameters?: InputJsonValue;
 };

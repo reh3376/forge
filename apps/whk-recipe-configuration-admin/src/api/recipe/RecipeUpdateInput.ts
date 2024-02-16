@@ -4,13 +4,13 @@ import { ProductionOrderQueueUpdateManyWithoutRecipesInput } from "./ProductionO
 export type RecipeUpdateInput = {
   active?: boolean | null;
   createdBy?: string;
-  customer?: string | null;
-  item?: string | null;
+  customerId?: string;
   itemDescription?: string | null;
+  itemId?: string;
   mashBill?: string | null;
   operation?: OperationWhereUniqueInput | null;
   productionOrderQueues?: ProductionOrderQueueUpdateManyWithoutRecipesInput;
   revision?: number | null;
   schemaVersion?: string | null;
-  updatedBy?: Date | null;
+  updatedBy?: string | null;
 };

@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { IntFilter } from "../../util/IntFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
@@ -90,14 +91,14 @@ class ProductionOrderQueueWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: IntFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => IntFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => IntFilter, {
     nullable: true,
   })
-  revision?: StringFilter;
+  revision?: IntFilter;
 
   @ApiProperty({
     required: false,

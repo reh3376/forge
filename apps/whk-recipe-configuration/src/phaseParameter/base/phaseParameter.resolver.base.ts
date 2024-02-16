@@ -96,6 +96,12 @@ export class PhaseParameterResolverBase {
       data: {
         ...args.data,
 
+        classId: args.data.classId
+          ? {
+              connect: args.data.classId,
+            }
+          : undefined,
+
         equipmentPhase: args.data.equipmentPhase
           ? {
               connect: args.data.equipmentPhase,
@@ -120,6 +126,12 @@ export class PhaseParameterResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          classId: args.data.classId
+            ? {
+                connect: args.data.classId,
+              }
+            : undefined,
 
           equipmentPhase: args.data.equipmentPhase
             ? {
@@ -157,6 +169,47 @@ export class PhaseParameterResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [PhaseParameter], { name: "phaseParameter" })
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findPhaseParameter(
+    @graphql.Parent() parent: PhaseParameter,
+    @graphql.Args() args: PhaseParameterFindManyArgs
+  ): Promise<PhaseParameter[]> {
+    const results = await this.service.findPhaseParameter(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => PhaseParameter, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(
+    @graphql.Parent() parent: PhaseParameter
+  ): Promise<PhaseParameter | null> {
+    const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

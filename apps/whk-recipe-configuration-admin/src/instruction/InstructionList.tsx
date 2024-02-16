@@ -25,7 +25,8 @@ export const InstructionList = (props: ListProps): React.ReactElement => {
         <TextField label="Edited By" source="editedBy" />
         <TextField label="File Path" source="filePath" />
         <TextField label="ID" source="id" />
-        <TextField label="Instruction Revision" source="instructionRevision" />
+        <TextField label="Name" source="name" />
+        <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <DateField source="updatedAt" label="Updated At" />
       </Datagrid>

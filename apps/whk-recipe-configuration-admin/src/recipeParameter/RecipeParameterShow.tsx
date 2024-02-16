@@ -40,7 +40,6 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
           source="recipeParamDescription"
         />
         <TextField label="Recipe Param Name" source="recipeParamName" />
-        <TextField label="Recipe Param Revision" source="recipeParamRevision" />
         <TextField label="Recipe Param Units" source="recipeParamUnits" />
         <BooleanField
           label="Recipe Setpoint Boolean Value"
@@ -55,6 +54,7 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
           label="Recipe Setpoint Upper Limit"
           source="recipeSetpointUpperLimit"
         />
+        <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <TextField label="Sequencer Parameters" source="sequencerParameters" />
         <ReferenceManyField
@@ -88,10 +88,6 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
               source="recipeParamDescription"
             />
             <TextField label="Recipe Param Name" source="recipeParamName" />
-            <TextField
-              label="Recipe Param Revision"
-              source="recipeParamRevision"
-            />
             <TextField label="Recipe Param Units" source="recipeParamUnits" />
             <BooleanField
               label="Recipe Setpoint Boolean Value"
@@ -109,6 +105,7 @@ export const RecipeParameterShow = (props: ShowProps): React.ReactElement => {
               label="Recipe Setpoint Upper Limit"
               source="recipeSetpointUpperLimit"
             />
+            <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
             <TextField
               label="Sequencer Parameters"

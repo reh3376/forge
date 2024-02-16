@@ -6,6 +6,7 @@ export type InstructionCreateInput = {
   editedBy?: string | null;
   equipmentPhase?: EquipmentPhaseCreateNestedManyWithoutInstructionsInput;
   filePath: string;
-  instructionRevision: number;
+  name?: string | null;
+  revision: number;
   schemaVersion: string;
 };

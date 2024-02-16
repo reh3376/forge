@@ -39,29 +39,7 @@ class TestParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  batch?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   classId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  className?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -84,6 +62,17 @@ class TestParameterOrderByInput {
     nullable: true,
   })
   createdBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  description?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -149,7 +138,7 @@ class TestParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  itemId?: SortOrder;
+  name?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -161,39 +150,6 @@ class TestParameterOrderByInput {
     nullable: true,
   })
   schemaVersion?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  test?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  testParamDescription?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  testParamName?: SortOrder;
 
   @ApiProperty({
     required: false,
