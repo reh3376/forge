@@ -94,17 +94,6 @@ class OperationOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  globalUuid?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   id?: SortOrder;
 
   @ApiProperty({
@@ -128,6 +117,17 @@ class OperationOrderByInput {
     nullable: true,
   })
   name?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  path?: SortOrder;
 
   @ApiProperty({
     required: false,

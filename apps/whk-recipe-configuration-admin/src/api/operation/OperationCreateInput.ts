@@ -10,11 +10,11 @@ export type OperationCreateInput = {
   createdBy: string;
   description: string;
   editedBy?: string | null;
-  globalUuid?: string | null;
   isClassDefinition?: boolean | null;
   name: string;
   operations?: OperationCreateNestedManyWithoutOperationsInput;
   operationSteps?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
+  path: string;
   procedure?: ProcedureWhereUniqueInput | null;
   procedureSequenceIndex: number;
   recipes?: RecipeCreateNestedManyWithoutOperationsInput;

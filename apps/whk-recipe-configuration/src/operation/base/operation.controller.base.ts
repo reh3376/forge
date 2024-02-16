@@ -86,10 +86,10 @@ export class OperationControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-        globalUuid: true,
         id: true,
         isClassDefinition: true,
         name: true,
+        path: true,
 
         procedure: {
           select: {
@@ -134,10 +134,10 @@ export class OperationControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-        globalUuid: true,
         id: true,
         isClassDefinition: true,
         name: true,
+        path: true,
 
         procedure: {
           select: {
@@ -183,10 +183,10 @@ export class OperationControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-        globalUuid: true,
         id: true,
         isClassDefinition: true,
         name: true,
+        path: true,
 
         procedure: {
           select: {
@@ -258,10 +258,10 @@ export class OperationControllerBase {
           createdBy: true,
           description: true,
           editedBy: true,
-          globalUuid: true,
           id: true,
           isClassDefinition: true,
           name: true,
+          path: true,
 
           procedure: {
             select: {
@@ -313,10 +313,10 @@ export class OperationControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-        globalUuid: true,
         id: true,
         isClassDefinition: true,
         name: true,
+        path: true,
 
         procedure: {
           select: {
