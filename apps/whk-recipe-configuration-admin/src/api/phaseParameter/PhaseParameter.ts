@@ -12,7 +12,7 @@ export type PhaseParameter = {
   isClassDef: boolean | null;
   itemId: string | null;
   name: string;
-  phaseParameter?: Array<PhaseParameter>;
+  phaseParameters?: Array<PhaseParameter>;
   recipeId: string | null;
   revision: number | null;
   schemaVersion: string | null;

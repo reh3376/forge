@@ -19,7 +19,7 @@ export type PhaseParameterWhereInput = {
   isClassDef?: BooleanNullableFilter;
   itemId?: StringNullableFilter;
   name?: StringFilter;
-  phaseParameter?: PhaseParameterListRelationFilter;
+  phaseParameters?: PhaseParameterListRelationFilter;
   recipeId?: StringNullableFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;

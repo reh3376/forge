@@ -12,7 +12,7 @@ export type PhaseParameterCreateInput = {
   isClassDef?: boolean | null;
   itemId?: string | null;
   name: string;
-  phaseParameter?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
+  phaseParameters?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
   recipeId?: string | null;
   revision?: number | null;
   schemaVersion?: string | null;
