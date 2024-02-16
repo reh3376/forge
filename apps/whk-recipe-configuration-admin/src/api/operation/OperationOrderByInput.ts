@@ -1,6 +1,7 @@
 import { SortOrder } from "../../util/SortOrder";
 
 export type OperationOrderByInput = {
+  abbreviation?: SortOrder;
   active?: SortOrder;
   classIdId?: SortOrder;
   createdAt?: SortOrder;
@@ -11,9 +12,9 @@ export type OperationOrderByInput = {
   isClassDefinition?: SortOrder;
   name?: SortOrder;
   path?: SortOrder;
-  procedureId?: SortOrder;
   procedureSequenceIndex?: SortOrder;
   revision?: SortOrder;
   schemaVersion?: SortOrder;
+  unitProcedureId?: SortOrder;
   updatedAt?: SortOrder;
 };

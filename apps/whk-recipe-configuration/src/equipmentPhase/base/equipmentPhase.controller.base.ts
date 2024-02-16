@@ -464,8 +464,7 @@ export class EquipmentPhaseControllerBase {
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
-        typeRevision: true,
-        typeUnits: true,
+        units: true,
         updatedAt: true,
       },
     });

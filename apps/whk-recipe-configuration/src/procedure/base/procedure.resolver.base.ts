@@ -25,8 +25,8 @@ import { ProcedureFindManyArgs } from "./ProcedureFindManyArgs";
 import { ProcedureFindUniqueArgs } from "./ProcedureFindUniqueArgs";
 import { CreateProcedureArgs } from "./CreateProcedureArgs";
 import { UpdateProcedureArgs } from "./UpdateProcedureArgs";
-import { OperationFindManyArgs } from "../../operation/base/OperationFindManyArgs";
-import { Operation } from "../../operation/base/Operation";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ProcedureService } from "../procedure.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Procedure)
@@ -123,17 +123,17 @@ export class ProcedureResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Operation], { name: "operations" })
+  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
   @nestAccessControl.UseRoles({
-    resource: "Operation",
+    resource: "UnitProcedure",
     action: "read",
     possession: "any",
   })
-  async findOperations(
+  async findUnitProcedures(
     @graphql.Parent() parent: Procedure,
-    @graphql.Args() args: OperationFindManyArgs
-  ): Promise<Operation[]> {
-    const results = await this.service.findOperations(parent.id, args);
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProcedures(parent.id, args);
 
     if (!results) {
       return [];

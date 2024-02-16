@@ -74,8 +74,7 @@ export const PhaseParameterCreate = (
           optionValue="value"
         />
         <NumberInput label="Setpoint Upper Limit" source="setpointUpperLimit" />
-        <NumberInput step={1} label="Type Revision" source="typeRevision" />
-        <TextInput label="Type Units" source="typeUnits" />
+        <TextInput label="Units" source="units" />
       </SimpleForm>
     </Create>
   );

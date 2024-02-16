@@ -22,7 +22,6 @@ import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFi
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
-import { IntFilter } from "../../util/IntFilter";
 
 @InputType()
 class PhaseParameterWhereInput {
@@ -240,17 +239,6 @@ class PhaseParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  typeRevision?: IntFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -258,7 +246,7 @@ class PhaseParameterWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  typeUnits?: StringFilter;
+  units?: StringFilter;
 }
 
 export { PhaseParameterWhereInput as PhaseParameterWhereInput };

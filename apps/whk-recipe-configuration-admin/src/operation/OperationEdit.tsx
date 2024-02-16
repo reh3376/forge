@@ -4,10 +4,10 @@ import {
   Edit,
   SimpleForm,
   EditProps,
+  TextInput,
   BooleanInput,
   ReferenceInput,
   SelectInput,
-  TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
   NumberInput,
@@ -15,13 +15,14 @@ import {
 
 import { OperationTitle } from "./OperationTitle";
 import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
-import { ProcedureTitle } from "../procedure/ProcedureTitle";
 import { RecipeTitle } from "../recipe/RecipeTitle";
+import { UnitProcedureTitle } from "../unitProcedure/UnitProcedureTitle";
 
 export const OperationEdit = (props: EditProps): React.ReactElement => {
   return (
     <Edit {...props}>
       <SimpleForm>
+        <TextInput label="Abbreviation" source="abbreviation" />
         <BooleanInput label="Active" source="active" />
         <ReferenceInput source="classId.id" reference="Operation" label="Class">
           <SelectInput optionText={OperationTitle} />
@@ -48,13 +49,6 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
           <SelectArrayInput optionText={OperationTitle} />
         </ReferenceArrayInput>
         <TextInput label="Path" source="path" />
-        <ReferenceInput
-          source="procedure.id"
-          reference="Procedure"
-          label="Procedure"
-        >
-          <SelectInput optionText={ProcedureTitle} />
-        </ReferenceInput>
         <NumberInput
           step={1}
           label="Procedure Sequence Index"
@@ -70,6 +64,13 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
         </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
+        <ReferenceInput
+          source="unitProcedure.id"
+          reference="UnitProcedure"
+          label="Unit Procedure"
+        >
+          <SelectInput optionText={UnitProcedureTitle} />
+        </ReferenceInput>
       </SimpleForm>
     </Edit>
   );

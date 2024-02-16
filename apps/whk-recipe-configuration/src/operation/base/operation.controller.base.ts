@@ -67,13 +67,14 @@ export class OperationControllerBase {
             }
           : undefined,
 
-        procedure: data.procedure
+        unitProcedure: data.unitProcedure
           ? {
-              connect: data.procedure,
+              connect: data.unitProcedure,
             }
           : undefined,
       },
       select: {
+        abbreviation: true,
         active: true,
 
         classId: {
@@ -90,16 +91,16 @@ export class OperationControllerBase {
         isClassDefinition: true,
         name: true,
         path: true,
+        procedureSequenceIndex: true,
+        revision: true,
+        schemaVersion: true,
 
-        procedure: {
+        unitProcedure: {
           select: {
             id: true,
           },
         },
 
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
       },
     });
@@ -122,6 +123,7 @@ export class OperationControllerBase {
     return this.service.operations({
       ...args,
       select: {
+        abbreviation: true,
         active: true,
 
         classId: {
@@ -138,16 +140,16 @@ export class OperationControllerBase {
         isClassDefinition: true,
         name: true,
         path: true,
+        procedureSequenceIndex: true,
+        revision: true,
+        schemaVersion: true,
 
-        procedure: {
+        unitProcedure: {
           select: {
             id: true,
           },
         },
 
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
       },
     });
@@ -171,6 +173,7 @@ export class OperationControllerBase {
     const result = await this.service.operation({
       where: params,
       select: {
+        abbreviation: true,
         active: true,
 
         classId: {
@@ -187,16 +190,16 @@ export class OperationControllerBase {
         isClassDefinition: true,
         name: true,
         path: true,
+        procedureSequenceIndex: true,
+        revision: true,
+        schemaVersion: true,
 
-        procedure: {
+        unitProcedure: {
           select: {
             id: true,
           },
         },
 
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
       },
     });
@@ -239,13 +242,14 @@ export class OperationControllerBase {
               }
             : undefined,
 
-          procedure: data.procedure
+          unitProcedure: data.unitProcedure
             ? {
-                connect: data.procedure,
+                connect: data.unitProcedure,
               }
             : undefined,
         },
         select: {
+          abbreviation: true,
           active: true,
 
           classId: {
@@ -262,16 +266,16 @@ export class OperationControllerBase {
           isClassDefinition: true,
           name: true,
           path: true,
+          procedureSequenceIndex: true,
+          revision: true,
+          schemaVersion: true,
 
-          procedure: {
+          unitProcedure: {
             select: {
               id: true,
             },
           },
 
-          procedureSequenceIndex: true,
-          revision: true,
-          schemaVersion: true,
           updatedAt: true,
         },
       });
@@ -425,6 +429,7 @@ export class OperationControllerBase {
     const results = await this.service.findOperations(params.id, {
       ...query,
       select: {
+        abbreviation: true,
         active: true,
 
         classId: {
@@ -441,16 +446,16 @@ export class OperationControllerBase {
         isClassDefinition: true,
         name: true,
         path: true,
+        procedureSequenceIndex: true,
+        revision: true,
+        schemaVersion: true,
 
-        procedure: {
+        unitProcedure: {
           select: {
             id: true,
           },
         },
 
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
       },
     });

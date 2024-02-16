@@ -40,9 +40,9 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Def" source="isClassDef" />
-        <BooleanInput label="Is Definition" source="isDefinition" />
         <TextInput label="Name" source="name" />
         <TextInput label="Schema Version" source="schemaVersion" />
+        <TextInput label="TestDetails" multiline source="testDetails" />
         <ReferenceArrayInput
           source="testParameters"
           reference="TestParameter"
@@ -95,6 +95,7 @@ export const TestParameterCreate = (props: CreateProps): React.ReactElement => {
           label="Test Setpoint Numerical Value"
           source="testSetpointValue"
         />
+        <TextInput label="Tooltip" source="tooltip" />
       </SimpleForm>
     </Create>
   );

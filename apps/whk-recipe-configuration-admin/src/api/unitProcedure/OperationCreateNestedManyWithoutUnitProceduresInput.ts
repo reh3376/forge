@@ -1,5 +1,5 @@
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
 
-export type OperationCreateNestedManyWithoutProceduresInput = {
+export type OperationCreateNestedManyWithoutUnitProceduresInput = {
   connect?: Array<OperationWhereUniqueInput>;
 };

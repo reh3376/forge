@@ -1,15 +1,16 @@
+import { StringFilter } from "../../util/StringFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../equipmentPhase/EquipmentPhaseListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
-import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { RecipeListRelationFilter } from "../recipe/RecipeListRelationFilter";
+import { UnitProcedureWhereUniqueInput } from "../unitProcedure/UnitProcedureWhereUniqueInput";
 
 export type OperationWhereInput = {
+  abbreviation?: StringFilter;
   active?: BooleanNullableFilter;
   classId?: OperationWhereUniqueInput;
   createdAt?: DateTimeNullableFilter;
@@ -22,10 +23,10 @@ export type OperationWhereInput = {
   name?: StringFilter;
   operations?: OperationListRelationFilter;
   path?: StringFilter;
-  procedure?: ProcedureWhereUniqueInput;
   procedureSequenceIndex?: IntFilter;
   recipes?: RecipeListRelationFilter;
   revision?: IntFilter;
   schemaVersion?: StringNullableFilter;
+  unitProcedure?: UnitProcedureWhereUniqueInput;
   updatedAt?: DateTimeNullableFilter;
 };

@@ -4,9 +4,9 @@ import {
   Show,
   SimpleShowLayout,
   ShowProps,
+  TextField,
   BooleanField,
   ReferenceField,
-  TextField,
   DateField,
   ReferenceManyField,
   Datagrid,
@@ -15,12 +15,13 @@ import {
 import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { OPERATION_TITLE_FIELD } from "./OperationTitle";
 import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
-import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
+import { UNITPROCEDURE_TITLE_FIELD } from "../unitProcedure/UnitProcedureTitle";
 
 export const OperationShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
+        <TextField label="Abbreviation" source="abbreviation" />
         <BooleanField label="Active" source="active" />
         <ReferenceField
           label="Class"
@@ -37,19 +38,19 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
         <BooleanField label="Is Class Definition" source="isClassDefinition" />
         <TextField label="Name" source="name" />
         <TextField label="Path" source="path" />
-        <ReferenceField
-          label="Procedure"
-          source="procedure.id"
-          reference="Procedure"
-        >
-          <TextField source={PROCEDURE_TITLE_FIELD} />
-        </ReferenceField>
         <TextField
           label="Procedure Sequence Index"
           source="procedureSequenceIndex"
         />
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
+        <ReferenceField
+          label="Unit Procedure"
+          source="unitprocedure.id"
+          reference="UnitProcedure"
+        >
+          <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+        </ReferenceField>
         <DateField source="updatedAt" label="Updated At" />
         <ReferenceManyField
           reference="EquipmentPhase"
@@ -104,6 +105,7 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
           label="Operations"
         >
           <Datagrid rowClick="show">
+            <TextField label="Abbreviation" source="abbreviation" />
             <BooleanField label="Active" source="active" />
             <ReferenceField
               label="Class"
@@ -123,19 +125,19 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
             />
             <TextField label="Name" source="name" />
             <TextField label="Path" source="path" />
-            <ReferenceField
-              label="Procedure"
-              source="procedure.id"
-              reference="Procedure"
-            >
-              <TextField source={PROCEDURE_TITLE_FIELD} />
-            </ReferenceField>
             <TextField
               label="Procedure Sequence Index"
               source="procedureSequenceIndex"
             />
             <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
+            <ReferenceField
+              label="Unit Procedure"
+              source="unitprocedure.id"
+              reference="UnitProcedure"
+            >
+              <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
             <DateField source="updatedAt" label="Updated At" />
           </Datagrid>
         </ReferenceManyField>
