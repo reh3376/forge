@@ -130,7 +130,7 @@ class PhaseParameterCreateInput {
   @Field(() => PhaseParameterCreateNestedManyWithoutPhaseParametersInput, {
     nullable: true,
   })
-  phaseParameter?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
+  phaseParameters?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,

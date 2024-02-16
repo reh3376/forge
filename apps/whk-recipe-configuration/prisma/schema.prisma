@@ -20,7 +20,7 @@ model User {
 
 model PhaseParameter {
   active                 Boolean?                       @default(false)
-  classId                PhaseParameter?                @relation(name: "phaseParameter", fields: [classIdId], references: [id])
+  classId                PhaseParameter?                @relation(name: "PhaseParameterClassIdPhaseParameterPhaseParameters", fields: [classIdId], references: [id])
   classIdId              String?
   createdAt              DateTime                       @default(now())
   createdBy              String                         @unique
@@ -32,7 +32,7 @@ model PhaseParameter {
   isClassDef             Boolean?                       @default(false)
   itemId                 String?
   name                   String
-  phaseParameter         PhaseParameter[]               @relation(name: "phaseParameter")
+  phaseParameters        PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterPhaseParameters")
   recipeId               String?
   revision               Int?                           @default(0)
   schemaVersion          String?                        @default("0001-alpha")

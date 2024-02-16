@@ -150,17 +150,17 @@ export class PhaseParameterResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [PhaseParameter], { name: "phaseParameter" })
+  @graphql.ResolveField(() => [PhaseParameter], { name: "phaseParameters" })
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
   })
-  async findPhaseParameter(
+  async findPhaseParameters(
     @graphql.Parent() parent: PhaseParameter,
     @graphql.Args() args: PhaseParameterFindManyArgs
   ): Promise<PhaseParameter[]> {
-    const results = await this.service.findPhaseParameter(parent.id, args);
+    const results = await this.service.findPhaseParameters(parent.id, args);
 
     if (!results) {
       return [];
