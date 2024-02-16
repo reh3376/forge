@@ -7,6 +7,7 @@
     "start:debug": "nest start --debug --watch",
     "build": "nest build",
     "test": "jest",
+    "test-coverage": "jest --coverage --coverageReporters json-summary --reporters=default --reporters=jest-junit",
     "seed": "ts-node scripts/seed.ts",
     "db:migrate-save": "prisma migrate dev",
     "db:migrate-up": "prisma migrate deploy",
