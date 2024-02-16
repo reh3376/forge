@@ -11,13 +11,33 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
-import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
+import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
+import {
+  ValidateNested,
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsInt,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitProcedureCreateNestedManyWithoutUnitProceduresInput";
 
 @InputType()
 class UnitProcedureCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: UnitProcedureWhereUniqueInput | null;
+
   @ApiProperty({
     required: true,
     type: String,
@@ -36,6 +56,17 @@ class UnitProcedureCreateInput {
     nullable: true,
   })
   description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: true,
@@ -87,6 +118,18 @@ class UnitProcedureCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureCreateNestedManyWithoutUnitProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureCreateNestedManyWithoutUnitProceduresInput)
+  @IsOptional()
+  @Field(() => UnitProcedureCreateNestedManyWithoutUnitProceduresInput, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureCreateNestedManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,

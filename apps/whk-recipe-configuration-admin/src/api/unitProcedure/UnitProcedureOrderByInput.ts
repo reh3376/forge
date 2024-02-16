@@ -1,10 +1,12 @@
 import { SortOrder } from "../../util/SortOrder";
 
 export type UnitProcedureOrderByInput = {
+  classId?: SortOrder;
   createdAt?: SortOrder;
   createdBy?: SortOrder;
   description?: SortOrder;
   id?: SortOrder;
+  isClassDef?: SortOrder;
   name?: SortOrder;
   procedureId?: SortOrder;
   revision?: SortOrder;

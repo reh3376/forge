@@ -175,17 +175,21 @@ model Operation {
 }
 
 model Procedure {
-  active         Boolean?        @default(true)
-  createdAt      DateTime        @default(now())
-  createdBy      String
-  description    String?
-  id             String          @id @default(cuid())
-  name           String?
-  revision       Int?            @default(0)
-  schemaVersion  String?         @default("0001-b")
-  unitProcedures UnitProcedure[]
-  updatedAt      DateTime        @updatedAt
-  updatedBy      String?
+  active            Boolean?        @default(true)
+  classId           Procedure?      @relation(name: "procedures", fields: [classIdId], references: [id])
+  classIdId         String?
+  createdAt         DateTime        @default(now())
+  createdBy         String
+  description       String?
+  id                String          @id @default(cuid())
+  isClassDefinition Boolean?
+  name              String?
+  procedures        Procedure[]     @relation(name: "procedures")
+  revision          Int?            @default(0)
+  schemaVersion     String?         @default("0001-b")
+  unitProcedures    UnitProcedure[]
+  updatedAt         DateTime        @updatedAt
+  updatedBy         String?
 
   @@unique([name, revision, active])
 }
@@ -246,17 +250,21 @@ model ProductionOrderQueue {
 }
 
 model UnitProcedure {
-  createdAt     DateTime    @default(now())
+  classId       UnitProcedure?  @relation(name: "UnitProcedureClassIdUnitProcedureUnitProcedure", fields: [classId], references: [id])
+  classId       String?
+  createdAt     DateTime        @default(now())
   createdBy     String
   description   String?
-  id            String      @id @default(cuid())
+  id            String          @id @default(cuid())
+  isClassDef    Boolean?        @default(false)
   name          String
   operations    Operation[]
-  procedure     Procedure   @relation(fields: [procedureId], references: [id])
+  procedure     Procedure       @relation(fields: [procedureId], references: [id])
   procedureId   String
-  revision      Int?        @default(0)
-  schemaVersion String?     @default("0001-b")
-  updatedAt     DateTime    @updatedAt
+  revision      Int?            @default(0)
+  schemaVersion String?         @default("0001-b")
+  unitProcedure UnitProcedure[] @relation(name: "UnitProcedureClassIdUnitProcedureUnitProcedure")
+  updatedAt     DateTime        @updatedAt
   updatedBy     String?
 
   @@unique([name, revision])
