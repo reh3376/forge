@@ -129,8 +129,8 @@ model EquipmentPhase {
   createdBy              String
   description            String?
   editedAt               DateTime?        @updatedAt
-  editedBy               String?
-  id                     String           @id @default(auto())
+  editedBy               String?          @unique
+  id                     String           @id @default(cuid())
   instructions           Instruction[]
   isClassDefinition      Boolean?         @default(false)
   name                   String
@@ -154,8 +154,9 @@ model Operation {
   createdAt              DateTime?        @default(now())
   createdBy              String
   description            String
-  editedBy               String?
-  id                     String           @id @default(auto())
+  editedBy               String?          @unique
+  globalUuid             String?          @default(uuid())
+  id                     String           @id @default(cuid())
   isClassDefinition      Boolean?         @default(false)
   name                   String
   operations             Operation[]      @relation(name: "OperationClassIdOperationOperations")
@@ -220,7 +221,7 @@ model Bom {
   editedAt        DateTime         @updatedAt
   editedBy        String?
   equipmentPhases EquipmentPhase[]
-  id              String           @id @default(auto())
+  id              String           @id @default(cuid())
   operationSteps  Json?
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
