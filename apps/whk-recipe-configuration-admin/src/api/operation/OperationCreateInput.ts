@@ -1,10 +1,11 @@
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
-import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 import { RecipeCreateNestedManyWithoutOperationsInput } from "./RecipeCreateNestedManyWithoutOperationsInput";
+import { UnitProcedureWhereUniqueInput } from "../unitProcedure/UnitProcedureWhereUniqueInput";
 
 export type OperationCreateInput = {
+  abbreviation: string;
   active?: boolean | null;
   classId?: OperationWhereUniqueInput | null;
   createdBy: string;
@@ -15,9 +16,9 @@ export type OperationCreateInput = {
   name: string;
   operations?: OperationCreateNestedManyWithoutOperationsInput;
   path: string;
-  procedure?: ProcedureWhereUniqueInput | null;
   procedureSequenceIndex: number;
   recipes?: RecipeCreateNestedManyWithoutOperationsInput;
   revision: number;
   schemaVersion?: string | null;
+  unitProcedure?: UnitProcedureWhereUniqueInput | null;
 };

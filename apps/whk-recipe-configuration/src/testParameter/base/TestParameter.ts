@@ -125,17 +125,6 @@ class TestParameter {
   isClassDef!: boolean | null;
 
   @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isDefinition!: boolean | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -153,6 +142,17 @@ class TestParameter {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testDetails!: string | null;
 
   @ApiProperty({
     required: false,
@@ -260,6 +260,17 @@ class TestParameter {
     nullable: true,
   })
   testSetpointValue!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  tooltip!: string | null;
 }
 
 export { TestParameter as TestParameter };

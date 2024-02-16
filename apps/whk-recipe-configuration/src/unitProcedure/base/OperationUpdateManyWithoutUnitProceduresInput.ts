@@ -14,7 +14,7 @@ import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUn
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class OperationUpdateManyWithoutProceduresInput {
+class OperationUpdateManyWithoutUnitProceduresInput {
   @Field(() => [OperationWhereUniqueInput], {
     nullable: true,
   })
@@ -43,4 +43,4 @@ class OperationUpdateManyWithoutProceduresInput {
   set?: Array<OperationWhereUniqueInput>;
 }
 
-export { OperationUpdateManyWithoutProceduresInput as OperationUpdateManyWithoutProceduresInput };
+export { OperationUpdateManyWithoutUnitProceduresInput as OperationUpdateManyWithoutUnitProceduresInput };

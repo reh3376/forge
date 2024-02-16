@@ -15,10 +15,10 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  ValidateNested,
   IsInt,
+  ValidateNested,
 } from "class-validator";
-import { OperationUpdateManyWithoutProceduresInput } from "./OperationUpdateManyWithoutProceduresInput";
+import { UnitProcedureUpdateManyWithoutProceduresInput } from "./UnitProcedureUpdateManyWithoutProceduresInput";
 import { Type } from "class-transformer";
 
 @InputType()
@@ -69,18 +69,6 @@ class ProcedureUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => OperationUpdateManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationUpdateManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => OperationUpdateManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  operations?: OperationUpdateManyWithoutProceduresInput;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
@@ -100,6 +88,18 @@ class ProcedureUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureUpdateManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureUpdateManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => UnitProcedureUpdateManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  unitProcedures?: UnitProcedureUpdateManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,

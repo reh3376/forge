@@ -26,9 +26,9 @@ import { Procedure } from "./Procedure";
 import { ProcedureFindManyArgs } from "./ProcedureFindManyArgs";
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { ProcedureUpdateInput } from "./ProcedureUpdateInput";
-import { OperationFindManyArgs } from "../../operation/base/OperationFindManyArgs";
-import { Operation } from "../../operation/base/Operation";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -187,37 +187,26 @@ export class ProcedureControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/operations")
-  @ApiNestedQuery(OperationFindManyArgs)
+  @common.Get("/:id/unitProcedures")
+  @ApiNestedQuery(UnitProcedureFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Operation",
+    resource: "UnitProcedure",
     action: "read",
     possession: "any",
   })
-  async findOperations(
+  async findUnitProcedures(
     @common.Req() request: Request,
     @common.Param() params: ProcedureWhereUniqueInput
-  ): Promise<Operation[]> {
-    const query = plainToClass(OperationFindManyArgs, request.query);
-    const results = await this.service.findOperations(params.id, {
+  ): Promise<UnitProcedure[]> {
+    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
+    const results = await this.service.findUnitProcedures(params.id, {
       ...query,
       select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
         createdBy: true,
         description: true,
-        editedBy: true,
         id: true,
-        isClassDefinition: true,
         name: true,
-        path: true,
 
         procedure: {
           select: {
@@ -225,10 +214,10 @@ export class ProcedureControllerBase {
           },
         },
 
-        procedureSequenceIndex: true,
         revision: true,
         schemaVersion: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -239,18 +228,18 @@ export class ProcedureControllerBase {
     return results;
   }
 
-  @common.Post("/:id/operations")
+  @common.Post("/:id/unitProcedures")
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
   })
-  async connectOperations(
+  async connectUnitProcedures(
     @common.Param() params: ProcedureWhereUniqueInput,
-    @common.Body() body: OperationWhereUniqueInput[]
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operations: {
+      unitProcedures: {
         connect: body,
       },
     };
@@ -261,18 +250,18 @@ export class ProcedureControllerBase {
     });
   }
 
-  @common.Patch("/:id/operations")
+  @common.Patch("/:id/unitProcedures")
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
   })
-  async updateOperations(
+  async updateUnitProcedures(
     @common.Param() params: ProcedureWhereUniqueInput,
-    @common.Body() body: OperationWhereUniqueInput[]
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operations: {
+      unitProcedures: {
         set: body,
       },
     };
@@ -283,18 +272,18 @@ export class ProcedureControllerBase {
     });
   }
 
-  @common.Delete("/:id/operations")
+  @common.Delete("/:id/unitProcedures")
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
   })
-  async disconnectOperations(
+  async disconnectUnitProcedures(
     @common.Param() params: ProcedureWhereUniqueInput,
-    @common.Body() body: OperationWhereUniqueInput[]
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operations: {
+      unitProcedures: {
         disconnect: body,
       },
     };

@@ -49,6 +49,10 @@ import { ProductionOrderQueueList } from "./productionOrderQueue/ProductionOrder
 import { ProductionOrderQueueCreate } from "./productionOrderQueue/ProductionOrderQueueCreate";
 import { ProductionOrderQueueEdit } from "./productionOrderQueue/ProductionOrderQueueEdit";
 import { ProductionOrderQueueShow } from "./productionOrderQueue/ProductionOrderQueueShow";
+import { UnitProcedureList } from "./unitProcedure/UnitProcedureList";
+import { UnitProcedureCreate } from "./unitProcedure/UnitProcedureCreate";
+import { UnitProcedureEdit } from "./unitProcedure/UnitProcedureEdit";
+import { UnitProcedureShow } from "./unitProcedure/UnitProcedureShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -151,6 +155,13 @@ const App = (): React.ReactElement => {
           edit={ProductionOrderQueueEdit}
           create={ProductionOrderQueueCreate}
           show={ProductionOrderQueueShow}
+        />
+        <Resource
+          name="UnitProcedure"
+          list={UnitProcedureList}
+          edit={UnitProcedureEdit}
+          create={UnitProcedureCreate}
+          show={UnitProcedureShow}
         />
       </Admin>
     </div>

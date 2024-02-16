@@ -1,10 +1,11 @@
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
-import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 import { RecipeUpdateManyWithoutOperationsInput } from "./RecipeUpdateManyWithoutOperationsInput";
+import { UnitProcedureWhereUniqueInput } from "../unitProcedure/UnitProcedureWhereUniqueInput";
 
 export type OperationUpdateInput = {
+  abbreviation?: string;
   active?: boolean | null;
   classId?: OperationWhereUniqueInput | null;
   createdBy?: string;
@@ -15,9 +16,9 @@ export type OperationUpdateInput = {
   name?: string;
   operations?: OperationUpdateManyWithoutOperationsInput;
   path?: string;
-  procedure?: ProcedureWhereUniqueInput | null;
   procedureSequenceIndex?: number;
   recipes?: RecipeUpdateManyWithoutOperationsInput;
   revision?: number;
   schemaVersion?: string | null;
+  unitProcedure?: UnitProcedureWhereUniqueInput | null;
 };

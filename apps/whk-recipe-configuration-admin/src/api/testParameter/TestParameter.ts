@@ -12,9 +12,9 @@ export type TestParameter = {
   equipmentPhases?: Array<EquipmentPhase>;
   id: string;
   isClassDef: boolean | null;
-  isDefinition: boolean | null;
   name: string;
   schemaVersion: string | null;
+  testDetails: string | null;
   testParameters?: Array<TestParameter>;
   testParamRevision: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
@@ -25,4 +25,5 @@ export type TestParameter = {
   testSetpointType?: "Boolean" | "Numerical" | null;
   testSetpointUpperLimit: number | null;
   testSetpointValue: number | null;
+  tooltip: string | null;
 };

@@ -10,9 +10,9 @@ export type TestParameterOrderByInput = {
   editedBy?: SortOrder;
   id?: SortOrder;
   isClassDef?: SortOrder;
-  isDefinition?: SortOrder;
   name?: SortOrder;
   schemaVersion?: SortOrder;
+  testDetails?: SortOrder;
   testParamRevision?: SortOrder;
   testParamUnits?: SortOrder;
   testPass?: SortOrder;
@@ -22,4 +22,5 @@ export type TestParameterOrderByInput = {
   testSetpointType?: SortOrder;
   testSetpointUpperLimit?: SortOrder;
   testSetpointValue?: SortOrder;
+  tooltip?: SortOrder;
 };
