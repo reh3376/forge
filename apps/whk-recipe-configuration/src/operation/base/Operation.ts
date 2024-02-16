@@ -85,6 +85,15 @@ class Operation {
   editedBy!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -119,15 +128,6 @@ class Operation {
   @Type(() => Operation)
   @IsOptional()
   operations?: Array<Operation>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  operationSteps?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: true,

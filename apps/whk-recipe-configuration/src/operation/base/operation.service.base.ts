@@ -54,6 +54,17 @@ export class OperationServiceBase {
     return this.prisma.operation.delete(args);
   }
 
+  async findEquipmentPhases(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .equipmentPhases(args);
+  }
+
   async findOperations(
     parentId: string,
     args: Prisma.OperationFindManyArgs
@@ -63,17 +74,6 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .operations(args);
-  }
-
-  async findOperationSteps(
-    parentId: string,
-    args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<EquipmentPhase[]> {
-    return this.prisma.operation
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .operationSteps(args);
   }
 
   async findRecipes(
