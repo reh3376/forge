@@ -41,15 +41,15 @@ jobs:
 
       - name: install dependencies
         run: npm install
-        working-directory: ./apps/core-mes
+        working-directory: ./apps/whk-recipe-configuration
 
       - name: build
         run: npm run build
-        working-directory: ./apps/core-mes
+        working-directory: ./apps/whk-recipe-configuration
 
       - name: test
         run: npm run test-coverage
-        working-directory: ./apps/core-mes
+        working-directory: ./apps/whk-recipe-configuration
 
       - name: Run tests
         run: |
@@ -60,7 +60,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/WHK01/whk-mes/core-mes
+          images: ghcr.io/WHK01/whk-mes/whk-recipe-configuration
           flavor: latest=true
           tags: |
             type=sha,prefix=sha-
