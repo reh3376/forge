@@ -66,7 +66,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
             <ReferenceField
-              label="Classs"
+              label="Class"
               source="phaseparameter.id"
               reference="PhaseParameter"
             >

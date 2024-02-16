@@ -20,8 +20,8 @@ model User {
 
 model PhaseParameter {
   active                 Boolean?                       @default(false)
-  classId                PhaseParameter?                @relation(name: "phaseParameter", fields: [classId], references: [id])
-  classId                String?
+  classId                PhaseParameter?                @relation(name: "phaseParameter", fields: [classIdId], references: [id])
+  classIdId              String?
   createdAt              DateTime                       @default(now())
   createdBy              String                         @unique
   description            String
@@ -45,7 +45,7 @@ model PhaseParameter {
   typeUnits              String
   updatedAt              DateTime                       @updatedAt
 
-  @@unique([name, revision, equipmentPhase]
+  @@unique([name, revision, equipmentPhase])
 }
 
 model TestParameter {
@@ -80,8 +80,8 @@ model TestParameter {
 model RecipeParameter {
   active                     Boolean                               @default(true)
   batch                      String?
-  classId                    RecipeParameter?                      @relation(name: "recipeParameters", fields: [classId], references: [id])
-  classId                    String?
+  classId                    RecipeParameter?                      @relation(name: "recipeParameters", fields: [classIdId], references: [id])
+  classIdId                  String?
   className                  String
   createdAt                  DateTime                              @default(now())
   createdBy                  String                                @unique
@@ -149,8 +149,8 @@ model EquipmentPhase {
 
 model Operation {
   active                 Boolean?         @default(true)
-  classId                Operation?       @relation(name: "OperationClassIdOperationOperations", fields: [classId], references: [id])
-  classId                String?
+  classId                Operation?       @relation(name: "OperationClassIdOperationOperations", fields: [classIdId], references: [id])
+  classIdId              String?
   createdAt              DateTime?        @default(now())
   createdBy              String           @unique
   description            String

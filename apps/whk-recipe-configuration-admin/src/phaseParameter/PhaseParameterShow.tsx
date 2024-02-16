@@ -21,7 +21,7 @@ export const PhaseParameterShow = (props: ShowProps): React.ReactElement => {
       <SimpleShowLayout>
         <BooleanField label="Active" source="active" />
         <ReferenceField
-          label="Classs"
+          label="Class"
           source="phaseparameter.id"
           reference="PhaseParameter"
         >
@@ -61,13 +61,13 @@ export const PhaseParameterShow = (props: ShowProps): React.ReactElement => {
         <DateField source="updatedAt" label="Updated At" />
         <ReferenceManyField
           reference="PhaseParameter"
-          target="classId"
+          target="classIdId"
           label="Phase Parameter"
         >
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
             <ReferenceField
-              label="Classs"
+              label="Class"
               source="phaseparameter.id"
               reference="PhaseParameter"
             >

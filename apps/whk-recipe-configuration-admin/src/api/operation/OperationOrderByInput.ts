@@ -2,7 +2,7 @@ import { SortOrder } from "../../util/SortOrder";
 
 export type OperationOrderByInput = {
   active?: SortOrder;
-  classId?: SortOrder;
+  classIdId?: SortOrder;
   createdAt?: SortOrder;
   createdBy?: SortOrder;
   description?: SortOrder;
