@@ -139,7 +139,7 @@ class PhaseParameterUpdateInput {
   @Field(() => PhaseParameterUpdateManyWithoutPhaseParametersInput, {
     nullable: true,
   })
-  phaseParameter?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
+  phaseParameters?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,
