@@ -108,7 +108,7 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
         </ReferenceManyField>
         <ReferenceManyField
           reference="TestParameter"
-          target="classId"
+          target="classIdId"
           label="TestParameters"
         >
           <Datagrid rowClick="show">
