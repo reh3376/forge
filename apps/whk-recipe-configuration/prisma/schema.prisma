@@ -50,8 +50,8 @@ model PhaseParameter {
 
 model TestParameter {
   active                   Boolean                            @default(true)
-  classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterTestParameters", fields: [classId], references: [id])
-  classId                  String?
+  classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterTestParameters", fields: [classIdId], references: [id])
+  classIdId                String?
   createdAt                DateTime                           @default(now())
   createdBy                String                             @unique
   description              String?

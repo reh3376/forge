@@ -39,7 +39,7 @@ class TestParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  classId?: SortOrder;
+  classIdId?: SortOrder;
 
   @ApiProperty({
     required: false,
