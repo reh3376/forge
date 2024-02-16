@@ -9,11 +9,11 @@ export type Operation = {
   createdBy: string;
   description: string;
   editedBy: string | null;
+  equipmentPhases?: Array<EquipmentPhase>;
   id: string;
   isClassDefinition: boolean | null;
   name: string;
   operations?: Array<Operation>;
-  operationSteps?: Array<EquipmentPhase>;
   path: string;
   procedure?: Procedure | null;
   procedureSequenceIndex: number;

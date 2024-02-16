@@ -12,10 +12,10 @@ import {
   Datagrid,
 } from "react-admin";
 
-import { OPERATION_TITLE_FIELD } from "./OperationTitle";
-import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 import { BOM_TITLE_FIELD } from "../bom/BomTitle";
+import { OPERATION_TITLE_FIELD } from "./OperationTitle";
 import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
+import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 
 export const OperationShow = (props: ShowProps): React.ReactElement => {
   return (
@@ -51,47 +51,6 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <DateField source="updatedAt" label="Updated At" />
-        <ReferenceManyField
-          reference="Operation"
-          target="classIdId"
-          label="Operations"
-        >
-          <Datagrid rowClick="show">
-            <BooleanField label="Active" source="active" />
-            <ReferenceField
-              label="Class"
-              source="operation.id"
-              reference="Operation"
-            >
-              <TextField source={OPERATION_TITLE_FIELD} />
-            </ReferenceField>
-            <DateField source="createdAt" label="Created At" />
-            <TextField label="Created By" source="createdBy" />
-            <TextField label="Description" source="description" />
-            <TextField label="Edited By" source="editedBy" />
-            <TextField label="ID" source="id" />
-            <BooleanField
-              label="Is Class Definition"
-              source="isClassDefinition"
-            />
-            <TextField label="Name" source="name" />
-            <TextField label="Path" source="path" />
-            <ReferenceField
-              label="Procedure"
-              source="procedure.id"
-              reference="Procedure"
-            >
-              <TextField source={PROCEDURE_TITLE_FIELD} />
-            </ReferenceField>
-            <TextField
-              label="Procedure Sequence Index"
-              source="procedureSequenceIndex"
-            />
-            <TextField label="Revision" source="revision" />
-            <TextField label="Schema Version" source="schemaVersion" />
-            <DateField source="updatedAt" label="Updated At" />
-          </Datagrid>
-        </ReferenceManyField>
         <ReferenceManyField
           reference="EquipmentPhase"
           target="operationId"
@@ -137,6 +96,47 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
             >
               <TextField source={TESTPARAMETER_TITLE_FIELD} />
             </ReferenceField>
+          </Datagrid>
+        </ReferenceManyField>
+        <ReferenceManyField
+          reference="Operation"
+          target="classIdId"
+          label="Operations"
+        >
+          <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
+            <ReferenceField
+              label="Class"
+              source="operation.id"
+              reference="Operation"
+            >
+              <TextField source={OPERATION_TITLE_FIELD} />
+            </ReferenceField>
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <TextField label="Description" source="description" />
+            <TextField label="Edited By" source="editedBy" />
+            <TextField label="ID" source="id" />
+            <BooleanField
+              label="Is Class Definition"
+              source="isClassDefinition"
+            />
+            <TextField label="Name" source="name" />
+            <TextField label="Path" source="path" />
+            <ReferenceField
+              label="Procedure"
+              source="procedure.id"
+              reference="Procedure"
+            >
+              <TextField source={PROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <TextField
+              label="Procedure Sequence Index"
+              source="procedureSequenceIndex"
+            />
+            <TextField label="Revision" source="revision" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <DateField source="updatedAt" label="Updated At" />
           </Datagrid>
         </ReferenceManyField>
         <ReferenceManyField
