@@ -1,16 +1,23 @@
-import { OperationStepUpdateManyWithoutOperationsInput } from "./OperationStepUpdateManyWithoutOperationsInput";
-import { InputJsonValue } from "../../types";
+import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
+import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
+import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
+import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
+import { RecipeUpdateManyWithoutOperationsInput } from "./RecipeUpdateManyWithoutOperationsInput";
 
 export type OperationUpdateInput = {
   active?: boolean | null;
+  classId?: OperationWhereUniqueInput | null;
   createdBy?: string;
+  description?: string;
   editedBy?: string | null;
   globalUuid?: string | null;
-  operationDescription?: string;
-  operationName?: string;
-  operationRevision?: number;
-  operationSequenceNumber?: number;
-  operationSteps?: OperationStepUpdateManyWithoutOperationsInput;
-  route?: InputJsonValue;
+  isClassDefinition?: boolean | null;
+  name?: string;
+  operations?: OperationUpdateManyWithoutOperationsInput;
+  operationSteps?: EquipmentPhaseUpdateManyWithoutOperationsInput;
+  procedure?: ProcedureWhereUniqueInput | null;
+  procedureSequenceIndex?: number;
+  recipes?: RecipeUpdateManyWithoutOperationsInput;
+  revision?: number;
   schemaVersion?: string | null;
 };

@@ -9,10 +9,10 @@ import { UserList } from "./user/UserList";
 import { UserCreate } from "./user/UserCreate";
 import { UserEdit } from "./user/UserEdit";
 import { UserShow } from "./user/UserShow";
-import { ParameterTypeList } from "./parameterType/ParameterTypeList";
-import { ParameterTypeCreate } from "./parameterType/ParameterTypeCreate";
-import { ParameterTypeEdit } from "./parameterType/ParameterTypeEdit";
-import { ParameterTypeShow } from "./parameterType/ParameterTypeShow";
+import { PhaseParameterList } from "./phaseParameter/PhaseParameterList";
+import { PhaseParameterCreate } from "./phaseParameter/PhaseParameterCreate";
+import { PhaseParameterEdit } from "./phaseParameter/PhaseParameterEdit";
+import { PhaseParameterShow } from "./phaseParameter/PhaseParameterShow";
 import { TestParameterList } from "./testParameter/TestParameterList";
 import { TestParameterCreate } from "./testParameter/TestParameterCreate";
 import { TestParameterEdit } from "./testParameter/TestParameterEdit";
@@ -25,14 +25,30 @@ import { InstructionList } from "./instruction/InstructionList";
 import { InstructionCreate } from "./instruction/InstructionCreate";
 import { InstructionEdit } from "./instruction/InstructionEdit";
 import { InstructionShow } from "./instruction/InstructionShow";
-import { OperationStepList } from "./operationStep/OperationStepList";
-import { OperationStepCreate } from "./operationStep/OperationStepCreate";
-import { OperationStepEdit } from "./operationStep/OperationStepEdit";
-import { OperationStepShow } from "./operationStep/OperationStepShow";
+import { EquipmentPhaseList } from "./equipmentPhase/EquipmentPhaseList";
+import { EquipmentPhaseCreate } from "./equipmentPhase/EquipmentPhaseCreate";
+import { EquipmentPhaseEdit } from "./equipmentPhase/EquipmentPhaseEdit";
+import { EquipmentPhaseShow } from "./equipmentPhase/EquipmentPhaseShow";
 import { OperationList } from "./operation/OperationList";
 import { OperationCreate } from "./operation/OperationCreate";
 import { OperationEdit } from "./operation/OperationEdit";
 import { OperationShow } from "./operation/OperationShow";
+import { ProcedureList } from "./procedure/ProcedureList";
+import { ProcedureCreate } from "./procedure/ProcedureCreate";
+import { ProcedureEdit } from "./procedure/ProcedureEdit";
+import { ProcedureShow } from "./procedure/ProcedureShow";
+import { RecipeList } from "./recipe/RecipeList";
+import { RecipeCreate } from "./recipe/RecipeCreate";
+import { RecipeEdit } from "./recipe/RecipeEdit";
+import { RecipeShow } from "./recipe/RecipeShow";
+import { BomList } from "./bom/BomList";
+import { BomCreate } from "./bom/BomCreate";
+import { BomEdit } from "./bom/BomEdit";
+import { BomShow } from "./bom/BomShow";
+import { ProductionOrderQueueList } from "./productionOrderQueue/ProductionOrderQueueList";
+import { ProductionOrderQueueCreate } from "./productionOrderQueue/ProductionOrderQueueCreate";
+import { ProductionOrderQueueEdit } from "./productionOrderQueue/ProductionOrderQueueEdit";
+import { ProductionOrderQueueShow } from "./productionOrderQueue/ProductionOrderQueueShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -67,11 +83,11 @@ const App = (): React.ReactElement => {
           show={UserShow}
         />
         <Resource
-          name="ParameterType"
-          list={ParameterTypeList}
-          edit={ParameterTypeEdit}
-          create={ParameterTypeCreate}
-          show={ParameterTypeShow}
+          name="PhaseParameter"
+          list={PhaseParameterList}
+          edit={PhaseParameterEdit}
+          create={PhaseParameterCreate}
+          show={PhaseParameterShow}
         />
         <Resource
           name="TestParameter"
@@ -95,11 +111,11 @@ const App = (): React.ReactElement => {
           show={InstructionShow}
         />
         <Resource
-          name="OperationStep"
-          list={OperationStepList}
-          edit={OperationStepEdit}
-          create={OperationStepCreate}
-          show={OperationStepShow}
+          name="EquipmentPhase"
+          list={EquipmentPhaseList}
+          edit={EquipmentPhaseEdit}
+          create={EquipmentPhaseCreate}
+          show={EquipmentPhaseShow}
         />
         <Resource
           name="Operation"
@@ -107,6 +123,34 @@ const App = (): React.ReactElement => {
           edit={OperationEdit}
           create={OperationCreate}
           show={OperationShow}
+        />
+        <Resource
+          name="Procedure"
+          list={ProcedureList}
+          edit={ProcedureEdit}
+          create={ProcedureCreate}
+          show={ProcedureShow}
+        />
+        <Resource
+          name="Recipe"
+          list={RecipeList}
+          edit={RecipeEdit}
+          create={RecipeCreate}
+          show={RecipeShow}
+        />
+        <Resource
+          name="Bom"
+          list={BomList}
+          edit={BomEdit}
+          create={BomCreate}
+          show={BomShow}
+        />
+        <Resource
+          name="ProductionOrderQueue"
+          list={ProductionOrderQueueList}
+          edit={ProductionOrderQueueEdit}
+          create={ProductionOrderQueueCreate}
+          show={ProductionOrderQueueShow}
         />
       </Admin>
     </div>

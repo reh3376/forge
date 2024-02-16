@@ -8,10 +8,12 @@ import {
   TextInput,
   ReferenceInput,
   SelectInput,
+  ReferenceArrayInput,
+  SelectArrayInput,
   NumberInput,
 } from "react-admin";
 
-import { ParameterTypeTitle } from "../parameterType/ParameterTypeTitle";
+import { RecipeParameterTitle } from "./RecipeParameterTitle";
 
 export const RecipeParameterCreate = (
   props: CreateProps
@@ -21,23 +23,31 @@ export const RecipeParameterCreate = (
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
         <TextInput label="Batch" source="batch" />
+        <ReferenceInput
+          source="classId.id"
+          reference="RecipeParameter"
+          label="Class ID"
+        >
+          <SelectInput optionText={RecipeParameterTitle} />
+        </ReferenceInput>
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Edited By" source="editedBy" />
+        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Item ID" source="itemId" />
-        <ReferenceInput
-          source="parameterType.id"
-          reference="ParameterType"
-          label="Parameter Type"
-        >
-          <SelectInput optionText={ParameterTypeTitle} />
-        </ReferenceInput>
         <TextInput
           label="Recipe Param Description"
           source="recipeParamDescription"
         />
+        <ReferenceArrayInput
+          source="recipeParameters"
+          reference="RecipeParameter"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={RecipeParameterTitle} />
+        </ReferenceArrayInput>
         <TextInput label="Recipe Param Name" source="recipeParamName" />
-        <TextInput label="Recipe Param Revision" source="recipeParamRevision" />
         <SelectInput
           source="recipeParamUnits"
           label="Recipe Param Units"
@@ -78,6 +88,7 @@ export const RecipeParameterCreate = (
           label="Recipe Setpoint Upper Limit"
           source="recipeSetpointUpperLimit"
         />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <div />
       </SimpleForm>

@@ -13,17 +13,19 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
-  IsString,
+  ValidateNested,
   IsOptional,
   IsDate,
+  IsString,
   IsEnum,
   IsNumber,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
 @ObjectType()
@@ -38,22 +40,12 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => TestParameter,
   })
-  @IsString()
+  @ValidateNested()
+  @Type(() => TestParameter)
   @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  batch!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  className!: string;
+  classId?: TestParameter | null;
 
   @ApiProperty({
     required: true,
@@ -70,6 +62,17 @@ class TestParameter {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description!: string | null;
 
   @ApiProperty({
     required: false,
@@ -94,12 +97,32 @@ class TestParameter {
   editedBy!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -118,7 +141,7 @@ class TestParameter {
   })
   @IsString()
   @Field(() => String)
-  itemId!: string;
+  name!: string;
 
   @ApiProperty({
     required: false,
@@ -133,32 +156,12 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
+    type: () => [TestParameter],
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => TestParameter)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  test!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamDescription!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  testParamName!: string;
+  testParameters?: Array<TestParameter>;
 
   @ApiProperty({
     required: false,
@@ -195,14 +198,13 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
-    type: String,
   })
-  @IsString()
+  @IsJSONValue()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  testResult!: string | null;
+  testResult!: JsonValue;
 
   @ApiProperty({
     required: false,

@@ -2,16 +2,18 @@ import { SortOrder } from "../../util/SortOrder";
 
 export type OperationOrderByInput = {
   active?: SortOrder;
+  classId?: SortOrder;
   createdAt?: SortOrder;
   createdBy?: SortOrder;
+  description?: SortOrder;
   editedBy?: SortOrder;
   globalUuid?: SortOrder;
   id?: SortOrder;
-  operationDescription?: SortOrder;
-  operationName?: SortOrder;
-  operationRevision?: SortOrder;
-  operationSequenceNumber?: SortOrder;
-  route?: SortOrder;
+  isClassDefinition?: SortOrder;
+  name?: SortOrder;
+  procedureId?: SortOrder;
+  procedureSequenceIndex?: SortOrder;
+  revision?: SortOrder;
   schemaVersion?: SortOrder;
   updatedAt?: SortOrder;
 };

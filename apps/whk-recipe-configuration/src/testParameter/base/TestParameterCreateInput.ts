@@ -13,15 +13,20 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
-  IsString,
+  ValidateNested,
   IsOptional,
+  IsString,
   IsEnum,
   IsNumber,
 } from "class-validator";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
+import { Type } from "class-transformer";
+import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
+import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
+import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
 @InputType()
@@ -36,22 +41,15 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => TestParameterWhereUniqueInput,
   })
-  @IsString()
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => TestParameterWhereUniqueInput, {
     nullable: true,
   })
-  batch?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  className!: string;
+  classId?: TestParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -70,7 +68,41 @@ class TestParameterCreateInput {
   @Field(() => String, {
     nullable: true,
   })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
   editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -89,7 +121,7 @@ class TestParameterCreateInput {
   })
   @IsString()
   @Field(() => String)
-  itemId!: string;
+  name!: string;
 
   @ApiProperty({
     required: false,
@@ -104,32 +136,15 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterCreateNestedManyWithoutTestParametersInput,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutTestParametersInput)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => TestParameterCreateNestedManyWithoutTestParametersInput, {
     nullable: true,
   })
-  test?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamDescription?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  testParamName!: string;
+  testParameters?: TestParameterCreateNestedManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,
@@ -166,14 +181,13 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
   })
-  @IsString()
+  @IsJSONValue()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  testResult?: string | null;
+  testResult?: InputJsonValue;
 
   @ApiProperty({
     required: false,
