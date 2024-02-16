@@ -25,7 +25,6 @@ import { TestParameterFindManyArgs } from "./TestParameterFindManyArgs";
 import { TestParameterFindUniqueArgs } from "./TestParameterFindUniqueArgs";
 import { CreateTestParameterArgs } from "./CreateTestParameterArgs";
 import { UpdateTestParameterArgs } from "./UpdateTestParameterArgs";
-import { DeleteTestParameterArgs } from "./DeleteTestParameterArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { TestParameterService } from "../testParameter.service";
@@ -129,27 +128,6 @@ export class TestParameterResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => TestParameter)
-  @nestAccessControl.UseRoles({
-    resource: "TestParameter",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteTestParameter(
-    @graphql.Args() args: DeleteTestParameterArgs
-  ): Promise<TestParameter | null> {
-    try {
-      return await this.service.deleteTestParameter(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

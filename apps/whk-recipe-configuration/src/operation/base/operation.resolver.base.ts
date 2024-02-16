@@ -25,7 +25,6 @@ import { OperationFindManyArgs } from "./OperationFindManyArgs";
 import { OperationFindUniqueArgs } from "./OperationFindUniqueArgs";
 import { CreateOperationArgs } from "./CreateOperationArgs";
 import { UpdateOperationArgs } from "./UpdateOperationArgs";
-import { DeleteOperationArgs } from "./DeleteOperationArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
@@ -144,27 +143,6 @@ export class OperationResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Operation)
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteOperation(
-    @graphql.Args() args: DeleteOperationArgs
-  ): Promise<Operation | null> {
-    try {
-      return await this.service.deleteOperation(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

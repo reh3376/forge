@@ -230,55 +230,6 @@ export class RecipeControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Recipe })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteRecipe(
-    @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<Recipe | null> {
-    try {
-      return await this.service.deleteRecipe({
-        where: params,
-        select: {
-          active: true,
-          createdAt: true,
-          createdBy: true,
-          customerId: true,
-          id: true,
-          itemDescription: true,
-          itemId: true,
-          mashBill: true,
-
-          operation: {
-            select: {
-              id: true,
-            },
-          },
-
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrderQueues")
   @ApiNestedQuery(ProductionOrderQueueFindManyArgs)

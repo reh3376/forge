@@ -162,41 +162,4 @@ export class UserControllerBase {
       throw error;
     }
   }
-
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: User })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteUser(
-    @common.Param() params: UserWhereUniqueInput
-  ): Promise<User | null> {
-    try {
-      return await this.service.deleteUser({
-        where: params,
-        select: {
-          createdAt: true,
-          firstName: true,
-          id: true,
-          lastName: true,
-          roles: true,
-          updatedAt: true,
-          username: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
 }

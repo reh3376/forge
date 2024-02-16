@@ -25,7 +25,6 @@ import { InstructionFindManyArgs } from "./InstructionFindManyArgs";
 import { InstructionFindUniqueArgs } from "./InstructionFindUniqueArgs";
 import { CreateInstructionArgs } from "./CreateInstructionArgs";
 import { UpdateInstructionArgs } from "./UpdateInstructionArgs";
-import { DeleteInstructionArgs } from "./DeleteInstructionArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { InstructionService } from "../instruction.service";
@@ -113,27 +112,6 @@ export class InstructionResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Instruction)
-  @nestAccessControl.UseRoles({
-    resource: "Instruction",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteInstruction(
-    @graphql.Args() args: DeleteInstructionArgs
-  ): Promise<Instruction | null> {
-    try {
-      return await this.service.deleteInstruction(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

@@ -25,7 +25,6 @@ import { ProductionOrderQueueFindManyArgs } from "./ProductionOrderQueueFindMany
 import { ProductionOrderQueueFindUniqueArgs } from "./ProductionOrderQueueFindUniqueArgs";
 import { CreateProductionOrderQueueArgs } from "./CreateProductionOrderQueueArgs";
 import { UpdateProductionOrderQueueArgs } from "./UpdateProductionOrderQueueArgs";
-import { DeleteProductionOrderQueueArgs } from "./DeleteProductionOrderQueueArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { ProductionOrderQueueService } from "../productionOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -128,27 +127,6 @@ export class ProductionOrderQueueResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => ProductionOrderQueue)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderQueue",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteProductionOrderQueue(
-    @graphql.Args() args: DeleteProductionOrderQueueArgs
-  ): Promise<ProductionOrderQueue | null> {
-    try {
-      return await this.service.deleteProductionOrderQueue(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
