@@ -16,7 +16,7 @@ services:
       timeout: 25s
       retries: 5
   redis:
-    container_name: ${REDIS_HOST}
+    container_name: redis-${REDIS_HOST}
     image: redis:7
     ports:
       - ${REDIS_PORT}:6379
@@ -58,7 +58,7 @@ services:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
-      - 8080:8080
+      - 8880:8080
     depends_on:
       - zookeeper
       - kafka
