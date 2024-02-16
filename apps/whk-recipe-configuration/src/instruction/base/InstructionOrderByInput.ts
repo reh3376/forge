@@ -94,7 +94,7 @@ class InstructionOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  instructionRevision?: SortOrder;
+  name?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -105,7 +105,7 @@ class InstructionOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  routes?: SortOrder;
+  revision?: SortOrder;
 
   @ApiProperty({
     required: false,

@@ -10,7 +10,12 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, TestParameter } from "@prisma/client";
+
+import {
+  Prisma,
+  TestParameter, // @ts-ignore
+  EquipmentPhase,
+} from "@prisma/client";
 
 export class TestParameterServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -45,5 +50,35 @@ export class TestParameterServiceBase {
     args: Prisma.SelectSubset<T, Prisma.TestParameterDeleteArgs>
   ): Promise<TestParameter> {
     return this.prisma.testParameter.delete(args);
+  }
+
+  async findEquipmentPhases(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
+    return this.prisma.testParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .equipmentPhases(args);
+  }
+
+  async findTestParameters(
+    parentId: string,
+    args: Prisma.TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    return this.prisma.testParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .testParameters(args);
+  }
+
+  async getClassId(parentId: string): Promise<TestParameter | null> {
+    return this.prisma.testParameter
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
   }
 }

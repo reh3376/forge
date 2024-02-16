@@ -15,14 +15,11 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
-import { OperationStepCreateNestedManyWithoutInstructionsInput } from "./OperationStepCreateNestedManyWithoutInstructionsInput";
+import { EquipmentPhaseCreateNestedManyWithoutInstructionsInput } from "./EquipmentPhaseCreateNestedManyWithoutInstructionsInput";
 import { Type } from "class-transformer";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
 
 @InputType()
 class InstructionCreateInput {
@@ -57,6 +54,18 @@ class InstructionCreateInput {
   editedBy?: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutInstructionsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutInstructionsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutInstructionsInput, {
+    nullable: true,
+  })
+  equipmentPhase?: EquipmentPhaseCreateNestedManyWithoutInstructionsInput;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -65,34 +74,23 @@ class InstructionCreateInput {
   filePath!: string;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
     required: true,
     type: Number,
   })
   @IsInt()
   @Field(() => Number)
-  instructionRevision!: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationStepCreateNestedManyWithoutInstructionsInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationStepCreateNestedManyWithoutInstructionsInput)
-  @IsOptional()
-  @Field(() => OperationStepCreateNestedManyWithoutInstructionsInput, {
-    nullable: true,
-  })
-  operationStep?: OperationStepCreateNestedManyWithoutInstructionsInput;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  routes?: InputJsonValue;
+  revision!: number;
 
   @ApiProperty({
     required: true,

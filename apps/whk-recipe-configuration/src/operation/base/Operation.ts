@@ -14,16 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsDate,
   IsString,
   IsInt,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { OperationStep } from "../../operationStep/base/OperationStep";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { JsonValue } from "type-fest";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { Procedure } from "../../procedure/base/Procedure";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Operation {
@@ -37,6 +36,15 @@ class Operation {
     nullable: true,
   })
   active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Operation,
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  classId?: Operation | null;
 
   @ApiProperty({
     required: false,
@@ -56,6 +64,14 @@ class Operation {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  description!: string;
 
   @ApiProperty({
     required: false,
@@ -88,55 +104,75 @@ class Operation {
   id!: string;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  operationDescription!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  operationName!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  operationRevision!: number;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  operationSequenceNumber!: number;
-
-  @ApiProperty({
     required: false,
-    type: () => [OperationStep],
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => OperationStep)
+  @IsBoolean()
   @IsOptional()
-  operationSteps?: Array<OperationStep>;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  route!: JsonValue;
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Operation],
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  operations?: Array<Operation>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  operationSteps?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: false,
+    type: () => Procedure,
+  })
+  @ValidateNested()
+  @Type(() => Procedure)
+  @IsOptional()
+  procedure?: Procedure | null;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Field(() => Number)
+  procedureSequenceIndex!: number;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Field(() => Number)
+  revision!: number;
 
   @ApiProperty({
     required: false,

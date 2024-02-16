@@ -15,14 +15,16 @@ import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { ParameterTypeWhereUniqueInput } from "../../parameterType/base/ParameterTypeWhereUniqueInput";
-import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { RecipeParameterListRelationFilter } from "./RecipeParameterListRelationFilter";
+import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
@@ -48,6 +50,18 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   batch?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeParameterWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -117,6 +131,17 @@ class RecipeParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -125,18 +150,6 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   itemId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ParameterTypeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ParameterTypeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ParameterTypeWhereUniqueInput, {
-    nullable: true,
-  })
-  parameterType?: ParameterTypeWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -151,6 +164,18 @@ class RecipeParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => RecipeParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeParameterListRelationFilter, {
+    nullable: true,
+  })
+  recipeParameters?: RecipeParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -159,17 +184,6 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   recipeParamName?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  recipeParamRevision?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -234,6 +248,17 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   recipeSetpointUpperLimit?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
