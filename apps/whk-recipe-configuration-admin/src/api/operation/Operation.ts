@@ -9,12 +9,12 @@ export type Operation = {
   createdBy: string;
   description: string;
   editedBy: string | null;
-  globalUuid: string | null;
   id: string;
   isClassDefinition: boolean | null;
   name: string;
   operations?: Array<Operation>;
   operationSteps?: Array<EquipmentPhase>;
+  path: string;
   procedure?: Procedure | null;
   procedureSequenceIndex: number;
   recipes?: Array<Recipe>;
