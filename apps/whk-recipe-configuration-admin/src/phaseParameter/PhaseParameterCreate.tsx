@@ -26,7 +26,7 @@ export const PhaseParameterCreate = (
         <ReferenceInput
           source="classId.id"
           reference="PhaseParameter"
-          label="Classs"
+          label="Class"
         >
           <SelectInput optionText={PhaseParameterTitle} />
         </ReferenceInput>
