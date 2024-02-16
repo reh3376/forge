@@ -12,7 +12,7 @@ export type PhaseParameterUpdateInput = {
   isClassDef?: boolean | null;
   itemId?: string | null;
   name?: string;
-  phaseParameter?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
+  phaseParameters?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
   recipeId?: string | null;
   revision?: number | null;
   schemaVersion?: string | null;
