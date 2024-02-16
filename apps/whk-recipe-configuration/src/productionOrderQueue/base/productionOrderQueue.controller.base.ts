@@ -45,6 +45,9 @@ export class ProductionOrderQueueControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ProductionOrderQueueCreateInput,
+  })
   async createProductionOrderQueue(
     @common.Body() data: ProductionOrderQueueCreateInput
   ): Promise<ProductionOrderQueue> {
@@ -179,6 +182,9 @@ export class ProductionOrderQueueControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ProductionOrderQueueUpdateInput,
   })
   async updateProductionOrderQueue(
     @common.Param() params: ProductionOrderQueueWhereUniqueInput,
