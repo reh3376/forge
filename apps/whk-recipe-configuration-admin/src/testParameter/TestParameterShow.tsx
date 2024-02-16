@@ -35,9 +35,9 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
         <BooleanField label="Is Class Def" source="isClassDef" />
-        <BooleanField label="Is Definition" source="isDefinition" />
         <TextField label="Name" source="name" />
         <TextField label="Schema Version" source="schemaVersion" />
+        <TextField label="TestDetails" source="testDetails" />
         <TextField label="Test Param Revision" source="testParamRevision" />
         <TextField label="Test Param Units" source="testParamUnits" />
         <BooleanField label="Test Pass" source="testPass" />
@@ -59,6 +59,7 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
           label="Test Setpoint Numerical Value"
           source="testSetpointValue"
         />
+        <TextField label="Tooltip" source="tooltip" />
         <ReferenceManyField
           reference="EquipmentPhase"
           target="testParameterId"
@@ -127,9 +128,9 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
             <TextField label="Edited By" source="editedBy" />
             <TextField label="ID" source="id" />
             <BooleanField label="Is Class Def" source="isClassDef" />
-            <BooleanField label="Is Definition" source="isDefinition" />
             <TextField label="Name" source="name" />
             <TextField label="Schema Version" source="schemaVersion" />
+            <TextField label="TestDetails" source="testDetails" />
             <TextField label="Test Param Revision" source="testParamRevision" />
             <TextField label="Test Param Units" source="testParamUnits" />
             <BooleanField label="Test Pass" source="testPass" />
@@ -151,6 +152,7 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
               label="Test Setpoint Numerical Value"
               source="testSetpointValue"
             />
+            <TextField label="Tooltip" source="tooltip" />
           </Datagrid>
         </ReferenceManyField>
       </SimpleShowLayout>

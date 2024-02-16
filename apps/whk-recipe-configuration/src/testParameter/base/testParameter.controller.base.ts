@@ -80,9 +80,9 @@ export class TestParameterControllerBase {
         editedBy: true,
         id: true,
         isClassDef: true,
-        isDefinition: true,
         name: true,
         schemaVersion: true,
+        testDetails: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -92,6 +92,7 @@ export class TestParameterControllerBase {
         testSetpointType: true,
         testSetpointUpperLimit: true,
         testSetpointValue: true,
+        tooltip: true,
       },
     });
   }
@@ -130,9 +131,9 @@ export class TestParameterControllerBase {
         editedBy: true,
         id: true,
         isClassDef: true,
-        isDefinition: true,
         name: true,
         schemaVersion: true,
+        testDetails: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -142,6 +143,7 @@ export class TestParameterControllerBase {
         testSetpointType: true,
         testSetpointUpperLimit: true,
         testSetpointValue: true,
+        tooltip: true,
       },
     });
   }
@@ -179,9 +181,9 @@ export class TestParameterControllerBase {
         editedBy: true,
         id: true,
         isClassDef: true,
-        isDefinition: true,
         name: true,
         schemaVersion: true,
+        testDetails: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -191,6 +193,7 @@ export class TestParameterControllerBase {
         testSetpointType: true,
         testSetpointUpperLimit: true,
         testSetpointValue: true,
+        tooltip: true,
       },
     });
     if (result === null) {
@@ -248,9 +251,9 @@ export class TestParameterControllerBase {
           editedBy: true,
           id: true,
           isClassDef: true,
-          isDefinition: true,
           name: true,
           schemaVersion: true,
+          testDetails: true,
           testParamRevision: true,
           testParamUnits: true,
           testPass: true,
@@ -260,6 +263,7 @@ export class TestParameterControllerBase {
           testSetpointType: true,
           testSetpointUpperLimit: true,
           testSetpointValue: true,
+          tooltip: true,
         },
       });
     } catch (error) {
@@ -427,9 +431,9 @@ export class TestParameterControllerBase {
         editedBy: true,
         id: true,
         isClassDef: true,
-        isDefinition: true,
         name: true,
         schemaVersion: true,
+        testDetails: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -439,6 +443,7 @@ export class TestParameterControllerBase {
         testSetpointType: true,
         testSetpointUpperLimit: true,
         testSetpointValue: true,
+        tooltip: true,
       },
     });
     if (results === null) {

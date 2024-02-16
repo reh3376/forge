@@ -20,9 +20,9 @@ export type TestParameterWhereInput = {
   equipmentPhases?: EquipmentPhaseListRelationFilter;
   id?: StringFilter;
   isClassDef?: BooleanNullableFilter;
-  isDefinition?: BooleanNullableFilter;
   name?: StringFilter;
   schemaVersion?: StringNullableFilter;
+  testDetails?: StringNullableFilter;
   testParameters?: TestParameterListRelationFilter;
   testParamRevision?: StringNullableFilter;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail";
@@ -30,4 +30,5 @@ export type TestParameterWhereInput = {
   testResult?: JsonFilter;
   testSetpointBooleanValue?: BooleanNullableFilter;
   testSetpointType?: "Boolean" | "Numerical";
+  tooltip?: StringNullableFilter;
 };

@@ -29,7 +29,7 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
-import { Procedure } from "../../procedure/base/Procedure";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { OperationService } from "../operation.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Operation)
@@ -105,9 +105,9 @@ export class OperationResolverBase {
             }
           : undefined,
 
-        procedure: args.data.procedure
+        unitProcedure: args.data.unitProcedure
           ? {
-              connect: args.data.procedure,
+              connect: args.data.unitProcedure,
             }
           : undefined,
       },
@@ -136,9 +136,9 @@ export class OperationResolverBase {
               }
             : undefined,
 
-          procedure: args.data.procedure
+          unitProcedure: args.data.unitProcedure
             ? {
-                connect: args.data.procedure,
+                connect: args.data.unitProcedure,
               }
             : undefined,
         },
@@ -235,19 +235,19 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Procedure, {
+  @graphql.ResolveField(() => UnitProcedure, {
     nullable: true,
-    name: "procedure",
+    name: "unitProcedure",
   })
   @nestAccessControl.UseRoles({
-    resource: "Procedure",
+    resource: "UnitProcedure",
     action: "read",
     possession: "any",
   })
-  async getProcedure(
+  async getUnitProcedure(
     @graphql.Parent() parent: Operation
-  ): Promise<Procedure | null> {
-    const result = await this.service.getProcedure(parent.id);
+  ): Promise<UnitProcedure | null> {
+    const result = await this.service.getUnitProcedure(parent.id);
 
     if (!result) {
       return null;

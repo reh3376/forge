@@ -16,8 +16,8 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { OperationListRelationFilter } from "../../operation/base/OperationListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
 @InputType()
 class ProcedureWhereInput {
@@ -78,18 +78,6 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => OperationListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => OperationListRelationFilter)
-  @IsOptional()
-  @Field(() => OperationListRelationFilter, {
-    nullable: true,
-  })
-  operations?: OperationListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: IntNullableFilter,
   })
   @Type(() => IntNullableFilter)
@@ -109,6 +97,18 @@ class ProcedureWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => UnitProcedureListRelationFilter, {
+    nullable: true,
+  })
+  unitProcedures?: UnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,

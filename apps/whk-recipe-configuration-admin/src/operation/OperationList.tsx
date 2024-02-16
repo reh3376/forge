@@ -4,15 +4,15 @@ import {
   List,
   Datagrid,
   ListProps,
+  TextField,
   BooleanField,
   ReferenceField,
-  TextField,
   DateField,
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
 import { OPERATION_TITLE_FIELD } from "./OperationTitle";
-import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
+import { UNITPROCEDURE_TITLE_FIELD } from "../unitProcedure/UnitProcedureTitle";
 
 export const OperationList = (props: ListProps): React.ReactElement => {
   return (
@@ -24,6 +24,7 @@ export const OperationList = (props: ListProps): React.ReactElement => {
       pagination={<Pagination />}
     >
       <Datagrid rowClick="show">
+        <TextField label="Abbreviation" source="abbreviation" />
         <BooleanField label="Active" source="active" />
         <ReferenceField
           label="Class"
@@ -40,19 +41,19 @@ export const OperationList = (props: ListProps): React.ReactElement => {
         <BooleanField label="Is Class Definition" source="isClassDefinition" />
         <TextField label="Name" source="name" />
         <TextField label="Path" source="path" />
-        <ReferenceField
-          label="Procedure"
-          source="procedure.id"
-          reference="Procedure"
-        >
-          <TextField source={PROCEDURE_TITLE_FIELD} />
-        </ReferenceField>
         <TextField
           label="Procedure Sequence Index"
           source="procedureSequenceIndex"
         />
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
+        <ReferenceField
+          label="Unit Procedure"
+          source="unitprocedure.id"
+          reference="UnitProcedure"
+        >
+          <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+        </ReferenceField>
         <DateField source="updatedAt" label="Updated At" />
       </Datagrid>
     </List>

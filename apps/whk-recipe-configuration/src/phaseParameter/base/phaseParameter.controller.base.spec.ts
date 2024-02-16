@@ -34,8 +34,7 @@ const CREATE_INPUT = {
   setpointLowerLimit: 42.42,
   setpointNumericalValue: 42.42,
   setpointUpperLimit: 42.42,
-  typeRevision: 42,
-  typeUnits: "exampleTypeUnits",
+  units: "exampleUnits",
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
@@ -55,8 +54,7 @@ const CREATE_RESULT = {
   setpointLowerLimit: 42.42,
   setpointNumericalValue: 42.42,
   setpointUpperLimit: 42.42,
-  typeRevision: 42,
-  typeUnits: "exampleTypeUnits",
+  units: "exampleUnits",
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
@@ -77,8 +75,7 @@ const FIND_MANY_RESULT = [
     setpointLowerLimit: 42.42,
     setpointNumericalValue: 42.42,
     setpointUpperLimit: 42.42,
-    typeRevision: 42,
-    typeUnits: "exampleTypeUnits",
+    units: "exampleUnits",
     updatedAt: new Date(),
   },
 ];
@@ -99,8 +96,7 @@ const FIND_ONE_RESULT = {
   setpointLowerLimit: 42.42,
   setpointNumericalValue: 42.42,
   setpointUpperLimit: 42.42,
-  typeRevision: 42,
-  typeUnits: "exampleTypeUnits",
+  units: "exampleUnits",
   updatedAt: new Date(),
 };
 

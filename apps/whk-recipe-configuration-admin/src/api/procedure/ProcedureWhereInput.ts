@@ -1,8 +1,8 @@
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { OperationListRelationFilter } from "../operation/OperationListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { UnitProcedureListRelationFilter } from "../unitProcedure/UnitProcedureListRelationFilter";
 
 export type ProcedureWhereInput = {
   active?: BooleanNullableFilter;
@@ -10,8 +10,8 @@ export type ProcedureWhereInput = {
   description?: StringNullableFilter;
   id?: StringFilter;
   name?: StringNullableFilter;
-  operations?: OperationListRelationFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
+  unitProcedures?: UnitProcedureListRelationFilter;
   updatedBy?: StringNullableFilter;
 };

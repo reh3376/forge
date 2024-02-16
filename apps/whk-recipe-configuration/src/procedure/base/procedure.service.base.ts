@@ -14,7 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Procedure, // @ts-ignore
-  Operation,
+  UnitProcedure,
 } from "@prisma/client";
 
 export class ProcedureServiceBase {
@@ -52,14 +52,14 @@ export class ProcedureServiceBase {
     return this.prisma.procedure.delete(args);
   }
 
-  async findOperations(
+  async findUnitProcedures(
     parentId: string,
-    args: Prisma.OperationFindManyArgs
-  ): Promise<Operation[]> {
+    args: Prisma.UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
     return this.prisma.procedure
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .operations(args);
+      .unitProcedures(args);
   }
 }
