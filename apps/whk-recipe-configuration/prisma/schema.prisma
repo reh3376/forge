@@ -234,7 +234,7 @@ model ProductionOrderQueue {
   createdAt     DateTime @default(now())
   createdBy     String   @unique
   id            String   @id @default(cuid())
-  queueIndex    Int?     @unique @default(autoincrement())
+  queueIndex    Int?     @unique
   recipe        Recipe?  @relation(fields: [recipeId], references: [id])
   recipeId      String?
   revision      Int      @default(0)
