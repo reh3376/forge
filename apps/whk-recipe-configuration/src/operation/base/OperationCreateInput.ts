@@ -20,8 +20,8 @@ import {
 } from "class-validator";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
-import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
+import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { RecipeCreateNestedManyWithoutOperationsInput } from "./RecipeCreateNestedManyWithoutOperationsInput";
 
@@ -79,6 +79,18 @@ class OperationCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -107,18 +119,6 @@ class OperationCreateInput {
     nullable: true,
   })
   operations?: OperationCreateNestedManyWithoutOperationsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  operationSteps?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: true,

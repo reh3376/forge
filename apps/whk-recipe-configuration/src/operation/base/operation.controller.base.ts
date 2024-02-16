@@ -286,6 +286,130 @@ export class OperationControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/equipmentPhases")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findEquipmentPhases(
+    @common.Req() request: Request,
+    @common.Param() params: OperationWhereUniqueInput
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findEquipmentPhases(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDefinition: true,
+        name: true,
+
+        operations: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationSequenceIndex: true,
+        operationStepSequence: true,
+        revision: true,
+        schemaVersion: true,
+
+        testParameters: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async connectEquipmentPhases(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        connect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async updateEquipmentPhases(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        set: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectEquipmentPhases(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/operations")
   @ApiNestedQuery(OperationFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -394,130 +518,6 @@ export class OperationControllerBase {
   ): Promise<void> {
     const data = {
       operations: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateOperation({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/operationSteps")
-  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "read",
-    possession: "any",
-  })
-  async findOperationSteps(
-    @common.Req() request: Request,
-    @common.Param() params: OperationWhereUniqueInput
-  ): Promise<EquipmentPhase[]> {
-    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
-    const results = await this.service.findOperationSteps(params.id, {
-      ...query,
-      select: {
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedAt: true,
-        editedBy: true,
-        id: true,
-        isClassDefinition: true,
-        name: true,
-
-        operations: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationSequenceIndex: true,
-        operationStepSequence: true,
-        revision: true,
-        schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/operationSteps")
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "update",
-    possession: "any",
-  })
-  async connectOperationSteps(
-    @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      operationSteps: {
-        connect: body,
-      },
-    };
-    await this.service.updateOperation({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/operationSteps")
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "update",
-    possession: "any",
-  })
-  async updateOperationSteps(
-    @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      operationSteps: {
-        set: body,
-      },
-    };
-    await this.service.updateOperation({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/operationSteps")
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectOperationSteps(
-    @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      operationSteps: {
         disconnect: body,
       },
     };
