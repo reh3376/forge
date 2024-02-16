@@ -14,12 +14,12 @@ export type RecipeParameterOrderByInput = {
   itemId?: SortOrder;
   recipeParamDescription?: SortOrder;
   recipeParamName?: SortOrder;
-  recipeParamRevision?: SortOrder;
   recipeParamUnits?: SortOrder;
   recipeSetpointBooleanValue?: SortOrder;
   recipeSetpointLowerLimit?: SortOrder;
   recipeSetpointType?: SortOrder;
   recipeSetpointUpperLimit?: SortOrder;
+  revision?: SortOrder;
   schemaVersion?: SortOrder;
   sequencerParameters?: SortOrder;
 };

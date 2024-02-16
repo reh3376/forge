@@ -18,6 +18,7 @@ import {
   ValidateNested,
   IsEnum,
   IsNumber,
+  IsInt,
 } from "class-validator";
 import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -140,17 +141,6 @@ class RecipeParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeParamRevision?: string | null;
-
-  @ApiProperty({
-    required: false,
     enum: EnumRecipeParameterRecipeParamUnits,
   })
   @IsEnum(EnumRecipeParameterRecipeParamUnits)
@@ -210,6 +200,17 @@ class RecipeParameterCreateInput {
     nullable: true,
   })
   recipeSetpointUpperLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
 
   @ApiProperty({
     required: false,

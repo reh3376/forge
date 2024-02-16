@@ -2,6 +2,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { RecipeWhereUniqueInput } from "../recipe/RecipeWhereUniqueInput";
+import { IntFilter } from "../../util/IntFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 export type ProductionOrderQueueWhereInput = {
@@ -11,7 +12,7 @@ export type ProductionOrderQueueWhereInput = {
   id?: StringFilter;
   queueIndex?: IntNullableFilter;
   recipe?: RecipeWhereUniqueInput;
-  revision?: StringFilter;
+  revision?: IntFilter;
   salesOrderId?: StringFilter;
   schemaVersion?: StringNullableFilter;
   updatedBy?: StringNullableFilter;

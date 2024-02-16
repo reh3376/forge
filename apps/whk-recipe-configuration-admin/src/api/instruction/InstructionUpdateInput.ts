@@ -6,6 +6,7 @@ export type InstructionUpdateInput = {
   editedBy?: string | null;
   equipmentPhase?: EquipmentPhaseUpdateManyWithoutInstructionsInput;
   filePath?: string;
-  instructionRevision?: number;
+  name?: string | null;
+  revision?: number;
   schemaVersion?: string;
 };

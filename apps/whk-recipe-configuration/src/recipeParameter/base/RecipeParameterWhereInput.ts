@@ -24,6 +24,7 @@ import { RecipeParameterListRelationFilter } from "./RecipeParameterListRelation
 import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
@@ -186,17 +187,6 @@ class RecipeParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  recipeParamRevision?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     enum: EnumRecipeParameterRecipeParamUnits,
   })
   @IsEnum(EnumRecipeParameterRecipeParamUnits)
@@ -258,6 +248,17 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   recipeSetpointUpperLimit?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,

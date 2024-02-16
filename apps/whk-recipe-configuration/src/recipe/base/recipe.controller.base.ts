@@ -63,10 +63,10 @@ export class RecipeControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+        customerId: true,
         id: true,
-        item: true,
         itemDescription: true,
+        itemId: true,
         mashBill: true,
 
         operation: {
@@ -103,10 +103,10 @@ export class RecipeControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+        customerId: true,
         id: true,
-        item: true,
         itemDescription: true,
+        itemId: true,
         mashBill: true,
 
         operation: {
@@ -144,10 +144,10 @@ export class RecipeControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+        customerId: true,
         id: true,
-        item: true,
         itemDescription: true,
+        itemId: true,
         mashBill: true,
 
         operation: {
@@ -202,10 +202,10 @@ export class RecipeControllerBase {
           active: true,
           createdAt: true,
           createdBy: true,
-          customer: true,
+          customerId: true,
           id: true,
-          item: true,
           itemDescription: true,
+          itemId: true,
           mashBill: true,
 
           operation: {
@@ -251,10 +251,10 @@ export class RecipeControllerBase {
           active: true,
           createdAt: true,
           createdBy: true,
-          customer: true,
+          customerId: true,
           id: true,
-          item: true,
           itemDescription: true,
+          itemId: true,
           mashBill: true,
 
           operation: {

@@ -11,6 +11,7 @@ export type InstructionWhereInput = {
   equipmentPhase?: EquipmentPhaseListRelationFilter;
   filePath?: StringFilter;
   id?: StringFilter;
-  instructionRevision?: IntFilter;
+  name?: StringNullableFilter;
+  revision?: IntFilter;
   schemaVersion?: StringFilter;
 };

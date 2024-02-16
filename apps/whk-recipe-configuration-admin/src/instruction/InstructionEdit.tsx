@@ -29,11 +29,8 @@ export const InstructionEdit = (props: EditProps): React.ReactElement => {
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
         <TextInput label="File Path" source="filePath" />
-        <NumberInput
-          step={1}
-          label="Instruction Revision"
-          source="instructionRevision"
-        />
+        <TextInput label="Name" source="name" />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
       </SimpleForm>
     </Edit>

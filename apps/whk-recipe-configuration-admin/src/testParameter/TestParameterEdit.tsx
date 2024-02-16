@@ -5,9 +5,9 @@ import {
   SimpleForm,
   EditProps,
   BooleanInput,
-  TextInput,
   ReferenceInput,
   SelectInput,
+  TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
   NumberInput,
@@ -21,7 +21,6 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
     <Edit {...props}>
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
-        <TextInput label="Batch" source="batch" />
         <ReferenceInput
           source="classId.id"
           reference="TestParameter"
@@ -29,8 +28,8 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectInput optionText={TestParameterTitle} />
         </ReferenceInput>
-        <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
+        <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
         <ReferenceArrayInput
           source="equipmentPhases"
@@ -42,13 +41,8 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Def" source="isClassDef" />
         <BooleanInput label="Is Definition" source="isDefinition" />
-        <TextInput label="Item ID" source="itemId" />
+        <TextInput label="Name" source="name" />
         <TextInput label="Schema Version" source="schemaVersion" />
-        <div />
-        <TextInput
-          label="Test Param Description"
-          source="testParamDescription"
-        />
         <ReferenceArrayInput
           source="testParameters"
           reference="TestParameter"
@@ -57,7 +51,6 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={TestParameterTitle} />
         </ReferenceArrayInput>
-        <TextInput label="Test Param Name" source="testParamName" />
         <TextInput label="Test Param Revision" source="testParamRevision" />
         <SelectInput
           source="testParamUnits"
@@ -74,7 +67,7 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
           optionValue="value"
         />
         <BooleanInput label="Test Pass" source="testPass" />
-        <TextInput label="Test Result" source="testResult" />
+        <div />
         <BooleanInput
           label="Test Setpoint Boolean Value"
           source="testSetpointBooleanValue"

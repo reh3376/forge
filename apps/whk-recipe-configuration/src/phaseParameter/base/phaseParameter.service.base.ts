@@ -52,6 +52,25 @@ export class PhaseParameterServiceBase {
     return this.prisma.phaseParameter.delete(args);
   }
 
+  async findPhaseParameter(
+    parentId: string,
+    args: Prisma.PhaseParameterFindManyArgs
+  ): Promise<PhaseParameter[]> {
+    return this.prisma.phaseParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .phaseParameter(args);
+  }
+
+  async getClassId(parentId: string): Promise<PhaseParameter | null> {
+    return this.prisma.phaseParameter
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
+  }
+
   async getEquipmentPhase(parentId: string): Promise<EquipmentPhase | null> {
     return this.prisma.phaseParameter
       .findUnique({

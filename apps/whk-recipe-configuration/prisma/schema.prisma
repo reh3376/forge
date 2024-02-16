@@ -19,51 +19,55 @@ model User {
 }
 
 model PhaseParameter {
+  active                 Boolean?                       @default(false)
+  classId                PhaseParameter?                @relation(name: "phaseParameter", fields: [classId], references: [id])
+  classId                String?
   createdAt              DateTime                       @default(now())
   createdBy              String                         @unique
+  description            String
   editedBy               String?                        @unique
   equipmentPhase         EquipmentPhase?                @relation(fields: [equipmentPhaseId], references: [id])
   equipmentPhaseId       String?
   id                     String                         @id @default(cuid())
+  isClassDef             Boolean?                       @default(false)
   itemId                 String?
+  name                   String
+  phaseParameter         PhaseParameter[]               @relation(name: "phaseParameter")
   recipeId               String?
+  revision Int? @default( @autoincrement)
   schemaVersion          String?                        @default("0001-alpha")
   setpointBooleanValue   Boolean?
   setpointLowerLimit     Float?
   setpointNumericalValue Float?
   setpointType           EnumPhaseParameterSetpointType
   setpointUpperLimit     Float?
-  typeDescription        String
-  typeName               String
   typeRevision           Int                            @default(0)
   typeUnits              String
   updatedAt              DateTime                       @updatedAt
+
+  @@unique([name, revision, equipmentPhase]
 }
 
 model TestParameter {
   active                   Boolean                            @default(true)
-  batch                    String?
   classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterTestParameters", fields: [classId], references: [id])
   classId                  String?
-  className                String
   createdAt                DateTime                           @default(now())
   createdBy                String                             @unique
+  description              String?
   editedAt                 DateTime?                          @updatedAt
   editedBy                 String?                            @unique
   equipmentPhases          EquipmentPhase[]
   id                       String                             @id @default(auto())
   isClassDef               Boolean?                           @default(false)
   isDefinition             Boolean?                           @default(false)
-  itemId                   String
+  name                     String
   schemaVersion            String?
-  test                     Json?
-  testParamDescription     String?
   testParameters           TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterTestParameters")
-  testParamName            String
   testParamRevision        String?
   testParamUnits           EnumTestParameterTestParamUnits?
   testPass                 Boolean?
-  testResult               String?
+  testResult               Json?
   testSetpointBooleanValue Boolean?                           @default(true)
   testSetpointLowerLimit   Float?
   testSetpointType         EnumTestParameterTestSetpointType?
@@ -89,12 +93,12 @@ model RecipeParameter {
   recipeParamDescription     String?
   recipeParameters           RecipeParameter[]                     @relation(name: "recipeParameters")
   recipeParamName            String
-  recipeParamRevision        String?
   recipeParamUnits           EnumRecipeParameterRecipeParamUnits?
   recipeSetpointBooleanValue Boolean?                              @default(true)
   recipeSetpointLowerLimit   Float?
   recipeSetpointType         EnumRecipeParameterRecipeSetpointType
   recipeSetpointUpperLimit   Float?
+  revision                   Int?                                  @default(0)
   schemaVersion              String?                               @default("0001-alpha")
   sequencerParameters        Json?
 
@@ -102,16 +106,19 @@ model RecipeParameter {
 }
 
 model Instruction {
-  active              Boolean?         @default(false)
-  createdAt           DateTime         @default(now())
-  createdBy           String           @unique
-  editedBy            String?          @unique
-  equipmentPhase      EquipmentPhase[]
-  filePath            String
-  id                  String           @id @default(cuid())
-  instructionRevision Int              @default(0)
-  schemaVersion       String           @default("0001-alpha")
-  updatedAt           DateTime         @updatedAt
+  active         Boolean?         @default(false)
+  createdAt      DateTime         @default(now())
+  createdBy      String           @unique
+  editedBy       String?          @unique
+  equipmentPhase EquipmentPhase[]
+  filePath       String
+  id             String           @id @default(cuid())
+  name           String?
+  revision       Int              @default(0)
+  schemaVersion  String           @default("0001-alpha")
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([name, revision])
 }
 
 model EquipmentPhase {
@@ -163,6 +170,7 @@ model Operation {
   schemaVersion          String?          @default("0001-b")
   updatedAt              DateTime?        @updatedAt
 
+  @@unique([name, revision, active])
   @@map("Operations")
 }
 
@@ -174,20 +182,22 @@ model Procedure {
   id            String      @id @default(cuid())
   name          String?
   operations    Operation[]
-  revision      Int?        @default(0)
+  revision Int? @default( @autoincrement)
   schemaVersion String?     @default("0001-b")
   updatedAt     DateTime    @updatedAt
   updatedBy     String?     @unique
+
+  @@unique([name, revision, active])
 }
 
 model Recipe {
   active                Boolean?               @default(true)
   createdAt             DateTime               @default(now())
-  createdBy             String
-  customer              String?
+  createdBy             String                 @unique
+  customerId            String
   id                    String                 @id @default(cuid())
-  item                  String?
   itemDescription       String?
+  itemId                String
   mashBill              String?
   operation             Operation?             @relation(fields: [operationId], references: [id])
   operationId           String?
@@ -195,7 +205,9 @@ model Recipe {
   revision              Int?                   @default(0)
   schemaVersion         String?                @default("0001-b")
   updatedAt             DateTime               @updatedAt
-  updatedBy             DateTime?
+  updatedBy             String?                @unique
+
+  @@unique([itemId, customerId])
 }
 
 model Bom {
@@ -226,8 +238,8 @@ model ProductionOrderQueue {
   queueIndex    Int?     @unique @default(autoincrement())
   recipe        Recipe?  @relation(fields: [recipeId], references: [id])
   recipeId      String?
-  revision      String   @default(autoincrement())
-  salesOrderId  String
+  revision      Int      @default(0)
+  salesOrderId  String   @unique
   schemaVersion String?  @default("0001-b")
   updatedAt     DateTime @updatedAt
   updatedBy     String?  @unique

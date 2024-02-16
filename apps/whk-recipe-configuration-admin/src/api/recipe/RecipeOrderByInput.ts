@@ -4,10 +4,10 @@ export type RecipeOrderByInput = {
   active?: SortOrder;
   createdAt?: SortOrder;
   createdBy?: SortOrder;
-  customer?: SortOrder;
+  customerId?: SortOrder;
   id?: SortOrder;
-  item?: SortOrder;
   itemDescription?: SortOrder;
+  itemId?: SortOrder;
   mashBill?: SortOrder;
   operationId?: SortOrder;
   revision?: SortOrder;

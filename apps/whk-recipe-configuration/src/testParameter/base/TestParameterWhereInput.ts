@@ -14,16 +14,16 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
-import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { JsonFilter } from "../../util/JsonFilter";
 import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
+import { JsonFilter } from "../../util/JsonFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
 @InputType()
@@ -41,17 +41,6 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  batch?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => TestParameterWhereUniqueInput,
   })
   @ValidateNested()
@@ -61,17 +50,6 @@ class TestParameterWhereInput {
     nullable: true,
   })
   classId?: TestParameterWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  className?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -94,6 +72,17 @@ class TestParameterWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -171,7 +160,7 @@ class TestParameterWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  itemId?: StringFilter;
+  name?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -186,28 +175,6 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  test?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  testParamDescription?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => TestParameterListRelationFilter,
   })
   @ValidateNested()
@@ -217,17 +184,6 @@ class TestParameterWhereInput {
     nullable: true,
   })
   testParameters?: TestParameterListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  testParamName?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -264,14 +220,14 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: JsonFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => JsonFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => JsonFilter, {
     nullable: true,
   })
-  testResult?: StringNullableFilter;
+  testResult?: JsonFilter;
 
   @ApiProperty({
     required: false,

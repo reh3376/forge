@@ -26,7 +26,7 @@ export const ProductionOrderQueueCreate = (
         <ReferenceInput source="recipe.id" reference="Recipe" label="Recipe">
           <SelectInput optionText={RecipeTitle} />
         </ReferenceInput>
-        <TextInput label="Revision" source="revision" />
+        <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Sales Order ID" source="salesOrderId" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <TextInput label="Updated By" source="updatedBy" />

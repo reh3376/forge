@@ -8,7 +8,7 @@ export type ProductionOrderQueue = {
   id: string;
   queueIndex: number | null;
   recipe?: Recipe | null;
-  revision: string;
+  revision: number;
   salesOrderId: string;
   schemaVersion: string | null;
   updatedAt: Date;

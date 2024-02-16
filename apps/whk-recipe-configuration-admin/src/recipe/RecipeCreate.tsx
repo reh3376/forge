@@ -11,7 +11,6 @@ import {
   ReferenceArrayInput,
   SelectArrayInput,
   NumberInput,
-  DateTimeInput,
 } from "react-admin";
 
 import { OperationTitle } from "../operation/OperationTitle";
@@ -23,13 +22,13 @@ export const RecipeCreate = (props: CreateProps): React.ReactElement => {
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
         <TextInput label="Created By" source="createdBy" />
-        <TextInput label="Customer ID" source="customer" />
-        <TextInput label="Item" source="item" />
+        <TextInput label="Customer ID" source="customerId" />
         <TextInput
           label="Item Description"
           multiline
           source="itemDescription"
         />
+        <TextInput label="Item ID" source="itemId" />
         <TextInput label="Mash Bill" source="mashBill" />
         <ReferenceInput
           source="operation.id"
@@ -48,7 +47,7 @@ export const RecipeCreate = (props: CreateProps): React.ReactElement => {
         </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
-        <DateTimeInput label="Updated By" source="updatedBy" />
+        <TextInput label="Updated By" source="updatedBy" />
       </SimpleForm>
     </Create>
   );

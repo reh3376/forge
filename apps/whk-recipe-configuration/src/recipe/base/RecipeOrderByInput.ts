@@ -61,7 +61,7 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  customer?: SortOrder;
+  customerId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -83,7 +83,7 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  item?: SortOrder;
+  itemDescription?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -94,7 +94,7 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  itemDescription?: SortOrder;
+  itemId?: SortOrder;
 
   @ApiProperty({
     required: false,

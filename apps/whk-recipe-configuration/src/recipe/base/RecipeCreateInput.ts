@@ -17,7 +17,6 @@ import {
   IsString,
   ValidateNested,
   IsInt,
-  IsDate,
 } from "class-validator";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -45,26 +44,12 @@ class RecipeCreateInput {
   createdBy!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  customer?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  item?: string | null;
+  @Field(() => String)
+  customerId!: string;
 
   @ApiProperty({
     required: false,
@@ -76,6 +61,14 @@ class RecipeCreateInput {
     nullable: true,
   })
   itemDescription?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  itemId!: string;
 
   @ApiProperty({
     required: false,
@@ -136,14 +129,14 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: Date | null;
+  updatedBy?: string | null;
 }
 
 export { RecipeCreateInput as RecipeCreateInput };

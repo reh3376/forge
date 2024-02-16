@@ -12,20 +12,45 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsString,
+  IsBoolean,
   IsOptional,
   ValidateNested,
-  IsBoolean,
+  IsString,
+  IsInt,
   IsNumber,
   IsEnum,
-  IsInt,
 } from "class-validator";
-import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { PhaseParameterUpdateManyWithoutPhaseParametersInput } from "./PhaseParameterUpdateManyWithoutPhaseParametersInput";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 
 @InputType()
 class PhaseParameterUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: PhaseParameterWhereUniqueInput | null;
+
   @ApiProperty({
     required: false,
     type: String,
@@ -36,6 +61,17 @@ class PhaseParameterUpdateInput {
     nullable: true,
   })
   createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description?: string;
 
   @ApiProperty({
     required: false,
@@ -62,6 +98,17 @@ class PhaseParameterUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -80,7 +127,41 @@ class PhaseParameterUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
+  name?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterUpdateManyWithoutPhaseParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterUpdateManyWithoutPhaseParametersInput)
+  @IsOptional()
+  @Field(() => PhaseParameterUpdateManyWithoutPhaseParametersInput, {
+    nullable: true,
+  })
+  phaseParameter?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
   recipeId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
 
   @ApiProperty({
     required: false,
@@ -147,28 +228,6 @@ class PhaseParameterUpdateInput {
     nullable: true,
   })
   setpointUpperLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  typeDescription?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  typeName?: string;
 
   @ApiProperty({
     required: false,
