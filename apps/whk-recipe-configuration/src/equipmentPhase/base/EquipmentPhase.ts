@@ -46,17 +46,6 @@ class EquipmentPhase {
   @Field(() => String, {
     nullable: true,
   })
-  bomId!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
   className!: string | null;
 
   @ApiProperty({

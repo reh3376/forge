@@ -6,7 +6,6 @@ import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhe
 
 export type EquipmentPhaseCreateInput = {
   bom?: BomWhereUniqueInput | null;
-  bomId?: string | null;
   className?: string | null;
   createdBy: string;
   description?: string | null;

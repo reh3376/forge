@@ -23,7 +23,7 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
       <SimpleShowLayout>
         <BooleanField label="Active" source="active" />
         <ReferenceField
-          label="Class ID"
+          label="Class"
           source="operation.id"
           reference="Operation"
         >
@@ -59,7 +59,7 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
             <ReferenceField
-              label="Class ID"
+              label="Class"
               source="operation.id"
               reference="Operation"
             >
@@ -101,7 +101,6 @@ export const OperationShow = (props: ShowProps): React.ReactElement => {
             <ReferenceField label="Bom" source="bom.id" reference="Bom">
               <TextField source={BOM_TITLE_FIELD} />
             </ReferenceField>
-            <TextField label="Bom ID" source="bomId" />
             <TextField label="Class Name" source="className" />
             <DateField source="createdAt" label="Created At" />
             <TextField label="Created By" source="createdBy" />
