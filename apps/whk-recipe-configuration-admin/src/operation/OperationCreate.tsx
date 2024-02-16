@@ -29,7 +29,6 @@ export const OperationCreate = (props: CreateProps): React.ReactElement => {
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
-        <TextInput label="globalUuid" source="globalUuid" />
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
         <ReferenceArrayInput
@@ -48,6 +47,7 @@ export const OperationCreate = (props: CreateProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
+        <TextInput label="Path" source="path" />
         <ReferenceInput
           source="procedure.id"
           reference="Procedure"

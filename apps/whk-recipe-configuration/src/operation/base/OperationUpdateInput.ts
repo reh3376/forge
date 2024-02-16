@@ -85,17 +85,6 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalUuid?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -139,6 +128,17 @@ class OperationUpdateInput {
     nullable: true,
   })
   operationSteps?: EquipmentPhaseUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path?: string;
 
   @ApiProperty({
     required: false,
