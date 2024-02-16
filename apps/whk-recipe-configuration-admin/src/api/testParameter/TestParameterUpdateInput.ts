@@ -11,9 +11,9 @@ export type TestParameterUpdateInput = {
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
   isClassDef?: boolean | null;
-  isDefinition?: boolean | null;
   name?: string;
   schemaVersion?: string | null;
+  testDetails?: string | null;
   testParameters?: TestParameterUpdateManyWithoutTestParametersInput;
   testParamRevision?: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
@@ -24,4 +24,5 @@ export type TestParameterUpdateInput = {
   testSetpointType?: "Boolean" | "Numerical" | null;
   testSetpointUpperLimit?: number | null;
   testSetpointValue?: number | null;
+  tooltip?: string | null;
 };

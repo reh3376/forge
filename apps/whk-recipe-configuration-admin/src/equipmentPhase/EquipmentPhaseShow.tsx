@@ -107,8 +107,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
               label="Setpoint Upper Limit"
               source="setpointUpperLimit"
             />
-            <TextField label="Type Revision" source="typeRevision" />
-            <TextField label="Type Units" source="typeUnits" />
+            <TextField label="Units" source="units" />
             <DateField source="updatedAt" label="Updated At" />
           </Datagrid>
         </ReferenceManyField>

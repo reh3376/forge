@@ -16,7 +16,7 @@ import {
   Operation, // @ts-ignore
   EquipmentPhase, // @ts-ignore
   Recipe, // @ts-ignore
-  Procedure,
+  UnitProcedure,
 } from "@prisma/client";
 
 export class OperationServiceBase {
@@ -95,11 +95,11 @@ export class OperationServiceBase {
       .classId();
   }
 
-  async getProcedure(parentId: string): Promise<Procedure | null> {
+  async getUnitProcedure(parentId: string): Promise<UnitProcedure | null> {
     return this.prisma.operation
       .findUnique({
         where: { id: parentId },
       })
-      .procedure();
+      .unitProcedure();
   }
 }

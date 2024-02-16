@@ -1,8 +1,9 @@
 import { EquipmentPhase } from "../equipmentPhase/EquipmentPhase";
-import { Procedure } from "../procedure/Procedure";
 import { Recipe } from "../recipe/Recipe";
+import { UnitProcedure } from "../unitProcedure/UnitProcedure";
 
 export type Operation = {
+  abbreviation: string;
   active: boolean | null;
   classId?: Operation | null;
   createdAt: Date | null;
@@ -15,10 +16,10 @@ export type Operation = {
   name: string;
   operations?: Array<Operation>;
   path: string;
-  procedure?: Procedure | null;
   procedureSequenceIndex: number;
   recipes?: Array<Recipe>;
   revision: number;
   schemaVersion: string | null;
+  unitProcedure?: UnitProcedure | null;
   updatedAt: Date | null;
 };

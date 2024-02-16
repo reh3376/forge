@@ -6,12 +6,12 @@ import {
   EditProps,
   BooleanInput,
   TextInput,
+  NumberInput,
   ReferenceArrayInput,
   SelectArrayInput,
-  NumberInput,
 } from "react-admin";
 
-import { OperationTitle } from "../operation/OperationTitle";
+import { UnitProcedureTitle } from "../unitProcedure/UnitProcedureTitle";
 
 export const ProcedureEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -21,16 +21,16 @@ export const ProcedureEdit = (props: EditProps): React.ReactElement => {
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" multiline source="description" />
         <TextInput label="Name" source="name" />
+        <NumberInput step={1} label="Revision" source="revision" />
+        <TextInput label="Schema Version" source="schemaVersion" />
         <ReferenceArrayInput
-          source="operations"
-          reference="Operation"
+          source="unitProcedures"
+          reference="UnitProcedure"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
-          <SelectArrayInput optionText={OperationTitle} />
+          <SelectArrayInput optionText={UnitProcedureTitle} />
         </ReferenceArrayInput>
-        <NumberInput step={1} label="Revision" source="revision" />
-        <TextInput label="Schema Version" source="schemaVersion" />
         <TextInput label="Updated By" source="updatedBy" />
       </SimpleForm>
     </Edit>

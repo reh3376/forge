@@ -99,8 +99,7 @@ export class PhaseParameterControllerBase {
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
-        typeRevision: true,
-        typeUnits: true,
+        units: true,
         updatedAt: true,
       },
     });
@@ -156,8 +155,7 @@ export class PhaseParameterControllerBase {
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
-        typeRevision: true,
-        typeUnits: true,
+        units: true,
         updatedAt: true,
       },
     });
@@ -212,8 +210,7 @@ export class PhaseParameterControllerBase {
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
-        typeRevision: true,
-        typeUnits: true,
+        units: true,
         updatedAt: true,
       },
     });
@@ -294,8 +291,7 @@ export class PhaseParameterControllerBase {
           setpointNumericalValue: true,
           setpointType: true,
           setpointUpperLimit: true,
-          typeRevision: true,
-          typeUnits: true,
+          units: true,
           updatedAt: true,
         },
       });
@@ -356,8 +352,7 @@ export class PhaseParameterControllerBase {
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
-        typeRevision: true,
-        typeUnits: true,
+        units: true,
         updatedAt: true,
       },
     });

@@ -16,11 +16,11 @@ import {
   IsOptional,
   IsDate,
   IsString,
-  ValidateNested,
   IsInt,
+  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { Operation } from "../../operation/base/Operation";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
 class Procedure {
@@ -83,15 +83,6 @@ class Procedure {
 
   @ApiProperty({
     required: false,
-    type: () => [Operation],
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  @IsOptional()
-  operations?: Array<Operation>;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
@@ -111,6 +102,15 @@ class Procedure {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProcedures?: Array<UnitProcedure>;
 
   @ApiProperty({
     required: true,

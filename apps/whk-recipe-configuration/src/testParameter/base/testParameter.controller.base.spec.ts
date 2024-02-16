@@ -26,15 +26,16 @@ const CREATE_INPUT = {
   editedBy: "exampleEditedBy",
   id: "exampleId",
   isClassDef: "true",
-  isDefinition: "true",
   name: "exampleName",
   schemaVersion: "exampleSchemaVersion",
+  testDetails: "exampleTestDetails",
   testParamRevision: "exampleTestParamRevision",
   testPass: "true",
   testSetpointBooleanValue: "true",
   testSetpointLowerLimit: 42.42,
   testSetpointUpperLimit: 42.42,
   testSetpointValue: 42.42,
+  tooltip: "exampleTooltip",
 };
 const CREATE_RESULT = {
   active: "true",
@@ -45,15 +46,16 @@ const CREATE_RESULT = {
   editedBy: "exampleEditedBy",
   id: "exampleId",
   isClassDef: "true",
-  isDefinition: "true",
   name: "exampleName",
   schemaVersion: "exampleSchemaVersion",
+  testDetails: "exampleTestDetails",
   testParamRevision: "exampleTestParamRevision",
   testPass: "true",
   testSetpointBooleanValue: "true",
   testSetpointLowerLimit: 42.42,
   testSetpointUpperLimit: 42.42,
   testSetpointValue: 42.42,
+  tooltip: "exampleTooltip",
 };
 const FIND_MANY_RESULT = [
   {
@@ -65,15 +67,16 @@ const FIND_MANY_RESULT = [
     editedBy: "exampleEditedBy",
     id: "exampleId",
     isClassDef: "true",
-    isDefinition: "true",
     name: "exampleName",
     schemaVersion: "exampleSchemaVersion",
+    testDetails: "exampleTestDetails",
     testParamRevision: "exampleTestParamRevision",
     testPass: "true",
     testSetpointBooleanValue: "true",
     testSetpointLowerLimit: 42.42,
     testSetpointUpperLimit: 42.42,
     testSetpointValue: 42.42,
+    tooltip: "exampleTooltip",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -85,15 +88,16 @@ const FIND_ONE_RESULT = {
   editedBy: "exampleEditedBy",
   id: "exampleId",
   isClassDef: "true",
-  isDefinition: "true",
   name: "exampleName",
   schemaVersion: "exampleSchemaVersion",
+  testDetails: "exampleTestDetails",
   testParamRevision: "exampleTestParamRevision",
   testPass: "true",
   testSetpointBooleanValue: "true",
   testSetpointLowerLimit: 42.42,
   testSetpointUpperLimit: 42.42,
   testSetpointValue: 42.42,
+  tooltip: "exampleTooltip",
 };
 
 const service = {

@@ -219,19 +219,11 @@ class PhaseParameterCreateInput {
 
   @ApiProperty({
     required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  typeRevision!: number;
-
-  @ApiProperty({
-    required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
-  typeUnits!: string;
+  units!: string;
 }
 
 export { PhaseParameterCreateInput as PhaseParameterCreateInput };

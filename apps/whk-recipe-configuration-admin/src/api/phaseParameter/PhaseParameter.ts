@@ -21,7 +21,6 @@ export type PhaseParameter = {
   setpointNumericalValue: number | null;
   setpointType?: "Boolean" | "Numeric";
   setpointUpperLimit: number | null;
-  typeRevision: number;
-  typeUnits: string;
+  units: string;
   updatedAt: Date;
 };

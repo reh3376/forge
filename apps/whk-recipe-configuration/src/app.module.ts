@@ -25,6 +25,7 @@ import { ProcedureModule } from "./procedure/procedure.module";
 import { RecipeModule } from "./recipe/recipe.module";
 import { BomModule } from "./bom/bom.module";
 import { ProductionOrderQueueModule } from "./productionOrderQueue/productionOrderQueue.module";
+import { UnitProcedureModule } from "./unitProcedure/unitProcedure.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -58,6 +59,7 @@ import { LoggerModule } from "./logger/logger.module";
     RecipeModule,
     BomModule,
     ProductionOrderQueueModule,
+    UnitProcedureModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
