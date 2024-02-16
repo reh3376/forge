@@ -7,10 +7,10 @@ export type OperationOrderByInput = {
   createdBy?: SortOrder;
   description?: SortOrder;
   editedBy?: SortOrder;
-  globalUuid?: SortOrder;
   id?: SortOrder;
   isClassDefinition?: SortOrder;
   name?: SortOrder;
+  path?: SortOrder;
   procedureId?: SortOrder;
   procedureSequenceIndex?: SortOrder;
   revision?: SortOrder;

@@ -16,12 +16,12 @@ export type OperationWhereInput = {
   createdBy?: StringFilter;
   description?: StringFilter;
   editedBy?: StringNullableFilter;
-  globalUuid?: StringNullableFilter;
   id?: StringFilter;
   isClassDefinition?: BooleanNullableFilter;
   name?: StringFilter;
   operations?: OperationListRelationFilter;
   operationSteps?: EquipmentPhaseListRelationFilter;
+  path?: StringFilter;
   procedure?: ProcedureWhereUniqueInput;
   procedureSequenceIndex?: IntFilter;
   recipes?: RecipeListRelationFilter;
