@@ -63,7 +63,7 @@ export class TestParameterServiceBase {
       .equipmentPhases(args);
   }
 
-  async findTestParameters(
+  async findInstances(
     parentId: string,
     args: Prisma.TestParameterFindManyArgs
   ): Promise<TestParameter[]> {
@@ -71,7 +71,7 @@ export class TestParameterServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .testParameters(args);
+      .instances(args);
   }
 
   async getClassId(parentId: string): Promise<TestParameter | null> {

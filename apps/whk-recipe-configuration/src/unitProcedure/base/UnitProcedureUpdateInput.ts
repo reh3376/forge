@@ -11,21 +11,32 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import {
-  ValidateNested,
-  IsOptional,
-  IsString,
   IsBoolean,
+  IsOptional,
+  ValidateNested,
+  IsString,
   IsInt,
 } from "class-validator";
+import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
+import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 
 @InputType()
 class UnitProcedureUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
   @ApiProperty({
     required: false,
     type: () => UnitProcedureWhereUniqueInput,
@@ -59,6 +70,18 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureUpdateManyWithoutUnitProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureUpdateManyWithoutUnitProceduresInput)
+  @IsOptional()
+  @Field(() => UnitProcedureUpdateManyWithoutUnitProceduresInput, {
+    nullable: true,
+  })
+  instances?: UnitProcedureUpdateManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,
@@ -127,18 +150,6 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureUpdateManyWithoutUnitProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureUpdateManyWithoutUnitProceduresInput)
-  @IsOptional()
-  @Field(() => UnitProcedureUpdateManyWithoutUnitProceduresInput, {
-    nullable: true,
-  })
-  unitProcedure?: UnitProcedureUpdateManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,

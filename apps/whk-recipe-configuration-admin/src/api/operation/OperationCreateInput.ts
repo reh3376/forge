@@ -12,9 +12,9 @@ export type OperationCreateInput = {
   description: string;
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
+  instances?: OperationCreateNestedManyWithoutOperationsInput;
   isClassDefinition?: boolean | null;
   name: string;
-  operations?: OperationCreateNestedManyWithoutOperationsInput;
   path: string;
   procedureSequenceIndex: number;
   recipes?: RecipeCreateNestedManyWithoutOperationsInput;

@@ -103,6 +103,15 @@ class PhaseParameter {
 
   @ApiProperty({
     required: false,
+    type: () => [PhaseParameter],
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  instances?: Array<PhaseParameter>;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -130,15 +139,6 @@ class PhaseParameter {
   @IsString()
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [PhaseParameter],
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameter)
-  @IsOptional()
-  phaseParameters?: Array<PhaseParameter>;
 
   @ApiProperty({
     required: false,

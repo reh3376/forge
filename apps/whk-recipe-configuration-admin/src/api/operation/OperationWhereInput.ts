@@ -19,9 +19,9 @@ export type OperationWhereInput = {
   editedBy?: StringNullableFilter;
   equipmentPhases?: EquipmentPhaseListRelationFilter;
   id?: StringFilter;
+  instances?: OperationListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
   name?: StringFilter;
-  operations?: OperationListRelationFilter;
   path?: StringFilter;
   procedureSequenceIndex?: IntFilter;
   recipes?: RecipeListRelationFilter;

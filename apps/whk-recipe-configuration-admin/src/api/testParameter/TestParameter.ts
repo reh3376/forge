@@ -11,11 +11,11 @@ export type TestParameter = {
   editedBy: string | null;
   equipmentPhases?: Array<EquipmentPhase>;
   id: string;
+  instances?: Array<TestParameter>;
   isClassDef: boolean | null;
   name: string;
   schemaVersion: string | null;
   testDetails: string | null;
-  testParameters?: Array<TestParameter>;
   testParamRevision: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
   testPass: boolean | null;

@@ -38,16 +38,16 @@ export const OperationEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
-        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
-        <TextInput label="Name" source="name" />
         <ReferenceArrayInput
-          source="operations"
+          source="instances"
           reference="Operation"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
           <SelectArrayInput optionText={OperationTitle} />
         </ReferenceArrayInput>
+        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
+        <TextInput label="Name" source="name" />
         <TextInput label="Path" source="path" />
         <NumberInput
           step={1}

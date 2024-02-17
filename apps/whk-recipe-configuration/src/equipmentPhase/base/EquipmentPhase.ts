@@ -39,6 +39,15 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
+    type: () => EquipmentPhase,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  classId?: EquipmentPhase | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -107,6 +116,15 @@ class EquipmentPhase {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  instances?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: false,

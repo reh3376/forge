@@ -7,9 +7,9 @@ export type ProcedureUpdateInput = {
   classId?: ProcedureWhereUniqueInput | null;
   createdBy?: string;
   description?: string | null;
+  instances?: ProcedureUpdateManyWithoutProceduresInput;
   isClassDefinition?: boolean | null;
   name?: string | null;
-  procedures?: ProcedureUpdateManyWithoutProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;
   unitProcedures?: UnitProcedureUpdateManyWithoutProceduresInput;

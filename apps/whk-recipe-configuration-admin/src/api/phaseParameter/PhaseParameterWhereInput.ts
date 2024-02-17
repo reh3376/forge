@@ -15,10 +15,10 @@ export type PhaseParameterWhereInput = {
   editedBy?: StringNullableFilter;
   equipmentPhase?: EquipmentPhaseWhereUniqueInput;
   id?: StringFilter;
+  instances?: PhaseParameterListRelationFilter;
   isClassDef?: BooleanNullableFilter;
   itemId?: StringNullableFilter;
   name?: StringFilter;
-  phaseParameters?: PhaseParameterListRelationFilter;
   recipeId?: StringNullableFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;

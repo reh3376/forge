@@ -235,19 +235,19 @@ export class ProcedureControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/procedures")
+  @common.Get("/:id/instances")
   @ApiNestedQuery(ProcedureFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",
   })
-  async findProcedures(
+  async findInstances(
     @common.Req() request: Request,
     @common.Param() params: ProcedureWhereUniqueInput
   ): Promise<Procedure[]> {
     const query = plainToClass(ProcedureFindManyArgs, request.query);
-    const results = await this.service.findProcedures(params.id, {
+    const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
         active: true,
@@ -278,18 +278,18 @@ export class ProcedureControllerBase {
     return results;
   }
 
-  @common.Post("/:id/procedures")
+  @common.Post("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
   })
-  async connectProcedures(
+  async connectInstances(
     @common.Param() params: ProcedureWhereUniqueInput,
     @common.Body() body: ProcedureWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      procedures: {
+      instances: {
         connect: body,
       },
     };
@@ -300,18 +300,18 @@ export class ProcedureControllerBase {
     });
   }
 
-  @common.Patch("/:id/procedures")
+  @common.Patch("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
   })
-  async updateProcedures(
+  async updateInstances(
     @common.Param() params: ProcedureWhereUniqueInput,
     @common.Body() body: ProcedureWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      procedures: {
+      instances: {
         set: body,
       },
     };
@@ -322,18 +322,18 @@ export class ProcedureControllerBase {
     });
   }
 
-  @common.Delete("/:id/procedures")
+  @common.Delete("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
   })
-  async disconnectProcedures(
+  async disconnectInstances(
     @common.Param() params: ProcedureWhereUniqueInput,
     @common.Body() body: ProcedureWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      procedures: {
+      instances: {
         disconnect: body,
       },
     };
@@ -360,6 +360,8 @@ export class ProcedureControllerBase {
     const results = await this.service.findUnitProcedures(params.id, {
       ...query,
       select: {
+        active: true,
+
         classId: {
           select: {
             id: true,

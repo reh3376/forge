@@ -72,6 +72,18 @@ class ProcedureUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureUpdateManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureUpdateManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => ProcedureUpdateManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  instances?: ProcedureUpdateManyWithoutProceduresInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -91,18 +103,6 @@ class ProcedureUpdateInput {
     nullable: true,
   })
   name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureUpdateManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureUpdateManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => ProcedureUpdateManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  procedures?: ProcedureUpdateManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,
