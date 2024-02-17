@@ -9,10 +9,10 @@ export type PhaseParameterCreateInput = {
   description: string;
   editedBy?: string | null;
   equipmentPhase?: EquipmentPhaseWhereUniqueInput | null;
+  instances?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
   isClassDef?: boolean | null;
   itemId?: string | null;
   name: string;
-  phaseParameters?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
   recipeId?: string | null;
   revision?: number | null;
   schemaVersion?: string | null;

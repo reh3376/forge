@@ -92,6 +92,18 @@ class PhaseParameterCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => PhaseParameterCreateNestedManyWithoutPhaseParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterCreateNestedManyWithoutPhaseParametersInput)
+  @IsOptional()
+  @Field(() => PhaseParameterCreateNestedManyWithoutPhaseParametersInput, {
+    nullable: true,
+  })
+  instances?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -119,18 +131,6 @@ class PhaseParameterCreateInput {
   @IsString()
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterCreateNestedManyWithoutPhaseParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterCreateNestedManyWithoutPhaseParametersInput)
-  @IsOptional()
-  @Field(() => PhaseParameterCreateNestedManyWithoutPhaseParametersInput, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,

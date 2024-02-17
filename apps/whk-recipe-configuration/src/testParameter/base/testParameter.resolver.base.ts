@@ -159,17 +159,17 @@ export class TestParameterResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
+  @graphql.ResolveField(() => [TestParameter], { name: "instances" })
   @nestAccessControl.UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
   })
-  async findTestParameters(
+  async findInstances(
     @graphql.Parent() parent: TestParameter,
     @graphql.Args() args: TestParameterFindManyArgs
   ): Promise<TestParameter[]> {
-    const results = await this.service.findTestParameters(parent.id, args);
+    const results = await this.service.findInstances(parent.id, args);
 
     if (!results) {
       return [];

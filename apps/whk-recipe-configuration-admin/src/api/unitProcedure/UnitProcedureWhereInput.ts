@@ -1,23 +1,24 @@
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
 import { OperationListRelationFilter } from "../operation/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
 
 export type UnitProcedureWhereInput = {
+  active?: BooleanNullableFilter;
   classId?: UnitProcedureWhereUniqueInput;
   createdBy?: StringFilter;
   description?: StringNullableFilter;
   id?: StringFilter;
+  instances?: UnitProcedureListRelationFilter;
   isClassDef?: BooleanNullableFilter;
   name?: StringFilter;
   operations?: OperationListRelationFilter;
   procedure?: ProcedureWhereUniqueInput;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
-  unitProcedure?: UnitProcedureListRelationFilter;
   updatedBy?: StringNullableFilter;
 };

@@ -10,11 +10,11 @@ export type TestParameterCreateInput = {
   description?: string | null;
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutTestParametersInput;
+  instances?: TestParameterCreateNestedManyWithoutTestParametersInput;
   isClassDef?: boolean | null;
   name: string;
   schemaVersion?: string | null;
   testDetails?: string | null;
-  testParameters?: TestParameterCreateNestedManyWithoutTestParametersInput;
   testParamRevision?: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
   testPass?: boolean | null;

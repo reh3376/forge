@@ -99,6 +99,18 @@ class OperationCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => OperationCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => OperationCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  instances?: OperationCreateNestedManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -115,18 +127,6 @@ class OperationCreateInput {
   @IsString()
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => OperationCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  operations?: OperationCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: true,

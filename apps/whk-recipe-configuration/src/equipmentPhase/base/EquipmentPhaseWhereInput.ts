@@ -14,9 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
+import { EquipmentPhaseListRelationFilter } from "./EquipmentPhaseListRelationFilter";
 import { InstructionListRelationFilter } from "../../instruction/base/InstructionListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
@@ -37,6 +39,18 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   bom?: BomWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: EquipmentPhaseWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -114,6 +128,18 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  instances?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,

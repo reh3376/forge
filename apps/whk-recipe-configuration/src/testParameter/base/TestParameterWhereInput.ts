@@ -20,8 +20,8 @@ import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { JsonFilter } from "../../util/JsonFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
@@ -131,6 +131,18 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => TestParameterListRelationFilter, {
+    nullable: true,
+  })
+  instances?: TestParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: BooleanNullableFilter,
   })
   @Type(() => BooleanNullableFilter)
@@ -172,18 +184,6 @@ class TestParameterWhereInput {
     nullable: true,
   })
   testDetails?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => TestParameterListRelationFilter, {
-    nullable: true,
-  })
-  testParameters?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -13,6 +13,7 @@ import {
 } from "react-admin";
 
 import { BOM_TITLE_FIELD } from "../bom/BomTitle";
+import { EQUIPMENTPHASE_TITLE_FIELD } from "../equipmentPhase/EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 import { TESTPARAMETER_TITLE_FIELD } from "./TestParameterTitle";
 
@@ -68,6 +69,13 @@ export const TestParameterShow = (props: ShowProps): React.ReactElement => {
           <Datagrid rowClick="show">
             <ReferenceField label="Bom" source="bom.id" reference="Bom">
               <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
+            <ReferenceField
+              label="Class"
+              source="equipmentphase.id"
+              reference="EquipmentPhase"
+            >
+              <TextField source={EQUIPMENTPHASE_TITLE_FIELD} />
             </ReferenceField>
             <TextField label="Class Name" source="className" />
             <DateField source="createdAt" label="Created At" />

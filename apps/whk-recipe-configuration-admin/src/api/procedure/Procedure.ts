@@ -7,9 +7,9 @@ export type Procedure = {
   createdBy: string;
   description: string | null;
   id: string;
+  instances?: Array<Procedure>;
   isClassDefinition: boolean | null;
   name: string | null;
-  procedures?: Array<Procedure>;
   revision: number | null;
   schemaVersion: string | null;
   unitProcedures?: Array<UnitProcedure>;

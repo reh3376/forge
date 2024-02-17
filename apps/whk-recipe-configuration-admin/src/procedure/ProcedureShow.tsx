@@ -72,6 +72,7 @@ export const ProcedureShow = (props: ShowProps): React.ReactElement => {
           label="Unit Procedures"
         >
           <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
             <ReferenceField
               label="Class"
               source="unitprocedure.id"

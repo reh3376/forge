@@ -311,6 +311,12 @@ export class OperationControllerBase {
           },
         },
 
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
@@ -414,19 +420,19 @@ export class OperationControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/operations")
+  @common.Get("/:id/instances")
   @ApiNestedQuery(OperationFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
   })
-  async findOperations(
+  async findInstances(
     @common.Req() request: Request,
     @common.Param() params: OperationWhereUniqueInput
   ): Promise<Operation[]> {
     const query = plainToClass(OperationFindManyArgs, request.query);
-    const results = await this.service.findOperations(params.id, {
+    const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
         abbreviation: true,
@@ -467,18 +473,18 @@ export class OperationControllerBase {
     return results;
   }
 
-  @common.Post("/:id/operations")
+  @common.Post("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
   })
-  async connectOperations(
+  async connectInstances(
     @common.Param() params: OperationWhereUniqueInput,
     @common.Body() body: OperationWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operations: {
+      instances: {
         connect: body,
       },
     };
@@ -489,18 +495,18 @@ export class OperationControllerBase {
     });
   }
 
-  @common.Patch("/:id/operations")
+  @common.Patch("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
   })
-  async updateOperations(
+  async updateInstances(
     @common.Param() params: OperationWhereUniqueInput,
     @common.Body() body: OperationWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operations: {
+      instances: {
         set: body,
       },
     };
@@ -511,18 +517,18 @@ export class OperationControllerBase {
     });
   }
 
-  @common.Delete("/:id/operations")
+  @common.Delete("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
   })
-  async disconnectOperations(
+  async disconnectInstances(
     @common.Param() params: OperationWhereUniqueInput,
     @common.Body() body: OperationWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      operations: {
+      instances: {
         disconnect: body,
       },
     };

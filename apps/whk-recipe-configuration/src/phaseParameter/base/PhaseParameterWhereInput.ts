@@ -106,6 +106,18 @@ class PhaseParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => PhaseParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => PhaseParameterListRelationFilter, {
+    nullable: true,
+  })
+  instances?: PhaseParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: BooleanNullableFilter,
   })
   @Type(() => BooleanNullableFilter)
@@ -136,18 +148,6 @@ class PhaseParameterWhereInput {
     nullable: true,
   })
   name?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => PhaseParameterListRelationFilter, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

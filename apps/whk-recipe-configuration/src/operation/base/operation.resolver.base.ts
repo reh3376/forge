@@ -174,17 +174,17 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Operation], { name: "operations" })
+  @graphql.ResolveField(() => [Operation], { name: "instances" })
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
   })
-  async findOperations(
+  async findInstances(
     @graphql.Parent() parent: Operation,
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
-    const results = await this.service.findOperations(parent.id, args);
+    const results = await this.service.findInstances(parent.id, args);
 
     if (!results) {
       return [];

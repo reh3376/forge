@@ -65,7 +65,7 @@ export class OperationServiceBase {
       .equipmentPhases(args);
   }
 
-  async findOperations(
+  async findInstances(
     parentId: string,
     args: Prisma.OperationFindManyArgs
   ): Promise<Operation[]> {
@@ -73,7 +73,7 @@ export class OperationServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .operations(args);
+      .instances(args);
   }
 
   async findRecipes(

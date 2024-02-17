@@ -12,9 +12,9 @@ export type Operation = {
   editedBy: string | null;
   equipmentPhases?: Array<EquipmentPhase>;
   id: string;
+  instances?: Array<Operation>;
   isClassDefinition: boolean | null;
   name: string;
-  operations?: Array<Operation>;
   path: string;
   procedureSequenceIndex: number;
   recipes?: Array<Recipe>;
