@@ -111,6 +111,15 @@ class Operation {
 
   @ApiProperty({
     required: false,
+    type: () => [Operation],
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  instances?: Array<Operation>;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -127,15 +136,6 @@ class Operation {
   @IsString()
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Operation],
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  @IsOptional()
-  operations?: Array<Operation>;
 
   @ApiProperty({
     required: true,

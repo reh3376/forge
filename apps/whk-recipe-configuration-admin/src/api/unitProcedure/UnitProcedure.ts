@@ -8,13 +8,13 @@ export type UnitProcedure = {
   createdBy: string;
   description: string | null;
   id: string;
+  instances?: Array<UnitProcedure>;
   isClassDef: boolean | null;
   name: string;
   operations?: Array<Operation>;
   procedure?: Procedure;
   revision: number | null;
   schemaVersion: string | null;
-  unitProcedure?: Array<UnitProcedure>;
   updatedAt: Date;
   updatedBy: string | null;
 };

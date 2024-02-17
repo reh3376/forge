@@ -82,6 +82,15 @@ class UnitProcedure {
 
   @ApiProperty({
     required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  instances?: Array<UnitProcedure>;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -137,15 +146,6 @@ class UnitProcedure {
     nullable: true,
   })
   schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [UnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProcedure?: Array<UnitProcedure>;
 
   @ApiProperty({
     required: true,

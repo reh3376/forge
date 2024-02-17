@@ -216,6 +216,12 @@ export class BomControllerBase {
           },
         },
 
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,

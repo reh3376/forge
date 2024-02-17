@@ -5,8 +5,8 @@ import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../equipmentPhase/EquipmentPhaseListRelationFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 
 export type TestParameterWhereInput = {
@@ -19,11 +19,11 @@ export type TestParameterWhereInput = {
   editedBy?: StringNullableFilter;
   equipmentPhases?: EquipmentPhaseListRelationFilter;
   id?: StringFilter;
+  instances?: TestParameterListRelationFilter;
   isClassDef?: BooleanNullableFilter;
   name?: StringFilter;
   schemaVersion?: StringNullableFilter;
   testDetails?: StringNullableFilter;
-  testParameters?: TestParameterListRelationFilter;
   testParamRevision?: StringNullableFilter;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail";
   testPass?: BooleanNullableFilter;

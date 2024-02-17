@@ -12,9 +12,9 @@ export type OperationUpdateInput = {
   description?: string;
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutOperationsInput;
+  instances?: OperationUpdateManyWithoutOperationsInput;
   isClassDefinition?: boolean | null;
   name?: string;
-  operations?: OperationUpdateManyWithoutOperationsInput;
   path?: string;
   procedureSequenceIndex?: number;
   recipes?: RecipeUpdateManyWithoutOperationsInput;

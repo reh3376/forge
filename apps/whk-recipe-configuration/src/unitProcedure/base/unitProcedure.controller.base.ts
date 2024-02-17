@@ -328,6 +328,123 @@ export class UnitProcedureControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/instances")
+  @ApiNestedQuery(UnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @common.Req() request: Request,
+    @common.Param() params: UnitProcedureWhereUniqueInput
+  ): Promise<UnitProcedure[]> {
+    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
+    const results = await this.service.findInstances(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "update",
+    possession: "any",
+  })
+  async connectInstances(
+    @common.Param() params: UnitProcedureWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        connect: body,
+      },
+    };
+    await this.service.updateUnitProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "update",
+    possession: "any",
+  })
+  async updateInstances(
+    @common.Param() params: UnitProcedureWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        set: body,
+      },
+    };
+    await this.service.updateUnitProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInstances(
+    @common.Param() params: UnitProcedureWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUnitProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/operations")
   @ApiNestedQuery(OperationFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -437,123 +554,6 @@ export class UnitProcedureControllerBase {
   ): Promise<void> {
     const data = {
       operations: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateUnitProcedure({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/unitProcedure")
-  @ApiNestedQuery(UnitProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findUnitProcedure(
-    @common.Req() request: Request,
-    @common.Param() params: UnitProcedureWhereUniqueInput
-  ): Promise<UnitProcedure[]> {
-    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
-    const results = await this.service.findUnitProcedure(params.id, {
-      ...query,
-      select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        id: true,
-        isClassDef: true,
-        name: true,
-
-        procedure: {
-          select: {
-            id: true,
-          },
-        },
-
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/unitProcedure")
-  @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
-    action: "update",
-    possession: "any",
-  })
-  async connectUnitProcedure(
-    @common.Param() params: UnitProcedureWhereUniqueInput,
-    @common.Body() body: UnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      unitProcedure: {
-        connect: body,
-      },
-    };
-    await this.service.updateUnitProcedure({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/unitProcedure")
-  @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
-    action: "update",
-    possession: "any",
-  })
-  async updateUnitProcedure(
-    @common.Param() params: UnitProcedureWhereUniqueInput,
-    @common.Body() body: UnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      unitProcedure: {
-        set: body,
-      },
-    };
-    await this.service.updateUnitProcedure({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/unitProcedure")
-  @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectUnitProcedure(
-    @common.Param() params: UnitProcedureWhereUniqueInput,
-    @common.Body() body: UnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      unitProcedure: {
         disconnect: body,
       },
     };

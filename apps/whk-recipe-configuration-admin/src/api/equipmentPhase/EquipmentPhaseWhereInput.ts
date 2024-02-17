@@ -1,7 +1,9 @@
 import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
+import { EquipmentPhaseListRelationFilter } from "./EquipmentPhaseListRelationFilter";
 import { InstructionListRelationFilter } from "../instruction/InstructionListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
@@ -11,6 +13,7 @@ import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhe
 
 export type EquipmentPhaseWhereInput = {
   bom?: BomWhereUniqueInput;
+  classId?: EquipmentPhaseWhereUniqueInput;
   className?: StringNullableFilter;
   createdAt?: DateTimeNullableFilter;
   createdBy?: StringFilter;
@@ -18,6 +21,7 @@ export type EquipmentPhaseWhereInput = {
   editedAt?: DateTimeNullableFilter;
   editedBy?: StringNullableFilter;
   id?: StringFilter;
+  instances?: EquipmentPhaseListRelationFilter;
   instructions?: InstructionListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
   name?: StringFilter;

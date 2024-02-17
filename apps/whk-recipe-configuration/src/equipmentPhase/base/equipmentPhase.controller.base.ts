@@ -67,6 +67,12 @@ export class EquipmentPhaseControllerBase {
             }
           : undefined,
 
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
+
         operations: {
           connect: data.operations,
         },
@@ -79,6 +85,12 @@ export class EquipmentPhaseControllerBase {
       },
       select: {
         bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
           select: {
             id: true,
           },
@@ -139,6 +151,12 @@ export class EquipmentPhaseControllerBase {
           },
         },
 
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
@@ -188,6 +206,12 @@ export class EquipmentPhaseControllerBase {
       where: params,
       select: {
         bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
           select: {
             id: true,
           },
@@ -260,6 +284,12 @@ export class EquipmentPhaseControllerBase {
               }
             : undefined,
 
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
+
           operations: {
             connect: data.operations,
           },
@@ -272,6 +302,12 @@ export class EquipmentPhaseControllerBase {
         },
         select: {
           bom: {
+            select: {
+              id: true,
+            },
+          },
+
+          classId: {
             select: {
               id: true,
             },
@@ -313,6 +349,136 @@ export class EquipmentPhaseControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/instances")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @common.Req() request: Request,
+    @common.Param() params: EquipmentPhaseWhereUniqueInput
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findInstances(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDefinition: true,
+        name: true,
+
+        operations: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationSequenceIndex: true,
+        operationStepSequence: true,
+        revision: true,
+        schemaVersion: true,
+
+        testParameters: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async connectInstances(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        connect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async updateInstances(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        set: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInstances(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

@@ -39,18 +39,18 @@ export const TestParameterEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
-        <BooleanInput label="Is Class Def" source="isClassDef" />
-        <TextInput label="Name" source="name" />
-        <TextInput label="Schema Version" source="schemaVersion" />
-        <TextInput label="TestDetails" multiline source="testDetails" />
         <ReferenceArrayInput
-          source="testParameters"
+          source="instances"
           reference="TestParameter"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
           <SelectArrayInput optionText={TestParameterTitle} />
         </ReferenceArrayInput>
+        <BooleanInput label="Is Class Def" source="isClassDef" />
+        <TextInput label="Name" source="name" />
+        <TextInput label="Schema Version" source="schemaVersion" />
+        <TextInput label="TestDetails" multiline source="testDetails" />
         <TextInput label="Test Param Revision" source="testParamRevision" />
         <SelectInput
           source="testParamUnits"

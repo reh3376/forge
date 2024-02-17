@@ -81,6 +81,18 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => ProcedureListRelationFilter, {
+    nullable: true,
+  })
+  instances?: ProcedureListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: BooleanNullableFilter,
   })
   @Type(() => BooleanNullableFilter)
@@ -100,18 +112,6 @@ class ProcedureWhereInput {
     nullable: true,
   })
   name?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureListRelationFilter)
-  @IsOptional()
-  @Field(() => ProcedureListRelationFilter, {
-    nullable: true,
-  })
-  procedures?: ProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,
