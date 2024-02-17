@@ -4,10 +4,10 @@ import {
   List,
   Datagrid,
   ListProps,
+  BooleanField,
   ReferenceField,
   TextField,
   DateField,
-  BooleanField,
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
@@ -24,6 +24,7 @@ export const UnitProcedureList = (props: ListProps): React.ReactElement => {
       pagination={<Pagination />}
     >
       <Datagrid rowClick="show">
+        <BooleanField label="Active" source="active" />
         <ReferenceField
           label="Class"
           source="unitprocedure.id"

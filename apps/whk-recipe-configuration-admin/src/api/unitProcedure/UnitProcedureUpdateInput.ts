@@ -4,6 +4,7 @@ import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInpu
 import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 
 export type UnitProcedureUpdateInput = {
+  active?: boolean | null;
   classId?: UnitProcedureWhereUniqueInput | null;
   createdBy?: string;
   description?: string | null;

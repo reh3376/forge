@@ -171,7 +171,6 @@ model Operation {
   updatedAt              DateTime?        @updatedAt
 
   @@unique([name, revision, active])
-  @@map("Operations")
 }
 
 model Procedure {
@@ -250,6 +249,7 @@ model ProductionOrderQueue {
 }
 
 model UnitProcedure {
+  active        Boolean?        @default(true)
   classId       UnitProcedure?  @relation(name: "UnitProcedureClassIdUnitProcedureUnitProcedure", fields: [classId], references: [id])
   classId       String?
   createdAt     DateTime        @default(now())
@@ -267,7 +267,7 @@ model UnitProcedure {
   updatedAt     DateTime        @updatedAt
   updatedBy     String?
 
-  @@unique([name, revision])
+  @@unique([name, revision, active])
 }
 
 enum EnumPhaseParameterSetpointType {

@@ -69,6 +69,8 @@ export class UnitProcedureControllerBase {
         },
       },
       select: {
+        active: true,
+
         classId: {
           select: {
             id: true,
@@ -115,6 +117,8 @@ export class UnitProcedureControllerBase {
     return this.service.unitProcedures({
       ...args,
       select: {
+        active: true,
+
         classId: {
           select: {
             id: true,
@@ -160,6 +164,8 @@ export class UnitProcedureControllerBase {
     const result = await this.service.unitProcedure({
       where: params,
       select: {
+        active: true,
+
         classId: {
           select: {
             id: true,
@@ -229,6 +235,8 @@ export class UnitProcedureControllerBase {
           },
         },
         select: {
+          active: true,
+
           classId: {
             select: {
               id: true,
@@ -282,6 +290,8 @@ export class UnitProcedureControllerBase {
       return await this.service.deleteUnitProcedure({
         where: params,
         select: {
+          active: true,
+
           classId: {
             select: {
               id: true,
@@ -453,6 +463,8 @@ export class UnitProcedureControllerBase {
     const results = await this.service.findUnitProcedure(params.id, {
       ...query,
       select: {
+        active: true,
+
         classId: {
           select: {
             id: true,

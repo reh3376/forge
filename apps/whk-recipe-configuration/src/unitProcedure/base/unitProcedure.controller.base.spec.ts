@@ -18,6 +18,7 @@ import { UnitProcedureService } from "../unitProcedure.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
@@ -30,6 +31,7 @@ const CREATE_INPUT = {
   updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
+  active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
@@ -43,6 +45,7 @@ const CREATE_RESULT = {
 };
 const FIND_MANY_RESULT = [
   {
+    active: "true",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     description: "exampleDescription",
@@ -56,6 +59,7 @@ const FIND_MANY_RESULT = [
   },
 ];
 const FIND_ONE_RESULT = {
+  active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",

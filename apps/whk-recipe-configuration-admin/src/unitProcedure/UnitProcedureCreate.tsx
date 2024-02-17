@@ -4,10 +4,10 @@ import {
   Create,
   SimpleForm,
   CreateProps,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
   TextInput,
-  BooleanInput,
   ReferenceArrayInput,
   SelectArrayInput,
   NumberInput,
@@ -21,6 +21,7 @@ export const UnitProcedureCreate = (props: CreateProps): React.ReactElement => {
   return (
     <Create {...props}>
       <SimpleForm>
+        <BooleanInput label="Active" source="active" />
         <ReferenceInput
           source="classId.id"
           reference="UnitProcedure"

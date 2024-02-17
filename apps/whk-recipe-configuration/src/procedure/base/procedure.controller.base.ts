@@ -360,6 +360,8 @@ export class ProcedureControllerBase {
     const results = await this.service.findUnitProcedures(params.id, {
       ...query,
       select: {
+        active: true,
+
         classId: {
           select: {
             id: true,

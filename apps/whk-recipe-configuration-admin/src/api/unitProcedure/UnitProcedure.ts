@@ -2,6 +2,7 @@ import { Operation } from "../operation/Operation";
 import { Procedure } from "../procedure/Procedure";
 
 export type UnitProcedure = {
+  active: boolean | null;
   classId?: UnitProcedure | null;
   createdAt: Date;
   createdBy: string;
