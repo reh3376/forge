@@ -250,8 +250,8 @@ model ProductionOrderQueue {
 
 model UnitProcedure {
   active        Boolean?        @default(true)
-  classId       UnitProcedure?  @relation(name: "UnitProcedureClassIdUnitProcedureUnitProcedure", fields: [classId], references: [id])
-  classId       String?
+  classId       UnitProcedure?  @relation(name: "UnitProcedureClassIdUnitProcedureUnitProcedure", fields: [classIdId], references: [id])
+  classIdId     String?
   createdAt     DateTime        @default(now())
   createdBy     String
   description   String?

@@ -89,7 +89,7 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
         </ReferenceManyField>
         <ReferenceManyField
           reference="UnitProcedure"
-          target="classId"
+          target="classIdId"
           label="Unit Procedures"
         >
           <Datagrid rowClick="show">
