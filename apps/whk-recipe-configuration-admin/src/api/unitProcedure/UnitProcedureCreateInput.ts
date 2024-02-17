@@ -4,6 +4,7 @@ import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInpu
 import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitProcedureCreateNestedManyWithoutUnitProceduresInput";
 
 export type UnitProcedureCreateInput = {
+  active?: boolean | null;
   classId?: UnitProcedureWhereUniqueInput | null;
   createdBy: string;
   description?: string | null;

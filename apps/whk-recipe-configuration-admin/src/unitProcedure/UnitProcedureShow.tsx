@@ -4,10 +4,10 @@ import {
   Show,
   SimpleShowLayout,
   ShowProps,
+  BooleanField,
   ReferenceField,
   TextField,
   DateField,
-  BooleanField,
   ReferenceManyField,
   Datagrid,
 } from "react-admin";
@@ -20,6 +20,7 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
+        <BooleanField label="Active" source="active" />
         <ReferenceField
           label="Class"
           source="unitprocedure.id"
@@ -92,6 +93,7 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
           label="Unit Procedures"
         >
           <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
             <ReferenceField
               label="Class"
               source="unitprocedure.id"

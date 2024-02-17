@@ -4,10 +4,10 @@ import {
   Edit,
   SimpleForm,
   EditProps,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
   TextInput,
-  BooleanInput,
   ReferenceArrayInput,
   SelectArrayInput,
   NumberInput,
@@ -21,6 +21,7 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
   return (
     <Edit {...props}>
       <SimpleForm>
+        <BooleanInput label="Active" source="active" />
         <ReferenceInput
           source="classId.id"
           reference="UnitProcedure"
