@@ -115,6 +115,15 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  instances?: Array<TestParameter>;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -153,15 +162,6 @@ class TestParameter {
     nullable: true,
   })
   testDetails!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [TestParameter],
-  })
-  @ValidateNested()
-  @Type(() => TestParameter)
-  @IsOptional()
-  testParameters?: Array<TestParameter>;
 
   @ApiProperty({
     required: false,

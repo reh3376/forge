@@ -101,6 +101,18 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => TestParameterUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  instances?: TestParameterUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -142,18 +154,6 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   testDetails?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterUpdateManyWithoutTestParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterUpdateManyWithoutTestParametersInput)
-  @IsOptional()
-  @Field(() => TestParameterUpdateManyWithoutTestParametersInput, {
-    nullable: true,
-  })
-  testParameters?: TestParameterUpdateManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,

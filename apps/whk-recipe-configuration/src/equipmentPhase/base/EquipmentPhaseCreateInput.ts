@@ -20,6 +20,8 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput";
 import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
@@ -38,6 +40,18 @@ class EquipmentPhaseCreateInput {
     nullable: true,
   })
   bom?: BomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: EquipmentPhaseWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -79,6 +93,18 @@ class EquipmentPhaseCreateInput {
     nullable: true,
   })
   editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  instances?: EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,

@@ -69,6 +69,18 @@ class ProcedureCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureCreateNestedManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureCreateNestedManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => ProcedureCreateNestedManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  instances?: ProcedureCreateNestedManyWithoutProceduresInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -88,18 +100,6 @@ class ProcedureCreateInput {
     nullable: true,
   })
   name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureCreateNestedManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureCreateNestedManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => ProcedureCreateNestedManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  procedures?: ProcedureCreateNestedManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,

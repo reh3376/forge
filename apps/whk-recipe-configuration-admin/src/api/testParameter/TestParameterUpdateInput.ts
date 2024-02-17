@@ -10,11 +10,11 @@ export type TestParameterUpdateInput = {
   description?: string | null;
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
+  instances?: TestParameterUpdateManyWithoutTestParametersInput;
   isClassDef?: boolean | null;
   name?: string;
   schemaVersion?: string | null;
   testDetails?: string | null;
-  testParameters?: TestParameterUpdateManyWithoutTestParametersInput;
   testParamRevision?: string | null;
   testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
   testPass?: boolean | null;

@@ -12,9 +12,9 @@ export type ProcedureWhereInput = {
   createdBy?: StringFilter;
   description?: StringNullableFilter;
   id?: StringFilter;
+  instances?: ProcedureListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
   name?: StringNullableFilter;
-  procedures?: ProcedureListRelationFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
   unitProcedures?: UnitProcedureListRelationFilter;

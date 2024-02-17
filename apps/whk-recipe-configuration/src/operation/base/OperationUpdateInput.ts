@@ -108,6 +108,18 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => OperationUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => OperationUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  instances?: OperationUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -127,18 +139,6 @@ class OperationUpdateInput {
     nullable: true,
   })
   name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationUpdateManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationUpdateManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => OperationUpdateManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  operations?: OperationUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,

@@ -129,6 +129,18 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => OperationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => OperationListRelationFilter)
+  @IsOptional()
+  @Field(() => OperationListRelationFilter, {
+    nullable: true,
+  })
+  instances?: OperationListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: BooleanNullableFilter,
   })
   @Type(() => BooleanNullableFilter)
@@ -148,18 +160,6 @@ class OperationWhereInput {
     nullable: true,
   })
   name?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => OperationListRelationFilter)
-  @IsOptional()
-  @Field(() => OperationListRelationFilter, {
-    nullable: true,
-  })
-  operations?: OperationListRelationFilter;
 
   @ApiProperty({
     required: false,

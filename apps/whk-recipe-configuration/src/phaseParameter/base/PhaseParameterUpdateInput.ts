@@ -98,6 +98,18 @@ class PhaseParameterUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => PhaseParameterUpdateManyWithoutPhaseParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterUpdateManyWithoutPhaseParametersInput)
+  @IsOptional()
+  @Field(() => PhaseParameterUpdateManyWithoutPhaseParametersInput, {
+    nullable: true,
+  })
+  instances?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -128,18 +140,6 @@ class PhaseParameterUpdateInput {
     nullable: true,
   })
   name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterUpdateManyWithoutPhaseParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterUpdateManyWithoutPhaseParametersInput)
-  @IsOptional()
-  @Field(() => PhaseParameterUpdateManyWithoutPhaseParametersInput, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,

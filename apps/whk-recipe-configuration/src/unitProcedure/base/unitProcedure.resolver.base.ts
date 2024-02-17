@@ -170,6 +170,26 @@ export class UnitProcedureResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnitProcedure], { name: "instances" })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @graphql.Parent() parent: UnitProcedure,
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Operation], { name: "operations" })
   @nestAccessControl.UseRoles({
     resource: "Operation",
@@ -181,26 +201,6 @@ export class UnitProcedureResolverBase {
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
     const results = await this.service.findOperations(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedure" })
-  @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findUnitProcedure(
-    @graphql.Parent() parent: UnitProcedure,
-    @graphql.Args() args: UnitProcedureFindManyArgs
-  ): Promise<UnitProcedure[]> {
-    const results = await this.service.findUnitProcedure(parent.id, args);
 
     if (!results) {
       return [];

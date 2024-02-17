@@ -7,9 +7,9 @@ export type ProcedureCreateInput = {
   classId?: ProcedureWhereUniqueInput | null;
   createdBy: string;
   description?: string | null;
+  instances?: ProcedureCreateNestedManyWithoutProceduresInput;
   isClassDefinition?: boolean | null;
   name?: string | null;
-  procedures?: ProcedureCreateNestedManyWithoutProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;
   unitProcedures?: UnitProcedureCreateNestedManyWithoutProceduresInput;
