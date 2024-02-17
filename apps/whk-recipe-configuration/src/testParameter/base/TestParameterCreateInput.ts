@@ -95,6 +95,18 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterCreateNestedManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => TestParameterCreateNestedManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  instances?: TestParameterCreateNestedManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -133,18 +145,6 @@ class TestParameterCreateInput {
     nullable: true,
   })
   testDetails?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterCreateNestedManyWithoutTestParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterCreateNestedManyWithoutTestParametersInput)
-  @IsOptional()
-  @Field(() => TestParameterCreateNestedManyWithoutTestParametersInput, {
-    nullable: true,
-  })
-  testParameters?: TestParameterCreateNestedManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,

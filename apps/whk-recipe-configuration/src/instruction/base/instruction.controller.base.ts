@@ -208,6 +208,12 @@ export class InstructionControllerBase {
           },
         },
 
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,

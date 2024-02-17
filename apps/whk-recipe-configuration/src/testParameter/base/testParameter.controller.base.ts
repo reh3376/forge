@@ -298,6 +298,12 @@ export class TestParameterControllerBase {
           },
         },
 
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         createdAt: true,
         createdBy: true,
@@ -401,19 +407,19 @@ export class TestParameterControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/testParameters")
+  @common.Get("/:id/instances")
   @ApiNestedQuery(TestParameterFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
   })
-  async findTestParameters(
+  async findInstances(
     @common.Req() request: Request,
     @common.Param() params: TestParameterWhereUniqueInput
   ): Promise<TestParameter[]> {
     const query = plainToClass(TestParameterFindManyArgs, request.query);
-    const results = await this.service.findTestParameters(params.id, {
+    const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
         active: true,
@@ -454,18 +460,18 @@ export class TestParameterControllerBase {
     return results;
   }
 
-  @common.Post("/:id/testParameters")
+  @common.Post("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
   })
-  async connectTestParameters(
+  async connectInstances(
     @common.Param() params: TestParameterWhereUniqueInput,
     @common.Body() body: TestParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      testParameters: {
+      instances: {
         connect: body,
       },
     };
@@ -476,18 +482,18 @@ export class TestParameterControllerBase {
     });
   }
 
-  @common.Patch("/:id/testParameters")
+  @common.Patch("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
   })
-  async updateTestParameters(
+  async updateInstances(
     @common.Param() params: TestParameterWhereUniqueInput,
     @common.Body() body: TestParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      testParameters: {
+      instances: {
         set: body,
       },
     };
@@ -498,18 +504,18 @@ export class TestParameterControllerBase {
     });
   }
 
-  @common.Delete("/:id/testParameters")
+  @common.Delete("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
   })
-  async disconnectTestParameters(
+  async disconnectInstances(
     @common.Param() params: TestParameterWhereUniqueInput,
     @common.Body() body: TestParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      testParameters: {
+      instances: {
         disconnect: body,
       },
     };

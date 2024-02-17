@@ -39,6 +39,17 @@ class EquipmentPhaseOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  classIdId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   className?: SortOrder;
 
   @ApiProperty({

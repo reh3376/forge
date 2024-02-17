@@ -52,7 +52,7 @@ export class ProcedureServiceBase {
     return this.prisma.procedure.delete(args);
   }
 
-  async findProcedures(
+  async findInstances(
     parentId: string,
     args: Prisma.ProcedureFindManyArgs
   ): Promise<Procedure[]> {
@@ -60,7 +60,7 @@ export class ProcedureServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .procedures(args);
+      .instances(args);
   }
 
   async findUnitProcedures(

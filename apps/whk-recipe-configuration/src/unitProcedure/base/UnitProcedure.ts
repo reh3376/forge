@@ -12,11 +12,11 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  ValidateNested,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
   IsDate,
   IsString,
-  IsBoolean,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -25,6 +25,17 @@ import { Procedure } from "../../procedure/base/Procedure";
 
 @ObjectType()
 class UnitProcedure {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
   @ApiProperty({
     required: false,
     type: () => UnitProcedure,
@@ -68,6 +79,15 @@ class UnitProcedure {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  instances?: Array<UnitProcedure>;
 
   @ApiProperty({
     required: false,
@@ -126,15 +146,6 @@ class UnitProcedure {
     nullable: true,
   })
   schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [UnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProcedure?: Array<UnitProcedure>;
 
   @ApiProperty({
     required: true,

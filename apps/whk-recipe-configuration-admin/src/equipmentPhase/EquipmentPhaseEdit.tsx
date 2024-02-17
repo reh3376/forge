@@ -14,6 +14,7 @@ import {
 } from "react-admin";
 
 import { BomTitle } from "../bom/BomTitle";
+import { EquipmentPhaseTitle } from "./EquipmentPhaseTitle";
 import { InstructionTitle } from "../instruction/InstructionTitle";
 import { OperationTitle } from "../operation/OperationTitle";
 import { PhaseParameterTitle } from "../phaseParameter/PhaseParameterTitle";
@@ -26,10 +27,25 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
         <ReferenceInput source="bom.id" reference="Bom" label="Bom">
           <SelectInput optionText={BomTitle} />
         </ReferenceInput>
+        <ReferenceInput
+          source="classId.id"
+          reference="EquipmentPhase"
+          label="Class"
+        >
+          <SelectInput optionText={EquipmentPhaseTitle} />
+        </ReferenceInput>
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" source="description" />
         <TextInput label="Edited By" source="editedBy" />
+        <ReferenceArrayInput
+          source="instances"
+          reference="EquipmentPhase"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={EquipmentPhaseTitle} />
+        </ReferenceArrayInput>
         <ReferenceArrayInput
           source="instructions"
           reference="Instruction"

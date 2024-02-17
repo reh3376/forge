@@ -9,10 +9,10 @@ export type PhaseParameter = {
   editedBy: string | null;
   equipmentPhase?: EquipmentPhase | null;
   id: string;
+  instances?: Array<PhaseParameter>;
   isClassDef: boolean | null;
   itemId: string | null;
   name: string;
-  phaseParameters?: Array<PhaseParameter>;
   recipeId: string | null;
   revision: number | null;
   schemaVersion: string | null;

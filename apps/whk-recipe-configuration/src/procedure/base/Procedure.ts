@@ -81,6 +81,15 @@ class Procedure {
 
   @ApiProperty({
     required: false,
+    type: () => [Procedure],
+  })
+  @ValidateNested()
+  @Type(() => Procedure)
+  @IsOptional()
+  instances?: Array<Procedure>;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -100,15 +109,6 @@ class Procedure {
     nullable: true,
   })
   name!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Procedure],
-  })
-  @ValidateNested()
-  @Type(() => Procedure)
-  @IsOptional()
-  procedures?: Array<Procedure>;
 
   @ApiProperty({
     required: false,

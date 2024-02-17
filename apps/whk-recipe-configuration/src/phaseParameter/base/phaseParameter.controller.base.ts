@@ -306,19 +306,19 @@ export class PhaseParameterControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/phaseParameters")
+  @common.Get("/:id/instances")
   @ApiNestedQuery(PhaseParameterFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
   })
-  async findPhaseParameters(
+  async findInstances(
     @common.Req() request: Request,
     @common.Param() params: PhaseParameterWhereUniqueInput
   ): Promise<PhaseParameter[]> {
     const query = plainToClass(PhaseParameterFindManyArgs, request.query);
-    const results = await this.service.findPhaseParameters(params.id, {
+    const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
         active: true,
@@ -364,18 +364,18 @@ export class PhaseParameterControllerBase {
     return results;
   }
 
-  @common.Post("/:id/phaseParameters")
+  @common.Post("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
   })
-  async connectPhaseParameters(
+  async connectInstances(
     @common.Param() params: PhaseParameterWhereUniqueInput,
     @common.Body() body: PhaseParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      phaseParameters: {
+      instances: {
         connect: body,
       },
     };
@@ -386,18 +386,18 @@ export class PhaseParameterControllerBase {
     });
   }
 
-  @common.Patch("/:id/phaseParameters")
+  @common.Patch("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
   })
-  async updatePhaseParameters(
+  async updateInstances(
     @common.Param() params: PhaseParameterWhereUniqueInput,
     @common.Body() body: PhaseParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      phaseParameters: {
+      instances: {
         set: body,
       },
     };
@@ -408,18 +408,18 @@ export class PhaseParameterControllerBase {
     });
   }
 
-  @common.Delete("/:id/phaseParameters")
+  @common.Delete("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
   })
-  async disconnectPhaseParameters(
+  async disconnectInstances(
     @common.Param() params: PhaseParameterWhereUniqueInput,
     @common.Body() body: PhaseParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      phaseParameters: {
+      instances: {
         disconnect: body,
       },
     };

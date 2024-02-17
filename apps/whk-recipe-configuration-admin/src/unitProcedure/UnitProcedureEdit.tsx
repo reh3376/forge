@@ -4,10 +4,10 @@ import {
   Edit,
   SimpleForm,
   EditProps,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
   TextInput,
-  BooleanInput,
   ReferenceArrayInput,
   SelectArrayInput,
   NumberInput,
@@ -21,6 +21,7 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
   return (
     <Edit {...props}>
       <SimpleForm>
+        <BooleanInput label="Active" source="active" />
         <ReferenceInput
           source="classId.id"
           reference="UnitProcedure"
@@ -30,6 +31,14 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
         </ReferenceInput>
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" multiline source="description" />
+        <ReferenceArrayInput
+          source="instances"
+          reference="UnitProcedure"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={UnitProcedureTitle} />
+        </ReferenceArrayInput>
         <BooleanInput label="Is Class Def" source="isClassDef" />
         <TextInput label="Name" source="name" />
         <ReferenceArrayInput
@@ -49,14 +58,6 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
         </ReferenceInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
-        <ReferenceArrayInput
-          source="unitProcedure"
-          reference="UnitProcedure"
-          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
-          format={(value: any) => value && value.map((v: any) => v.id)}
-        >
-          <SelectArrayInput optionText={UnitProcedureTitle} />
-        </ReferenceArrayInput>
         <TextInput label="Updated By" source="updatedBy" />
       </SimpleForm>
     </Edit>

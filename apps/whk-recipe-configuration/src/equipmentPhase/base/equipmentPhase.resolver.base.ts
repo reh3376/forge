@@ -107,6 +107,12 @@ export class EquipmentPhaseResolverBase {
             }
           : undefined,
 
+        classId: args.data.classId
+          ? {
+              connect: args.data.classId,
+            }
+          : undefined,
+
         operations: {
           connect: args.data.operations,
         },
@@ -142,6 +148,12 @@ export class EquipmentPhaseResolverBase {
               }
             : undefined,
 
+          classId: args.data.classId
+            ? {
+                connect: args.data.classId,
+              }
+            : undefined,
+
           operations: {
             connect: args.data.operations,
           },
@@ -161,6 +173,26 @@ export class EquipmentPhaseResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [EquipmentPhase], { name: "instances" })
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @graphql.Parent() parent: EquipmentPhase,
+    @graphql.Args() args: EquipmentPhaseFindManyArgs
+  ): Promise<EquipmentPhase[]> {
+    const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -215,6 +247,27 @@ export class EquipmentPhaseResolverBase {
   })
   async getBom(@graphql.Parent() parent: EquipmentPhase): Promise<Bom | null> {
     const result = await this.service.getBom(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => EquipmentPhase, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(
+    @graphql.Parent() parent: EquipmentPhase
+  ): Promise<EquipmentPhase | null> {
+    const result = await this.service.getClassId(parent.id);
 
     if (!result) {
       return null;

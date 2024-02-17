@@ -1,7 +1,8 @@
 import { SortOrder } from "../../util/SortOrder";
 
 export type UnitProcedureOrderByInput = {
-  classId?: SortOrder;
+  active?: SortOrder;
+  classIdId?: SortOrder;
   createdAt?: SortOrder;
   createdBy?: SortOrder;
   description?: SortOrder;

@@ -26,16 +26,16 @@ export const ProcedureCreate = (props: CreateProps): React.ReactElement => {
         </ReferenceInput>
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Description" multiline source="description" />
-        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
-        <TextInput label="Name" source="name" />
         <ReferenceArrayInput
-          source="procedures"
+          source="instances"
           reference="Procedure"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
           <SelectArrayInput optionText={ProcedureTitle} />
         </ReferenceArrayInput>
+        <BooleanInput label="Is Class Definition" source="isClassDefinition" />
+        <TextInput label="Name" source="name" />
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <ReferenceArrayInput

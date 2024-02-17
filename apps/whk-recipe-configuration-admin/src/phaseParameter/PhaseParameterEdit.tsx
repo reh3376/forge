@@ -38,17 +38,17 @@ export const PhaseParameterEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectInput optionText={EquipmentPhaseTitle} />
         </ReferenceInput>
-        <BooleanInput label="Is Class Def" source="isClassDef" />
-        <TextInput label="Item ID" source="itemId" />
-        <TextInput label="Name" source="name" />
         <ReferenceArrayInput
-          source="phaseParameters"
+          source="instances"
           reference="PhaseParameter"
           parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
           format={(value: any) => value && value.map((v: any) => v.id)}
         >
           <SelectArrayInput optionText={PhaseParameterTitle} />
         </ReferenceArrayInput>
+        <BooleanInput label="Is Class Def" source="isClassDef" />
+        <TextInput label="Item ID" source="itemId" />
+        <TextInput label="Name" source="name" />
         <TextInput label="Recipe ID" source="recipeId" />
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
