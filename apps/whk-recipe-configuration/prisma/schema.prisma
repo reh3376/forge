@@ -224,7 +224,7 @@ model Bom {
   editedAt        DateTime         @updatedAt
   editedBy        String?
   equipmentPhases EquipmentPhase[]
-  id              String           @id @default(auto())
+  id              String           @id @default(cuid())
   operationSteps  Json?
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
