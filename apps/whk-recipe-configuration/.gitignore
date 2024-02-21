@@ -4,11 +4,14 @@
 /dist
 .DS_Store
 
+# test coverage
 /coverage/*
 !/coverage/coverage-final.json
 
+# Docker container dirs
 /etcd_data/*
 
+# Files that should be generated at runtime
 schema.graphql
 package-lock.json
 prisma/migrations/*
