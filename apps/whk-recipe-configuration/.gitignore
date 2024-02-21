@@ -8,3 +8,7 @@
 !/coverage/coverage-final.json
 
 /etcd_data/*
+
+schema.graphql
+package-lock.json
+prisma/migrations/*
