@@ -6,3 +6,5 @@
 
 /coverage/*
 !/coverage/coverage-final.json
+
+/etcd_data/*
