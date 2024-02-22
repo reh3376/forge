@@ -1,52 +1,90 @@
-version: "3"
+version: "3.9"
+
+#  KONG_DATABASE: ${KONG_DATABASE:-off}
+x-kong-config:
+  &kong-env
+  #  KONG_DATABASE: ${KONG_DATABASE:-postgres}
+  KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
+  KONG_PG_HOST: db
+  KONG_PG_USER: ${KONG_PG_USER:-kong}
+  KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
+
 services:
-  # Add ApiSix API Gateway for testing
-
-  dashboard:
-#    image: "apache/apisix-dashboard:${APISIX_DASHBOARD_VERSION}"
-    image: "apache/apisix-dashboard:3.0.1-alpine"
-    restart: always
-    volumes:
-      - ./apisix_dashboard_conf/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
+  # Add kong api gateway resources
+  kong-migrations:
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    command: kong migrations bootstrap
+    profiles: [ "database" ]
     depends_on:
-      - etcd
-    ports:
-      - "9000:9000/tcp"
-    networks:
-      - apisix
-  apisix:
-    image: apache/apisix:3.8.0-debian
-    restart: always
-    volumes:
-      - ./apisix_conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
-    depends_on:
-      - etcd
-    ports:
-      - "9180:9180/tcp"
-      - "9080:9080/tcp"
-      - "9091:9091/tcp"
-      - "9443:9443/tcp"
-      - "9092:9092/tcp"
-    networks:
-      apisix:
-  etcd:
-    image: rancher/coreos-etcd:v3.4.15-arm64
-    user: root
-    restart: always
-    volumes:
-      - ./etcd_data:/etcd-data
+      - db
     environment:
-      ETCD_UNSUPPORTED_ARCH: "arm64"
-      ETCD_ENABLE_V2: "true"
-      ALLOW_NONE_AUTHENTICATION: "yes"
-      ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
-      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
-      ETCD_DATA_DIR: "/etcd-data"
-    ports:
-      - "2379:2379/tcp"
+      <<: *kong-env
+    secrets:
+      - kong_postgres_password
     networks:
-      apisix:
+      - kong-net
+    restart: on-failure
 
+  kong-migrations-up:
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    command: kong migrations up && kong migrations finish
+    profiles: [ "database" ]
+    depends_on:
+      - db
+    environment:
+      <<: *kong-env
+    secrets:
+      - kong_postgres_password
+    networks:
+      - kong-net
+    restart: on-failure
+
+  kong:
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    user: "${KONG_USER:-kong}"
+    environment:
+      <<: *kong-env
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_LISTEN: "${KONG_PROXY_LISTEN:-0.0.0.0:8000}"
+      KONG_ADMIN_LISTEN: "${KONG_ADMIN_LISTEN:-0.0.0.0:8001}"
+      KONG_ADMIN_GUI_LISTEN: "${KONG_ADMIN_GUI_LISTEN:-0.0.0.0:8002}"
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_PREFIX: ${KONG_PREFIX:-/var/run/kong}
+      KONG_DECLARATIVE_CONFIG: "/opt/kong/kong.yaml"
+    secrets:
+      - kong_postgres_password
+    networks:
+      - kong-net
+    ports:
+      # The following two environment variables default to an insecure value (0.0.0.0)
+      # according to the CIS Security test.
+      - "${KONG_INBOUND_PROXY_LISTEN:-0.0.0.0}:8000:8000/tcp"
+      - "${KONG_INBOUND_SSL_PROXY_LISTEN:-0.0.0.0}:8443:8443/tcp"
+      # Making them mandatory but undefined, like so would be backwards-breaking:
+      # - "${KONG_INBOUND_PROXY_LISTEN?Missing inbound proxy host}:8000:8000/tcp"
+      # - "${KONG_INBOUND_SSL_PROXY_LISTEN?Missing inbound proxy ssl host}:8443:8443/tcp"
+      # Alternative is deactivating check 5.13 in the security bench, if we consider Kong's own config to be enough security here
+
+      - "127.0.0.1:8001:8001/tcp"
+      - "127.0.0.1:8444:8444/tcp"
+      - "127.0.0.1:8002:8002/tcp"
+    healthcheck:
+      test: [ "CMD", "kong", "health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    #    restart: on-failure:5
+    read_only: true
+    volumes:
+      - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
+      - kong_tmp_vol:/tmp
+      - ./config:/opt/kong
+    security_opt:
+      - no-new-privileges
+
+  ## Continuation of amplication generated stack
   redis:
     container_name: redis-${REDIS_HOST}
     image: redis:7
@@ -120,9 +158,18 @@ services:
     depends_on:
       - jaeger
 networks:
-  apisix:
-    driver: bridge
+  kong-net:
+    external: false
 volumes:
   redis:
     driver: local
   postgres: ~
+  kong_data: { }
+  kong_prefix_vol:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  kong_tmp_vol:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs

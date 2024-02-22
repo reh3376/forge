@@ -44,6 +44,13 @@ deployment:
     prefix: "/apisix"               # apisix configurations prefix
     timeout: 30                     # 30 seconds
 
+  ip:
+    host:
+        - "httpbin.org:80"
+    prefix: "/ip"
+    type: "roundrobin"
+    timeout: 30
+
 plugin_attr:
   prometheus:
     export_addr:
