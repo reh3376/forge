@@ -1,0 +1,14 @@
+# a very minimal declarative config file
+_format_version: "2.1"
+_transform: true
+
+services:
+  - host: httpbin.org
+    name: example_service
+    port: 80
+    protocol: http
+    routes:
+      - name: example_route
+        paths:
+          - /mock
+        strip_path: true
