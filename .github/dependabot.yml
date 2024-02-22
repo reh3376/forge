@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/apps/whk-mes/" # Location of package manifests
+    directory: "/apps/whk-recipe-configuration/" # Location of package manifests
     schedule:
       interval: "weekly"
   # Enable version updates for Docker
