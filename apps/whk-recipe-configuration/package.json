@@ -15,6 +15,7 @@
     "db:init": "run-s \"db:migrate-save -- --name 'initial version'\" db:migrate-up seed",
     "prisma:generate": "prisma generate",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:dev:kong": "docker-compose -f docker-compose.dev.yml --profile kong up -d",
     "package:container": "docker build .",
     "compose:up": "docker-compose up -d",
     "compose:down": "docker-compose down --volumes",
