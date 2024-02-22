@@ -14,7 +14,7 @@ services:
   kong-migrations:
     image: "${KONG_DOCKER_TAG:-kong:latest}"
     command: kong migrations bootstrap
-    profiles: [ "database" ]
+    profiles: [ "kong" ]
     depends_on:
       - db
     environment:
