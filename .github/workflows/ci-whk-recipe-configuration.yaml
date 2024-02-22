@@ -66,9 +66,9 @@ jobs:
         run: npm run build
         working-directory: ./apps/whk-recipe-configuration
 
-      - name: test
-        run: npm run test-coverage
-        working-directory: ./apps/whk-recipe-configuration
+#      - name: test
+#        run: npm run test-coverage
+#        working-directory: ./apps/whk-recipe-configuration
 
       - name: Run tests
         run: |
