@@ -3,7 +3,7 @@ version: "3.9"
 #  KONG_DATABASE: ${KONG_DATABASE:-off}
 x-kong-config:
   &kong-env
-  #  KONG_DATABASE: ${KONG_DATABASE:-postgres}
+  KONG_DATABASE: ${KONG_DATABASE:-postgres}
   KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
   KONG_PG_HOST: db
   KONG_PG_USER: ${KONG_PG_USER:-kong}
@@ -28,7 +28,7 @@ services:
   kong-migrations-up:
     image: "${KONG_DOCKER_TAG:-kong:latest}"
     command: kong migrations up && kong migrations finish
-    profiles: [ "database" ]
+    profiles: [ "kong" ]
     depends_on:
       - db
     environment:
@@ -75,7 +75,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-    #    restart: on-failure:5
+#        restart: on-failure:5
     read_only: true
     volumes:
       - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
@@ -96,10 +96,41 @@ services:
     image: postgres:12
     ports:
       - ${DB_PORT}:5432
+    profiles: [ "kong" ]
+    environment:
+      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
+      POSTGRES_USER: ${KONG_PG_USER:-kong}
+      POSTGRES_PASSWORD_FILE: /run/secrets/kong_postgres_password
+    secrets:
+      - kong_postgres_password
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-d",
+          "${KONG_PG_DATABASE:-kong}",
+          "-U",
+          "${KONG_PG_USER:-kong}"
+        ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: on-failure
+    stdin_open: true
+    tty: true
+    networks:
+      - kong-net
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+  db-local:
+    image: postgres:12
+    ports:
+      - ${DB_PORT}:5432
+    profiles: [ "local" ]
     environment:
       POSTGRES_USER: ${DB_USER}
-#      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_PASSWORD: /run/secrets/kong_postgres_password
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres:/var/lib/postgresql/data
   zookeeper:
@@ -177,4 +208,4 @@ volumes:
 
 secrets:
   kong_postgres_password:
-    file: ./secretes/POSTGRES_PASSWORD
+    file: ./secrets/POSTGRES_PASSWORD
