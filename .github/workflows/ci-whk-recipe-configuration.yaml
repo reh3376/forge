@@ -4,12 +4,6 @@ concurrency:
   group: whk-recipe-configuration
   cancel-in-progress: true
 
-#on:
-#  workflow_dispatch:
-#  push:
-#    branches: ["*"]
-#    paths: ["./apps/whk-recipe-configuration"]
-
 on:
   pull_request:
     branches:
@@ -66,40 +60,7 @@ jobs:
         run: npm run build
         working-directory: ./apps/whk-recipe-configuration
 
-#      - name: test
-#        run: npm run test-coverage
-#        working-directory: ./apps/whk-recipe-configuration
-
       - name: Run tests
         run: |
           npx jest --coverage | tee ./coverage.txt && exit ${PIPESTATUS[0]}
         working-directory: ./apps/whk-recipe-configuration
-
-#      - name: docker metadata
-#        id: meta
-#        uses: docker/metadata-action@v4
-#        with:
-#          images: ghcr.io/whiskeyhouse/whk-mes/whk-recipe-configuration
-#          flavor: latest=true
-#          tags: |
-#            type=sha,prefix=sha-
-#            type=ref,event=branch
-#            type=ref,event=pr,prefix=pr-
-#            type=ref,event=tag,prefix=tag-
-#            type=raw,value=${{ github.run_id }},prefix=gh-
-#
-#      - name: login to image repostiory
-#        uses: docker/login-action@v2
-#        with:
-#          registry: ${{ env.REGISTRY }}
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: build and push
-#        uses: docker/build-push-action@v3
-#        with:
-#          context: ./apps/whk-recipe-configuration
-#          file: ./apps/whk-recipe-configuration/Dockerfile
-#          push: true
-#          tags: ${{ steps.meta.outputs.tags }}
-#          labels: ${{ steps.meta.outputs.labels }}
