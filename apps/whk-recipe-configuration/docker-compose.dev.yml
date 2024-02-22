@@ -80,7 +80,7 @@ services:
     volumes:
       - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
       - kong_tmp_vol:/tmp
-      - ./config:/opt/kong
+      - ./kong_config:/opt/kong
     security_opt:
       - no-new-privileges
 
@@ -98,7 +98,8 @@ services:
       - ${DB_PORT}:5432
     environment:
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: /run/secrets/kong_postgres_password
     volumes:
       - postgres:/var/lib/postgresql/data
   zookeeper:
@@ -173,3 +174,7 @@ volumes:
     driver_opts:
       type: tmpfs
       device: tmpfs
+
+secrets:
+  kong_postgres_password:
+    file: ./secretes/POSTGRES_PASSWORD
