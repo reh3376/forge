@@ -79,7 +79,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/WHK01/whk-mes/whk-recipe-configuration
+          images: ghcr.io/whiskeyhouse/whk-mes/whk-recipe-configuration
           flavor: latest=true
           tags: |
             type=sha,prefix=sha-
