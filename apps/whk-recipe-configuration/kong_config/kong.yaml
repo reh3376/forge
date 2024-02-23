@@ -104,10 +104,6 @@ services:
           - POST
           - PATCH
           - DELETE
-          - OPTIONS
-          - HEAD
-          - CONNECT
-          - TRACE
         name: recipe-routing
         path_handling: v0
         paths:
@@ -126,4 +122,152 @@ services:
     tags:
       - mes
       - ' graphql'
+    write_timeout: 60000
+  - connect_timeout: 60000
+    enabled: true
+    host: host.docker.internal
+    name: batching
+    port: 3003
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - https_redirect_status_code: 426
+        methods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+        name: batching
+        path_handling: v0
+        paths:
+          - /batching
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+        tags:
+          - mes
+          - graphql
+          - rest
+    tags:
+      - mes
+      - graphql
+      - rest
+    write_timeout: 60000
+  - connect_timeout: 60000
+    enabled: true
+    host: host.docker.internal
+    name: inventory
+    port: 3004
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - https_redirect_status_code: 426
+        methods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+        name: inventory
+        path_handling: v0
+        paths:
+          - /inventory
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+        tags:
+          - mes
+          - graphql
+          - rest
+    tags:
+      - mes
+      - graphql
+      - rest
+    write_timeout: 60000
+  - connect_timeout: 60000
+    enabled: true
+    host: host.docker.internal
+    name: cmms
+    port: 3002
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - https_redirect_status_code: 426
+        methods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+        name: cmms
+        path_handling: v0
+        paths:
+          - /cmms
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+        tags:
+          - cmms
+          - graphql
+          - rest
+    tags:
+      - cmms
+      - graphql
+      - rest
+    write_timeout: 60000
+  - connect_timeout: 60000
+    enabled: true
+    host: host.docker.internal
+    name: wms
+    port: 3010
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - https_redirect_status_code: 426
+        methods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+        name: wms
+        path_handling: v0
+        paths:
+          - /wms
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+        tags:
+          - wms
+          - graphql
+          - rest
+    tags:
+      - wms
+      - graphql
+      - rest
     write_timeout: 60000
