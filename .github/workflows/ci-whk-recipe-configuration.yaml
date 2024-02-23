@@ -61,8 +61,13 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: install dependencies
-        run: npm install
+        run: npm ci
         working-directory: ./apps/whk-recipe-configuration
+
+
+#      - name: install dependencies
+#        run: npm install
+#        working-directory: ./apps/whk-recipe-configuration
 
       - name: build
         run: npm run build
