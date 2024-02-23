@@ -13,5 +13,5 @@
 
 # Files that should be generated at runtime
 schema.graphql
-package-lock.json
+#package-lock.json
 prisma/migrations/*
