@@ -14,7 +14,7 @@ import { ProductionOrderQueueWhereUniqueInput } from "../../productionOrderQueue
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class ProductionOrderQueueCreateNestedManyWithoutRecipesInput {
+class ProductionOrderQueueCreateNestedManyWithoutProceduresInput {
   @Field(() => [ProductionOrderQueueWhereUniqueInput], {
     nullable: true,
   })
@@ -25,4 +25,4 @@ class ProductionOrderQueueCreateNestedManyWithoutRecipesInput {
   connect?: Array<ProductionOrderQueueWhereUniqueInput>;
 }
 
-export { ProductionOrderQueueCreateNestedManyWithoutRecipesInput as ProductionOrderQueueCreateNestedManyWithoutRecipesInput };
+export { ProductionOrderQueueCreateNestedManyWithoutProceduresInput as ProductionOrderQueueCreateNestedManyWithoutProceduresInput };

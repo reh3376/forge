@@ -15,10 +15,10 @@ import {
   IsString,
   IsOptional,
   IsBoolean,
-  IsInt,
   ValidateNested,
+  IsInt,
 } from "class-validator";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 
 @InputType()
@@ -58,6 +58,18 @@ class ProductionOrderQueueUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
@@ -66,18 +78,6 @@ class ProductionOrderQueueUpdateInput {
     nullable: true,
   })
   queueIndex?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

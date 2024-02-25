@@ -1,4 +1,4 @@
-import { Recipe } from "../recipe/Recipe";
+import { Procedure } from "../procedure/Procedure";
 
 export type ProductionOrderQueue = {
   accountId: string;
@@ -6,8 +6,8 @@ export type ProductionOrderQueue = {
   createdAt: Date;
   createdBy: string;
   id: string;
+  procedure?: Procedure;
   queueIndex: number | null;
-  recipe?: Recipe | null;
   revision: number;
   salesOrderId: string;
   schemaVersion: string | null;

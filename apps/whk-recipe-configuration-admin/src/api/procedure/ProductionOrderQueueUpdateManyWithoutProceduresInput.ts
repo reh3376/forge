@@ -1,6 +1,6 @@
 import { ProductionOrderQueueWhereUniqueInput } from "../productionOrderQueue/ProductionOrderQueueWhereUniqueInput";
 
-export type ProductionOrderQueueUpdateManyWithoutRecipesInput = {
+export type ProductionOrderQueueUpdateManyWithoutProceduresInput = {
   connect?: Array<ProductionOrderQueueWhereUniqueInput>;
   disconnect?: Array<ProductionOrderQueueWhereUniqueInput>;
   set?: Array<ProductionOrderQueueWhereUniqueInput>;
