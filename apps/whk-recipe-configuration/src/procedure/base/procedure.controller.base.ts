@@ -26,6 +26,9 @@ import { Procedure } from "./Procedure";
 import { ProcedureFindManyArgs } from "./ProcedureFindManyArgs";
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { ProcedureUpdateInput } from "./ProcedureUpdateInput";
+import { ProductionOrderQueueFindManyArgs } from "../../productionOrderQueue/base/ProductionOrderQueueFindManyArgs";
+import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
+import { ProductionOrderQueueWhereUniqueInput } from "../../productionOrderQueue/base/ProductionOrderQueueWhereUniqueInput";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -334,6 +337,116 @@ export class ProcedureControllerBase {
   ): Promise<void> {
     const data = {
       instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderQueues")
+  @ApiNestedQuery(ProductionOrderQueueFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderQueues(
+    @common.Req() request: Request,
+    @common.Param() params: ProcedureWhereUniqueInput
+  ): Promise<ProductionOrderQueue[]> {
+    const query = plainToClass(ProductionOrderQueueFindManyArgs, request.query);
+    const results = await this.service.findProductionOrderQueues(params.id, {
+      ...query,
+      select: {
+        accountId: true,
+        active: true,
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        queueIndex: true,
+        revision: true,
+        salesOrderId: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "Procedure",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderQueues(
+    @common.Param() params: ProcedureWhereUniqueInput,
+    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderQueues: {
+        connect: body,
+      },
+    };
+    await this.service.updateProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "Procedure",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderQueues(
+    @common.Param() params: ProcedureWhereUniqueInput,
+    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderQueues: {
+        set: body,
+      },
+    };
+    await this.service.updateProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "Procedure",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderQueues(
+    @common.Param() params: ProcedureWhereUniqueInput,
+    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderQueues: {
         disconnect: body,
       },
     };

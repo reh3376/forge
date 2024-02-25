@@ -21,6 +21,7 @@ import {
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ProcedureCreateNestedManyWithoutProceduresInput } from "./ProcedureCreateNestedManyWithoutProceduresInput";
+import { ProductionOrderQueueCreateNestedManyWithoutProceduresInput } from "./ProductionOrderQueueCreateNestedManyWithoutProceduresInput";
 import { UnitProcedureCreateNestedManyWithoutProceduresInput } from "./UnitProcedureCreateNestedManyWithoutProceduresInput";
 
 @InputType()
@@ -100,6 +101,18 @@ class ProcedureCreateInput {
     nullable: true,
   })
   name?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderQueueCreateNestedManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderQueueCreateNestedManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => ProductionOrderQueueCreateNestedManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  productionOrderQueues?: ProductionOrderQueueCreateNestedManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,

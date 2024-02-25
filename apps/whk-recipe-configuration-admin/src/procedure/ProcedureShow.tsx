@@ -67,6 +67,32 @@ export const ProcedureShow = (props: ShowProps): React.ReactElement => {
           </Datagrid>
         </ReferenceManyField>
         <ReferenceManyField
+          reference="ProductionOrderQueue"
+          target="procedureId"
+          label="Production Order Queues"
+        >
+          <Datagrid rowClick="show">
+            <TextField label="Account ID" source="accountId" />
+            <BooleanField label="Active" source="active" />
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <TextField label="ID" source="id" />
+            <ReferenceField
+              label="Procedure"
+              source="procedure.id"
+              reference="Procedure"
+            >
+              <TextField source={PROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <TextField label="Queue Index" source="queueIndex" />
+            <TextField label="Revision" source="revision" />
+            <TextField label="Sales Order ID" source="salesOrderId" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <DateField source="updatedAt" label="Updated At" />
+            <TextField label="Updated By" source="updatedBy" />
+          </Datagrid>
+        </ReferenceManyField>
+        <ReferenceManyField
           reference="UnitProcedure"
           target="procedureId"
           label="Unit Procedures"

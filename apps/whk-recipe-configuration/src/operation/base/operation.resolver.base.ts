@@ -27,8 +27,6 @@ import { CreateOperationArgs } from "./CreateOperationArgs";
 import { UpdateOperationArgs } from "./UpdateOperationArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
-import { Recipe } from "../../recipe/base/Recipe";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { OperationService } from "../operation.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -185,26 +183,6 @@ export class OperationResolverBase {
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
     const results = await this.service.findInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Recipe], { name: "recipes" })
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipes(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: RecipeFindManyArgs
-  ): Promise<Recipe[]> {
-    const results = await this.service.findRecipes(parent.id, args);
 
     if (!results) {
       return [];

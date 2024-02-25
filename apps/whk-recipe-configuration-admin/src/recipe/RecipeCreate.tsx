@@ -1,20 +1,12 @@
 import * as React from "react";
-
 import {
   Create,
   SimpleForm,
   CreateProps,
   BooleanInput,
   TextInput,
-  ReferenceInput,
-  SelectInput,
-  ReferenceArrayInput,
-  SelectArrayInput,
   NumberInput,
 } from "react-admin";
-
-import { OperationTitle } from "../operation/OperationTitle";
-import { ProductionOrderQueueTitle } from "../productionOrderQueue/ProductionOrderQueueTitle";
 
 export const RecipeCreate = (props: CreateProps): React.ReactElement => {
   return (
@@ -30,21 +22,6 @@ export const RecipeCreate = (props: CreateProps): React.ReactElement => {
         />
         <TextInput label="Item ID" source="itemId" />
         <TextInput label="Mash Bill" source="mashBill" />
-        <ReferenceInput
-          source="operation.id"
-          reference="Operation"
-          label="Operation"
-        >
-          <SelectInput optionText={OperationTitle} />
-        </ReferenceInput>
-        <ReferenceArrayInput
-          source="productionOrderQueues"
-          reference="ProductionOrderQueue"
-          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
-          format={(value: any) => value && value.map((v: any) => v.id)}
-        >
-          <SelectArrayInput optionText={ProductionOrderQueueTitle} />
-        </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <TextInput label="Updated By" source="updatedBy" />

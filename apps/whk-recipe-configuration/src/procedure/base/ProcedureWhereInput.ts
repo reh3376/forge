@@ -18,6 +18,7 @@ import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
+import { ProductionOrderQueueListRelationFilter } from "../../productionOrderQueue/base/ProductionOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
@@ -112,6 +113,18 @@ class ProcedureWhereInput {
     nullable: true,
   })
   name?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderQueueListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderQueueListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderQueueListRelationFilter, {
+    nullable: true,
+  })
+  productionOrderQueues?: ProductionOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,

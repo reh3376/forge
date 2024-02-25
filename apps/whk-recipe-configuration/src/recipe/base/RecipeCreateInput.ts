@@ -11,16 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsBoolean,
-  IsOptional,
-  IsString,
-  ValidateNested,
-  IsInt,
-} from "class-validator";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { Type } from "class-transformer";
-import { ProductionOrderQueueCreateNestedManyWithoutRecipesInput } from "./ProductionOrderQueueCreateNestedManyWithoutRecipesInput";
+import { IsBoolean, IsOptional, IsString, IsInt } from "class-validator";
 
 @InputType()
 class RecipeCreateInput {
@@ -80,30 +71,6 @@ class RecipeCreateInput {
     nullable: true,
   })
   mashBill?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderQueueCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderQueueCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => ProductionOrderQueueCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  productionOrderQueues?: ProductionOrderQueueCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

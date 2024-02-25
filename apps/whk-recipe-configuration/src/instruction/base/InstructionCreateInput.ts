@@ -93,12 +93,15 @@ class InstructionCreateInput {
   revision!: number;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @Field(() => String)
-  schemaVersion!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
 }
 
 export { InstructionCreateInput as InstructionCreateInput };

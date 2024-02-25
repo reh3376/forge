@@ -25,9 +25,6 @@ import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeFindUniqueArgs } from "./RecipeFindUniqueArgs";
 import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
-import { ProductionOrderQueueFindManyArgs } from "../../productionOrderQueue/base/ProductionOrderQueueFindManyArgs";
-import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
-import { Operation } from "../../operation/base/Operation";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Recipe)
@@ -90,15 +87,7 @@ export class RecipeResolverBase {
   async createRecipe(@graphql.Args() args: CreateRecipeArgs): Promise<Recipe> {
     return await this.service.createRecipe({
       ...args,
-      data: {
-        ...args.data,
-
-        operation: args.data.operation
-          ? {
-              connect: args.data.operation,
-            }
-          : undefined,
-      },
+      data: args.data,
     });
   }
 
@@ -115,15 +104,7 @@ export class RecipeResolverBase {
     try {
       return await this.service.updateRecipe({
         ...args,
-        data: {
-          ...args.data,
-
-          operation: args.data.operation
-            ? {
-                connect: args.data.operation,
-              }
-            : undefined,
-        },
+        data: args.data,
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -133,51 +114,5 @@ export class RecipeResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderQueue], {
-    name: "productionOrderQueues",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderQueue",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderQueues(
-    @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: ProductionOrderQueueFindManyArgs
-  ): Promise<ProductionOrderQueue[]> {
-    const results = await this.service.findProductionOrderQueues(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Operation, {
-    nullable: true,
-    name: "operation",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "read",
-    possession: "any",
-  })
-  async getOperation(
-    @graphql.Parent() parent: Recipe
-  ): Promise<Operation | null> {
-    const result = await this.service.getOperation(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 }
