@@ -14,10 +14,10 @@ processors:
         value: "test-value"
         action: insert
 exporters:
-  logging:
-    loglevel: info
-  otlp:
-    endpoint: jaeger:14250
+  debug:
+    verbosity: detailed
+  otlp/jaeger:
+    endpoint: jaeger:4317 # This is the default port for Jaeger
     tls:
       insecure: true
 #  jaeger:
@@ -35,11 +35,6 @@ service:
   extensions: [pprof, zpages, health_check]
   pipelines:
     traces:
-      receivers: [ otlp ]
-      processors: [ batch, resource ]
-      exporters: [ logging, otlp ]
-#  pipelines:
-#    traces:
-#      receivers: [otlp]
-#      processors: [batch, resource]
-#      exporters: [logging, jaeger]
+      receivers: [otlp]
+      processors: [batch, resource]
+      exporters: [debug, otlp/jaeger]

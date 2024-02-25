@@ -116,7 +116,7 @@ services:
     ports:
       - ${JAEGER_AGENT_PORT}:${JAEGER_AGENT_PORT}
       - 14268:14268
-      - 14250:14250
+      - 14250:4317
   opentelemetry:
     image: otel/opentelemetry-collector:latest
     ports:
