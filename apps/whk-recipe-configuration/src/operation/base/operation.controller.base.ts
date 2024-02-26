@@ -334,12 +334,6 @@ export class OperationControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (results === null) {

@@ -15,7 +15,6 @@ import {
 import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "./EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
-import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 import { PHASEPARAMETER_TITLE_FIELD } from "../phaseParameter/PhaseParameterTitle";
 
 export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
@@ -58,13 +57,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
         />
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
-        <ReferenceField
-          label="Test Parameters"
-          source="testparameter.id"
-          reference="TestParameter"
-        >
-          <TextField source={TESTPARAMETER_TITLE_FIELD} />
-        </ReferenceField>
         <ReferenceManyField
           reference="EquipmentPhase"
           target="classIdId"
@@ -110,13 +102,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
             />
             <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
-            <ReferenceField
-              label="Test Parameters"
-              source="testparameter.id"
-              reference="TestParameter"
-            >
-              <TextField source={TESTPARAMETER_TITLE_FIELD} />
-            </ReferenceField>
           </Datagrid>
         </ReferenceManyField>
         <ReferenceManyField
