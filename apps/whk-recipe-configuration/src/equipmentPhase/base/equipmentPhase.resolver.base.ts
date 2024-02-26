@@ -29,9 +29,10 @@ import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindM
 import { Instruction } from "../../instruction/base/Instruction";
 import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Bom } from "../../bom/base/Bom";
 import { Operation } from "../../operation/base/Operation";
-import { TestParameter } from "../../testParameter/base/TestParameter";
 import { EquipmentPhaseService } from "../equipmentPhase.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => EquipmentPhase)
@@ -116,12 +117,6 @@ export class EquipmentPhaseResolverBase {
         operations: {
           connect: args.data.operations,
         },
-
-        testParameters: args.data.testParameters
-          ? {
-              connect: args.data.testParameters,
-            }
-          : undefined,
       },
     });
   }
@@ -157,12 +152,6 @@ export class EquipmentPhaseResolverBase {
           operations: {
             connect: args.data.operations,
           },
-
-          testParameters: args.data.testParameters
-            ? {
-                connect: args.data.testParameters,
-              }
-            : undefined,
         },
       });
     } catch (error) {
@@ -236,6 +225,26 @@ export class EquipmentPhaseResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @graphql.Parent() parent: EquipmentPhase,
+    @graphql.Args() args: TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    const results = await this.service.findTestParameters(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Bom, {
     nullable: true,
     name: "bom",
@@ -289,27 +298,6 @@ export class EquipmentPhaseResolverBase {
     @graphql.Parent() parent: EquipmentPhase
   ): Promise<Operation | null> {
     const result = await this.service.getOperations(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => TestParameter, {
-    nullable: true,
-    name: "testParameters",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "TestParameter",
-    action: "read",
-    possession: "any",
-  })
-  async getTestParameters(
-    @graphql.Parent() parent: EquipmentPhase
-  ): Promise<TestParameter | null> {
-    const result = await this.service.getTestParameters(parent.id);
 
     if (!result) {
       return null;

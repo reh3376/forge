@@ -144,8 +144,7 @@ model EquipmentPhase {
   phaseParameters        PhaseParameter[]
   revision               Int?             @default(0)
   schemaVersion          String?          @default("0001-b")
-  testParameters         TestParameter?   @relation(fields: [testParameterId], references: [id])
-  testParameterId        String?
+  testParameters         TestParameter[]
 
   @@map("equipmentPhases")
 }
