@@ -79,7 +79,7 @@
     "jest-mock-extended": "^3.0.5",
     "jest-junit": "^16.0.0",
     "prettier": "^2.8.0",
-    "prisma": "^5.4.2",
+    "prisma": "^5.10.2",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
