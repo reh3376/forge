@@ -123,5 +123,63 @@ export async function customSeed() {
     }
   });
 
+  await client.testParameter.create({
+    data: {
+      active: true,
+      createdBy: "creator1",
+      description: "Test Parameter description 1",
+      editedBy: "editor1",
+      isClassDef: true,
+      name: "Test Parameter Name 1",
+      schemaVersion: "0001-b",
+      testDetails: "Test Details 1",
+      testParamRevision: "Revision1",
+      testParamUnits: "Gal",
+      testSetpointLowerLimit: 0.1,
+      testSetpointType: "Numerical",
+      testSetpointUpperLimit: 1,
+      testSetpointValue: 0.5,
+      tooltip: "Tooltip 1"
+    }
+  });
+  await client.testParameter.create({
+    data: {
+      active: true,
+      createdBy: "creator2",
+      description: "Test Parameter description 2",
+      editedBy: "editor2",
+      isClassDef: true,
+      name: "Test Parameter Name 2",
+      schemaVersion: "0001-b",
+      testDetails: "Test Details 2",
+      testParamRevision: "Revision2",
+      testParamUnits: "Gal",
+      testSetpointLowerLimit: 0.2,
+      testSetpointType: "Numerical",
+      testSetpointUpperLimit: 1.1,
+      testSetpointValue: 0.6,
+      tooltip: "Tooltip 2"
+    }
+  });
+  await client.testParameter.create({
+    data: {
+      active: true,
+      createdBy: "creator3",
+      description: "Test Parameter description 3",
+      editedBy: "editor3",
+      isClassDef: true,
+      name: "Test Parameter Name 3",
+      schemaVersion: "0001-b",
+      testDetails: "Test Details 3",
+      testParamRevision: "Revision3",
+      testParamUnits: "Gal",
+      testSetpointLowerLimit: 0.3,
+      testSetpointType: "Numerical",
+      testSetpointUpperLimit: 1.2,
+      testSetpointValue: 0.7,
+      tooltip: "Tooltip 3"
+    }
+  });
+
   client.$disconnect();
 }
