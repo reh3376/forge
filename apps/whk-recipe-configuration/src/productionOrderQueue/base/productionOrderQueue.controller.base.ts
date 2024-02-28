@@ -55,11 +55,9 @@ export class ProductionOrderQueueControllerBase {
       data: {
         ...data,
 
-        recipe: data.recipe
-          ? {
-              connect: data.recipe,
-            }
-          : undefined,
+        procedure: {
+          connect: data.procedure,
+        },
       },
       select: {
         accountId: true,
@@ -67,14 +65,14 @@ export class ProductionOrderQueueControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
-        queueIndex: true,
 
-        recipe: {
+        procedure: {
           select: {
             id: true,
           },
         },
 
+        queueIndex: true,
         revision: true,
         salesOrderId: true,
         schemaVersion: true,
@@ -108,14 +106,14 @@ export class ProductionOrderQueueControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
-        queueIndex: true,
 
-        recipe: {
+        procedure: {
           select: {
             id: true,
           },
         },
 
+        queueIndex: true,
         revision: true,
         salesOrderId: true,
         schemaVersion: true,
@@ -148,14 +146,14 @@ export class ProductionOrderQueueControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
-        queueIndex: true,
 
-        recipe: {
+        procedure: {
           select: {
             id: true,
           },
         },
 
+        queueIndex: true,
         revision: true,
         salesOrderId: true,
         schemaVersion: true,
@@ -196,11 +194,9 @@ export class ProductionOrderQueueControllerBase {
         data: {
           ...data,
 
-          recipe: data.recipe
-            ? {
-                connect: data.recipe,
-              }
-            : undefined,
+          procedure: {
+            connect: data.procedure,
+          },
         },
         select: {
           accountId: true,
@@ -208,14 +204,14 @@ export class ProductionOrderQueueControllerBase {
           createdAt: true,
           createdBy: true,
           id: true,
-          queueIndex: true,
 
-          recipe: {
+          procedure: {
             select: {
               id: true,
             },
           },
 
+          queueIndex: true,
           revision: true,
           salesOrderId: true,
           schemaVersion: true,

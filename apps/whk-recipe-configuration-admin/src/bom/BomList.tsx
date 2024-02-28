@@ -12,8 +12,6 @@ export const BomList = (props: ListProps): React.ReactElement => {
       pagination={<Pagination />}
     >
       <Datagrid rowClick="show">
-        <TextField label="Batches" source="batches" />
-        <TextField label="Bom Items" source="bomItems" />
         <TextField label="Bom Name" source="bomName" />
         <TextField label="Bom Revision" source="bomRevision" />
         <TextField label="Class Name" source="className" />
@@ -22,7 +20,6 @@ export const BomList = (props: ListProps): React.ReactElement => {
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
-        <TextField label="Operation Steps" source="operationSteps" />
         <TextField label="Schema Version" source="schemaVersion" />
         <TextField label="Wip Item ID" source="wipItemId" />
       </Datagrid>

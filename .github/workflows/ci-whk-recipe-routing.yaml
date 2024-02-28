@@ -1,7 +1,7 @@
-name: continuous integration - whk-recipe-configuration
+name: continuous integration - whk-recipe-routing
 
 concurrency:
-  group: whk-recipe-configuration
+  group: whk-recipe-routing
   cancel-in-progress: true
 
 on:

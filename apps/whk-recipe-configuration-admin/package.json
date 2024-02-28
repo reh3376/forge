@@ -1,5 +1,5 @@
 {
-  "name": "@whk-recipe-configuration/admin",
+  "name": "@whk-recipe-routing/admin",
   "private": true,
   "dependencies": {
     "@apollo/client": "3.6.9",

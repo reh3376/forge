@@ -25,7 +25,7 @@ import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./Equ
 import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
-import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
+import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./TestParameterCreateNestedManyWithoutEquipmentPhasesInput";
 
 @InputType()
 class EquipmentPhaseCreateInput {
@@ -148,14 +148,14 @@ class EquipmentPhaseCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
+    type: Number,
   })
-  @IsBoolean()
+  @IsInt()
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => Number, {
     nullable: true,
   })
-  operationSequenceIndex?: boolean | null;
+  operationSequenceIndex?: number | null;
 
   @ApiProperty({
     required: false,
@@ -204,15 +204,15 @@ class EquipmentPhaseCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestParameterWhereUniqueInput,
+    type: () => TestParameterCreateNestedManyWithoutEquipmentPhasesInput,
   })
   @ValidateNested()
-  @Type(() => TestParameterWhereUniqueInput)
+  @Type(() => TestParameterCreateNestedManyWithoutEquipmentPhasesInput)
   @IsOptional()
-  @Field(() => TestParameterWhereUniqueInput, {
+  @Field(() => TestParameterCreateNestedManyWithoutEquipmentPhasesInput, {
     nullable: true,
   })
-  testParameters?: TestParameterWhereUniqueInput | null;
+  testParameters?: TestParameterCreateNestedManyWithoutEquipmentPhasesInput;
 }
 
 export { EquipmentPhaseCreateInput as EquipmentPhaseCreateInput };

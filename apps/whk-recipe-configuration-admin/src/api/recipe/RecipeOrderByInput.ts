@@ -9,7 +9,6 @@ export type RecipeOrderByInput = {
   itemDescription?: SortOrder;
   itemId?: SortOrder;
   mashBill?: SortOrder;
-  operationId?: SortOrder;
   revision?: SortOrder;
   schemaVersion?: SortOrder;
   updatedAt?: SortOrder;

@@ -11,7 +11,7 @@ import {
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
-import { RECIPE_TITLE_FIELD } from "../recipe/RecipeTitle";
+import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 
 export const ProductionOrderQueueList = (
   props: ListProps
@@ -30,10 +30,14 @@ export const ProductionOrderQueueList = (
         <DateField source="createdAt" label="Created At" />
         <TextField label="Created By" source="createdBy" />
         <TextField label="ID" source="id" />
-        <TextField label="Queue Index" source="queueIndex" />
-        <ReferenceField label="Recipe" source="recipe.id" reference="Recipe">
-          <TextField source={RECIPE_TITLE_FIELD} />
+        <ReferenceField
+          label="Procedure"
+          source="procedure.id"
+          reference="Procedure"
+        >
+          <TextField source={PROCEDURE_TITLE_FIELD} />
         </ReferenceField>
+        <TextField label="Queue Index" source="queueIndex" />
         <TextField label="Revision" source="revision" />
         <TextField label="Sales Order ID" source="salesOrderId" />
         <TextField label="Schema Version" source="schemaVersion" />

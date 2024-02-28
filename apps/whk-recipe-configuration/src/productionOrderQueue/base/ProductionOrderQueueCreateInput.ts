@@ -14,11 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   IsBoolean,
+  ValidateNested,
   IsInt,
   IsOptional,
-  ValidateNested,
 } from "class-validator";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 
 @InputType()
@@ -48,6 +48,15 @@ class ProductionOrderQueueCreateInput {
   createdBy!: string;
 
   @ApiProperty({
+    required: true,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @Field(() => ProcedureWhereUniqueInput)
+  procedure!: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
     required: false,
     type: Number,
   })
@@ -57,18 +66,6 @@ class ProductionOrderQueueCreateInput {
     nullable: true,
   })
   queueIndex?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,

@@ -6,7 +6,6 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../equipmentPhase/EquipmentPhaseListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
-import { RecipeListRelationFilter } from "../recipe/RecipeListRelationFilter";
 import { UnitProcedureWhereUniqueInput } from "../unitProcedure/UnitProcedureWhereUniqueInput";
 
 export type OperationWhereInput = {
@@ -24,7 +23,6 @@ export type OperationWhereInput = {
   name?: StringFilter;
   path?: StringFilter;
   procedureSequenceIndex?: IntFilter;
-  recipes?: RecipeListRelationFilter;
   revision?: IntFilter;
   schemaVersion?: StringNullableFilter;
   unitProcedure?: UnitProcedureWhereUniqueInput;

@@ -14,7 +14,6 @@ import Pagination from "../Components/Pagination";
 import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "./EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
-import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 
 export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
   return (
@@ -52,7 +51,7 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
         >
           <TextField source={OPERATION_TITLE_FIELD} />
         </ReferenceField>
-        <BooleanField
+        <TextField
           label="Operation Sequence Index"
           source="operationSequenceIndex"
         />
@@ -62,13 +61,6 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
         />
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
-        <ReferenceField
-          label="Test Parameters"
-          source="testparameter.id"
-          reference="TestParameter"
-        >
-          <TextField source={TESTPARAMETER_TITLE_FIELD} />
-        </ReferenceField>
       </Datagrid>
     </List>
   );

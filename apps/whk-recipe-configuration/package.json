@@ -1,5 +1,5 @@
 {
-  "name": "@whk-recipe-configuration/server",
+  "name": "@whk-recipe-routing/server",
   "private": true,
   "scripts": {
     "start": "nest start",
@@ -22,7 +22,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@amplication/opentelemetry-nestjs": "^4.4.0",
+    "@amplication/opentelemetry-nestjs": "^4.5.0",
     "@apollo/server": "^4.9.4",
     "@nestjs/apollo": "12.0.9",
     "@nestjs/cache-manager": "^2.1.0",

@@ -13,5 +13,5 @@ export type InstructionWhereInput = {
   id?: StringFilter;
   name?: StringNullableFilter;
   revision?: IntFilter;
-  schemaVersion?: StringFilter;
+  schemaVersion?: StringNullableFilter;
 };

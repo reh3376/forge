@@ -21,7 +21,6 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
-import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
@@ -182,18 +181,6 @@ class OperationWhereInput {
     nullable: true,
   })
   procedureSequenceIndex?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeListRelationFilter, {
-    nullable: true,
-  })
-  recipes?: RecipeListRelationFilter;
 
   @ApiProperty({
     required: false,

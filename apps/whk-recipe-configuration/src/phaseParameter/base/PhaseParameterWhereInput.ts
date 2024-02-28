@@ -19,6 +19,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
+import { BooleanFilter } from "../../util/BooleanFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
@@ -118,14 +119,14 @@ class PhaseParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
+    type: BooleanFilter,
   })
-  @Type(() => BooleanNullableFilter)
+  @Type(() => BooleanFilter)
   @IsOptional()
-  @Field(() => BooleanNullableFilter, {
+  @Field(() => BooleanFilter, {
     nullable: true,
   })
-  isClassDef?: BooleanNullableFilter;
+  isClassDef?: BooleanFilter;
 
   @ApiProperty({
     required: false,
