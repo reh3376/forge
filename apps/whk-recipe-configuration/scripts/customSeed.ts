@@ -225,5 +225,67 @@ export async function customSeed() {
     }
   });
 
+  //PhaseParameters
+  await client.phaseParameter.create({
+    data: {
+      active: true,
+      createdBy: "Catherine Richmond",
+      description: "Idea local middle authority I.",
+      editedBy: "Valerie Esparza",
+      equipmentPhaseId: "2279302f-7750-4b12-9d8d-da921f06af2e",
+      isClassDef: true,
+      itemId: "26421351-4797-46c3-b901-a23487c858c7",
+      name: "check",
+      recipeId: "4f78b3ff-3c3e-4460-8b15-800a7778d367",
+      revision: 3,
+      schemaVersion: "0001-alpha",
+      setpointLowerLimit: 88,
+      setpointNumericalValue: 3,
+      setpointType: "Numeric",
+      setpointUpperLimit: 4,
+      units: "data",
+    }
+  });
+  await client.phaseParameter.create({
+    data: {
+      active: true,
+      createdBy: "Christina Russell",
+      description: "Apply foreign simply build operation air last.",
+      editedBy: "Denise Chapman",
+      equipmentPhaseId: "97d344d0-0ad5-429b-93b4-c01b0fd8a2a0",
+      isClassDef: true,
+      itemId: "ad9f9c72-2821-4ede-a843-e7272937af72",
+      name: "be",
+      recipeId: "a7532ec9-1489-4d52-8a2f-92f4fbdaa2ab",
+      revision: 4,
+      schemaVersion: "0001-alpha",
+      setpointLowerLimit: 66,
+      setpointNumericalValue: 43,
+      setpointType: "Numeric",
+      setpointUpperLimit: 44,
+      units: "trial",
+    }
+  });
+  await client.phaseParameter.create({
+    data: {
+      active: true,
+      createdBy: "Eric Barron",
+      description: "Realize sense authority health mean not.",
+      editedBy: "Makayla Acosta",
+      equipmentPhaseId: "a4ba4fd7-ee11-4b1a-89af-e15cedc0b8f5",
+      isClassDef: true,
+      itemId: "a0d4e677-3ff4-4a30-a2b1-274f9ceb8662",
+      name: "white",
+      recipeId: "c4d26b61-4296-4278-9d1d-883aa121da05",
+      revision: 10,
+      schemaVersion: "0001-alpha",
+      setpointLowerLimit: 45,
+      setpointNumericalValue: 47,
+      setpointType: "Numeric",
+      setpointUpperLimit: 0,
+      units: "act",
+    }
+  });
+
   client.$disconnect();
 }
