@@ -22,7 +22,6 @@ import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
-import { RecipeUpdateManyWithoutOperationsInput } from "./RecipeUpdateManyWithoutOperationsInput";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
@@ -161,18 +160,6 @@ class OperationUpdateInput {
     nullable: true,
   })
   procedureSequenceIndex?: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeUpdateManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeUpdateManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => RecipeUpdateManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  recipes?: RecipeUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,

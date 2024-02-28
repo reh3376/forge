@@ -20,6 +20,7 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -109,6 +110,15 @@ class Procedure {
     nullable: true,
   })
   name!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderQueue],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderQueue)
+  @IsOptional()
+  productionOrderQueues?: Array<ProductionOrderQueue>;
 
   @ApiProperty({
     required: false,

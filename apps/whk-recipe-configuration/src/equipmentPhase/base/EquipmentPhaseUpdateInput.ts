@@ -25,7 +25,7 @@ import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./Equipment
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
-import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
+import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
 @InputType()
 class EquipmentPhaseUpdateInput {
@@ -213,15 +213,15 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestParameterWhereUniqueInput,
+    type: () => TestParameterUpdateManyWithoutEquipmentPhasesInput,
   })
   @ValidateNested()
-  @Type(() => TestParameterWhereUniqueInput)
+  @Type(() => TestParameterUpdateManyWithoutEquipmentPhasesInput)
   @IsOptional()
-  @Field(() => TestParameterWhereUniqueInput, {
+  @Field(() => TestParameterUpdateManyWithoutEquipmentPhasesInput, {
     nullable: true,
   })
-  testParameters?: TestParameterWhereUniqueInput | null;
+  testParameters?: TestParameterUpdateManyWithoutEquipmentPhasesInput;
 }
 
 export { EquipmentPhaseUpdateInput as EquipmentPhaseUpdateInput };

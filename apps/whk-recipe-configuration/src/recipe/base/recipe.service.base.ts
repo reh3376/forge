@@ -10,13 +10,7 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-
-import {
-  Prisma,
-  Recipe, // @ts-ignore
-  ProductionOrderQueue, // @ts-ignore
-  Operation,
-} from "@prisma/client";
+import { Prisma, Recipe } from "@prisma/client";
 
 export class RecipeServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -51,24 +45,5 @@ export class RecipeServiceBase {
     args: Prisma.SelectSubset<T, Prisma.RecipeDeleteArgs>
   ): Promise<Recipe> {
     return this.prisma.recipe.delete(args);
-  }
-
-  async findProductionOrderQueues(
-    parentId: string,
-    args: Prisma.ProductionOrderQueueFindManyArgs
-  ): Promise<ProductionOrderQueue[]> {
-    return this.prisma.recipe
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderQueues(args);
-  }
-
-  async getOperation(parentId: string): Promise<Operation | null> {
-    return this.prisma.recipe
-      .findUnique({
-        where: { id: parentId },
-      })
-      .operation();
   }
 }

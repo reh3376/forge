@@ -1,7 +1,6 @@
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
-import { RecipeUpdateManyWithoutOperationsInput } from "./RecipeUpdateManyWithoutOperationsInput";
 import { UnitProcedureWhereUniqueInput } from "../unitProcedure/UnitProcedureWhereUniqueInput";
 
 export type OperationUpdateInput = {
@@ -17,7 +16,6 @@ export type OperationUpdateInput = {
   name?: string;
   path?: string;
   procedureSequenceIndex?: number;
-  recipes?: RecipeUpdateManyWithoutOperationsInput;
   revision?: number;
   schemaVersion?: string | null;
   unitProcedure?: UnitProcedureWhereUniqueInput | null;

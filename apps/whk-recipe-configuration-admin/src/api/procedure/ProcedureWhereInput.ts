@@ -3,6 +3,7 @@ import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
+import { ProductionOrderQueueListRelationFilter } from "../productionOrderQueue/ProductionOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureListRelationFilter } from "../unitProcedure/UnitProcedureListRelationFilter";
 
@@ -15,6 +16,7 @@ export type ProcedureWhereInput = {
   instances?: ProcedureListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
   name?: StringNullableFilter;
+  productionOrderQueues?: ProductionOrderQueueListRelationFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
   unitProcedures?: UnitProcedureListRelationFilter;

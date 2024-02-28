@@ -14,6 +14,7 @@ import {
 } from "react-admin";
 
 import { ProcedureTitle } from "./ProcedureTitle";
+import { ProductionOrderQueueTitle } from "../productionOrderQueue/ProductionOrderQueueTitle";
 import { UnitProcedureTitle } from "../unitProcedure/UnitProcedureTitle";
 
 export const ProcedureCreate = (props: CreateProps): React.ReactElement => {
@@ -36,6 +37,14 @@ export const ProcedureCreate = (props: CreateProps): React.ReactElement => {
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
+        <ReferenceArrayInput
+          source="productionOrderQueues"
+          reference="ProductionOrderQueue"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={ProductionOrderQueueTitle} />
+        </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <ReferenceArrayInput

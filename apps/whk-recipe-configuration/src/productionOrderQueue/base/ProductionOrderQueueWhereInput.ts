@@ -15,8 +15,8 @@ import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { BooleanFilter } from "../../util/BooleanFilter";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
@@ -68,6 +68,18 @@ class ProductionOrderQueueWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: IntNullableFilter,
   })
   @Type(() => IntNullableFilter)
@@ -76,18 +88,6 @@ class ProductionOrderQueueWhereInput {
     nullable: true,
   })
   queueIndex?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,
