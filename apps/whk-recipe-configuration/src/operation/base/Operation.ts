@@ -21,7 +21,6 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { Recipe } from "../../recipe/base/Recipe";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -152,15 +151,6 @@ class Operation {
   @IsInt()
   @Field(() => Number)
   procedureSequenceIndex!: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Recipe],
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipes?: Array<Recipe>;
 
   @ApiProperty({
     required: true,

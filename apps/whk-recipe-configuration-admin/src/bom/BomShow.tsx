@@ -15,7 +15,6 @@ import {
 import { BOM_TITLE_FIELD } from "./BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "../equipmentPhase/EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
-import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 
 export const BomShow = (props: ShowProps): React.ReactElement => {
   return (
@@ -79,13 +78,6 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
             />
             <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
-            <ReferenceField
-              label="Test Parameters"
-              source="testparameter.id"
-              reference="TestParameter"
-            >
-              <TextField source={TESTPARAMETER_TITLE_FIELD} />
-            </ReferenceField>
           </Datagrid>
         </ReferenceManyField>
       </SimpleShowLayout>

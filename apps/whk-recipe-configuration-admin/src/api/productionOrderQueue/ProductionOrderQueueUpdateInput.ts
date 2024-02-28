@@ -1,11 +1,11 @@
-import { RecipeWhereUniqueInput } from "../recipe/RecipeWhereUniqueInput";
+import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 
 export type ProductionOrderQueueUpdateInput = {
   accountId?: string;
   active?: boolean;
   createdBy?: string;
+  procedure?: ProcedureWhereUniqueInput;
   queueIndex?: number | null;
-  recipe?: RecipeWhereUniqueInput | null;
   revision?: number;
   salesOrderId?: string;
   schemaVersion?: string | null;

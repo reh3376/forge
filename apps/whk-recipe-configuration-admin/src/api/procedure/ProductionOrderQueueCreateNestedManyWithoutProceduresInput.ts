@@ -1,5 +1,5 @@
 import { ProductionOrderQueueWhereUniqueInput } from "../productionOrderQueue/ProductionOrderQueueWhereUniqueInput";
 
-export type ProductionOrderQueueCreateNestedManyWithoutRecipesInput = {
+export type ProductionOrderQueueCreateNestedManyWithoutProceduresInput = {
   connect?: Array<ProductionOrderQueueWhereUniqueInput>;
 };
