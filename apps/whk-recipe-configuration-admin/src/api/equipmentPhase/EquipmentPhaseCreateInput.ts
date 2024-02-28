@@ -7,6 +7,7 @@ import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./Pha
 import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./TestParameterCreateNestedManyWithoutEquipmentPhasesInput";
 
 export type EquipmentPhaseCreateInput = {
+  active?: boolean | null;
   bom?: BomWhereUniqueInput | null;
   classId?: EquipmentPhaseWhereUniqueInput | null;
   className?: string | null;
@@ -19,7 +20,6 @@ export type EquipmentPhaseCreateInput = {
   name: string;
   operations: OperationWhereUniqueInput;
   operationSequenceIndex?: number | null;
-  operationStepSequence?: number | null;
   phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
   revision?: number | null;
   schemaVersion?: string | null;

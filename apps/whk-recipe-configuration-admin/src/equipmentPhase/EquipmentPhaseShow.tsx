@@ -4,10 +4,10 @@ import {
   Show,
   SimpleShowLayout,
   ShowProps,
+  BooleanField,
   ReferenceField,
   TextField,
   DateField,
-  BooleanField,
   ReferenceManyField,
   Datagrid,
 } from "react-admin";
@@ -21,6 +21,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
+        <BooleanField label="Active" source="active" />
         <ReferenceField label="Bom" source="bom.id" reference="Bom">
           <TextField source={BOM_TITLE_FIELD} />
         </ReferenceField>
@@ -51,10 +52,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
           label="Operation Sequence Index"
           source="operationSequenceIndex"
         />
-        <TextField
-          label="Operation Step Sequence"
-          source="operationStepSequence"
-        />
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <ReferenceManyField
@@ -63,6 +60,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
           label="EquipmentPhases"
         >
           <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
             <ReferenceField label="Bom" source="bom.id" reference="Bom">
               <TextField source={BOM_TITLE_FIELD} />
             </ReferenceField>
@@ -95,10 +93,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
             <TextField
               label="Operation Sequence Index"
               source="operationSequenceIndex"
-            />
-            <TextField
-              label="Operation Step Sequence"
-              source="operationStepSequence"
             />
             <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
