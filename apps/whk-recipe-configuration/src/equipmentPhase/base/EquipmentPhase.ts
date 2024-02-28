@@ -11,15 +11,15 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Bom } from "../../bom/base/Bom";
 import {
-  ValidateNested,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
   IsString,
   IsDate,
-  IsBoolean,
   IsInt,
 } from "class-validator";
+import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
 import { Operation } from "../../operation/base/Operation";
@@ -28,6 +28,17 @@ import { TestParameter } from "../../testParameter/base/TestParameter";
 
 @ObjectType()
 class EquipmentPhase {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
   @ApiProperty({
     required: false,
     type: () => Bom,
@@ -172,17 +183,6 @@ class EquipmentPhase {
     nullable: true,
   })
   operationSequenceIndex!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationStepSequence!: number | null;
 
   @ApiProperty({
     required: false,

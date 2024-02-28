@@ -18,6 +18,7 @@ import { EquipmentPhaseService } from "../equipmentPhase.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  active: "true",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
@@ -28,11 +29,11 @@ const CREATE_INPUT = {
   isClassDefinition: "true",
   name: "exampleName",
   operationSequenceIndex: 42,
-  operationStepSequence: 42,
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
 const CREATE_RESULT = {
+  active: "true",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
@@ -43,12 +44,12 @@ const CREATE_RESULT = {
   isClassDefinition: "true",
   name: "exampleName",
   operationSequenceIndex: 42,
-  operationStepSequence: 42,
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
 const FIND_MANY_RESULT = [
   {
+    active: "true",
     className: "exampleClassName",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
@@ -59,12 +60,12 @@ const FIND_MANY_RESULT = [
     isClassDefinition: "true",
     name: "exampleName",
     operationSequenceIndex: 42,
-    operationStepSequence: 42,
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
   },
 ];
 const FIND_ONE_RESULT = {
+  active: "true",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
@@ -75,7 +76,6 @@ const FIND_ONE_RESULT = {
   isClassDefinition: "true",
   name: "exampleName",
   operationSequenceIndex: 42,
-  operationStepSequence: 42,
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };

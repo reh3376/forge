@@ -7,6 +7,7 @@ import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhasePara
 import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
 export type EquipmentPhaseUpdateInput = {
+  active?: boolean | null;
   bom?: BomWhereUniqueInput | null;
   classId?: EquipmentPhaseWhereUniqueInput | null;
   className?: string | null;
@@ -19,7 +20,6 @@ export type EquipmentPhaseUpdateInput = {
   name?: string;
   operations?: OperationWhereUniqueInput;
   operationSequenceIndex?: number | null;
-  operationStepSequence?: number | null;
   phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
   revision?: number | null;
   schemaVersion?: string | null;
