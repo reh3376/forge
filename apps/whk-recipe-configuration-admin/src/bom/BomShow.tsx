@@ -15,14 +15,11 @@ import {
 import { BOM_TITLE_FIELD } from "./BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "../equipmentPhase/EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
-import { TESTPARAMETER_TITLE_FIELD } from "../testParameter/TestParameterTitle";
 
 export const BomShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
-        <TextField label="Batches" source="batches" />
-        <TextField label="Bom Items" source="bomItems" />
         <TextField label="Bom Name" source="bomName" />
         <TextField label="Bom Revision" source="bomRevision" />
         <TextField label="Class Name" source="className" />
@@ -31,7 +28,6 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
-        <TextField label="Operation Steps" source="operationSteps" />
         <TextField label="Schema Version" source="schemaVersion" />
         <TextField label="Wip Item ID" source="wipItemId" />
         <ReferenceManyField
@@ -69,7 +65,7 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
             >
               <TextField source={OPERATION_TITLE_FIELD} />
             </ReferenceField>
-            <BooleanField
+            <TextField
               label="Operation Sequence Index"
               source="operationSequenceIndex"
             />
@@ -79,13 +75,6 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
             />
             <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
-            <ReferenceField
-              label="Test Parameters"
-              source="testparameter.id"
-              reference="TestParameter"
-            >
-              <TextField source={TESTPARAMETER_TITLE_FIELD} />
-            </ReferenceField>
           </Datagrid>
         </ReferenceManyField>
       </SimpleShowLayout>

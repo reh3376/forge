@@ -30,7 +30,7 @@ model PhaseParameter {
   equipmentPhaseId       String?
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
-  isClassDef             Boolean?                       @default(false)
+  isClassDef             Boolean                        @default(false)
   itemId                 String?
   name                   String
   recipeId               String?
@@ -115,7 +115,7 @@ model Instruction {
   id             String           @id @default(cuid())
   name           String?
   revision       Int              @default(0)
-  schemaVersion  String           @default("0001-alpha")
+  schemaVersion  String?          @default("0001-alpha")
   updatedAt      DateTime         @updatedAt
 
   @@unique([name, revision])
@@ -139,13 +139,12 @@ model EquipmentPhase {
   name                   String
   operations             Operation        @relation(fields: [operationId], references: [id])
   operationId            String
-  operationSequenceIndex Boolean?
+  operationSequenceIndex Int?
   operationStepSequence  Int?
   phaseParameters        PhaseParameter[]
   revision               Int?             @default(0)
   schemaVersion          String?          @default("0001-b")
-  testParameters         TestParameter?   @relation(fields: [testParameterId], references: [id])
-  testParameterId        String?
+  testParameters         TestParameter[]
 
   @@map("equipmentPhases")
 }
@@ -165,8 +164,7 @@ model Operation {
   isClassDefinition      Boolean?         @default(false)
   name                   String
   path                   String
-  procedureSequenceIndex Int              @unique @default(0)
-  recipes                Recipe[]
+  procedureSequenceIndex Int              @default(0)
   revision               Int              @default(0)
   schemaVersion          String?          @default("0001-b")
   unitProcedure          UnitProcedure?   @relation(fields: [unitProcedureId], references: [id])
@@ -177,48 +175,44 @@ model Operation {
 }
 
 model Procedure {
-  active            Boolean?        @default(true)
-  classId           Procedure?      @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
-  classIdId         String?
-  createdAt         DateTime        @default(now())
-  createdBy         String
-  description       String?
-  id                String          @id @default(cuid())
-  instances         Procedure[]     @relation(name: "ProcedureClassIdProcedureInstances")
-  isClassDefinition Boolean?
-  name              String?
-  revision          Int?            @default(0)
-  schemaVersion     String?         @default("0001-b")
-  unitProcedures    UnitProcedure[]
-  updatedAt         DateTime        @updatedAt
-  updatedBy         String?
+  active                Boolean?               @default(true)
+  classId               Procedure?             @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
+  classIdId             String?
+  createdAt             DateTime               @default(now())
+  createdBy             String
+  description           String?
+  id                    String                 @id @default(cuid())
+  instances             Procedure[]            @relation(name: "ProcedureClassIdProcedureInstances")
+  isClassDefinition     Boolean?
+  name                  String?
+  productionOrderQueues ProductionOrderQueue[]
+  revision              Int?                   @default(0)
+  schemaVersion         String?                @default("0001-b")
+  unitProcedures        UnitProcedure[]
+  updatedAt             DateTime               @updatedAt
+  updatedBy             String?
 
   @@unique([name, revision, active])
 }
 
 model Recipe {
-  active                Boolean?               @default(true)
-  createdAt             DateTime               @default(now())
-  createdBy             String
-  customerId            String
-  id                    String                 @id @default(cuid())
-  itemDescription       String?
-  itemId                String
-  mashBill              String?
-  operation             Operation?             @relation(fields: [operationId], references: [id])
-  operationId           String?
-  productionOrderQueues ProductionOrderQueue[]
-  revision              Int?                   @default(0)
-  schemaVersion         String?                @default("0001-b")
-  updatedAt             DateTime               @updatedAt
-  updatedBy             String?
+  active          Boolean? @default(true)
+  createdAt       DateTime @default(now())
+  createdBy       String
+  customerId      String
+  id              String   @id @default(cuid())
+  itemDescription String?
+  itemId          String
+  mashBill        String?
+  revision        Int?     @default(0)
+  schemaVersion   String?  @default("0001-b")
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
 
   @@unique([itemId, customerId])
 }
 
 model Bom {
-  batches         Json?
-  bomItems        Json
   bomName         String
   bomRevision     Int?             @default(0)
   className       String?
@@ -228,7 +222,6 @@ model Bom {
   editedBy        String?
   equipmentPhases EquipmentPhase[]
   id              String           @id @default(cuid())
-  operationSteps  Json?
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
 
@@ -237,17 +230,17 @@ model Bom {
 
 model ProductionOrderQueue {
   accountId     String
-  active        Boolean  @default(true)
-  createdAt     DateTime @default(now())
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
   createdBy     String
-  id            String   @id @default(cuid())
-  queueIndex    Int?     @unique
-  recipe        Recipe?  @relation(fields: [recipeId], references: [id])
-  recipeId      String?
-  revision      Int      @default(0)
-  salesOrderId  String   @unique
-  schemaVersion String?  @default("0001-b")
-  updatedAt     DateTime @updatedAt
+  id            String    @id @default(cuid())
+  procedure     Procedure @relation(fields: [procedureId], references: [id])
+  procedureId   String
+  queueIndex    Int?      @unique
+  revision      Int       @default(0)
+  salesOrderId  String    @unique
+  schemaVersion String?   @default("0001-b")
+  updatedAt     DateTime  @updatedAt
   updatedBy     String?
 }
 

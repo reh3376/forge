@@ -11,35 +11,12 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsJSONValue } from "../../validators";
-import { IsOptional, IsString, IsInt, ValidateNested } from "class-validator";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
+import { IsString, IsOptional, IsInt, ValidateNested } from "class-validator";
 import { EquipmentPhaseUpdateManyWithoutBomsInput } from "./EquipmentPhaseUpdateManyWithoutBomsInput";
 import { Type } from "class-transformer";
 
 @InputType()
 class BomUpdateInput {
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  batches?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  bomItems?: InputJsonValue;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -106,16 +83,6 @@ class BomUpdateInput {
     nullable: true,
   })
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  operationSteps?: InputJsonValue;
 
   @ApiProperty({
     required: false,

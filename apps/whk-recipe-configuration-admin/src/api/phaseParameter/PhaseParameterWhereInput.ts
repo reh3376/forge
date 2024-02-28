@@ -4,6 +4,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseWhereUniqueInput } from "../equipmentPhase/EquipmentPhaseWhereUniqueInput";
 import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
+import { BooleanFilter } from "../../util/BooleanFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
@@ -16,7 +17,7 @@ export type PhaseParameterWhereInput = {
   equipmentPhase?: EquipmentPhaseWhereUniqueInput;
   id?: StringFilter;
   instances?: PhaseParameterListRelationFilter;
-  isClassDef?: BooleanNullableFilter;
+  isClassDef?: BooleanFilter;
   itemId?: StringNullableFilter;
   name?: StringFilter;
   recipeId?: StringNullableFilter;

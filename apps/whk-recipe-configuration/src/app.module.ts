@@ -107,7 +107,7 @@ import { LoggerModule } from "./logger/logger.module";
       inject: [ConfigService],
     }),
     OpenTelemetryModule.forRoot({
-      serviceName: "whk-recipe-configuration",
+      serviceName: "whk-recipe-routing",
       spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
       instrumentations: [
         new HttpInstrumentation({

@@ -15,12 +15,12 @@ import {
   IsString,
   IsBoolean,
   IsDate,
+  ValidateNested,
   IsInt,
   IsOptional,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { Recipe } from "../../recipe/base/Recipe";
+import { Procedure } from "../../procedure/base/Procedure";
 
 @ObjectType()
 class ProductionOrderQueue {
@@ -65,6 +65,14 @@ class ProductionOrderQueue {
   id!: string;
 
   @ApiProperty({
+    required: true,
+    type: () => Procedure,
+  })
+  @ValidateNested()
+  @Type(() => Procedure)
+  procedure?: Procedure;
+
+  @ApiProperty({
     required: false,
     type: Number,
   })
@@ -74,15 +82,6 @@ class ProductionOrderQueue {
     nullable: true,
   })
   queueIndex!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Recipe,
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipe?: Recipe | null;
 
   @ApiProperty({
     required: true,

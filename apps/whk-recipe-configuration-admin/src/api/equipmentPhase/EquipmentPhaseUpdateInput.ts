@@ -4,7 +4,7 @@ import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./Equipment
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
-import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhereUniqueInput";
+import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
 export type EquipmentPhaseUpdateInput = {
   bom?: BomWhereUniqueInput | null;
@@ -18,10 +18,10 @@ export type EquipmentPhaseUpdateInput = {
   isClassDefinition?: boolean | null;
   name?: string;
   operations?: OperationWhereUniqueInput;
-  operationSequenceIndex?: boolean | null;
+  operationSequenceIndex?: number | null;
   operationStepSequence?: number | null;
   phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
   revision?: number | null;
   schemaVersion?: string | null;
-  testParameters?: TestParameterWhereUniqueInput | null;
+  testParameters?: TestParameterUpdateManyWithoutEquipmentPhasesInput;
 };

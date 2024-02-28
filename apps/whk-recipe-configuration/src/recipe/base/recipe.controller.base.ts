@@ -26,9 +26,6 @@ import { Recipe } from "./Recipe";
 import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { RecipeUpdateInput } from "./RecipeUpdateInput";
-import { ProductionOrderQueueFindManyArgs } from "../../productionOrderQueue/base/ProductionOrderQueueFindManyArgs";
-import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
-import { ProductionOrderQueueWhereUniqueInput } from "../../productionOrderQueue/base/ProductionOrderQueueWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -53,15 +50,7 @@ export class RecipeControllerBase {
   })
   async createRecipe(@common.Body() data: RecipeCreateInput): Promise<Recipe> {
     return await this.service.createRecipe({
-      data: {
-        ...data,
-
-        operation: data.operation
-          ? {
-              connect: data.operation,
-            }
-          : undefined,
-      },
+      data: data,
       select: {
         active: true,
         createdAt: true,
@@ -71,13 +60,6 @@ export class RecipeControllerBase {
         itemDescription: true,
         itemId: true,
         mashBill: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -111,13 +93,6 @@ export class RecipeControllerBase {
         itemDescription: true,
         itemId: true,
         mashBill: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -152,13 +127,6 @@ export class RecipeControllerBase {
         itemDescription: true,
         itemId: true,
         mashBill: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -195,15 +163,7 @@ export class RecipeControllerBase {
     try {
       return await this.service.updateRecipe({
         where: params,
-        data: {
-          ...data,
-
-          operation: data.operation
-            ? {
-                connect: data.operation,
-              }
-            : undefined,
-        },
+        data: data,
         select: {
           active: true,
           createdAt: true,
@@ -213,13 +173,6 @@ export class RecipeControllerBase {
           itemDescription: true,
           itemId: true,
           mashBill: true,
-
-          operation: {
-            select: {
-              id: true,
-            },
-          },
-
           revision: true,
           schemaVersion: true,
           updatedAt: true,
@@ -234,115 +187,5 @@ export class RecipeControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/productionOrderQueues")
-  @ApiNestedQuery(ProductionOrderQueueFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderQueue",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderQueues(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<ProductionOrderQueue[]> {
-    const query = plainToClass(ProductionOrderQueueFindManyArgs, request.query);
-    const results = await this.service.findProductionOrderQueues(params.id, {
-      ...query,
-      select: {
-        accountId: true,
-        active: true,
-        createdAt: true,
-        createdBy: true,
-        id: true,
-        queueIndex: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
-        revision: true,
-        salesOrderId: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/productionOrderQueues")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async connectProductionOrderQueues(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderQueues: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/productionOrderQueues")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async updateProductionOrderQueues(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderQueues: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/productionOrderQueues")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectProductionOrderQueues(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderQueues: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 }

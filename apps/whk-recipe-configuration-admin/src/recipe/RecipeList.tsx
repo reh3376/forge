@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   List,
   Datagrid,
@@ -7,11 +6,8 @@ import {
   BooleanField,
   DateField,
   TextField,
-  ReferenceField,
 } from "react-admin";
-
 import Pagination from "../Components/Pagination";
-import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 
 export const RecipeList = (props: ListProps): React.ReactElement => {
   return (
@@ -31,13 +27,6 @@ export const RecipeList = (props: ListProps): React.ReactElement => {
         <TextField label="Item Description" source="itemDescription" />
         <TextField label="Item ID" source="itemId" />
         <TextField label="Mash Bill" source="mashBill" />
-        <ReferenceField
-          label="Operation"
-          source="operation.id"
-          reference="Operation"
-        >
-          <TextField source={OPERATION_TITLE_FIELD} />
-        </ReferenceField>
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />
         <DateField source="updatedAt" label="Updated At" />

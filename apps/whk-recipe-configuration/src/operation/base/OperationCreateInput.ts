@@ -22,7 +22,6 @@ import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
-import { RecipeCreateNestedManyWithoutOperationsInput } from "./RecipeCreateNestedManyWithoutOperationsInput";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
@@ -143,18 +142,6 @@ class OperationCreateInput {
   @IsInt()
   @Field(() => Number)
   procedureSequenceIndex!: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => RecipeCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  recipes?: RecipeCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: true,

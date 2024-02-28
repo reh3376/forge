@@ -24,7 +24,7 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PhaseParameterListRelationFilter } from "../../phaseParameter/base/PhaseParameterListRelationFilter";
-import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 
 @InputType()
 class EquipmentPhaseWhereInput {
@@ -189,14 +189,14 @@ class EquipmentPhaseWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => BooleanNullableFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => BooleanNullableFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  operationSequenceIndex?: BooleanNullableFilter;
+  operationSequenceIndex?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -245,15 +245,15 @@ class EquipmentPhaseWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestParameterWhereUniqueInput,
+    type: () => TestParameterListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => TestParameterWhereUniqueInput)
+  @Type(() => TestParameterListRelationFilter)
   @IsOptional()
-  @Field(() => TestParameterWhereUniqueInput, {
+  @Field(() => TestParameterListRelationFilter, {
     nullable: true,
   })
-  testParameters?: TestParameterWhereUniqueInput;
+  testParameters?: TestParameterListRelationFilter;
 }
 
 export { EquipmentPhaseWhereInput as EquipmentPhaseWhereInput };
