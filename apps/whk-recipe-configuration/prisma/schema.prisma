@@ -30,7 +30,7 @@ model PhaseParameter {
   equipmentPhaseId       String?
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
-  isClassDef             Boolean?                       @default(false)
+  isClassDef             Boolean                        @default(false)
   itemId                 String?
   name                   String
   recipeId               String?
@@ -122,6 +122,7 @@ model Instruction {
 }
 
 model EquipmentPhase {
+  active                 Boolean          @default(true)
   bom                    Bom?             @relation(fields: [bomId], references: [id])
   bomId                  String?
   classId                EquipmentPhase?  @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
@@ -139,13 +140,14 @@ model EquipmentPhase {
   name                   String
   operations             Operation        @relation(fields: [operationId], references: [id])
   operationId            String
-  operationSequenceIndex Boolean?
+  operationSequenceIndex Int?
   operationStepSequence  Int?
   phaseParameters        PhaseParameter[]
   revision               Int?             @default(0)
   schemaVersion          String?          @default("0001-b")
   testParameters         TestParameter[]
 
+  @@unique([name, revision, active, isClassDefinition])
   @@map("equipmentPhases")
 }
 
@@ -164,14 +166,14 @@ model Operation {
   isClassDefinition      Boolean?         @default(false)
   name                   String
   path                   String
-  procedureSequenceIndex Int              @unique @default(0)
+  procedureSequenceIndex Int              @default(0)
   revision               Int              @default(0)
   schemaVersion          String?          @default("0001-b")
   unitProcedure          UnitProcedure?   @relation(fields: [unitProcedureId], references: [id])
   unitProcedureId        String?
   updatedAt              DateTime?        @updatedAt
 
-  @@unique([name, revision, active])
+  @@unique([name, revision, active, isClassDefinition])
 }
 
 model Procedure {
@@ -192,7 +194,7 @@ model Procedure {
   updatedAt             DateTime               @updatedAt
   updatedBy             String?
 
-  @@unique([name, revision, active])
+  @@unique([name, revision, active, isClassDefinition])
 }
 
 model Recipe {
@@ -213,8 +215,6 @@ model Recipe {
 }
 
 model Bom {
-  batches         Json?
-  bomItems        Json
   bomName         String
   bomRevision     Int?             @default(0)
   className       String?
@@ -224,7 +224,6 @@ model Bom {
   editedBy        String?
   equipmentPhases EquipmentPhase[]
   id              String           @id @default(cuid())
-  operationSteps  Json?
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
 
@@ -266,7 +265,7 @@ model UnitProcedure {
   updatedAt     DateTime        @updatedAt
   updatedBy     String?
 
-  @@unique([name, revision, active])
+  @@unique([name, revision, active, isClassDef])
 }
 
 enum EnumPhaseParameterSetpointType {

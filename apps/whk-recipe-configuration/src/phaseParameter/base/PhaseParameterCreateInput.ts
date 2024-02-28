@@ -103,15 +103,12 @@ class PhaseParameterCreateInput {
   instances?: PhaseParameterCreateNestedManyWithoutPhaseParametersInput;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Boolean,
   })
   @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDef?: boolean | null;
+  @Field(() => Boolean)
+  isClassDef!: boolean;
 
   @ApiProperty({
     required: false,

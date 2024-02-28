@@ -117,7 +117,7 @@ class PhaseParameterUpdateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
-  isClassDef?: boolean | null;
+  isClassDef?: boolean;
 
   @ApiProperty({
     required: false,

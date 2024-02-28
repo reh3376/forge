@@ -51,7 +51,7 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
         >
           <TextField source={OPERATION_TITLE_FIELD} />
         </ReferenceField>
-        <BooleanField
+        <TextField
           label="Operation Sequence Index"
           source="operationSequenceIndex"
         />

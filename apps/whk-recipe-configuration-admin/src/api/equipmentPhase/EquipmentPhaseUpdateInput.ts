@@ -18,7 +18,7 @@ export type EquipmentPhaseUpdateInput = {
   isClassDefinition?: boolean | null;
   name?: string;
   operations?: OperationWhereUniqueInput;
-  operationSequenceIndex?: boolean | null;
+  operationSequenceIndex?: number | null;
   operationStepSequence?: number | null;
   phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
   revision?: number | null;
