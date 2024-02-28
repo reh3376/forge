@@ -24,5 +24,5 @@ export type EquipmentPhase = {
   phaseParameters?: Array<PhaseParameter>;
   revision: number | null;
   schemaVersion: string | null;
-  testParameters?: TestParameter | null;
+  testParameters?: Array<TestParameter>;
 };

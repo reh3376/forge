@@ -6,8 +6,8 @@ export type ProductionOrderQueueOrderByInput = {
   createdAt?: SortOrder;
   createdBy?: SortOrder;
   id?: SortOrder;
+  procedureId?: SortOrder;
   queueIndex?: SortOrder;
-  recipeId?: SortOrder;
   revision?: SortOrder;
   salesOrderId?: SortOrder;
   schemaVersion?: SortOrder;

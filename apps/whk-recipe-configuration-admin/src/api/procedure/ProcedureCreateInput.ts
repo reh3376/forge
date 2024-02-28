@@ -1,5 +1,6 @@
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { ProcedureCreateNestedManyWithoutProceduresInput } from "./ProcedureCreateNestedManyWithoutProceduresInput";
+import { ProductionOrderQueueCreateNestedManyWithoutProceduresInput } from "./ProductionOrderQueueCreateNestedManyWithoutProceduresInput";
 import { UnitProcedureCreateNestedManyWithoutProceduresInput } from "./UnitProcedureCreateNestedManyWithoutProceduresInput";
 
 export type ProcedureCreateInput = {
@@ -10,6 +11,7 @@ export type ProcedureCreateInput = {
   instances?: ProcedureCreateNestedManyWithoutProceduresInput;
   isClassDefinition?: boolean | null;
   name?: string | null;
+  productionOrderQueues?: ProductionOrderQueueCreateNestedManyWithoutProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;
   unitProcedures?: UnitProcedureCreateNestedManyWithoutProceduresInput;

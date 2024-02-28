@@ -83,7 +83,7 @@ class ProductionOrderQueueOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  queueIndex?: SortOrder;
+  procedureId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -94,7 +94,7 @@ class ProductionOrderQueueOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  recipeId?: SortOrder;
+  queueIndex?: SortOrder;
 
   @ApiProperty({
     required: false,
