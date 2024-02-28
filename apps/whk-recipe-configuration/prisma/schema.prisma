@@ -264,7 +264,7 @@ model UnitProcedure {
   updatedAt     DateTime        @updatedAt
   updatedBy     String?
 
-  @@unique([name, revision, active, isClassDefinition])
+  @@unique([name, revision, active, isClassDef])
 }
 
 enum EnumPhaseParameterSetpointType {
