@@ -28,6 +28,17 @@ class EquipmentPhaseOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  active?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   bomId?: SortOrder;
 
   @ApiProperty({
@@ -161,17 +172,6 @@ class EquipmentPhaseOrderByInput {
     nullable: true,
   })
   operationSequenceIndex?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  operationStepSequence?: SortOrder;
 
   @ApiProperty({
     required: false,

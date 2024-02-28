@@ -11,14 +11,14 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
-  ValidateNested,
-  IsOptional,
-  IsString,
   IsBoolean,
+  IsOptional,
+  ValidateNested,
+  IsString,
   IsInt,
 } from "class-validator";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput";
@@ -29,6 +29,17 @@ import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./Test
 
 @InputType()
 class EquipmentPhaseCreateInput {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
   @ApiProperty({
     required: false,
     type: () => BomWhereUniqueInput,
@@ -156,17 +167,6 @@ class EquipmentPhaseCreateInput {
     nullable: true,
   })
   operationSequenceIndex?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationStepSequence?: number | null;
 
   @ApiProperty({
     required: false,

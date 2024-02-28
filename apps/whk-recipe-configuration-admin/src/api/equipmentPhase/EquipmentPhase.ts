@@ -5,6 +5,7 @@ import { PhaseParameter } from "../phaseParameter/PhaseParameter";
 import { TestParameter } from "../testParameter/TestParameter";
 
 export type EquipmentPhase = {
+  active: boolean | null;
   bom?: Bom | null;
   classId?: EquipmentPhase | null;
   className: string | null;
@@ -20,7 +21,6 @@ export type EquipmentPhase = {
   name: string;
   operations?: Operation;
   operationSequenceIndex: number | null;
-  operationStepSequence: number | null;
   phaseParameters?: Array<PhaseParameter>;
   revision: number | null;
   schemaVersion: string | null;
