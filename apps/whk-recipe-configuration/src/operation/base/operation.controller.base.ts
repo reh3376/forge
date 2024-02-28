@@ -302,6 +302,8 @@ export class OperationControllerBase {
     const results = await this.service.findEquipmentPhases(params.id, {
       ...query,
       select: {
+        active: true,
+
         bom: {
           select: {
             id: true,
@@ -331,7 +333,6 @@ export class OperationControllerBase {
         },
 
         operationSequenceIndex: true,
-        operationStepSequence: true,
         revision: true,
         schemaVersion: true,
       },

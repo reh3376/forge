@@ -4,12 +4,12 @@ import {
   Edit,
   SimpleForm,
   EditProps,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
   TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
-  BooleanInput,
   NumberInput,
 } from "react-admin";
 
@@ -24,6 +24,7 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
   return (
     <Edit {...props}>
       <SimpleForm>
+        <BooleanInput label="Active" source="active" />
         <ReferenceInput source="bom.id" reference="Bom" label="Bom">
           <SelectInput optionText={BomTitle} />
         </ReferenceInput>
@@ -67,11 +68,6 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
           step={1}
           label="Operation Sequence Index"
           source="operationSequenceIndex"
-        />
-        <NumberInput
-          step={1}
-          label="Operation Step Sequence"
-          source="operationStepSequence"
         />
         <ReferenceArrayInput
           source="phaseParameters"

@@ -4,12 +4,12 @@ import {
   Create,
   SimpleForm,
   CreateProps,
+  BooleanInput,
   ReferenceInput,
   SelectInput,
   TextInput,
   ReferenceArrayInput,
   SelectArrayInput,
-  BooleanInput,
   NumberInput,
 } from "react-admin";
 
@@ -26,6 +26,7 @@ export const EquipmentPhaseCreate = (
   return (
     <Create {...props}>
       <SimpleForm>
+        <BooleanInput label="Active" source="active" />
         <ReferenceInput source="bom.id" reference="Bom" label="Bom">
           <SelectInput optionText={BomTitle} />
         </ReferenceInput>
@@ -69,11 +70,6 @@ export const EquipmentPhaseCreate = (
           step={1}
           label="Operation Sequence Index"
           source="operationSequenceIndex"
-        />
-        <NumberInput
-          step={1}
-          label="Operation Step Sequence"
-          source="operationStepSequence"
         />
         <ReferenceArrayInput
           source="phaseParameters"

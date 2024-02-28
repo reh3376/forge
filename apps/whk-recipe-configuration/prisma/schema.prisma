@@ -44,7 +44,7 @@ model PhaseParameter {
   units                  String
   updatedAt              DateTime                       @updatedAt
 
-  @@unique([name, revision, equipmentPhaseId])
+  @@unique([name, revision, isClassDef])
 }
 
 model TestParameter {
@@ -122,7 +122,7 @@ model Instruction {
 }
 
 model EquipmentPhase {
-  active                 Boolean          @default(true)
+  active                 Boolean?         @default(true)
   bom                    Bom?             @relation(fields: [bomId], references: [id])
   bomId                  String?
   classId                EquipmentPhase?  @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
@@ -141,7 +141,6 @@ model EquipmentPhase {
   operations             Operation        @relation(fields: [operationId], references: [id])
   operationId            String
   operationSequenceIndex Int?
-  operationStepSequence  Int?
   phaseParameters        PhaseParameter[]
   revision               Int?             @default(0)
   schemaVersion          String?          @default("0001-b")
