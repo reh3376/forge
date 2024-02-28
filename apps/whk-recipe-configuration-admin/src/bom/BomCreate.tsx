@@ -16,8 +16,6 @@ export const BomCreate = (props: CreateProps): React.ReactElement => {
   return (
     <Create {...props}>
       <SimpleForm>
-        <div />
-        <div />
         <TextInput label="Bom Name" source="bomName" />
         <NumberInput step={1} label="Bom Revision" source="bomRevision" />
         <TextInput label="Class Name" source="className" />
@@ -31,7 +29,6 @@ export const BomCreate = (props: CreateProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
-        <div />
         <TextInput label="Schema Version" source="schemaVersion" />
         <TextInput label="Wip Item ID" source="wipItemId" />
       </SimpleForm>

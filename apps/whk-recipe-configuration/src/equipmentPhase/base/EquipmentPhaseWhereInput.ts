@@ -189,14 +189,14 @@ class EquipmentPhaseWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => BooleanNullableFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => BooleanNullableFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  operationSequenceIndex?: BooleanNullableFilter;
+  operationSequenceIndex?: IntNullableFilter;
 
   @ApiProperty({
     required: false,

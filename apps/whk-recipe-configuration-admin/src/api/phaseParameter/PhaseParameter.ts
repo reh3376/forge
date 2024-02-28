@@ -10,7 +10,7 @@ export type PhaseParameter = {
   equipmentPhase?: EquipmentPhase | null;
   id: string;
   instances?: Array<PhaseParameter>;
-  isClassDef: boolean | null;
+  isClassDef: boolean;
   itemId: string | null;
   name: string;
   recipeId: string | null;

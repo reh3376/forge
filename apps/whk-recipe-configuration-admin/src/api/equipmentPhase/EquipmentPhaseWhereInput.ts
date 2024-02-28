@@ -26,7 +26,7 @@ export type EquipmentPhaseWhereInput = {
   isClassDefinition?: BooleanNullableFilter;
   name?: StringFilter;
   operations?: OperationWhereUniqueInput;
-  operationSequenceIndex?: BooleanNullableFilter;
+  operationSequenceIndex?: IntNullableFilter;
   operationStepSequence?: IntNullableFilter;
   phaseParameters?: PhaseParameterListRelationFilter;
   revision?: IntNullableFilter;

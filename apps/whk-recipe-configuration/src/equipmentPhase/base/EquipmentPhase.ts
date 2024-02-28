@@ -164,14 +164,14 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
+    type: Number,
   })
-  @IsBoolean()
+  @IsInt()
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => Number, {
     nullable: true,
   })
-  operationSequenceIndex!: boolean | null;
+  operationSequenceIndex!: number | null;
 
   @ApiProperty({
     required: false,

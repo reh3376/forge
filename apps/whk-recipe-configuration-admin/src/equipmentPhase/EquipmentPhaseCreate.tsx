@@ -65,7 +65,8 @@ export const EquipmentPhaseCreate = (
         >
           <SelectInput optionText={OperationTitle} />
         </ReferenceInput>
-        <BooleanInput
+        <NumberInput
+          step={1}
           label="Operation Sequence Index"
           source="operationSequenceIndex"
         />
