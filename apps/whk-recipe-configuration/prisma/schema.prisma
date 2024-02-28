@@ -146,6 +146,7 @@ model EquipmentPhase {
   schemaVersion          String?          @default("0001-b")
   testParameters         TestParameter[]
 
+  @@unique([name, revision, active, isClassDefinition])
   @@map("equipmentPhases")
 }
 
@@ -171,7 +172,7 @@ model Operation {
   unitProcedureId        String?
   updatedAt              DateTime?        @updatedAt
 
-  @@unique([name, revision, active])
+  @@unique([name, revision, active, isClassDefinition])
 }
 
 model Procedure {
@@ -192,7 +193,7 @@ model Procedure {
   updatedAt             DateTime               @updatedAt
   updatedBy             String?
 
-  @@unique([name, revision, active])
+  @@unique([name, revision, active, isClassDefinition])
 }
 
 model Recipe {
@@ -263,7 +264,7 @@ model UnitProcedure {
   updatedAt     DateTime        @updatedAt
   updatedBy     String?
 
-  @@unique([name, revision, active])
+  @@unique([name, revision, active, isClassDefinition])
 }
 
 enum EnumPhaseParameterSetpointType {
