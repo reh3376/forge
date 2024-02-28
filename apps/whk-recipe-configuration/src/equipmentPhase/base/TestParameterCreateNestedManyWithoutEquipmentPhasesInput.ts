@@ -10,19 +10,19 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { ProductionOrderQueueWhereUniqueInput } from "../../productionOrderQueue/base/ProductionOrderQueueWhereUniqueInput";
+import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class ProductionOrderQueueCreateNestedManyWithoutRecipesInput {
-  @Field(() => [ProductionOrderQueueWhereUniqueInput], {
+class TestParameterCreateNestedManyWithoutEquipmentPhasesInput {
+  @Field(() => [TestParameterWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [ProductionOrderQueueWhereUniqueInput],
+    type: () => [TestParameterWhereUniqueInput],
   })
-  connect?: Array<ProductionOrderQueueWhereUniqueInput>;
+  connect?: Array<TestParameterWhereUniqueInput>;
 }
 
-export { ProductionOrderQueueCreateNestedManyWithoutRecipesInput as ProductionOrderQueueCreateNestedManyWithoutRecipesInput };
+export { TestParameterCreateNestedManyWithoutEquipmentPhasesInput as TestParameterCreateNestedManyWithoutEquipmentPhasesInput };

@@ -13,11 +13,9 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { ProductionOrderQueueListRelationFilter } from "../../productionOrderQueue/base/ProductionOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
@@ -98,30 +96,6 @@ class RecipeWhereInput {
     nullable: true,
   })
   mashBill?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderQueueListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderQueueListRelationFilter)
-  @IsOptional()
-  @Field(() => ProductionOrderQueueListRelationFilter, {
-    nullable: true,
-  })
-  productionOrderQueues?: ProductionOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,

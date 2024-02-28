@@ -32,6 +32,9 @@ import { InstructionWhereUniqueInput } from "../../instruction/base/InstructionW
 import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
+import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -76,12 +79,6 @@ export class EquipmentPhaseControllerBase {
         operations: {
           connect: data.operations,
         },
-
-        testParameters: data.testParameters
-          ? {
-              connect: data.testParameters,
-            }
-          : undefined,
       },
       select: {
         bom: {
@@ -116,12 +113,6 @@ export class EquipmentPhaseControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
   }
@@ -177,12 +168,6 @@ export class EquipmentPhaseControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
   }
@@ -237,12 +222,6 @@ export class EquipmentPhaseControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (result === null) {
@@ -293,12 +272,6 @@ export class EquipmentPhaseControllerBase {
           operations: {
             connect: data.operations,
           },
-
-          testParameters: data.testParameters
-            ? {
-                connect: data.testParameters,
-              }
-            : undefined,
         },
         select: {
           bom: {
@@ -333,12 +306,6 @@ export class EquipmentPhaseControllerBase {
           operationStepSequence: true,
           revision: true,
           schemaVersion: true,
-
-          testParameters: {
-            select: {
-              id: true,
-            },
-          },
         },
       });
     } catch (error) {
@@ -399,12 +366,6 @@ export class EquipmentPhaseControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (results === null) {
@@ -698,6 +659,126 @@ export class EquipmentPhaseControllerBase {
   ): Promise<void> {
     const data = {
       phaseParameters: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/testParameters")
+  @ApiNestedQuery(TestParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @common.Req() request: Request,
+    @common.Param() params: EquipmentPhaseWhereUniqueInput
+  ): Promise<TestParameter[]> {
+    const query = plainToClass(TestParameterFindManyArgs, request.query);
+    const results = await this.service.findTestParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        tooltip: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async connectTestParameters(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async updateTestParameters(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        set: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectTestParameters(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
         disconnect: body,
       },
     };

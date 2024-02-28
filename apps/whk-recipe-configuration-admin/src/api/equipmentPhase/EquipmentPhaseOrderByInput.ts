@@ -17,5 +17,4 @@ export type EquipmentPhaseOrderByInput = {
   operationStepSequence?: SortOrder;
   revision?: SortOrder;
   schemaVersion?: SortOrder;
-  testParameterId?: SortOrder;
 };

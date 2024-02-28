@@ -112,14 +112,14 @@ class InstructionWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  schemaVersion?: StringFilter;
+  schemaVersion?: StringNullableFilter;
 }
 
 export { InstructionWhereInput as InstructionWhereInput };

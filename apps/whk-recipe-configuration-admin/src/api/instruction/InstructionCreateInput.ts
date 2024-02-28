@@ -8,5 +8,5 @@ export type InstructionCreateInput = {
   filePath: string;
   name?: string | null;
   revision: number;
-  schemaVersion: string;
+  schemaVersion?: string | null;
 };

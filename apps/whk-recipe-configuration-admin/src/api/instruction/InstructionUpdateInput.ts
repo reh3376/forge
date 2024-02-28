@@ -8,5 +8,5 @@ export type InstructionUpdateInput = {
   filePath?: string;
   name?: string | null;
   revision?: number;
-  schemaVersion?: string;
+  schemaVersion?: string | null;
 };
