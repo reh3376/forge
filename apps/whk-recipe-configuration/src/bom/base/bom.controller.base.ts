@@ -242,12 +242,6 @@ export class BomControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (results === null) {

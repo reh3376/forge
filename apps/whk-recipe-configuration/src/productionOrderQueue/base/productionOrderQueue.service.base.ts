@@ -14,7 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ProductionOrderQueue, // @ts-ignore
-  Recipe,
+  Procedure,
 } from "@prisma/client";
 
 export class ProductionOrderQueueServiceBase {
@@ -62,11 +62,11 @@ export class ProductionOrderQueueServiceBase {
     return this.prisma.productionOrderQueue.delete(args);
   }
 
-  async getRecipe(parentId: string): Promise<Recipe | null> {
+  async getProcedure(parentId: string): Promise<Procedure | null> {
     return this.prisma.productionOrderQueue
       .findUnique({
         where: { id: parentId },
       })
-      .recipe();
+      .procedure();
   }
 }

@@ -1,5 +1,4 @@
 import { EquipmentPhase } from "../equipmentPhase/EquipmentPhase";
-import { Recipe } from "../recipe/Recipe";
 import { UnitProcedure } from "../unitProcedure/UnitProcedure";
 
 export type Operation = {
@@ -17,7 +16,6 @@ export type Operation = {
   name: string;
   path: string;
   procedureSequenceIndex: number;
-  recipes?: Array<Recipe>;
   revision: number;
   schemaVersion: string | null;
   unitProcedure?: UnitProcedure | null;

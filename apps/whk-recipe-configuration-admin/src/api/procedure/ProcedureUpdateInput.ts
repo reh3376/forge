@@ -1,5 +1,6 @@
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { ProcedureUpdateManyWithoutProceduresInput } from "./ProcedureUpdateManyWithoutProceduresInput";
+import { ProductionOrderQueueUpdateManyWithoutProceduresInput } from "./ProductionOrderQueueUpdateManyWithoutProceduresInput";
 import { UnitProcedureUpdateManyWithoutProceduresInput } from "./UnitProcedureUpdateManyWithoutProceduresInput";
 
 export type ProcedureUpdateInput = {
@@ -10,6 +11,7 @@ export type ProcedureUpdateInput = {
   instances?: ProcedureUpdateManyWithoutProceduresInput;
   isClassDefinition?: boolean | null;
   name?: string | null;
+  productionOrderQueues?: ProductionOrderQueueUpdateManyWithoutProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;
   unitProcedures?: UnitProcedureUpdateManyWithoutProceduresInput;

@@ -15,7 +15,6 @@ import {
 
 import { OperationTitle } from "./OperationTitle";
 import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
-import { RecipeTitle } from "../recipe/RecipeTitle";
 import { UnitProcedureTitle } from "../unitProcedure/UnitProcedureTitle";
 
 export const OperationCreate = (props: CreateProps): React.ReactElement => {
@@ -54,14 +53,6 @@ export const OperationCreate = (props: CreateProps): React.ReactElement => {
           label="Procedure Sequence Index"
           source="procedureSequenceIndex"
         />
-        <ReferenceArrayInput
-          source="recipes"
-          reference="Recipe"
-          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
-          format={(value: any) => value && value.map((v: any) => v.id)}
-        >
-          <SelectArrayInput optionText={RecipeTitle} />
-        </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <ReferenceInput

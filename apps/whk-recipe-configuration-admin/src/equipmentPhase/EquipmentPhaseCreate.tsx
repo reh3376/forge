@@ -84,13 +84,14 @@ export const EquipmentPhaseCreate = (
         </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
-        <ReferenceInput
-          source="testParameters.id"
+        <ReferenceArrayInput
+          source="testParameters"
           reference="TestParameter"
-          label="Test Parameters"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
         >
-          <SelectInput optionText={TestParameterTitle} />
-        </ReferenceInput>
+          <SelectArrayInput optionText={TestParameterTitle} />
+        </ReferenceArrayInput>
       </SimpleForm>
     </Create>
   );

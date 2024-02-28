@@ -11,7 +11,6 @@ services:
       BCRYPT_SALT: ${BCRYPT_SALT}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
-      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       LOG_LEVEL: ${LOG_LEVEL}
       SERVICE_NAME: ${SERVICE_NAME}
       KAFKA_BROKERS: kafka:9092
@@ -24,6 +23,7 @@ services:
       OTEL_COLLECTOR_PORT_GRPC: ${OTEL_COLLECTOR_PORT_GRPC}
       OTEL_COLLECTOR_PORT_HTTP: ${OTEL_COLLECTOR_PORT_HTTP}
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
     depends_on:
       - redis
     restart: on-failure
@@ -47,23 +47,6 @@ services:
       - ${REDIS_PORT}:6379
     volumes:
       - redis:/data
-  db:
-    image: postgres:12
-    ports:
-      - ${DB_PORT}:5432
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
-      timeout: 45s
-      interval: 10s
-      retries: 10
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.4
     environment:
@@ -120,6 +103,23 @@ services:
       - --config=/etc/otel-config.yml
     depends_on:
       - jaeger
+  db:
+    image: postgres:12
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 45s
+      interval: 10s
+      retries: 10
 volumes:
   redis:
     driver: local

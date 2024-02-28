@@ -110,7 +110,7 @@ class InstructionUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string;
+  schemaVersion?: string | null;
 }
 
 export { InstructionUpdateInput as InstructionUpdateInput };

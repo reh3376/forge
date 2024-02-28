@@ -234,12 +234,6 @@ export class InstructionControllerBase {
         operationStepSequence: true,
         revision: true,
         schemaVersion: true,
-
-        testParameters: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (results === null) {

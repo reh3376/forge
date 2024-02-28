@@ -66,15 +66,6 @@ services:
       - ${REDIS_PORT}:6379
     volumes:
       - redis:/data
-  db:
-    image: postgres:12
-    ports:
-      - ${DB_PORT}:5432
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres:/var/lib/postgresql/data
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.4
     environment:
@@ -131,6 +122,15 @@ services:
       - --config=/etc/otel-config.yml
     depends_on:
       - jaeger
+  db:
+    image: postgres:12
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
 networks:
   kong-net:
     external: false

@@ -1,3 +1,4 @@
+import { ProductionOrderQueue } from "../productionOrderQueue/ProductionOrderQueue";
 import { UnitProcedure } from "../unitProcedure/UnitProcedure";
 
 export type Procedure = {
@@ -10,6 +11,7 @@ export type Procedure = {
   instances?: Array<Procedure>;
   isClassDefinition: boolean | null;
   name: string | null;
+  productionOrderQueues?: Array<ProductionOrderQueue>;
   revision: number | null;
   schemaVersion: string | null;
   unitProcedures?: Array<UnitProcedure>;

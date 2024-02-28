@@ -6,12 +6,12 @@ import {
   CreateProps,
   TextInput,
   BooleanInput,
-  NumberInput,
   ReferenceInput,
   SelectInput,
+  NumberInput,
 } from "react-admin";
 
-import { RecipeTitle } from "../recipe/RecipeTitle";
+import { ProcedureTitle } from "../procedure/ProcedureTitle";
 
 export const ProductionOrderQueueCreate = (
   props: CreateProps
@@ -22,10 +22,14 @@ export const ProductionOrderQueueCreate = (
         <TextInput label="Account ID" source="accountId" />
         <BooleanInput label="Active" source="active" />
         <TextInput label="Created By" source="createdBy" />
-        <NumberInput step={1} label="Queue Index" source="queueIndex" />
-        <ReferenceInput source="recipe.id" reference="Recipe" label="Recipe">
-          <SelectInput optionText={RecipeTitle} />
+        <ReferenceInput
+          source="procedure.id"
+          reference="Procedure"
+          label="Procedure"
+        >
+          <SelectInput optionText={ProcedureTitle} />
         </ReferenceInput>
+        <NumberInput step={1} label="Queue Index" source="queueIndex" />
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Sales Order ID" source="salesOrderId" />
         <TextInput label="Schema Version" source="schemaVersion" />

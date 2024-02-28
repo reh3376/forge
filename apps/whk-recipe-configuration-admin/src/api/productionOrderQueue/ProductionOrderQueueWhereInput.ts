@@ -1,7 +1,7 @@
 import { StringFilter } from "../../util/StringFilter";
 import { BooleanFilter } from "../../util/BooleanFilter";
+import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { RecipeWhereUniqueInput } from "../recipe/RecipeWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
@@ -10,8 +10,8 @@ export type ProductionOrderQueueWhereInput = {
   active?: BooleanFilter;
   createdBy?: StringFilter;
   id?: StringFilter;
+  procedure?: ProcedureWhereUniqueInput;
   queueIndex?: IntNullableFilter;
-  recipe?: RecipeWhereUniqueInput;
   revision?: IntFilter;
   salesOrderId?: StringFilter;
   schemaVersion?: StringNullableFilter;
