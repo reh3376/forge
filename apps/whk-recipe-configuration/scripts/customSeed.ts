@@ -181,5 +181,49 @@ export async function customSeed() {
     }
   });
 
+  // Boms
+  await client.bom.create({
+    data: {
+      batches: {"batch1": "value"},
+      bomItems: {"item1": "value"},
+      bomName: "Bom Name 1",
+      bomRevision: 0,
+      className: "Class Name 1",
+      createdBy: "creator1",
+      editedBy: "editor1",
+      operationSteps: {"step1": "value"},
+      schemaVersion: "0001-alpha",
+      wipItemId: "wipId1"
+    }
+  });
+  await client.bom.create({
+    data: {
+      batches: {"batch2": "value"},
+      bomItems: {"item2": "value"},
+      bomName: "Bom Name 2",
+      bomRevision: 1,
+      className: "Class Name 2",
+      createdBy: "creator2",
+      editedBy: "editor2",
+      operationSteps: {"step2": "value"},
+      schemaVersion: "0001-alpha",
+      wipItemId: "wipId2"
+    }
+  });
+  await client.bom.create({
+    data: {
+      batches: {"batch3": "value"},
+      bomItems: {"item3": "value"},
+      bomName: "Bom Name 3",
+      bomRevision: 2,
+      className: "Class Name 3",
+      createdBy: "creator3",
+      editedBy: "editor3",
+      operationSteps: {"step3": "value"},
+      schemaVersion: "0001-alpha",
+      wipItemId: "wipId3"
+    }
+  });
+
   client.$disconnect();
 }
