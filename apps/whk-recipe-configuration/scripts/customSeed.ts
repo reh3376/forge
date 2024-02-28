@@ -287,5 +287,43 @@ export async function customSeed() {
     }
   });
 
+  // Instructions
+  await client.instruction.create({
+    data: {
+      active: true,
+      createdBy: "creator1",
+      editedBy: "editor1",
+      filePath: "/path/to/file1",
+      id: "id1",
+      name: "Instruction Name 1",
+      revision: 0,
+      schemaVersion: "0001-alpha",
+    }
+  });
+  await client.instruction.create({
+    data: {
+      active: true,
+      createdBy: "creator2",
+      editedBy: "editor2",
+      filePath: "/path/to/file2",
+      id: "id2",
+      name: "Instruction Name 2",
+      revision: 1,
+      schemaVersion: "0001-alpha",
+    }
+  });
+  await client.instruction.create({
+    data: {
+      active: true,
+      createdBy: "creator3",
+      editedBy: "editor3",
+      filePath: "/path/to/file3",
+      id: "id3",
+      name: "Instruction Name 3",
+      revision: 2,
+      schemaVersion: "0001-alpha",
+    }
+  });
+
   client.$disconnect();
 }
