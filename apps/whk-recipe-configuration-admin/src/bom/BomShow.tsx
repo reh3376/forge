@@ -20,8 +20,6 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
-        <TextField label="Batches" source="batches" />
-        <TextField label="Bom Items" source="bomItems" />
         <TextField label="Bom Name" source="bomName" />
         <TextField label="Bom Revision" source="bomRevision" />
         <TextField label="Class Name" source="className" />
@@ -30,7 +28,6 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
         <DateField source="editedAt" label="Edited At" />
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
-        <TextField label="Operation Steps" source="operationSteps" />
         <TextField label="Schema Version" source="schemaVersion" />
         <TextField label="Wip Item ID" source="wipItemId" />
         <ReferenceManyField
@@ -68,7 +65,7 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
             >
               <TextField source={OPERATION_TITLE_FIELD} />
             </ReferenceField>
-            <BooleanField
+            <TextField
               label="Operation Sequence Index"
               source="operationSequenceIndex"
             />

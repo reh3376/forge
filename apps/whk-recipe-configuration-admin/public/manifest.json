@@ -1,6 +1,6 @@
 {
-  "short_name": "whk-recipe-configuration",
-  "name": "whk-recipe-configuration",
+  "short_name": "whk-recipe-routing",
+  "name": "whk-recipe-routing",
   "icons": [
     {
       "src": "favicon.ico",

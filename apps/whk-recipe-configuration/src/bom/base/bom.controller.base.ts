@@ -55,8 +55,6 @@ export class BomControllerBase {
     return await this.service.createBom({
       data: data,
       select: {
-        batches: true,
-        bomItems: true,
         bomName: true,
         bomRevision: true,
         className: true,
@@ -65,7 +63,6 @@ export class BomControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
-        operationSteps: true,
         schemaVersion: true,
         wipItemId: true,
       },
@@ -89,8 +86,6 @@ export class BomControllerBase {
     return this.service.boms({
       ...args,
       select: {
-        batches: true,
-        bomItems: true,
         bomName: true,
         bomRevision: true,
         className: true,
@@ -99,7 +94,6 @@ export class BomControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
-        operationSteps: true,
         schemaVersion: true,
         wipItemId: true,
       },
@@ -122,8 +116,6 @@ export class BomControllerBase {
     const result = await this.service.bom({
       where: params,
       select: {
-        batches: true,
-        bomItems: true,
         bomName: true,
         bomRevision: true,
         className: true,
@@ -132,7 +124,6 @@ export class BomControllerBase {
         editedAt: true,
         editedBy: true,
         id: true,
-        operationSteps: true,
         schemaVersion: true,
         wipItemId: true,
       },
@@ -169,8 +160,6 @@ export class BomControllerBase {
         where: params,
         data: data,
         select: {
-          batches: true,
-          bomItems: true,
           bomName: true,
           bomRevision: true,
           className: true,
@@ -179,7 +168,6 @@ export class BomControllerBase {
           editedAt: true,
           editedBy: true,
           id: true,
-          operationSteps: true,
           schemaVersion: true,
           wipItemId: true,
         },

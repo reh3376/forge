@@ -19,7 +19,7 @@ export type EquipmentPhase = {
   isClassDefinition: boolean | null;
   name: string;
   operations?: Operation;
-  operationSequenceIndex: boolean | null;
+  operationSequenceIndex: number | null;
   operationStepSequence: number | null;
   phaseParameters?: Array<PhaseParameter>;
   revision: number | null;
