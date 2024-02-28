@@ -4,10 +4,10 @@ import {
   List,
   Datagrid,
   ListProps,
+  BooleanField,
   ReferenceField,
   TextField,
   DateField,
-  BooleanField,
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
@@ -25,6 +25,7 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
       pagination={<Pagination />}
     >
       <Datagrid rowClick="show">
+        <BooleanField label="Active" source="active" />
         <ReferenceField label="Bom" source="bom.id" reference="Bom">
           <TextField source={BOM_TITLE_FIELD} />
         </ReferenceField>
@@ -54,10 +55,6 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
         <TextField
           label="Operation Sequence Index"
           source="operationSequenceIndex"
-        />
-        <TextField
-          label="Operation Step Sequence"
-          source="operationStepSequence"
         />
         <TextField label="Revision" source="revision" />
         <TextField label="Schema Version" source="schemaVersion" />

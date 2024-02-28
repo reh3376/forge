@@ -81,6 +81,8 @@ export class EquipmentPhaseControllerBase {
         },
       },
       select: {
+        active: true,
+
         bom: {
           select: {
             id: true,
@@ -110,7 +112,6 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
-        operationStepSequence: true,
         revision: true,
         schemaVersion: true,
       },
@@ -136,6 +137,8 @@ export class EquipmentPhaseControllerBase {
     return this.service.equipmentPhases({
       ...args,
       select: {
+        active: true,
+
         bom: {
           select: {
             id: true,
@@ -165,7 +168,6 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
-        operationStepSequence: true,
         revision: true,
         schemaVersion: true,
       },
@@ -190,6 +192,8 @@ export class EquipmentPhaseControllerBase {
     const result = await this.service.equipmentPhase({
       where: params,
       select: {
+        active: true,
+
         bom: {
           select: {
             id: true,
@@ -219,7 +223,6 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
-        operationStepSequence: true,
         revision: true,
         schemaVersion: true,
       },
@@ -274,6 +277,8 @@ export class EquipmentPhaseControllerBase {
           },
         },
         select: {
+          active: true,
+
           bom: {
             select: {
               id: true,
@@ -303,7 +308,6 @@ export class EquipmentPhaseControllerBase {
           },
 
           operationSequenceIndex: true,
-          operationStepSequence: true,
           revision: true,
           schemaVersion: true,
         },
@@ -334,6 +338,8 @@ export class EquipmentPhaseControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
+        active: true,
+
         bom: {
           select: {
             id: true,
@@ -363,7 +369,6 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
-        operationStepSequence: true,
         revision: true,
         schemaVersion: true,
       },
