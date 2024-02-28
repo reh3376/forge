@@ -10,6 +10,6 @@ export type Instruction = {
   id: string;
   name: string | null;
   revision: number;
-  schemaVersion: string;
+  schemaVersion: string | null;
   updatedAt: Date;
 };

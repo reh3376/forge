@@ -15,7 +15,6 @@ import {
   Prisma,
   Operation, // @ts-ignore
   EquipmentPhase, // @ts-ignore
-  Recipe, // @ts-ignore
   UnitProcedure,
 } from "@prisma/client";
 
@@ -74,17 +73,6 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .instances(args);
-  }
-
-  async findRecipes(
-    parentId: string,
-    args: Prisma.RecipeFindManyArgs
-  ): Promise<Recipe[]> {
-    return this.prisma.operation
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .recipes(args);
   }
 
   async getClassId(parentId: string): Promise<Operation | null> {

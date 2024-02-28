@@ -4,7 +4,7 @@ import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./Equ
 import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
 import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
-import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhereUniqueInput";
+import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./TestParameterCreateNestedManyWithoutEquipmentPhasesInput";
 
 export type EquipmentPhaseCreateInput = {
   bom?: BomWhereUniqueInput | null;
@@ -23,5 +23,5 @@ export type EquipmentPhaseCreateInput = {
   phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
   revision?: number | null;
   schemaVersion?: string | null;
-  testParameters?: TestParameterWhereUniqueInput | null;
+  testParameters?: TestParameterCreateNestedManyWithoutEquipmentPhasesInput;
 };

@@ -25,7 +25,7 @@ import { ProductionOrderQueueFindManyArgs } from "./ProductionOrderQueueFindMany
 import { ProductionOrderQueueFindUniqueArgs } from "./ProductionOrderQueueFindUniqueArgs";
 import { CreateProductionOrderQueueArgs } from "./CreateProductionOrderQueueArgs";
 import { UpdateProductionOrderQueueArgs } from "./UpdateProductionOrderQueueArgs";
-import { Recipe } from "../../recipe/base/Recipe";
+import { Procedure } from "../../procedure/base/Procedure";
 import { ProductionOrderQueueService } from "../productionOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ProductionOrderQueue)
@@ -95,11 +95,9 @@ export class ProductionOrderQueueResolverBase {
       data: {
         ...args.data,
 
-        recipe: args.data.recipe
-          ? {
-              connect: args.data.recipe,
-            }
-          : undefined,
+        procedure: {
+          connect: args.data.procedure,
+        },
       },
     });
   }
@@ -120,11 +118,9 @@ export class ProductionOrderQueueResolverBase {
         data: {
           ...args.data,
 
-          recipe: args.data.recipe
-            ? {
-                connect: args.data.recipe,
-              }
-            : undefined,
+          procedure: {
+            connect: args.data.procedure,
+          },
         },
       });
     } catch (error) {
@@ -138,19 +134,19 @@ export class ProductionOrderQueueResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Recipe, {
+  @graphql.ResolveField(() => Procedure, {
     nullable: true,
-    name: "recipe",
+    name: "procedure",
   })
   @nestAccessControl.UseRoles({
-    resource: "Recipe",
+    resource: "Procedure",
     action: "read",
     possession: "any",
   })
-  async getRecipe(
+  async getProcedure(
     @graphql.Parent() parent: ProductionOrderQueue
-  ): Promise<Recipe | null> {
-    const result = await this.service.getRecipe(parent.id);
+  ): Promise<Procedure | null> {
+    const result = await this.service.getProcedure(parent.id);
 
     if (!result) {
       return null;

@@ -217,12 +217,12 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
-    type: () => TestParameter,
+    type: () => [TestParameter],
   })
   @ValidateNested()
   @Type(() => TestParameter)
   @IsOptional()
-  testParameters?: TestParameter | null;
+  testParameters?: Array<TestParameter>;
 }
 
 export { EquipmentPhase as EquipmentPhase };

@@ -9,7 +9,7 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationWhereUniqueInput } from "../operation/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PhaseParameterListRelationFilter } from "../phaseParameter/PhaseParameterListRelationFilter";
-import { TestParameterWhereUniqueInput } from "../testParameter/TestParameterWhereUniqueInput";
+import { TestParameterListRelationFilter } from "../testParameter/TestParameterListRelationFilter";
 
 export type EquipmentPhaseWhereInput = {
   bom?: BomWhereUniqueInput;
@@ -31,5 +31,5 @@ export type EquipmentPhaseWhereInput = {
   phaseParameters?: PhaseParameterListRelationFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
-  testParameters?: TestParameterWhereUniqueInput;
+  testParameters?: TestParameterListRelationFilter;
 };
