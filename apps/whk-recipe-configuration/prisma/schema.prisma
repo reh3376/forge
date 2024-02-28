@@ -122,6 +122,7 @@ model Instruction {
 }
 
 model EquipmentPhase {
+  active                 Boolean          @default(true)
   bom                    Bom?             @relation(fields: [bomId], references: [id])
   bomId                  String?
   classId                EquipmentPhase?  @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
@@ -264,7 +265,7 @@ model UnitProcedure {
   updatedAt     DateTime        @updatedAt
   updatedBy     String?
 
-  @@unique([name, revision, active, isClassDefinition])
+  @@unique([name, revision, active, isClassDef])
 }
 
 enum EnumPhaseParameterSetpointType {
