@@ -16,30 +16,28 @@ done
 echo "Registering Debezium PostgreSQL connector ⏳"
 curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" \
     http://localhost:8083/connectors/ -d '{
+    "name": "recipe-db-connector",
     "config": {
       "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
       "database.dbname": "recipe-configuration",
-      "database.history.kafka.bootstrap.servers": "localhost:9092",
+      "database.history.kafka.bootstrap.servers": "host.docker.internal:9092",
       "database.history.kafka.topic": "schema-changes.movies",
-      "database.hostname": "localhost",
+      "database.hostname": "host.docker.internal",
       "database.password": "admin",
       "database.port": "5432",
-      "database.server.name": "postgres",
+      "database.server.name": "localhost",
       "database.user": "admin",
-      "name": "movies-db-connector",
+      "name": "recipe-db-connector",
       "plugin.name": "pgoutput",
-      "table.include.list": "public.Procedure",
+      "table.include.list": "public.Procedure,public.UnitProcedure,public.Operation,public.EquipmentPhases,public.Boms,public.Instruction,public.PhaseParameters,public.ProductionOrderQueue,public.TestParameters",
       "tasks.max": "1",
       "topic.creation.default.cleanup.policy": "delete",
       "topic.creation.default.partitions": "1",
       "topic.creation.default.replication.factor": "1",
       "topic.creation.default.retention.ms": "604800000",
       "topic.creation.enable": "true",
-      "topic.prefix": "postgres"
-    },
-    "name": "movies-db-connector",
-    "tasks": [],
-    "type": "source"
+      "topic.prefix": "mes-recipe-routing"
+    }
   }'
 
 echo -e "\nRegistered Debezium PostgreSQL connector"
