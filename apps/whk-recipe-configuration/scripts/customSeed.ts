@@ -1,74 +1,218 @@
-import {Prisma, PrismaClient} from "@prisma/client";
+// import {Prisma, PrismaClient} from "@prisma/client";
 
-const _CLIENT = new PrismaClient();
+import {
+  EnumTestParameterTestParamUnits,
+  EnumTestParameterTestSetpointType,
+  Prisma,
+  PrismaClient
+} from "@prisma/client";
+import {faker} from "@faker-js/faker";
+import { hash } from "bcrypt";
 
-function selectRandomId(ids: string[]): string {
-  const randomIndex = Math.floor(Math.random() * ids.length);
-  return ids[randomIndex];
+// Function to get a random element from an array
+function getRandomElement<T>(arr: Array<T>): T | null {
+  if (arr.length === 0) return null;
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
 }
 
-async function getAllProcedureIds() {
-  const procedures = await _CLIENT.procedure.findMany({
-    select: {
-      id: true // Select only the 'id' field
-    }
-  });
-
-  return procedures.map(p => p.id);
+// Function to get a random element from an array
+// Define the function using a generic type parameter <T>
+function getRandomArrayElement<T>(arr: Array<T>): T | undefined {
+  if (arr.length === 0) return undefined; // Handle empty array case
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
 }
 
-async function getAllUnitProcedureIds() {
-  const unitProcedures = await _CLIENT.unitProcedure.findMany({
-    select: {
-      id: true // Select only the 'id' field
-    }
-  });
-
-  return unitProcedures.map(p => p.id);
-}
-
-async function getAllOperationIds() {
-  const operations = await _CLIENT.operation.findMany({
-    select: {
-      id: true // Select only the 'id' field
-    }
-  });
-
-  return operations.map(p => p.id);
-}
-
-async function getAllBomIds() {
-  const boms = await _CLIENT.bom.findMany({
-    select: {
-      id: true // Select only the 'id' field
-    }
-  });
-
-  return boms.map(p => p.id);
-}
-
-async function getAllEpIds() {
-  const eps = await _CLIENT.equipmentPhase.findMany({
-    select: {
-      id: true // Select only the 'id' field
-    }
-  });
-
-  return eps.map(p => p.id);
-}
 
 export async function customSeed() {
   const client = new PrismaClient();
-  const username = "admin";
+  type EntityType = 'User' | 'Item' | 'Asset' | "Account" | "TestParameter" | "PurchaseOrder" | "SalesOrder" | "ItemReceipt" | "Lot" | "ProductionOrder";
+  type SeedFunction = (n: number) => Promise<void>;
+  type SeedFunctions = {
+    [key in EntityType]: SeedFunction;
+  };
 
-  //replace this sample code to populate your database
-  //with data that is required for your service to start
-  await client.user.update({
-    where: { username: username },
-    data: {
-      username,
-    },
-  });
+  async function seedUser(n: number=10): Promise<void> {
+    for (let i = 0; i < n; i++) {
+      const saltRounds = 10;
+      const passwordHash = await hash(faker.internet.password(18), saltRounds);
+
+      await client.user.create({
+        data: {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          password: passwordHash,
+          roles: JSON.stringify(['user', 'admin']), // Example roles
+          username: faker.internet.userName(),
+        },
+      });
+
+      // console.log('User created:', user);
+    }
+    return;
+  }
+
+  // Utility function to generate a unique name, consider implementing uniqueness checks
+  function generateUniqueName(baseName: string): string {
+    return `${baseName}-${faker.datatype.uuid()}`;
+  }
+
+  async function seedProcedureClasses(n: number): Promise<string[]> {
+    let classIds = [];
+
+    for (let i = 0; i < n; i++) {
+      const procedure = await client.procedure.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          name: generateUniqueName("Class"),
+          isClassDefinition: true,
+          active: true, // Assuming class definitions are active
+          description: faker.commerce.productDescription(),
+          revision: faker.datatype.number({ min: 0, max: 10 }),
+          // Populate other fields as needed
+        },
+      });
+      classIds.push(procedure.id);
+    }
+
+    return classIds; // Return the IDs of created class definitions for linking instances
+  }
+
+  async function seedProcedureInstances(classIds: string[], n: number): Promise<void> {
+    for (const classId of classIds) {
+      for (let i = 0; i < n; i++) {
+        await client.procedure.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            classIdId: classId,
+            isClassDefinition: false,
+            name: generateUniqueName("Instance"),
+            active: faker.datatype.boolean(),
+            description: faker.commerce.productDescription(),
+            revision: faker.datatype.number({ min: 0, max: 10 }),
+            // Populate other fields as needed
+          },
+        });
+      }
+    }
+  }
+
+  async function seedProcedure(n: number): Promise<void> {
+    const classIds = await seedProcedureClasses(Math.ceil(n / 5)); // Adjust ratio as needed
+    await seedProcedureInstances(classIds, n - classIds.length); // Seed remaining as instances
+    console.log(`${n} Procedures (classes and instances) created.`);
+  }
+
+  // Unit Procedure
+  async function seedUnitProcedureClasses(procedureId: string, n: number): Promise<string[]> {
+    let classIds = [];
+    for (let i = 0; i < n; i++) {
+      const unitProcedure = await client.unitProcedure.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          name: `Class-${faker.random.word()}-${faker.datatype.uuid()}`,
+          isClassDef: true,
+          active: true,
+          procedure: {
+            connect: { id: procedureId },
+          },
+          description: faker.commerce.productDescription(),
+          revision: faker.datatype.number(10),
+        },
+      });
+      classIds.push(unitProcedure.id);
+    }
+    return classIds;
+  }
+
+  async function seedUnitProcedureInstances(classIds: string[], procedureId: string, n: number): Promise<void> {
+    for (const classId of classIds) {
+      for (let i = 0; i < n; i++) {
+        await client.unitProcedure.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            name: `Instance-${faker.random.word()}-${faker.datatype.uuid()}`,
+            isClassDef: false,
+            active: faker.datatype.boolean(),
+            classId: {
+              connect: { id: classId },
+            },
+            procedure: {
+              connect: { id: procedureId },
+            },
+            description: faker.commerce.productDescription(),
+            revision: faker.datatype.number(10),
+          },
+        });
+      }
+    }
+  }
+
+  async function seedUnitProcedure(total: number): Promise<void> {
+    const classRatio = 0.3; // 30% as class definitions
+    const numClasses = Math.round(total * classRatio);
+    const classIds = await seedUnitProcedureClasses(numClasses);
+    await seedUnitProcedureInstances(classIds, total - numClasses);
+    console.log(`${total} UnitProcedures (classes and instances) created for Procedure ID: ${procedureId}.`);
+  }
+
+  // operation
+  async function seedOperationClasses(unitProcedureId: string, n: number): Promise<string[]> {
+    let classIds = [];
+    for (let i = 0; i < n; i++) {
+      const operation = await client.operation.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          name: `Class-${faker.random.word()}-${faker.datatype.uuid()}`,
+          abbreviation: faker.random.alpha({ count: 3 }).toUpperCase(),
+          description: faker.commerce.productDescription(),
+          path: `/class/${faker.random.word()}`,
+          isClassDefinition: true,
+          active: true,
+          unitProcedure: {
+            connect: { id: unitProcedureId },
+          },
+          // Assuming default values for other fields are acceptable
+        },
+      });
+      classIds.push(operation.id);
+    }
+    return classIds; // Return the IDs of created class definitions for linking instances
+  }
+
+  async function seedOperationInstances(classIds: string[], unitProcedureId: string, n: number): Promise<void> {
+    for (const classId of classIds) {
+      for (let i = 0; i < n; i++) {
+        await client.operation.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            name: `Instance-${faker.random.word()}-${faker.datatype.uuid()}`,
+            abbreviation: faker.random.alpha({ count: 3 }).toUpperCase(),
+            description: faker.commerce.productDescription(),
+            path: `/instance/${faker.random.word()}`,
+            isClassDefinition: false,
+            active: faker.datatype.boolean(),
+            classId: {
+              connect: { id: classId },
+            },
+            unitProcedure: {
+              connect: { id: unitProcedureId },
+            },
+            // Assuming default values for other fields are acceptable
+          },
+        });
+      }
+    }
+  }
+
+  async function seedOperation(unitProcedureId: string, total: number): Promise<void> {
+    const classRatio = 0.3; // Example ratio of class definitions
+    const numClasses = Math.round(total * classRatio);
+    const classIds = await seedOperationClasses(unitProcedureId, numClasses);
+    await seedOperationInstances(classIds, unitProcedureId, total - numClasses);
+    console.log(`${total} Operations (classes and instances) created for UnitProcedure ID: ${unitProcedureId}.`);
+  }
 
   try {
     await client.procedure.create({
@@ -483,6 +627,9 @@ export async function customSeed() {
   try {
     // Fetch the records you want to update
     const phaseParameters = await client.phaseParameter.findMany({
+      //   // Your criteria here
+      //   active: true,
+      // },
     });
 
     // Update each record individually
@@ -512,6 +659,9 @@ export async function customSeed() {
       // Add more error codes as needed
     }
   }
+
+  // Create the instances of the route (procedure, unit prcedure, operation, equipment phase)
+  // Using the id's for the classId's
 
   client.$disconnect();
 }
