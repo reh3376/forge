@@ -145,7 +145,7 @@ services:
       retries: 5
   debezium:
     image: debezium/connect:latest
-    restart: always
+#    restart: always
     container_name: debezium
     hostname: debezium
     depends_on:
@@ -156,7 +156,7 @@ services:
     ports:
       - '8083:8083'
     environment:
-      BOOTSTRAP_SERVERS: broker:29092
+      BOOTSTRAP_SERVERS: kafka:29092
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: connect_configs
       STATUS_STORAGE_TOPIC: connect_statuses
