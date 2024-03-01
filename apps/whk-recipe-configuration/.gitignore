@@ -20,4 +20,3 @@ prisma/migrations/*
 .flaskenv*
 !.env.project
 !.env.vault
-.env.me
