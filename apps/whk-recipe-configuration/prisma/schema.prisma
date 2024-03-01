@@ -220,8 +220,6 @@ model Bom {
   id              String           @id @default(cuid())
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
-
-  @@map("boms"
 }
 
 model ProductionOrderQueue {
