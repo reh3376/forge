@@ -401,7 +401,7 @@ export async function customSeed() {
     await seedFunction(n);
   }
 
-  const numberOfEntitiesToSeed = 10;
+  const numberOfEntitiesToSeed = 100;
   await dynamicSeed('User', numberOfEntitiesToSeed);
   await dynamicSeed('Procedure', numberOfEntitiesToSeed);
   await dynamicSeed('UnitProcedure', numberOfEntitiesToSeed);
