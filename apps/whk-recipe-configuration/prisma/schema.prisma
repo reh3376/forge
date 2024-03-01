@@ -73,8 +73,6 @@ model TestParameter {
   testSetpointUpperLimit   Float?
   testSetpointValue        Float?
   tooltip                  String?
-
-  @@map("TestParameters")
 }
 
 model RecipeParameter {
@@ -101,8 +99,6 @@ model RecipeParameter {
   revision                   Int?                                  @default(0)
   schemaVersion              String?                               @default("0001-alpha")
   sequencerParameters        Json?
-
-  @@map("RecipeParameters")
 }
 
 model Instruction {
@@ -147,7 +143,6 @@ model EquipmentPhase {
   testParameters         TestParameter[]
 
   @@unique([name, revision, active, isClassDefinition])
-  @@map("equipmentPhases")
 }
 
 model Operation {
@@ -226,7 +221,7 @@ model Bom {
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
 
-  @@map("boms")
+  @@map("boms"
 }
 
 model ProductionOrderQueue {
