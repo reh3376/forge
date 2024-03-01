@@ -15,3 +15,9 @@
 schema.graphql
 #package-lock.json
 prisma/migrations/*
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
+.env.me
