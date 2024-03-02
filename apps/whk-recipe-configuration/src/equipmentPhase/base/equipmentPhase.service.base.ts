@@ -116,11 +116,11 @@ export class EquipmentPhaseServiceBase {
       .classId();
   }
 
-  async getOperations(parentId: string): Promise<Operation | null> {
+  async getOperation(parentId: string): Promise<Operation | null> {
     return this.prisma.equipmentPhase
       .findUnique({
         where: { id: parentId },
       })
-      .operations();
+      .operation();
   }
 }
