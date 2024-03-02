@@ -76,8 +76,8 @@ export class EquipmentPhaseControllerBase {
             }
           : undefined,
 
-        operations: {
-          connect: data.operations,
+        operation: {
+          connect: data.operation,
         },
       },
       select: {
@@ -105,7 +105,7 @@ export class EquipmentPhaseControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },
@@ -161,7 +161,7 @@ export class EquipmentPhaseControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },
@@ -216,7 +216,7 @@ export class EquipmentPhaseControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },
@@ -272,8 +272,8 @@ export class EquipmentPhaseControllerBase {
               }
             : undefined,
 
-          operations: {
-            connect: data.operations,
+          operation: {
+            connect: data.operation,
           },
         },
         select: {
@@ -301,7 +301,7 @@ export class EquipmentPhaseControllerBase {
           isClassDefinition: true,
           name: true,
 
-          operations: {
+          operation: {
             select: {
               id: true,
             },
@@ -362,7 +362,7 @@ export class EquipmentPhaseControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },

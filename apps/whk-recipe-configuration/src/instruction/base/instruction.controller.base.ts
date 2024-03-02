@@ -226,7 +226,7 @@ export class InstructionControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },

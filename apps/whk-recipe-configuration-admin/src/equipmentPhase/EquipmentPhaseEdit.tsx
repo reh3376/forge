@@ -58,7 +58,7 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
         <ReferenceInput
-          source="operations.id"
+          source="operation.id"
           reference="Operation"
           label="Operation"
         >
