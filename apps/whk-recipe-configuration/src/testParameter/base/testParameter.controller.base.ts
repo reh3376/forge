@@ -316,7 +316,7 @@ export class TestParameterControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },

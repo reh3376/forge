@@ -18,7 +18,7 @@ export type EquipmentPhaseCreateInput = {
   instructions?: InstructionCreateNestedManyWithoutEquipmentPhasesInput;
   isClassDefinition?: boolean | null;
   name: string;
-  operations: OperationWhereUniqueInput;
+  operation: OperationWhereUniqueInput;
   operationSequenceIndex?: number | null;
   phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
   revision?: number | null;

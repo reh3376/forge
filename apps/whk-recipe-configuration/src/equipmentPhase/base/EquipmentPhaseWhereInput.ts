@@ -196,7 +196,7 @@ class EquipmentPhaseWhereInput {
   @Field(() => OperationWhereUniqueInput, {
     nullable: true,
   })
-  operations?: OperationWhereUniqueInput;
+  operation?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,
