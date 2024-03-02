@@ -354,7 +354,7 @@ export async function customSeed() {
           name: `${isClassDefinition ? 'Class' : 'Instance'}-${faker.commerce.productName()}-${faker.string.uuid()}`,
           isClassDefinition,
           active: faker.datatype.boolean(),
-          operations: {
+          operation: {
             connect: { id: operation.id },
           },
           ...(bom && {
