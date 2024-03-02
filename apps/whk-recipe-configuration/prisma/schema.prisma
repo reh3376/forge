@@ -134,7 +134,7 @@ model EquipmentPhase {
   instructions           Instruction[]
   isClassDefinition      Boolean?         @default(false)
   name                   String
-  operations             Operation        @relation(fields: [operationId], references: [id])
+  operation              Operation        @relation(fields: [operationId], references: [id])
   operationId            String
   operationSequenceIndex Int?
   phaseParameters        PhaseParameter[]

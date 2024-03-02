@@ -326,7 +326,7 @@ export class OperationControllerBase {
         isClassDefinition: true,
         name: true,
 
-        operations: {
+        operation: {
           select: {
             id: true,
           },

@@ -171,7 +171,7 @@ class EquipmentPhase {
   })
   @ValidateNested()
   @Type(() => Operation)
-  operations?: Operation;
+  operation?: Operation;
 
   @ApiProperty({
     required: false,

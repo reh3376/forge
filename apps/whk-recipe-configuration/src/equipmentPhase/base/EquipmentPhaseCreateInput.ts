@@ -155,7 +155,7 @@ class EquipmentPhaseCreateInput {
   @ValidateNested()
   @Type(() => OperationWhereUniqueInput)
   @Field(() => OperationWhereUniqueInput)
-  operations!: OperationWhereUniqueInput;
+  operation!: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,

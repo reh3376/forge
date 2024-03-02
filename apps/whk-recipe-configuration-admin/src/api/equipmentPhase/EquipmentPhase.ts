@@ -19,7 +19,7 @@ export type EquipmentPhase = {
   instructions?: Array<Instruction>;
   isClassDefinition: boolean | null;
   name: string;
-  operations?: Operation;
+  operation?: Operation;
   operationSequenceIndex: number | null;
   phaseParameters?: Array<PhaseParameter>;
   revision: number | null;
