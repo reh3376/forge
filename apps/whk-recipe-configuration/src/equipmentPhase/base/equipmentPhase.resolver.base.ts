@@ -114,8 +114,8 @@ export class EquipmentPhaseResolverBase {
             }
           : undefined,
 
-        operations: {
-          connect: args.data.operations,
+        operation: {
+          connect: args.data.operation,
         },
       },
     });
@@ -149,8 +149,8 @@ export class EquipmentPhaseResolverBase {
               }
             : undefined,
 
-          operations: {
-            connect: args.data.operations,
+          operation: {
+            connect: args.data.operation,
           },
         },
       });
@@ -287,17 +287,17 @@ export class EquipmentPhaseResolverBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Operation, {
     nullable: true,
-    name: "operations",
+    name: "operation",
   })
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
   })
-  async getOperations(
+  async getOperation(
     @graphql.Parent() parent: EquipmentPhase
   ): Promise<Operation | null> {
-    const result = await this.service.getOperations(parent.id);
+    const result = await this.service.getOperation(parent.id);
 
     if (!result) {
       return null;

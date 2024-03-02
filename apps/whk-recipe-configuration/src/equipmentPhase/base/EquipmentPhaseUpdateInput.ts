@@ -164,7 +164,7 @@ class EquipmentPhaseUpdateInput {
   @Field(() => OperationWhereUniqueInput, {
     nullable: true,
   })
-  operations?: OperationWhereUniqueInput;
+  operation?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,

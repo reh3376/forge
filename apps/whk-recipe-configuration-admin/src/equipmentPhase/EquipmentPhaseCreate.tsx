@@ -60,7 +60,7 @@ export const EquipmentPhaseCreate = (
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
         <TextInput label="Name" source="name" />
         <ReferenceInput
-          source="operations.id"
+          source="operation.id"
           reference="Operation"
           label="Operation"
         >
