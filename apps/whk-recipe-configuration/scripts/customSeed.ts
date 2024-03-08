@@ -2,8 +2,8 @@
 
 import {
   EnumPhaseParameterSetpointType,
-  EnumTestParameterTestParamUnits, EnumTestParameterTestSetpointType, Operation,
-  PrismaClient
+  EnumTestParameterTestParamUnits, EnumTestParameterTestSetpointType, Operation, PhaseParameter,
+  PrismaClient, TestParameter
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
@@ -58,7 +58,7 @@ export async function customSeed() {
   }
 
   async function seedProcedureClasses(n: number): Promise<string[]> {
-    let classIds = [];
+    const classIds = [];
 
     for (let i = 0; i < n; i++) {
       const procedure = await client.procedure.create({
@@ -118,7 +118,7 @@ export async function customSeed() {
 
     const classRatio = 0.3; // Ratio of class definitions
     const numClasses = Math.round(total * classRatio);
-    let classIds: string[] = [];
+    const classIds: string[] = [];
 
     for (let i = 0; i < total; i++) {
       const isClassDefinition = i < numClasses;
@@ -188,7 +188,7 @@ export async function customSeed() {
       } else {
         // get classId from Operation
         const classIds = await client.operation.findMany();
-        const randomClassId = getRandomArrayElement(classIds) as any;
+        const randomClassId = getRandomArrayElement(classIds) as Operation;
         await client.operation.create({
           data: {
             createdBy: faker.internet.userName(),
@@ -214,7 +214,7 @@ export async function customSeed() {
 
   // Test Parameter Handling
   async function seedTestParameterClasses(n: number=10): Promise<string[]> {
-    let classIds = [];
+    const classIds = [];
     // First, create class definitions
     for (let i = 0; i < n; i++) {
       const testParameter = await client.testParameter.create({
@@ -287,7 +287,7 @@ export async function customSeed() {
 
     const classRatio = 0.2; // Ratio of class definitions
     const numClasses = Math.round(total * classRatio);
-    let classIds: string[] = [];
+    const classIds: string[] = [];
 
     for (let i = 0; i < total; i++) {
       const isClassDef = i < numClasses;
@@ -333,20 +333,28 @@ export async function customSeed() {
     // Fetch necessary relations
     const operations = await client.operation.findMany({ select: { id: true } });
     const boms = await client.bom.findMany({ select: { id: true } });
+    const testParameters = await client.testParameter.findMany({ select: { id: true } });
+    const phaseParameters = await client.phaseParameter.findMany({ select: { id: true } });
 
-    if (operations.length === 0) {
+    if (operations.length === 0 ||
+      boms.length === 0 ||
+      testParameters.length === 0 ||
+      phaseParameters.length === 0
+    ) {
       console.warn('No Operations found. Please seed Operations first.');
       return;
     }
 
     const classRatio = 0.3; // Ratio of class definitions
     const numClasses = Math.round(total * classRatio);
-    let classIds: string[] = [];
+    const classIds: string[] = [];
 
     for (let i = 0; i < total; i++) {
       const isClassDefinition = i < numClasses;
       const operation = getRandomArrayElement(operations) as Operation;
       const bom = getRandomArrayElement(boms)
+      const testParameter = getRandomArrayElement(testParameters) as TestParameter;
+      const phaseParameter = getRandomArrayElement(phaseParameters) as PhaseParameter;
 
       const equipmentPhase = await client.equipmentPhase.create({
         data: {
@@ -369,6 +377,12 @@ export async function customSeed() {
           }),
           description: faker.commerce.productDescription(),
           revision: faker.number.int({ min: 0, max: 10 }),
+          testParameters: {
+            connect: { id: testParameter.id},
+          },
+          phaseParameters: {
+            connect: { id: phaseParameter.id },
+          },
         },
       });
 
