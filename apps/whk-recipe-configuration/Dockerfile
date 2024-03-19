@@ -1,6 +1,11 @@
 # multi-stage: base (build)
 FROM node:21.7.0 AS base
 
+# Add New Relic Env Vars
+ENV NEW_RELIC_NO_CONFIG_FILE=true
+ENV NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
+ENV NEW_RELIC_LOG=stdout
+
 # create directory where the application will be built
 WORKDIR /app
 
