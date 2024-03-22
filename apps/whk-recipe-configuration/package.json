@@ -59,7 +59,8 @@
     "reflect-metadata": "0.1.13",
     "ts-node": "10.9.1",
     "type-fest": "2.19.0",
-    "validator": "13.11.0"
+    "validator": "13.11.0",
+    "newrelic": "latest"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.1.18",
