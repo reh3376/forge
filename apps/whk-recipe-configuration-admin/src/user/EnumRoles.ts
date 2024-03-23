@@ -1,7 +1,7 @@
 export enum EnumRoles {
-  Operator = "operator",
   Admin = "admin",
-  User = "user",
-  Supervisor = "supervisor",
   Manager = "manager",
+  Operator = "operator",
+  Supervisor = "supervisor",
+  User = "user",
 }

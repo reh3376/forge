@@ -1,6 +1,4 @@
 import { Module } from "@nestjs/common";
-import { CacheModule } from "@nestjs/cache-manager";
-import { redisStore } from "cache-manager-ioredis-yet";
 
 import {
   OpenTelemetryModule,
@@ -14,6 +12,8 @@ import {
 import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import { CacheModule } from "@nestjs/cache-manager";
+import { redisStore } from "cache-manager-ioredis-yet";
 import { UserModule } from "./user/user.module";
 import { PhaseParameterModule } from "./phaseParameter/phaseParameter.module";
 import { TestParameterModule } from "./testParameter/testParameter.module";
@@ -36,18 +36,18 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
+import { LoggerModule } from "./logger/logger.module";
+
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
-
-import { LoggerModule } from "./logger/logger.module";
 
 @Module({
   controllers: [],
   imports: [
-    KafkaModule,
-    LoggerModule,
     ACLModule,
     AuthModule,
+    KafkaModule,
+    LoggerModule,
     UserModule,
     PhaseParameterModule,
     TestParameterModule,
@@ -82,6 +82,26 @@ import { LoggerModule } from "./logger/logger.module";
       inject: [ConfigService],
       imports: [ConfigModule],
     }),
+    OpenTelemetryModule.forRoot({
+      serviceName: "whk-recipe-routing",
+      spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
+      instrumentations: [
+        new HttpInstrumentation({
+          requestHook: (span, request) => {
+            if (request.method)
+              span.setAttribute("http.method", request.method);
+          },
+        }),
+      ],
+
+      traceAutoInjectors: [
+        ControllerInjector,
+        EventEmitterInjector,
+        GraphQLResolverInjector,
+        GuardInjector,
+        PipeInjector,
+      ],
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
@@ -105,26 +125,6 @@ import { LoggerModule } from "./logger/logger.module";
       },
 
       inject: [ConfigService],
-    }),
-    OpenTelemetryModule.forRoot({
-      serviceName: "whk-recipe-routing",
-      spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
-      instrumentations: [
-        new HttpInstrumentation({
-          requestHook: (span, request) => {
-            if (request.method)
-              span.setAttribute("http.method", request.method);
-          },
-        }),
-      ],
-
-      traceAutoInjectors: [
-        ControllerInjector,
-        EventEmitterInjector,
-        GraphQLResolverInjector,
-        GuardInjector,
-        PipeInjector,
-      ],
     }),
   ],
   providers: [],
