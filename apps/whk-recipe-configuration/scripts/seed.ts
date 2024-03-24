@@ -2,6 +2,13 @@ import * as dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { customSeed } from "./customSeed";
 
+/*
+Developer Team note...
+
+A bug has been found in Amplication that may overwrite this... what it has been overwriting to does not work.
+Talk with Patrick if necessary
+ */
+
 if (require.main === module) {
   dotenv.config();
 
