@@ -1,14 +1,15 @@
 version: "3.9"
 
 services:
-  ## Continuation of amplication generated stack
-  redis:
-    container_name: redis-${REDIS_HOST}
-    image: redis:7
+  db:
+    image: postgres:12
     ports:
-      - ${REDIS_PORT}:6379
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - redis:/data
+      - postgres:/var/lib/postgresql/data
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.4
     environment:
@@ -71,35 +72,15 @@ services:
       - --config=/etc/otel-config.yml
     depends_on:
       - jaeger
-  db:
-    image: postgres:12
+  redis:
+    container_name: ${REDIS_HOST}
+    image: redis:7
     ports:
-      - ${DB_PORT}:5432
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      - ${REDIS_PORT}:6379
     volumes:
-      - postgres:/var/lib/postgresql/data
-    command: ["postgres", "-c", "wal_level=logical"]
-    healthcheck:
-      test: [ 'CMD', 'psql', '-U', 'admin', '-c', 'SELECT 1' ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - redis:/data
 
-networks:
-  kong-net:
-    external: false
 volumes:
+  postgres: ~
   redis:
     driver: local
-  postgres: ~
-  kong_data: { }
-  kong_prefix_vol:
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-  kong_tmp_vol:
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
