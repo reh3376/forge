@@ -12,6 +12,7 @@ import {
   Datagrid,
 } from "react-admin";
 
+import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { UNITPROCEDURE_TITLE_FIELD } from "./UnitProcedureTitle";
 import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
@@ -21,6 +22,9 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
     <Show {...props}>
       <SimpleShowLayout>
         <BooleanField label="Active" source="active" />
+        <ReferenceField label="Boms" source="bom.id" reference="Bom">
+          <TextField source={BOM_TITLE_FIELD} />
+        </ReferenceField>
         <ReferenceField
           label="Class"
           source="unitprocedure.id"
@@ -34,6 +38,9 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
         <TextField label="ID" source="id" />
         <BooleanField label="Is Class Def" source="isClassDef" />
         <TextField label="Name" source="name" />
+        <ReferenceField label="Primary Bom" source="bom.id" reference="Bom">
+          <TextField source={BOM_TITLE_FIELD} />
+        </ReferenceField>
         <ReferenceField
           label="Procedure"
           source="procedure.id"
@@ -52,6 +59,9 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
         >
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
+            <ReferenceField label="Boms" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
             <ReferenceField
               label="Class"
               source="unitprocedure.id"
@@ -65,6 +75,9 @@ export const UnitProcedureShow = (props: ShowProps): React.ReactElement => {
             <TextField label="ID" source="id" />
             <BooleanField label="Is Class Def" source="isClassDef" />
             <TextField label="Name" source="name" />
+            <ReferenceField label="Primary Bom" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
             <ReferenceField
               label="Procedure"
               source="procedure.id"

@@ -20,6 +20,7 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
+import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { Operation } from "../../operation/base/Operation";
@@ -38,6 +39,15 @@ class UnitProcedure {
     nullable: true,
   })
   active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Bom,
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  boms?: Bom | null;
 
   @ApiProperty({
     required: false,
@@ -126,6 +136,15 @@ class UnitProcedure {
   @Type(() => Operation)
   @IsOptional()
   operations?: Array<Operation>;
+
+  @ApiProperty({
+    required: false,
+    type: () => Bom,
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  primaryBom?: Bom | null;
 
   @ApiProperty({
     required: true,

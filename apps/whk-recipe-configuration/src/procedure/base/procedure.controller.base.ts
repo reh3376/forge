@@ -475,6 +475,12 @@ export class ProcedureControllerBase {
       select: {
         active: true,
 
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -487,6 +493,12 @@ export class ProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
 
         procedure: {
           select: {

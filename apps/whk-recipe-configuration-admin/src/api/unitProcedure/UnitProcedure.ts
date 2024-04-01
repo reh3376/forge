@@ -1,9 +1,11 @@
+import { Bom } from "../bom/Bom";
 import { Operation } from "../operation/Operation";
 import { Procedure } from "../procedure/Procedure";
 import { Recipe } from "../recipe/Recipe";
 
 export type UnitProcedure = {
   active: boolean | null;
+  boms?: Bom | null;
   classId?: UnitProcedure | null;
   createdAt: Date;
   createdBy: string;
@@ -18,6 +20,7 @@ export type UnitProcedure = {
     | "Processing01"
     | "Granary01";
   operations?: Array<Operation>;
+  primaryBom?: Bom | null;
   procedure?: Procedure;
   recipe?: Array<Recipe>;
   revision: number | null;

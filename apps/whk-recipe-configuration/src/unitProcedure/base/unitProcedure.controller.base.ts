@@ -61,9 +61,21 @@ export class UnitProcedureControllerBase {
       data: {
         ...data,
 
+        boms: data.boms
+          ? {
+              connect: data.boms,
+            }
+          : undefined,
+
         classId: data.classId
           ? {
               connect: data.classId,
+            }
+          : undefined,
+
+        primaryBom: data.primaryBom
+          ? {
+              connect: data.primaryBom,
             }
           : undefined,
 
@@ -73,6 +85,12 @@ export class UnitProcedureControllerBase {
       },
       select: {
         active: true,
+
+        boms: {
+          select: {
+            id: true,
+          },
+        },
 
         classId: {
           select: {
@@ -86,6 +104,12 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
 
         procedure: {
           select: {
@@ -122,6 +146,12 @@ export class UnitProcedureControllerBase {
       select: {
         active: true,
 
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -134,6 +164,12 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
 
         procedure: {
           select: {
@@ -169,6 +205,12 @@ export class UnitProcedureControllerBase {
       select: {
         active: true,
 
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -181,6 +223,12 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
 
         procedure: {
           select: {
@@ -227,9 +275,21 @@ export class UnitProcedureControllerBase {
         data: {
           ...data,
 
+          boms: data.boms
+            ? {
+                connect: data.boms,
+              }
+            : undefined,
+
           classId: data.classId
             ? {
                 connect: data.classId,
+              }
+            : undefined,
+
+          primaryBom: data.primaryBom
+            ? {
+                connect: data.primaryBom,
               }
             : undefined,
 
@@ -239,6 +299,12 @@ export class UnitProcedureControllerBase {
         },
         select: {
           active: true,
+
+          boms: {
+            select: {
+              id: true,
+            },
+          },
 
           classId: {
             select: {
@@ -252,6 +318,12 @@ export class UnitProcedureControllerBase {
           id: true,
           isClassDef: true,
           name: true,
+
+          primaryBom: {
+            select: {
+              id: true,
+            },
+          },
 
           procedure: {
             select: {
@@ -295,6 +367,12 @@ export class UnitProcedureControllerBase {
         select: {
           active: true,
 
+          boms: {
+            select: {
+              id: true,
+            },
+          },
+
           classId: {
             select: {
               id: true,
@@ -307,6 +385,12 @@ export class UnitProcedureControllerBase {
           id: true,
           isClassDef: true,
           name: true,
+
+          primaryBom: {
+            select: {
+              id: true,
+            },
+          },
 
           procedure: {
             select: {
@@ -348,6 +432,12 @@ export class UnitProcedureControllerBase {
       select: {
         active: true,
 
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -360,6 +450,12 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
 
         procedure: {
           select: {

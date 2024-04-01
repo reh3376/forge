@@ -1,4 +1,5 @@
 import { EquipmentPhaseCreateNestedManyWithoutBomsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomsInput";
+import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
 
 export type BomCreateInput = {
   bomName: string;
@@ -8,5 +9,7 @@ export type BomCreateInput = {
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomsInput;
   schemaVersion?: string | null;
+  unitProcedure?: UnitProcedureCreateNestedManyWithoutBomsInput;
+  unitProceduresPrimary?: UnitProcedureCreateNestedManyWithoutBomsInput;
   wipItemId?: string | null;
 };

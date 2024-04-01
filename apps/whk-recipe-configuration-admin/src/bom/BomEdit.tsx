@@ -11,6 +11,7 @@ import {
 } from "react-admin";
 
 import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
+import { UnitProcedureTitle } from "../unitProcedure/UnitProcedureTitle";
 
 export const BomEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -30,6 +31,22 @@ export const BomEdit = (props: EditProps): React.ReactElement => {
           <SelectArrayInput optionText={EquipmentPhaseTitle} />
         </ReferenceArrayInput>
         <TextInput label="Schema Version" source="schemaVersion" />
+        <ReferenceArrayInput
+          source="unitProcedure"
+          reference="UnitProcedure"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={UnitProcedureTitle} />
+        </ReferenceArrayInput>
+        <ReferenceArrayInput
+          source="unitProceduresPrimary"
+          reference="UnitProcedure"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={UnitProcedureTitle} />
+        </ReferenceArrayInput>
         <TextInput label="Wip Item ID" source="wipItemId" />
       </SimpleForm>
     </Edit>

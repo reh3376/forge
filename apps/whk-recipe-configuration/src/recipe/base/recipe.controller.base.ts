@@ -254,6 +254,12 @@ export class RecipeControllerBase {
       select: {
         active: true,
 
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -266,6 +272,12 @@ export class RecipeControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
 
         procedure: {
           select: {

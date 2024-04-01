@@ -20,6 +20,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
 class Bom {
@@ -115,6 +116,24 @@ class Bom {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProcedure?: Array<UnitProcedure>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProceduresPrimary?: Array<UnitProcedure>;
 
   @ApiProperty({
     required: false,
