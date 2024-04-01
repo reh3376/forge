@@ -16,6 +16,7 @@ import {
 import { UnitProcedureTitle } from "./UnitProcedureTitle";
 import { OperationTitle } from "../operation/OperationTitle";
 import { ProcedureTitle } from "../procedure/ProcedureTitle";
+import { RecipeTitle } from "../recipe/RecipeTitle";
 
 export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
   return (
@@ -68,6 +69,14 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectInput optionText={ProcedureTitle} />
         </ReferenceInput>
+        <ReferenceArrayInput
+          source="recipe"
+          reference="Recipe"
+          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
+          format={(value: any) => value && value.map((v: any) => v.id)}
+        >
+          <SelectArrayInput optionText={RecipeTitle} />
+        </ReferenceArrayInput>
         <NumberInput step={1} label="Revision" source="revision" />
         <TextInput label="Schema Version" source="schemaVersion" />
         <TextInput label="Updated By" source="updatedBy" />

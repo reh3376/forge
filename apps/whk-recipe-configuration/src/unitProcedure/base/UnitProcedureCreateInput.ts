@@ -25,6 +25,7 @@ import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitP
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreateNestedManyWithoutUnitProceduresInput";
 
 @InputType()
 class UnitProcedureCreateInput {
@@ -126,6 +127,18 @@ class UnitProcedureCreateInput {
   @Type(() => ProcedureWhereUniqueInput)
   @Field(() => ProcedureWhereUniqueInput)
   procedure!: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutUnitProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutUnitProceduresInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutUnitProceduresInput, {
+    nullable: true,
+  })
+  recipe?: RecipeCreateNestedManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,
