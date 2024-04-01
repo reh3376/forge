@@ -11,6 +11,7 @@ export type PhaseParameterUpdateInput = {
   equipmentPhase?: EquipmentPhaseWhereUniqueInput | null;
   instances?: PhaseParameterUpdateManyWithoutPhaseParametersInput;
   isClassDef?: boolean;
+  isStaticParameter?: boolean | null;
   itemId?: string | null;
   name?: string;
   recipeId?: string | null;
@@ -21,5 +22,12 @@ export type PhaseParameterUpdateInput = {
   setpointNumericalValue?: number | null;
   setpointType?: "Boolean" | "Numeric";
   setpointUpperLimit?: number | null;
+  staticName?:
+    | "SteamTemperature"
+    | "HoldTime"
+    | "IngredientName"
+    | "IngredientQuantity"
+    | "IngredientUnits"
+    | null;
   units?: string;
 };
