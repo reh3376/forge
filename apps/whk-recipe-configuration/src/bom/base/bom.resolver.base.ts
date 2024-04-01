@@ -27,6 +27,8 @@ import { CreateBomArgs } from "./CreateBomArgs";
 import { UpdateBomArgs } from "./UpdateBomArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { BomService } from "../bom.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Bom)
@@ -126,6 +128,51 @@ export class BomResolverBase {
     @graphql.Args() args: EquipmentPhaseFindManyArgs
   ): Promise<EquipmentPhase[]> {
     const results = await this.service.findEquipmentPhases(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedure" })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProcedure(
+    @graphql.Parent() parent: Bom,
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProcedure(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnitProcedure], {
+    name: "unitProceduresPrimary",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProceduresPrimary(
+    @graphql.Parent() parent: Bom,
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProceduresPrimary(
+      parent.id,
+      args
+    );
 
     if (!results) {
       return [];

@@ -14,7 +14,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Bom, // @ts-ignore
-  EquipmentPhase,
+  EquipmentPhase, // @ts-ignore
+  UnitProcedure,
 } from "@prisma/client";
 
 export class BomServiceBase {
@@ -61,5 +62,27 @@ export class BomServiceBase {
         where: { id: parentId },
       })
       .equipmentPhases(args);
+  }
+
+  async findUnitProcedure(
+    parentId: string,
+    args: Prisma.UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    return this.prisma.bom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .unitProcedure(args);
+  }
+
+  async findUnitProceduresPrimary(
+    parentId: string,
+    args: Prisma.UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    return this.prisma.bom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .unitProceduresPrimary(args);
   }
 }

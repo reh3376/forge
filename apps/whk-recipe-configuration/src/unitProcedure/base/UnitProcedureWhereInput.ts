@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -36,6 +37,18 @@ class UnitProcedureWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  boms?: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -132,6 +145,18 @@ class UnitProcedureWhereInput {
     nullable: true,
   })
   operations?: OperationListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  primaryBom?: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,

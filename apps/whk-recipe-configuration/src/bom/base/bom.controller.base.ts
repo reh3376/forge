@@ -29,6 +29,9 @@ import { BomUpdateInput } from "./BomUpdateInput";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -297,6 +300,264 @@ export class BomControllerBase {
   ): Promise<void> {
     const data = {
       equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/unitProcedure")
+  @ApiNestedQuery(UnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProcedure(
+    @common.Req() request: Request,
+    @common.Param() params: BomWhereUniqueInput
+  ): Promise<UnitProcedure[]> {
+    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
+    const results = await this.service.findUnitProcedure(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/unitProcedure")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async connectUnitProcedure(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedure: {
+        connect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/unitProcedure")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitProcedure(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedure: {
+        set: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/unitProcedure")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectUnitProcedure(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedure: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/unitProceduresPrimary")
+  @ApiNestedQuery(UnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProceduresPrimary(
+    @common.Req() request: Request,
+    @common.Param() params: BomWhereUniqueInput
+  ): Promise<UnitProcedure[]> {
+    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
+    const results = await this.service.findUnitProceduresPrimary(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/unitProceduresPrimary")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async connectUnitProceduresPrimary(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProceduresPrimary: {
+        connect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/unitProceduresPrimary")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitProceduresPrimary(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProceduresPrimary: {
+        set: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/unitProceduresPrimary")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectUnitProceduresPrimary(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProceduresPrimary: {
         disconnect: body,
       },
     };

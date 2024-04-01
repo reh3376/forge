@@ -1,4 +1,5 @@
 import { EquipmentPhase } from "../equipmentPhase/EquipmentPhase";
+import { UnitProcedure } from "../unitProcedure/UnitProcedure";
 
 export type Bom = {
   bomName: string;
@@ -11,5 +12,7 @@ export type Bom = {
   equipmentPhases?: Array<EquipmentPhase>;
   id: string;
   schemaVersion: string | null;
+  unitProcedure?: Array<UnitProcedure>;
+  unitProceduresPrimary?: Array<UnitProcedure>;
   wipItemId: string | null;
 };
