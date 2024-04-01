@@ -26,6 +26,7 @@ import {
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
+import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 
 @ObjectType()
 class PhaseParameter {
@@ -117,6 +118,17 @@ class PhaseParameter {
   @IsBoolean()
   @Field(() => Boolean)
   isClassDef!: boolean;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isStaticParameter!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -223,6 +235,23 @@ class PhaseParameter {
     nullable: true,
   })
   setpointUpperLimit!: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumPhaseParameterStaticName,
+  })
+  @IsEnum(EnumPhaseParameterStaticName)
+  @IsOptional()
+  @Field(() => EnumPhaseParameterStaticName, {
+    nullable: true,
+  })
+  staticName?:
+    | "SteamTemperature"
+    | "HoldTime"
+    | "IngredientName"
+    | "IngredientQuantity"
+    | "IngredientUnits"
+    | null;
 
   @ApiProperty({
     required: true,

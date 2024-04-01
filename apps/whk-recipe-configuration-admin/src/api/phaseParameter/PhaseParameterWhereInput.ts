@@ -18,6 +18,7 @@ export type PhaseParameterWhereInput = {
   id?: StringFilter;
   instances?: PhaseParameterListRelationFilter;
   isClassDef?: BooleanFilter;
+  isStaticParameter?: BooleanNullableFilter;
   itemId?: StringNullableFilter;
   name?: StringFilter;
   recipeId?: StringNullableFilter;
@@ -28,5 +29,11 @@ export type PhaseParameterWhereInput = {
   setpointNumericalValue?: FloatNullableFilter;
   setpointType?: "Boolean" | "Numeric";
   setpointUpperLimit?: FloatNullableFilter;
+  staticName?:
+    | "SteamTemperature"
+    | "HoldTime"
+    | "IngredientName"
+    | "IngredientQuantity"
+    | "IngredientUnits";
   units?: StringFilter;
 };

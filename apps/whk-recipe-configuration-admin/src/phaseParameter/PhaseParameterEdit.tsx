@@ -47,6 +47,7 @@ export const PhaseParameterEdit = (props: EditProps): React.ReactElement => {
           <SelectArrayInput optionText={PhaseParameterTitle} />
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Def" source="isClassDef" />
+        <BooleanInput label="Is Static Parameter" source="isStaticParameter" />
         <TextInput label="Item ID" source="itemId" />
         <TextInput label="Name" source="name" />
         <TextInput label="Recipe ID" source="recipeId" />
@@ -72,6 +73,20 @@ export const PhaseParameterEdit = (props: EditProps): React.ReactElement => {
           optionValue="value"
         />
         <NumberInput label="Setpoint Upper Limit" source="setpointUpperLimit" />
+        <SelectInput
+          source="staticName"
+          label="Static Name"
+          choices={[
+            { label: "Steam Temperature", value: "SteamTemperature" },
+            { label: "Hold Time", value: "HoldTime" },
+            { label: "Ingredient Name", value: "IngredientName" },
+            { label: "Ingredient Quantity", value: "IngredientQuantity" },
+            { label: "Ingredient Units", value: "IngredientUnits" },
+          ]}
+          optionText="label"
+          allowEmpty
+          optionValue="value"
+        />
         <TextInput label="Units" source="units" />
       </SimpleForm>
     </Edit>

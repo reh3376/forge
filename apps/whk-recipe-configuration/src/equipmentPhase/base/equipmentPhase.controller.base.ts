@@ -586,6 +586,7 @@ export class EquipmentPhaseControllerBase {
 
         id: true,
         isClassDef: true,
+        isStaticParameter: true,
         itemId: true,
         name: true,
         recipeId: true,
@@ -596,6 +597,7 @@ export class EquipmentPhaseControllerBase {
         setpointNumericalValue: true,
         setpointType: true,
         setpointUpperLimit: true,
+        staticName: true,
         units: true,
         updatedAt: true,
       },

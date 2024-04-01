@@ -23,6 +23,7 @@ import { BooleanFilter } from "../../util/BooleanFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
+import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 
 @InputType()
 class PhaseParameterWhereInput {
@@ -127,6 +128,17 @@ class PhaseParameterWhereInput {
     nullable: true,
   })
   isClassDef?: BooleanFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isStaticParameter?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -237,6 +249,22 @@ class PhaseParameterWhereInput {
     nullable: true,
   })
   setpointUpperLimit?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumPhaseParameterStaticName,
+  })
+  @IsEnum(EnumPhaseParameterStaticName)
+  @IsOptional()
+  @Field(() => EnumPhaseParameterStaticName, {
+    nullable: true,
+  })
+  staticName?:
+    | "SteamTemperature"
+    | "HoldTime"
+    | "IngredientName"
+    | "IngredientQuantity"
+    | "IngredientUnits";
 
   @ApiProperty({
     required: false,
