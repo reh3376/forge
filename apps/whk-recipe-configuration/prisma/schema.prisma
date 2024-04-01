@@ -222,8 +222,6 @@ model Bom {
   id              String           @id @default(cuid())
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
-
-  @@map("boms"
 }
 
 model ProductionOrderQueue {
@@ -261,7 +259,7 @@ model UnitProcedure {
   updatedAt     DateTime              @updatedAt
   updatedBy     String?
 
-  @@unique([name, revision, active, isClassDefinition])
+  @@unique([name, revision, active, isClassDef])
 }
 
 enum EnumPhaseParameterSetpointType {
