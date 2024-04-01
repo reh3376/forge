@@ -36,7 +36,14 @@ export const ProcedureCreate = (props: CreateProps): React.ReactElement => {
           <SelectArrayInput optionText={ProcedureTitle} />
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
-        <TextInput label="Name" source="name" />
+        <SelectInput
+          source="name"
+          label="Name"
+          choices={[{ label: "Line1", value: "Line1" }]}
+          optionText="label"
+          allowEmpty
+          optionValue="value"
+        />
         <ReferenceArrayInput
           source="productionOrderQueues"
           reference="ProductionOrderQueue"

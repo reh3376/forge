@@ -13,11 +13,12 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
+import { EnumProcedureName } from "./EnumProcedureName";
 import { ProductionOrderQueueListRelationFilter } from "../../productionOrderQueue/base/ProductionOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
@@ -105,14 +106,14 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    enum: EnumProcedureName,
   })
-  @Type(() => StringNullableFilter)
+  @IsEnum(EnumProcedureName)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => EnumProcedureName, {
     nullable: true,
   })
-  name?: StringNullableFilter;
+  name?: "Line1";
 
   @ApiProperty({
     required: false,

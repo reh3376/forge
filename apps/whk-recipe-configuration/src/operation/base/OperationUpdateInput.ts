@@ -16,12 +16,14 @@ import {
   IsOptional,
   IsBoolean,
   ValidateNested,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
+import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
@@ -130,14 +132,19 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    enum: EnumOperationName,
   })
-  @IsString()
+  @IsEnum(EnumOperationName)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => EnumOperationName, {
     nullable: true,
   })
-  name?: string;
+  name?:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
 
   @ApiProperty({
     required: false,

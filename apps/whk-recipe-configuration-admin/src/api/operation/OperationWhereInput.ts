@@ -20,7 +20,12 @@ export type OperationWhereInput = {
   id?: StringFilter;
   instances?: OperationListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
-  name?: StringFilter;
+  name?:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
   path?: StringFilter;
   procedureSequenceIndex?: IntFilter;
   revision?: IntFilter;

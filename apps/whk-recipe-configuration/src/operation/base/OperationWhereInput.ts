@@ -13,13 +13,14 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
+import { EnumOperationName } from "./EnumOperationName";
 import { IntFilter } from "../../util/IntFilter";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
@@ -151,14 +152,19 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    enum: EnumOperationName,
   })
-  @Type(() => StringFilter)
+  @IsEnum(EnumOperationName)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => EnumOperationName, {
     nullable: true,
   })
-  name?: StringFilter;
+  name?:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
 
   @ApiProperty({
     required: false,
