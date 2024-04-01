@@ -10,7 +10,7 @@ export type ProcedureCreateInput = {
   description?: string | null;
   instances?: ProcedureCreateNestedManyWithoutProceduresInput;
   isClassDefinition?: boolean | null;
-  name?: string | null;
+  name?: "Line1" | null;
   productionOrderQueues?: ProductionOrderQueueCreateNestedManyWithoutProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;

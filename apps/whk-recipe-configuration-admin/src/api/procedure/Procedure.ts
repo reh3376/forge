@@ -10,7 +10,7 @@ export type Procedure = {
   id: string;
   instances?: Array<Procedure>;
   isClassDefinition: boolean | null;
-  name: string | null;
+  name?: "Line1" | null;
   productionOrderQueues?: Array<ProductionOrderQueue>;
   revision: number | null;
   schemaVersion: string | null;

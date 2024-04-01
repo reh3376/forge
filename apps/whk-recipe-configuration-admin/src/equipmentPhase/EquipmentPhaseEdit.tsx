@@ -56,7 +56,18 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
           <SelectArrayInput optionText={InstructionTitle} />
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
-        <TextInput label="Name" source="name" />
+        <SelectInput
+          source="name"
+          label="Name"
+          choices={[
+            { label: "Ingredient Add", value: "IngredientAdd" },
+            { label: "Pre-Steam", value: "PreSteam" },
+            { label: "Steam", value: "Steam" },
+            { label: "Hold", value: "Hold" },
+          ]}
+          optionText="label"
+          optionValue="value"
+        />
         <ReferenceInput
           source="operation.id"
           reference="Operation"

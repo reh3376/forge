@@ -15,7 +15,7 @@ export type ProcedureWhereInput = {
   id?: StringFilter;
   instances?: ProcedureListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
-  name?: StringNullableFilter;
+  name?: "Line1";
   productionOrderQueues?: ProductionOrderQueueListRelationFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;

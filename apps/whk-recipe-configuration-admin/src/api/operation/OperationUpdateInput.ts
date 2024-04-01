@@ -13,7 +13,12 @@ export type OperationUpdateInput = {
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutOperationsInput;
   instances?: OperationUpdateManyWithoutOperationsInput;
   isClassDefinition?: boolean | null;
-  name?: string;
+  name?:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
   path?: string;
   procedureSequenceIndex?: number;
   revision?: number;

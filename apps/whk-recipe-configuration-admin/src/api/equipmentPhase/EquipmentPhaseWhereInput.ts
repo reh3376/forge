@@ -25,7 +25,7 @@ export type EquipmentPhaseWhereInput = {
   instances?: EquipmentPhaseListRelationFilter;
   instructions?: InstructionListRelationFilter;
   isClassDefinition?: BooleanNullableFilter;
-  name?: StringFilter;
+  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
   operation?: OperationWhereUniqueInput;
   operationSequenceIndex?: IntNullableFilter;
   phaseParameters?: PhaseParameterListRelationFilter;

@@ -46,7 +46,19 @@ export const OperationCreate = (props: CreateProps): React.ReactElement => {
           <SelectArrayInput optionText={OperationTitle} />
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Definition" source="isClassDefinition" />
-        <TextInput label="Name" source="name" />
+        <SelectInput
+          source="name"
+          label="Name"
+          choices={[
+            { label: "Mash Vessel", value: "MashVessel" },
+            { label: "Fermentation Vessel", value: "FermentationVessel" },
+            { label: "Distillation Run", value: "DistillationRun" },
+            { label: "Blending Vessel", value: "BlendingVessel" },
+            { label: "Cistern Tank", value: "CisternTank" },
+          ]}
+          optionText="label"
+          optionValue="value"
+        />
         <TextInput label="Path" source="path" />
         <NumberInput
           step={1}

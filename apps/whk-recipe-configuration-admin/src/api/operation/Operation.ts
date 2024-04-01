@@ -13,7 +13,12 @@ export type Operation = {
   id: string;
   instances?: Array<Operation>;
   isClassDefinition: boolean | null;
-  name: string;
+  name?:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
   path: string;
   procedureSequenceIndex: number;
   revision: number;

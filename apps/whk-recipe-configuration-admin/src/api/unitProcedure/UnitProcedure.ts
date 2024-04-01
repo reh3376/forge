@@ -10,7 +10,12 @@ export type UnitProcedure = {
   id: string;
   instances?: Array<UnitProcedure>;
   isClassDef: boolean | null;
-  name: string;
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
   operations?: Array<Operation>;
   procedure?: Procedure;
   revision: number | null;
