@@ -11,7 +11,17 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsOptional, IsString, IsInt } from "class-validator";
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  ValidateNested,
+  IsInt,
+} from "class-validator";
+import { Recipe } from "./Recipe";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { Type } from "class-transformer";
+import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 
 @InputType()
 class RecipeUpdateInput {
@@ -79,7 +89,19 @@ class RecipeUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  mashBill?: string | null;
+  Recipe?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  recipeGroup?: RecipeGroupWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -102,6 +124,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => UnitProcedureUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  unitProcedures?: UnitProcedureUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

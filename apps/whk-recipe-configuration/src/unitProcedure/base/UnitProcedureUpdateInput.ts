@@ -25,6 +25,7 @@ import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedu
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { RecipeUpdateManyWithoutUnitProceduresInput } from "./RecipeUpdateManyWithoutUnitProceduresInput";
 
 @InputType()
 class UnitProcedureUpdateInput {
@@ -135,6 +136,18 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutUnitProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutUnitProceduresInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutUnitProceduresInput, {
+    nullable: true,
+  })
+  recipe?: RecipeUpdateManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,

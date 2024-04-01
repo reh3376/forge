@@ -5,6 +5,7 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
 import { OperationListRelationFilter } from "../operation/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
+import { RecipeListRelationFilter } from "../recipe/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 export type UnitProcedureWhereInput = {
@@ -23,6 +24,7 @@ export type UnitProcedureWhereInput = {
     | "Granary01";
   operations?: OperationListRelationFilter;
   procedure?: ProcedureWhereUniqueInput;
+  recipe?: RecipeListRelationFilter;
   revision?: IntNullableFilter;
   schemaVersion?: StringNullableFilter;
   updatedBy?: StringNullableFilter;

@@ -25,6 +25,9 @@ import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeFindUniqueArgs } from "./RecipeFindUniqueArgs";
 import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Recipe)
@@ -87,7 +90,15 @@ export class RecipeResolverBase {
   async createRecipe(@graphql.Args() args: CreateRecipeArgs): Promise<Recipe> {
     return await this.service.createRecipe({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        recipeGroup: args.data.recipeGroup
+          ? {
+              connect: args.data.recipeGroup,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -104,7 +115,15 @@ export class RecipeResolverBase {
     try {
       return await this.service.updateRecipe({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          recipeGroup: args.data.recipeGroup
+            ? {
+                connect: args.data.recipeGroup,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -114,5 +133,46 @@ export class RecipeResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProcedures(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProcedures(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => RecipeGroup, {
+    nullable: true,
+    name: "recipeGroup",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "read",
+    possession: "any",
+  })
+  async getRecipeGroup(
+    @graphql.Parent() parent: Recipe
+  ): Promise<RecipeGroup | null> {
+    const result = await this.service.getRecipeGroup(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

@@ -1,5 +1,6 @@
 import { Operation } from "../operation/Operation";
 import { Procedure } from "../procedure/Procedure";
+import { Recipe } from "../recipe/Recipe";
 
 export type UnitProcedure = {
   active: boolean | null;
@@ -18,6 +19,7 @@ export type UnitProcedure = {
     | "Granary01";
   operations?: Array<Operation>;
   procedure?: Procedure;
+  recipe?: Array<Recipe>;
   revision: number | null;
   schemaVersion: string | null;
   updatedAt: Date;

@@ -1,4 +1,5 @@
 import { SortOrder } from "../../util/SortOrder";
+import { Recipe } from "./Recipe";
 
 export type RecipeOrderByInput = {
   active?: SortOrder;
@@ -8,7 +9,8 @@ export type RecipeOrderByInput = {
   id?: SortOrder;
   itemDescription?: SortOrder;
   itemId?: SortOrder;
-  mashBill?: SortOrder;
+  Recipe?: SortOrder;
+  recipeGroupId?: SortOrder;
   revision?: SortOrder;
   schemaVersion?: SortOrder;
   updatedAt?: SortOrder;

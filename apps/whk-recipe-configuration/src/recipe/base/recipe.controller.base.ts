@@ -26,6 +26,9 @@ import { Recipe } from "./Recipe";
 import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { RecipeUpdateInput } from "./RecipeUpdateInput";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -50,7 +53,15 @@ export class RecipeControllerBase {
   })
   async createRecipe(@common.Body() data: RecipeCreateInput): Promise<Recipe> {
     return await this.service.createRecipe({
-      data: data,
+      data: {
+        ...data,
+
+        recipeGroup: data.recipeGroup
+          ? {
+              connect: data.recipeGroup,
+            }
+          : undefined,
+      },
       select: {
         active: true,
         createdAt: true,
@@ -59,7 +70,14 @@ export class RecipeControllerBase {
         id: true,
         itemDescription: true,
         itemId: true,
-        mashBill: true,
+        Recipe: true,
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -92,7 +110,14 @@ export class RecipeControllerBase {
         id: true,
         itemDescription: true,
         itemId: true,
-        mashBill: true,
+        Recipe: true,
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -126,7 +151,14 @@ export class RecipeControllerBase {
         id: true,
         itemDescription: true,
         itemId: true,
-        mashBill: true,
+        Recipe: true,
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -163,7 +195,15 @@ export class RecipeControllerBase {
     try {
       return await this.service.updateRecipe({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          recipeGroup: data.recipeGroup
+            ? {
+                connect: data.recipeGroup,
+              }
+            : undefined,
+        },
         select: {
           active: true,
           createdAt: true,
@@ -172,7 +212,14 @@ export class RecipeControllerBase {
           id: true,
           itemDescription: true,
           itemId: true,
-          mashBill: true,
+          Recipe: true,
+
+          recipeGroup: {
+            select: {
+              id: true,
+            },
+          },
+
           revision: true,
           schemaVersion: true,
           updatedAt: true,
@@ -187,5 +234,122 @@ export class RecipeControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/unitProcedures")
+  @ApiNestedQuery(UnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProcedures(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<UnitProcedure[]> {
+    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
+    const results = await this.service.findUnitProcedures(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/unitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedures: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/unitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedures: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/unitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedures: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }
