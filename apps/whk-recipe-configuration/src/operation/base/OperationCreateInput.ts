@@ -16,12 +16,14 @@ import {
   IsBoolean,
   IsOptional,
   ValidateNested,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
+import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
@@ -121,11 +123,16 @@ class OperationCreateInput {
 
   @ApiProperty({
     required: true,
-    type: String,
+    enum: EnumOperationName,
   })
-  @IsString()
-  @Field(() => String)
-  name!: string;
+  @IsEnum(EnumOperationName)
+  @Field(() => EnumOperationName)
+  name!:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
 
   @ApiProperty({
     required: true,

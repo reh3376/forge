@@ -17,9 +17,11 @@ import {
   ValidateNested,
   IsDate,
   IsString,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { Operation } from "../../operation/base/Operation";
 import { Procedure } from "../../procedure/base/Procedure";
 
@@ -102,11 +104,18 @@ class UnitProcedure {
 
   @ApiProperty({
     required: true,
-    type: String,
+    enum: EnumUnitProcedureName,
   })
-  @IsString()
-  @Field(() => String)
-  name!: string;
+  @IsEnum(EnumUnitProcedureName)
+  @Field(() => EnumUnitProcedureName, {
+    nullable: true,
+  })
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
 
   @ApiProperty({
     required: false,

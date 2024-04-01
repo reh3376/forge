@@ -13,11 +13,12 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
+import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationListRelationFilter } from "../../operation/base/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -105,14 +106,19 @@ class UnitProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    enum: EnumUnitProcedureName,
   })
-  @Type(() => StringFilter)
+  @IsEnum(EnumUnitProcedureName)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => EnumUnitProcedureName, {
     nullable: true,
   })
-  name?: StringFilter;
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
 
   @ApiProperty({
     required: false,

@@ -17,10 +17,12 @@ import {
   IsOptional,
   ValidateNested,
   IsDate,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -130,11 +132,18 @@ class Operation {
 
   @ApiProperty({
     required: true,
-    type: String,
+    enum: EnumOperationName,
   })
-  @IsString()
-  @Field(() => String)
-  name!: string;
+  @IsEnum(EnumOperationName)
+  @Field(() => EnumOperationName, {
+    nullable: true,
+  })
+  name?:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
 
   @ApiProperty({
     required: true,
