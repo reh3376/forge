@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
 @InputType()
 class BomWhereInput {
@@ -108,6 +109,30 @@ class BomWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => UnitProcedureListRelationFilter, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => UnitProcedureListRelationFilter, {
+    nullable: true,
+  })
+  unitProceduresPrimary?: UnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,

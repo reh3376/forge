@@ -1,4 +1,5 @@
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -10,6 +11,7 @@ import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 export type UnitProcedureWhereInput = {
   active?: BooleanNullableFilter;
+  boms?: BomWhereUniqueInput;
   classId?: UnitProcedureWhereUniqueInput;
   createdBy?: StringFilter;
   description?: StringNullableFilter;
@@ -23,6 +25,7 @@ export type UnitProcedureWhereInput = {
     | "Processing01"
     | "Granary01";
   operations?: OperationListRelationFilter;
+  primaryBom?: BomWhereUniqueInput;
   procedure?: ProcedureWhereUniqueInput;
   recipe?: RecipeListRelationFilter;
   revision?: IntNullableFilter;

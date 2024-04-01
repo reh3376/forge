@@ -15,6 +15,8 @@ import {
 import { BOM_TITLE_FIELD } from "./BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "../equipmentPhase/EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
+import { UNITPROCEDURE_TITLE_FIELD } from "../unitProcedure/UnitProcedureTitle";
+import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 
 export const BomShow = (props: ShowProps): React.ReactElement => {
   return (
@@ -72,6 +74,84 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
             />
             <TextField label="Revision" source="revision" />
             <TextField label="Schema Version" source="schemaVersion" />
+          </Datagrid>
+        </ReferenceManyField>
+        <ReferenceManyField
+          reference="UnitProcedure"
+          target="bomsId"
+          label="Unit Procedures"
+        >
+          <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
+            <ReferenceField label="Boms" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
+            <ReferenceField
+              label="Class"
+              source="unitprocedure.id"
+              reference="UnitProcedure"
+            >
+              <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <TextField label="Description" source="description" />
+            <TextField label="ID" source="id" />
+            <BooleanField label="Is Class Def" source="isClassDef" />
+            <TextField label="Name" source="name" />
+            <ReferenceField label="Primary Bom" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
+            <ReferenceField
+              label="Procedure"
+              source="procedure.id"
+              reference="Procedure"
+            >
+              <TextField source={PROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <TextField label="Revision" source="revision" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <DateField source="updatedAt" label="Updated At" />
+            <TextField label="Updated By" source="updatedBy" />
+          </Datagrid>
+        </ReferenceManyField>
+        <ReferenceManyField
+          reference="UnitProcedure"
+          target="primaryBomId"
+          label="Unit Procedures"
+        >
+          <Datagrid rowClick="show">
+            <BooleanField label="Active" source="active" />
+            <ReferenceField label="Boms" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
+            <ReferenceField
+              label="Class"
+              source="unitprocedure.id"
+              reference="UnitProcedure"
+            >
+              <TextField source={UNITPROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <DateField source="createdAt" label="Created At" />
+            <TextField label="Created By" source="createdBy" />
+            <TextField label="Description" source="description" />
+            <TextField label="ID" source="id" />
+            <BooleanField label="Is Class Def" source="isClassDef" />
+            <TextField label="Name" source="name" />
+            <ReferenceField label="Primary Bom" source="bom.id" reference="Bom">
+              <TextField source={BOM_TITLE_FIELD} />
+            </ReferenceField>
+            <ReferenceField
+              label="Procedure"
+              source="procedure.id"
+              reference="Procedure"
+            >
+              <TextField source={PROCEDURE_TITLE_FIELD} />
+            </ReferenceField>
+            <TextField label="Revision" source="revision" />
+            <TextField label="Schema Version" source="schemaVersion" />
+            <DateField source="updatedAt" label="Updated At" />
+            <TextField label="Updated By" source="updatedBy" />
           </Datagrid>
         </ReferenceManyField>
       </SimpleShowLayout>

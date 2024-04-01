@@ -214,17 +214,19 @@ model Recipe {
 }
 
 model Bom {
-  bomName         String
-  bomRevision     Int?             @default(0)
-  className       String?
-  createdAt       DateTime         @default(now())
-  createdBy       String
-  editedAt        DateTime         @updatedAt
-  editedBy        String?
-  equipmentPhases EquipmentPhase[]
-  id              String           @id @default(cuid())
-  schemaVersion   String?          @default("0001-alpha")
-  wipItemId       String?
+  bomName               String
+  bomRevision           Int?             @default(0)
+  className             String?
+  createdAt             DateTime         @default(now())
+  createdBy             String
+  editedAt              DateTime         @updatedAt
+  editedBy              String?
+  equipmentPhases       EquipmentPhase[]
+  id                    String           @id @default(cuid())
+  schemaVersion         String?          @default("0001-alpha")
+  unitProcedure         UnitProcedure[]  @relation(name: "BomsOnUnitProcedure")
+  unitProceduresPrimary UnitProcedure[]  @relation(name: "primaryBom")
+  wipItemId             String?
 }
 
 model ProductionOrderQueue {
@@ -245,6 +247,8 @@ model ProductionOrderQueue {
 
 model UnitProcedure {
   active        Boolean?              @default(true)
+  boms          Bom?                  @relation(name: "BomsOnUnitProcedure", fields: [bomsId], references: [id])
+  bomsId        String?
   classId       UnitProcedure?        @relation(name: "UnitProcedureClassIdUnitProcedureInstances", fields: [classIdId], references: [id])
   classIdId     String?
   createdAt     DateTime              @default(now())
@@ -255,6 +259,8 @@ model UnitProcedure {
   isClassDef    Boolean?              @default(false)
   name          EnumUnitProcedureName
   operations    Operation[]
+  primaryBom    Bom?                  @relation(name: "primaryBom", fields: [primaryBomId], references: [id])
+  primaryBomId  String?
   procedure     Procedure             @relation(fields: [procedureId], references: [id])
   procedureId   String
   recipe        Recipe[]

@@ -1,4 +1,5 @@
 import { EquipmentPhaseUpdateManyWithoutBomsInput } from "./EquipmentPhaseUpdateManyWithoutBomsInput";
+import { UnitProcedureUpdateManyWithoutBomsInput } from "./UnitProcedureUpdateManyWithoutBomsInput";
 
 export type BomUpdateInput = {
   bomName?: string;
@@ -8,5 +9,7 @@ export type BomUpdateInput = {
   editedBy?: string | null;
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutBomsInput;
   schemaVersion?: string | null;
+  unitProcedure?: UnitProcedureUpdateManyWithoutBomsInput;
+  unitProceduresPrimary?: UnitProcedureUpdateManyWithoutBomsInput;
   wipItemId?: string | null;
 };

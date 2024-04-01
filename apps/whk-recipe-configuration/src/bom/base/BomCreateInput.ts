@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsInt, IsOptional, ValidateNested } from "class-validator";
 import { EquipmentPhaseCreateNestedManyWithoutBomsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomsInput";
 import { Type } from "class-transformer";
+import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
 
 @InputType()
 class BomCreateInput {
@@ -88,6 +89,30 @@ class BomCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureCreateNestedManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureCreateNestedManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => UnitProcedureCreateNestedManyWithoutBomsInput, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureCreateNestedManyWithoutBomsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureCreateNestedManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureCreateNestedManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => UnitProcedureCreateNestedManyWithoutBomsInput, {
+    nullable: true,
+  })
+  unitProceduresPrimary?: UnitProcedureCreateNestedManyWithoutBomsInput;
 
   @ApiProperty({
     required: false,
