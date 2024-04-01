@@ -40,7 +40,19 @@ export const UnitProcedureCreate = (props: CreateProps): React.ReactElement => {
           <SelectArrayInput optionText={UnitProcedureTitle} />
         </ReferenceArrayInput>
         <BooleanInput label="Is Class Def" source="isClassDef" />
-        <TextInput label="Name" source="name" />
+        <SelectInput
+          source="name"
+          label="Name"
+          choices={[
+            { label: "Mashing01", value: "Mashing01" },
+            { label: "Fermentation01", value: "Fermentation01" },
+            { label: "Distillation01", value: "Distillation01" },
+            { label: "Processing01", value: "Processing01" },
+            { label: "Granary01", value: "Granary01" },
+          ]}
+          optionText="label"
+          optionValue="value"
+        />
         <ReferenceArrayInput
           source="operations"
           reference="Operation"

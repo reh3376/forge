@@ -17,7 +17,7 @@ export type EquipmentPhaseCreateInput = {
   instances?: EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput;
   instructions?: InstructionCreateNestedManyWithoutEquipmentPhasesInput;
   isClassDefinition?: boolean | null;
-  name: string;
+  name: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
   operation: OperationWhereUniqueInput;
   operationSequenceIndex?: number | null;
   phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;

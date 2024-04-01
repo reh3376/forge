@@ -13,7 +13,7 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -21,6 +21,7 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { EquipmentPhaseListRelationFilter } from "./EquipmentPhaseListRelationFilter";
 import { InstructionListRelationFilter } from "../../instruction/base/InstructionListRelationFilter";
+import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PhaseParameterListRelationFilter } from "../../phaseParameter/base/PhaseParameterListRelationFilter";
@@ -177,14 +178,14 @@ class EquipmentPhaseWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    enum: EnumEquipmentPhaseName,
   })
-  @Type(() => StringFilter)
+  @IsEnum(EnumEquipmentPhaseName)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => EnumEquipmentPhaseName, {
     nullable: true,
   })
-  name?: StringFilter;
+  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
 
   @ApiProperty({
     required: false,

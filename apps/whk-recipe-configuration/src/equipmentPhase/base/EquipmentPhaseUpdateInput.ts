@@ -16,6 +16,7 @@ import {
   IsOptional,
   ValidateNested,
   IsString,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
@@ -23,6 +24,7 @@ import { Type } from "class-transformer";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
 import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
@@ -145,14 +147,14 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    enum: EnumEquipmentPhaseName,
   })
-  @IsString()
+  @IsEnum(EnumEquipmentPhaseName)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => EnumEquipmentPhaseName, {
     nullable: true,
   })
-  name?: string;
+  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
 
   @ApiProperty({
     required: false,

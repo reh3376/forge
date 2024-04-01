@@ -17,7 +17,7 @@ export type EquipmentPhaseUpdateInput = {
   instances?: EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput;
   instructions?: InstructionUpdateManyWithoutEquipmentPhasesInput;
   isClassDefinition?: boolean | null;
-  name?: string;
+  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
   operation?: OperationWhereUniqueInput;
   operationSequenceIndex?: number | null;
   phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
