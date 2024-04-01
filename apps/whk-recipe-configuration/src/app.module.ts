@@ -26,6 +26,7 @@ import { RecipeModule } from "./recipe/recipe.module";
 import { BomModule } from "./bom/bom.module";
 import { ProductionOrderQueueModule } from "./productionOrderQueue/productionOrderQueue.module";
 import { UnitProcedureModule } from "./unitProcedure/unitProcedure.module";
+import { RecipeGroupModule } from "./recipeGroup/recipeGroup.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -60,6 +61,7 @@ import { AuthModule } from "./auth/auth.module";
     BomModule,
     ProductionOrderQueueModule,
     UnitProcedureModule,
+    RecipeGroupModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

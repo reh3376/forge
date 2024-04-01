@@ -2,6 +2,7 @@ import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
+import { RecipeUpdateManyWithoutUnitProceduresInput } from "./RecipeUpdateManyWithoutUnitProceduresInput";
 
 export type UnitProcedureUpdateInput = {
   active?: boolean | null;
@@ -18,6 +19,7 @@ export type UnitProcedureUpdateInput = {
     | "Granary01";
   operations?: OperationUpdateManyWithoutUnitProceduresInput;
   procedure?: ProcedureWhereUniqueInput;
+  recipe?: RecipeUpdateManyWithoutUnitProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;
   updatedBy?: string | null;

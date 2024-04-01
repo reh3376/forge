@@ -53,6 +53,10 @@ import { UnitProcedureList } from "./unitProcedure/UnitProcedureList";
 import { UnitProcedureCreate } from "./unitProcedure/UnitProcedureCreate";
 import { UnitProcedureEdit } from "./unitProcedure/UnitProcedureEdit";
 import { UnitProcedureShow } from "./unitProcedure/UnitProcedureShow";
+import { RecipeGroupList } from "./recipeGroup/RecipeGroupList";
+import { RecipeGroupCreate } from "./recipeGroup/RecipeGroupCreate";
+import { RecipeGroupEdit } from "./recipeGroup/RecipeGroupEdit";
+import { RecipeGroupShow } from "./recipeGroup/RecipeGroupShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -162,6 +166,13 @@ const App = (): React.ReactElement => {
           edit={UnitProcedureEdit}
           create={UnitProcedureCreate}
           show={UnitProcedureShow}
+        />
+        <Resource
+          name="RecipeGroup"
+          list={RecipeGroupList}
+          edit={RecipeGroupEdit}
+          create={RecipeGroupCreate}
+          show={RecipeGroupShow}
         />
       </Admin>
     </div>

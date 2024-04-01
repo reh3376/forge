@@ -15,6 +15,7 @@ import {
   Prisma,
   UnitProcedure, // @ts-ignore
   Operation, // @ts-ignore
+  Recipe, // @ts-ignore
   Procedure,
 } from "@prisma/client";
 
@@ -73,6 +74,17 @@ export class UnitProcedureServiceBase {
         where: { id: parentId },
       })
       .operations(args);
+  }
+
+  async findRecipe(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    return this.prisma.unitProcedure
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipe(args);
   }
 
   async getClassId(parentId: string): Promise<UnitProcedure | null> {
