@@ -1,3 +1,6 @@
+import { RecipeGroup } from "../recipeGroup/RecipeGroup";
+import { UnitProcedure } from "../unitProcedure/UnitProcedure";
+
 export type Recipe = {
   active: boolean | null;
   createdAt: Date;
@@ -6,9 +9,11 @@ export type Recipe = {
   id: string;
   itemDescription: string | null;
   itemId: string;
-  mashBill: string | null;
+  Recipe: string;
+  recipeGroup?: RecipeGroup | null;
   revision: number | null;
   schemaVersion: string | null;
+  unitProcedures?: Array<UnitProcedure>;
   updatedAt: Date;
   updatedBy: string | null;
 };

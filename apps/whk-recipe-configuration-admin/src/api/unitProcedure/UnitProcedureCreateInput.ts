@@ -2,6 +2,7 @@ import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitProcedureCreateNestedManyWithoutUnitProceduresInput";
 import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../procedure/ProcedureWhereUniqueInput";
+import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreateNestedManyWithoutUnitProceduresInput";
 
 export type UnitProcedureCreateInput = {
   active?: boolean | null;
@@ -18,6 +19,7 @@ export type UnitProcedureCreateInput = {
     | "Granary01";
   operations?: OperationCreateNestedManyWithoutUnitProceduresInput;
   procedure: ProcedureWhereUniqueInput;
+  recipe?: RecipeCreateNestedManyWithoutUnitProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;
   updatedBy?: string | null;

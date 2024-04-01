@@ -1798,5 +1798,155 @@
     "resource": "UnitProcedure",
     "action": "read:any",
     "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeGroup",
+    "action": "read:any",
+    "attributes": "*"
   }
 ]

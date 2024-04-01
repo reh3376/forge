@@ -13,6 +13,7 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsEnum } from "class-validator";
 import { SortOrder } from "../../util/SortOrder";
+import { Recipe } from "./Recipe";
 
 @InputType({
   isAbstract: true,
@@ -105,7 +106,18 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  mashBill?: SortOrder;
+  Recipe?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  recipeGroupId?: SortOrder;
 
   @ApiProperty({
     required: false,

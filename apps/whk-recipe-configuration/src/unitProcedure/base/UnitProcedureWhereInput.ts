@@ -21,6 +21,7 @@ import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilt
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationListRelationFilter } from "../../operation/base/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
@@ -143,6 +144,18 @@ class UnitProcedureWhereInput {
     nullable: true,
   })
   procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeListRelationFilter, {
+    nullable: true,
+  })
+  recipe?: RecipeListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -16,9 +16,12 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  ValidateNested,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
 class Recipe {
@@ -85,15 +88,21 @@ class Recipe {
   itemId!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
+  @Field(() => String)
+  Recipe!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroup,
   })
-  mashBill!: string | null;
+  @ValidateNested()
+  @Type(() => RecipeGroup)
+  @IsOptional()
+  recipeGroup?: RecipeGroup | null;
 
   @ApiProperty({
     required: false,
@@ -116,6 +125,15 @@ class Recipe {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProcedures?: Array<UnitProcedure>;
 
   @ApiProperty({
     required: true,
