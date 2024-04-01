@@ -28,6 +28,8 @@ import { UpdateUnitProcedureArgs } from "./UpdateUnitProcedureArgs";
 import { DeleteUnitProcedureArgs } from "./DeleteUnitProcedureArgs";
 import { OperationFindManyArgs } from "../../operation/base/OperationFindManyArgs";
 import { Operation } from "../../operation/base/Operation";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
 import { Procedure } from "../../procedure/base/Procedure";
 import { UnitProcedureService } from "../unitProcedure.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -201,6 +203,26 @@ export class UnitProcedureResolverBase {
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
     const results = await this.service.findOperations(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Recipe], { name: "recipe" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipe(
+    @graphql.Parent() parent: UnitProcedure,
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findRecipe(parent.id, args);
 
     if (!results) {
       return [];

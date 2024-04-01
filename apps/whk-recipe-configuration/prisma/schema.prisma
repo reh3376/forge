@@ -194,17 +194,20 @@ model Procedure {
 }
 
 model Recipe {
-  active          Boolean? @default(true)
-  createdAt       DateTime @default(now())
+  active          Boolean?        @default(true)
+  createdAt       DateTime        @default(now())
   createdBy       String
   customerId      String
-  id              String   @id @default(cuid())
+  id              String          @id @default(cuid())
   itemDescription String?
   itemId          String
-  mashBill        String?
-  revision        Int?     @default(0)
-  schemaVersion   String?  @default("0001-b")
-  updatedAt       DateTime @updatedAt
+  Recipe String @Follows the format of "XX-XX-XX-XX" where the "XX"s are percents and the order is Corn, Wheat, Rye, Malt (CONFIRM)
+  recipeGroup     RecipeGroup?    @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId   String?
+  revision        Int?            @default(0)
+  schemaVersion   String?         @default("0001-b")
+  unitProcedures  UnitProcedure[]
+  updatedAt       DateTime        @updatedAt
   updatedBy       String?
 
   @@unique([itemId, customerId])
@@ -223,7 +226,7 @@ model Bom {
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
 
-  @@map("boms"
+  @@map("boms")
 }
 
 model ProductionOrderQueue {
@@ -256,12 +259,27 @@ model UnitProcedure {
   operations    Operation[]
   procedure     Procedure             @relation(fields: [procedureId], references: [id])
   procedureId   String
+  recipe        Recipe[]
   revision      Int?                  @default(0)
   schemaVersion String?               @default("0001-b")
   updatedAt     DateTime              @updatedAt
   updatedBy     String?
 
   @@unique([name, revision, active, isClassDefinition])
+}
+
+model RecipeGroup {
+  createdAt DateTime @default(now())
+  createdBy String
+  id        String   @id @default(cuid())
+  recipe String @Follows the format of "XX-XX-XX-XX" where the "XX"s are percents and the order is Corn, Wheat, Rye, Malt (CONFIRM)
+  recipes   Recipe[]
+  revision  Int?     @default(0)
+  schemaVersion String? @default("0001-alpha)
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@unique([recipe, revision])
 }
 
 enum EnumPhaseParameterSetpointType {
