@@ -10,6 +10,7 @@ export type PhaseParameterOrderByInput = {
   equipmentPhaseId?: SortOrder;
   id?: SortOrder;
   isClassDef?: SortOrder;
+  isStaticParameter?: SortOrder;
   itemId?: SortOrder;
   name?: SortOrder;
   recipeId?: SortOrder;
@@ -20,6 +21,7 @@ export type PhaseParameterOrderByInput = {
   setpointNumericalValue?: SortOrder;
   setpointType?: SortOrder;
   setpointUpperLimit?: SortOrder;
+  staticName?: SortOrder;
   units?: SortOrder;
   updatedAt?: SortOrder;
 };

@@ -125,6 +125,10 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
             </ReferenceField>
             <TextField label="ID" source="id" />
             <BooleanField label="Is Class Def" source="isClassDef" />
+            <BooleanField
+              label="Is Static Parameter"
+              source="isStaticParameter"
+            />
             <TextField label="Item ID" source="itemId" />
             <TextField label="Name" source="name" />
             <TextField label="Recipe ID" source="recipeId" />
@@ -147,6 +151,7 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
               label="Setpoint Upper Limit"
               source="setpointUpperLimit"
             />
+            <TextField label="Static Name" source="staticName" />
             <TextField label="Units" source="units" />
             <DateField source="updatedAt" label="Updated At" />
           </Datagrid>
