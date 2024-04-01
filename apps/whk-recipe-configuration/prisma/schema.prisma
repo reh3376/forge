@@ -201,7 +201,7 @@ model Recipe {
   id              String          @id @default(cuid())
   itemDescription String?
   itemId          String
-  Recipe String @Follows the format of "XX-XX-XX-XX" where the "XX"s are percents and the order is Corn, Wheat, Rye, Malt (CONFIRM)
+  Recipe          String
   recipeGroup     RecipeGroup?    @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId   String?
   revision        Int?            @default(0)
@@ -225,8 +225,6 @@ model Bom {
   id              String           @id @default(cuid())
   schemaVersion   String?          @default("0001-alpha")
   wipItemId       String?
-
-  @@map("boms")
 }
 
 model ProductionOrderQueue {
@@ -272,7 +270,7 @@ model RecipeGroup {
   createdAt DateTime @default(now())
   createdBy String
   id        String   @id @default(cuid())
-  recipe String @Follows the format of "XX-XX-XX-XX" where the "XX"s are percents and the order is Corn, Wheat, Rye, Malt (CONFIRM)
+  recipe    String
   recipes   Recipe[]
   revision  Int?     @default(0)
   schemaVersion String? @default("0001-alpha)
