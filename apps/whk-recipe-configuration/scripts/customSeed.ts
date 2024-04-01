@@ -1,9 +1,11 @@
 // import {Prisma, PrismaClient} from "@prisma/client";
 
 import {
-  EnumPhaseParameterSetpointType,
-  EnumTestParameterTestParamUnits, EnumTestParameterTestSetpointType, Operation, PhaseParameter,
-  PrismaClient, TestParameter
+  EnumEquipmentPhaseName,
+  EnumOperationName,
+  EnumPhaseParameterSetpointType, EnumProcedureName,
+  EnumTestParameterTestParamUnits, EnumTestParameterTestSetpointType, EnumUnitProcedureName, Operation, PhaseParameter,
+  PrismaClient,
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
@@ -53,163 +55,136 @@ export async function customSeed() {
   }
 
   // Utility function to generate a unique name, consider implementing uniqueness checks
-  function generateUniqueName(baseName: string): string {
-    return `${baseName}-${faker.string.uuid()}`;
-  }
-
-  async function seedProcedureClasses(n: number): Promise<string[]> {
-    const classIds = [];
-
-    for (let i = 0; i < n; i++) {
-      const procedure = await client.procedure.create({
-        data: {
-          createdBy: faker.internet.userName(),
-          name: generateUniqueName("Class"),
-          isClassDefinition: true,
-          active: true, // Assuming class definitions are active
-          description: faker.commerce.productDescription(),
-          revision: faker.number.int({ min: 0, max: 10 }),
-          // Populate other fields as needed
-        },
-      });
-      classIds.push(procedure.id);
-    }
-
-    return classIds; // Return the IDs of created class definitions for linking instances
-  }
-
-  async function seedProcedureInstances(classIds: string[], n: number): Promise<void> {
-    for (const classId of classIds) {
-      for (let i = 0; i < n; i++) {
-        await client.procedure.create({
-          data: {
-            createdBy: faker.internet.userName(),
-            classIdId: classId,
-            isClassDefinition: false,
-            name: generateUniqueName("Instance"),
-            active: faker.datatype.boolean(),
-            description: faker.commerce.productDescription(),
-            revision: faker.number.int({ min: 0, max: 10 }),
-            // Populate other fields as needed
-          },
-        });
-      }
-    }
-  }
+  // function generateUniqueName(baseName: string): string {
+  //   return `${baseName}-${faker.string.uuid()}`;
+  // }
 
   async function seedProcedure(n: number): Promise<void> {
-    const classIds = await seedProcedureClasses(Math.ceil(n / 5)); // Adjust ratio as needed
-    await seedProcedureInstances(classIds, n - classIds.length); // Seed remaining as instances
-    console.log(`${n} Procedures (classes and instances) created.`);
+    const classDefinitions = [];
+
+    // Assume EnumProcedureName has limited values, adjust as necessary
+    const procedureNames = Object.values(EnumProcedureName);
+
+    // Step 1: Seed class definitions
+    for (const name of procedureNames) {
+      const classDefinition = await client.procedure.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          description: faker.lorem.sentences(),
+          name,
+          isClassDefinition: true,
+          revision: 0, // Starting revision for class definitions
+        },
+      });
+      classDefinitions.push(classDefinition);
+    }
+
+    // Step 2: Seed instances for each class definition
+    for (const classDefinition of classDefinitions) {
+      await client.procedure.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          description: faker.lorem.sentences(),
+          name: classDefinition.name,
+          // classId: classDefinition.id,
+          isClassDefinition: false,
+          revision: faker.datatype.number({ min: 1, max: 10 }), // Assume instances can have varying revisions
+          // Optionally set active and other fields as necessary
+        },
+      });
+    }
+
+    console.log(`Procedures seeded: ${procedureNames.length} class definitions and ${n * procedureNames.length} instances.`);
   }
 
   // Unit Procedure
-  async function seedUnitProcedure(total: number): Promise<void> {
-    // Fetch Procedure IDs
-    const procedures = await client.procedure.findMany({
-      select: { id: true },
-    });
-    const procedureIds = procedures.map(proc => proc.id);
+  async function seedUnitProcedure(): Promise<void> {
+    const procedureIds = (await client.procedure.findMany()).map(procedure => procedure.id);
 
     if (procedureIds.length === 0) {
-      console.warn('No Procedures found. Please seed Procedures first.');
+      console.warn("No Procedures found. Please seed Procedures first.");
       return;
     }
 
-    const classRatio = 0.3; // Ratio of class definitions
-    const numClasses = Math.round(total * classRatio);
-    const classIds: string[] = [];
-
-    for (let i = 0; i < total; i++) {
-      const isClassDefinition = i < numClasses;
-      const procedureId = getRandomArrayElement(procedureIds); // Randomly select a Procedure ID
-      if (!procedureId) continue; // Skip if no Procedure ID is found
-
-      const unitProcedure = await client.unitProcedure.create({
+    // Seed class definitions for each UnitProcedure name
+    for (const name of Object.values(EnumUnitProcedureName)) {
+      const procedureId = getRandomArrayElement(procedureIds);
+      await client.unitProcedure.create({
         data: {
           createdBy: faker.internet.userName(),
-          name: isClassDefinition ? `Class-${faker.commerce.productName()}` : `Instance-${faker.commerce.productName()}`,
-          description: faker.commerce.productDescription(),
-          isClassDef: isClassDefinition,
-          active: faker.datatype.boolean(),
-          procedure: {
-            connect: { id: procedureId },
-          },
-          ...(isClassDefinition ? {} : { classId: { connect: { id: getRandomArrayElement(classIds) || undefined } } }), // Connect to a random classId if it's an instance
-          revision: faker.number.int(10),
+          name: name,
+          isClassDef: true,
+          procedure: { connect: { id: procedureId } },
+          revision: 0, // Initial revision for class definitions
+          // Additional fields as necessary
         },
       });
 
-      if (isClassDefinition) {
-        classIds.push(unitProcedure.id); // Collect new class definition IDs to use for instances
+      // Seed instances for the class definition
+      const instancesCount = faker.datatype.number({ min: 1, max: 5 });
+      for (let i = 0; i < instancesCount; i++) {
+        await client.unitProcedure.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            name: name, // Same name as class definition
+            isClassDef: false,
+            // classId: classDefinition.id,
+            procedure: { connect: { id: procedureId } },
+            revision: i + 1, // Incremental revisions for instances
+            // Additional fields as necessary
+          },
+        });
       }
     }
 
-    console.log(`${total} UnitProcedures (classes and instances) created.`);
+    console.log("UnitProcedures seeded.");
   }
-
   // operation
-  async function seedOperation(total: number): Promise<void> {
-    // Fetch UnitProcedure IDs
-    const unitProcedures = await client.unitProcedure.findMany({
-      select: { id: true }, // Only fetch the IDs to minimize data transfer
-    });
-    const unitProcedureIds = unitProcedures.map(up => up.id);
+  async function seedOperation(): Promise<void> {
+    const unitProcedures = await client.unitProcedure.findMany();
 
-    if (unitProcedureIds.length === 0) {
-      console.warn('No UnitProcedures found. Please seed UnitProcedures first.');
+    if (unitProcedures.length === 0) {
+      console.warn("No UnitProcedures found. Please seed UnitProcedures first.");
       return;
     }
 
-    const classRatio = 0.3; // Example ratio of class definitions
-    const numClasses = Math.round(total * classRatio);
+    // Seed class definitions for each Operation name
+    for (const name of Object.values(EnumOperationName)) {
+      const unitProcedure = getRandomArrayElement(unitProcedures) as any;
+      const classDefinition = await client.operation.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          description: faker.commerce.productDescription(),
+          name,
+          abbreviation: faker.lorem.word(),
+          path: `/${faker.helpers.slugify(name)}`,
+          isClassDefinition: true,
+          unitProcedure: { connect: { id: unitProcedure.id } },
+          // Additional fields as necessary
+        },
+      });
 
-    for (let i = 0; i < total; i++) {
-      const isClassDefinition = i < numClasses;
-      const unitProcedureId = getRandomArrayElement(unitProcedureIds); // Randomly select a UnitProcedure ID
-      if (isClassDefinition) {
+      // Seed a few instances for the class definition
+      const instancesCount = faker.datatype.number({ min: 1, max: 5 });
+      for (let i = 0; i < instancesCount; i++) {
         await client.operation.create({
           data: {
             createdBy: faker.internet.userName(),
-            name: `${isClassDefinition ? 'Class' : 'Instance'}-${faker.word.noun()}-${faker.string.uuid()}`,
-            abbreviation: faker.string.alphanumeric(3).toUpperCase(),
-            description: faker.commerce.productDescription(),
-            path: `/${isClassDefinition ? 'class' : 'instance'}/${faker.word.noun()}`,
-            isClassDefinition: isClassDefinition,
-            active: faker.datatype.boolean(),
-            unitProcedure: {
-              connect: { id: unitProcedureId },
-            },
-            // Set additional fields as needed
-            procedureSequenceIndex: faker.number.int({ min: 1, max: 100 }),
-            revision: faker.number.int({ min: 0, max: 10 }),
-          },
-        });
-      } else {
-        // get classId from Operation
-        const classIds = await client.operation.findMany();
-        const randomClassId = getRandomArrayElement(classIds) as Operation;
-        await client.operation.create({
-          data: {
-            createdBy: faker.internet.userName(),
-            name: `${isClassDefinition ? 'Class' : 'Instance'}-${faker.word.noun()}-${faker.string.uuid()}`,
-            abbreviation: faker.string.alphanumeric(3).toUpperCase(),
-            description: faker.commerce.productDescription(),
-            path: `/${isClassDefinition ? 'class' : 'instance'}/${faker.word.noun()}`,
-            isClassDefinition: isClassDefinition,
-            active: faker.datatype.boolean(),
-            unitProcedure: {
-              connect: { id: unitProcedureId },
-            },
-            classId: { connect: { id: randomClassId.id } }, // Connect to a random classId if it's an instance
-            procedureSequenceIndex: faker.number.int({ min: 1, max: 100 }),
-            revision: faker.number.int({ min: 0, max: 10 }),
+            description: `${classDefinition.description} - instance ${i + 1}`,
+            name, // Same name as class definition
+            path: classDefinition.path + `/instance-${i + 1}`,
+            isClassDefinition: false,
+            abbreviation: faker.lorem.word(),
+            // classId: classDefinition.id,
+            unitProcedure: { connect: { id: unitProcedure.id } },
+            revision: i + 1, // Incremental revisions for instances
+            // Additional fields as necessary
           },
         });
       }
     }
 
-    console.log(`${total} Operations (classes and instances) created.`);
+    console.log("Operations seeded successfully.");
   }
 
   // Test Parameter Handling
@@ -329,69 +304,47 @@ export async function customSeed() {
   }
 
   // equipment phase
-  async function seedEquipmentPhase(total: number): Promise<void> {
-    // Fetch necessary relations
-    const operations = await client.operation.findMany({ select: { id: true } });
-    const boms = await client.bom.findMany({ select: { id: true } });
-    const testParameters = await client.testParameter.findMany({ select: { id: true } });
-    const phaseParameters = await client.phaseParameter.findMany({ select: { id: true } });
+  async function seedEquipmentPhase(): Promise<void> {
+    const operations = await client.operation.findMany();
 
-    if (operations.length === 0 ||
-      boms.length === 0 ||
-      testParameters.length === 0 ||
-      phaseParameters.length === 0
-    ) {
-      console.warn('No Operations found. Please seed Operations first.');
+    if (operations.length === 0) {
+      console.warn("No Operations found. Please seed Operations first.");
       return;
     }
 
-    const classRatio = 0.3; // Ratio of class definitions
-    const numClasses = Math.round(total * classRatio);
-    const classIds: string[] = [];
-
-    for (let i = 0; i < total; i++) {
-      const isClassDefinition = i < numClasses;
-      const operation = getRandomArrayElement(operations) as Operation;
-      const bom = getRandomArrayElement(boms)
-      const testParameter = getRandomArrayElement(testParameters) as TestParameter;
-      const phaseParameter = getRandomArrayElement(phaseParameters) as PhaseParameter;
-
-      const equipmentPhase = await client.equipmentPhase.create({
+    // Seed class definitions for each EquipmentPhase name
+    for (const name of Object.values(EnumEquipmentPhaseName)) {
+      const operation = getRandomArrayElement(operations) as any;
+      const classDefinition = await client.equipmentPhase.create({
         data: {
           createdBy: faker.internet.userName(),
-          name: `${isClassDefinition ? 'Class' : 'Instance'}-${faker.commerce.productName()}-${faker.string.uuid()}`,
-          isClassDefinition,
-          active: faker.datatype.boolean(),
-          operation: {
-            connect: { id: operation.id },
-          },
-          ...(bom && {
-            bom: {
-              connect: { id: bom.id },
-            },
-          }),
-          ...(isClassDefinition ? {} : {
-            classId: {
-              connect: { id: getRandomArrayElement(classIds) },
-            },
-          }),
-          description: faker.commerce.productDescription(),
-          revision: faker.number.int({ min: 0, max: 10 }),
-          testParameters: {
-            connect: { id: testParameter.id},
-          },
-          phaseParameters: {
-            connect: { id: phaseParameter.id },
-          },
+          description: faker.lorem.sentence(),
+          name,
+          operation: { connect: { id: operation.id } },
+          isClassDefinition: true,
+          // Additional fields as necessary
         },
       });
 
-      if (isClassDefinition) {
-        classIds.push(equipmentPhase.id); // Collect new class definition IDs to use for instances
+      // Seed instances for the class definition
+      const instancesCount = faker.datatype.number({ min: 1, max: 5 });
+      for (let i = 0; i < instancesCount; i++) {
+        await client.equipmentPhase.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            description: `${classDefinition.description} - instance ${i + 1}`,
+            name, // Same name as class definition
+            operation: { connect: { id: operation.id } },
+            // classId: classDefinition.id,
+            isClassDefinition: false,
+            revision: i + 1, // Incremental revisions for instances
+            // Additional fields as necessary
+          },
+        });
       }
     }
 
-    console.log(`${total} EquipmentPhases (classes and instances) created.`);
+    console.log("EquipmentPhases seeded successfully.");
   }
 
   const seedFunctions: SeedFunctions = {
