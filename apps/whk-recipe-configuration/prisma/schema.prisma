@@ -31,6 +31,7 @@ model PhaseParameter {
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
   isClassDef             Boolean                        @default(false)
+  isStaticParameter      Boolean?                       @default(false)
   itemId                 String?
   name                   String
   recipeId               String?
@@ -41,6 +42,7 @@ model PhaseParameter {
   setpointNumericalValue Float?
   setpointType           EnumPhaseParameterSetpointType
   setpointUpperLimit     Float?
+  staticName             EnumPhaseParameterStaticName?
   units                  String
   updatedAt              DateTime                       @updatedAt
 
@@ -265,6 +267,14 @@ model UnitProcedure {
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
+}
+
+enum EnumPhaseParameterStaticName {
+  SteamTemperature
+  HoldTime
+  IngredientName
+  IngredientQuantity
+  IngredientUnits
 }
 
 enum EnumTestParameterTestParamUnits {
