@@ -30,6 +30,7 @@ import { OperationFindManyArgs } from "../../operation/base/OperationFindManyArg
 import { Operation } from "../../operation/base/Operation";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
+import { Bom } from "../../bom/base/Bom";
 import { Procedure } from "../../procedure/base/Procedure";
 import { UnitProcedureService } from "../unitProcedure.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -100,9 +101,21 @@ export class UnitProcedureResolverBase {
       data: {
         ...args.data,
 
+        boms: args.data.boms
+          ? {
+              connect: args.data.boms,
+            }
+          : undefined,
+
         classId: args.data.classId
           ? {
               connect: args.data.classId,
+            }
+          : undefined,
+
+        primaryBom: args.data.primaryBom
+          ? {
+              connect: args.data.primaryBom,
             }
           : undefined,
 
@@ -129,9 +142,21 @@ export class UnitProcedureResolverBase {
         data: {
           ...args.data,
 
+          boms: args.data.boms
+            ? {
+                connect: args.data.boms,
+              }
+            : undefined,
+
           classId: args.data.classId
             ? {
                 connect: args.data.classId,
+              }
+            : undefined,
+
+          primaryBom: args.data.primaryBom
+            ? {
+                connect: args.data.primaryBom,
               }
             : undefined,
 
@@ -232,6 +257,25 @@ export class UnitProcedureResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Bom, {
+    nullable: true,
+    name: "boms",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async getBoms(@graphql.Parent() parent: UnitProcedure): Promise<Bom | null> {
+    const result = await this.service.getBoms(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => UnitProcedure, {
     nullable: true,
     name: "classId",
@@ -245,6 +289,27 @@ export class UnitProcedureResolverBase {
     @graphql.Parent() parent: UnitProcedure
   ): Promise<UnitProcedure | null> {
     const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Bom, {
+    nullable: true,
+    name: "primaryBom",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async getPrimaryBom(
+    @graphql.Parent() parent: UnitProcedure
+  ): Promise<Bom | null> {
+    const result = await this.service.getPrimaryBom(parent.id);
 
     if (!result) {
       return null;

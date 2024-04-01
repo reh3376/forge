@@ -1,3 +1,4 @@
+import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitProcedureCreateNestedManyWithoutUnitProceduresInput";
 import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
@@ -6,6 +7,7 @@ import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreate
 
 export type UnitProcedureCreateInput = {
   active?: boolean | null;
+  boms?: BomWhereUniqueInput | null;
   classId?: UnitProcedureWhereUniqueInput | null;
   createdBy: string;
   description?: string | null;
@@ -18,6 +20,7 @@ export type UnitProcedureCreateInput = {
     | "Processing01"
     | "Granary01";
   operations?: OperationCreateNestedManyWithoutUnitProceduresInput;
+  primaryBom?: BomWhereUniqueInput | null;
   procedure: ProcedureWhereUniqueInput;
   recipe?: RecipeCreateNestedManyWithoutUnitProceduresInput;
   revision?: number | null;

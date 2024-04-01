@@ -1,3 +1,4 @@
+import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
@@ -6,6 +7,7 @@ import { RecipeUpdateManyWithoutUnitProceduresInput } from "./RecipeUpdateManyWi
 
 export type UnitProcedureUpdateInput = {
   active?: boolean | null;
+  boms?: BomWhereUniqueInput | null;
   classId?: UnitProcedureWhereUniqueInput | null;
   createdBy?: string;
   description?: string | null;
@@ -18,6 +20,7 @@ export type UnitProcedureUpdateInput = {
     | "Processing01"
     | "Granary01";
   operations?: OperationUpdateManyWithoutUnitProceduresInput;
+  primaryBom?: BomWhereUniqueInput | null;
   procedure?: ProcedureWhereUniqueInput;
   recipe?: RecipeUpdateManyWithoutUnitProceduresInput;
   revision?: number | null;
