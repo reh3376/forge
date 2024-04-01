@@ -18,7 +18,7 @@ export type EquipmentPhase = {
   instances?: Array<EquipmentPhase>;
   instructions?: Array<Instruction>;
   isClassDefinition: boolean | null;
-  name: string;
+  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
   operation?: Operation;
   operationSequenceIndex: number | null;
   phaseParameters?: Array<PhaseParameter>;

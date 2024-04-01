@@ -16,11 +16,13 @@ import {
   IsOptional,
   ValidateNested,
   IsString,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
+import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 
@@ -96,14 +98,19 @@ class UnitProcedureUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    enum: EnumUnitProcedureName,
   })
-  @IsString()
+  @IsEnum(EnumUnitProcedureName)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => EnumUnitProcedureName, {
     nullable: true,
   })
-  name?: string;
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
 
   @ApiProperty({
     required: false,

@@ -17,11 +17,13 @@ import {
   ValidateNested,
   IsString,
   IsDate,
+  IsEnum,
   IsInt,
 } from "class-validator";
 import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
+import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { Operation } from "../../operation/base/Operation";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 import { TestParameter } from "../../testParameter/base/TestParameter";
@@ -159,11 +161,13 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: true,
-    type: String,
+    enum: EnumEquipmentPhaseName,
   })
-  @IsString()
-  @Field(() => String)
-  name!: string;
+  @IsEnum(EnumEquipmentPhaseName)
+  @Field(() => EnumEquipmentPhaseName, {
+    nullable: true,
+  })
+  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
 
   @ApiProperty({
     required: true,

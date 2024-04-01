@@ -15,7 +15,12 @@ export type UnitProcedureWhereInput = {
   id?: StringFilter;
   instances?: UnitProcedureListRelationFilter;
   isClassDef?: BooleanNullableFilter;
-  name?: StringFilter;
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
   operations?: OperationListRelationFilter;
   procedure?: ProcedureWhereUniqueInput;
   revision?: IntNullableFilter;

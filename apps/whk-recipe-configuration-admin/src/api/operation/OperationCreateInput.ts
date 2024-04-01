@@ -13,7 +13,12 @@ export type OperationCreateInput = {
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutOperationsInput;
   instances?: OperationCreateNestedManyWithoutOperationsInput;
   isClassDefinition?: boolean | null;
-  name: string;
+  name:
+    | "MashVessel"
+    | "FermentationVessel"
+    | "DistillationRun"
+    | "BlendingVessel"
+    | "CisternTank";
   path: string;
   procedureSequenceIndex: number;
   revision: number;

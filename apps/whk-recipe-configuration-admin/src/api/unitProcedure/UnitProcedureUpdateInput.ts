@@ -10,7 +10,12 @@ export type UnitProcedureUpdateInput = {
   description?: string | null;
   instances?: UnitProcedureUpdateManyWithoutUnitProceduresInput;
   isClassDef?: boolean | null;
-  name?: string;
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
   operations?: OperationUpdateManyWithoutUnitProceduresInput;
   procedure?: ProcedureWhereUniqueInput;
   revision?: number | null;

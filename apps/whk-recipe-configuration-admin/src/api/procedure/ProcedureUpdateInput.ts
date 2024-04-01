@@ -10,7 +10,7 @@ export type ProcedureUpdateInput = {
   description?: string | null;
   instances?: ProcedureUpdateManyWithoutProceduresInput;
   isClassDefinition?: boolean | null;
-  name?: string | null;
+  name?: "Line1" | null;
   productionOrderQueues?: ProductionOrderQueueUpdateManyWithoutProceduresInput;
   revision?: number | null;
   schemaVersion?: string | null;

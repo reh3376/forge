@@ -4,13 +4,6 @@ import { customSeed } from "./customSeed";
 import { Salt, parseSalt } from "../src/auth/password.service";
 import { hash } from "bcrypt";
 
-/*
-Developer Team note...
-
-A bug has been found in Amplication that may overwrite this... what it has been overwriting to does not work.
-Talk with Patrick if necessary
- */
-
 if (require.main === module) {
   dotenv.config();
 
