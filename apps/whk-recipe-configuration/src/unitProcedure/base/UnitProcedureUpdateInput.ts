@@ -19,8 +19,9 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
-import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { Type } from "class-transformer";
+import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
@@ -39,6 +40,18 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  boms?: BomWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -124,6 +137,18 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   operations?: OperationUpdateManyWithoutUnitProceduresInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  primaryBom?: BomWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

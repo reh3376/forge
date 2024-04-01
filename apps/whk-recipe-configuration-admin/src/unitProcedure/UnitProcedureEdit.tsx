@@ -13,6 +13,7 @@ import {
   NumberInput,
 } from "react-admin";
 
+import { BomTitle } from "../bom/BomTitle";
 import { UnitProcedureTitle } from "./UnitProcedureTitle";
 import { OperationTitle } from "../operation/OperationTitle";
 import { ProcedureTitle } from "../procedure/ProcedureTitle";
@@ -23,6 +24,9 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
     <Edit {...props}>
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
+        <ReferenceInput source="boms.id" reference="Bom" label="Boms">
+          <SelectInput optionText={BomTitle} />
+        </ReferenceInput>
         <ReferenceInput
           source="classId.id"
           reference="UnitProcedure"
@@ -62,6 +66,13 @@ export const UnitProcedureEdit = (props: EditProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={OperationTitle} />
         </ReferenceArrayInput>
+        <ReferenceInput
+          source="primaryBom.id"
+          reference="Bom"
+          label="Primary Bom"
+        >
+          <SelectInput optionText={BomTitle} />
+        </ReferenceInput>
         <ReferenceInput
           source="procedure.id"
           reference="Procedure"
