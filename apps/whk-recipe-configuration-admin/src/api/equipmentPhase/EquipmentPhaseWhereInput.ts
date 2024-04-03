@@ -1,5 +1,4 @@
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
@@ -13,7 +12,6 @@ import { TestParameterListRelationFilter } from "../testParameter/TestParameterL
 
 export type EquipmentPhaseWhereInput = {
   active?: BooleanNullableFilter;
-  bom?: BomWhereUniqueInput;
   classId?: EquipmentPhaseWhereUniqueInput;
   className?: StringNullableFilter;
   createdAt?: DateTimeNullableFilter;

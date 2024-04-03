@@ -1,4 +1,3 @@
-import { BomWhereUniqueInput } from "../bom/BomWhereUniqueInput";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
@@ -8,7 +7,6 @@ import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParame
 
 export type EquipmentPhaseUpdateInput = {
   active?: boolean | null;
-  bom?: BomWhereUniqueInput | null;
   classId?: EquipmentPhaseWhereUniqueInput | null;
   className?: string | null;
   createdBy?: string;

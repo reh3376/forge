@@ -127,7 +127,7 @@ class BomOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  wipItemId?: SortOrder;
+  wipItem?: SortOrder;
 }
 
 export { BomOrderByInput as BomOrderByInput };

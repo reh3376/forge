@@ -19,7 +19,6 @@ import {
   ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -90,15 +89,6 @@ class Bom {
   editedBy!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  equipmentPhases?: Array<EquipmentPhase>;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -144,7 +134,7 @@ class Bom {
   @Field(() => String, {
     nullable: true,
   })
-  wipItemId!: string | null;
+  wipItem!: string | null;
 }
 
 export { Bom as Bom };
