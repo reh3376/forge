@@ -13,8 +13,6 @@ import {
 } from "react-admin";
 
 import { BOM_TITLE_FIELD } from "./BomTitle";
-import { EQUIPMENTPHASE_TITLE_FIELD } from "../equipmentPhase/EquipmentPhaseTitle";
-import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 import { UNITPROCEDURE_TITLE_FIELD } from "../unitProcedure/UnitProcedureTitle";
 import { PROCEDURE_TITLE_FIELD } from "../procedure/ProcedureTitle";
 
@@ -31,51 +29,7 @@ export const BomShow = (props: ShowProps): React.ReactElement => {
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
         <TextField label="Schema Version" source="schemaVersion" />
-        <TextField label="Wip Item ID" source="wipItemId" />
-        <ReferenceManyField
-          reference="EquipmentPhase"
-          target="bomId"
-          label="EquipmentPhases"
-        >
-          <Datagrid rowClick="show">
-            <BooleanField label="Active" source="active" />
-            <ReferenceField label="Bom" source="bom.id" reference="Bom">
-              <TextField source={BOM_TITLE_FIELD} />
-            </ReferenceField>
-            <ReferenceField
-              label="Class"
-              source="equipmentphase.id"
-              reference="EquipmentPhase"
-            >
-              <TextField source={EQUIPMENTPHASE_TITLE_FIELD} />
-            </ReferenceField>
-            <TextField label="Class Name" source="className" />
-            <DateField source="createdAt" label="Created At" />
-            <TextField label="Created By" source="createdBy" />
-            <TextField label="Description" source="description" />
-            <DateField source="editedAt" label="Edited At" />
-            <TextField label="Edited By" source="editedBy" />
-            <TextField label="ID" source="id" />
-            <BooleanField
-              label="Is Class Definition"
-              source="isClassDefinition"
-            />
-            <TextField label="Name" source="name" />
-            <ReferenceField
-              label="Operation"
-              source="operation.id"
-              reference="Operation"
-            >
-              <TextField source={OPERATION_TITLE_FIELD} />
-            </ReferenceField>
-            <TextField
-              label="Operation Sequence Index"
-              source="operationSequenceIndex"
-            />
-            <TextField label="Revision" source="revision" />
-            <TextField label="Schema Version" source="schemaVersion" />
-          </Datagrid>
-        </ReferenceManyField>
+        <TextField label="Wip Item" source="wipItem" />
         <ReferenceManyField
           reference="UnitProcedure"
           target="bomsId"

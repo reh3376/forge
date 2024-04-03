@@ -26,9 +26,6 @@ import { Bom } from "./Bom";
 import { BomFindManyArgs } from "./BomFindManyArgs";
 import { BomWhereUniqueInput } from "./BomWhereUniqueInput";
 import { BomUpdateInput } from "./BomUpdateInput";
-import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -67,7 +64,7 @@ export class BomControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItemId: true,
+        wipItem: true,
       },
     });
   }
@@ -98,7 +95,7 @@ export class BomControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItemId: true,
+        wipItem: true,
       },
     });
   }
@@ -128,7 +125,7 @@ export class BomControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItemId: true,
+        wipItem: true,
       },
     });
     if (result === null) {
@@ -172,7 +169,7 @@ export class BomControllerBase {
           editedBy: true,
           id: true,
           schemaVersion: true,
-          wipItemId: true,
+          wipItem: true,
         },
       });
     } catch (error) {
@@ -183,131 +180,6 @@ export class BomControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/equipmentPhases")
-  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "read",
-    possession: "any",
-  })
-  async findEquipmentPhases(
-    @common.Req() request: Request,
-    @common.Param() params: BomWhereUniqueInput
-  ): Promise<EquipmentPhase[]> {
-    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
-    const results = await this.service.findEquipmentPhases(params.id, {
-      ...query,
-      select: {
-        active: true,
-
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedAt: true,
-        editedBy: true,
-        id: true,
-        isClassDefinition: true,
-        name: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "update",
-    possession: "any",
-  })
-  async connectEquipmentPhases(
-    @common.Param() params: BomWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      equipmentPhases: {
-        connect: body,
-      },
-    };
-    await this.service.updateBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "update",
-    possession: "any",
-  })
-  async updateEquipmentPhases(
-    @common.Param() params: BomWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      equipmentPhases: {
-        set: body,
-      },
-    };
-    await this.service.updateBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectEquipmentPhases(
-    @common.Param() params: BomWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      equipmentPhases: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

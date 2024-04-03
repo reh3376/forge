@@ -19,9 +19,8 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
-import { Type } from "class-transformer";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
@@ -41,18 +40,6 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  bom?: BomWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

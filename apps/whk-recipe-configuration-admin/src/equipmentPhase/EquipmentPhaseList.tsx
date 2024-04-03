@@ -11,7 +11,6 @@ import {
 } from "react-admin";
 
 import Pagination from "../Components/Pagination";
-import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "./EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 
@@ -26,9 +25,6 @@ export const EquipmentPhaseList = (props: ListProps): React.ReactElement => {
     >
       <Datagrid rowClick="show">
         <BooleanField label="Active" source="active" />
-        <ReferenceField label="Bom" source="bom.id" reference="Bom">
-          <TextField source={BOM_TITLE_FIELD} />
-        </ReferenceField>
         <ReferenceField
           label="Class"
           source="equipmentphase.id"

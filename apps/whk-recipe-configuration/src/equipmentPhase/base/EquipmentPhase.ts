@@ -20,7 +20,6 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
-import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
@@ -40,15 +39,6 @@ class EquipmentPhase {
     nullable: true,
   })
   active!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Bom,
-  })
-  @ValidateNested()
-  @Type(() => Bom)
-  @IsOptional()
-  bom?: Bom | null;
 
   @ApiProperty({
     required: false,
