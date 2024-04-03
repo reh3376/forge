@@ -13,52 +13,54 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  UnitProcedure, // @ts-ignore
-  Operation, // @ts-ignore
-  Recipe, // @ts-ignore
-  Bom, // @ts-ignore
-  Procedure,
+  UnitProcedure as PrismaUnitProcedure,
+  Operation as PrismaOperation,
+  Recipe as PrismaRecipe,
+  Bom as PrismaBom,
+  Procedure as PrismaProcedure,
 } from "@prisma/client";
 
 export class UnitProcedureServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.UnitProcedureCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitProcedureCountArgs>
+  async count(
+    args: Omit<Prisma.UnitProcedureCountArgs, "select">
   ): Promise<number> {
     return this.prisma.unitProcedure.count(args);
   }
 
   async unitProcedures<T extends Prisma.UnitProcedureFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureFindManyArgs>
-  ): Promise<UnitProcedure[]> {
-    return this.prisma.unitProcedure.findMany(args);
+  ): Promise<PrismaUnitProcedure[]> {
+    return this.prisma.unitProcedure.findMany<Prisma.UnitProcedureFindManyArgs>(
+      args
+    );
   }
   async unitProcedure<T extends Prisma.UnitProcedureFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureFindUniqueArgs>
-  ): Promise<UnitProcedure | null> {
+  ): Promise<PrismaUnitProcedure | null> {
     return this.prisma.unitProcedure.findUnique(args);
   }
   async createUnitProcedure<T extends Prisma.UnitProcedureCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>
-  ): Promise<UnitProcedure> {
+  ): Promise<PrismaUnitProcedure> {
     return this.prisma.unitProcedure.create<T>(args);
   }
   async updateUnitProcedure<T extends Prisma.UnitProcedureUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureUpdateArgs>
-  ): Promise<UnitProcedure> {
+  ): Promise<PrismaUnitProcedure> {
     return this.prisma.unitProcedure.update<T>(args);
   }
   async deleteUnitProcedure<T extends Prisma.UnitProcedureDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureDeleteArgs>
-  ): Promise<UnitProcedure> {
+  ): Promise<PrismaUnitProcedure> {
     return this.prisma.unitProcedure.delete(args);
   }
 
   async findInstances(
     parentId: string,
     args: Prisma.UnitProcedureFindManyArgs
-  ): Promise<UnitProcedure[]> {
+  ): Promise<PrismaUnitProcedure[]> {
     return this.prisma.unitProcedure
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -69,7 +71,7 @@ export class UnitProcedureServiceBase {
   async findOperations(
     parentId: string,
     args: Prisma.OperationFindManyArgs
-  ): Promise<Operation[]> {
+  ): Promise<PrismaOperation[]> {
     return this.prisma.unitProcedure
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -80,7 +82,7 @@ export class UnitProcedureServiceBase {
   async findRecipe(
     parentId: string,
     args: Prisma.RecipeFindManyArgs
-  ): Promise<Recipe[]> {
+  ): Promise<PrismaRecipe[]> {
     return this.prisma.unitProcedure
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -88,7 +90,7 @@ export class UnitProcedureServiceBase {
       .recipe(args);
   }
 
-  async getBoms(parentId: string): Promise<Bom | null> {
+  async getBoms(parentId: string): Promise<PrismaBom | null> {
     return this.prisma.unitProcedure
       .findUnique({
         where: { id: parentId },
@@ -96,7 +98,7 @@ export class UnitProcedureServiceBase {
       .boms();
   }
 
-  async getClassId(parentId: string): Promise<UnitProcedure | null> {
+  async getClassId(parentId: string): Promise<PrismaUnitProcedure | null> {
     return this.prisma.unitProcedure
       .findUnique({
         where: { id: parentId },
@@ -104,7 +106,7 @@ export class UnitProcedureServiceBase {
       .classId();
   }
 
-  async getPrimaryBom(parentId: string): Promise<Bom | null> {
+  async getPrimaryBom(parentId: string): Promise<PrismaBom | null> {
     return this.prisma.unitProcedure
       .findUnique({
         where: { id: parentId },
@@ -112,7 +114,7 @@ export class UnitProcedureServiceBase {
       .primaryBom();
   }
 
-  async getProcedure(parentId: string): Promise<Procedure | null> {
+  async getProcedure(parentId: string): Promise<PrismaProcedure | null> {
     return this.prisma.unitProcedure
       .findUnique({
         where: { id: parentId },
