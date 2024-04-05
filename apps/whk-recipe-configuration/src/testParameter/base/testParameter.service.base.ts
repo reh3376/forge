@@ -13,49 +13,51 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  TestParameter, // @ts-ignore
-  EquipmentPhase,
+  TestParameter as PrismaTestParameter,
+  EquipmentPhase as PrismaEquipmentPhase,
 } from "@prisma/client";
 
 export class TestParameterServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.TestParameterCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestParameterCountArgs>
+  async count(
+    args: Omit<Prisma.TestParameterCountArgs, "select">
   ): Promise<number> {
     return this.prisma.testParameter.count(args);
   }
 
   async testParameters<T extends Prisma.TestParameterFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestParameterFindManyArgs>
-  ): Promise<TestParameter[]> {
-    return this.prisma.testParameter.findMany(args);
+  ): Promise<PrismaTestParameter[]> {
+    return this.prisma.testParameter.findMany<Prisma.TestParameterFindManyArgs>(
+      args
+    );
   }
   async testParameter<T extends Prisma.TestParameterFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestParameterFindUniqueArgs>
-  ): Promise<TestParameter | null> {
+  ): Promise<PrismaTestParameter | null> {
     return this.prisma.testParameter.findUnique(args);
   }
   async createTestParameter<T extends Prisma.TestParameterCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestParameterCreateArgs>
-  ): Promise<TestParameter> {
+  ): Promise<PrismaTestParameter> {
     return this.prisma.testParameter.create<T>(args);
   }
   async updateTestParameter<T extends Prisma.TestParameterUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestParameterUpdateArgs>
-  ): Promise<TestParameter> {
+  ): Promise<PrismaTestParameter> {
     return this.prisma.testParameter.update<T>(args);
   }
   async deleteTestParameter<T extends Prisma.TestParameterDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestParameterDeleteArgs>
-  ): Promise<TestParameter> {
+  ): Promise<PrismaTestParameter> {
     return this.prisma.testParameter.delete(args);
   }
 
   async findEquipmentPhases(
     parentId: string,
     args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<EquipmentPhase[]> {
+  ): Promise<PrismaEquipmentPhase[]> {
     return this.prisma.testParameter
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -66,7 +68,7 @@ export class TestParameterServiceBase {
   async findInstances(
     parentId: string,
     args: Prisma.TestParameterFindManyArgs
-  ): Promise<TestParameter[]> {
+  ): Promise<PrismaTestParameter[]> {
     return this.prisma.testParameter
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -74,7 +76,7 @@ export class TestParameterServiceBase {
       .instances(args);
   }
 
-  async getClassId(parentId: string): Promise<TestParameter | null> {
+  async getClassId(parentId: string): Promise<PrismaTestParameter | null> {
     return this.prisma.testParameter
       .findUnique({
         where: { id: parentId },

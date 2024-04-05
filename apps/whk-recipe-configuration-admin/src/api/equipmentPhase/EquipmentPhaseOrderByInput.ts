@@ -2,7 +2,6 @@ import { SortOrder } from "../../util/SortOrder";
 
 export type EquipmentPhaseOrderByInput = {
   active?: SortOrder;
-  bomId?: SortOrder;
   classIdId?: SortOrder;
   className?: SortOrder;
   createdAt?: SortOrder;

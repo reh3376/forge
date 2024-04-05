@@ -64,12 +64,6 @@ export class EquipmentPhaseControllerBase {
       data: {
         ...data,
 
-        bom: data.bom
-          ? {
-              connect: data.bom,
-            }
-          : undefined,
-
         classId: data.classId
           ? {
               connect: data.classId,
@@ -82,12 +76,6 @@ export class EquipmentPhaseControllerBase {
       },
       select: {
         active: true,
-
-        bom: {
-          select: {
-            id: true,
-          },
-        },
 
         classId: {
           select: {
@@ -139,12 +127,6 @@ export class EquipmentPhaseControllerBase {
       select: {
         active: true,
 
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
         classId: {
           select: {
             id: true,
@@ -193,12 +175,6 @@ export class EquipmentPhaseControllerBase {
       where: params,
       select: {
         active: true,
-
-        bom: {
-          select: {
-            id: true,
-          },
-        },
 
         classId: {
           select: {
@@ -260,12 +236,6 @@ export class EquipmentPhaseControllerBase {
         data: {
           ...data,
 
-          bom: data.bom
-            ? {
-                connect: data.bom,
-              }
-            : undefined,
-
           classId: data.classId
             ? {
                 connect: data.classId,
@@ -278,12 +248,6 @@ export class EquipmentPhaseControllerBase {
         },
         select: {
           active: true,
-
-          bom: {
-            select: {
-              id: true,
-            },
-          },
 
           classId: {
             select: {
@@ -339,12 +303,6 @@ export class EquipmentPhaseControllerBase {
       ...query,
       select: {
         active: true,
-
-        bom: {
-          select: {
-            id: true,
-          },
-        },
 
         classId: {
           select: {

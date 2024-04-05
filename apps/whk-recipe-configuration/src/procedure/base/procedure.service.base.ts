@@ -13,50 +13,50 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  Procedure, // @ts-ignore
-  ProductionOrderQueue, // @ts-ignore
-  UnitProcedure,
+  Procedure as PrismaProcedure,
+  ProductionOrderQueue as PrismaProductionOrderQueue,
+  UnitProcedure as PrismaUnitProcedure,
 } from "@prisma/client";
 
 export class ProcedureServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.ProcedureCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProcedureCountArgs>
+  async count(
+    args: Omit<Prisma.ProcedureCountArgs, "select">
   ): Promise<number> {
     return this.prisma.procedure.count(args);
   }
 
   async procedures<T extends Prisma.ProcedureFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProcedureFindManyArgs>
-  ): Promise<Procedure[]> {
-    return this.prisma.procedure.findMany(args);
+  ): Promise<PrismaProcedure[]> {
+    return this.prisma.procedure.findMany<Prisma.ProcedureFindManyArgs>(args);
   }
   async procedure<T extends Prisma.ProcedureFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProcedureFindUniqueArgs>
-  ): Promise<Procedure | null> {
+  ): Promise<PrismaProcedure | null> {
     return this.prisma.procedure.findUnique(args);
   }
   async createProcedure<T extends Prisma.ProcedureCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProcedureCreateArgs>
-  ): Promise<Procedure> {
+  ): Promise<PrismaProcedure> {
     return this.prisma.procedure.create<T>(args);
   }
   async updateProcedure<T extends Prisma.ProcedureUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProcedureUpdateArgs>
-  ): Promise<Procedure> {
+  ): Promise<PrismaProcedure> {
     return this.prisma.procedure.update<T>(args);
   }
   async deleteProcedure<T extends Prisma.ProcedureDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProcedureDeleteArgs>
-  ): Promise<Procedure> {
+  ): Promise<PrismaProcedure> {
     return this.prisma.procedure.delete(args);
   }
 
   async findInstances(
     parentId: string,
     args: Prisma.ProcedureFindManyArgs
-  ): Promise<Procedure[]> {
+  ): Promise<PrismaProcedure[]> {
     return this.prisma.procedure
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -67,7 +67,7 @@ export class ProcedureServiceBase {
   async findProductionOrderQueues(
     parentId: string,
     args: Prisma.ProductionOrderQueueFindManyArgs
-  ): Promise<ProductionOrderQueue[]> {
+  ): Promise<PrismaProductionOrderQueue[]> {
     return this.prisma.procedure
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -78,7 +78,7 @@ export class ProcedureServiceBase {
   async findUnitProcedures(
     parentId: string,
     args: Prisma.UnitProcedureFindManyArgs
-  ): Promise<UnitProcedure[]> {
+  ): Promise<PrismaUnitProcedure[]> {
     return this.prisma.procedure
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -86,7 +86,7 @@ export class ProcedureServiceBase {
       .unitProcedures(args);
   }
 
-  async getClassId(parentId: string): Promise<Procedure | null> {
+  async getClassId(parentId: string): Promise<PrismaProcedure | null> {
     return this.prisma.procedure
       .findUnique({
         where: { id: parentId },

@@ -10,7 +10,6 @@ import {
   SelectArrayInput,
 } from "react-admin";
 
-import { EquipmentPhaseTitle } from "../equipmentPhase/EquipmentPhaseTitle";
 import { UnitProcedureTitle } from "../unitProcedure/UnitProcedureTitle";
 
 export const BomCreate = (props: CreateProps): React.ReactElement => {
@@ -22,14 +21,6 @@ export const BomCreate = (props: CreateProps): React.ReactElement => {
         <TextInput label="Class Name" source="className" />
         <TextInput label="Created By" source="createdBy" />
         <TextInput label="Edited By" source="editedBy" />
-        <ReferenceArrayInput
-          source="equipmentPhases"
-          reference="EquipmentPhase"
-          parse={(value: any) => value && value.map((v: any) => ({ id: v }))}
-          format={(value: any) => value && value.map((v: any) => v.id)}
-        >
-          <SelectArrayInput optionText={EquipmentPhaseTitle} />
-        </ReferenceArrayInput>
         <TextInput label="Schema Version" source="schemaVersion" />
         <ReferenceArrayInput
           source="unitProcedure"
@@ -47,7 +38,7 @@ export const BomCreate = (props: CreateProps): React.ReactElement => {
         >
           <SelectArrayInput optionText={UnitProcedureTitle} />
         </ReferenceArrayInput>
-        <TextInput label="Wip Item ID" source="wipItemId" />
+        <TextInput label="Wip Item" source="wipItem" />
       </SimpleForm>
     </Create>
   );

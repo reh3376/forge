@@ -13,50 +13,48 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  Recipe, // @ts-ignore
-  UnitProcedure, // @ts-ignore
-  RecipeGroup,
+  Recipe as PrismaRecipe,
+  UnitProcedure as PrismaUnitProcedure,
+  RecipeGroup as PrismaRecipeGroup,
 } from "@prisma/client";
 
 export class RecipeServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.RecipeCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeCountArgs>
-  ): Promise<number> {
+  async count(args: Omit<Prisma.RecipeCountArgs, "select">): Promise<number> {
     return this.prisma.recipe.count(args);
   }
 
   async recipes<T extends Prisma.RecipeFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeFindManyArgs>
-  ): Promise<Recipe[]> {
-    return this.prisma.recipe.findMany(args);
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.recipe.findMany<Prisma.RecipeFindManyArgs>(args);
   }
   async recipe<T extends Prisma.RecipeFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeFindUniqueArgs>
-  ): Promise<Recipe | null> {
+  ): Promise<PrismaRecipe | null> {
     return this.prisma.recipe.findUnique(args);
   }
   async createRecipe<T extends Prisma.RecipeCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeCreateArgs>
-  ): Promise<Recipe> {
+  ): Promise<PrismaRecipe> {
     return this.prisma.recipe.create<T>(args);
   }
   async updateRecipe<T extends Prisma.RecipeUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeUpdateArgs>
-  ): Promise<Recipe> {
+  ): Promise<PrismaRecipe> {
     return this.prisma.recipe.update<T>(args);
   }
   async deleteRecipe<T extends Prisma.RecipeDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeDeleteArgs>
-  ): Promise<Recipe> {
+  ): Promise<PrismaRecipe> {
     return this.prisma.recipe.delete(args);
   }
 
   async findUnitProcedures(
     parentId: string,
     args: Prisma.UnitProcedureFindManyArgs
-  ): Promise<UnitProcedure[]> {
+  ): Promise<PrismaUnitProcedure[]> {
     return this.prisma.recipe
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -64,7 +62,7 @@ export class RecipeServiceBase {
       .unitProcedures(args);
   }
 
-  async getRecipeGroup(parentId: string): Promise<RecipeGroup | null> {
+  async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
     return this.prisma.recipe
       .findUnique({
         where: { id: parentId },
