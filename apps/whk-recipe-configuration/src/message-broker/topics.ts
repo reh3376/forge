@@ -1,3 +1,1 @@
-export enum MyMessageBrokerTopics {
-  PurchaseorderUpdate = "purchaseorder.update",
-}
+export enum MyMessageBrokerTopics {}
