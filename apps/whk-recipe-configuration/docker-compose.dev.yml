@@ -1,4 +1,5 @@
-version: "3"
+version: "3.9"
+
 services:
   db:
     image: postgres:12
@@ -32,11 +33,17 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 10
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
-      - 8080:8080
+      - 8880:8080
     depends_on:
       - zookeeper
       - kafka
@@ -72,6 +79,7 @@ services:
       - ${REDIS_PORT}:6379
     volumes:
       - redis:/data
+
 volumes:
   postgres: ~
   redis:
