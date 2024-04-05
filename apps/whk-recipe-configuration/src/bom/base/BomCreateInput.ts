@@ -12,9 +12,8 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsInt, IsOptional, ValidateNested } from "class-validator";
-import { EquipmentPhaseCreateNestedManyWithoutBomsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomsInput";
-import { Type } from "class-transformer";
 import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
+import { Type } from "class-transformer";
 
 @InputType()
 class BomCreateInput {
@@ -69,18 +68,6 @@ class BomCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseCreateNestedManyWithoutBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseCreateNestedManyWithoutBomsInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseCreateNestedManyWithoutBomsInput, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -123,7 +110,7 @@ class BomCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  wipItemId?: string | null;
+  wipItem?: string | null;
 }
 
 export { BomCreateInput as BomCreateInput };

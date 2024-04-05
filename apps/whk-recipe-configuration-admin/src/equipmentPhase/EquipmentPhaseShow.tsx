@@ -12,7 +12,6 @@ import {
   Datagrid,
 } from "react-admin";
 
-import { BOM_TITLE_FIELD } from "../bom/BomTitle";
 import { EQUIPMENTPHASE_TITLE_FIELD } from "./EquipmentPhaseTitle";
 import { OPERATION_TITLE_FIELD } from "../operation/OperationTitle";
 import { PHASEPARAMETER_TITLE_FIELD } from "../phaseParameter/PhaseParameterTitle";
@@ -22,9 +21,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
     <Show {...props}>
       <SimpleShowLayout>
         <BooleanField label="Active" source="active" />
-        <ReferenceField label="Bom" source="bom.id" reference="Bom">
-          <TextField source={BOM_TITLE_FIELD} />
-        </ReferenceField>
         <ReferenceField
           label="Class"
           source="equipmentphase.id"
@@ -61,9 +57,6 @@ export const EquipmentPhaseShow = (props: ShowProps): React.ReactElement => {
         >
           <Datagrid rowClick="show">
             <BooleanField label="Active" source="active" />
-            <ReferenceField label="Bom" source="bom.id" reference="Bom">
-              <TextField source={BOM_TITLE_FIELD} />
-            </ReferenceField>
             <ReferenceField
               label="Class"
               source="equipmentphase.id"

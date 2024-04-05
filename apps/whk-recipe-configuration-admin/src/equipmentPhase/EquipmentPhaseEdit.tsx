@@ -13,7 +13,6 @@ import {
   NumberInput,
 } from "react-admin";
 
-import { BomTitle } from "../bom/BomTitle";
 import { EquipmentPhaseTitle } from "./EquipmentPhaseTitle";
 import { InstructionTitle } from "../instruction/InstructionTitle";
 import { OperationTitle } from "../operation/OperationTitle";
@@ -25,9 +24,6 @@ export const EquipmentPhaseEdit = (props: EditProps): React.ReactElement => {
     <Edit {...props}>
       <SimpleForm>
         <BooleanInput label="Active" source="active" />
-        <ReferenceInput source="bom.id" reference="Bom" label="Bom">
-          <SelectInput optionText={BomTitle} />
-        </ReferenceInput>
         <ReferenceInput
           source="classId.id"
           reference="EquipmentPhase"

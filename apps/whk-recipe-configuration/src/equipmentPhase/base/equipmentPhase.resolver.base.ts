@@ -31,7 +31,6 @@ import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParam
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
-import { Bom } from "../../bom/base/Bom";
 import { Operation } from "../../operation/base/Operation";
 import { EquipmentPhaseService } from "../equipmentPhase.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -102,12 +101,6 @@ export class EquipmentPhaseResolverBase {
       data: {
         ...args.data,
 
-        bom: args.data.bom
-          ? {
-              connect: args.data.bom,
-            }
-          : undefined,
-
         classId: args.data.classId
           ? {
               connect: args.data.classId,
@@ -136,12 +129,6 @@ export class EquipmentPhaseResolverBase {
         ...args,
         data: {
           ...args.data,
-
-          bom: args.data.bom
-            ? {
-                connect: args.data.bom,
-              }
-            : undefined,
 
           classId: args.data.classId
             ? {
@@ -242,25 +229,6 @@ export class EquipmentPhaseResolverBase {
     }
 
     return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Bom, {
-    nullable: true,
-    name: "bom",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "read",
-    possession: "any",
-  })
-  async getBom(@graphql.Parent() parent: EquipmentPhase): Promise<Bom | null> {
-    const result = await this.service.getBom(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
