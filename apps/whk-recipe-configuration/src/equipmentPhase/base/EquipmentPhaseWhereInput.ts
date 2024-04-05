@@ -14,7 +14,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
@@ -39,18 +38,6 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  bom?: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,

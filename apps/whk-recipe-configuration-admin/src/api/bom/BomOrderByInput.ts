@@ -10,5 +10,5 @@ export type BomOrderByInput = {
   editedBy?: SortOrder;
   id?: SortOrder;
   schemaVersion?: SortOrder;
-  wipItemId?: SortOrder;
+  wipItem?: SortOrder;
 };

@@ -21,7 +21,7 @@ export const BomList = (props: ListProps): React.ReactElement => {
         <TextField label="Edited By" source="editedBy" />
         <TextField label="ID" source="id" />
         <TextField label="Schema Version" source="schemaVersion" />
-        <TextField label="Wip Item ID" source="wipItemId" />
+        <TextField label="Wip Item" source="wipItem" />
       </Datagrid>
     </List>
   );

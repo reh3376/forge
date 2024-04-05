@@ -25,8 +25,6 @@ import { BomFindManyArgs } from "./BomFindManyArgs";
 import { BomFindUniqueArgs } from "./BomFindUniqueArgs";
 import { CreateBomArgs } from "./CreateBomArgs";
 import { UpdateBomArgs } from "./UpdateBomArgs";
-import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { BomService } from "../bom.service";
@@ -114,26 +112,6 @@ export class BomResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [EquipmentPhase], { name: "equipmentPhases" })
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "read",
-    possession: "any",
-  })
-  async findEquipmentPhases(
-    @graphql.Parent() parent: Bom,
-    @graphql.Args() args: EquipmentPhaseFindManyArgs
-  ): Promise<EquipmentPhase[]> {
-    const results = await this.service.findEquipmentPhases(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
