@@ -1,10 +1,6 @@
 {
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": [
-      {
-        "include": "swagger/**/*"
-      }
-    ]
+    "assets": ["swagger"]
   }
 }

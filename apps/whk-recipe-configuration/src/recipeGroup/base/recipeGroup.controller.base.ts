@@ -48,9 +48,6 @@ export class RecipeGroupControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: RecipeGroupCreateInput,
-  })
   async createRecipeGroup(
     @common.Body() data: RecipeGroupCreateInput
   ): Promise<RecipeGroup> {
@@ -145,9 +142,6 @@ export class RecipeGroupControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: RecipeGroupUpdateInput,
   })
   async updateRecipeGroup(
     @common.Param() params: RecipeGroupWhereUniqueInput,

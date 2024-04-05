@@ -48,9 +48,6 @@ export class OperationControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: OperationCreateInput,
-  })
   async createOperation(
     @common.Body() data: OperationCreateInput
   ): Promise<Operation> {
@@ -219,9 +216,6 @@ export class OperationControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: OperationUpdateInput,
   })
   async updateOperation(
     @common.Param() params: OperationWhereUniqueInput,

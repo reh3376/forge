@@ -54,9 +54,6 @@ export class EquipmentPhaseControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: EquipmentPhaseCreateInput,
-  })
   async createEquipmentPhase(
     @common.Body() data: EquipmentPhaseCreateInput
   ): Promise<EquipmentPhase> {
@@ -222,9 +219,6 @@ export class EquipmentPhaseControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: EquipmentPhaseUpdateInput,
   })
   async updateEquipmentPhase(
     @common.Param() params: EquipmentPhaseWhereUniqueInput,

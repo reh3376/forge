@@ -51,9 +51,6 @@ export class ProcedureControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: ProcedureCreateInput,
-  })
   async createProcedure(
     @common.Body() data: ProcedureCreateInput
   ): Promise<Procedure> {
@@ -186,9 +183,6 @@ export class ProcedureControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: ProcedureUpdateInput,
   })
   async updateProcedure(
     @common.Param() params: ProcedureWhereUniqueInput,

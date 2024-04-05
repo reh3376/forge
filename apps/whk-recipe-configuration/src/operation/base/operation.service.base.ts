@@ -13,50 +13,50 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  Operation as PrismaOperation,
-  EquipmentPhase as PrismaEquipmentPhase,
-  UnitProcedure as PrismaUnitProcedure,
+  Operation, // @ts-ignore
+  EquipmentPhase, // @ts-ignore
+  UnitProcedure,
 } from "@prisma/client";
 
 export class OperationServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count(
-    args: Omit<Prisma.OperationCountArgs, "select">
+  async count<T extends Prisma.OperationCountArgs>(
+    args: Prisma.SelectSubset<T, Prisma.OperationCountArgs>
   ): Promise<number> {
     return this.prisma.operation.count(args);
   }
 
   async operations<T extends Prisma.OperationFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.OperationFindManyArgs>
-  ): Promise<PrismaOperation[]> {
-    return this.prisma.operation.findMany<Prisma.OperationFindManyArgs>(args);
+  ): Promise<Operation[]> {
+    return this.prisma.operation.findMany(args);
   }
   async operation<T extends Prisma.OperationFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.OperationFindUniqueArgs>
-  ): Promise<PrismaOperation | null> {
+  ): Promise<Operation | null> {
     return this.prisma.operation.findUnique(args);
   }
   async createOperation<T extends Prisma.OperationCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.OperationCreateArgs>
-  ): Promise<PrismaOperation> {
+  ): Promise<Operation> {
     return this.prisma.operation.create<T>(args);
   }
   async updateOperation<T extends Prisma.OperationUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.OperationUpdateArgs>
-  ): Promise<PrismaOperation> {
+  ): Promise<Operation> {
     return this.prisma.operation.update<T>(args);
   }
   async deleteOperation<T extends Prisma.OperationDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.OperationDeleteArgs>
-  ): Promise<PrismaOperation> {
+  ): Promise<Operation> {
     return this.prisma.operation.delete(args);
   }
 
   async findEquipmentPhases(
     parentId: string,
     args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<PrismaEquipmentPhase[]> {
+  ): Promise<EquipmentPhase[]> {
     return this.prisma.operation
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -67,7 +67,7 @@ export class OperationServiceBase {
   async findInstances(
     parentId: string,
     args: Prisma.OperationFindManyArgs
-  ): Promise<PrismaOperation[]> {
+  ): Promise<Operation[]> {
     return this.prisma.operation
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -75,7 +75,7 @@ export class OperationServiceBase {
       .instances(args);
   }
 
-  async getClassId(parentId: string): Promise<PrismaOperation | null> {
+  async getClassId(parentId: string): Promise<Operation | null> {
     return this.prisma.operation
       .findUnique({
         where: { id: parentId },
@@ -83,9 +83,7 @@ export class OperationServiceBase {
       .classId();
   }
 
-  async getUnitProcedure(
-    parentId: string
-  ): Promise<PrismaUnitProcedure | null> {
+  async getUnitProcedure(parentId: string): Promise<UnitProcedure | null> {
     return this.prisma.operation
       .findUnique({
         where: { id: parentId },
