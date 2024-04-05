@@ -13,54 +13,52 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  EquipmentPhase as PrismaEquipmentPhase,
-  Instruction as PrismaInstruction,
-  PhaseParameter as PrismaPhaseParameter,
-  TestParameter as PrismaTestParameter,
-  Operation as PrismaOperation,
+  EquipmentPhase, // @ts-ignore
+  Instruction, // @ts-ignore
+  PhaseParameter, // @ts-ignore
+  TestParameter, // @ts-ignore
+  Operation,
 } from "@prisma/client";
 
 export class EquipmentPhaseServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count(
-    args: Omit<Prisma.EquipmentPhaseCountArgs, "select">
+  async count<T extends Prisma.EquipmentPhaseCountArgs>(
+    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCountArgs>
   ): Promise<number> {
     return this.prisma.equipmentPhase.count(args);
   }
 
   async equipmentPhases<T extends Prisma.EquipmentPhaseFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseFindManyArgs>
-  ): Promise<PrismaEquipmentPhase[]> {
-    return this.prisma.equipmentPhase.findMany<Prisma.EquipmentPhaseFindManyArgs>(
-      args
-    );
+  ): Promise<EquipmentPhase[]> {
+    return this.prisma.equipmentPhase.findMany(args);
   }
   async equipmentPhase<T extends Prisma.EquipmentPhaseFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseFindUniqueArgs>
-  ): Promise<PrismaEquipmentPhase | null> {
+  ): Promise<EquipmentPhase | null> {
     return this.prisma.equipmentPhase.findUnique(args);
   }
   async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCreateArgs>
-  ): Promise<PrismaEquipmentPhase> {
+  ): Promise<EquipmentPhase> {
     return this.prisma.equipmentPhase.create<T>(args);
   }
   async updateEquipmentPhase<T extends Prisma.EquipmentPhaseUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseUpdateArgs>
-  ): Promise<PrismaEquipmentPhase> {
+  ): Promise<EquipmentPhase> {
     return this.prisma.equipmentPhase.update<T>(args);
   }
   async deleteEquipmentPhase<T extends Prisma.EquipmentPhaseDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseDeleteArgs>
-  ): Promise<PrismaEquipmentPhase> {
+  ): Promise<EquipmentPhase> {
     return this.prisma.equipmentPhase.delete(args);
   }
 
   async findInstances(
     parentId: string,
     args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<PrismaEquipmentPhase[]> {
+  ): Promise<EquipmentPhase[]> {
     return this.prisma.equipmentPhase
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -71,7 +69,7 @@ export class EquipmentPhaseServiceBase {
   async findInstructions(
     parentId: string,
     args: Prisma.InstructionFindManyArgs
-  ): Promise<PrismaInstruction[]> {
+  ): Promise<Instruction[]> {
     return this.prisma.equipmentPhase
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -82,7 +80,7 @@ export class EquipmentPhaseServiceBase {
   async findPhaseParameters(
     parentId: string,
     args: Prisma.PhaseParameterFindManyArgs
-  ): Promise<PrismaPhaseParameter[]> {
+  ): Promise<PhaseParameter[]> {
     return this.prisma.equipmentPhase
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -93,7 +91,7 @@ export class EquipmentPhaseServiceBase {
   async findTestParameters(
     parentId: string,
     args: Prisma.TestParameterFindManyArgs
-  ): Promise<PrismaTestParameter[]> {
+  ): Promise<TestParameter[]> {
     return this.prisma.equipmentPhase
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -101,7 +99,7 @@ export class EquipmentPhaseServiceBase {
       .testParameters(args);
   }
 
-  async getClassId(parentId: string): Promise<PrismaEquipmentPhase | null> {
+  async getClassId(parentId: string): Promise<EquipmentPhase | null> {
     return this.prisma.equipmentPhase
       .findUnique({
         where: { id: parentId },
@@ -109,7 +107,7 @@ export class EquipmentPhaseServiceBase {
       .classId();
   }
 
-  async getOperation(parentId: string): Promise<PrismaOperation | null> {
+  async getOperation(parentId: string): Promise<Operation | null> {
     return this.prisma.equipmentPhase
       .findUnique({
         where: { id: parentId },

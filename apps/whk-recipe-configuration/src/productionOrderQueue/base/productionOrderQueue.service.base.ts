@@ -13,15 +13,15 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  ProductionOrderQueue as PrismaProductionOrderQueue,
-  Procedure as PrismaProcedure,
+  ProductionOrderQueue, // @ts-ignore
+  Procedure,
 } from "@prisma/client";
 
 export class ProductionOrderQueueServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count(
-    args: Omit<Prisma.ProductionOrderQueueCountArgs, "select">
+  async count<T extends Prisma.ProductionOrderQueueCountArgs>(
+    args: Prisma.SelectSubset<T, Prisma.ProductionOrderQueueCountArgs>
   ): Promise<number> {
     return this.prisma.productionOrderQueue.count(args);
   }
@@ -30,41 +30,39 @@ export class ProductionOrderQueueServiceBase {
     T extends Prisma.ProductionOrderQueueFindManyArgs
   >(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderQueueFindManyArgs>
-  ): Promise<PrismaProductionOrderQueue[]> {
-    return this.prisma.productionOrderQueue.findMany<Prisma.ProductionOrderQueueFindManyArgs>(
-      args
-    );
+  ): Promise<ProductionOrderQueue[]> {
+    return this.prisma.productionOrderQueue.findMany(args);
   }
   async productionOrderQueue<
     T extends Prisma.ProductionOrderQueueFindUniqueArgs
   >(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderQueueFindUniqueArgs>
-  ): Promise<PrismaProductionOrderQueue | null> {
+  ): Promise<ProductionOrderQueue | null> {
     return this.prisma.productionOrderQueue.findUnique(args);
   }
   async createProductionOrderQueue<
     T extends Prisma.ProductionOrderQueueCreateArgs
   >(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderQueueCreateArgs>
-  ): Promise<PrismaProductionOrderQueue> {
+  ): Promise<ProductionOrderQueue> {
     return this.prisma.productionOrderQueue.create<T>(args);
   }
   async updateProductionOrderQueue<
     T extends Prisma.ProductionOrderQueueUpdateArgs
   >(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderQueueUpdateArgs>
-  ): Promise<PrismaProductionOrderQueue> {
+  ): Promise<ProductionOrderQueue> {
     return this.prisma.productionOrderQueue.update<T>(args);
   }
   async deleteProductionOrderQueue<
     T extends Prisma.ProductionOrderQueueDeleteArgs
   >(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderQueueDeleteArgs>
-  ): Promise<PrismaProductionOrderQueue> {
+  ): Promise<ProductionOrderQueue> {
     return this.prisma.productionOrderQueue.delete(args);
   }
 
-  async getProcedure(parentId: string): Promise<PrismaProcedure | null> {
+  async getProcedure(parentId: string): Promise<Procedure | null> {
     return this.prisma.productionOrderQueue
       .findUnique({
         where: { id: parentId },

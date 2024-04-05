@@ -13,51 +13,49 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  Instruction as PrismaInstruction,
-  EquipmentPhase as PrismaEquipmentPhase,
+  Instruction, // @ts-ignore
+  EquipmentPhase,
 } from "@prisma/client";
 
 export class InstructionServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count(
-    args: Omit<Prisma.InstructionCountArgs, "select">
+  async count<T extends Prisma.InstructionCountArgs>(
+    args: Prisma.SelectSubset<T, Prisma.InstructionCountArgs>
   ): Promise<number> {
     return this.prisma.instruction.count(args);
   }
 
   async instructions<T extends Prisma.InstructionFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.InstructionFindManyArgs>
-  ): Promise<PrismaInstruction[]> {
-    return this.prisma.instruction.findMany<Prisma.InstructionFindManyArgs>(
-      args
-    );
+  ): Promise<Instruction[]> {
+    return this.prisma.instruction.findMany(args);
   }
   async instruction<T extends Prisma.InstructionFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.InstructionFindUniqueArgs>
-  ): Promise<PrismaInstruction | null> {
+  ): Promise<Instruction | null> {
     return this.prisma.instruction.findUnique(args);
   }
   async createInstruction<T extends Prisma.InstructionCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.InstructionCreateArgs>
-  ): Promise<PrismaInstruction> {
+  ): Promise<Instruction> {
     return this.prisma.instruction.create<T>(args);
   }
   async updateInstruction<T extends Prisma.InstructionUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.InstructionUpdateArgs>
-  ): Promise<PrismaInstruction> {
+  ): Promise<Instruction> {
     return this.prisma.instruction.update<T>(args);
   }
   async deleteInstruction<T extends Prisma.InstructionDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.InstructionDeleteArgs>
-  ): Promise<PrismaInstruction> {
+  ): Promise<Instruction> {
     return this.prisma.instruction.delete(args);
   }
 
   async findEquipmentPhase(
     parentId: string,
     args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<PrismaEquipmentPhase[]> {
+  ): Promise<EquipmentPhase[]> {
     return this.prisma.instruction
       .findUniqueOrThrow({
         where: { id: parentId },

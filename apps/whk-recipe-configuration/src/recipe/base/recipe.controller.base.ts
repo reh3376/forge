@@ -48,9 +48,6 @@ export class RecipeControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: RecipeCreateInput,
-  })
   async createRecipe(@common.Body() data: RecipeCreateInput): Promise<Recipe> {
     return await this.service.createRecipe({
       data: {
@@ -184,9 +181,6 @@ export class RecipeControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: RecipeUpdateInput,
   })
   async updateRecipe(
     @common.Param() params: RecipeWhereUniqueInput,
