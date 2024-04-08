@@ -14,13 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsString,
   IsEnum,
-  ValidateNested,
 } from "class-validator";
-import { EnumItemItemClass } from "./EnumItemItemClass";
-import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
+import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { EnumItemItemClass } from "./EnumItemItemClass";
+import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
+import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 
 @InputType()
 class ItemCreateInput {
@@ -34,6 +36,30 @@ class ItemCreateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BomCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  bomsWipItem?: BomCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BomCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  bomWipItems?: BomCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: true,
@@ -67,6 +93,18 @@ class ItemCreateInput {
     nullable: true,
   })
   itemDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  itemGroup?: ItemGroupWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,

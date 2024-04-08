@@ -26,8 +26,11 @@ import { ItemFindUniqueArgs } from "./ItemFindUniqueArgs";
 import { CreateItemArgs } from "./CreateItemArgs";
 import { UpdateItemArgs } from "./UpdateItemArgs";
 import { DeleteItemArgs } from "./DeleteItemArgs";
+import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
+import { Bom } from "../../bom/base/Bom";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Item)
@@ -88,7 +91,15 @@ export class ItemResolverBase {
   async createItem(@graphql.Args() args: CreateItemArgs): Promise<Item> {
     return await this.service.createItem({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        itemGroup: args.data.itemGroup
+          ? {
+              connect: args.data.itemGroup,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -103,7 +114,15 @@ export class ItemResolverBase {
     try {
       return await this.service.updateItem({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          itemGroup: args.data.itemGroup
+            ? {
+                connect: args.data.itemGroup,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -135,6 +154,46 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Bom], { name: "bomsWipItem" })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async findBomsWipItem(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: BomFindManyArgs
+  ): Promise<Bom[]> {
+    const results = await this.service.findBomsWipItem(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Bom], { name: "bomWipItems" })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async findBomWipItems(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: BomFindManyArgs
+  ): Promise<Bom[]> {
+    const results = await this.service.findBomWipItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
   @nestAccessControl.UseRoles({
     resource: "ProductionOrder",
@@ -152,5 +211,26 @@ export class ItemResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ItemGroup, {
+    nullable: true,
+    name: "itemGroup",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ItemGroup",
+    action: "read",
+    possession: "any",
+  })
+  async getItemGroup(
+    @graphql.Parent() parent: Item
+  ): Promise<ItemGroup | null> {
+    const result = await this.service.getItemGroup(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

@@ -27,7 +27,6 @@ const CREATE_INPUT = {
   editedBy: "exampleEditedBy",
   id: "exampleId",
   schemaVersion: "exampleSchemaVersion",
-  wipItem: "exampleWipItem",
 };
 const CREATE_RESULT = {
   bomName: "exampleBomName",
@@ -39,7 +38,6 @@ const CREATE_RESULT = {
   editedBy: "exampleEditedBy",
   id: "exampleId",
   schemaVersion: "exampleSchemaVersion",
-  wipItem: "exampleWipItem",
 };
 const FIND_MANY_RESULT = [
   {
@@ -52,7 +50,6 @@ const FIND_MANY_RESULT = [
     editedBy: "exampleEditedBy",
     id: "exampleId",
     schemaVersion: "exampleSchemaVersion",
-    wipItem: "exampleWipItem",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -65,7 +62,6 @@ const FIND_ONE_RESULT = {
   editedBy: "exampleEditedBy",
   id: "exampleId",
   schemaVersion: "exampleSchemaVersion",
-  wipItem: "exampleWipItem",
 };
 
 const service = {

@@ -14,13 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsDate,
   IsString,
   IsEnum,
-  ValidateNested,
 } from "class-validator";
+import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { EnumItemItemClass } from "./EnumItemItemClass";
+import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 
 @ObjectType()
@@ -35,6 +37,24 @@ class Item {
     nullable: true,
   })
   active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Bom],
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  bomsWipItem?: Array<Bom>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Bom],
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  bomWipItems?: Array<Bom>;
 
   @ApiProperty({
     required: true,
@@ -86,6 +106,15 @@ class Item {
     nullable: true,
   })
   itemDescription!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemGroup,
+  })
+  @ValidateNested()
+  @Type(() => ItemGroup)
+  @IsOptional()
+  itemGroup?: ItemGroup | null;
 
   @ApiProperty({
     required: true,
