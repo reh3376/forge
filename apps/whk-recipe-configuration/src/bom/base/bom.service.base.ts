@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Bom, // @ts-ignore
+  ProductionOrder, // @ts-ignore
   UnitProcedure,
 } from "@prisma/client";
 
@@ -50,6 +51,17 @@ export class BomServiceBase {
     args: Prisma.SelectSubset<T, Prisma.BomDeleteArgs>
   ): Promise<Bom> {
     return this.prisma.bom.delete(args);
+  }
+
+  async findProductionOrder(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    return this.prisma.bom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrder(args);
   }
 
   async findUnitProcedure(

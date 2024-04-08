@@ -171,62 +171,64 @@ model Operation {
 }
 
 model Procedure {
-  active                Boolean?               @default(true)
-  classId               Procedure?             @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
+  active                Boolean?             @default(true)
+  classId               Procedure?           @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
   classIdId             String?
-  createdAt             DateTime               @default(now())
+  createdAt             DateTime             @default(now())
   createdBy             String
   description           String?
-  id                    String                 @id @default(cuid())
-  instances             Procedure[]            @relation(name: "ProcedureClassIdProcedureInstances")
+  id                    String               @id @default(cuid())
+  instances             Procedure[]          @relation(name: "ProcedureClassIdProcedureInstances")
   isClassDefinition     Boolean?
   name                  EnumProcedureName?
-  productionOrderQueues ProductionOrderQueue[]
-  revision              Int?                   @default(0)
-  schemaVersion         String?                @default("0001-b")
+  productionOrderQueues ScheduleOrderQueue[]
+  revision              Int?                 @default(0)
+  schemaVersion         String?              @default("0001-b")
   unitProcedures        UnitProcedure[]
-  updatedAt             DateTime               @updatedAt
+  updatedAt             DateTime             @updatedAt
   updatedBy             String?
 
   @@unique([name, revision, active, isClassDefinition])
 }
 
 model Recipe {
-  active          Boolean?        @default(true)
-  createdAt       DateTime        @default(now())
-  createdBy       String
-  customerId      String
-  id              String          @id @default(cuid())
-  itemDescription String?
-  itemId          String
-  Recipe          String
-  recipeGroup     RecipeGroup?    @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId   String?
-  revision        Int?            @default(0)
-  schemaVersion   String?         @default("0001-b")
-  unitProcedures  UnitProcedure[]
-  updatedAt       DateTime        @updatedAt
-  updatedBy       String?
+  active           Boolean?          @default(true)
+  createdAt        DateTime          @default(now())
+  createdBy        String
+  customerId       String
+  id               String            @id @default(cuid())
+  itemDescription  String?
+  itemId           String
+  productionOrders ProductionOrder[]
+  Recipe           String
+  recipeGroup      RecipeGroup?      @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId    String?
+  revision         Int?              @default(0)
+  schemaVersion    String?           @default("0001-b")
+  unitProcedures   UnitProcedure[]
+  updatedAt        DateTime          @updatedAt
+  updatedBy        String?
 
   @@unique([itemId, customerId])
 }
 
 model Bom {
   bomName               String
-  bomRevision           Int?            @default(0)
+  bomRevision           Int?              @default(0)
   className             String?
-  createdAt             DateTime        @default(now())
+  createdAt             DateTime          @default(now())
   createdBy             String
-  editedAt              DateTime        @updatedAt
+  editedAt              DateTime          @updatedAt
   editedBy              String?
-  id                    String          @id @default(cuid())
-  schemaVersion         String?         @default("0001-alpha")
-  unitProcedure         UnitProcedure[] @relation(name: "BomsOnUnitProcedure")
-  unitProceduresPrimary UnitProcedure[] @relation(name: "primaryBom")
+  id                    String            @id @default(cuid())
+  productionOrder       ProductionOrder[]
+  schemaVersion         String?           @default("0001-alpha")
+  unitProcedure         UnitProcedure[]   @relation(name: "BomsOnUnitProcedure")
+  unitProceduresPrimary UnitProcedure[]   @relation(name: "primaryBom")
   wipItem               String?
 }
 
-model ProductionOrderQueue {
+model ScheduleOrderQueue {
   accountId     String
   active        Boolean   @default(true)
   createdAt     DateTime  @default(now())
@@ -270,17 +272,65 @@ model UnitProcedure {
 }
 
 model RecipeGroup {
-  createdAt     DateTime @default(now())
-  createdBy     String
-  id            String   @id @default(cuid())
-  recipe        String
-  recipes       Recipe[]
-  revision      Int?     @default(0)
-  schemaVersion String?  @default("0001-alpha")
-  updatedAt     DateTime @updatedAt
-  updatedBy     String?
+  createdAt        DateTime          @default(now())
+  createdBy        String
+  id               String            @id @default(cuid())
+  productionOrders ProductionOrder[]
+  recipe           String
+  recipes          Recipe[]
+  revision         Int?              @default(0)
+  schemaVersion    String?           @default("0001-alpha")
+  updatedAt        DateTime          @updatedAt
+  updatedBy        String?
 
   @@unique([recipe, revision])
+}
+
+model ProductionOrder {
+  boms          Bom[]
+  className     String
+  complete      Boolean?                   @default(false)
+  createdAt     DateTime                   @default(now())
+  createdBy     String
+  customer      String?
+  endDate       DateTime?
+  fg            Item?                      @relation(fields: [fgItemId], references: [id])
+  fgItemId      String?
+  id            String                     @id @default(cuid())
+  inProcess     Boolean?                   @default(false)
+  recipe        Recipe?                    @relation(fields: [recipeId], references: [id])
+  recipeId      String?
+  recipeGroup   RecipeGroup?               @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId String?
+  scheduled     Boolean?                   @default(false)
+  schemaVersion String?                    @default("0001-alpha")
+  startDate     DateTime
+  status        EnumProductionOrderStatus? @default(Initiated)
+  updatedAt     DateTime                   @updatedAt
+  updatedBy     DateTime?
+}
+
+model ScheduleOrder {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model Item {
+  active           Boolean?          @default(false)
+  createdAt        DateTime          @default(now())
+  createdBy        String
+  id               String            @id @default(cuid())
+  itemClass        EnumItemItemClass
+  itemDescription  String?
+  itemName         String
+  itemNumber       String
+  itemRevision     String
+  itemType         String
+  productionOrders ProductionOrder[]
+  schemaVersion    String?
+  updatedAt        DateTime          @updatedAt
+  updatedBy        String?
 }
 
 enum EnumPhaseParameterSetpointType {
@@ -351,4 +401,21 @@ enum EnumUnitProcedureName {
   Distillation01
   Processing01
   Granary01
+}
+
+enum EnumProductionOrderStatus {
+  Planned
+  Committed
+  Initiated
+  InProgress
+  Complete
+}
+
+enum EnumItemItemClass {
+  Inventory
+  Assembly
+  LotNumberedAssembly
+  SerializedAssembly
+  LotNumberedInventory
+  SerializedInventory
 }

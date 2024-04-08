@@ -18,9 +18,10 @@ import {
   ValidateNested,
   IsInt,
 } from "class-validator";
+import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
+import { Type } from "class-transformer";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
-import { Type } from "class-transformer";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 
 @InputType()
@@ -79,6 +80,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   itemId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

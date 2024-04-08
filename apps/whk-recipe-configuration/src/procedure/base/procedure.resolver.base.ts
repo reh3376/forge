@@ -25,8 +25,8 @@ import { ProcedureFindManyArgs } from "./ProcedureFindManyArgs";
 import { ProcedureFindUniqueArgs } from "./ProcedureFindUniqueArgs";
 import { CreateProcedureArgs } from "./CreateProcedureArgs";
 import { UpdateProcedureArgs } from "./UpdateProcedureArgs";
-import { ProductionOrderQueueFindManyArgs } from "../../productionOrderQueue/base/ProductionOrderQueueFindManyArgs";
-import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ProcedureService } from "../procedure.service";
@@ -161,18 +161,18 @@ export class ProcedureResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderQueue], {
+  @graphql.ResolveField(() => [ScheduleOrderQueue], {
     name: "productionOrderQueues",
   })
   @nestAccessControl.UseRoles({
-    resource: "ProductionOrderQueue",
+    resource: "ScheduleOrderQueue",
     action: "read",
     possession: "any",
   })
   async findProductionOrderQueues(
     @graphql.Parent() parent: Procedure,
-    @graphql.Args() args: ProductionOrderQueueFindManyArgs
-  ): Promise<ProductionOrderQueue[]> {
+    @graphql.Args() args: ScheduleOrderQueueFindManyArgs
+  ): Promise<ScheduleOrderQueue[]> {
     const results = await this.service.findProductionOrderQueues(
       parent.id,
       args
