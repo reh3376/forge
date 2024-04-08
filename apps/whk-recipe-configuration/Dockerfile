@@ -1,5 +1,5 @@
 # multi-stage: base (build)
-FROM node:21.7.1 AS base
+FROM node:21.7.2 AS base
 
 # Add New Relic Env Vars
 ENV NEW_RELIC_NO_CONFIG_FILE=true
@@ -29,7 +29,7 @@ COPY . .
 RUN npm run build
 
 # multi-stage: production (runtime)
-FROM node:21.7.1-slim AS production
+FROM node:21.7.2-slim AS production
 
 # create arguments of builds time variables
 ARG user=amplication
