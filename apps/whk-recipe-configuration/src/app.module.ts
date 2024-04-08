@@ -24,9 +24,12 @@ import { OperationModule } from "./operation/operation.module";
 import { ProcedureModule } from "./procedure/procedure.module";
 import { RecipeModule } from "./recipe/recipe.module";
 import { BomModule } from "./bom/bom.module";
-import { ProductionOrderQueueModule } from "./productionOrderQueue/productionOrderQueue.module";
+import { ScheduleOrderQueueModule } from "./scheduleOrderQueue/scheduleOrderQueue.module";
 import { UnitProcedureModule } from "./unitProcedure/unitProcedure.module";
 import { RecipeGroupModule } from "./recipeGroup/recipeGroup.module";
+import { ProductionOrderModule } from "./productionOrder/productionOrder.module";
+import { ScheduleOrderModule } from "./scheduleOrder/scheduleOrder.module";
+import { ItemModule } from "./item/item.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -57,9 +60,12 @@ import { AuthModule } from "./auth/auth.module";
     ProcedureModule,
     RecipeModule,
     BomModule,
-    ProductionOrderQueueModule,
+    ScheduleOrderQueueModule,
     UnitProcedureModule,
     RecipeGroupModule,
+    ProductionOrderModule,
+    ScheduleOrderModule,
+    ItemModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

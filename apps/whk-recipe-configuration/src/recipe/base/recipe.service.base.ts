@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Recipe, // @ts-ignore
+  ProductionOrder, // @ts-ignore
   UnitProcedure, // @ts-ignore
   RecipeGroup,
 } from "@prisma/client";
@@ -51,6 +52,17 @@ export class RecipeServiceBase {
     args: Prisma.SelectSubset<T, Prisma.RecipeDeleteArgs>
   ): Promise<Recipe> {
     return this.prisma.recipe.delete(args);
+  }
+
+  async findProductionOrders(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrders(args);
   }
 
   async findUnitProcedures(
