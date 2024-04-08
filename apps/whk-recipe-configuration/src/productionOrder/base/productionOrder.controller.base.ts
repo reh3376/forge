@@ -407,7 +407,12 @@ export class ProductionOrderControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItem: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

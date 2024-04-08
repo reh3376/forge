@@ -13,10 +13,12 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional, IsEnum, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 
 @InputType()
@@ -31,6 +33,30 @@ class ItemWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BomListRelationFilter)
+  @IsOptional()
+  @Field(() => BomListRelationFilter, {
+    nullable: true,
+  })
+  bomsWipItem?: BomListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BomListRelationFilter)
+  @IsOptional()
+  @Field(() => BomListRelationFilter, {
+    nullable: true,
+  })
+  bomWipItems?: BomListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -81,6 +107,18 @@ class ItemWhereInput {
     nullable: true,
   })
   itemDescription?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  itemGroup?: ItemGroupWhereUniqueInput;
 
   @ApiProperty({
     required: false,

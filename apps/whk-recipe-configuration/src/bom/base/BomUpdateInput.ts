@@ -11,13 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsInt, ValidateNested } from "class-validator";
-import { ProductionOrderUpdateManyWithoutBomsInput } from "./ProductionOrderUpdateManyWithoutBomsInput";
+import { ItemUpdateManyWithoutBomsInput } from "./ItemUpdateManyWithoutBomsInput";
+import { ValidateNested, IsOptional, IsString, IsInt } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrderUpdateManyWithoutBomsInput } from "./ProductionOrderUpdateManyWithoutBomsInput";
 import { UnitProcedureUpdateManyWithoutBomsInput } from "./UnitProcedureUpdateManyWithoutBomsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class BomUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => ItemUpdateManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemUpdateManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => ItemUpdateManyWithoutBomsInput, {
+    nullable: true,
+  })
+  bomItem?: ItemUpdateManyWithoutBomsInput;
+
   @ApiProperty({
     required: false,
     type: String,
@@ -122,14 +136,15 @@ class BomUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => ItemWhereUniqueInput,
   })
-  @IsString()
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => ItemWhereUniqueInput, {
     nullable: true,
   })
-  wipItem?: string | null;
+  wipItem?: ItemWhereUniqueInput;
 }
 
 export { BomUpdateInput as BomUpdateInput };

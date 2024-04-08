@@ -213,6 +213,7 @@ model Recipe {
 }
 
 model Bom {
+  bomItem               Item[]            @relation(name: "bomItem")
   bomName               String
   bomRevision           Int?              @default(0)
   className             String?
@@ -225,7 +226,8 @@ model Bom {
   schemaVersion         String?           @default("0001-alpha")
   unitProcedure         UnitProcedure[]   @relation(name: "BomsOnUnitProcedure")
   unitProceduresPrimary UnitProcedure[]   @relation(name: "primaryBom")
-  wipItem               String?
+  wipItem               Item              @relation(name: "bomsWipItem", fields: [wipItemId], references: [id])
+  wipItemId             String
 }
 
 model ScheduleOrderQueue {
@@ -318,11 +320,15 @@ model ScheduleOrder {
 
 model Item {
   active           Boolean?          @default(false)
+  bomsWipItem      Bom[]             @relation(name: "bomsWipItem")
+  bomWipItems      Bom[]             @relation(name: "bomItem")
   createdAt        DateTime          @default(now())
   createdBy        String
   id               String            @id @default(cuid())
   itemClass        EnumItemItemClass
   itemDescription  String?
+  itemGroup        ItemGroup?        @relation(fields: [itemGroupId], references: [id])
+  itemGroupId      String?
   itemName         String
   itemNumber       String
   itemRevision     String
@@ -331,6 +337,15 @@ model Item {
   schemaVersion    String?
   updatedAt        DateTime          @updatedAt
   updatedBy        String?
+}
+
+model ItemGroup {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  items       Item[]
+  name        String
+  updatedAt   DateTime @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {

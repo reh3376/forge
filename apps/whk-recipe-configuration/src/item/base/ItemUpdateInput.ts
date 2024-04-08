@@ -14,13 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
+  ValidateNested,
   IsString,
   IsEnum,
-  ValidateNested,
 } from "class-validator";
-import { EnumItemItemClass } from "./EnumItemItemClass";
-import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
+import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { EnumItemItemClass } from "./EnumItemItemClass";
+import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
+import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 
 @InputType()
 class ItemUpdateInput {
@@ -34,6 +36,30 @@ class ItemUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BomUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  bomsWipItem?: BomUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BomUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  bomWipItems?: BomUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -73,6 +99,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   itemDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  itemGroup?: ItemGroupWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

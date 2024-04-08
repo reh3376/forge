@@ -26,6 +26,9 @@ import { Item } from "./Item";
 import { ItemFindManyArgs } from "./ItemFindManyArgs";
 import { ItemWhereUniqueInput } from "./ItemWhereUniqueInput";
 import { ItemUpdateInput } from "./ItemUpdateInput";
+import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
+import { Bom } from "../../bom/base/Bom";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -50,7 +53,15 @@ export class ItemControllerBase {
   })
   async createItem(@common.Body() data: ItemCreateInput): Promise<Item> {
     return await this.service.createItem({
-      data: data,
+      data: {
+        ...data,
+
+        itemGroup: data.itemGroup
+          ? {
+              connect: data.itemGroup,
+            }
+          : undefined,
+      },
       select: {
         active: true,
         createdAt: true,
@@ -58,6 +69,13 @@ export class ItemControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
         itemName: true,
         itemNumber: true,
         itemRevision: true,
@@ -92,6 +110,13 @@ export class ItemControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
         itemName: true,
         itemNumber: true,
         itemRevision: true,
@@ -127,6 +152,13 @@ export class ItemControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
         itemName: true,
         itemNumber: true,
         itemRevision: true,
@@ -163,7 +195,15 @@ export class ItemControllerBase {
     try {
       return await this.service.updateItem({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          itemGroup: data.itemGroup
+            ? {
+                connect: data.itemGroup,
+              }
+            : undefined,
+        },
         select: {
           active: true,
           createdAt: true,
@@ -171,6 +211,13 @@ export class ItemControllerBase {
           id: true,
           itemClass: true,
           itemDescription: true,
+
+          itemGroup: {
+            select: {
+              id: true,
+            },
+          },
+
           itemName: true,
           itemNumber: true,
           itemRevision: true,
@@ -214,6 +261,13 @@ export class ItemControllerBase {
           id: true,
           itemClass: true,
           itemDescription: true,
+
+          itemGroup: {
+            select: {
+              id: true,
+            },
+          },
+
           itemName: true,
           itemNumber: true,
           itemRevision: true,
@@ -231,6 +285,220 @@ export class ItemControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomsWipItem")
+  @ApiNestedQuery(BomFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async findBomsWipItem(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<Bom[]> {
+    const query = plainToClass(BomFindManyArgs, request.query);
+    const results = await this.service.findBomsWipItem(params.id, {
+      ...query,
+      select: {
+        bomName: true,
+        bomRevision: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        schemaVersion: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomsWipItem")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomsWipItem(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomsWipItem: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomsWipItem")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomsWipItem(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomsWipItem: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomsWipItem")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomsWipItem(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomsWipItem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomWipItems")
+  @ApiNestedQuery(BomFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async findBomWipItems(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<Bom[]> {
+    const query = plainToClass(BomFindManyArgs, request.query);
+    const results = await this.service.findBomWipItems(params.id, {
+      ...query,
+      select: {
+        bomName: true,
+        bomRevision: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        schemaVersion: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomWipItems")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomWipItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomWipItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomWipItems")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomWipItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomWipItems: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomWipItems")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomWipItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomWipItems: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
