@@ -238,6 +238,8 @@ export async function customSeed() {
 
   // boms
   async function seedBom(n: number): Promise<void> {
+    const wipItems = await client.item.findMany();
+
     for (let i = 0; i < n; i++) {
       await client.bom.create({
         data: {
@@ -245,7 +247,7 @@ export async function customSeed() {
           className: faker.commerce.productMaterial(),
           createdBy: faker.internet.userName(),
           // Optionally include wipItemId if it's meant to reference another entity
-          wipItemId: faker.string.alphanumeric(10), // Assume it's a simple alphanumeric string
+          wipItemId: getRandomArrayElement(wipItems)?.id as any,
           bomRevision: faker.number.int({ min: 0, max: 10 }),
           // Other fields like schemaVersion have default values and need not be explicitly set
         },
