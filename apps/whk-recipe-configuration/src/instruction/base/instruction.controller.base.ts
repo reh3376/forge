@@ -48,9 +48,6 @@ export class InstructionControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: InstructionCreateInput,
-  })
   async createInstruction(
     @common.Body() data: InstructionCreateInput
   ): Promise<Instruction> {
@@ -151,9 +148,6 @@ export class InstructionControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: InstructionUpdateInput,
   })
   async updateInstruction(
     @common.Param() params: InstructionWhereUniqueInput,

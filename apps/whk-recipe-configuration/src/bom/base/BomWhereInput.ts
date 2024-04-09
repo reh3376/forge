@@ -11,15 +11,30 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class BomWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => ItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemListRelationFilter, {
+    nullable: true,
+  })
+  bomItem?: ItemListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -88,6 +103,18 @@ class BomWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProductionOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderListRelationFilter, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -123,14 +150,15 @@ class BomWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: () => ItemWhereUniqueInput,
   })
-  @Type(() => StringNullableFilter)
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => ItemWhereUniqueInput, {
     nullable: true,
   })
-  wipItem?: StringNullableFilter;
+  wipItem?: ItemWhereUniqueInput;
 }
 
 export { BomWhereInput as BomWhereInput };

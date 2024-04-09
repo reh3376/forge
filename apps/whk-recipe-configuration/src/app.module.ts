@@ -24,13 +24,16 @@ import { OperationModule } from "./operation/operation.module";
 import { ProcedureModule } from "./procedure/procedure.module";
 import { RecipeModule } from "./recipe/recipe.module";
 import { BomModule } from "./bom/bom.module";
-import { ProductionOrderQueueModule } from "./productionOrderQueue/productionOrderQueue.module";
+import { ScheduleOrderQueueModule } from "./scheduleOrderQueue/scheduleOrderQueue.module";
 import { UnitProcedureModule } from "./unitProcedure/unitProcedure.module";
 import { RecipeGroupModule } from "./recipeGroup/recipeGroup.module";
+import { ProductionOrderModule } from "./productionOrder/productionOrder.module";
+import { ScheduleOrderModule } from "./scheduleOrder/scheduleOrder.module";
+import { ItemModule } from "./item/item.module";
+import { ItemGroupModule } from "./itemGroup/itemGroup.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
-import { KafkaModule } from "./kafka/kafka.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { ServeStaticOptionsService } from "./serveStaticOptions.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -47,7 +50,6 @@ import { AuthModule } from "./auth/auth.module";
   imports: [
     ACLModule,
     AuthModule,
-    KafkaModule,
     LoggerModule,
     UserModule,
     PhaseParameterModule,
@@ -59,9 +61,13 @@ import { AuthModule } from "./auth/auth.module";
     ProcedureModule,
     RecipeModule,
     BomModule,
-    ProductionOrderQueueModule,
+    ScheduleOrderQueueModule,
     UnitProcedureModule,
     RecipeGroupModule,
+    ProductionOrderModule,
+    ScheduleOrderModule,
+    ItemModule,
+    ItemGroupModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

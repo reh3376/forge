@@ -26,9 +26,9 @@ import { Procedure } from "./Procedure";
 import { ProcedureFindManyArgs } from "./ProcedureFindManyArgs";
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { ProcedureUpdateInput } from "./ProcedureUpdateInput";
-import { ProductionOrderQueueFindManyArgs } from "../../productionOrderQueue/base/ProductionOrderQueueFindManyArgs";
-import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
-import { ProductionOrderQueueWhereUniqueInput } from "../../productionOrderQueue/base/ProductionOrderQueueWhereUniqueInput";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -50,9 +50,6 @@ export class ProcedureControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: ProcedureCreateInput,
   })
   async createProcedure(
     @common.Body() data: ProcedureCreateInput
@@ -186,9 +183,6 @@ export class ProcedureControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: ProcedureUpdateInput,
   })
   async updateProcedure(
     @common.Param() params: ProcedureWhereUniqueInput,
@@ -349,17 +343,17 @@ export class ProcedureControllerBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrderQueues")
-  @ApiNestedQuery(ProductionOrderQueueFindManyArgs)
+  @ApiNestedQuery(ScheduleOrderQueueFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "ProductionOrderQueue",
+    resource: "ScheduleOrderQueue",
     action: "read",
     possession: "any",
   })
   async findProductionOrderQueues(
     @common.Req() request: Request,
     @common.Param() params: ProcedureWhereUniqueInput
-  ): Promise<ProductionOrderQueue[]> {
-    const query = plainToClass(ProductionOrderQueueFindManyArgs, request.query);
+  ): Promise<ScheduleOrderQueue[]> {
+    const query = plainToClass(ScheduleOrderQueueFindManyArgs, request.query);
     const results = await this.service.findProductionOrderQueues(params.id, {
       ...query,
       select: {
@@ -399,7 +393,7 @@ export class ProcedureControllerBase {
   })
   async connectProductionOrderQueues(
     @common.Param() params: ProcedureWhereUniqueInput,
-    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       productionOrderQueues: {
@@ -421,7 +415,7 @@ export class ProcedureControllerBase {
   })
   async updateProductionOrderQueues(
     @common.Param() params: ProcedureWhereUniqueInput,
-    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       productionOrderQueues: {
@@ -443,7 +437,7 @@ export class ProcedureControllerBase {
   })
   async disconnectProductionOrderQueues(
     @common.Param() params: ProcedureWhereUniqueInput,
-    @common.Body() body: ProductionOrderQueueWhereUniqueInput[]
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       productionOrderQueues: {

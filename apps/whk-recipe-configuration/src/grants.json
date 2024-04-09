@@ -1501,186 +1501,186 @@
   },
   {
     "role": "admin",
-    "resource": "ProductionOrderQueue",
+    "resource": "ScheduleOrderQueue",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "manager",
-    "resource": "ProductionOrderQueue",
+    "resource": "ScheduleOrderQueue",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "operator",
-    "resource": "ProductionOrderQueue",
+    "resource": "ScheduleOrderQueue",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "supervisor",
-    "resource": "ProductionOrderQueue",
+    "resource": "ScheduleOrderQueue",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "ProductionOrderQueue",
-    "action": "read:own",
-    "attributes": "*"
-  },
-  {
-    "role": "admin",
-    "resource": "ProductionOrderQueue",
-    "action": "create:any",
-    "attributes": "*"
-  },
-  {
-    "role": "manager",
-    "resource": "ProductionOrderQueue",
-    "action": "create:any",
-    "attributes": "*"
-  },
-  {
-    "role": "operator",
-    "resource": "ProductionOrderQueue",
-    "action": "create:any",
-    "attributes": "*"
-  },
-  {
-    "role": "supervisor",
-    "resource": "ProductionOrderQueue",
-    "action": "create:any",
-    "attributes": "*"
-  },
-  {
-    "role": "user",
-    "resource": "ProductionOrderQueue",
-    "action": "create:any",
-    "attributes": "*"
-  },
-  {
-    "role": "admin",
-    "resource": "ProductionOrderQueue",
-    "action": "update:any",
-    "attributes": "*"
-  },
-  {
-    "role": "manager",
-    "resource": "ProductionOrderQueue",
-    "action": "update:any",
-    "attributes": "*"
-  },
-  {
-    "role": "operator",
-    "resource": "ProductionOrderQueue",
-    "action": "update:any",
-    "attributes": "*"
-  },
-  {
-    "role": "supervisor",
-    "resource": "ProductionOrderQueue",
-    "action": "update:any",
-    "attributes": "*"
-  },
-  {
-    "role": "user",
-    "resource": "ProductionOrderQueue",
-    "action": "update:any",
-    "attributes": "*"
-  },
-  {
-    "role": "admin",
-    "resource": "ProductionOrderQueue",
-    "action": "delete:any",
-    "attributes": "*"
-  },
-  {
-    "role": "manager",
-    "resource": "ProductionOrderQueue",
-    "action": "delete:any",
-    "attributes": "*"
-  },
-  {
-    "role": "operator",
-    "resource": "ProductionOrderQueue",
-    "action": "delete:any",
-    "attributes": "*"
-  },
-  {
-    "role": "supervisor",
-    "resource": "ProductionOrderQueue",
-    "action": "delete:any",
-    "attributes": "*"
-  },
-  {
-    "role": "user",
-    "resource": "ProductionOrderQueue",
-    "action": "delete:any",
-    "attributes": "*"
-  },
-  {
-    "role": "admin",
-    "resource": "ProductionOrderQueue",
-    "action": "read:any",
-    "attributes": "*"
-  },
-  {
-    "role": "manager",
-    "resource": "ProductionOrderQueue",
-    "action": "read:any",
-    "attributes": "*"
-  },
-  {
-    "role": "operator",
-    "resource": "ProductionOrderQueue",
-    "action": "read:any",
-    "attributes": "*"
-  },
-  {
-    "role": "supervisor",
-    "resource": "ProductionOrderQueue",
-    "action": "read:any",
-    "attributes": "*"
-  },
-  {
-    "role": "user",
-    "resource": "ProductionOrderQueue",
-    "action": "read:any",
-    "attributes": "*"
-  },
-  {
-    "role": "admin",
-    "resource": "UnitProcedure",
-    "action": "read:own",
-    "attributes": "*"
-  },
-  {
-    "role": "manager",
-    "resource": "UnitProcedure",
-    "action": "read:own",
-    "attributes": "*"
-  },
-  {
-    "role": "operator",
-    "resource": "UnitProcedure",
-    "action": "read:own",
-    "attributes": "*"
-  },
-  {
-    "role": "supervisor",
-    "resource": "UnitProcedure",
-    "action": "read:own",
-    "attributes": "*"
-  },
-  {
-    "role": "user",
-    "resource": "UnitProcedure",
+    "resource": "ScheduleOrderQueue",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "admin",
+    "resource": "ScheduleOrderQueue",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrderQueue",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrderQueue",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrderQueue",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrderQueue",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrderQueue",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrderQueue",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrderQueue",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrderQueue",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrderQueue",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrderQueue",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrderQueue",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrderQueue",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrderQueue",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrderQueue",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrderQueue",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrderQueue",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrderQueue",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrderQueue",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrderQueue",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnitProcedure",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnitProcedure",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnitProcedure",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnitProcedure",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnitProcedure",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
     "resource": "UnitProcedure",
     "action": "create:any",
     "attributes": "*"
@@ -1946,6 +1946,606 @@
   {
     "role": "user",
     "resource": "RecipeGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ProductionOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ProductionOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ProductionOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ProductionOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ProductionOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ProductionOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ProductionOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ProductionOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ProductionOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ProductionOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ProductionOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ProductionOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ProductionOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ProductionOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ProductionOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ProductionOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ProductionOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ProductionOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ProductionOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ProductionOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ProductionOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrder",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrder",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrder",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrder",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ScheduleOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ScheduleOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ScheduleOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ScheduleOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ScheduleOrder",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Item",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Item",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Item",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Item",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Item",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Item",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Item",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Item",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Item",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Item",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Item",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Item",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Item",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Item",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Item",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Item",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Item",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Item",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Item",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Item",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Item",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Item",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Item",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Item",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Item",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ItemGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ItemGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ItemGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ItemGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ItemGroup",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ItemGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ItemGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ItemGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ItemGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ItemGroup",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ItemGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ItemGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ItemGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ItemGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ItemGroup",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ItemGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ItemGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ItemGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ItemGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ItemGroup",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "ItemGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "ItemGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "ItemGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "ItemGroup",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "ItemGroup",
     "action": "read:any",
     "attributes": "*"
   }
