@@ -26,6 +26,12 @@ import { Bom } from "./Bom";
 import { BomFindManyArgs } from "./BomFindManyArgs";
 import { BomWhereUniqueInput } from "./BomWhereUniqueInput";
 import { BomUpdateInput } from "./BomUpdateInput";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -48,12 +54,15 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: BomCreateInput,
-  })
   async createBom(@common.Body() data: BomCreateInput): Promise<Bom> {
     return await this.service.createBom({
-      data: data,
+      data: {
+        ...data,
+
+        wipItem: {
+          connect: data.wipItem,
+        },
+      },
       select: {
         bomName: true,
         bomRevision: true,
@@ -64,7 +73,12 @@ export class BomControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItem: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -95,7 +109,12 @@ export class BomControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItem: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -125,7 +144,12 @@ export class BomControllerBase {
         editedBy: true,
         id: true,
         schemaVersion: true,
-        wipItem: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -148,9 +172,6 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: BomUpdateInput,
-  })
   async updateBom(
     @common.Param() params: BomWhereUniqueInput,
     @common.Body() data: BomUpdateInput
@@ -158,7 +179,13 @@ export class BomControllerBase {
     try {
       return await this.service.updateBom({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          wipItem: {
+            connect: data.wipItem,
+          },
+        },
         select: {
           bomName: true,
           bomRevision: true,
@@ -169,7 +196,12 @@ export class BomControllerBase {
           editedBy: true,
           id: true,
           schemaVersion: true,
-          wipItem: true,
+
+          wipItem: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -180,6 +212,244 @@ export class BomControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomItem")
+  @ApiNestedQuery(ItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItem(
+    @common.Req() request: Request,
+    @common.Param() params: BomWhereUniqueInput
+  ): Promise<Item[]> {
+    const query = plainToClass(ItemFindManyArgs, request.query);
+    const results = await this.service.findBomItem(params.id, {
+      ...query,
+      select: {
+        active: true,
+        createdAt: true,
+        createdBy: true,
+        id: true,
+        itemClass: true,
+        itemDescription: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemName: true,
+        itemNumber: true,
+        itemRevision: true,
+        itemType: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomItem(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        connect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomItem(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        set: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomItem(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrder")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrder(
+    @common.Req() request: Request,
+    @common.Param() params: BomWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrder(params.id, {
+      ...query,
+      select: {
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        customer: true,
+        endDate: true,
+
+        fg: {
+          select: {
+            id: true,
+          },
+        },
+
+        id: true,
+        inProcess: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        status: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrder")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrder(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrder: {
+        connect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrder")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrder(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrder: {
+        set: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrder")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrder(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrder: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

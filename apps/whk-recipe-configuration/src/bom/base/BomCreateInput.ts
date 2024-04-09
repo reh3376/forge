@@ -11,12 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsInt, IsOptional, ValidateNested } from "class-validator";
-import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
+import { ItemCreateNestedManyWithoutBomsInput } from "./ItemCreateNestedManyWithoutBomsInput";
+import { ValidateNested, IsOptional, IsString, IsInt } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrderCreateNestedManyWithoutBomsInput } from "./ProductionOrderCreateNestedManyWithoutBomsInput";
+import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class BomCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => ItemCreateNestedManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemCreateNestedManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutBomsInput, {
+    nullable: true,
+  })
+  bomItem?: ItemCreateNestedManyWithoutBomsInput;
+
   @ApiProperty({
     required: true,
     type: String,
@@ -68,6 +83,18 @@ class BomCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutBomsInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderCreateNestedManyWithoutBomsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -102,15 +129,13 @@ class BomCreateInput {
   unitProceduresPrimary?: UnitProcedureCreateNestedManyWithoutBomsInput;
 
   @ApiProperty({
-    required: false,
-    type: String,
+    required: true,
+    type: () => ItemWhereUniqueInput,
   })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  wipItem?: string | null;
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  wipItem!: ItemWhereUniqueInput;
 }
 
 export { BomCreateInput as BomCreateInput };

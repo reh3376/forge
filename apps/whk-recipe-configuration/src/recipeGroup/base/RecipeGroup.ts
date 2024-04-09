@@ -19,6 +19,7 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
@@ -46,6 +47,15 @@ class RecipeGroup {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
     required: true,
