@@ -9,8 +9,6 @@ import {
   EnumTestParameterTestSetpointType,
   EnumUnitProcedureName,
   Item,
-  Operation,
-  PhaseParameter,
   PrismaClient,
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
@@ -98,7 +96,7 @@ export async function customSeed() {
             name: classDefinition.name,
             // classId: classDefinition.id,
             isClassDefinition: false,
-            revision: faker.datatype.number({min: 1, max: 10}), // Assume instances can have varying revisions
+            revision: faker.number.int({min: 1, max: 10}), // Assume instances can have varying revisions
             // Optionally set active and other fields as necessary
           },
         });
@@ -138,7 +136,7 @@ export async function customSeed() {
       }
 
       // Seed instances for the class definition
-      const instancesCount = faker.datatype.number({min: 1, max: 5});
+      const instancesCount = faker.number.int({min: 1, max: 5});
       for (let i = 0; i < instancesCount; i++) {
         try {
           await client.unitProcedure.create({
@@ -188,7 +186,7 @@ export async function customSeed() {
         });
 
         // Seed a few instances for the class definition
-        const instancesCount = faker.datatype.number({ min: 1, max: 5 });
+        const instancesCount = faker.number.int({ min: 1, max: 5 });
         for (let i = 0; i < instancesCount; i++) {
           await client.operation.create({
             data: {
@@ -289,8 +287,8 @@ export async function customSeed() {
     for (let i = 0; i < n; i++) {
       const itemGroup = getRandomArrayElement(itemGroups);
       const itemName = faker.commerce.productName();
-      const itemNumber = `IN-${faker.datatype.number({ min: 1000, max: 9999 })}`;
-      const itemRevision = `Rev-${faker.random.alphaNumeric(3).toUpperCase()}`;
+      const itemNumber = `IN-${faker.number.int({ min: 1000, max: 9999 })}`;
+      const itemRevision = `Rev-${faker.string.alphanumeric(3).toUpperCase()}`;
       const itemType = getRandomArrayElement(Object.values(EnumItemItemClass)) as any;
 
       await client.item.create({
@@ -413,7 +411,7 @@ export async function customSeed() {
         });
 
         // Seed instances for the class definition
-        const instancesCount = faker.datatype.number({ min: 1, max: 5 });
+        const instancesCount = faker.number.int({ min: 1, max: 5 });
         for (let i = 0; i < instancesCount; i++) {
           await client.equipmentPhase.create({
             data: {
