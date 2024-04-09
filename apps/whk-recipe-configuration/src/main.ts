@@ -4,6 +4,8 @@ import { OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./filters/HttpExceptions.filter";
 import { AppModule } from "./app.module";
 import { connectMicroservices } from "./connectMicroservices";
+import { NewrelicInterceptor } from './newrelic.interceptor';
+
 import {
   swaggerPath,
   swaggerDocumentOptions,
@@ -19,6 +21,8 @@ async function main() {
     cors: true,
     bufferLogs: true
   });
+
+  app.useGlobalInterceptors(new NewrelicInterceptor());
 
   app.useLogger(app.get(Logger));
 
