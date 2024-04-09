@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -41,6 +42,18 @@ class RecipeGroupWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderListRelationFilter, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderListRelationFilter;
 
   @ApiProperty({
     required: false,

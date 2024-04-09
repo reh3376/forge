@@ -19,7 +19,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
 import { EnumProcedureName } from "./EnumProcedureName";
-import { ProductionOrderQueueListRelationFilter } from "../../productionOrderQueue/base/ProductionOrderQueueListRelationFilter";
+import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
@@ -117,15 +117,15 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderQueueListRelationFilter,
+    type: () => ScheduleOrderQueueListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderQueueListRelationFilter)
+  @Type(() => ScheduleOrderQueueListRelationFilter)
   @IsOptional()
-  @Field(() => ProductionOrderQueueListRelationFilter, {
+  @Field(() => ScheduleOrderQueueListRelationFilter, {
     nullable: true,
   })
-  productionOrderQueues?: ProductionOrderQueueListRelationFilter;
+  productionOrderQueues?: ScheduleOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,

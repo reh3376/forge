@@ -20,6 +20,7 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
@@ -86,6 +87,15 @@ class Recipe {
   @IsString()
   @Field(() => String)
   itemId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
     required: true,

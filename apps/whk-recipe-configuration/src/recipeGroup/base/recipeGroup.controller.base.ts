@@ -26,6 +26,9 @@ import { RecipeGroup } from "./RecipeGroup";
 import { RecipeGroupFindManyArgs } from "./RecipeGroupFindManyArgs";
 import { RecipeGroupWhereUniqueInput } from "./RecipeGroupWhereUniqueInput";
 import { RecipeGroupUpdateInput } from "./RecipeGroupUpdateInput";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -47,9 +50,6 @@ export class RecipeGroupControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: RecipeGroupCreateInput,
   })
   async createRecipeGroup(
     @common.Body() data: RecipeGroupCreateInput
@@ -146,9 +146,6 @@ export class RecipeGroupControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  @swagger.ApiBody({
-    type: RecipeGroupUpdateInput,
-  })
   async updateRecipeGroup(
     @common.Param() params: RecipeGroupWhereUniqueInput,
     @common.Body() data: RecipeGroupUpdateInput
@@ -214,6 +211,132 @@ export class RecipeGroupControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrders")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeGroupWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrders(params.id, {
+      ...query,
+      select: {
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        customer: true,
+        endDate: true,
+
+        fg: {
+          select: {
+            id: true,
+          },
+        },
+
+        id: true,
+        inProcess: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        status: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

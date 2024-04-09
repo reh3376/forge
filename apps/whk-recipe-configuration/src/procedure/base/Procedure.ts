@@ -22,7 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EnumProcedureName } from "./EnumProcedureName";
-import { ProductionOrderQueue } from "../../productionOrderQueue/base/ProductionOrderQueue";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -115,12 +115,12 @@ class Procedure {
 
   @ApiProperty({
     required: false,
-    type: () => [ProductionOrderQueue],
+    type: () => [ScheduleOrderQueue],
   })
   @ValidateNested()
-  @Type(() => ProductionOrderQueue)
+  @Type(() => ScheduleOrderQueue)
   @IsOptional()
-  productionOrderQueues?: Array<ProductionOrderQueue>;
+  productionOrderQueues?: Array<ScheduleOrderQueue>;
 
   @ApiProperty({
     required: false,

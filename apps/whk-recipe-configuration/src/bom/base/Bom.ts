@@ -11,18 +11,29 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { Item } from "../../item/base/Item";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   IsInt,
-  IsOptional,
   IsDate,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
 class Bom {
+  @ApiProperty({
+    required: false,
+    type: () => [Item],
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  bomItem?: Array<Item>;
+
   @ApiProperty({
     required: true,
     type: String,
@@ -98,6 +109,15 @@ class Bom {
 
   @ApiProperty({
     required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrder?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -126,15 +146,12 @@ class Bom {
   unitProceduresPrimary?: Array<UnitProcedure>;
 
   @ApiProperty({
-    required: false,
-    type: String,
+    required: true,
+    type: () => Item,
   })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  wipItem!: string | null;
+  @ValidateNested()
+  @Type(() => Item)
+  wipItem?: Item;
 }
 
 export { Bom as Bom };
