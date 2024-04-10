@@ -20,6 +20,7 @@ import {
 } from "class-validator";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderQueueUpdateInput {
@@ -100,6 +101,18 @@ class ScheduleOrderQueueUpdateInput {
     nullable: true,
   })
   salesOrderId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

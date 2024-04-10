@@ -18,11 +18,19 @@ import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { ScheduleOrder } from "./ScheduleOrder";
 import { ScheduleOrderCountArgs } from "./ScheduleOrderCountArgs";
 import { ScheduleOrderFindManyArgs } from "./ScheduleOrderFindManyArgs";
 import { ScheduleOrderFindUniqueArgs } from "./ScheduleOrderFindUniqueArgs";
+import { CreateScheduleOrderArgs } from "./CreateScheduleOrderArgs";
+import { UpdateScheduleOrderArgs } from "./UpdateScheduleOrderArgs";
 import { DeleteScheduleOrderArgs } from "./DeleteScheduleOrderArgs";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { ScheduleOrderService } from "../scheduleOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ScheduleOrder)
@@ -77,6 +85,87 @@ export class ScheduleOrderResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => ScheduleOrder)
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "create",
+    possession: "any",
+  })
+  async createScheduleOrder(
+    @graphql.Args() args: CreateScheduleOrderArgs
+  ): Promise<ScheduleOrder> {
+    return await this.service.createScheduleOrder({
+      ...args,
+      data: {
+        ...args.data,
+
+        recipe: args.data.recipe
+          ? {
+              connect: args.data.recipe,
+            }
+          : undefined,
+
+        recipeGroup: args.data.recipeGroup
+          ? {
+              connect: args.data.recipeGroup,
+            }
+          : undefined,
+
+        scheduleQueue: args.data.scheduleQueue
+          ? {
+              connect: args.data.scheduleQueue,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => ScheduleOrder)
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateScheduleOrder(
+    @graphql.Args() args: UpdateScheduleOrderArgs
+  ): Promise<ScheduleOrder | null> {
+    try {
+      return await this.service.updateScheduleOrder({
+        ...args,
+        data: {
+          ...args.data,
+
+          recipe: args.data.recipe
+            ? {
+                connect: args.data.recipe,
+              }
+            : undefined,
+
+          recipeGroup: args.data.recipeGroup
+            ? {
+                connect: args.data.recipeGroup,
+              }
+            : undefined,
+
+          scheduleQueue: args.data.scheduleQueue
+            ? {
+                connect: args.data.scheduleQueue,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
   @graphql.Mutation(() => ScheduleOrder)
   @nestAccessControl.UseRoles({
     resource: "ScheduleOrder",
@@ -96,5 +185,88 @@ export class ScheduleOrderResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @graphql.Parent() parent: ScheduleOrder,
+    @graphql.Args() args: ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Recipe, {
+    nullable: true,
+    name: "recipe",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async getRecipe(
+    @graphql.Parent() parent: ScheduleOrder
+  ): Promise<Recipe | null> {
+    const result = await this.service.getRecipe(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => RecipeGroup, {
+    nullable: true,
+    name: "recipeGroup",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "read",
+    possession: "any",
+  })
+  async getRecipeGroup(
+    @graphql.Parent() parent: ScheduleOrder
+  ): Promise<RecipeGroup | null> {
+    const result = await this.service.getRecipeGroup(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ScheduleOrderQueue, {
+    nullable: true,
+    name: "scheduleQueue",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async getScheduleQueue(
+    @graphql.Parent() parent: ScheduleOrder
+  ): Promise<ScheduleOrderQueue | null> {
+    const result = await this.service.getScheduleQueue(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

@@ -22,6 +22,7 @@ import {
 import { Type } from "class-transformer";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -124,6 +125,15 @@ class Recipe {
     nullable: true,
   })
   revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ScheduleOrder],
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrders?: Array<ScheduleOrder>;
 
   @ApiProperty({
     required: false,

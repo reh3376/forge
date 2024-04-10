@@ -22,6 +22,7 @@ import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./Production
 import { Type } from "class-transformer";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrderCreateNestedManyWithoutRecipesInput";
 import { UnitProcedureCreateNestedManyWithoutRecipesInput } from "./UnitProcedureCreateNestedManyWithoutRecipesInput";
 
 @InputType()
@@ -114,6 +115,18 @@ class RecipeCreateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

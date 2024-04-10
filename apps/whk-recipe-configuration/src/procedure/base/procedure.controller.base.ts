@@ -372,6 +372,13 @@ export class ProcedureControllerBase {
         queueIndex: true,
         revision: true,
         salesOrderId: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,

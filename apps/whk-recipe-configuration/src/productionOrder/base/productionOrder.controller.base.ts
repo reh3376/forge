@@ -72,6 +72,12 @@ export class ProductionOrderControllerBase {
               connect: data.recipeGroup,
             }
           : undefined,
+
+        scheduleOrder: data.scheduleOrder
+          ? {
+              connect: data.scheduleOrder,
+            }
+          : undefined,
       },
       select: {
         className: true,
@@ -103,6 +109,13 @@ export class ProductionOrderControllerBase {
         },
 
         scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         startDate: true,
         status: true,
@@ -160,6 +173,13 @@ export class ProductionOrderControllerBase {
         },
 
         scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         startDate: true,
         status: true,
@@ -216,6 +236,13 @@ export class ProductionOrderControllerBase {
         },
 
         scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         startDate: true,
         status: true,
@@ -270,6 +297,12 @@ export class ProductionOrderControllerBase {
                 connect: data.recipeGroup,
               }
             : undefined,
+
+          scheduleOrder: data.scheduleOrder
+            ? {
+                connect: data.scheduleOrder,
+              }
+            : undefined,
         },
         select: {
           className: true,
@@ -301,6 +334,13 @@ export class ProductionOrderControllerBase {
           },
 
           scheduled: true,
+
+          scheduleOrder: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           startDate: true,
           status: true,
@@ -365,6 +405,13 @@ export class ProductionOrderControllerBase {
           },
 
           scheduled: true,
+
+          scheduleOrder: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           startDate: true,
           status: true,
