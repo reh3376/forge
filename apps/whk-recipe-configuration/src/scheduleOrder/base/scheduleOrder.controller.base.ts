@@ -82,6 +82,7 @@ export class ScheduleOrderControllerBase {
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
         id: true,
+        productionOrderAllocation: true,
 
         recipe: {
           select: {
@@ -104,6 +105,7 @@ export class ScheduleOrderControllerBase {
         },
 
         status: true,
+        totalBarrels: true,
         totalProofGallons: true,
         updatedAt: true,
         updatedBy: true,
@@ -138,6 +140,7 @@ export class ScheduleOrderControllerBase {
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
         id: true,
+        productionOrderAllocation: true,
 
         recipe: {
           select: {
@@ -160,6 +163,7 @@ export class ScheduleOrderControllerBase {
         },
 
         status: true,
+        totalBarrels: true,
         totalProofGallons: true,
         updatedAt: true,
         updatedBy: true,
@@ -193,6 +197,7 @@ export class ScheduleOrderControllerBase {
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
         id: true,
+        productionOrderAllocation: true,
 
         recipe: {
           select: {
@@ -215,6 +220,7 @@ export class ScheduleOrderControllerBase {
         },
 
         status: true,
+        totalBarrels: true,
         totalProofGallons: true,
         updatedAt: true,
         updatedBy: true,
@@ -277,6 +283,7 @@ export class ScheduleOrderControllerBase {
           estimatedProcessing: true,
           estimatedTotalProductionTime: true,
           id: true,
+          productionOrderAllocation: true,
 
           recipe: {
             select: {
@@ -299,6 +306,7 @@ export class ScheduleOrderControllerBase {
           },
 
           status: true,
+          totalBarrels: true,
           totalProofGallons: true,
           updatedAt: true,
           updatedBy: true,
@@ -340,6 +348,7 @@ export class ScheduleOrderControllerBase {
           estimatedProcessing: true,
           estimatedTotalProductionTime: true,
           id: true,
+          productionOrderAllocation: true,
 
           recipe: {
             select: {
@@ -362,6 +371,7 @@ export class ScheduleOrderControllerBase {
           },
 
           status: true,
+          totalBarrels: true,
           totalProofGallons: true,
           updatedAt: true,
           updatedBy: true,
