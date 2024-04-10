@@ -22,6 +22,7 @@ import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderU
 import { Type } from "class-transformer";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 
 @InputType()
@@ -126,6 +127,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

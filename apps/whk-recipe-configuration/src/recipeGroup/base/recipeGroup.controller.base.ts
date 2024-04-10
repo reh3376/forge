@@ -32,6 +32,9 @@ import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/Prod
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -258,6 +261,13 @@ export class RecipeGroupControllerBase {
         },
 
         scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         startDate: true,
         status: true,
@@ -440,6 +450,131 @@ export class RecipeGroupControllerBase {
   ): Promise<void> {
     const data = {
       recipes: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/scheduleOrders")
+  @ApiNestedQuery(ScheduleOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrders(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeGroupWhereUniqueInput
+  ): Promise<ScheduleOrder[]> {
+    const query = plainToClass(ScheduleOrderFindManyArgs, request.query);
+    const results = await this.service.findScheduleOrders(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        estimatedDistillationTime: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedTotalProductionTime: true,
+        id: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleQueue: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/scheduleOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async connectScheduleOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/scheduleOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async updateScheduleOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/scheduleOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectScheduleOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrders: {
         disconnect: body,
       },
     };

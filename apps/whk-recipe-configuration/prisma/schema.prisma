@@ -204,6 +204,7 @@ model Recipe {
   recipeGroup      RecipeGroup?      @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId    String?
   revision         Int?              @default(0)
+  scheduleOrders   ScheduleOrder[]
   schemaVersion    String?           @default("0001-b")
   unitProcedures   UnitProcedure[]
   updatedAt        DateTime          @updatedAt
@@ -232,17 +233,18 @@ model Bom {
 
 model ScheduleOrderQueue {
   accountId     String
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
   createdBy     String
-  id            String    @id @default(cuid())
-  procedure     Procedure @relation(fields: [procedureId], references: [id])
+  id            String         @id @default(cuid())
+  procedure     Procedure      @relation(fields: [procedureId], references: [id])
   procedureId   String
-  queueIndex    Int?      @unique
-  revision      Int       @default(0)
-  salesOrderId  String    @unique
-  schemaVersion String?   @default("0001-b")
-  updatedAt     DateTime  @updatedAt
+  queueIndex    Int?           @unique
+  revision      Int            @default(0)
+  salesOrderId  String         @unique
+  scheduleOrder ScheduleOrder?
+  schemaVersion String?        @default("0001-b")
+  updatedAt     DateTime       @updatedAt
   updatedBy     String?
 }
 
@@ -281,6 +283,7 @@ model RecipeGroup {
   recipe           String
   recipes          Recipe[]
   revision         Int?              @default(0)
+  scheduleOrders   ScheduleOrder[]
   schemaVersion    String?           @default("0001-alpha")
   updatedAt        DateTime          @updatedAt
   updatedBy        String?
@@ -289,33 +292,52 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
-  boms          Bom[]
-  className     String
-  complete      Boolean?                   @default(false)
-  createdAt     DateTime                   @default(now())
-  createdBy     String
-  customer      String?
-  endDate       DateTime?
-  fg            Item?                      @relation(fields: [fgItemId], references: [id])
-  fgItemId      String?
-  id            String                     @id @default(cuid())
-  inProcess     Boolean?                   @default(false)
-  recipe        Recipe?                    @relation(fields: [recipeId], references: [id])
-  recipeId      String?
-  recipeGroup   RecipeGroup?               @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId String?
-  scheduled     Boolean?                   @default(false)
-  schemaVersion String?                    @default("0001-alpha")
-  startDate     DateTime
-  status        EnumProductionOrderStatus? @default(Initiated)
-  updatedAt     DateTime                   @updatedAt
-  updatedBy     DateTime?
+  boms            Bom[]
+  className       String
+  complete        Boolean?                   @default(false)
+  createdAt       DateTime                   @default(now())
+  createdBy       String
+  customer        String?
+  endDate         DateTime?
+  fg              Item?                      @relation(fields: [fgItemId], references: [id])
+  fgItemId        String?
+  id              String                     @id @default(cuid())
+  inProcess       Boolean?                   @default(false)
+  recipe          Recipe?                    @relation(fields: [recipeId], references: [id])
+  recipeId        String?
+  recipeGroup     RecipeGroup?               @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId   String?
+  scheduled       Boolean?                   @default(false)
+  scheduleOrder   ScheduleOrder?             @relation(fields: [scheduleOrderId], references: [id])
+  scheduleOrderId String?
+  schemaVersion   String?                    @default("0001-alpha")
+  startDate       DateTime
+  status          EnumProductionOrderStatus? @default(Initiated)
+  updatedAt       DateTime                   @updatedAt
+  updatedBy       DateTime?
 }
 
 model ScheduleOrder {
-  createdAt DateTime @default(now())
-  id        String   @id @default(cuid())
-  updatedAt DateTime @updatedAt
+  createdAt                    DateTime                 @default(now())
+  createdBy                    String?
+  estimatedDistillationTime    Int?
+  estimatedFermentationTime    Int?
+  estimatedMashingTime         Int?
+  estimatedProcessing          Int?
+  estimatedTotalProductionTime Int?
+  id                           String                   @id @default(cuid())
+  productionOrders             ProductionOrder[]
+  recipe                       Recipe?                  @relation(fields: [recipeId], references: [id])
+  recipeId                     String?
+  recipeGroup                  RecipeGroup?             @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                String?
+  recipeName                   String
+  scheduleQueue                ScheduleOrderQueue?      @relation(fields: [scheduleQueueId], references: [id])
+  scheduleQueueId              String?                  @unique
+  status                       EnumScheduleOrderStatus? @default(Created)
+  totalProofGallons            Int?
+  updatedAt                    DateTime                 @updatedAt
+  updatedBy                    String?
 }
 
 model Item {
@@ -422,6 +444,13 @@ enum EnumProductionOrderStatus {
   Planned
   Committed
   Initiated
+  InProgress
+  Complete
+}
+
+enum EnumScheduleOrderStatus {
+  Created
+  Scheduled
   InProgress
   Complete
 }

@@ -9,5 +9,178 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class ScheduleOrderCreateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  ValidateNested,
+  IsEnum,
+} from "class-validator";
+import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
+import { Type } from "class-transformer";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
+
+@InputType()
+class ScheduleOrderCreateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedDistillationTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedFermentationTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedMashingTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedProcessing?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedTotalProductionTime?: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderCreateNestedManyWithoutScheduleOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  recipe?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  recipeGroup?: RecipeGroupWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  recipeName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleQueue?: ScheduleOrderQueueWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumScheduleOrderStatus,
+  })
+  @IsEnum(EnumScheduleOrderStatus)
+  @IsOptional()
+  @Field(() => EnumScheduleOrderStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "Scheduled" | "InProgress" | "Complete" | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalProofGallons?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
+}
+
 export { ScheduleOrderCreateInput as ScheduleOrderCreateInput };

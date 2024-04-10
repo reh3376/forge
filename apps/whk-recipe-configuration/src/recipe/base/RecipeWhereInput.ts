@@ -20,6 +20,7 @@ import { ProductionOrderListRelationFilter } from "../../productionOrder/base/Pr
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
 @InputType()
@@ -135,6 +136,18 @@ class RecipeWhereInput {
     nullable: true,
   })
   revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ScheduleOrderListRelationFilter, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -26,6 +26,9 @@ import { ScheduleOrder } from "./ScheduleOrder";
 import { ScheduleOrderFindManyArgs } from "./ScheduleOrderFindManyArgs";
 import { ScheduleOrderWhereUniqueInput } from "./ScheduleOrderWhereUniqueInput";
 import { ScheduleOrderUpdateInput } from "./ScheduleOrderUpdateInput";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -49,11 +52,61 @@ export class ScheduleOrderControllerBase {
     @common.Body() data: ScheduleOrderCreateInput
   ): Promise<ScheduleOrder> {
     return await this.service.createScheduleOrder({
-      data: data,
+      data: {
+        ...data,
+
+        recipe: data.recipe
+          ? {
+              connect: data.recipe,
+            }
+          : undefined,
+
+        recipeGroup: data.recipeGroup
+          ? {
+              connect: data.recipeGroup,
+            }
+          : undefined,
+
+        scheduleQueue: data.scheduleQueue
+          ? {
+              connect: data.scheduleQueue,
+            }
+          : undefined,
+      },
       select: {
         createdAt: true,
+        createdBy: true,
+        estimatedDistillationTime: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedTotalProductionTime: true,
         id: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleQueue: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        totalProofGallons: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -78,8 +131,38 @@ export class ScheduleOrderControllerBase {
       ...args,
       select: {
         createdAt: true,
+        createdBy: true,
+        estimatedDistillationTime: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedTotalProductionTime: true,
         id: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleQueue: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        totalProofGallons: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -103,8 +186,38 @@ export class ScheduleOrderControllerBase {
       where: params,
       select: {
         createdAt: true,
+        createdBy: true,
+        estimatedDistillationTime: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedTotalProductionTime: true,
         id: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleQueue: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        totalProofGallons: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -134,11 +247,61 @@ export class ScheduleOrderControllerBase {
     try {
       return await this.service.updateScheduleOrder({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          recipe: data.recipe
+            ? {
+                connect: data.recipe,
+              }
+            : undefined,
+
+          recipeGroup: data.recipeGroup
+            ? {
+                connect: data.recipeGroup,
+              }
+            : undefined,
+
+          scheduleQueue: data.scheduleQueue
+            ? {
+                connect: data.scheduleQueue,
+              }
+            : undefined,
+        },
         select: {
           createdAt: true,
+          createdBy: true,
+          estimatedDistillationTime: true,
+          estimatedFermentationTime: true,
+          estimatedMashingTime: true,
+          estimatedProcessing: true,
+          estimatedTotalProductionTime: true,
           id: true,
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipeGroup: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipeName: true,
+
+          scheduleQueue: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+          totalProofGallons: true,
           updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -170,8 +333,38 @@ export class ScheduleOrderControllerBase {
         where: params,
         select: {
           createdAt: true,
+          createdBy: true,
+          estimatedDistillationTime: true,
+          estimatedFermentationTime: true,
+          estimatedMashingTime: true,
+          estimatedProcessing: true,
+          estimatedTotalProductionTime: true,
           id: true,
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipeGroup: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipeName: true,
+
+          scheduleQueue: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+          totalProofGallons: true,
           updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -182,5 +375,138 @@ export class ScheduleOrderControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrders")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @common.Req() request: Request,
+    @common.Param() params: ScheduleOrderWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrders(params.id, {
+      ...query,
+      select: {
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        customer: true,
+        endDate: true,
+
+        fg: {
+          select: {
+            id: true,
+          },
+        },
+
+        id: true,
+        inProcess: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        startDate: true,
+        status: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrders(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrders(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrders(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

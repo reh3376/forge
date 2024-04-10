@@ -371,6 +371,13 @@ export class BomControllerBase {
         },
 
         scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         startDate: true,
         status: true,
