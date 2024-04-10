@@ -55,6 +55,12 @@ export class ScheduleOrderQueueControllerBase {
         procedure: {
           connect: data.procedure,
         },
+
+        scheduleOrder: data.scheduleOrder
+          ? {
+              connect: data.scheduleOrder,
+            }
+          : undefined,
       },
       select: {
         accountId: true,
@@ -72,6 +78,13 @@ export class ScheduleOrderQueueControllerBase {
         queueIndex: true,
         revision: true,
         salesOrderId: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -113,6 +126,13 @@ export class ScheduleOrderQueueControllerBase {
         queueIndex: true,
         revision: true,
         salesOrderId: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -153,6 +173,13 @@ export class ScheduleOrderQueueControllerBase {
         queueIndex: true,
         revision: true,
         salesOrderId: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -191,6 +218,12 @@ export class ScheduleOrderQueueControllerBase {
           procedure: {
             connect: data.procedure,
           },
+
+          scheduleOrder: data.scheduleOrder
+            ? {
+                connect: data.scheduleOrder,
+              }
+            : undefined,
         },
         select: {
           accountId: true,
@@ -208,6 +241,13 @@ export class ScheduleOrderQueueControllerBase {
           queueIndex: true,
           revision: true,
           salesOrderId: true,
+
+          scheduleOrder: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,

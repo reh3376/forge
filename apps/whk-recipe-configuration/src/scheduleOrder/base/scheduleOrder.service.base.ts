@@ -10,7 +10,15 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, ScheduleOrder } from "@prisma/client";
+
+import {
+  Prisma,
+  ScheduleOrder, // @ts-ignore
+  ProductionOrder, // @ts-ignore
+  Recipe, // @ts-ignore
+  RecipeGroup, // @ts-ignore
+  ScheduleOrderQueue,
+} from "@prisma/client";
 
 export class ScheduleOrderServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -45,5 +53,40 @@ export class ScheduleOrderServiceBase {
     args: Prisma.SelectSubset<T, Prisma.ScheduleOrderDeleteArgs>
   ): Promise<ScheduleOrder> {
     return this.prisma.scheduleOrder.delete(args);
+  }
+
+  async findProductionOrders(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    return this.prisma.scheduleOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrders(args);
+  }
+
+  async getRecipe(parentId: string): Promise<Recipe | null> {
+    return this.prisma.scheduleOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .recipe();
+  }
+
+  async getRecipeGroup(parentId: string): Promise<RecipeGroup | null> {
+    return this.prisma.scheduleOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .recipeGroup();
+  }
+
+  async getScheduleQueue(parentId: string): Promise<ScheduleOrderQueue | null> {
+    return this.prisma.scheduleOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .scheduleQueue();
   }
 }

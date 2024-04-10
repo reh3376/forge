@@ -26,6 +26,7 @@ import { ScheduleOrderQueueFindUniqueArgs } from "./ScheduleOrderQueueFindUnique
 import { CreateScheduleOrderQueueArgs } from "./CreateScheduleOrderQueueArgs";
 import { UpdateScheduleOrderQueueArgs } from "./UpdateScheduleOrderQueueArgs";
 import { Procedure } from "../../procedure/base/Procedure";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ScheduleOrderQueue)
@@ -98,6 +99,12 @@ export class ScheduleOrderQueueResolverBase {
         procedure: {
           connect: args.data.procedure,
         },
+
+        scheduleOrder: args.data.scheduleOrder
+          ? {
+              connect: args.data.scheduleOrder,
+            }
+          : undefined,
       },
     });
   }
@@ -121,6 +128,12 @@ export class ScheduleOrderQueueResolverBase {
           procedure: {
             connect: args.data.procedure,
           },
+
+          scheduleOrder: args.data.scheduleOrder
+            ? {
+                connect: args.data.scheduleOrder,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -147,6 +160,27 @@ export class ScheduleOrderQueueResolverBase {
     @graphql.Parent() parent: ScheduleOrderQueue
   ): Promise<Procedure | null> {
     const result = await this.service.getProcedure(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ScheduleOrder, {
+    nullable: true,
+    name: "scheduleOrder",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getScheduleOrder(
+    @graphql.Parent() parent: ScheduleOrderQueue
+  ): Promise<ScheduleOrder | null> {
+    const result = await this.service.getScheduleOrder(parent.id);
 
     if (!result) {
       return null;
