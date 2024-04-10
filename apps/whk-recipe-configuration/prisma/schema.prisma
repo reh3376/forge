@@ -326,6 +326,7 @@ model ScheduleOrder {
   estimatedProcessing          Int?
   estimatedTotalProductionTime Int?
   id                           String                   @id @default(cuid())
+  productionOrderAllocation    Json
   productionOrders             ProductionOrder[]
   recipe                       Recipe?                  @relation(fields: [recipeId], references: [id])
   recipeId                     String?
@@ -335,6 +336,7 @@ model ScheduleOrder {
   scheduleQueue                ScheduleOrderQueue?      @relation(fields: [scheduleQueueId], references: [id])
   scheduleQueueId              String?                  @unique
   status                       EnumScheduleOrderStatus? @default(Created)
+  totalBarrels                 Int?
   totalProofGallons            Int?
   updatedAt                    DateTime                 @updatedAt
   updatedBy                    String?
