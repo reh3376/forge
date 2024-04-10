@@ -16,11 +16,12 @@ import {
   IsBoolean,
   IsDate,
   ValidateNested,
-  IsInt,
   IsOptional,
+  IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Procedure } from "../../procedure/base/Procedure";
+import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
@@ -72,6 +73,15 @@ class ScheduleOrderQueue {
   @ValidateNested()
   @Type(() => Procedure)
   procedure?: Procedure;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionSchedule,
+  })
+  @ValidateNested()
+  @Type(() => ProductionSchedule)
+  @IsOptional()
+  productionSchedule?: ProductionSchedule | null;
 
   @ApiProperty({
     required: false,

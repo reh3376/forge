@@ -16,6 +16,7 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
+import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { IntFilter } from "../../util/IntFilter";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
@@ -78,6 +79,18 @@ class ScheduleOrderQueueWhereInput {
     nullable: true,
   })
   procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionScheduleWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionScheduleWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionScheduleWhereUniqueInput, {
+    nullable: true,
+  })
+  productionSchedule?: ProductionScheduleWhereUniqueInput;
 
   @ApiProperty({
     required: false,

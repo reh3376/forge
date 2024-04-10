@@ -369,6 +369,12 @@ export class ProcedureControllerBase {
           },
         },
 
+        productionSchedule: {
+          select: {
+            id: true,
+          },
+        },
+
         queueIndex: true,
         revision: true,
         salesOrderId: true,

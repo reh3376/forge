@@ -56,6 +56,12 @@ export class ScheduleOrderQueueControllerBase {
           connect: data.procedure,
         },
 
+        productionSchedule: data.productionSchedule
+          ? {
+              connect: data.productionSchedule,
+            }
+          : undefined,
+
         scheduleOrder: data.scheduleOrder
           ? {
               connect: data.scheduleOrder,
@@ -70,6 +76,12 @@ export class ScheduleOrderQueueControllerBase {
         id: true,
 
         procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionSchedule: {
           select: {
             id: true,
           },
@@ -123,6 +135,12 @@ export class ScheduleOrderQueueControllerBase {
           },
         },
 
+        productionSchedule: {
+          select: {
+            id: true,
+          },
+        },
+
         queueIndex: true,
         revision: true,
         salesOrderId: true,
@@ -165,6 +183,12 @@ export class ScheduleOrderQueueControllerBase {
         id: true,
 
         procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionSchedule: {
           select: {
             id: true,
           },
@@ -219,6 +243,12 @@ export class ScheduleOrderQueueControllerBase {
             connect: data.procedure,
           },
 
+          productionSchedule: data.productionSchedule
+            ? {
+                connect: data.productionSchedule,
+              }
+            : undefined,
+
           scheduleOrder: data.scheduleOrder
             ? {
                 connect: data.scheduleOrder,
@@ -233,6 +263,12 @@ export class ScheduleOrderQueueControllerBase {
           id: true,
 
           procedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          productionSchedule: {
             select: {
               id: true,
             },
