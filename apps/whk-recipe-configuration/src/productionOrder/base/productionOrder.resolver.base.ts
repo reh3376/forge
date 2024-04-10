@@ -31,6 +31,7 @@ import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ProductionOrderService } from "../productionOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ProductionOrder)
@@ -117,6 +118,12 @@ export class ProductionOrderResolverBase {
               connect: args.data.recipeGroup,
             }
           : undefined,
+
+        scheduleOrder: args.data.scheduleOrder
+          ? {
+              connect: args.data.scheduleOrder,
+            }
+          : undefined,
       },
     });
   }
@@ -152,6 +159,12 @@ export class ProductionOrderResolverBase {
           recipeGroup: args.data.recipeGroup
             ? {
                 connect: args.data.recipeGroup,
+              }
+            : undefined,
+
+          scheduleOrder: args.data.scheduleOrder
+            ? {
+                connect: args.data.scheduleOrder,
               }
             : undefined,
         },
@@ -261,6 +274,27 @@ export class ProductionOrderResolverBase {
     @graphql.Parent() parent: ProductionOrder
   ): Promise<RecipeGroup | null> {
     const result = await this.service.getRecipeGroup(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ScheduleOrder, {
+    nullable: true,
+    name: "scheduleOrder",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getScheduleOrder(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<ScheduleOrder | null> {
+    const result = await this.service.getScheduleOrder(parent.id);
 
     if (!result) {
       return null;

@@ -18,6 +18,7 @@ import { BooleanFilter } from "../../util/BooleanFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { IntFilter } from "../../util/IntFilter";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
@@ -110,6 +111,18 @@ class ScheduleOrderQueueWhereInput {
     nullable: true,
   })
   salesOrderId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrder?: ScheduleOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,

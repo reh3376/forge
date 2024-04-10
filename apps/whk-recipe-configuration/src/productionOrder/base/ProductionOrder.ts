@@ -24,6 +24,7 @@ import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
 @ObjectType()
@@ -150,6 +151,15 @@ class ProductionOrder {
     nullable: true,
   })
   scheduled!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrder,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrder?: ScheduleOrder | null;
 
   @ApiProperty({
     required: false,
