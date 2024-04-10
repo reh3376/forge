@@ -14,38 +14,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { BooleanFilter } from "../../util/BooleanFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { IntFilter } from "../../util/IntFilter";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class ScheduleOrderQueueWhereInput {
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  accountId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanFilter,
-  })
-  @Type(() => BooleanFilter)
-  @IsOptional()
-  @Field(() => BooleanFilter, {
-    nullable: true,
-  })
-  active?: BooleanFilter;
-
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -102,28 +78,6 @@ class ScheduleOrderQueueWhereInput {
     nullable: true,
   })
   queueIndex?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  revision?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  salesOrderId?: StringFilter;
 
   @ApiProperty({
     required: false,

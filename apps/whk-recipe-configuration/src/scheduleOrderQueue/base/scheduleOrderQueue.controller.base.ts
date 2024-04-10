@@ -69,8 +69,6 @@ export class ScheduleOrderQueueControllerBase {
           : undefined,
       },
       select: {
-        accountId: true,
-        active: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -88,8 +86,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         queueIndex: true,
-        revision: true,
-        salesOrderId: true,
 
         scheduleOrder: {
           select: {
@@ -123,8 +119,6 @@ export class ScheduleOrderQueueControllerBase {
     return this.service.scheduleOrderQueues({
       ...args,
       select: {
-        accountId: true,
-        active: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -142,8 +136,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         queueIndex: true,
-        revision: true,
-        salesOrderId: true,
 
         scheduleOrder: {
           select: {
@@ -176,8 +168,6 @@ export class ScheduleOrderQueueControllerBase {
     const result = await this.service.scheduleOrderQueue({
       where: params,
       select: {
-        accountId: true,
-        active: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -195,8 +185,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         queueIndex: true,
-        revision: true,
-        salesOrderId: true,
 
         scheduleOrder: {
           select: {
@@ -256,8 +244,6 @@ export class ScheduleOrderQueueControllerBase {
             : undefined,
         },
         select: {
-          accountId: true,
-          active: true,
           createdAt: true,
           createdBy: true,
           id: true,
@@ -275,8 +261,6 @@ export class ScheduleOrderQueueControllerBase {
           },
 
           queueIndex: true,
-          revision: true,
-          salesOrderId: true,
 
           scheduleOrder: {
             select: {
