@@ -27,6 +27,8 @@ import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -149,6 +151,26 @@ export class RecipeResolverBase {
     @graphql.Args() args: ProductionOrderFindManyArgs
   ): Promise<ProductionOrder[]> {
     const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrders(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: ScheduleOrderFindManyArgs
+  ): Promise<ScheduleOrder[]> {
+    const results = await this.service.findScheduleOrders(parent.id, args);
 
     if (!results) {
       return [];

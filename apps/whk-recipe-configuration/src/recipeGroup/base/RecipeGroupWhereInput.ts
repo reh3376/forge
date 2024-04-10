@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
@@ -88,6 +89,18 @@ class RecipeGroupWhereInput {
     nullable: true,
   })
   revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ScheduleOrderListRelationFilter, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderListRelationFilter;
 
   @ApiProperty({
     required: false,

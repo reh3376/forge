@@ -19,25 +19,61 @@ const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  estimatedDistillationTime: 42,
+  estimatedFermentationTime: 42,
+  estimatedMashingTime: 42,
+  estimatedProcessing: 42,
+  estimatedTotalProductionTime: 42,
   id: "exampleId",
+  recipeName: "exampleRecipeName",
+  totalProofGallons: 42,
   updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  estimatedDistillationTime: 42,
+  estimatedFermentationTime: 42,
+  estimatedMashingTime: 42,
+  estimatedProcessing: 42,
+  estimatedTotalProductionTime: 42,
   id: "exampleId",
+  recipeName: "exampleRecipeName",
+  totalProofGallons: 42,
   updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
     createdAt: new Date(),
+    createdBy: "exampleCreatedBy",
+    estimatedDistillationTime: 42,
+    estimatedFermentationTime: 42,
+    estimatedMashingTime: 42,
+    estimatedProcessing: 42,
+    estimatedTotalProductionTime: 42,
     id: "exampleId",
+    recipeName: "exampleRecipeName",
+    totalProofGallons: 42,
     updatedAt: new Date(),
+    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
   createdAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  estimatedDistillationTime: 42,
+  estimatedFermentationTime: 42,
+  estimatedMashingTime: 42,
+  estimatedProcessing: 42,
+  estimatedTotalProductionTime: 42,
   id: "exampleId",
+  recipeName: "exampleRecipeName",
+  totalProofGallons: 42,
   updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {

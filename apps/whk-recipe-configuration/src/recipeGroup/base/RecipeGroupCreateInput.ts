@@ -15,6 +15,7 @@ import { IsString, ValidateNested, IsOptional, IsInt } from "class-validator";
 import { ProductionOrderCreateNestedManyWithoutRecipeGroupsInput } from "./ProductionOrderCreateNestedManyWithoutRecipeGroupsInput";
 import { Type } from "class-transformer";
 import { RecipeCreateNestedManyWithoutRecipeGroupsInput } from "./RecipeCreateNestedManyWithoutRecipeGroupsInput";
+import { ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput } from "./ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput";
 
 @InputType()
 class RecipeGroupCreateInput {
@@ -68,6 +69,18 @@ class RecipeGroupCreateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput;
 
   @ApiProperty({
     required: false,

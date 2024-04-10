@@ -546,6 +546,13 @@ export class ItemControllerBase {
         },
 
         scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         startDate: true,
         status: true,

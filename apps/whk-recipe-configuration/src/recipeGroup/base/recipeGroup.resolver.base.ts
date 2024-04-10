@@ -30,6 +30,8 @@ import { ProductionOrderFindManyArgs } from "../../productionOrder/base/Producti
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { RecipeGroupService } from "../recipeGroup.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeGroup)
@@ -178,6 +180,26 @@ export class RecipeGroupResolverBase {
     @graphql.Args() args: RecipeFindManyArgs
   ): Promise<Recipe[]> {
     const results = await this.service.findRecipes(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrders(
+    @graphql.Parent() parent: RecipeGroup,
+    @graphql.Args() args: ScheduleOrderFindManyArgs
+  ): Promise<ScheduleOrder[]> {
+    const results = await this.service.findScheduleOrders(parent.id, args);
 
     if (!results) {
       return [];

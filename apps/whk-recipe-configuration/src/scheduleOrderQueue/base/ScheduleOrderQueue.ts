@@ -21,6 +21,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Procedure } from "../../procedure/base/Procedure";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class ScheduleOrderQueue {
@@ -98,6 +99,15 @@ class ScheduleOrderQueue {
   @IsString()
   @Field(() => String)
   salesOrderId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrder,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrder?: ScheduleOrder | null;
 
   @ApiProperty({
     required: false,

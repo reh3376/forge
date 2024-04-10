@@ -11,12 +11,85 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @InputType()
 class ScheduleOrderWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  createdBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  estimatedDistillationTime?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  estimatedFermentationTime?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  estimatedMashingTime?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  estimatedProcessing?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  estimatedTotalProductionTime?: IntNullableFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -27,6 +100,87 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderListRelationFilter, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  recipe?: RecipeWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  recipeGroup?: RecipeGroupWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  recipeName?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleQueue?: ScheduleOrderQueueWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumScheduleOrderStatus,
+  })
+  @IsEnum(EnumScheduleOrderStatus)
+  @IsOptional()
+  @Field(() => EnumScheduleOrderStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "Scheduled" | "InProgress" | "Complete";
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  totalProofGallons?: IntNullableFilter;
 }
 
 export { ScheduleOrderWhereInput as ScheduleOrderWhereInput };

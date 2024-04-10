@@ -21,6 +21,7 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
@@ -161,6 +162,18 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   scheduled?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrder?: ScheduleOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,
