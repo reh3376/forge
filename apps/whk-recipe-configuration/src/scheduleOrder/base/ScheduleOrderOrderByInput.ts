@@ -116,6 +116,17 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  productionOrderAllocation?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   recipeId?: SortOrder;
 
   @ApiProperty({
@@ -161,6 +172,17 @@ class ScheduleOrderOrderByInput {
     nullable: true,
   })
   status?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  totalBarrels?: SortOrder;
 
   @ApiProperty({
     required: false,
