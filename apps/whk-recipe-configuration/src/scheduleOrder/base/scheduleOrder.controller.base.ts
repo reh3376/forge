@@ -55,6 +55,12 @@ export class ScheduleOrderControllerBase {
       data: {
         ...data,
 
+        productionSchedules: data.productionSchedules
+          ? {
+              connect: data.productionSchedules,
+            }
+          : undefined,
+
         recipe: data.recipe
           ? {
               connect: data.recipe,
@@ -83,6 +89,12 @@ export class ScheduleOrderControllerBase {
         estimatedTotalProductionTime: true,
         id: true,
         productionOrderAllocation: true,
+
+        productionSchedules: {
+          select: {
+            id: true,
+          },
+        },
 
         recipe: {
           select: {
@@ -142,6 +154,12 @@ export class ScheduleOrderControllerBase {
         id: true,
         productionOrderAllocation: true,
 
+        productionSchedules: {
+          select: {
+            id: true,
+          },
+        },
+
         recipe: {
           select: {
             id: true,
@@ -198,6 +216,12 @@ export class ScheduleOrderControllerBase {
         estimatedTotalProductionTime: true,
         id: true,
         productionOrderAllocation: true,
+
+        productionSchedules: {
+          select: {
+            id: true,
+          },
+        },
 
         recipe: {
           select: {
@@ -256,6 +280,12 @@ export class ScheduleOrderControllerBase {
         data: {
           ...data,
 
+          productionSchedules: data.productionSchedules
+            ? {
+                connect: data.productionSchedules,
+              }
+            : undefined,
+
           recipe: data.recipe
             ? {
                 connect: data.recipe,
@@ -284,6 +314,12 @@ export class ScheduleOrderControllerBase {
           estimatedTotalProductionTime: true,
           id: true,
           productionOrderAllocation: true,
+
+          productionSchedules: {
+            select: {
+              id: true,
+            },
+          },
 
           recipe: {
             select: {
@@ -349,6 +385,12 @@ export class ScheduleOrderControllerBase {
           estimatedTotalProductionTime: true,
           id: true,
           productionOrderAllocation: true,
+
+          productionSchedules: {
+            select: {
+              id: true,
+            },
+          },
 
           recipe: {
             select: {

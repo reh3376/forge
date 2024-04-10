@@ -23,6 +23,7 @@ import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
 import { Type } from "class-transformer";
+import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
@@ -114,6 +115,18 @@ class ScheduleOrderCreateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderCreateNestedManyWithoutScheduleOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionScheduleWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionScheduleWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionScheduleWhereUniqueInput, {
+    nullable: true,
+  })
+  productionSchedules?: ProductionScheduleWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
