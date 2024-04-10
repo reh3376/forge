@@ -486,6 +486,12 @@ export class RecipeGroupControllerBase {
         id: true,
         productionOrderAllocation: true,
 
+        productionSchedules: {
+          select: {
+            id: true,
+          },
+        },
+
         recipe: {
           select: {
             id: true,

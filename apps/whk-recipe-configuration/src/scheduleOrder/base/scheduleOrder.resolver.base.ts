@@ -28,6 +28,7 @@ import { UpdateScheduleOrderArgs } from "./UpdateScheduleOrderArgs";
 import { DeleteScheduleOrderArgs } from "./DeleteScheduleOrderArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
@@ -100,6 +101,12 @@ export class ScheduleOrderResolverBase {
       data: {
         ...args.data,
 
+        productionSchedules: args.data.productionSchedules
+          ? {
+              connect: args.data.productionSchedules,
+            }
+          : undefined,
+
         recipe: args.data.recipe
           ? {
               connect: args.data.recipe,
@@ -136,6 +143,12 @@ export class ScheduleOrderResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          productionSchedules: args.data.productionSchedules
+            ? {
+                connect: args.data.productionSchedules,
+              }
+            : undefined,
 
           recipe: args.data.recipe
             ? {
@@ -205,6 +218,27 @@ export class ScheduleOrderResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionSchedule, {
+    nullable: true,
+    name: "productionSchedules",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionSchedule",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionSchedules(
+    @graphql.Parent() parent: ScheduleOrder
+  ): Promise<ProductionSchedule | null> {
+    const result = await this.service.getProductionSchedules(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
