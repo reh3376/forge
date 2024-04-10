@@ -18,6 +18,9 @@ import {
   ValidateNested,
   IsEnum,
 } from "class-validator";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
 import { Type } from "class-transformer";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -95,6 +98,13 @@ class ScheduleOrderCreateInput {
 
   @ApiProperty({
     required: true,
+  })
+  @IsJSONValue()
+  @Field(() => GraphQLJSON)
+  productionOrderAllocation!: InputJsonValue;
+
+  @ApiProperty({
+    required: true,
     type: () => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput,
   })
   @ValidateNested()
@@ -159,6 +169,17 @@ class ScheduleOrderCreateInput {
     nullable: true,
   })
   status?: "Created" | "Scheduled" | "InProgress" | "Complete" | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalBarrels?: number | null;
 
   @ApiProperty({
     required: false,
