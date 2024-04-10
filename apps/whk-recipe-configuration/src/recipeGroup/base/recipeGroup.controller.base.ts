@@ -484,6 +484,7 @@ export class RecipeGroupControllerBase {
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
         id: true,
+        productionOrderAllocation: true,
 
         recipe: {
           select: {
@@ -506,6 +507,7 @@ export class RecipeGroupControllerBase {
         },
 
         status: true,
+        totalBarrels: true,
         totalProofGallons: true,
         updatedAt: true,
         updatedBy: true,

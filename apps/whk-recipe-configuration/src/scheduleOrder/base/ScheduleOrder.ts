@@ -20,6 +20,9 @@ import {
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { JsonValue } from "type-fest";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -112,6 +115,13 @@ class ScheduleOrder {
 
   @ApiProperty({
     required: true,
+  })
+  @IsJSONValue()
+  @Field(() => GraphQLJSON)
+  productionOrderAllocation!: JsonValue;
+
+  @ApiProperty({
+    required: true,
     type: () => [ProductionOrder],
   })
   @ValidateNested()
@@ -164,6 +174,17 @@ class ScheduleOrder {
     nullable: true,
   })
   status?: "Created" | "Scheduled" | "InProgress" | "Complete" | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalBarrels!: number | null;
 
   @ApiProperty({
     required: false,
