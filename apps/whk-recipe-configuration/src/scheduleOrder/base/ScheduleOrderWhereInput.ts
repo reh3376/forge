@@ -18,6 +18,7 @@ import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
+import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
@@ -124,6 +125,18 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionScheduleWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionScheduleWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionScheduleWhereUniqueInput, {
+    nullable: true,
+  })
+  productionSchedules?: ProductionScheduleWhereUniqueInput;
 
   @ApiProperty({
     required: false,

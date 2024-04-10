@@ -24,6 +24,7 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
@@ -128,6 +129,15 @@ class ScheduleOrder {
   @Type(() => ProductionOrder)
   @IsOptional()
   productionOrders?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionSchedule,
+  })
+  @ValidateNested()
+  @Type(() => ProductionSchedule)
+  @IsOptional()
+  productionSchedules?: ProductionSchedule | null;
 
   @ApiProperty({
     required: false,
