@@ -171,22 +171,21 @@ model Operation {
 }
 
 model Procedure {
-  active                Boolean?             @default(true)
-  classId               Procedure?           @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
-  classIdId             String?
-  createdAt             DateTime             @default(now())
-  createdBy             String
-  description           String?
-  id                    String               @id @default(cuid())
-  instances             Procedure[]          @relation(name: "ProcedureClassIdProcedureInstances")
-  isClassDefinition     Boolean?
-  name                  EnumProcedureName?
-  productionOrderQueues ScheduleOrderQueue[]
-  revision              Int?                 @default(0)
-  schemaVersion         String?              @default("0001-b")
-  unitProcedures        UnitProcedure[]
-  updatedAt             DateTime             @updatedAt
-  updatedBy             String?
+  active            Boolean?           @default(true)
+  classId           Procedure?         @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
+  classIdId         String?
+  createdAt         DateTime           @default(now())
+  createdBy         String
+  description       String?
+  id                String             @id @default(cuid())
+  instances         Procedure[]        @relation(name: "ProcedureClassIdProcedureInstances")
+  isClassDefinition Boolean?
+  name              EnumProcedureName?
+  revision          Int?               @default(0)
+  schemaVersion     String?            @default("0001-b")
+  unitProcedures    UnitProcedure[]
+  updatedAt         DateTime           @updatedAt
+  updatedBy         String?
 
   @@unique([name, revision, active, isClassDefinition])
 }
@@ -235,8 +234,6 @@ model ScheduleOrderQueue {
   createdAt          DateTime            @default(now())
   createdBy          String
   id                 String              @id @default(cuid())
-  procedure          Procedure           @relation(fields: [procedureId], references: [id])
-  procedureId        String
   productionSchedule ProductionSchedule?
   queueIndex         Int?                @unique
   schemaVersion      String?             @default("0001-b")
