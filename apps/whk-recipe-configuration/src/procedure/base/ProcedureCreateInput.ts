@@ -23,7 +23,6 @@ import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ProcedureCreateNestedManyWithoutProceduresInput } from "./ProcedureCreateNestedManyWithoutProceduresInput";
 import { EnumProcedureName } from "./EnumProcedureName";
-import { ScheduleOrderQueueCreateNestedManyWithoutProceduresInput } from "./ScheduleOrderQueueCreateNestedManyWithoutProceduresInput";
 import { UnitProcedureCreateNestedManyWithoutProceduresInput } from "./UnitProcedureCreateNestedManyWithoutProceduresInput";
 
 @InputType()
@@ -103,18 +102,6 @@ class ProcedureCreateInput {
     nullable: true,
   })
   name?: "Line1" | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderQueueCreateNestedManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderQueueCreateNestedManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderQueueCreateNestedManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  productionOrderQueues?: ScheduleOrderQueueCreateNestedManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,
