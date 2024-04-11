@@ -61,21 +61,13 @@ export class ScheduleOrderControllerBase {
             }
           : undefined,
 
-        recipe: data.recipe
-          ? {
-              connect: data.recipe,
-            }
-          : undefined,
+        recipeGroup: {
+          connect: data.recipeGroup,
+        },
 
-        recipeGroup: data.recipeGroup
+        scheduleOrderRecipe: data.scheduleOrderRecipe
           ? {
-              connect: data.recipeGroup,
-            }
-          : undefined,
-
-        scheduleQueue: data.scheduleQueue
-          ? {
-              connect: data.scheduleQueue,
+              connect: data.scheduleOrderRecipe,
             }
           : undefined,
       },
@@ -96,12 +88,6 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeGroup: {
           select: {
             id: true,
@@ -110,7 +96,7 @@ export class ScheduleOrderControllerBase {
 
         recipeName: true,
 
-        scheduleQueue: {
+        scheduleOrderRecipe: {
           select: {
             id: true,
           },
@@ -160,12 +146,6 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeGroup: {
           select: {
             id: true,
@@ -174,7 +154,7 @@ export class ScheduleOrderControllerBase {
 
         recipeName: true,
 
-        scheduleQueue: {
+        scheduleOrderRecipe: {
           select: {
             id: true,
           },
@@ -223,12 +203,6 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeGroup: {
           select: {
             id: true,
@@ -237,7 +211,7 @@ export class ScheduleOrderControllerBase {
 
         recipeName: true,
 
-        scheduleQueue: {
+        scheduleOrderRecipe: {
           select: {
             id: true,
           },
@@ -286,21 +260,13 @@ export class ScheduleOrderControllerBase {
               }
             : undefined,
 
-          recipe: data.recipe
-            ? {
-                connect: data.recipe,
-              }
-            : undefined,
+          recipeGroup: {
+            connect: data.recipeGroup,
+          },
 
-          recipeGroup: data.recipeGroup
+          scheduleOrderRecipe: data.scheduleOrderRecipe
             ? {
-                connect: data.recipeGroup,
-              }
-            : undefined,
-
-          scheduleQueue: data.scheduleQueue
-            ? {
-                connect: data.scheduleQueue,
+                connect: data.scheduleOrderRecipe,
               }
             : undefined,
         },
@@ -321,12 +287,6 @@ export class ScheduleOrderControllerBase {
             },
           },
 
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
           recipeGroup: {
             select: {
               id: true,
@@ -335,7 +295,7 @@ export class ScheduleOrderControllerBase {
 
           recipeName: true,
 
-          scheduleQueue: {
+          scheduleOrderRecipe: {
             select: {
               id: true,
             },
@@ -392,12 +352,6 @@ export class ScheduleOrderControllerBase {
             },
           },
 
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
           recipeGroup: {
             select: {
               id: true,
@@ -406,7 +360,7 @@ export class ScheduleOrderControllerBase {
 
           recipeName: true,
 
-          scheduleQueue: {
+          scheduleOrderRecipe: {
             select: {
               id: true,
             },

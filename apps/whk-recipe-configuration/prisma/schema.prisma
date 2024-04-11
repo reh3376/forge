@@ -239,7 +239,6 @@ model ScheduleOrderQueue {
   procedureId        String
   productionSchedule ProductionSchedule?
   queueIndex         Int?                @unique
-  scheduleOrder      ScheduleOrder?
   schemaVersion      String?             @default("0001-b")
   updatedAt          DateTime            @updatedAt
   updatedBy          String?
@@ -326,13 +325,11 @@ model ScheduleOrder {
   productionOrderAllocation    Json
   productionOrders             ProductionOrder[]
   productionSchedules          ProductionSchedule?
-  recipe                       Recipe?                  @relation(fields: [recipeId], references: [id])
-  recipeId                     String?
-  recipeGroup                  RecipeGroup?             @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId                String?
+  recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                String
   recipeName                   String
-  scheduleQueue                ScheduleOrderQueue?      @relation(fields: [scheduleQueueId], references: [id])
-  scheduleQueueId              String?                  @unique
+  scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
+  scheduleOrderRecipeId        String?
   status                       EnumScheduleOrderStatus? @default(Created)
   totalBarrels                 Int?
   totalProofGallons            Int?
@@ -432,17 +429,42 @@ enum EnumRecipeParameterRecipeSetpointType {
 }
 
 enum EnumEquipmentPhaseName {
-  IngredientAdd
   PreSteam
   Steam
   Hold
+  BacksetAdd
+  WaterAdd
+  AdditiveAdd
+  CornAdd
+  MaltAdd
+  RyeAdd
+  WheatAdd
+  Drop
+  PhCapture
+  Cooldown
+  Rinse
+  HotFlush
+  Cip
+  Fill
+  Run
+  FermenterSteam
+  CoolerSteam
+  DropTubSteam
+  DropLineSteam
+  DropToMashCooler
+  StillStartup
+  StillShutdown
+  Cut
+  Gauge
 }
 
 enum EnumOperationName {
-  MashVessel
-  FermentationVessel
-  DistillationRun
-  BlendingVessel
+  Cook
+  FermenterSet
+  Fermenter
+  Clean
+  StillRun
+  BlendingTank
   CisternTank
 }
 

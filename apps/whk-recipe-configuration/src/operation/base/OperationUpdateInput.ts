@@ -140,10 +140,12 @@ class OperationUpdateInput {
     nullable: true,
   })
   name?:
-    | "MashVessel"
-    | "FermentationVessel"
-    | "DistillationRun"
-    | "BlendingVessel"
+    | "Cook"
+    | "FermenterSet"
+    | "Fermenter"
+    | "Clean"
+    | "StillRun"
+    | "BlendingTank"
     | "CisternTank";
 
   @ApiProperty({

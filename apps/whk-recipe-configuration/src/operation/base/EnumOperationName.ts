@@ -12,10 +12,12 @@ https://docs.amplication.com/how-to/custom-code
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum EnumOperationName {
-  MashVessel = "MashVessel",
-  FermentationVessel = "FermentationVessel",
-  DistillationRun = "DistillationRun",
-  BlendingVessel = "BlendingVessel",
+  Cook = "Cook",
+  FermenterSet = "FermenterSet",
+  Fermenter = "Fermenter",
+  Clean = "Clean",
+  StillRun = "StillRun",
+  BlendingTank = "BlendingTank",
   CisternTank = "CisternTank",
 }
 
