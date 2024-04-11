@@ -25,7 +25,6 @@ import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs
 import { ScheduleOrderQueueFindUniqueArgs } from "./ScheduleOrderQueueFindUniqueArgs";
 import { CreateScheduleOrderQueueArgs } from "./CreateScheduleOrderQueueArgs";
 import { UpdateScheduleOrderQueueArgs } from "./UpdateScheduleOrderQueueArgs";
-import { Procedure } from "../../procedure/base/Procedure";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -96,10 +95,6 @@ export class ScheduleOrderQueueResolverBase {
       data: {
         ...args.data,
 
-        procedure: {
-          connect: args.data.procedure,
-        },
-
         productionSchedule: args.data.productionSchedule
           ? {
               connect: args.data.productionSchedule,
@@ -125,10 +120,6 @@ export class ScheduleOrderQueueResolverBase {
         data: {
           ...args.data,
 
-          procedure: {
-            connect: args.data.procedure,
-          },
-
           productionSchedule: args.data.productionSchedule
             ? {
                 connect: args.data.productionSchedule,
@@ -144,27 +135,6 @@ export class ScheduleOrderQueueResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Procedure, {
-    nullable: true,
-    name: "procedure",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Procedure",
-    action: "read",
-    possession: "any",
-  })
-  async getProcedure(
-    @graphql.Parent() parent: ScheduleOrderQueue
-  ): Promise<Procedure | null> {
-    const result = await this.service.getProcedure(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

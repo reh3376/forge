@@ -12,9 +12,8 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
-import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { Type } from "class-transformer";
 import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
+import { Type } from "class-transformer";
 
 @InputType()
 class ScheduleOrderQueueUpdateInput {
@@ -28,18 +27,6 @@ class ScheduleOrderQueueUpdateInput {
     nullable: true,
   })
   createdBy?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  procedure?: ProcedureWhereUniqueInput;
 
   @ApiProperty({
     required: false,

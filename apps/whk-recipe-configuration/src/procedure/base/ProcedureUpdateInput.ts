@@ -23,7 +23,6 @@ import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ProcedureUpdateManyWithoutProceduresInput } from "./ProcedureUpdateManyWithoutProceduresInput";
 import { EnumProcedureName } from "./EnumProcedureName";
-import { ScheduleOrderQueueUpdateManyWithoutProceduresInput } from "./ScheduleOrderQueueUpdateManyWithoutProceduresInput";
 import { UnitProcedureUpdateManyWithoutProceduresInput } from "./UnitProcedureUpdateManyWithoutProceduresInput";
 
 @InputType()
@@ -106,18 +105,6 @@ class ProcedureUpdateInput {
     nullable: true,
   })
   name?: "Line1" | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderQueueUpdateManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderQueueUpdateManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderQueueUpdateManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  productionOrderQueues?: ScheduleOrderQueueUpdateManyWithoutProceduresInput;
 
   @ApiProperty({
     required: false,
