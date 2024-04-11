@@ -11,13 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  ValidateNested,
-  IsInt,
-} from "class-validator";
+import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
@@ -25,28 +19,6 @@ import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/Schedule
 
 @InputType()
 class ScheduleOrderQueueUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  accountId?: string;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -92,28 +64,6 @@ class ScheduleOrderQueueUpdateInput {
     nullable: true,
   })
   queueIndex?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  salesOrderId?: string;
 
   @ApiProperty({
     required: false,
