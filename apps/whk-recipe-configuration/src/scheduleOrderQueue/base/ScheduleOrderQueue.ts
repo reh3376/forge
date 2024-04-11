@@ -12,9 +12,8 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsString,
-  IsBoolean,
   IsDate,
+  IsString,
   ValidateNested,
   IsOptional,
   IsInt,
@@ -26,22 +25,6 @@ import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class ScheduleOrderQueue {
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  accountId!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @Field(() => Boolean)
-  active!: boolean;
-
   @ApiProperty({
     required: true,
   })
@@ -93,22 +76,6 @@ class ScheduleOrderQueue {
     nullable: true,
   })
   queueIndex!: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  revision!: number;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  salesOrderId!: string;
 
   @ApiProperty({
     required: false,

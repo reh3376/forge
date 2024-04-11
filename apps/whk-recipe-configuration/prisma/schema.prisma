@@ -232,8 +232,6 @@ model Bom {
 }
 
 model ScheduleOrderQueue {
-  accountId          String
-  active             Boolean             @default(true)
   createdAt          DateTime            @default(now())
   createdBy          String
   id                 String              @id @default(cuid())
@@ -241,8 +239,6 @@ model ScheduleOrderQueue {
   procedureId        String
   productionSchedule ProductionSchedule?
   queueIndex         Int?                @unique
-  revision           Int                 @default(0)
-  salesOrderId       String              @unique
   scheduleOrder      ScheduleOrder?
   schemaVersion      String?             @default("0001-b")
   updatedAt          DateTime            @updatedAt
