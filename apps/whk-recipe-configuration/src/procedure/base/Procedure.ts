@@ -22,7 +22,6 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EnumProcedureName } from "./EnumProcedureName";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
@@ -112,15 +111,6 @@ class Procedure {
     nullable: true,
   })
   name?: "Line1" | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ScheduleOrderQueue],
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderQueue)
-  @IsOptional()
-  productionOrderQueues?: Array<ScheduleOrderQueue>;
 
   @ApiProperty({
     required: false,

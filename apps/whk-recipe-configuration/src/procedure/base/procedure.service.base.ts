@@ -14,7 +14,6 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Procedure, // @ts-ignore
-  ScheduleOrderQueue, // @ts-ignore
   UnitProcedure,
 } from "@prisma/client";
 
@@ -62,17 +61,6 @@ export class ProcedureServiceBase {
         where: { id: parentId },
       })
       .instances(args);
-  }
-
-  async findProductionOrderQueues(
-    parentId: string,
-    args: Prisma.ScheduleOrderQueueFindManyArgs
-  ): Promise<ScheduleOrderQueue[]> {
-    return this.prisma.procedure
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderQueues(args);
   }
 
   async findUnitProcedures(

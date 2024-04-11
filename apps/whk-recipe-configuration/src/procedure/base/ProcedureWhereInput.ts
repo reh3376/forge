@@ -19,7 +19,6 @@ import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
 import { EnumProcedureName } from "./EnumProcedureName";
-import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
@@ -114,18 +113,6 @@ class ProcedureWhereInput {
     nullable: true,
   })
   name?: "Line1";
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderQueueListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderQueueListRelationFilter)
-  @IsOptional()
-  @Field(() => ScheduleOrderQueueListRelationFilter, {
-    nullable: true,
-  })
-  productionOrderQueues?: ScheduleOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,
