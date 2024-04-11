@@ -19,9 +19,8 @@ import { StringFilter } from "../../util/StringFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
-import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @InputType()
@@ -140,18 +139,6 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: () => RecipeGroupWhereUniqueInput,
   })
   @ValidateNested()
@@ -175,15 +162,15 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueueWhereUniqueInput,
+    type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  scheduleQueue?: ScheduleOrderQueueWhereUniqueInput;
+  scheduleOrderRecipe?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,

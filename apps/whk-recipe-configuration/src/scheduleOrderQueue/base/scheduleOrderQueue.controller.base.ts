@@ -61,12 +61,6 @@ export class ScheduleOrderQueueControllerBase {
               connect: data.productionSchedule,
             }
           : undefined,
-
-        scheduleOrder: data.scheduleOrder
-          ? {
-              connect: data.scheduleOrder,
-            }
-          : undefined,
       },
       select: {
         createdAt: true,
@@ -86,13 +80,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         queueIndex: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -136,13 +123,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         queueIndex: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -185,13 +165,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         queueIndex: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -236,12 +209,6 @@ export class ScheduleOrderQueueControllerBase {
                 connect: data.productionSchedule,
               }
             : undefined,
-
-          scheduleOrder: data.scheduleOrder
-            ? {
-                connect: data.scheduleOrder,
-              }
-            : undefined,
         },
         select: {
           createdAt: true,
@@ -261,13 +228,6 @@ export class ScheduleOrderQueueControllerBase {
           },
 
           queueIndex: true,
-
-          scheduleOrder: {
-            select: {
-              id: true,
-            },
-          },
-
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,

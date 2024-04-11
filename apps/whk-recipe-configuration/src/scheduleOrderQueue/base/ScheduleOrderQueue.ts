@@ -21,7 +21,6 @@ import {
 import { Type } from "class-transformer";
 import { Procedure } from "../../procedure/base/Procedure";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class ScheduleOrderQueue {
@@ -76,15 +75,6 @@ class ScheduleOrderQueue {
     nullable: true,
   })
   queueIndex!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrder,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrder)
-  @IsOptional()
-  scheduleOrder?: ScheduleOrder | null;
 
   @ApiProperty({
     required: false,

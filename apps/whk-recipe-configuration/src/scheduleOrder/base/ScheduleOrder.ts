@@ -25,9 +25,8 @@ import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
-import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
+import { Recipe } from "../../recipe/base/Recipe";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @ObjectType()
@@ -140,22 +139,12 @@ class ScheduleOrder {
   productionSchedules?: ProductionSchedule | null;
 
   @ApiProperty({
-    required: false,
-    type: () => Recipe,
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipe?: Recipe | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: () => RecipeGroup,
   })
   @ValidateNested()
   @Type(() => RecipeGroup)
-  @IsOptional()
-  recipeGroup?: RecipeGroup | null;
+  recipeGroup?: RecipeGroup;
 
   @ApiProperty({
     required: true,
@@ -167,12 +156,12 @@ class ScheduleOrder {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueue,
+    type: () => Recipe,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueue)
+  @Type(() => Recipe)
   @IsOptional()
-  scheduleQueue?: ScheduleOrderQueue | null;
+  scheduleOrderRecipe?: Recipe | null;
 
   @ApiProperty({
     required: false,
