@@ -9,10 +9,11 @@ import {
   EnumTestParameterTestSetpointType,
   EnumUnitProcedureName,
   Item,
-  PrismaClient,
+  PrismaClient, Procedure, ProductionSchedule, Recipe, RecipeGroup, ScheduleOrder, ScheduleOrderQueue,
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
+import {EnumScheduleOrderStatus} from "../src/scheduleOrder/base/EnumScheduleOrderStatus";
 
 // Function to get a random element from an array
 // function getRandomElement<T>(arr: Array<T>): T | null {
@@ -32,7 +33,7 @@ function getRandomArrayElement<T>(arr: Array<T>): T | undefined {
 
 export async function customSeed() {
   const client = new PrismaClient();
-  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "EquipmentPhase" | "Item" | "ItemGroup";
+  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "EquipmentPhase" | "Item" | "ItemGroup" | "Recipe" | "RecipeGroup" | "ScheduleOrder" | "ScheduleOrderQueue" | "ProductionSchedule";
   type SeedFunction = (n: number) => Promise<void>;
   type SeedFunctions = {
     [key in EntityType]: SeedFunction;
@@ -435,6 +436,171 @@ export async function customSeed() {
     console.log("EquipmentPhases seeded successfully.");
   }
 
+  async function seedRecipe(n: number): Promise<void> {
+    const items = await client.item.findMany();
+    const recipeGroups = await client.recipeGroup.findMany();
+    const customerIds = ["CUST-1001", "CUST-1002", "CUST-1003"];  // Example customer IDs
+
+    for (let i = 0; i < n; i++) {
+      const item = getRandomArrayElement(items) as Item;
+      const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
+      const customerId = getRandomArrayElement(customerIds) as string;
+
+      try {
+        await client.recipe.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            customerId: customerId,
+            itemId: item.id,
+            Recipe: `Recipe-${faker.commerce.productName()}`,
+            itemDescription: item.itemDescription || faker.commerce.productDescription(),
+            // recipeGroupId: recipeGroup ? recipeGroup.id : undefined,
+            revision: faker.datatype.number({ min: 0, max: 10 }),
+            schemaVersion: "0001-b",
+            updatedBy: faker.internet.userName(),
+            // Additional attributes as needed
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} Recipe records created.`);
+  }
+
+  async function seedRecipeGroup(n: number): Promise<void> {
+    for (let i = 0; i < n; i++) {
+      const recipeBaseName = faker.commerce.productMaterial();  // Base name for recipe group
+      const revisionNumber = faker.datatype.number({ min: 1, max: 5 });
+
+      try {
+        await client.recipeGroup.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            recipe: `${recipeBaseName} Type`,
+            revision: revisionNumber,
+            schemaVersion: "0001-alpha",
+            updatedBy: faker.internet.userName(),
+            // The actual link to recipes can be dynamically managed based on specific business logic
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} RecipeGroup records created.`);
+  }
+
+  async function seedScheduleOrder(n: number): Promise<void> {
+    const recipes = await client.recipe.findMany();
+    const recipeGroups = await client.recipeGroup.findMany();
+    // const productionSchedules = await client.productionSchedule.findMany();
+    // const scheduleQueues = await client.scheduleOrderQueue.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const recipe = getRandomArrayElement(recipes) as Recipe;
+      const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
+      // const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
+      // const scheduleQueue = getRandomArrayElement(scheduleQueues) as ScheduleOrderQueue;
+      try {
+        await client.scheduleOrder.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            estimatedMashingTime: faker.number.int({ min: 60, max: 480 }), // in minutes
+            estimatedFermentationTime: faker.number.int({ min: 1000, max: 10080 }), // in minutes
+            estimatedDistillationTime: faker.number.int({ min: 120, max: 1440 }), // in minutes
+            estimatedProcessing: faker.number.int({ min: 30, max: 300 }), // in minutes
+            estimatedTotalProductionTime: faker.number.int({ min: 2000, max: 12000 }), // in minutes
+            productionOrderAllocation: JSON.stringify({ orderId: faker.string.uuid() }),
+            recipeId: recipe ? recipe.id : undefined,
+            recipeGroupId: recipeGroup ? recipeGroup.id : undefined,
+            recipeName: recipe ? recipe.Recipe : faker.string.uuid(),
+            // productionSchedulesId: productionSchedule ? productionSchedule.id : undefined,
+            // scheduleQueueId: scheduleQueue ? scheduleQueue.id : undefined,
+            status: getRandomArrayElement(Object.values(EnumScheduleOrderStatus)),
+            totalBarrels: faker.number.int({ min: 10, max: 100 }),
+            totalProofGallons: faker.number.int({ min: 500, max: 5000 }),
+            updatedBy: faker.internet.userName(),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ScheduleOrder records created.`);
+  }
+
+  async function seedProductionSchedule(n: number): Promise<void> {
+    const scheduleOrders = await client.scheduleOrder.findMany();
+    const scheduleQueues = await client.scheduleOrderQueue.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const scheduleOrder = getRandomArrayElement(scheduleOrders) as ScheduleOrder;
+      const scheduleQueue = getRandomArrayElement(scheduleQueues) as ScheduleOrderQueue;
+      const daysAhead = faker.number.int({min: 1, max: 30});
+      const estimatedStart = faker.date.soon({days: daysAhead});
+      const duration = faker.number.int({min: 1, max: 24}); // duration in hours
+      const estimatedEnd = new Date(estimatedStart.getTime() + duration * 60 * 60 * 1000);
+
+      try {
+        await client.productionSchedule.create({
+          data: {
+            createdBy: faker.internet.userName() + " " + faker.name.lastName(),
+            estimatedStart: estimatedStart,
+            estimatedEnd: estimatedEnd,
+            actualStart: faker.date.soon({days: daysAhead}),
+            actualEnd: new Date(estimatedStart.getTime() + (duration + faker.number.int({min: -2, max: 2})) * 60 * 60 * 1000), // actual end time might slightly vary
+            duration: duration,
+            scheduleOrderId: scheduleOrder ? scheduleOrder.id : undefined,
+            scheduleQueueId: scheduleQueue ? scheduleQueue.id : undefined,
+            updatedBy: faker.internet.userName(),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ProductionSchedule records created.`);
+  }
+
+  async function seedScheduleOrderQueue(n: number): Promise<void> {
+    const procedures = await client.procedure.findMany();
+    const productionSchedules = await client.productionSchedule.findMany();
+    const scheduleOrders = await client.scheduleOrder.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const procedure = getRandomArrayElement(procedures) as Procedure;
+      const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
+      const scheduleOrder = getRandomArrayElement(scheduleOrders) as ScheduleOrder;
+      const salesOrderId = `SO-${faker.string.uuid()}`;
+      const queueIndex = i;  // Unique queue index for each entry
+
+      try {
+        await client.scheduleOrderQueue.create({
+          data: {
+            accountId: faker.string.uuid(),
+            createdBy: faker.internet.userName(),
+            procedureId: procedure.id,
+            productionSchedule: {connect: { id: productionSchedule.id } },
+            queueIndex: queueIndex,
+            revision: faker.number.int({ min: 0, max: 10 }),
+            salesOrderId: salesOrderId,
+            scheduleOrder: { connect: { id: scheduleOrder.id } },
+            updatedBy: faker.internet.userName(),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ScheduleOrderQueue records created.`);
+  }
+
   const seedFunctions: SeedFunctions = {
     User: seedUser, // Store the function reference itself
     Procedure: seedProcedure,
@@ -446,6 +612,11 @@ export async function customSeed() {
     EquipmentPhase: seedEquipmentPhase,
     ItemGroup: seedItemGroup,
     Item: seedItem,
+    Recipe: seedRecipe,
+    RecipeGroup: seedRecipeGroup,
+    ScheduleOrder: seedScheduleOrder,
+    ProductionSchedule: seedProductionSchedule,
+    ScheduleOrderQueue: seedScheduleOrderQueue,
   }
 
   async function dynamicSeed(entityType: EntityType, n = 10): Promise<void> {
@@ -469,6 +640,11 @@ export async function customSeed() {
   await dynamicSeed('Item', numberOfEntitiesToSeed);
   await dynamicSeed('Bom', numberOfEntitiesToSeed);
   await dynamicSeed('EquipmentPhase', numberOfEntitiesToSeed);
+  await dynamicSeed('Recipe', numberOfEntitiesToSeed);
+  await dynamicSeed('RecipeGroup', numberOfEntitiesToSeed);
+  await dynamicSeed('ScheduleOrder', numberOfEntitiesToSeed);
+  await dynamicSeed('ProductionSchedule', numberOfEntitiesToSeed);
+  await dynamicSeed('ScheduleOrderQueue', numberOfEntitiesToSeed);
 
   client.$disconnect();
 }
