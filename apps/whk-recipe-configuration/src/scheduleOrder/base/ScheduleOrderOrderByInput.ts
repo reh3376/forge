@@ -138,17 +138,6 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  recipeId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   recipeGroupId?: SortOrder;
 
   @ApiProperty({
@@ -171,7 +160,7 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  scheduleQueueId?: SortOrder;
+  scheduleOrderRecipeId?: SortOrder;
 
   @ApiProperty({
     required: false,

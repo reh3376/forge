@@ -374,13 +374,6 @@ export class ProcedureControllerBase {
         },
 
         queueIndex: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
