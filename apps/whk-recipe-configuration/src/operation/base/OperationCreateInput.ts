@@ -128,10 +128,12 @@ class OperationCreateInput {
   @IsEnum(EnumOperationName)
   @Field(() => EnumOperationName)
   name!:
-    | "MashVessel"
-    | "FermentationVessel"
-    | "DistillationRun"
-    | "BlendingVessel"
+    | "Cook"
+    | "FermenterSet"
+    | "Fermenter"
+    | "Clean"
+    | "StillRun"
+    | "BlendingTank"
     | "CisternTank";
 
   @ApiProperty({
