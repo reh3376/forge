@@ -19,7 +19,6 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { Procedure } from "../../procedure/base/Procedure";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 
 @ObjectType()
@@ -47,14 +46,6 @@ class ScheduleOrderQueue {
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: true,
-    type: () => Procedure,
-  })
-  @ValidateNested()
-  @Type(() => Procedure)
-  procedure?: Procedure;
 
   @ApiProperty({
     required: false,
