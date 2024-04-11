@@ -18,55 +18,39 @@ import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  accountId: "exampleAccountId",
-  active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   id: "exampleId",
   queueIndex: 42,
-  revision: 42,
-  salesOrderId: "exampleSalesOrderId",
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
-  accountId: "exampleAccountId",
-  active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   id: "exampleId",
   queueIndex: 42,
-  revision: 42,
-  salesOrderId: "exampleSalesOrderId",
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
-    accountId: "exampleAccountId",
-    active: "true",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     id: "exampleId",
     queueIndex: 42,
-    revision: 42,
-    salesOrderId: "exampleSalesOrderId",
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
-  accountId: "exampleAccountId",
-  active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   id: "exampleId",
   queueIndex: 42,
-  revision: 42,
-  salesOrderId: "exampleSalesOrderId",
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",

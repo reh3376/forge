@@ -357,8 +357,6 @@ export class ProcedureControllerBase {
     const results = await this.service.findProductionOrderQueues(params.id, {
       ...query,
       select: {
-        accountId: true,
-        active: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -376,8 +374,6 @@ export class ProcedureControllerBase {
         },
 
         queueIndex: true,
-        revision: true,
-        salesOrderId: true,
 
         scheduleOrder: {
           select: {
