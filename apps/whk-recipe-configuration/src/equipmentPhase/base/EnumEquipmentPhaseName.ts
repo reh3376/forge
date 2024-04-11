@@ -12,10 +12,33 @@ https://docs.amplication.com/how-to/custom-code
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum EnumEquipmentPhaseName {
-  IngredientAdd = "IngredientAdd",
   PreSteam = "PreSteam",
   Steam = "Steam",
   Hold = "Hold",
+  BacksetAdd = "BacksetAdd",
+  WaterAdd = "WaterAdd",
+  AdditiveAdd = "AdditiveAdd",
+  CornAdd = "CornAdd",
+  MaltAdd = "MaltAdd",
+  RyeAdd = "RyeAdd",
+  WheatAdd = "WheatAdd",
+  Drop = "Drop",
+  PhCapture = "PhCapture",
+  Cooldown = "Cooldown",
+  Rinse = "Rinse",
+  HotFlush = "HotFlush",
+  Cip = "Cip",
+  Fill = "Fill",
+  Run = "Run",
+  FermenterSteam = "FermenterSteam",
+  CoolerSteam = "CoolerSteam",
+  DropTubSteam = "DropTubSteam",
+  DropLineSteam = "DropLineSteam",
+  DropToMashCooler = "DropToMashCooler",
+  StillStartup = "StillStartup",
+  StillShutdown = "StillShutdown",
+  Cut = "Cut",
+  Gauge = "Gauge",
 }
 
 registerEnumType(EnumEquipmentPhaseName, {

@@ -24,9 +24,8 @@ import { InputJsonValue } from "../../types";
 import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
 import { Type } from "class-transformer";
 import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
-import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @InputType()
@@ -129,28 +128,13 @@ class ScheduleOrderCreateInput {
   productionSchedules?: ProductionScheduleWhereUniqueInput | null;
 
   @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: () => RecipeGroupWhereUniqueInput,
   })
   @ValidateNested()
   @Type(() => RecipeGroupWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeGroupWhereUniqueInput, {
-    nullable: true,
-  })
-  recipeGroup?: RecipeGroupWhereUniqueInput | null;
+  @Field(() => RecipeGroupWhereUniqueInput)
+  recipeGroup!: RecipeGroupWhereUniqueInput;
 
   @ApiProperty({
     required: true,
@@ -162,15 +146,15 @@ class ScheduleOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueueWhereUniqueInput,
+    type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  scheduleQueue?: ScheduleOrderQueueWhereUniqueInput | null;
+  scheduleOrderRecipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

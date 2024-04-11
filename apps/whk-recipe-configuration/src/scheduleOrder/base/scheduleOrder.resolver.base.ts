@@ -29,9 +29,8 @@ import { DeleteScheduleOrderArgs } from "./DeleteScheduleOrderArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
-import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
+import { Recipe } from "../../recipe/base/Recipe";
 import { ScheduleOrderService } from "../scheduleOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ScheduleOrder)
@@ -107,21 +106,13 @@ export class ScheduleOrderResolverBase {
             }
           : undefined,
 
-        recipe: args.data.recipe
-          ? {
-              connect: args.data.recipe,
-            }
-          : undefined,
+        recipeGroup: {
+          connect: args.data.recipeGroup,
+        },
 
-        recipeGroup: args.data.recipeGroup
+        scheduleOrderRecipe: args.data.scheduleOrderRecipe
           ? {
-              connect: args.data.recipeGroup,
-            }
-          : undefined,
-
-        scheduleQueue: args.data.scheduleQueue
-          ? {
-              connect: args.data.scheduleQueue,
+              connect: args.data.scheduleOrderRecipe,
             }
           : undefined,
       },
@@ -150,21 +141,13 @@ export class ScheduleOrderResolverBase {
               }
             : undefined,
 
-          recipe: args.data.recipe
-            ? {
-                connect: args.data.recipe,
-              }
-            : undefined,
+          recipeGroup: {
+            connect: args.data.recipeGroup,
+          },
 
-          recipeGroup: args.data.recipeGroup
+          scheduleOrderRecipe: args.data.scheduleOrderRecipe
             ? {
-                connect: args.data.recipeGroup,
-              }
-            : undefined,
-
-          scheduleQueue: args.data.scheduleQueue
-            ? {
-                connect: args.data.scheduleQueue,
+                connect: args.data.scheduleOrderRecipe,
               }
             : undefined,
         },
@@ -242,27 +225,6 @@ export class ScheduleOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Recipe, {
-    nullable: true,
-    name: "recipe",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async getRecipe(
-    @graphql.Parent() parent: ScheduleOrder
-  ): Promise<Recipe | null> {
-    const result = await this.service.getRecipe(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => RecipeGroup, {
     nullable: true,
     name: "recipeGroup",
@@ -284,19 +246,19 @@ export class ScheduleOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ScheduleOrderQueue, {
+  @graphql.ResolveField(() => Recipe, {
     nullable: true,
-    name: "scheduleQueue",
+    name: "scheduleOrderRecipe",
   })
   @nestAccessControl.UseRoles({
-    resource: "ScheduleOrderQueue",
+    resource: "Recipe",
     action: "read",
     possession: "any",
   })
-  async getScheduleQueue(
+  async getScheduleOrderRecipe(
     @graphql.Parent() parent: ScheduleOrder
-  ): Promise<ScheduleOrderQueue | null> {
-    const result = await this.service.getScheduleQueue(parent.id);
+  ): Promise<Recipe | null> {
+    const result = await this.service.getScheduleOrderRecipe(parent.id);
 
     if (!result) {
       return null;

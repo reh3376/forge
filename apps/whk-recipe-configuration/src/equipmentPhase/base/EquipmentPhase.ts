@@ -157,7 +157,34 @@ class EquipmentPhase {
   @Field(() => EnumEquipmentPhaseName, {
     nullable: true,
   })
-  name?: "IngredientAdd" | "PreSteam" | "Steam" | "Hold";
+  name?:
+    | "PreSteam"
+    | "Steam"
+    | "Hold"
+    | "BacksetAdd"
+    | "WaterAdd"
+    | "AdditiveAdd"
+    | "CornAdd"
+    | "MaltAdd"
+    | "RyeAdd"
+    | "WheatAdd"
+    | "Drop"
+    | "PhCapture"
+    | "Cooldown"
+    | "Rinse"
+    | "HotFlush"
+    | "Cip"
+    | "Fill"
+    | "Run"
+    | "FermenterSteam"
+    | "CoolerSteam"
+    | "DropTubSteam"
+    | "DropLineSteam"
+    | "DropToMashCooler"
+    | "StillStartup"
+    | "StillShutdown"
+    | "Cut"
+    | "Gauge";
 
   @ApiProperty({
     required: true,

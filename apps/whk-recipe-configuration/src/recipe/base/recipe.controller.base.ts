@@ -401,12 +401,6 @@ export class RecipeControllerBase {
           },
         },
 
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         recipeGroup: {
           select: {
             id: true,
@@ -415,7 +409,7 @@ export class RecipeControllerBase {
 
         recipeName: true,
 
-        scheduleQueue: {
+        scheduleOrderRecipe: {
           select: {
             id: true,
           },
