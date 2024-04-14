@@ -9,7 +9,7 @@ import {
   EnumTestParameterTestSetpointType,
   EnumUnitProcedureName,
   Item,
-  PrismaClient, Procedure, ProductionSchedule, Recipe, RecipeGroup, ScheduleOrder, ScheduleOrderQueue,
+  PrismaClient, Procedure, ProductionOrder, ProductionSchedule, Recipe, RecipeGroup, ScheduleOrder, ScheduleOrderQueue,
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
@@ -496,34 +496,39 @@ export async function customSeed() {
   async function seedScheduleOrder(n: number): Promise<void> {
     const recipes = await client.recipe.findMany();
     const recipeGroups = await client.recipeGroup.findMany();
-    // const productionSchedules = await client.productionSchedule.findMany();
-    // const scheduleQueues = await client.scheduleOrderQueue.findMany();
+    const productionOrders = await client.productionOrder.findMany();
 
     for (let i = 0; i < n; i++) {
       const recipe = getRandomArrayElement(recipes) as Recipe;
       const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
-      // const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
-      // const scheduleQueue = getRandomArrayElement(scheduleQueues) as ScheduleOrderQueue;
+      const productionOrder1 = getRandomArrayElement(productionOrders) as ProductionOrder;
+      const productionOrder2 = getRandomArrayElement(productionOrders) as ProductionOrder;
+      const productionOrder3 = getRandomArrayElement(productionOrders) as ProductionOrder;
       try {
         await client.scheduleOrder.create({
           data: {
             createdBy: faker.internet.userName(),
-            estimatedMashingTime: faker.number.int({ min: 60, max: 480 }), // in minutes
-            estimatedFermentationTime: faker.number.int({ min: 1000, max: 10080 }), // in minutes
-            estimatedDistillationTime: faker.number.int({ min: 120, max: 1440 }), // in minutes
-            estimatedProcessing: faker.number.int({ min: 30, max: 300 }), // in minutes
-            estimatedTotalProductionTime: faker.number.int({ min: 2000, max: 12000 }), // in minutes
-            productionOrderAllocation: JSON.stringify({ orderId: faker.string.uuid() }),
-            recipeId: recipe ? recipe.id : undefined,
-            recipeGroupId: recipeGroup ? recipeGroup.id : undefined,
+            estimatedMashingTime: faker.number.int({min: 60, max: 480}), // in minutes
+            estimatedFermentationTime: faker.number.int({min: 1000, max: 10080}), // in minutes
+            estimatedDistillationTime: faker.number.int({min: 120, max: 1440}), // in minutes
+            estimatedProcessing: faker.number.int({min: 30, max: 300}), // in minutes
+            estimatedTotalProductionTime: faker.number.int({min: 2000, max: 12000}), // in minutes
+            productionOrderAllocation: JSON.stringify({orderId: faker.string.uuid()}),
+            scheduleOrderRecipe: {connect: {id: recipe.id}},
+            recipeGroup: {connect: {id: recipeGroup.id}},
             recipeName: recipe ? recipe.Recipe : faker.string.uuid(),
-            // productionSchedulesId: productionSchedule ? productionSchedule.id : undefined,
-            // scheduleQueueId: scheduleQueue ? scheduleQueue.id : undefined,
             status: getRandomArrayElement(Object.values(EnumScheduleOrderStatus)),
-            totalBarrels: faker.number.int({ min: 10, max: 100 }),
-            totalProofGallons: faker.number.int({ min: 500, max: 5000 }),
+            totalBarrels: faker.number.int({min: 10, max: 100}),
+            totalProofGallons: faker.number.int({min: 500, max: 5000}),
             updatedBy: faker.internet.userName(),
-          },
+            productionOrders: {
+              connect: [
+                {id: productionOrder1.id},
+                {id: productionOrder2.id},
+                {id: productionOrder3.id},
+              ]
+            }
+          }
         });
       } catch (error) {
         console.error(error);
@@ -575,21 +580,15 @@ export async function customSeed() {
     for (let i = 0; i < n; i++) {
       const procedure = getRandomArrayElement(procedures) as Procedure;
       const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
-      const scheduleOrder = getRandomArrayElement(scheduleOrders) as ScheduleOrder;
       const salesOrderId = `SO-${faker.string.uuid()}`;
       const queueIndex = i;  // Unique queue index for each entry
 
       try {
         await client.scheduleOrderQueue.create({
           data: {
-            accountId: faker.string.uuid(),
             createdBy: faker.internet.userName(),
-            procedureId: procedure.id,
             productionSchedule: {connect: { id: productionSchedule.id } },
             queueIndex: queueIndex,
-            revision: faker.number.int({ min: 0, max: 10 }),
-            salesOrderId: salesOrderId,
-            scheduleOrder: { connect: { id: scheduleOrder.id } },
             updatedBy: faker.internet.userName(),
           },
         });
