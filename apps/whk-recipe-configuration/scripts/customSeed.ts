@@ -1,17 +1,649 @@
-import { PrismaClient } from "@prisma/client";
+// import {Prisma, PrismaClient} from "@prisma/client";
+
+import {
+  EnumEquipmentPhaseName, EnumItemItemClass,
+  EnumOperationName,
+  EnumPhaseParameterSetpointType,
+  EnumProcedureName,
+  EnumTestParameterTestParamUnits,
+  EnumTestParameterTestSetpointType,
+  EnumUnitProcedureName,
+  Item,
+  PrismaClient, Procedure, ProductionOrder, ProductionSchedule, Recipe, RecipeGroup, ScheduleOrder, ScheduleOrderQueue,
+} from "@prisma/client";
+import {faker} from "@faker-js/faker";
+import { hash } from "bcrypt";
+import {EnumScheduleOrderStatus} from "../src/scheduleOrder/base/EnumScheduleOrderStatus";
+
+// Function to get a random element from an array
+// function getRandomElement<T>(arr: Array<T>): T | null {
+//   if (arr.length === 0) return null;
+//   const randomIndex = Math.floor(Math.random() * arr.length);
+//   return arr[randomIndex];
+// }
+
+// Function to get a random element from an array
+// Define the function using a generic type parameter <T>
+function getRandomArrayElement<T>(arr: Array<T>): T | undefined {
+  if (arr.length === 0) return undefined; // Handle empty array case
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+
 
 export async function customSeed() {
   const client = new PrismaClient();
-  const username = "admin";
+  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "EquipmentPhase" | "Item" | "ItemGroup" | "Recipe" | "RecipeGroup" | "ScheduleOrder" | "ScheduleOrderQueue" | "ProductionSchedule";
+  type SeedFunction = (n: number) => Promise<void>;
+  type SeedFunctions = {
+    [key in EntityType]: SeedFunction;
+  };
 
-  //replace this sample code to populate your database
-  //with data that is required for your service to start
-  await client.user.update({
-    where: { username: username },
-    data: {
-      username,
-    },
-  });
+  async function seedUser(n: number=10): Promise<void> {
+    for (let i = 0; i < n; i++) {
+      const saltRounds = 10;
+      const passwordHash = await hash(faker.internet.password({length: 18}), saltRounds);
+
+      await client.user.create({
+        data: {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          password: passwordHash,
+          roles: JSON.stringify(['user', 'admin']), // Example roles
+          username: faker.internet.userName(),
+        },
+      });
+
+      // console.log('User created:', user);
+    }
+    return;
+  }
+
+  // Utility function to generate a unique name, consider implementing uniqueness checks
+  // function generateUniqueName(baseName: string): string {
+  //   return `${baseName}-${faker.string.uuid()}`;
+  // }
+
+  async function seedProcedure(n: number): Promise<void> {
+    const classDefinitions = [];
+
+    // Assume EnumProcedureName has limited values, adjust as necessary
+    const procedureNames = Object.values(EnumProcedureName);
+
+    try {
+      // Step 1: Seed class definitions
+      for (const name of procedureNames) {
+        const classDefinition = await client.procedure.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            description: faker.lorem.sentences(),
+            name,
+            isClassDefinition: true,
+            revision: 0, // Starting revision for class definitions
+          },
+        });
+        classDefinitions.push(classDefinition);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      // Step 2: Seed instances for each class definition
+      for (const classDefinition of classDefinitions) {
+        await client.procedure.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            description: faker.lorem.sentences(),
+            name: classDefinition.name,
+            // classId: classDefinition.id,
+            isClassDefinition: false,
+            revision: faker.number.int({min: 1, max: 10}), // Assume instances can have varying revisions
+            // Optionally set active and other fields as necessary
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    console.log(`Procedures seeded: ${procedureNames.length} class definitions and ${n * procedureNames.length} instances.`);
+  }
+
+  // Unit Procedure
+  async function seedUnitProcedure(): Promise<void> {
+    const procedureIds = (await client.procedure.findMany()).map(procedure => procedure.id);
+
+    if (procedureIds.length === 0) {
+      console.warn("No Procedures found. Please seed Procedures first.");
+      return;
+    }
+
+    // Seed class definitions for each UnitProcedure name
+    for (const name of Object.values(EnumUnitProcedureName)) {
+      const procedureId = getRandomArrayElement(procedureIds);
+      try {
+        await client.unitProcedure.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            name: name,
+            isClassDef: true,
+            procedure: {connect: {id: procedureId}},
+            revision: 0, // Initial revision for class definitions
+            // Additional fields as necessary
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+
+      // Seed instances for the class definition
+      const instancesCount = faker.number.int({min: 1, max: 5});
+      for (let i = 0; i < instancesCount; i++) {
+        try {
+          await client.unitProcedure.create({
+            data: {
+              createdBy: faker.internet.userName(),
+              name: name, // Same name as class definition
+              isClassDef: false,
+              // classId: classDefinition.id,
+              procedure: {connect: {id: procedureId}},
+              revision: i + 1, // Incremental revisions for instances
+              // Additional fields as necessary
+            },
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+
+    console.log("UnitProcedures seeded.");
+  }
+
+  // operation
+  async function seedOperation(): Promise<void> {
+    const unitProcedures = await client.unitProcedure.findMany();
+
+    if (unitProcedures.length === 0) {
+      console.warn("No UnitProcedures found. Please seed UnitProcedures first.");
+      return;
+    }
+
+    // Seed class definitions for each Operation name
+    for (const name of Object.values(EnumOperationName)) {
+      const unitProcedure = getRandomArrayElement(unitProcedures) as any;
+      try {
+        const classDefinition = await client.operation.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            description: faker.commerce.productDescription(),
+            name,
+            abbreviation: faker.lorem.word(),
+            path: `/${faker.helpers.slugify(name)}`,
+            isClassDefinition: true,
+            unitProcedure: {connect: {id: unitProcedure.id}},
+            // Additional fields as necessary
+          },
+        });
+
+        // Seed a few instances for the class definition
+        const instancesCount = faker.number.int({ min: 1, max: 5 });
+        for (let i = 0; i < instancesCount; i++) {
+          await client.operation.create({
+            data: {
+              createdBy: faker.internet.userName(),
+              description: `${classDefinition.description} - instance ${i + 1}`,
+              name, // Same name as class definition
+              path: classDefinition.path + `/instance-${i + 1}`,
+              isClassDefinition: false,
+              abbreviation: faker.lorem.word(),
+              // classId: classDefinition.id,
+              unitProcedure: { connect: { id: unitProcedure.id } },
+              revision: i + 1, // Incremental revisions for instances
+              // Additional fields as necessary
+            },
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log("Operations seeded successfully.");
+  }
+
+  // Test Parameter Handling
+  async function seedTestParameterClasses(n: number=10): Promise<string[]> {
+    const classIds = [];
+    // First, create class definitions
+    for (let i = 0; i < n; i++) {
+      const testParameter = await client.testParameter.create({
+        data: {
+          name: faker.commerce.productName() + " Class",
+          createdBy: faker.internet.userName(),
+          isClassDef: true,
+          active: faker.datatype.boolean(),
+          description: faker.commerce.productDescription(),
+          // Populate other fields as necessary, focusing on those relevant for class definitions
+        },
+      });
+      classIds.push(testParameter.id);
+    }
+    return classIds;
+  }
+
+  async function seedTestParameterInstances(classIds: string[], n: number=10): Promise<void> {
+    // Then, create instances linked to the class definitions
+    for (const classId of classIds) {
+      for (let i = 0; i < n; i++) {
+        await client.testParameter.create({
+          data: {
+            name: faker.commerce.productName(),
+            createdBy: faker.internet.userName(),
+            classIdId: classId,
+            active: faker.datatype.boolean(),
+            description: faker.commerce.productDescription(),
+            // testParamUnits: faker.helpers.randomize(Object.values(EnumTestParameterTestParamUnits)),
+            // testSetpointType: faker.helpers.randomize(Object.values(EnumTestParameterTestSetpointType)),
+            testParamUnits: EnumTestParameterTestParamUnits.Gal,
+            testSetpointType: EnumTestParameterTestSetpointType.Boolean,
+            testSetpointBooleanValue: faker.datatype.boolean(),
+            // Populate other fields as necessary
+          },
+        });
+      }
+    }
+  }
+
+  async function seedTestParameter(n: number=10): Promise<void> {
+    const classIds = await seedTestParameterClasses(Math.ceil(n / 10)); // Adjust the ratio as needed
+    await seedTestParameterInstances(classIds, n - classIds.length);
+    console.log(`${n} TestParameters created.`);
+  }
+
+  async function seedItemGroup(): Promise<void> {
+    // Example item group names and optional descriptions
+    const itemGroups = [
+      { name: "Raw Materials", description: "Primary materials used in the production process." },
+      { name: "Finished Products", description: "Completed goods ready for sale or distribution." },
+      { name: "Consumables", description: "Items used during production that do not become part of the final product." },
+      // Add more groups as needed
+    ];
+
+    for (const group of itemGroups) {
+      await client.itemGroup.create({
+        data: {
+          name: group.name,
+          description: group.description,
+        },
+      });
+    }
+
+    console.log(`${itemGroups.length} ItemGroup records created.`);
+  }
+
+  async function seedItem(n: number): Promise<void> {
+    const itemGroups = await client.itemGroup.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const itemGroup = getRandomArrayElement(itemGroups);
+      const itemName = faker.commerce.productName();
+      const itemNumber = `IN-${faker.number.int({ min: 1000, max: 9999 })}`;
+      const itemRevision = `Rev-${faker.string.alphanumeric(3).toUpperCase()}`;
+      const itemType = getRandomArrayElement(Object.values(EnumItemItemClass)) as any;
+
+      await client.item.create({
+        data: {
+          active: faker.datatype.boolean(),
+          createdBy: faker.internet.userName(),
+          itemClass: getRandomArrayElement(Object.values(EnumItemItemClass)) as any,
+          itemDescription: faker.commerce.productDescription(),
+          itemGroup: itemGroup ? { connect: { id: itemGroup.id } } : undefined,
+          itemName: itemName,
+          itemNumber: itemNumber,
+          itemRevision: itemRevision,
+          itemType: itemType,
+          schemaVersion: "0001-alpha",
+          updatedBy: faker.internet.userName(),
+          // Relations to BOMs and ProductionOrders are managed elsewhere or through application logic
+        },
+      });
+    }
+
+    console.log(`${n} Item records created.`);
+  }
+
+  // boms
+  async function seedBom(n: number): Promise<void> {
+
+    for (let i = 0; i < n; i++) {
+      const wipItems = await client.item.findMany({ select: { id: true } });
+      const wipItemId = getRandomArrayElement(wipItems) as Item;
+      try {
+        await client.bom.create({
+          data: {
+            bomName: `BOM-${faker.string.uuid()}`,
+            className: faker.commerce.productMaterial(),
+            createdBy: faker.internet.userName(),
+            // Optionally include wipItemId if it's meant to reference another entity
+            wipItem: { connect: { id: wipItemId.id } },
+            bomRevision: faker.number.int({ min: 0, max: 10 }),
+            // Other fields like schemaVersion have default values and need not be explicitly set
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} BOMs created.`);
+  }
+
+  // phase paramters
+  async function seedPhaseParameter(total: number): Promise<void> {
+    // Fetch EquipmentPhase IDs if needed for linking
+    const equipmentPhases = await client.equipmentPhase.findMany({ select: { id: true } });
+
+    const classRatio = 0.2; // Ratio of class definitions
+    const numClasses = Math.round(total * classRatio);
+    const classIds: string[] = [];
+
+    for (let i = 0; i < total; i++) {
+      const isClassDef = i < numClasses;
+      const equipmentPhase = equipmentPhases.length > 0 ? getRandomArrayElement(equipmentPhases) : null;
+
+      const phaseParameter = await client.phaseParameter.create({
+        data: {
+          createdBy: faker.internet.userName(),
+          name: `${isClassDef ? 'Class' : 'Instance'}-${faker.commerce.productName()}-${faker.string.uuid()}`,
+          description: faker.commerce.productDescription(),
+          isClassDef: isClassDef,
+          active: faker.datatype.boolean(),
+          units: getRandomArrayElement(['kg', 'lbs', 'units']) as string,
+          setpointType: getRandomArrayElement(Object.values(EnumPhaseParameterSetpointType)) as EnumPhaseParameterSetpointType,
+          setpointNumericalValue: faker.number.float({ min: 0, max: 100 }),
+          // Optional linking to an EquipmentPhase
+          ...(equipmentPhase && {
+            equipmentPhase: {
+              connect: { id: equipmentPhase.id },
+            },
+          }),
+          // Connect instances to a class definition if available
+          ...(isClassDef ? {} : {
+            classId: {
+              connect: { id: getRandomArrayElement(classIds) },
+            },
+          }),
+          revision: faker.number.int({ min: 0, max: 10 }),
+        },
+      });
+
+      // Collect class definition IDs to use for instances
+      if (isClassDef) {
+        classIds.push(phaseParameter.id);
+      }
+    }
+
+    console.log(`${total} PhaseParameters (classes and instances) created.`);
+  }
+
+  // equipment phase
+  async function seedEquipmentPhase(): Promise<void> {
+    const operations = await client.operation.findMany();
+
+    if (operations.length === 0) {
+      console.warn("No Operations found. Please seed Operations first.");
+      return;
+    }
+
+    // Seed class definitions for each EquipmentPhase name
+    for (const name of Object.values(EnumEquipmentPhaseName)) {
+      try {
+        const operation = getRandomArrayElement(operations) as any;
+        const classDefinition = await client.equipmentPhase.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            description: faker.lorem.sentence(),
+            name,
+            operation: { connect: { id: operation.id } },
+            isClassDefinition: true,
+            // Additional fields as necessary
+          },
+        });
+
+        // Seed instances for the class definition
+        const instancesCount = faker.number.int({ min: 1, max: 5 });
+        for (let i = 0; i < instancesCount; i++) {
+          await client.equipmentPhase.create({
+            data: {
+              createdBy: faker.internet.userName(),
+              description: `${classDefinition.description} - instance ${i + 1}`,
+              name, // Same name as class definition
+              operation: { connect: { id: operation.id } },
+              // classId: classDefinition.id,
+              isClassDefinition: false,
+              revision: i + 1, // Incremental revisions for instances
+              // Additional fields as necessary
+            },
+          });
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log("EquipmentPhases seeded successfully.");
+  }
+
+  async function seedRecipe(n: number): Promise<void> {
+    const items = await client.item.findMany();
+    const recipeGroups = await client.recipeGroup.findMany();
+    const customerIds = ["CUST-1001", "CUST-1002", "CUST-1003"];  // Example customer IDs
+
+    for (let i = 0; i < n; i++) {
+      const item = getRandomArrayElement(items) as Item;
+      const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
+      const customerId = getRandomArrayElement(customerIds) as string;
+
+      try {
+        await client.recipe.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            customerId: customerId,
+            itemId: item.id,
+            Recipe: `Recipe-${faker.commerce.productName()}`,
+            itemDescription: item.itemDescription || faker.commerce.productDescription(),
+            // recipeGroupId: recipeGroup ? recipeGroup.id : undefined,
+            revision: faker.datatype.number({ min: 0, max: 10 }),
+            schemaVersion: "0001-b",
+            updatedBy: faker.internet.userName(),
+            // Additional attributes as needed
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} Recipe records created.`);
+  }
+
+  async function seedRecipeGroup(n: number): Promise<void> {
+    for (let i = 0; i < n; i++) {
+      const recipeBaseName = faker.commerce.productMaterial();  // Base name for recipe group
+      const revisionNumber = faker.datatype.number({ min: 1, max: 5 });
+
+      try {
+        await client.recipeGroup.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            recipe: `${recipeBaseName} Type`,
+            revision: revisionNumber,
+            schemaVersion: "0001-alpha",
+            updatedBy: faker.internet.userName(),
+            // The actual link to recipes can be dynamically managed based on specific business logic
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} RecipeGroup records created.`);
+  }
+
+  async function seedScheduleOrder(n: number): Promise<void> {
+    const recipes = await client.recipe.findMany();
+    const recipeGroups = await client.recipeGroup.findMany();
+    const productionOrders = await client.productionOrder.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const recipe = getRandomArrayElement(recipes) as Recipe;
+      const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
+      const productionOrder1 = getRandomArrayElement(productionOrders) as ProductionOrder;
+      const productionOrder2 = getRandomArrayElement(productionOrders) as ProductionOrder;
+      const productionOrder3 = getRandomArrayElement(productionOrders) as ProductionOrder;
+      try {
+        await client.scheduleOrder.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            estimatedMashingTime: faker.number.int({min: 60, max: 480}), // in minutes
+            estimatedFermentationTime: faker.number.int({min: 1000, max: 10080}), // in minutes
+            estimatedDistillationTime: faker.number.int({min: 120, max: 1440}), // in minutes
+            estimatedProcessing: faker.number.int({min: 30, max: 300}), // in minutes
+            estimatedTotalProductionTime: faker.number.int({min: 2000, max: 12000}), // in minutes
+            productionOrderAllocation: JSON.stringify({orderId: faker.string.uuid()}),
+            scheduleOrderRecipe: {connect: {id: recipe.id}},
+            recipeGroup: {connect: {id: recipeGroup.id}},
+            recipeName: recipe ? recipe.Recipe : faker.string.uuid(),
+            status: getRandomArrayElement(Object.values(EnumScheduleOrderStatus)),
+            totalBarrels: faker.number.int({min: 10, max: 100}),
+            totalProofGallons: faker.number.int({min: 500, max: 5000}),
+            updatedBy: faker.internet.userName(),
+            productionOrders: {
+              connect: [
+                {id: productionOrder1.id},
+                {id: productionOrder2.id},
+                {id: productionOrder3.id},
+              ]
+            }
+          }
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ScheduleOrder records created.`);
+  }
+
+  async function seedProductionSchedule(n: number): Promise<void> {
+    const scheduleOrders = await client.scheduleOrder.findMany();
+    const scheduleQueues = await client.scheduleOrderQueue.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const scheduleOrder = getRandomArrayElement(scheduleOrders) as ScheduleOrder;
+      const scheduleQueue = getRandomArrayElement(scheduleQueues) as ScheduleOrderQueue;
+      const daysAhead = faker.number.int({min: 1, max: 30});
+      const estimatedStart = faker.date.soon({days: daysAhead});
+      const duration = faker.number.int({min: 1, max: 24}); // duration in hours
+      const estimatedEnd = new Date(estimatedStart.getTime() + duration * 60 * 60 * 1000);
+
+      try {
+        await client.productionSchedule.create({
+          data: {
+            createdBy: faker.internet.userName() + " " + faker.name.lastName(),
+            estimatedStart: estimatedStart,
+            estimatedEnd: estimatedEnd,
+            actualStart: faker.date.soon({days: daysAhead}),
+            actualEnd: new Date(estimatedStart.getTime() + (duration + faker.number.int({min: -2, max: 2})) * 60 * 60 * 1000), // actual end time might slightly vary
+            duration: duration,
+            scheduleOrderId: scheduleOrder ? scheduleOrder.id : undefined,
+            scheduleQueueId: scheduleQueue ? scheduleQueue.id : undefined,
+            updatedBy: faker.internet.userName(),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ProductionSchedule records created.`);
+  }
+
+  async function seedScheduleOrderQueue(n: number): Promise<void> {
+    const procedures = await client.procedure.findMany();
+    const productionSchedules = await client.productionSchedule.findMany();
+    const scheduleOrders = await client.scheduleOrder.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const procedure = getRandomArrayElement(procedures) as Procedure;
+      const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
+      const salesOrderId = `SO-${faker.string.uuid()}`;
+      const queueIndex = i;  // Unique queue index for each entry
+
+      try {
+        await client.scheduleOrderQueue.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            productionSchedule: {connect: { id: productionSchedule.id } },
+            queueIndex: queueIndex,
+            updatedBy: faker.internet.userName(),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ScheduleOrderQueue records created.`);
+  }
+
+  const seedFunctions: SeedFunctions = {
+    User: seedUser, // Store the function reference itself
+    Procedure: seedProcedure,
+    UnitProcedure: seedUnitProcedure,
+    Operation: seedOperation,
+    TestParameter: seedTestParameter,
+    PhaseParameter: seedPhaseParameter,
+    Bom: seedBom,
+    EquipmentPhase: seedEquipmentPhase,
+    ItemGroup: seedItemGroup,
+    Item: seedItem,
+    Recipe: seedRecipe,
+    RecipeGroup: seedRecipeGroup,
+    ScheduleOrder: seedScheduleOrder,
+    ProductionSchedule: seedProductionSchedule,
+    ScheduleOrderQueue: seedScheduleOrderQueue,
+  }
+
+  async function dynamicSeed(entityType: EntityType, n = 10): Promise<void> {
+    const seedFunction = seedFunctions[entityType];
+    if (!seedFunction) {
+      console.error(`No seeding function found for entity type: ${entityType}`);
+      return;
+    }
+
+    await seedFunction(n);
+  }
+
+  const numberOfEntitiesToSeed = 100;
+  await dynamicSeed('User', numberOfEntitiesToSeed);
+  await dynamicSeed('Procedure', numberOfEntitiesToSeed);
+  await dynamicSeed('UnitProcedure', numberOfEntitiesToSeed);
+  await dynamicSeed('Operation', numberOfEntitiesToSeed);
+  await dynamicSeed('TestParameter', numberOfEntitiesToSeed);
+  await dynamicSeed('PhaseParameter', numberOfEntitiesToSeed);
+  await dynamicSeed('ItemGroup', numberOfEntitiesToSeed);
+  await dynamicSeed('Item', numberOfEntitiesToSeed);
+  await dynamicSeed('Bom', numberOfEntitiesToSeed);
+  await dynamicSeed('EquipmentPhase', numberOfEntitiesToSeed);
+  await dynamicSeed('Recipe', numberOfEntitiesToSeed);
+  await dynamicSeed('RecipeGroup', numberOfEntitiesToSeed);
+  await dynamicSeed('ScheduleOrder', numberOfEntitiesToSeed);
+  await dynamicSeed('ProductionSchedule', numberOfEntitiesToSeed);
+  await dynamicSeed('ScheduleOrderQueue', numberOfEntitiesToSeed);
 
   client.$disconnect();
 }
