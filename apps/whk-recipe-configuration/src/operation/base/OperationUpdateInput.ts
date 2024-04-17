@@ -157,7 +157,7 @@ class OperationUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  path?: string;
+  path?: string | null;
 
   @ApiProperty({
     required: false,

@@ -148,12 +148,15 @@ class Operation {
     | "CisternTank";
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @Field(() => String)
-  path!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path!: string | null;
 
   @ApiProperty({
     required: true,
