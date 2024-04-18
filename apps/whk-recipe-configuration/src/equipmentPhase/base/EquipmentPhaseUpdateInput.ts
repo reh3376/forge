@@ -195,6 +195,17 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PhaseParameterUpdateManyWithoutEquipmentPhasesInput,
   })
   @ValidateNested()

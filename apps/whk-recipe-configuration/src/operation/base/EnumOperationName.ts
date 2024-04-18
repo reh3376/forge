@@ -19,6 +19,7 @@ export enum EnumOperationName {
   StillRun = "StillRun",
   BlendingTank = "BlendingTank",
   CisternTank = "CisternTank",
+  Barreling = "Barreling",
 }
 
 registerEnumType(EnumOperationName, {
