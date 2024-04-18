@@ -28,6 +28,7 @@ const CREATE_INPUT = {
   id: "exampleId",
   isClassDefinition: "true",
   operationSequenceIndex: 42,
+  path: "examplePath",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
@@ -42,6 +43,7 @@ const CREATE_RESULT = {
   id: "exampleId",
   isClassDefinition: "true",
   operationSequenceIndex: 42,
+  path: "examplePath",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };
@@ -57,6 +59,7 @@ const FIND_MANY_RESULT = [
     id: "exampleId",
     isClassDefinition: "true",
     operationSequenceIndex: 42,
+    path: "examplePath",
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
   },
@@ -72,6 +75,7 @@ const FIND_ONE_RESULT = {
   id: "exampleId",
   isClassDefinition: "true",
   operationSequenceIndex: 42,
+  path: "examplePath",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
 };

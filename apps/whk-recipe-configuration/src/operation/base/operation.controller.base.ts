@@ -321,6 +321,7 @@ export class OperationControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },

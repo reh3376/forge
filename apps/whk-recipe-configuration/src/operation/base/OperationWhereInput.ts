@@ -166,18 +166,19 @@ class OperationWhereInput {
     | "Clean"
     | "StillRun"
     | "BlendingTank"
-    | "CisternTank";
+    | "CisternTank"
+    | "Barreling";
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  path?: StringFilter;
+  path?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
