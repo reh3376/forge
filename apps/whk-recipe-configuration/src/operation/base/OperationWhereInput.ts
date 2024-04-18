@@ -166,7 +166,8 @@ class OperationWhereInput {
     | "Clean"
     | "StillRun"
     | "BlendingTank"
-    | "CisternTank";
+    | "CisternTank"
+    | "Barreling";
 
   @ApiProperty({
     required: false,

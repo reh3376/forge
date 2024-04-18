@@ -134,7 +134,8 @@ class OperationCreateInput {
     | "Clean"
     | "StillRun"
     | "BlendingTank"
-    | "CisternTank";
+    | "CisternTank"
+    | "Barreling";
 
   @ApiProperty({
     required: false,
