@@ -25,15 +25,27 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
       args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>
   ): Promise<UnitProcedure> {
     const name = args.data.name as string;
-    const operations = Array.isArray(args.data.operations) ? args.data.operations.map((operation: { name: any; }) => operation.name) : [];
+    const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
+    if (operations.length) {
+      const operationsData = await Promise.all(
+          operations.map(async (operation) => {
+            const operationRecord = await this.prisma.operation.findUnique({
+              where: { id: operation.id },
+            }) as any;
+            return { name: operationRecord.name, id: operationRecord.id };
+          })
+      );
+      this.logger.info(`Provided operations: ${operationsData}`);
+      const acceptableOperations = this.unitProcedureOperationsMap[name];
+      this.logger.info(`Acceptable operations: ${acceptableOperations}`);
 
-    const acceptableOperations = this.unitProcedureOperationsMap[name];
-    if (!acceptableOperations) {
-      throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
-    }
+      if (!acceptableOperations) {
+        throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
+      }
 
-    if (!operations.every(operation => acceptableOperations.includes(operation))) {
-      throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
+      if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
+        throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
+      }
     }
 
     // If operations are acceptable, proceed with the creation
@@ -47,29 +59,29 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     this.logger.info(`Updating Operation: ${unitProcedure.name}`);
     const name = unitProcedure.name as string;
     const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
-    const operationsData = await Promise.all(
-        operations.map(async (operation) => {
-          const operationRecord = await this.prisma.operation.findUnique({
-            where: { id: operation.id },
-          }) as any;
-          return { name: operationRecord.name, id: operationRecord.id };
-        })
-    );
+
     this.logger.info(`Provided operations: ${operations}`);
+    if (operations.length) {
+      this.logger.info(`Provided operations: ${operations}`);
+      const operationsData = await Promise.all(
+          operations.map(async (operation) => {
+            const operationRecord = await this.prisma.operation.findUnique({
+              where: { id: operation.id },
+            }) as any;
+            return { name: operationRecord.name, id: operationRecord.id };
+          })
+      );
 
-    // const operationNames = Array.isArray(operations) ? operations.map((operation: { name: any; }) => operation.name) : [];
-    this.logger.info(`Provided operations: ${operationsData}`);
-    if (!operations.length) {
-      throw new BadRequestException(`No operations provided for unitProcedure: ${name}`);
-    }
-    const acceptableOperations = this.unitProcedureOperationsMap[name];
-    this.logger.info(`Acceptable operations: ${acceptableOperations}`);
-    if (!acceptableOperations) {
-      throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
-    }
+      this.logger.info(`Provided operations: ${operationsData}`);
+      const acceptableOperations = this.unitProcedureOperationsMap[name];
+      this.logger.info(`Acceptable operations: ${acceptableOperations}`);
+      if (!acceptableOperations) {
+        throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
+      }
 
-    if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
-      throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
+      if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
+        throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
+      }
     }
 
     return super.updateUnitProcedure(args);
