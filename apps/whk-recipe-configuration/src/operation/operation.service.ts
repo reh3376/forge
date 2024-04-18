@@ -10,13 +10,41 @@ export class OperationService extends OperationServiceBase {
   }
 
   private operationEquipmentPhasesMap: { [key: string]: string[] } = {
-    Cook: ['Cook', 'Clean'],
-    FermenterSet: ['FermenterSet', 'Fermenter', 'Clean'],
-    Fermenter: ['StillRun', 'Clean'],
-    Clean: ['TankProcessing', 'Barreling'],
-    StillRun: ['StillRun', 'Clean'],
-    TankProcessing: ['TankProcessing', 'Barreling'],
-    Barreling: ['Barreling'],
+    Cook: [
+      'Pre-Steam',
+      'Steam',
+      'Hold',
+      'BacksetAdd',
+      'WaterAdd',
+      'AdditiveAdd',
+      'CornAdd',
+      'MaltAdd',
+      'RyeAdd',
+      'WheatAdd',
+      'Drop',
+      'PhCapture',
+      'Prompt',
+      'Rinse',
+      'Cooldown',
+      'HotFlush',
+      'CIP',
+    ],
+    FermenterSet: [
+      'DropToMashCooler',
+      'Fill',
+    ],
+    Fermenter: [
+      'Run',
+    ],
+    Clean: [
+      'FermenterSteam',
+      'CoolerSteam',
+      'DropTubSteam',
+      'DropLineSteam'
+    ],
+    StillRun: ['StillStartup', 'StillRun', 'StillShutdown'],
+    TankProcessing: ['Cut', 'Hold', 'Gauge'],
+    Barreling: ['BarrelFill'],
     Mill: ['Mill'],
   };
 
