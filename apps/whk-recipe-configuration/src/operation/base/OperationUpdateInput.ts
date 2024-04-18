@@ -146,7 +146,8 @@ class OperationUpdateInput {
     | "Clean"
     | "StillRun"
     | "BlendingTank"
-    | "CisternTank";
+    | "CisternTank"
+    | "Barreling";
 
   @ApiProperty({
     required: false,
@@ -157,7 +158,7 @@ class OperationUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  path?: string;
+  path?: string | null;
 
   @ApiProperty({
     required: false,
