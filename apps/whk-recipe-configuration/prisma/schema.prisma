@@ -137,6 +137,7 @@ model EquipmentPhase {
   operation              Operation              @relation(fields: [operationId], references: [id])
   operationId            String
   operationSequenceIndex Int?
+  path                   String?
   phaseParameters        PhaseParameter[]
   revision               Int?                   @default(0)
   schemaVersion          String?                @default("0001-b")
@@ -159,7 +160,7 @@ model Operation {
   instances              Operation[]       @relation(name: "OperationClassIdOperationInstances")
   isClassDefinition      Boolean?          @default(false)
   name                   EnumOperationName
-  path                   String
+  path                   String?
   procedureSequenceIndex Int               @default(0)
   revision               Int               @default(0)
   schemaVersion          String?           @default("0001-b")
@@ -463,6 +464,7 @@ enum EnumOperationName {
   StillRun
   BlendingTank
   CisternTank
+  Barreling
 }
 
 enum EnumProcedureName {
