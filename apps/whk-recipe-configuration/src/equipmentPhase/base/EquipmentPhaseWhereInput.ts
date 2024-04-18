@@ -226,6 +226,17 @@ class EquipmentPhaseWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  path?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => PhaseParameterListRelationFilter,
   })
   @ValidateNested()

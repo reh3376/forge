@@ -97,6 +97,7 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },
@@ -147,6 +148,7 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },
@@ -196,6 +198,7 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },
@@ -266,6 +269,7 @@ export class EquipmentPhaseControllerBase {
           },
 
           operationSequenceIndex: true,
+          path: true,
           revision: true,
           schemaVersion: true,
         },
@@ -321,6 +325,7 @@ export class EquipmentPhaseControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },
