@@ -311,6 +311,7 @@ export class TestParameterControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },

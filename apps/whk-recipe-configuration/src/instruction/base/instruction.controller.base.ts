@@ -221,6 +221,7 @@ export class InstructionControllerBase {
         },
 
         operationSequenceIndex: true,
+        path: true,
         revision: true,
         schemaVersion: true,
       },
