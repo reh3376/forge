@@ -464,6 +464,7 @@ enum EnumOperationName {
   StillRun
   BlendingTank
   CisternTank
+  Barreling
 }
 
 enum EnumProcedureName {
