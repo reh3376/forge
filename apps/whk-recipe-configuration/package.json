@@ -33,11 +33,12 @@
     "@nestjs/jwt": "^10.1.1",
     "@nestjs/microservices": "10.2.7",
     "@nestjs/passport": "^10.0.2",
-    "@nestjs/platform-express": "10.2.7",
+    "@nestjs/platform-express": "10.3.7",
     "@nestjs/serve-static": "4.0.0",
     "@nestjs/swagger": "7.1.13",
-    "@prisma/client": "^5.4.2",
+    "@prisma/client": "^5.12.1",
     "@types/bcrypt": "5.0.0",
+    "@faker-js/faker": "^8.4.1",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",
     "bcrypt": "5.1.1",
@@ -57,7 +58,8 @@
     "reflect-metadata": "0.1.13",
     "ts-node": "10.9.1",
     "type-fest": "2.19.0",
-    "validator": "13.11.0"
+    "validator": "13.11.0",
+    "newrelic": "latest"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.1.18",
