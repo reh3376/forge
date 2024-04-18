@@ -11,7 +11,7 @@ export class OperationService extends OperationServiceBase {
 
   private operationEquipmentPhasesMap: { [key: string]: string[] } = {
     Cook: [
-      'Pre-Steam',
+      'PreSteam',
       'Steam',
       'Hold',
       'BacksetAdd',
