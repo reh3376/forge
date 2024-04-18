@@ -1,7 +1,8 @@
 // import {Prisma, PrismaClient} from "@prisma/client";
 
 import {
-  EnumEquipmentPhaseName, EnumItemItemClass,
+  EnumEquipmentPhaseName,
+  EnumItemItemClass,
   EnumOperationName,
   EnumPhaseParameterSetpointType,
   EnumProcedureName,
@@ -9,7 +10,16 @@ import {
   EnumTestParameterTestSetpointType,
   EnumUnitProcedureName,
   Item,
-  PrismaClient, Procedure, ProductionOrder, ProductionSchedule, Recipe, RecipeGroup, ScheduleOrder, ScheduleOrderQueue,
+  Operation,
+  PrismaClient,
+  Procedure,
+  ProductionOrder,
+  ProductionSchedule,
+  Recipe,
+  RecipeGroup,
+  ScheduleOrder,
+  ScheduleOrderQueue,
+  UnitProcedure,
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
@@ -160,6 +170,14 @@ export async function customSeed() {
     console.log("UnitProcedures seeded.");
   }
 
+  const unitProcedureOperationsMap: { [key: string]: string[] } = {
+      Mashing01: ['Cook', 'Clean'],
+      Fermentation01: ['FermenterSet', 'Fermenter', 'Clean'],
+      Distillation01: ['StillRun', 'Clean'],
+      Processing01: ['TankProcessing', 'Barreling'],
+      Milling01: ['Mill'],
+    };
+
   // operation
   async function seedOperation(): Promise<void> {
     const unitProcedures = await client.unitProcedure.findMany();
@@ -171,7 +189,10 @@ export async function customSeed() {
 
     // Seed class definitions for each Operation name
     for (const name of Object.values(EnumOperationName)) {
-      const unitProcedure = getRandomArrayElement(unitProcedures) as any;
+      // use the name (which is a value in the mapping) to get the key that matches from unitProcedureOperationsMap
+      const unitProcedureName = Object.keys(unitProcedureOperationsMap).find(key => unitProcedureOperationsMap[key].includes(name));
+      const unitProcedure = unitProcedures.find(up => up.name === unitProcedureName) as UnitProcedure;
+      // const unitProcedure = getRandomArrayElement(unitProcedures) as any;
       try {
         const classDefinition = await client.operation.create({
           data: {
@@ -387,6 +408,45 @@ export async function customSeed() {
     console.log(`${total} PhaseParameters (classes and instances) created.`);
   }
 
+  const operationEquipmentPhasesMap: { [key: string]: string[] } = {
+    Cook: [
+      'PreSteam',
+      'Steam',
+      'Hold',
+      'BacksetAdd',
+      'WaterAdd',
+      'AdditiveAdd',
+      'CornAdd',
+      'MaltAdd',
+      'RyeAdd',
+      'WheatAdd',
+      'Drop',
+      'PhCapture',
+      'Prompt',
+      'Rinse',
+      'Cooldown',
+      'HotFlush',
+      'CIP',
+    ],
+    FermenterSet: [
+      'DropToMashCooler',
+      'Fill',
+    ],
+    Fermenter: [
+      'Run',
+    ],
+    Clean: [
+      'FermenterSteam',
+      'CoolerSteam',
+      'DropTubSteam',
+      'DropLineSteam'
+    ],
+    StillRun: ['StillStartup', 'StillRun', 'StillShutdown'],
+    TankProcessing: ['Cut', 'Hold', 'Gauge'],
+    Barreling: ['BarrelFill'],
+    Mill: ['Mill'],
+  };
+
   // equipment phase
   async function seedEquipmentPhase(): Promise<void> {
     const operations = await client.operation.findMany();
@@ -398,8 +458,11 @@ export async function customSeed() {
 
     // Seed class definitions for each EquipmentPhase name
     for (const name of Object.values(EnumEquipmentPhaseName)) {
+      // use name to get the key that matches from operationEquipmentPhasesMap
+      const operationName = Object.keys(operationEquipmentPhasesMap).find(key => operationEquipmentPhasesMap[key].includes(name));
+      const operation = operations.find(op => op.name === operationName) as Operation;
       try {
-        const operation = getRandomArrayElement(operations) as any;
+        // const operation = getRandomArrayElement(operations) as any;
         const classDefinition = await client.equipmentPhase.create({
           data: {
             createdBy: faker.internet.userName(),
