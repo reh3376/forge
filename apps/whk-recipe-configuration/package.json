@@ -36,7 +36,7 @@
     "@nestjs/platform-express": "10.3.7",
     "@nestjs/serve-static": "4.0.0",
     "@nestjs/swagger": "7.1.13",
-    "@prisma/client": "^5.12.1",
+    "@prisma/client": "^5.11.0",
     "@types/bcrypt": "5.0.0",
     "@faker-js/faker": "^8.4.1",
     "amqp-connection-manager": "^4.1.14",
@@ -87,6 +87,6 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "modulePathIgnorePatterns": ["<rootDir>/dist/"]
+    "modulePathIgnorePatterns": ["<root Dir>/dist/"]
   }
 }
