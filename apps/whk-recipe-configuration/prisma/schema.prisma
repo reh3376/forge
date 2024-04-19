@@ -162,7 +162,7 @@ model Operation {
   name                   EnumOperationName
   path                   String?
   procedureSequenceIndex Int               @default(0)
-  revision               Int               @default(0)
+  revision               Int?              @default(0)
   schemaVersion          String?           @default("0001-b")
   unitProcedure          UnitProcedure?    @relation(fields: [unitProcedureId], references: [id])
   unitProcedureId        String?
@@ -256,6 +256,7 @@ model UnitProcedure {
   isClassDef    Boolean?              @default(false)
   name          EnumUnitProcedureName
   operations    Operation[]
+  path          String?
   primaryBom    Bom?                  @relation(name: "primaryBom", fields: [primaryBomId], references: [id])
   primaryBomId  String?
   procedure     Procedure             @relation(fields: [procedureId], references: [id])

@@ -374,6 +374,7 @@ export class ProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
