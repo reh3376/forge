@@ -1,9 +1,8 @@
 import {BadRequestException, Injectable} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { EquipmentPhaseServiceBase } from "./base/equipmentPhase.service.base";
-import {EquipmentPhase, Operation, Prisma} from "@prisma/client";
+import {EquipmentPhase, Prisma} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
-import {OperationWhereUniqueInput} from "../operation/base/OperationWhereUniqueInput";
 import {PhaseParameterWhereUniqueInput} from "../phaseParameter/base/PhaseParameterWhereUniqueInput";
 
 @Injectable()
@@ -54,36 +53,105 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     Mill: ['Mill'],
   };
 
-  private equipmentPhaseToPhaseParameterMap: { [key: string]: string } = {
-    PreSteam: 'preSteam',      Steam: 'steam',
-      Hold: 'hold',
-      BacksetAdd: 'backsetAdd',
-      WaterAdd: 'waterAdd',
-      AdditiveAdd: 'additiveAdd',
-      CornAdd: 'cornAdd',
-      MaltAdd: 'maltAdd',
-      RyeAdd: 'ryeAdd',
-      WheatAdd: 'wheatAdd',
-      Drop: 'drop',
-      PhCapture: 'phCapture',
-      Prompt: 'prompt',
-      Rinse: 'rinse',
-      Cooldown: 'cooldown',
-      HotFlush: 'hotFlush',
-      CIP: 'cip',
-      DropToMashCooler: 'dropToMashCooler',
-      Fill: 'fill',
-      Run: 'run',
-      FermenterSteam: 'fermenterSteam',
-      CoolerSteam: 'coolerSteam',
-      DropTubSteam: 'dropTubSteam',
-      DropLineSteam: 'dropLineSteam',
-      StillStartup: 'stillStartup',
-      StillRun: 'stillRun',
-      StillShutdown: 'stillShutdown',
-      Cut: 'cut',
-      Gauge: 'gauge',
-      BarrelFill: ''
+  private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
+    PreSteam: ['TemperatureSetpoint'],
+    CornAdd: [
+      'Quantity',
+      'Units',
+    ],
+    MaltAdd: [
+      'Quantity',
+      'Units',
+    ],
+    RyeAdd: [
+      'Quantity',
+      'Units',
+    ],
+    WheatAdd: [
+      'Quantity',
+      'Units',
+    ],
+    AdditiveAdd: [
+      'Quantity',
+      'Units',
+      'ItemName',
+    ],
+    Prompt: [
+      'Type',
+      'Message',
+      'Header',
+      'Duration',
+      'Units',
+      'Confirmation',
+    ],
+    Hold: [
+      'Duration',
+      'Units'
+    ],
+    Steam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    Cooldown: [
+      'Duration',
+      'Units',
+      'TemperatureSetpoint',
+    ],
+    PhCapture: [
+      'TODO'
+    ],
+    Drop: [
+      'FlowSetpoint',
+      'SprayballTime',
+      'FlushTime',
+    ],
+    Rinse: [
+      'Duration',
+      'Units',
+      'TemperatureSetpoint',
+    ],
+    DropTubToMashCooler: [
+      'MashPumpSetpoint',
+      'MidTemperatureSP',
+      'OutTemperatureSP',
+      'MashCoolerEnable',
+    ],
+    Fill: [
+      'LevelSetpoint',
+      'AgitationSpeed',
+      'TemperatureSetpoint',
+    ],
+    FermDrop: [
+      'LevelSetpoint',
+    ],
+    FermSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    DropLineSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    DropTubSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    CoolerSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    StillRun: [
+      'TowerWaterTemperatureSetpoint',
+      'TowerWaterFlowSetpoint',
+      'HighWineCondenserTowerWaterTemperatureSetpoint',
+      'LowWineProof',
+      'HighWineProof',
+    ],
   }
 
   async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
