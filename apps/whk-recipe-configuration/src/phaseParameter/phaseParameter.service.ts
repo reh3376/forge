@@ -2,8 +2,7 @@ import {BadRequestException, Injectable} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { PhaseParameterServiceBase } from "./base/phaseParameter.service.base";
 import {PinoLogger} from "nestjs-pino";
-import {PhaseParameter, Prisma, UnitProcedure} from "@prisma/client";
-import {OperationWhereUniqueInput} from "../operation/base/OperationWhereUniqueInput";
+import {PhaseParameter, Prisma} from "@prisma/client";
 
 @Injectable()
 export class PhaseParameterService extends PhaseParameterServiceBase {
