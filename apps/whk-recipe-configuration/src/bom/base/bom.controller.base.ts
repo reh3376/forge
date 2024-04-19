@@ -495,6 +495,7 @@ export class BomControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
@@ -624,6 +625,7 @@ export class BomControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
