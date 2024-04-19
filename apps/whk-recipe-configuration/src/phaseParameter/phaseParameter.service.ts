@@ -13,12 +13,106 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
     super(prisma);
   }
 
-private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
-    PreSteam: ['preSteam'],
-    PreBoil: ['preBoil'],
-    Boil: ['boil'],
-    PostBoil: ['postBoil'],
-}
+    private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
+        PreSteam: ['TemperatureSetpoint'],
+        CornAdd: [
+            'Quantity',
+            'Units',
+        ],
+        MaltAdd: [
+            'Quantity',
+            'Units',
+        ],
+        RyeAdd: [
+            'Quantity',
+            'Units',
+        ],
+        WheatAdd: [
+            'Quantity',
+            'Units',
+        ],
+        AdditiveAdd: [
+            'Quantity',
+            'Units',
+            'ItemName',
+        ],
+        Prompt: [
+            'Type',
+            'Message',
+            'Header',
+            'Duration',
+            'Units',
+            'Confirmation',
+        ],
+        Hold: [
+            'Duration',
+            'Units'
+        ],
+        Steam: [
+            'TemperatureSetpoint',
+            'Duration',
+            'Units',
+        ],
+        Cooldown: [
+            'Duration',
+            'Units',
+            'TemperatureSetpoint',
+        ],
+        PhCapture: [
+            'TODO'
+        ],
+        Drop: [
+            'FlowSetpoint',
+            'SprayballTime',
+            'FlushTime',
+        ],
+        Rinse: [
+            'Duration',
+            'Units',
+            'TemperatureSetpoint',
+        ],
+        DropTubToMashCooler: [
+            'MashPumpSetpoint',
+            'MidTemperatureSP',
+            'OutTemperatureSP',
+            'MashCoolerEnable',
+        ],
+        Fill: [
+            'LevelSetpoint',
+            'AgitationSpeed',
+            'TemperatureSetpoint',
+        ],
+        FermDrop: [
+            'LevelSetpoint',
+        ],
+        FermSteam: [
+            'TemperatureSetpoint',
+            'Duration',
+            'Units',
+        ],
+        DropLineSteam: [
+            'TemperatureSetpoint',
+            'Duration',
+            'Units',
+        ],
+        DropTubSteam: [
+            'TemperatureSetpoint',
+            'Duration',
+            'Units',
+        ],
+        CoolerSteam: [
+            'TemperatureSetpoint',
+            'Duration',
+            'Units',
+        ],
+        StillRun: [
+            'TowerWaterTemperatureSetpoint',
+            'TowerWaterFlowSetpoint',
+            'HighWineCondenserTowerWaterTemperatureSetpoint',
+            'LowWineProof',
+            'HighWineProof',
+        ],
+    }
 
   async createPhaseParameter<T extends Prisma.PhaseParameterCreateArgs>(
       args: Prisma.SelectSubset<T, Prisma.PhaseParameterCreateArgs>
@@ -39,8 +133,8 @@ private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
           if (!acceptableEquipmentPhases) {
               throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
           }
-          if (!acceptableEquipmentPhases.every(equipmentPhase => acceptableEquipmentPhases.includes(args.data.name))) {
-              throw new BadRequestException(`Provided UnitProcedure Id does not match the acceptable list for Operation: ${name}`);
+          if (!acceptableEquipmentPhases.includes(args.data.name)) {
+              throw new BadRequestException(`Provided EquipmentPhase Id does not match the acceptable list for Phase Parameter: ${name}`);
           }
       }
 
@@ -59,13 +153,15 @@ private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
 
       // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
       const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
-      this.logger.info(`Acceptable Equipment Phases: ${acceptableEquipmentPhases}`);
+      this.logger.info(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
 
       if (!acceptableEquipmentPhases) {
-          throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
+          throw new BadRequestException(`No Equipment Phase mapping found for Phase Parameter: ${name}`);
       }
-      if (!acceptableEquipmentPhases.every(ep => acceptableEquipmentPhases.includes(equipmentPhase.name))) {
-          throw new BadRequestException(`Provided UnitProcedure Id does not match the acceptable list for Operation: ${name}`);
+
+      this.logger.info(`Result of includes: ${acceptableEquipmentPhases.includes(phaseParameter.name)}`);
+      if (!acceptableEquipmentPhases.includes(phaseParameter.name)) {
+          throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
       }
 
       return super.updatePhaseParameter(args);
