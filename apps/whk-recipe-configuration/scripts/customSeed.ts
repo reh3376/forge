@@ -8,11 +8,10 @@ import {
   EnumProcedureName,
   EnumTestParameterTestParamUnits,
   EnumTestParameterTestSetpointType,
-  EnumUnitProcedureName,
+  EnumUnitProcedureName, EquipmentPhase,
   Item,
   Operation,
   PrismaClient,
-  Procedure,
   ProductionOrder,
   ProductionSchedule,
   Recipe,
@@ -361,9 +360,109 @@ export async function customSeed() {
   }
 
   // phase paramters
+  const equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
+    PreSteam: ['TemperatureSetpoint'],
+    CornAdd: [
+      'Quantity',
+      'Units',
+    ],
+    MaltAdd: [
+      'Quantity',
+      'Units',
+    ],
+    RyeAdd: [
+      'Quantity',
+      'Units',
+    ],
+    WheatAdd: [
+      'Quantity',
+      'Units',
+    ],
+    AdditiveAdd: [
+      'Quantity',
+      'Units',
+      'ItemName',
+    ],
+    Prompt: [
+      'Type',
+      'Message',
+      'Header',
+      'Duration',
+      'Units',
+      'Confirmation',
+    ],
+    Hold: [
+      'Duration',
+      'Units'
+    ],
+    Steam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    Cooldown: [
+      'Duration',
+      'Units',
+      'TemperatureSetpoint',
+    ],
+    PhCapture: [
+      'TODO'
+    ],
+    Drop: [
+      'FlowSetpoint',
+      'SprayballTime',
+      'FlushTime',
+    ],
+    Rinse: [
+      'Duration',
+      'Units',
+      'TemperatureSetpoint',
+    ],
+    DropTubToMashCooler: [
+      'MashPumpSetpoint',
+      'MidTemperatureSP',
+      'OutTemperatureSP',
+      'MashCoolerEnable',
+    ],
+    Fill: [
+      'LevelSetpoint',
+      'AgitationSpeed',
+      'TemperatureSetpoint',
+    ],
+    FermDrop: [
+      'LevelSetpoint',
+    ],
+    FermSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    DropLineSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    DropTubSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    CoolerSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    StillRun: [
+      'TowerWaterTemperatureSetpoint',
+      'TowerWaterFlowSetpoint',
+      'HighWineCondenserTowerWaterTemperatureSetpoint',
+      'LowWineProof',
+      'HighWineProof',
+    ],
+  }
   async function seedPhaseParameter(total: number): Promise<void> {
     // Fetch EquipmentPhase IDs if needed for linking
-    const equipmentPhases = await client.equipmentPhase.findMany({ select: { id: true } });
+    const equipmentPhases = await client.equipmentPhase.findMany();
 
     const classRatio = 0.2; // Ratio of class definitions
     const numClasses = Math.round(total * classRatio);
@@ -371,12 +470,16 @@ export async function customSeed() {
 
     for (let i = 0; i < total; i++) {
       const isClassDef = i < numClasses;
-      const equipmentPhase = equipmentPhases.length > 0 ? getRandomArrayElement(equipmentPhases) : null;
+      // Use the equipmentPhaseToPhaseParameter mapping to get a random PhaseParameter name
+      const name = getRandomArrayElement(getRandomArrayElement(Object.values(equipmentPhaseToPhaseParameterMap)) as string[]) as string;
+
+      const equipmentPhaseName = Object.keys(equipmentPhaseToPhaseParameterMap).find(key => equipmentPhaseToPhaseParameterMap[key].includes(name));
+      const equipmentPhase = equipmentPhases.find(ep => ep.name === equipmentPhaseName) as EquipmentPhase;
 
       const phaseParameter = await client.phaseParameter.create({
         data: {
           createdBy: faker.internet.userName(),
-          name: `${isClassDef ? 'Class' : 'Instance'}-${faker.commerce.productName()}-${faker.string.uuid()}`,
+          name: name,
           description: faker.commerce.productDescription(),
           isClassDef: isClassDef,
           active: faker.datatype.boolean(),
@@ -501,12 +604,10 @@ export async function customSeed() {
 
   async function seedRecipe(n: number): Promise<void> {
     const items = await client.item.findMany();
-    const recipeGroups = await client.recipeGroup.findMany();
     const customerIds = ["CUST-1001", "CUST-1002", "CUST-1003"];  // Example customer IDs
 
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
-      const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
       const customerId = getRandomArrayElement(customerIds) as string;
 
       try {
@@ -636,22 +737,17 @@ export async function customSeed() {
   }
 
   async function seedScheduleOrderQueue(n: number): Promise<void> {
-    const procedures = await client.procedure.findMany();
     const productionSchedules = await client.productionSchedule.findMany();
-    const scheduleOrders = await client.scheduleOrder.findMany();
 
     for (let i = 0; i < n; i++) {
-      const procedure = getRandomArrayElement(procedures) as Procedure;
       const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
-      const salesOrderId = `SO-${faker.string.uuid()}`;
-      const queueIndex = i;  // Unique queue index for each entry
 
       try {
         await client.scheduleOrderQueue.create({
           data: {
             createdBy: faker.internet.userName(),
             productionSchedule: {connect: { id: productionSchedule.id } },
-            queueIndex: queueIndex,
+            queueIndex: i,
             updatedBy: faker.internet.userName(),
           },
         });
