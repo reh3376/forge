@@ -96,18 +96,6 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  fg?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -127,6 +115,18 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   inProcess?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,

@@ -96,15 +96,6 @@ class ProductionOrder {
   endDate!: Date | null;
 
   @ApiProperty({
-    required: false,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  fg?: Item | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -122,6 +113,14 @@ class ProductionOrder {
     nullable: true,
   })
   inProcess!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
 
   @ApiProperty({
     required: false,

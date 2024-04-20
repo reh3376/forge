@@ -258,15 +258,14 @@ export class RecipeControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        id: true,
+        inProcess: true,
 
-        fg: {
+        item: {
           select: {
             id: true,
           },
         },
-
-        id: true,
-        inProcess: true,
 
         recipe: {
           select: {
