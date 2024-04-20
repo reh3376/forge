@@ -21,6 +21,7 @@ import {
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { Item } from "../../item/base/Item";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
@@ -59,6 +60,14 @@ class ItemReceipt {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
 
   @ApiProperty({
     required: false,

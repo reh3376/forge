@@ -23,7 +23,9 @@ import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 
 @ObjectType()
 class Item {
@@ -133,6 +135,15 @@ class Item {
   itemNumber!: string;
 
   @ApiProperty({
+    required: false,
+    type: () => [ItemReceipt],
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipts?: Array<ItemReceipt>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -156,6 +167,15 @@ class Item {
   @Type(() => ProductionOrder)
   @IsOptional()
   productionOrders?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrders?: Array<PurchaseOrder>;
 
   @ApiProperty({
     required: false,

@@ -32,6 +32,9 @@ import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
+import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -68,6 +71,10 @@ export class PurchaseOrderControllerBase {
             }
           : undefined,
 
+        item: {
+          connect: data.item,
+        },
+
         purchaseOrderRejectedLots: data.purchaseOrderRejectedLots
           ? {
               connect: data.purchaseOrderRejectedLots,
@@ -95,7 +102,13 @@ export class PurchaseOrderControllerBase {
         editedBy: true,
         grainType: true,
         id: true,
-        itemId: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         orderQuantity: true,
         purchaseOrderReceiptDate: true,
@@ -155,7 +168,13 @@ export class PurchaseOrderControllerBase {
         editedBy: true,
         grainType: true,
         id: true,
-        itemId: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         orderQuantity: true,
         purchaseOrderReceiptDate: true,
@@ -214,7 +233,13 @@ export class PurchaseOrderControllerBase {
         editedBy: true,
         grainType: true,
         id: true,
-        itemId: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         orderQuantity: true,
         purchaseOrderReceiptDate: true,
@@ -273,6 +298,10 @@ export class PurchaseOrderControllerBase {
               }
             : undefined,
 
+          item: {
+            connect: data.item,
+          },
+
           purchaseOrderRejectedLots: data.purchaseOrderRejectedLots
             ? {
                 connect: data.purchaseOrderRejectedLots,
@@ -300,7 +329,13 @@ export class PurchaseOrderControllerBase {
           editedBy: true,
           grainType: true,
           id: true,
-          itemId: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
           name: true,
           orderQuantity: true,
           purchaseOrderReceiptDate: true,
@@ -367,7 +402,13 @@ export class PurchaseOrderControllerBase {
           editedBy: true,
           grainType: true,
           id: true,
-          itemId: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
           name: true,
           orderQuantity: true,
           purchaseOrderReceiptDate: true,
@@ -523,6 +564,12 @@ export class PurchaseOrderControllerBase {
         driver: true,
         id: true,
 
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrder: {
           select: {
             id: true,
@@ -651,7 +698,13 @@ export class PurchaseOrderControllerBase {
         editedBy: true,
         grainType: true,
         id: true,
-        itemId: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         orderQuantity: true,
         purchaseOrderReceiptDate: true,
@@ -734,6 +787,126 @@ export class PurchaseOrderControllerBase {
   ): Promise<void> {
     const data = {
       lotsRejected: {
+        disconnect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/qualityTests")
+  @ApiNestedQuery(TestParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findQualityTests(
+    @common.Req() request: Request,
+    @common.Param() params: PurchaseOrderWhereUniqueInput
+  ): Promise<TestParameter[]> {
+    const query = plainToClass(TestParameterFindManyArgs, request.query);
+    const results = await this.service.findQualityTests(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        tooltip: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/qualityTests")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectQualityTests(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      qualityTests: {
+        connect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/qualityTests")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateQualityTests(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      qualityTests: {
+        set: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/qualityTests")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectQualityTests(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      qualityTests: {
         disconnect: body,
       },
     };

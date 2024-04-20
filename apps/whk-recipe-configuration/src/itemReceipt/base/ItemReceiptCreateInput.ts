@@ -19,8 +19,9 @@ import {
   IsBoolean,
   IsEnum,
 } from "class-validator";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestCreateNestedManyWithoutItemReceiptsInput } from "./TestCreateNestedManyWithoutItemReceiptsInput";
@@ -42,6 +43,15 @@ class ItemReceiptCreateInput {
   @IsString()
   @Field(() => String)
   driver!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  item!: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
