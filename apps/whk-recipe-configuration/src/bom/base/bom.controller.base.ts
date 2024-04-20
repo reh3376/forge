@@ -369,6 +369,12 @@ export class BomControllerBase {
           },
         },
 
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         scheduled: true,
 
         scheduleOrder: {
