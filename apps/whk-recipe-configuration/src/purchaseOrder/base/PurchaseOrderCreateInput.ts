@@ -24,9 +24,11 @@ import {
 import { Type } from "class-transformer";
 import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ItemReceiptCreateNestedManyWithoutPurchaseOrdersInput } from "./ItemReceiptCreateNestedManyWithoutPurchaseOrdersInput";
 import { PurchaseOrderCreateNestedManyWithoutPurchaseOrdersInput } from "./PurchaseOrderCreateNestedManyWithoutPurchaseOrdersInput";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
+import { TestParameterCreateNestedManyWithoutPurchaseOrdersInput } from "./TestParameterCreateNestedManyWithoutPurchaseOrdersInput";
 import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 
 @InputType()
@@ -115,11 +117,12 @@ class PurchaseOrderCreateInput {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => ItemWhereUniqueInput,
   })
-  @IsString()
-  @Field(() => String)
-  itemId!: string;
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  item!: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -194,6 +197,18 @@ class PurchaseOrderCreateInput {
     nullable: true,
   })
   purchaseOrderRejectedLots?: PurchaseOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterCreateNestedManyWithoutPurchaseOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => TestParameterCreateNestedManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  qualityTests?: TestParameterCreateNestedManyWithoutPurchaseOrdersInput;
 
   @ApiProperty({
     required: false,

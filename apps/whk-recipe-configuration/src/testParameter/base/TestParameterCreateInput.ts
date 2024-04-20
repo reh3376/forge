@@ -23,6 +23,7 @@ import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
 import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
+import { PurchaseOrderCreateNestedManyWithoutTestParametersInput } from "./PurchaseOrderCreateNestedManyWithoutTestParametersInput";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -123,6 +124,18 @@ class TestParameterCreateInput {
   @IsString()
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderCreateNestedManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderCreateNestedManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderCreateNestedManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  purchaseOrder?: PurchaseOrderCreateNestedManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,

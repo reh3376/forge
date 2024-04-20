@@ -22,7 +22,9 @@ import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWitho
 import { Type } from "class-transformer";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
+import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
+import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
 
 @InputType()
 class ItemCreateInput {
@@ -123,6 +125,18 @@ class ItemCreateInput {
   itemNumber!: string;
 
   @ApiProperty({
+    required: false,
+    type: () => ItemReceiptCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ItemReceiptCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -149,6 +163,18 @@ class ItemCreateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

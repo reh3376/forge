@@ -22,7 +22,9 @@ import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput
 import { Type } from "class-transformer";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
+import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
+import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
 
 @InputType()
 class ItemUpdateInput {
@@ -136,6 +138,18 @@ class ItemUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceiptUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ItemReceiptUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -167,6 +181,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

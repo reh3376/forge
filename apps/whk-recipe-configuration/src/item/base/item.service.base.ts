@@ -15,7 +15,9 @@ import {
   Prisma,
   Item, // @ts-ignore
   Bom, // @ts-ignore
+  ItemReceipt, // @ts-ignore
   ProductionOrder, // @ts-ignore
+  PurchaseOrder, // @ts-ignore
   ItemGroup,
 } from "@prisma/client";
 
@@ -76,6 +78,17 @@ export class ItemServiceBase {
       .bomWipItems(args);
   }
 
+  async findItemReceipts(
+    parentId: string,
+    args: Prisma.ItemReceiptFindManyArgs
+  ): Promise<ItemReceipt[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .itemReceipts(args);
+  }
+
   async findProductionOrders(
     parentId: string,
     args: Prisma.ProductionOrderFindManyArgs
@@ -85,6 +98,17 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .productionOrders(args);
+  }
+
+  async findPurchaseOrders(
+    parentId: string,
+    args: Prisma.PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .purchaseOrders(args);
   }
 
   async getItemGroup(parentId: string): Promise<ItemGroup | null> {

@@ -15,6 +15,7 @@ import {
   Prisma,
   ItemReceipt, // @ts-ignore
   Test, // @ts-ignore
+  Item, // @ts-ignore
   PurchaseOrder,
 } from "@prisma/client";
 
@@ -62,6 +63,14 @@ export class ItemReceiptServiceBase {
         where: { id: parentId },
       })
       .tests(args);
+  }
+
+  async getItem(parentId: string): Promise<Item | null> {
+    return this.prisma.itemReceipt
+      .findUnique({
+        where: { id: parentId },
+      })
+      .item();
   }
 
   async getPurchaseOrder(parentId: string): Promise<PurchaseOrder | null> {

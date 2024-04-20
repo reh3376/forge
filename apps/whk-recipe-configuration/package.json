@@ -1,5 +1,5 @@
 {
-  "name": "@whk-recipe-routing/server",
+  "name": "@whk-mes/server",
   "private": true,
   "scripts": {
     "start": "nest start",
