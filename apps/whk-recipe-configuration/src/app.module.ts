@@ -33,6 +33,13 @@ import { ScheduleOrderModule } from "./scheduleOrder/scheduleOrder.module";
 import { ItemModule } from "./item/item.module";
 import { ItemGroupModule } from "./itemGroup/itemGroup.module";
 import { ProductionScheduleModule } from "./productionSchedule/productionSchedule.module";
+import { AccountModule } from "./account/account.module";
+import { PurchaseOrderModule } from "./purchaseOrder/purchaseOrder.module";
+import { SalesOrderModule } from "./salesOrder/salesOrder.module";
+import { TestModule } from "./test/test.module";
+import { AssetModule } from "./asset/asset.module";
+import { ItemReceiptModule } from "./itemReceipt/itemReceipt.module";
+import { LotModule } from "./lot/lot.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -72,6 +79,13 @@ import { AuthModule } from "./auth/auth.module";
     ItemModule,
     ItemGroupModule,
     ProductionScheduleModule,
+    AccountModule,
+    PurchaseOrderModule,
+    SalesOrderModule,
+    TestModule,
+    AssetModule,
+    ItemReceiptModule,
+    LotModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

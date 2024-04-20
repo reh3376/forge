@@ -384,6 +384,140 @@ model ProductionSchedule {
   updatedBy       String?
 }
 
+model Account {
+  address        String
+  createdAt      DateTime        @default(now())
+  createdBy      String
+  description    String?
+  editedBy       String?
+  email          String?
+  id             String          @id @default(cuid())
+  name           String
+  purchaseOrders PurchaseOrder[]
+  revision       Int             @default(0)
+  salesOrders    SalesOrder[]
+  schemaVersion  String?         @default("0001-alpha")
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([revision, name])
+}
+
+model PurchaseOrder {
+  acceptedLots                Lot[]
+  account                     Account                         @relation(fields: [accountId], references: [id])
+  accountId                   String
+  asset                       Asset?                          @relation(fields: [assetId], references: [id])
+  assetId                     String?
+  className                   String?
+  complete                    Boolean?                        @default(false)
+  createdAt                   DateTime?                       @default(now())
+  createdBy                   String
+  editedAt                    DateTime?                       @updatedAt
+  editedBy                    String?
+  grainType                   String
+  id                          String                          @id @default(cuid())
+  itemId                      String
+  itemReceipts                ItemReceipt[]
+  lotsRejected                PurchaseOrder[]                 @relation(name: "lotsRejected")
+  name                        String
+  orderQuantity               Int
+  purchaseOrderReceiptDate    DateTime?
+  purchaseOrderReceived       Boolean?                        @default(false)
+  purchaseOrderRejectedLots   PurchaseOrder?                  @relation(name: "lotsRejected", fields: [purchaseOrderRejectedLotsId], references: [id])
+  purchaseOrderRejectedLotsId String?
+  receiptStatus               EnumPurchaseOrderReceiptStatus? @default(InitializedNotReceived)
+  receivedQuantity            Int?
+  revision                    Int?                            @default(0)
+  schemaVersion               String?
+  units                       String
+
+  @@unique([name, revision, accountId])
+}
+
+model SalesOrder {
+  account       Account?                @relation(fields: [accountId], references: [id])
+  accountId     String?
+  createdAt     DateTime                @default(now())
+  createdBy     String
+  id            String                  @id @default(cuid())
+  itemId        String
+  orderType     EnumSalesOrderOrderType
+  quantity      Int
+  revision      Int                     @default(0)
+  schemaVersion String?                 @default("0001-alpha")
+  updatedAt     DateTime                @updatedAt
+  updatedBy     String?
+}
+
+model Test {
+  active            Boolean      @default(true)
+  classId           Test?        @relation(name: "TestClassIdTestInstances", fields: [classIdId], references: [id])
+  classIdId         String?
+  createdAt         DateTime     @default(now())
+  createdBy         String
+  editedAt          DateTime?    @updatedAt
+  editedBy          String?
+  id                String       @id @default(cuid())
+  instances         Test[]       @relation(name: "TestClassIdTestInstances")
+  isClassDefinition Boolean?     @default(false)
+  itemReceipt       ItemReceipt? @relation(fields: [itemReceiptId], references: [id])
+  itemReceiptId     String?
+  schemaVersion     String?
+  testDescription   String?
+  testName          String
+  testRevision      Int?         @default(0)
+}
+
+model Asset {
+  assetPath      String          @unique
+  children       Json?
+  createdAt      DateTime        @default(now())
+  createdBy      String
+  description    String
+  id             String          @id @default(cuid())
+  name           String
+  purchaseOrders PurchaseOrder[]
+  revision       Int?            @default(0)
+  schemaVersion  String          @default("0001-alpha")
+  type           EnumAssetType
+  updatedAt      DateTime        @updatedAt
+  updatedBy      String?
+
+  @@unique([name, revision])
+}
+
+model ItemReceipt {
+  createdAt       DateTime               @default(now())
+  createdBy       String
+  driver          String
+  id              String                 @id @default(cuid())
+  purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
+  purchaseOrderId String?
+  quantity        Decimal
+  receiptAccepted Boolean?               @default(false)
+  schemaVersion   String?                @default("0001-b")
+  status          EnumItemReceiptStatus? @default(InProgress)
+  supplierLot     String?
+  tests           Test[]
+  units           String
+  updatedAt       DateTime               @updatedAt
+  updatedBy       String?
+  weighIn         Decimal?
+  weighOut        Decimal?
+}
+
+model Lot {
+  createdAt                   DateTime       @default(now())
+  createdBy                   String?
+  externalId                  String?        @unique
+  id                          String         @id @default(cuid())
+  lotNumber                   String         @unique
+  purchaseOrderAcceptedLots   PurchaseOrder? @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
+  purchaseOrderAcceptedLotsId String?
+  schemaVersion               String?        @default("0001-b")
+  updatedAt                   DateTime       @updatedAt
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
@@ -502,4 +636,34 @@ enum EnumItemItemClass {
   SerializedAssembly
   LotNumberedInventory
   SerializedInventory
+}
+
+enum EnumPurchaseOrderReceiptStatus {
+  NotReceived
+  ReceiptInProgress
+  ReceiptComplete
+  PurchaseOrderComplete
+  InitializedNotReceived
+}
+
+enum EnumSalesOrderOrderType {
+  TopFilledBarrels
+  BulkProofGallons
+  SideFilledBarrels
+}
+
+enum EnumAssetType {
+  ENT
+  SITE
+  AREA
+  LINE
+  CELL
+  EQUIPMOD
+  EQUIPPHASE
+  CONTROLMOD
+}
+
+enum EnumItemReceiptStatus {
+  InProgress
+  Complete
 }
