@@ -14,8 +14,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
-  ValidateNested,
   IsOptional,
+  ValidateNested,
   IsNumber,
   IsBoolean,
   IsEnum,
@@ -52,6 +52,17 @@ class ItemReceipt {
   @IsString()
   @Field(() => String)
   driver!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  glabalId!: string | null;
 
   @ApiProperty({
     required: true,

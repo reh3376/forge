@@ -72,6 +72,7 @@ export class ProductionScheduleControllerBase {
         duration: true,
         estimatedEnd: true,
         estimatedStart: true,
+        globalId: true,
         id: true,
 
         scheduleOrder: {
@@ -119,6 +120,7 @@ export class ProductionScheduleControllerBase {
         duration: true,
         estimatedEnd: true,
         estimatedStart: true,
+        globalId: true,
         id: true,
 
         scheduleOrder: {
@@ -165,6 +167,7 @@ export class ProductionScheduleControllerBase {
         duration: true,
         estimatedEnd: true,
         estimatedStart: true,
+        globalId: true,
         id: true,
 
         scheduleOrder: {
@@ -234,6 +237,7 @@ export class ProductionScheduleControllerBase {
           duration: true,
           estimatedEnd: true,
           estimatedStart: true,
+          globalId: true,
           id: true,
 
           scheduleOrder: {
@@ -288,6 +292,7 @@ export class ProductionScheduleControllerBase {
           duration: true,
           estimatedEnd: true,
           estimatedStart: true,
+          globalId: true,
           id: true,
 
           scheduleOrder: {

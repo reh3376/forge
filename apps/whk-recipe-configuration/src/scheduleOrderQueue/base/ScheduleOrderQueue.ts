@@ -14,8 +14,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
-  ValidateNested,
   IsOptional,
+  ValidateNested,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -38,6 +38,17 @@ class ScheduleOrderQueue {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 
   @ApiProperty({
     required: true,

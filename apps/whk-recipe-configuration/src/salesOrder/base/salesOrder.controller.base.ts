@@ -73,6 +73,7 @@ export class SalesOrderControllerBase {
 
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemId: true,
         orderType: true,
@@ -117,6 +118,7 @@ export class SalesOrderControllerBase {
 
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemId: true,
         orderType: true,
@@ -162,6 +164,7 @@ export class SalesOrderControllerBase {
 
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemId: true,
         orderType: true,
@@ -230,6 +233,7 @@ export class SalesOrderControllerBase {
 
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
           itemId: true,
           orderType: true,
@@ -283,6 +287,7 @@ export class SalesOrderControllerBase {
 
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
           itemId: true,
           orderType: true,
