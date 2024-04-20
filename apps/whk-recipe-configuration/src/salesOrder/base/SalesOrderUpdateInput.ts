@@ -21,6 +21,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @InputType()
 class SalesOrderUpdateInput {
@@ -68,6 +69,18 @@ class SalesOrderUpdateInput {
     nullable: true,
   })
   orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

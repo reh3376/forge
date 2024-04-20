@@ -24,6 +24,7 @@ import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
@@ -139,6 +140,14 @@ class ProductionOrder {
   @Type(() => RecipeGroup)
   @IsOptional()
   recipeGroup?: RecipeGroup | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => SalesOrder,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrder)
+  salesOrder?: SalesOrder;
 
   @ApiProperty({
     required: false,
