@@ -157,12 +157,15 @@ class OperationCreateInput {
   procedureSequenceIndex!: number;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: Number,
   })
   @IsInt()
-  @Field(() => Number)
-  revision!: number;
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
 
   @ApiProperty({
     required: false,

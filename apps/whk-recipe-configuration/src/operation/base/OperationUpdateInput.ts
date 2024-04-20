@@ -180,7 +180,7 @@ class OperationUpdateInput {
   @Field(() => Number, {
     nullable: true,
   })
-  revision?: number;
+  revision?: number | null;
 
   @ApiProperty({
     required: false,
