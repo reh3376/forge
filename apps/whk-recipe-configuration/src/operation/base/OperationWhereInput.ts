@@ -22,6 +22,7 @@ import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/Equi
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { EnumOperationName } from "./EnumOperationName";
 import { IntFilter } from "../../util/IntFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
@@ -193,14 +194,14 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => IntFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => IntFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  revision?: IntFilter;
+  revision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
