@@ -20,10 +20,12 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { PurchaseOrderListRelationFilter } from "./PurchaseOrderListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
@@ -155,14 +157,15 @@ class PurchaseOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: () => ItemWhereUniqueInput,
   })
-  @Type(() => StringFilter)
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => ItemWhereUniqueInput, {
     nullable: true,
   })
-  itemId?: StringFilter;
+  item?: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -243,6 +246,18 @@ class PurchaseOrderWhereInput {
     nullable: true,
   })
   purchaseOrderRejectedLots?: PurchaseOrderWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => TestParameterListRelationFilter, {
+    nullable: true,
+  })
+  qualityTests?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

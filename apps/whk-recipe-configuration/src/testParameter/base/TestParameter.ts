@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -140,6 +141,15 @@ class TestParameter {
   @IsString()
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrder?: Array<PurchaseOrder>;
 
   @ApiProperty({
     required: false,

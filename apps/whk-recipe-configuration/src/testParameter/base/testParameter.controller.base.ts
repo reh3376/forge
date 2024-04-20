@@ -29,6 +29,9 @@ import { TestParameterUpdateInput } from "./TestParameterUpdateInput";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -500,6 +503,141 @@ export class TestParameterControllerBase {
   ): Promise<void> {
     const data = {
       instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/purchaseOrder")
+  @ApiNestedQuery(PurchaseOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrder(
+    @common.Req() request: Request,
+    @common.Param() params: TestParameterWhereUniqueInput
+  ): Promise<PurchaseOrder[]> {
+    const query = plainToClass(PurchaseOrderFindManyArgs, request.query);
+    const results = await this.service.findPurchaseOrder(params.id, {
+      ...query,
+      select: {
+        account: {
+          select: {
+            id: true,
+          },
+        },
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        editedAt: true,
+        editedBy: true,
+        grainType: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        name: true,
+        orderQuantity: true,
+        purchaseOrderReceiptDate: true,
+        purchaseOrderReceived: true,
+
+        purchaseOrderRejectedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        receiptStatus: true,
+        receivedQuantity: true,
+        revision: true,
+        schemaVersion: true,
+        units: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/purchaseOrder")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectPurchaseOrder(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrder: {
+        connect: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/purchaseOrder")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updatePurchaseOrder(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrder: {
+        set: body,
+      },
+    };
+    await this.service.updateTestParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/purchaseOrder")
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectPurchaseOrder(
+    @common.Param() params: TestParameterWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrder: {
         disconnect: body,
       },
     };

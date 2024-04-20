@@ -55,6 +55,10 @@ export class ItemReceiptControllerBase {
       data: {
         ...data,
 
+        item: {
+          connect: data.item,
+        },
+
         purchaseOrder: data.purchaseOrder
           ? {
               connect: data.purchaseOrder,
@@ -66,6 +70,12 @@ export class ItemReceiptControllerBase {
         createdBy: true,
         driver: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
 
         purchaseOrder: {
           select: {
@@ -109,6 +119,12 @@ export class ItemReceiptControllerBase {
         driver: true,
         id: true,
 
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrder: {
           select: {
             id: true,
@@ -151,6 +167,12 @@ export class ItemReceiptControllerBase {
         createdBy: true,
         driver: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
 
         purchaseOrder: {
           select: {
@@ -200,6 +222,10 @@ export class ItemReceiptControllerBase {
         data: {
           ...data,
 
+          item: {
+            connect: data.item,
+          },
+
           purchaseOrder: data.purchaseOrder
             ? {
                 connect: data.purchaseOrder,
@@ -211,6 +237,12 @@ export class ItemReceiptControllerBase {
           createdBy: true,
           driver: true,
           id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
 
           purchaseOrder: {
             select: {
@@ -262,6 +294,12 @@ export class ItemReceiptControllerBase {
           createdBy: true,
           driver: true,
           id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
 
           purchaseOrder: {
             select: {

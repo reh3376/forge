@@ -264,7 +264,13 @@ export class AccountControllerBase {
         editedBy: true,
         grainType: true,
         id: true,
-        itemId: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         orderQuantity: true,
         purchaseOrderReceiptDate: true,

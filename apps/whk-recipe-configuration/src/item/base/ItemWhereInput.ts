@@ -19,7 +19,9 @@ import { StringFilter } from "../../util/StringFilter";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
+import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
+import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 
 @InputType()
 class ItemWhereInput {
@@ -144,6 +146,18 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceiptListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemReceiptListRelationFilter, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -175,6 +189,18 @@ class ItemWhereInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => PurchaseOrderListRelationFilter, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderListRelationFilter;
 
   @ApiProperty({
     required: false,

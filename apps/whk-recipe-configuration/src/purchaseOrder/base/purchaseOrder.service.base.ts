@@ -16,8 +16,10 @@ import {
   PurchaseOrder, // @ts-ignore
   Lot, // @ts-ignore
   ItemReceipt, // @ts-ignore
+  TestParameter, // @ts-ignore
   Account, // @ts-ignore
-  Asset,
+  Asset, // @ts-ignore
+  Item,
 } from "@prisma/client";
 
 export class PurchaseOrderServiceBase {
@@ -88,6 +90,17 @@ export class PurchaseOrderServiceBase {
       .lotsRejected(args);
   }
 
+  async findQualityTests(
+    parentId: string,
+    args: Prisma.TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    return this.prisma.purchaseOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .qualityTests(args);
+  }
+
   async getAccount(parentId: string): Promise<Account | null> {
     return this.prisma.purchaseOrder
       .findUnique({
@@ -102,6 +115,14 @@ export class PurchaseOrderServiceBase {
         where: { id: parentId },
       })
       .asset();
+  }
+
+  async getItem(parentId: string): Promise<Item | null> {
+    return this.prisma.purchaseOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .item();
   }
 
   async getPurchaseOrderRejectedLots(

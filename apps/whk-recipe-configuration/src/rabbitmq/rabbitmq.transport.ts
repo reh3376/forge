@@ -5,7 +5,7 @@ export class RabbitMQ extends ServerRMQ implements CustomTransportStrategy {
     const exchange = this.queue;
     const groupId =
       this.getOptionsProp(this.options?.queueOptions, "consumerGroupId") ||
-      "whk-recipe-routing";
+      "whk-mes";
 
     await channel.assertExchange(exchange, "fanout", { durable: true });
 

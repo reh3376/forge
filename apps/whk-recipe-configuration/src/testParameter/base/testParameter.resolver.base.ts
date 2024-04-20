@@ -27,6 +27,8 @@ import { CreateTestParameterArgs } from "./CreateTestParameterArgs";
 import { UpdateTestParameterArgs } from "./UpdateTestParameterArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { TestParameterService } from "../testParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => TestParameter)
@@ -170,6 +172,26 @@ export class TestParameterResolverBase {
     @graphql.Args() args: TestParameterFindManyArgs
   ): Promise<TestParameter[]> {
     const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrder" })
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrder(
+    @graphql.Parent() parent: TestParameter,
+    @graphql.Args() args: PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    const results = await this.service.findPurchaseOrder(parent.id, args);
 
     if (!results) {
       return [];
