@@ -109,7 +109,7 @@ import { AuthModule } from "./auth/auth.module";
       imports: [ConfigModule],
     }),
     OpenTelemetryModule.forRoot({
-      serviceName: "whk-recipe-routing",
+      serviceName: "whk-mes",
       spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
       instrumentations: [
         new HttpInstrumentation({
