@@ -71,6 +71,7 @@ export class BomControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         schemaVersion: true,
 
@@ -107,6 +108,7 @@ export class BomControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         schemaVersion: true,
 
@@ -142,6 +144,7 @@ export class BomControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         schemaVersion: true,
 
@@ -194,6 +197,7 @@ export class BomControllerBase {
           createdBy: true,
           editedAt: true,
           editedBy: true,
+          globalId: true,
           id: true,
           schemaVersion: true,
 
@@ -233,6 +237,7 @@ export class BomControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemClass: true,
         itemDescription: true,
@@ -348,6 +353,7 @@ export class BomControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 
@@ -497,6 +503,7 @@ export class BomControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
+        globalId: true,
         id: true,
         isClassDef: true,
         name: true,
@@ -627,6 +634,7 @@ export class BomControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
+        globalId: true,
         id: true,
         isClassDef: true,
         name: true,

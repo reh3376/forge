@@ -15,11 +15,11 @@ import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestListRelationFilter } from "../../test/base/TestListRelationFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
@@ -58,6 +58,17 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   driver?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  glabalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

@@ -62,6 +62,7 @@ export class RecipeGroupControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         recipe: true,
         revision: true,
@@ -91,6 +92,7 @@ export class RecipeGroupControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         recipe: true,
         revision: true,
@@ -121,6 +123,7 @@ export class RecipeGroupControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         recipe: true,
         revision: true,
@@ -160,6 +163,7 @@ export class RecipeGroupControllerBase {
         select: {
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
           recipe: true,
           revision: true,
@@ -198,6 +202,7 @@ export class RecipeGroupControllerBase {
         select: {
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
           recipe: true,
           revision: true,
@@ -238,6 +243,7 @@ export class RecipeGroupControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 
@@ -374,6 +380,7 @@ export class RecipeGroupControllerBase {
         createdAt: true,
         createdBy: true,
         customerId: true,
+        globalId: true,
         id: true,
         itemDescription: true,
         itemId: true,
@@ -488,6 +495,7 @@ export class RecipeGroupControllerBase {
         estimatedMashingTime: true,
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
+        globalId: true,
         id: true,
         productionOrderAllocation: true,
 
