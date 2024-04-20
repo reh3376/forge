@@ -1,21 +1,22 @@
 // import {Prisma, PrismaClient} from "@prisma/client";
 
 import {
+  EnumAssetType,
   EnumEquipmentPhaseName,
   EnumItemItemClass,
   EnumOperationName,
   EnumPhaseParameterSetpointType,
-  EnumProcedureName,
+  EnumProcedureName, EnumProductionOrderStatus, EnumSalesOrderOrderType,
   EnumTestParameterTestParamUnits,
   EnumTestParameterTestSetpointType,
   EnumUnitProcedureName, EquipmentPhase,
   Item,
-  Operation,
+  Operation, Prisma,
   PrismaClient,
   ProductionOrder,
   ProductionSchedule,
   Recipe,
-  RecipeGroup,
+  RecipeGroup, SalesOrder,
   ScheduleOrder,
   ScheduleOrderQueue,
   UnitProcedure,
@@ -42,7 +43,8 @@ function getRandomArrayElement<T>(arr: Array<T>): T | undefined {
 
 export async function customSeed() {
   const client = new PrismaClient();
-  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "EquipmentPhase" | "Item" | "ItemGroup" | "Recipe" | "RecipeGroup" | "ScheduleOrder" | "ScheduleOrderQueue" | "ProductionSchedule";
+  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "EquipmentPhase" | "Item" | "ItemGroup" | "Recipe" | "RecipeGroup" | "ScheduleOrder" | "ScheduleOrderQueue" | "ProductionSchedule" | "ProductionOrder"
+      | "Lot" | "ItemReceipt" | "PurchaseOrder" | "SalesOrder" | "Account" | "Asset";
   type SeedFunction = (n: number) => Promise<void>;
   type SeedFunctions = {
     [key in EntityType]: SeedFunction;
@@ -72,6 +74,67 @@ export async function customSeed() {
   // function generateUniqueName(baseName: string): string {
   //   return `${baseName}-${faker.string.uuid()}`;
   // }
+
+  async function seedAsset(n: number=10): Promise<void> {
+    for (let i = 0; i < n; i++) {
+      const assetPath = faker.internet.url(); // Assuming assetPath is a URL
+      const description = faker.commerce.productDescription();
+      const name = faker.commerce.productName();
+      const createdBy = faker.internet.userName();
+      // Generate a revision number, if applicable
+      const revision = faker.number.int({min: 0, max: 10});
+      // Select a random type from EnumAssetType
+
+      try {
+        await client.asset.create({
+          data: {
+            assetPath: assetPath,
+            // children: JSON.stringify({child: faker.word.noun()}), // Example of optional JSON field
+            createdBy: createdBy,
+            description: description,
+            name: name,
+            revision: revision,
+            type: EnumAssetType.CELL,
+          },
+        })
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    return;
+  }
+
+  async function seedAccount(n: number): Promise<void> {
+    for (let i = 0; i < n; i++) {
+      const name = faker.company.name();
+      const revision = faker.number.int({ min: 0, max: 10 });
+      // Ensure uniqueness for combination of revision and name if necessary
+      const address = faker.location.streetAddress();
+      const createdBy = faker.internet.userName();
+      const description = faker.datatype.boolean() ? faker.company.catchPhrase() : undefined;
+      const editedBy = faker.datatype.boolean() ? faker.internet.userName() : undefined;
+      const email = faker.datatype.boolean() ? faker.internet.email() : undefined;
+
+      try {
+        await client.account.create({
+          data: {
+            address,
+            createdBy,
+            description,
+            editedBy,
+            email,
+            name,
+            revision,
+            // Optional fields left undefined will not be included
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+
+    }
+    console.log(`${n} accounts created.`);
+  }
 
   async function seedProcedure(n: number): Promise<void> {
     const classDefinitions = [];
@@ -333,6 +396,144 @@ export async function customSeed() {
     console.log(`${n} Item records created.`);
   }
 
+  async function seedPurchaseOrder(n: number): Promise<void> {
+    // Assuming accounts, assets, and items have been seeded and their IDs are retrievable
+    const accounts = await client.account.findMany();
+    const assets = await client.asset.findMany();
+    const items = await client.item.findMany();
+    const testParams = await client.testParameter.findMany();
+
+    if(accounts.length === 0 || items.length === 0 || assets.length === 0) {
+      console.warn('Required related entities (Accounts or Items) not found. Please seed those first.');
+      return;
+    }
+
+    for (let i = 0; i < n; i++) {
+      const account = getRandomArrayElement(accounts) as any;
+      const asset = getRandomArrayElement(assets) as any; // Optional relation
+      const item = getRandomArrayElement(items) as any;
+      const testParam1 = getRandomArrayElement(testParams) as any;
+      const testParam2 = getRandomArrayElement(testParams) as any;
+
+      try {
+        await client.purchaseOrder.create({
+          data: {
+            name: faker.commerce.productName(),
+            accountId: account.id,
+            assetId: asset ? asset.id : null, // Nullable field
+            className: faker.commerce.department(),
+            complete: faker.datatype.boolean(),
+            createdBy: faker.internet.userName(),
+            grainType: faker.commerce.productMaterial(),
+            itemId: item.id,
+            orderQuantity: faker.number.int({ min: 1, max: 1000 }),
+            units: getRandomArrayElement(['kg', 'lbs', 'tons']) as string, // Directly use JavaScript's method for random array element selection
+            qualityTests: {
+              connect: [
+                {id: testParam1.id},
+                {id: testParam2.id}
+              ]
+            }
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} PurchaseOrders created.`);
+  }
+
+  async function seedSalesOrder(n: number): Promise<void> {
+    const accounts = await client.account.findMany();
+    const items = await client.item.findMany();
+
+    if (items.length === 0 || accounts.length === 0) {
+      console.warn('Required related entities (Items) not found. Please seed those first.');
+      return;
+    }
+
+    for (let i = 0; i < n; i++) {
+      const account = getRandomArrayElement(accounts) as any; // Use the previously defined getRandomArrayElement function
+      const item = getRandomArrayElement(items) as any;
+      if (!item) continue; // Skip if no item is found, though this should not happen due to the earlier check
+      try {
+        await client.salesOrder.create({
+          data: {
+            accountId: account?.id,
+            itemId: item.id,
+            orderType: getRandomArrayElement(Object.values(EnumSalesOrderOrderType)) as EnumSalesOrderOrderType,
+            quantity: faker.number.int({ min: 1, max: 1000 }),
+            createdBy: faker.internet.userName(),
+            // Populate other fields as needed
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} SalesOrders created.`);
+  }
+
+  async function seedItemReceipt(n: number): Promise<void> {
+    const items = await client.item.findMany();
+    const purchaseOrders = await client.purchaseOrder.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const item = getRandomArrayElement(items) as any;
+      const purchaseOrder = getRandomArrayElement(purchaseOrders) as any;
+      const quantity = parseFloat(faker.commerce.price({min: 1, max: 100,dec: 2})); // Generate a decimal quantity between 1 and 100 with 2 decimal places
+      try {
+        await client.itemReceipt.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            driver: faker.person.fullName(),
+            itemId: item ? item.id : null, // Associate with an Item, if available
+            purchaseOrderId: purchaseOrder ? purchaseOrder.id : null, // Associate with a PurchaseOrder, if available
+            quantity: new Prisma.Decimal(quantity), // Ensure quantity is treated as a decimal
+            supplierLot: faker.string.uuid(),
+            units: getRandomArrayElement(['kg', 'lbs', 'units']) as string, // Use an example unit type
+            // Populate other fields as necessary
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} ItemReceipts created.`);
+  }
+
+  // lot
+  async function seedLot(n: number): Promise<void> {
+    const purchaseOrders = await client.purchaseOrder.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const purchaseOrder = getRandomArrayElement(purchaseOrders) as any;
+
+      // Ensure externalId and lotNumber are unique; consider a more robust uniqueness strategy for larger datasets
+      const externalId = faker.string.uuid();
+      const lotNumber = `LOT-${faker.string.uuid()}`;
+
+      try {
+        await client.lot.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            externalId,
+            lotNumber,
+            purchaseOrderAcceptedLotsId: purchaseOrder?.id,
+            // Populate other fields as necessary
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} Lots created.`);
+  }
+
   // boms
   async function seedBom(n: number): Promise<void> {
 
@@ -476,36 +677,40 @@ export async function customSeed() {
       const equipmentPhaseName = Object.keys(equipmentPhaseToPhaseParameterMap).find(key => equipmentPhaseToPhaseParameterMap[key].includes(name));
       const equipmentPhase = equipmentPhases.find(ep => ep.name === equipmentPhaseName) as EquipmentPhase;
 
-      const phaseParameter = await client.phaseParameter.create({
-        data: {
-          createdBy: faker.internet.userName(),
-          name: name,
-          description: faker.commerce.productDescription(),
-          isClassDef: isClassDef,
-          active: faker.datatype.boolean(),
-          units: getRandomArrayElement(['kg', 'lbs', 'units']) as string,
-          setpointType: getRandomArrayElement(Object.values(EnumPhaseParameterSetpointType)) as EnumPhaseParameterSetpointType,
-          setpointNumericalValue: faker.number.float({ min: 0, max: 100 }),
-          // Optional linking to an EquipmentPhase
-          ...(equipmentPhase && {
-            equipmentPhase: {
-              connect: { id: equipmentPhase.id },
-            },
-          }),
-          // Connect instances to a class definition if available
-          ...(isClassDef ? {} : {
-            classId: {
-              connect: { id: getRandomArrayElement(classIds) },
-            },
-          }),
-          revision: faker.number.int({ min: 0, max: 10 }),
-        },
-      });
-
-      // Collect class definition IDs to use for instances
-      if (isClassDef) {
-        classIds.push(phaseParameter.id);
+      try {
+        const phaseParameter = await client.phaseParameter.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            name: name,
+            description: faker.commerce.productDescription(),
+            isClassDef: isClassDef,
+            active: faker.datatype.boolean(),
+            units: getRandomArrayElement(['kg', 'lbs', 'units']) as string,
+            setpointType: getRandomArrayElement(Object.values(EnumPhaseParameterSetpointType)) as EnumPhaseParameterSetpointType,
+            setpointNumericalValue: faker.number.float({ min: 0, max: 100 }),
+            // Optional linking to an EquipmentPhase
+            ...(equipmentPhase && {
+              equipmentPhase: {
+                connect: { id: equipmentPhase.id },
+              },
+            }),
+            // Connect instances to a class definition if available
+            ...(isClassDef ? {} : {
+              classId: {
+                connect: { id: getRandomArrayElement(classIds) },
+              },
+            }),
+            revision: faker.number.int({ min: 0, max: 10 }),
+          },
+        });
+        // Collect class definition IDs to use for instances
+        if (isClassDef) {
+          classIds.push(phaseParameter.id);
+        }
+      } catch (error) {
+        console.error(error);
       }
+
     }
 
     console.log(`${total} PhaseParameters (classes and instances) created.`);
@@ -657,6 +862,39 @@ export async function customSeed() {
     console.log(`${n} RecipeGroup records created.`);
   }
 
+  async function seedProductionOrder(n: number): Promise<void> {
+    const items = await client.item.findMany();
+    const salesOrders = await client.salesOrder.findMany();
+
+
+    for (let i = 0; i < n; i++) {
+      const item = getRandomArrayElement(items) as Item;
+      const salesOrder = getRandomArrayElement(salesOrders) as SalesOrder;
+
+      try {
+        await client.productionOrder.create({
+          data: {
+            className: faker.commerce.productName(),
+            createdBy: faker.internet.userName(),
+            endDate: faker.date.future(),
+            item: {
+              connect: {id: item.id},
+            },
+            salesOrder: {
+              connect: {id: salesOrder.id},
+            },
+            startDate: faker.date.past(),
+            status: EnumProductionOrderStatus.Planned, // Adjust based on your enum
+            // batches: sampleBatches,
+            // Populate other fields as necessary
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
   async function seedScheduleOrder(n: number): Promise<void> {
     const recipes = await client.recipe.findMany();
     const recipeGroups = await client.recipeGroup.findMany();
@@ -775,6 +1013,13 @@ export async function customSeed() {
     ScheduleOrder: seedScheduleOrder,
     ProductionSchedule: seedProductionSchedule,
     ScheduleOrderQueue: seedScheduleOrderQueue,
+    ProductionOrder: seedProductionOrder,
+    Lot: seedLot,
+    ItemReceipt: seedItemReceipt,
+    PurchaseOrder: seedPurchaseOrder,
+    SalesOrder: seedSalesOrder,
+    Account: seedAccount,
+    Asset: seedAsset,
   }
 
   async function dynamicSeed(entityType: EntityType, n = 10): Promise<void> {
@@ -789,6 +1034,8 @@ export async function customSeed() {
 
   const numberOfEntitiesToSeed = 100;
   await dynamicSeed('User', numberOfEntitiesToSeed);
+  await dynamicSeed('Asset', numberOfEntitiesToSeed);
+  await dynamicSeed('Account', numberOfEntitiesToSeed);
   await dynamicSeed('Procedure', numberOfEntitiesToSeed);
   await dynamicSeed('UnitProcedure', numberOfEntitiesToSeed);
   await dynamicSeed('Operation', numberOfEntitiesToSeed);
@@ -796,10 +1043,15 @@ export async function customSeed() {
   await dynamicSeed('PhaseParameter', numberOfEntitiesToSeed);
   await dynamicSeed('ItemGroup', numberOfEntitiesToSeed);
   await dynamicSeed('Item', numberOfEntitiesToSeed);
+  await dynamicSeed('PurchaseOrder', numberOfEntitiesToSeed);
+  await dynamicSeed('SalesOrder', numberOfEntitiesToSeed);
+  await dynamicSeed('ItemReceipt', numberOfEntitiesToSeed);
+  await dynamicSeed('Lot', numberOfEntitiesToSeed);
   await dynamicSeed('Bom', numberOfEntitiesToSeed);
   await dynamicSeed('EquipmentPhase', numberOfEntitiesToSeed);
   await dynamicSeed('Recipe', numberOfEntitiesToSeed);
   await dynamicSeed('RecipeGroup', numberOfEntitiesToSeed);
+  await dynamicSeed('ProductionOrder', numberOfEntitiesToSeed);
   await dynamicSeed('ScheduleOrder', numberOfEntitiesToSeed);
   await dynamicSeed('ProductionSchedule', numberOfEntitiesToSeed);
   await dynamicSeed('ScheduleOrderQueue', numberOfEntitiesToSeed);
