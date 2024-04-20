@@ -56,6 +56,7 @@ export class ItemGroupControllerBase {
       select: {
         createdAt: true,
         description: true,
+        globalId: true,
         id: true,
         name: true,
         updatedAt: true,
@@ -82,6 +83,7 @@ export class ItemGroupControllerBase {
       select: {
         createdAt: true,
         description: true,
+        globalId: true,
         id: true,
         name: true,
         updatedAt: true,
@@ -109,6 +111,7 @@ export class ItemGroupControllerBase {
       select: {
         createdAt: true,
         description: true,
+        globalId: true,
         id: true,
         name: true,
         updatedAt: true,
@@ -145,6 +148,7 @@ export class ItemGroupControllerBase {
         select: {
           createdAt: true,
           description: true,
+          globalId: true,
           id: true,
           name: true,
           updatedAt: true,
@@ -180,6 +184,7 @@ export class ItemGroupControllerBase {
         select: {
           createdAt: true,
           description: true,
+          globalId: true,
           id: true,
           name: true,
           updatedAt: true,
@@ -214,6 +219,7 @@ export class ItemGroupControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemClass: true,
         itemDescription: true,

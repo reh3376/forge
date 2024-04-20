@@ -16,10 +16,10 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { JsonFilter } from "../../util/JsonFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumAssetType } from "./EnumAssetType";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class AssetWhereInput {
@@ -77,6 +77,17 @@ class AssetWhereInput {
     nullable: true,
   })
   description?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

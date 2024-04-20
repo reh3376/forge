@@ -28,6 +28,7 @@ model PhaseParameter {
   editedBy               String?
   equipmentPhase         EquipmentPhase?                @relation(fields: [equipmentPhaseId], references: [id])
   equipmentPhaseId       String?
+  globalId               String?                        @unique @default(cuid())
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
   isClassDef             Boolean                        @default(false)
@@ -59,6 +60,7 @@ model TestParameter {
   editedAt                 DateTime?                          @updatedAt
   editedBy                 String?
   equipmentPhases          EquipmentPhase[]
+  globalId                 String?                            @default(cuid())
   id                       String                             @id @default(cuid())
   instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
   isClassDef               Boolean?                           @default(false)
@@ -88,6 +90,7 @@ model RecipeParameter {
   createdBy                  String
   editedAt                   DateTime?                             @updatedAt
   editedBy                   String?
+  globalId                   String?                               @default(cuid())
   id                         String                                @id @default(cuid())
   isClassDefinition          Boolean?                              @default(false)
   itemId                     String
@@ -111,6 +114,7 @@ model Instruction {
   editedBy       String?
   equipmentPhase EquipmentPhase[]
   filePath       String
+  globalId       String?          @unique @default(cuid())
   id             String           @id @default(cuid())
   name           String?
   revision       Int              @default(0)
@@ -130,6 +134,7 @@ model EquipmentPhase {
   description            String?
   editedAt               DateTime?              @updatedAt
   editedBy               String?
+  globalId               String?                @unique @default(cuid())
   id                     String                 @id @default(cuid())
   instances              EquipmentPhase[]       @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances")
   instructions           Instruction[]
@@ -157,6 +162,7 @@ model Operation {
   description            String
   editedBy               String?
   equipmentPhases        EquipmentPhase[]
+  globalId               String?           @default(cuid())
   id                     String            @id @default(cuid())
   instances              Operation[]       @relation(name: "OperationClassIdOperationInstances")
   isClassDefinition      Boolean?          @default(false)
@@ -179,6 +185,7 @@ model Procedure {
   createdAt         DateTime           @default(now())
   createdBy         String
   description       String?
+  globalId          String?            @unique @default(cuid())
   id                String             @id @default(cuid())
   instances         Procedure[]        @relation(name: "ProcedureClassIdProcedureInstances")
   isClassDefinition Boolean?
@@ -197,6 +204,7 @@ model Recipe {
   createdAt        DateTime          @default(now())
   createdBy        String
   customerId       String
+  globalId         String?           @unique @default(cuid())
   id               String            @id @default(cuid())
   itemDescription  String?
   itemId           String
@@ -223,6 +231,7 @@ model Bom {
   createdBy             String
   editedAt              DateTime          @updatedAt
   editedBy              String?
+  globalId              String?           @unique @default(cuid())
   id                    String            @id @default(cuid())
   productionOrder       ProductionOrder[]
   schemaVersion         String?           @default("0001-alpha")
@@ -235,6 +244,7 @@ model Bom {
 model ScheduleOrderQueue {
   createdAt          DateTime            @default(now())
   createdBy          String
+  globalId           String?             @unique @default(cuid())
   id                 String              @id @default(cuid())
   productionSchedule ProductionSchedule?
   queueIndex         Int?                @unique
@@ -252,6 +262,7 @@ model UnitProcedure {
   createdAt     DateTime              @default(now())
   createdBy     String
   description   String?
+  globalId      String?               @unique @default(cuid())
   id            String                @id @default(cuid())
   instances     UnitProcedure[]       @relation(name: "UnitProcedureClassIdUnitProcedureInstances")
   isClassDef    Boolean?              @default(false)
@@ -274,6 +285,7 @@ model UnitProcedure {
 model RecipeGroup {
   createdAt        DateTime          @default(now())
   createdBy        String
+  globalId         String?           @unique @default(cuid())
   id               String            @id @default(cuid())
   productionOrders ProductionOrder[]
   recipe           String
@@ -295,6 +307,7 @@ model ProductionOrder {
   createdBy       String
   customer        String?
   endDate         DateTime?
+  globalId        String?                    @default(cuid())
   id              String                     @id @default(cuid())
   inProcess       Boolean?                   @default(false)
   item            Item                       @relation(fields: [fgItemId], references: [id])
@@ -323,6 +336,7 @@ model ScheduleOrder {
   estimatedMashingTime         Int?
   estimatedProcessing          Int?
   estimatedTotalProductionTime Int?
+  globalId                     String?                  @unique @default(cuid())
   id                           String                   @id @default(cuid())
   productionOrderAllocation    Json
   productionOrders             ProductionOrder[]
@@ -345,6 +359,7 @@ model Item {
   bomWipItems      Bom[]             @relation(name: "bomItem")
   createdAt        DateTime          @default(now())
   createdBy        String
+  globalId         String?           @unique @default(cuid())
   id               String            @id @default(cuid())
   itemClass        EnumItemItemClass
   itemDescription  String?
@@ -365,6 +380,7 @@ model Item {
 model ItemGroup {
   createdAt   DateTime @default(now())
   description String?
+  globalId    String?  @unique @default(cuid())
   id          String   @id @default(cuid())
   items       Item[]
   name        String
@@ -379,6 +395,7 @@ model ProductionSchedule {
   duration        Int?
   estimatedEnd    DateTime?
   estimatedStart  DateTime?
+  globalId        String?             @unique @default(cuid())
   id              String              @id @default(cuid())
   scheduleOrder   ScheduleOrder?      @relation(fields: [scheduleOrderId], references: [id])
   scheduleOrderId String?             @unique
@@ -396,6 +413,7 @@ model Account {
   description    String?
   editedBy       String?
   email          String?
+  globalId       String?         @unique @default(cuid())
   id             String          @id @default(cuid())
   name           String
   purchaseOrders PurchaseOrder[]
@@ -419,6 +437,7 @@ model PurchaseOrder {
   createdBy                   String
   editedAt                    DateTime?                       @updatedAt
   editedBy                    String?
+  globalId                    String?                         @unique @default(cuid())
   grainType                   String
   id                          String                          @id @default(cuid())
   item                        Item                            @relation(fields: [itemId], references: [id])
@@ -446,6 +465,7 @@ model SalesOrder {
   accountId        String?
   createdAt        DateTime                @default(now())
   createdBy        String
+  globalId         String?                 @unique @default(cuid())
   id               String                  @id @default(cuid())
   itemId           String
   orderType        EnumSalesOrderOrderType
@@ -465,6 +485,7 @@ model Test {
   createdBy         String
   editedAt          DateTime?    @updatedAt
   editedBy          String?
+  globalId          String?      @unique @default(cuid())
   id                String       @id @default(cuid())
   instances         Test[]       @relation(name: "TestClassIdTestInstances")
   isClassDefinition Boolean?     @default(false)
@@ -482,6 +503,7 @@ model Asset {
   createdAt      DateTime        @default(now())
   createdBy      String
   description    String
+  globalId       String?         @unique @default(cuid())
   id             String          @id @default(cuid())
   name           String
   purchaseOrders PurchaseOrder[]
@@ -498,6 +520,7 @@ model ItemReceipt {
   createdAt       DateTime               @default(now())
   createdBy       String
   driver          String
+  glabalId        String?                @unique @default(cuid())
   id              String                 @id @default(cuid())
   item            Item                   @relation(fields: [itemId], references: [id])
   itemId          String
@@ -520,6 +543,7 @@ model Lot {
   createdAt                   DateTime       @default(now())
   createdBy                   String?
   externalId                  String?        @unique
+  globalId                    String?        @unique @default(cuid())
   id                          String         @id @default(cuid())
   lotNumber                   String         @unique
   purchaseOrderAcceptedLots   PurchaseOrder? @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
