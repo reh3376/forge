@@ -63,6 +63,7 @@ model TestParameter {
   instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
   isClassDef               Boolean?                           @default(false)
   name                     String
+  purchaseOrder            PurchaseOrder[]
   schemaVersion            String?
   testDetails              String?
   testParamRevision        String?
@@ -349,9 +350,11 @@ model Item {
   itemGroupId      String?
   itemName         String
   itemNumber       String
+  itemReceipts     ItemReceipt[]
   itemRevision     String
   itemType         String
   productionOrders ProductionOrder[]
+  purchaseOrders   PurchaseOrder[]
   schemaVersion    String?
   updatedAt        DateTime          @updatedAt
   updatedBy        String?
@@ -416,6 +419,7 @@ model PurchaseOrder {
   editedBy                    String?
   grainType                   String
   id                          String                          @id @default(cuid())
+  item                        Item                            @relation(fields: [itemId], references: [id])
   itemId                      String
   itemReceipts                ItemReceipt[]
   lotsRejected                PurchaseOrder[]                 @relation(name: "lotsRejected")
@@ -425,6 +429,7 @@ model PurchaseOrder {
   purchaseOrderReceived       Boolean?                        @default(false)
   purchaseOrderRejectedLots   PurchaseOrder?                  @relation(name: "lotsRejected", fields: [purchaseOrderRejectedLotsId], references: [id])
   purchaseOrderRejectedLotsId String?
+  qualityTests                TestParameter[]
   receiptStatus               EnumPurchaseOrderReceiptStatus? @default(InitializedNotReceived)
   receivedQuantity            Int?
   revision                    Int?                            @default(0)
@@ -491,6 +496,8 @@ model ItemReceipt {
   createdBy       String
   driver          String
   id              String                 @id @default(cuid())
+  item            Item                   @relation(fields: [itemId], references: [id])
+  itemId          String
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   quantity        Decimal

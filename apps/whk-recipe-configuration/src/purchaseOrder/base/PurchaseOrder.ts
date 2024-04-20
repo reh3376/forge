@@ -24,7 +24,9 @@ import {
 import { Type } from "class-transformer";
 import { Account } from "../../account/base/Account";
 import { Asset } from "../../asset/base/Asset";
+import { Item } from "../../item/base/Item";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 
 @ObjectType()
@@ -136,11 +138,11 @@ class PurchaseOrder {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => Item,
   })
-  @IsString()
-  @Field(() => String)
-  itemId!: string;
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
 
   @ApiProperty({
     required: false,
@@ -206,6 +208,15 @@ class PurchaseOrder {
   @Type(() => PurchaseOrder)
   @IsOptional()
   purchaseOrderRejectedLots?: PurchaseOrder | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  qualityTests?: Array<TestParameter>;
 
   @ApiProperty({
     required: false,

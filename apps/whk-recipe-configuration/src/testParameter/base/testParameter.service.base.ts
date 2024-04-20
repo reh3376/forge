@@ -14,7 +14,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   TestParameter, // @ts-ignore
-  EquipmentPhase,
+  EquipmentPhase, // @ts-ignore
+  PurchaseOrder,
 } from "@prisma/client";
 
 export class TestParameterServiceBase {
@@ -72,6 +73,17 @@ export class TestParameterServiceBase {
         where: { id: parentId },
       })
       .instances(args);
+  }
+
+  async findPurchaseOrder(
+    parentId: string,
+    args: Prisma.PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    return this.prisma.testParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .purchaseOrder(args);
   }
 
   async getClassId(parentId: string): Promise<TestParameter | null> {
