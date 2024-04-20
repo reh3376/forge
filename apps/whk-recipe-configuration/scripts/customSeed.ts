@@ -677,36 +677,40 @@ export async function customSeed() {
       const equipmentPhaseName = Object.keys(equipmentPhaseToPhaseParameterMap).find(key => equipmentPhaseToPhaseParameterMap[key].includes(name));
       const equipmentPhase = equipmentPhases.find(ep => ep.name === equipmentPhaseName) as EquipmentPhase;
 
-      const phaseParameter = await client.phaseParameter.create({
-        data: {
-          createdBy: faker.internet.userName(),
-          name: name,
-          description: faker.commerce.productDescription(),
-          isClassDef: isClassDef,
-          active: faker.datatype.boolean(),
-          units: getRandomArrayElement(['kg', 'lbs', 'units']) as string,
-          setpointType: getRandomArrayElement(Object.values(EnumPhaseParameterSetpointType)) as EnumPhaseParameterSetpointType,
-          setpointNumericalValue: faker.number.float({ min: 0, max: 100 }),
-          // Optional linking to an EquipmentPhase
-          ...(equipmentPhase && {
-            equipmentPhase: {
-              connect: { id: equipmentPhase.id },
-            },
-          }),
-          // Connect instances to a class definition if available
-          ...(isClassDef ? {} : {
-            classId: {
-              connect: { id: getRandomArrayElement(classIds) },
-            },
-          }),
-          revision: faker.number.int({ min: 0, max: 10 }),
-        },
-      });
-
-      // Collect class definition IDs to use for instances
-      if (isClassDef) {
-        classIds.push(phaseParameter.id);
+      try {
+        const phaseParameter = await client.phaseParameter.create({
+          data: {
+            createdBy: faker.internet.userName(),
+            name: name,
+            description: faker.commerce.productDescription(),
+            isClassDef: isClassDef,
+            active: faker.datatype.boolean(),
+            units: getRandomArrayElement(['kg', 'lbs', 'units']) as string,
+            setpointType: getRandomArrayElement(Object.values(EnumPhaseParameterSetpointType)) as EnumPhaseParameterSetpointType,
+            setpointNumericalValue: faker.number.float({ min: 0, max: 100 }),
+            // Optional linking to an EquipmentPhase
+            ...(equipmentPhase && {
+              equipmentPhase: {
+                connect: { id: equipmentPhase.id },
+              },
+            }),
+            // Connect instances to a class definition if available
+            ...(isClassDef ? {} : {
+              classId: {
+                connect: { id: getRandomArrayElement(classIds) },
+              },
+            }),
+            revision: faker.number.int({ min: 0, max: 10 }),
+          },
+        });
+        // Collect class definition IDs to use for instances
+        if (isClassDef) {
+          classIds.push(phaseParameter.id);
+        }
+      } catch (error) {
+        console.error(error);
       }
+
     }
 
     console.log(`${total} PhaseParameters (classes and instances) created.`);
@@ -862,6 +866,7 @@ export async function customSeed() {
     const items = await client.item.findMany();
     const salesOrders = await client.salesOrder.findMany();
 
+
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
       const salesOrder = getRandomArrayElement(salesOrders) as SalesOrder;
@@ -878,9 +883,7 @@ export async function customSeed() {
             salesOrder: {
               connect: {id: salesOrder.id},
             },
-            productionOrderQueueId: faker.string.uuid(),
             startDate: faker.date.past(),
-            state: getRandomArrayElement(["Planned", "InProgress", "Completed"]) as string,
             status: EnumProductionOrderStatus.Planned, // Adjust based on your enum
             // batches: sampleBatches,
             // Populate other fields as necessary
