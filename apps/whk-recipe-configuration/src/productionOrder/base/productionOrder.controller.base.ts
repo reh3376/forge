@@ -55,11 +55,9 @@ export class ProductionOrderControllerBase {
       data: {
         ...data,
 
-        fg: data.fg
-          ? {
-              connect: data.fg,
-            }
-          : undefined,
+        item: {
+          connect: data.item,
+        },
 
         recipe: data.recipe
           ? {
@@ -86,15 +84,14 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        id: true,
+        inProcess: true,
 
-        fg: {
+        item: {
           select: {
             id: true,
           },
         },
-
-        id: true,
-        inProcess: true,
 
         recipe: {
           select: {
@@ -150,15 +147,14 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        id: true,
+        inProcess: true,
 
-        fg: {
+        item: {
           select: {
             id: true,
           },
         },
-
-        id: true,
-        inProcess: true,
 
         recipe: {
           select: {
@@ -213,15 +209,14 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        id: true,
+        inProcess: true,
 
-        fg: {
+        item: {
           select: {
             id: true,
           },
         },
-
-        id: true,
-        inProcess: true,
 
         recipe: {
           select: {
@@ -280,11 +275,9 @@ export class ProductionOrderControllerBase {
         data: {
           ...data,
 
-          fg: data.fg
-            ? {
-                connect: data.fg,
-              }
-            : undefined,
+          item: {
+            connect: data.item,
+          },
 
           recipe: data.recipe
             ? {
@@ -311,15 +304,14 @@ export class ProductionOrderControllerBase {
           createdBy: true,
           customer: true,
           endDate: true,
+          id: true,
+          inProcess: true,
 
-          fg: {
+          item: {
             select: {
               id: true,
             },
           },
-
-          id: true,
-          inProcess: true,
 
           recipe: {
             select: {
@@ -382,15 +374,14 @@ export class ProductionOrderControllerBase {
           createdBy: true,
           customer: true,
           endDate: true,
+          id: true,
+          inProcess: true,
 
-          fg: {
+          item: {
             select: {
               id: true,
             },
           },
-
-          id: true,
-          inProcess: true,
 
           recipe: {
             select: {
