@@ -71,6 +71,10 @@ export class ProductionOrderControllerBase {
             }
           : undefined,
 
+        salesOrder: {
+          connect: data.salesOrder,
+        },
+
         scheduleOrder: data.scheduleOrder
           ? {
               connect: data.scheduleOrder,
@@ -100,6 +104,12 @@ export class ProductionOrderControllerBase {
         },
 
         recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        salesOrder: {
           select: {
             id: true,
           },
@@ -168,6 +178,12 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         scheduled: true,
 
         scheduleOrder: {
@@ -225,6 +241,12 @@ export class ProductionOrderControllerBase {
         },
 
         recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        salesOrder: {
           select: {
             id: true,
           },
@@ -291,6 +313,10 @@ export class ProductionOrderControllerBase {
               }
             : undefined,
 
+          salesOrder: {
+            connect: data.salesOrder,
+          },
+
           scheduleOrder: data.scheduleOrder
             ? {
                 connect: data.scheduleOrder,
@@ -320,6 +346,12 @@ export class ProductionOrderControllerBase {
           },
 
           recipeGroup: {
+            select: {
+              id: true,
+            },
+          },
+
+          salesOrder: {
             select: {
               id: true,
             },
@@ -390,6 +422,12 @@ export class ProductionOrderControllerBase {
           },
 
           recipeGroup: {
+            select: {
+              id: true,
+            },
+          },
+
+          salesOrder: {
             select: {
               id: true,
             },
