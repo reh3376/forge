@@ -279,6 +279,12 @@ export class RecipeControllerBase {
           },
         },
 
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         scheduled: true,
 
         scheduleOrder: {

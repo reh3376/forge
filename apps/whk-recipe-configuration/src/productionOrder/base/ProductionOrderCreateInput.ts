@@ -24,6 +24,7 @@ import { Type } from "class-transformer";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
@@ -133,6 +134,15 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   recipeGroup?: RecipeGroupWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => SalesOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderWhereUniqueInput)
+  @Field(() => SalesOrderWhereUniqueInput)
+  salesOrder!: SalesOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,

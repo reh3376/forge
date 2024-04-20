@@ -57,6 +57,12 @@ export class SalesOrderControllerBase {
               connect: data.account,
             }
           : undefined,
+
+        productionOrders: data.productionOrders
+          ? {
+              connect: data.productionOrders,
+            }
+          : undefined,
       },
       select: {
         account: {
@@ -70,6 +76,13 @@ export class SalesOrderControllerBase {
         id: true,
         itemId: true,
         orderType: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         revision: true,
         schemaVersion: true,
@@ -107,6 +120,13 @@ export class SalesOrderControllerBase {
         id: true,
         itemId: true,
         orderType: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         revision: true,
         schemaVersion: true,
@@ -145,6 +165,13 @@ export class SalesOrderControllerBase {
         id: true,
         itemId: true,
         orderType: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         revision: true,
         schemaVersion: true,
@@ -187,6 +214,12 @@ export class SalesOrderControllerBase {
                 connect: data.account,
               }
             : undefined,
+
+          productionOrders: data.productionOrders
+            ? {
+                connect: data.productionOrders,
+              }
+            : undefined,
         },
         select: {
           account: {
@@ -200,6 +233,13 @@ export class SalesOrderControllerBase {
           id: true,
           itemId: true,
           orderType: true,
+
+          productionOrders: {
+            select: {
+              id: true,
+            },
+          },
+
           quantity: true,
           revision: true,
           schemaVersion: true,
@@ -246,6 +286,13 @@ export class SalesOrderControllerBase {
           id: true,
           itemId: true,
           orderType: true,
+
+          productionOrders: {
+            select: {
+              id: true,
+            },
+          },
+
           quantity: true,
           revision: true,
           schemaVersion: true,
