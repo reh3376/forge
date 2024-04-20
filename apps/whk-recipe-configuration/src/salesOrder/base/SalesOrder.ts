@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 
 @ObjectType()
 class SalesOrder {
@@ -75,6 +76,15 @@ class SalesOrder {
     nullable: true,
   })
   orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrder,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: ProductionOrder | null;
 
   @ApiProperty({
     required: true,
