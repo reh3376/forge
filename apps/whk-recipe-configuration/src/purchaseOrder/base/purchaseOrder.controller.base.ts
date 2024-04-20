@@ -100,6 +100,7 @@ export class PurchaseOrderControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         grainType: true,
         id: true,
 
@@ -166,6 +167,7 @@ export class PurchaseOrderControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         grainType: true,
         id: true,
 
@@ -231,6 +233,7 @@ export class PurchaseOrderControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         grainType: true,
         id: true,
 
@@ -327,6 +330,7 @@ export class PurchaseOrderControllerBase {
           createdBy: true,
           editedAt: true,
           editedBy: true,
+          globalId: true,
           grainType: true,
           id: true,
 
@@ -400,6 +404,7 @@ export class PurchaseOrderControllerBase {
           createdBy: true,
           editedAt: true,
           editedBy: true,
+          globalId: true,
           grainType: true,
           id: true,
 
@@ -456,6 +461,7 @@ export class PurchaseOrderControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+        globalId: true,
         id: true,
         lotNumber: true,
 
@@ -562,6 +568,7 @@ export class PurchaseOrderControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
+        glabalId: true,
         id: true,
 
         item: {
@@ -696,6 +703,7 @@ export class PurchaseOrderControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         grainType: true,
         id: true,
 
@@ -826,6 +834,7 @@ export class PurchaseOrderControllerBase {
         description: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         isClassDef: true,
         name: true,

@@ -68,6 +68,17 @@ class AccountCreateInput {
   email?: string | null;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })

@@ -25,6 +25,7 @@ const CREATE_INPUT = {
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   schemaVersion: "exampleSchemaVersion",
 };
@@ -36,6 +37,7 @@ const CREATE_RESULT = {
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   schemaVersion: "exampleSchemaVersion",
 };
@@ -48,6 +50,7 @@ const FIND_MANY_RESULT = [
     createdBy: "exampleCreatedBy",
     editedAt: new Date(),
     editedBy: "exampleEditedBy",
+    globalId: "exampleGlobalId",
     id: "exampleId",
     schemaVersion: "exampleSchemaVersion",
   },
@@ -60,6 +63,7 @@ const FIND_ONE_RESULT = {
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   schemaVersion: "exampleSchemaVersion",
 };

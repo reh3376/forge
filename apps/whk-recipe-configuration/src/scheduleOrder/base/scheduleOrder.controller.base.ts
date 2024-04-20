@@ -79,6 +79,7 @@ export class ScheduleOrderControllerBase {
         estimatedMashingTime: true,
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
+        globalId: true,
         id: true,
         productionOrderAllocation: true,
 
@@ -137,6 +138,7 @@ export class ScheduleOrderControllerBase {
         estimatedMashingTime: true,
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
+        globalId: true,
         id: true,
         productionOrderAllocation: true,
 
@@ -194,6 +196,7 @@ export class ScheduleOrderControllerBase {
         estimatedMashingTime: true,
         estimatedProcessing: true,
         estimatedTotalProductionTime: true,
+        globalId: true,
         id: true,
         productionOrderAllocation: true,
 
@@ -278,6 +281,7 @@ export class ScheduleOrderControllerBase {
           estimatedMashingTime: true,
           estimatedProcessing: true,
           estimatedTotalProductionTime: true,
+          globalId: true,
           id: true,
           productionOrderAllocation: true,
 
@@ -343,6 +347,7 @@ export class ScheduleOrderControllerBase {
           estimatedMashingTime: true,
           estimatedProcessing: true,
           estimatedTotalProductionTime: true,
+          globalId: true,
           id: true,
           productionOrderAllocation: true,
 
@@ -405,6 +410,7 @@ export class ScheduleOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 

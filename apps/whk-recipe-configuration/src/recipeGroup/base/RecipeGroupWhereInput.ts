@@ -14,11 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class RecipeGroupWhereInput {
@@ -32,6 +32,17 @@ class RecipeGroupWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
