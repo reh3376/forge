@@ -84,6 +84,7 @@ export class PhaseParameterControllerBase {
           },
         },
 
+        globalId: true,
         id: true,
         isClassDef: true,
         isStaticParameter: true,
@@ -142,6 +143,7 @@ export class PhaseParameterControllerBase {
           },
         },
 
+        globalId: true,
         id: true,
         isClassDef: true,
         isStaticParameter: true,
@@ -199,6 +201,7 @@ export class PhaseParameterControllerBase {
           },
         },
 
+        globalId: true,
         id: true,
         isClassDef: true,
         isStaticParameter: true,
@@ -279,6 +282,7 @@ export class PhaseParameterControllerBase {
             },
           },
 
+          globalId: true,
           id: true,
           isClassDef: true,
           isStaticParameter: true,
@@ -342,6 +346,7 @@ export class PhaseParameterControllerBase {
           },
         },
 
+        globalId: true,
         id: true,
         isClassDef: true,
         isStaticParameter: true,
