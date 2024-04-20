@@ -303,6 +303,8 @@ model ProductionOrder {
   recipeId        String?
   recipeGroup     RecipeGroup?               @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId   String?
+  salesOrder      SalesOrder                 @relation(fields: [salesOrderId], references: [id])
+  salesOrderId    String                     @unique
   scheduled       Boolean?                   @default(false)
   scheduleOrder   ScheduleOrder?             @relation(fields: [scheduleOrderId], references: [id])
   scheduleOrderId String?
@@ -440,18 +442,19 @@ model PurchaseOrder {
 }
 
 model SalesOrder {
-  account       Account?                @relation(fields: [accountId], references: [id])
-  accountId     String?
-  createdAt     DateTime                @default(now())
-  createdBy     String
-  id            String                  @id @default(cuid())
-  itemId        String
-  orderType     EnumSalesOrderOrderType
-  quantity      Int
-  revision      Int                     @default(0)
-  schemaVersion String?                 @default("0001-alpha")
-  updatedAt     DateTime                @updatedAt
-  updatedBy     String?
+  account          Account?                @relation(fields: [accountId], references: [id])
+  accountId        String?
+  createdAt        DateTime                @default(now())
+  createdBy        String
+  id               String                  @id @default(cuid())
+  itemId           String
+  orderType        EnumSalesOrderOrderType
+  productionOrders ProductionOrder?
+  quantity         Int
+  revision         Int                     @default(0)
+  schemaVersion    String?                 @default("0001-alpha")
+  updatedAt        DateTime                @updatedAt
+  updatedBy        String?
 }
 
 model Test {

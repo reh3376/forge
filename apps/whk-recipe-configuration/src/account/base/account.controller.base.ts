@@ -390,6 +390,13 @@ export class AccountControllerBase {
         id: true,
         itemId: true,
         orderType: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         revision: true,
         schemaVersion: true,
