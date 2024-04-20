@@ -67,12 +67,12 @@ export class ProductionOrderServiceBase {
       .boms(args);
   }
 
-  async getFg(parentId: string): Promise<Item | null> {
+  async getItem(parentId: string): Promise<Item | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
       })
-      .fg();
+      .item();
   }
 
   async getRecipe(parentId: string): Promise<Recipe | null> {

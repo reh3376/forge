@@ -295,10 +295,10 @@ model ProductionOrder {
   createdBy       String
   customer        String?
   endDate         DateTime?
-  fg              Item?                      @relation(fields: [fgItemId], references: [id])
-  fgItemId        String?
   id              String                     @id @default(cuid())
   inProcess       Boolean?                   @default(false)
+  item            Item                       @relation(fields: [fgItemId], references: [id])
+  fgItemId        String
   recipe          Recipe?                    @relation(fields: [recipeId], references: [id])
   recipeId        String?
   recipeGroup     RecipeGroup?               @relation(fields: [recipeGroupId], references: [id])

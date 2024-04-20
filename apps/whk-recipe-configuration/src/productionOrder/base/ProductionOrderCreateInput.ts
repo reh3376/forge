@@ -92,18 +92,6 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  fg?: ItemWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -112,6 +100,15 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   inProcess?: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  item!: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
