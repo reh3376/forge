@@ -1,15 +1,24 @@
 // import {Prisma, PrismaClient} from "@prisma/client";
 
 import {
-  EnumEquipmentPhaseName, EnumItemItemClass,
+  EnumEquipmentPhaseName,
+  EnumItemItemClass,
   EnumOperationName,
   EnumPhaseParameterSetpointType,
   EnumProcedureName,
   EnumTestParameterTestParamUnits,
   EnumTestParameterTestSetpointType,
-  EnumUnitProcedureName,
+  EnumUnitProcedureName, EquipmentPhase,
   Item,
-  PrismaClient, Procedure, ProductionOrder, ProductionSchedule, Recipe, RecipeGroup, ScheduleOrder, ScheduleOrderQueue,
+  Operation,
+  PrismaClient,
+  ProductionOrder,
+  ProductionSchedule,
+  Recipe,
+  RecipeGroup,
+  ScheduleOrder,
+  ScheduleOrderQueue,
+  UnitProcedure,
 } from "@prisma/client";
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
@@ -160,6 +169,14 @@ export async function customSeed() {
     console.log("UnitProcedures seeded.");
   }
 
+  const unitProcedureOperationsMap: { [key: string]: string[] } = {
+      Mashing01: ['Cook', 'Clean'],
+      Fermentation01: ['FermenterSet', 'Fermenter', 'Clean'],
+      Distillation01: ['StillRun', 'Clean'],
+      Processing01: ['TankProcessing', 'Barreling'],
+      Milling01: ['Mill'],
+    };
+
   // operation
   async function seedOperation(): Promise<void> {
     const unitProcedures = await client.unitProcedure.findMany();
@@ -171,7 +188,10 @@ export async function customSeed() {
 
     // Seed class definitions for each Operation name
     for (const name of Object.values(EnumOperationName)) {
-      const unitProcedure = getRandomArrayElement(unitProcedures) as any;
+      // use the name (which is a value in the mapping) to get the key that matches from unitProcedureOperationsMap
+      const unitProcedureName = Object.keys(unitProcedureOperationsMap).find(key => unitProcedureOperationsMap[key].includes(name));
+      const unitProcedure = unitProcedures.find(up => up.name === unitProcedureName) as UnitProcedure;
+      // const unitProcedure = getRandomArrayElement(unitProcedures) as any;
       try {
         const classDefinition = await client.operation.create({
           data: {
@@ -340,9 +360,109 @@ export async function customSeed() {
   }
 
   // phase paramters
+  const equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
+    PreSteam: ['TemperatureSetpoint'],
+    CornAdd: [
+      'Quantity',
+      'Units',
+    ],
+    MaltAdd: [
+      'Quantity',
+      'Units',
+    ],
+    RyeAdd: [
+      'Quantity',
+      'Units',
+    ],
+    WheatAdd: [
+      'Quantity',
+      'Units',
+    ],
+    AdditiveAdd: [
+      'Quantity',
+      'Units',
+      'ItemName',
+    ],
+    Prompt: [
+      'Type',
+      'Message',
+      'Header',
+      'Duration',
+      'Units',
+      'Confirmation',
+    ],
+    Hold: [
+      'Duration',
+      'Units'
+    ],
+    Steam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    Cooldown: [
+      'Duration',
+      'Units',
+      'TemperatureSetpoint',
+    ],
+    PhCapture: [
+      'TODO'
+    ],
+    Drop: [
+      'FlowSetpoint',
+      'SprayballTime',
+      'FlushTime',
+    ],
+    Rinse: [
+      'Duration',
+      'Units',
+      'TemperatureSetpoint',
+    ],
+    DropTubToMashCooler: [
+      'MashPumpSetpoint',
+      'MidTemperatureSP',
+      'OutTemperatureSP',
+      'MashCoolerEnable',
+    ],
+    Fill: [
+      'LevelSetpoint',
+      'AgitationSpeed',
+      'TemperatureSetpoint',
+    ],
+    FermDrop: [
+      'LevelSetpoint',
+    ],
+    FermSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    DropLineSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    DropTubSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    CoolerSteam: [
+      'TemperatureSetpoint',
+      'Duration',
+      'Units',
+    ],
+    StillRun: [
+      'TowerWaterTemperatureSetpoint',
+      'TowerWaterFlowSetpoint',
+      'HighWineCondenserTowerWaterTemperatureSetpoint',
+      'LowWineProof',
+      'HighWineProof',
+    ],
+  }
   async function seedPhaseParameter(total: number): Promise<void> {
     // Fetch EquipmentPhase IDs if needed for linking
-    const equipmentPhases = await client.equipmentPhase.findMany({ select: { id: true } });
+    const equipmentPhases = await client.equipmentPhase.findMany();
 
     const classRatio = 0.2; // Ratio of class definitions
     const numClasses = Math.round(total * classRatio);
@@ -350,12 +470,16 @@ export async function customSeed() {
 
     for (let i = 0; i < total; i++) {
       const isClassDef = i < numClasses;
-      const equipmentPhase = equipmentPhases.length > 0 ? getRandomArrayElement(equipmentPhases) : null;
+      // Use the equipmentPhaseToPhaseParameter mapping to get a random PhaseParameter name
+      const name = getRandomArrayElement(getRandomArrayElement(Object.values(equipmentPhaseToPhaseParameterMap)) as string[]) as string;
+
+      const equipmentPhaseName = Object.keys(equipmentPhaseToPhaseParameterMap).find(key => equipmentPhaseToPhaseParameterMap[key].includes(name));
+      const equipmentPhase = equipmentPhases.find(ep => ep.name === equipmentPhaseName) as EquipmentPhase;
 
       const phaseParameter = await client.phaseParameter.create({
         data: {
           createdBy: faker.internet.userName(),
-          name: `${isClassDef ? 'Class' : 'Instance'}-${faker.commerce.productName()}-${faker.string.uuid()}`,
+          name: name,
           description: faker.commerce.productDescription(),
           isClassDef: isClassDef,
           active: faker.datatype.boolean(),
@@ -387,6 +511,45 @@ export async function customSeed() {
     console.log(`${total} PhaseParameters (classes and instances) created.`);
   }
 
+  const operationEquipmentPhasesMap: { [key: string]: string[] } = {
+    Cook: [
+      'PreSteam',
+      'Steam',
+      'Hold',
+      'BacksetAdd',
+      'WaterAdd',
+      'AdditiveAdd',
+      'CornAdd',
+      'MaltAdd',
+      'RyeAdd',
+      'WheatAdd',
+      'Drop',
+      'PhCapture',
+      'Prompt',
+      'Rinse',
+      'Cooldown',
+      'HotFlush',
+      'CIP',
+    ],
+    FermenterSet: [
+      'DropToMashCooler',
+      'Fill',
+    ],
+    Fermenter: [
+      'Run',
+    ],
+    Clean: [
+      'FermenterSteam',
+      'CoolerSteam',
+      'DropTubSteam',
+      'DropLineSteam'
+    ],
+    StillRun: ['StillStartup', 'StillRun', 'StillShutdown'],
+    TankProcessing: ['Cut', 'Hold', 'Gauge'],
+    Barreling: ['BarrelFill'],
+    Mill: ['Mill'],
+  };
+
   // equipment phase
   async function seedEquipmentPhase(): Promise<void> {
     const operations = await client.operation.findMany();
@@ -398,8 +561,11 @@ export async function customSeed() {
 
     // Seed class definitions for each EquipmentPhase name
     for (const name of Object.values(EnumEquipmentPhaseName)) {
+      // use name to get the key that matches from operationEquipmentPhasesMap
+      const operationName = Object.keys(operationEquipmentPhasesMap).find(key => operationEquipmentPhasesMap[key].includes(name));
+      const operation = operations.find(op => op.name === operationName) as Operation;
       try {
-        const operation = getRandomArrayElement(operations) as any;
+        // const operation = getRandomArrayElement(operations) as any;
         const classDefinition = await client.equipmentPhase.create({
           data: {
             createdBy: faker.internet.userName(),
@@ -438,12 +604,10 @@ export async function customSeed() {
 
   async function seedRecipe(n: number): Promise<void> {
     const items = await client.item.findMany();
-    const recipeGroups = await client.recipeGroup.findMany();
     const customerIds = ["CUST-1001", "CUST-1002", "CUST-1003"];  // Example customer IDs
 
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
-      const recipeGroup = getRandomArrayElement(recipeGroups) as RecipeGroup;
       const customerId = getRandomArrayElement(customerIds) as string;
 
       try {
@@ -573,22 +737,17 @@ export async function customSeed() {
   }
 
   async function seedScheduleOrderQueue(n: number): Promise<void> {
-    const procedures = await client.procedure.findMany();
     const productionSchedules = await client.productionSchedule.findMany();
-    const scheduleOrders = await client.scheduleOrder.findMany();
 
     for (let i = 0; i < n; i++) {
-      const procedure = getRandomArrayElement(procedures) as Procedure;
       const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
-      const salesOrderId = `SO-${faker.string.uuid()}`;
-      const queueIndex = i;  // Unique queue index for each entry
 
       try {
         await client.scheduleOrderQueue.create({
           data: {
             createdBy: faker.internet.userName(),
             productionSchedule: {connect: { id: productionSchedule.id } },
-            queueIndex: queueIndex,
+            queueIndex: i,
             updatedBy: faker.internet.userName(),
           },
         });
