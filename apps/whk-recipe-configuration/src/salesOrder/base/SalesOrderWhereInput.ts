@@ -17,6 +17,7 @@ import { Type } from "class-transformer";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
@@ -88,6 +89,18 @@ class SalesOrderWhereInput {
     nullable: true,
   })
   orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,

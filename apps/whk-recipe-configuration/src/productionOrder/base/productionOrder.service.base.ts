@@ -18,6 +18,7 @@ import {
   Item, // @ts-ignore
   Recipe, // @ts-ignore
   RecipeGroup, // @ts-ignore
+  SalesOrder, // @ts-ignore
   ScheduleOrder,
 } from "@prisma/client";
 
@@ -89,6 +90,14 @@ export class ProductionOrderServiceBase {
         where: { id: parentId },
       })
       .recipeGroup();
+  }
+
+  async getSalesOrder(parentId: string): Promise<SalesOrder | null> {
+    return this.prisma.productionOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .salesOrder();
   }
 
   async getScheduleOrder(parentId: string): Promise<ScheduleOrder | null> {

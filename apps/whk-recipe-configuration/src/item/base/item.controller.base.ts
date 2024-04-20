@@ -669,6 +669,12 @@ export class ItemControllerBase {
           },
         },
 
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         scheduled: true,
 
         scheduleOrder: {
