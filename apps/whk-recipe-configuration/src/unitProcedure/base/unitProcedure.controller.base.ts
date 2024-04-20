@@ -101,6 +101,7 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
@@ -161,6 +162,7 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
@@ -220,6 +222,7 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
@@ -312,6 +315,7 @@ export class UnitProcedureControllerBase {
           id: true,
           isClassDef: true,
           name: true,
+          path: true,
 
           primaryBom: {
             select: {
@@ -379,6 +383,7 @@ export class UnitProcedureControllerBase {
           id: true,
           isClassDef: true,
           name: true,
+          path: true,
 
           primaryBom: {
             select: {
@@ -444,6 +449,7 @@ export class UnitProcedureControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {

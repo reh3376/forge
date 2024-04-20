@@ -532,6 +532,7 @@ export class RecipeControllerBase {
         id: true,
         isClassDef: true,
         name: true,
+        path: true,
 
         primaryBom: {
           select: {
