@@ -101,11 +101,9 @@ export class ProductionOrderResolverBase {
       data: {
         ...args.data,
 
-        fg: args.data.fg
-          ? {
-              connect: args.data.fg,
-            }
-          : undefined,
+        item: {
+          connect: args.data.item,
+        },
 
         recipe: args.data.recipe
           ? {
@@ -144,11 +142,9 @@ export class ProductionOrderResolverBase {
         data: {
           ...args.data,
 
-          fg: args.data.fg
-            ? {
-                connect: args.data.fg,
-              }
-            : undefined,
+          item: {
+            connect: args.data.item,
+          },
 
           recipe: args.data.recipe
             ? {
@@ -223,15 +219,17 @@ export class ProductionOrderResolverBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Item, {
     nullable: true,
-    name: "fg",
+    name: "item",
   })
   @nestAccessControl.UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
   })
-  async getFg(@graphql.Parent() parent: ProductionOrder): Promise<Item | null> {
-    const result = await this.service.getFg(parent.id);
+  async getItem(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<Item | null> {
+    const result = await this.service.getItem(parent.id);
 
     if (!result) {
       return null;
