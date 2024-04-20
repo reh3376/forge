@@ -72,6 +72,7 @@ export class ItemControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemClass: true,
         itemDescription: true,
@@ -113,6 +114,7 @@ export class ItemControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemClass: true,
         itemDescription: true,
@@ -155,6 +157,7 @@ export class ItemControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
         itemClass: true,
         itemDescription: true,
@@ -214,6 +217,7 @@ export class ItemControllerBase {
           active: true,
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
           itemClass: true,
           itemDescription: true,
@@ -264,6 +268,7 @@ export class ItemControllerBase {
           active: true,
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
           itemClass: true,
           itemDescription: true,
@@ -316,6 +321,7 @@ export class ItemControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         schemaVersion: true,
 
@@ -423,6 +429,7 @@ export class ItemControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         schemaVersion: true,
 
@@ -526,6 +533,7 @@ export class ItemControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
+        glabalId: true,
         id: true,
 
         item: {
@@ -648,6 +656,7 @@ export class ItemControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 
@@ -798,6 +807,7 @@ export class ItemControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         grainType: true,
         id: true,
 

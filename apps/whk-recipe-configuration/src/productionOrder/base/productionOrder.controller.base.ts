@@ -88,6 +88,7 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 
@@ -157,6 +158,7 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 
@@ -225,6 +227,7 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         customer: true,
         endDate: true,
+        globalId: true,
         id: true,
         inProcess: true,
 
@@ -330,6 +333,7 @@ export class ProductionOrderControllerBase {
           createdBy: true,
           customer: true,
           endDate: true,
+          globalId: true,
           id: true,
           inProcess: true,
 
@@ -406,6 +410,7 @@ export class ProductionOrderControllerBase {
           createdBy: true,
           customer: true,
           endDate: true,
+          globalId: true,
           id: true,
           inProcess: true,
 
@@ -481,6 +486,7 @@ export class ProductionOrderControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         schemaVersion: true,
 

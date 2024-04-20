@@ -60,6 +60,7 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+        globalId: true,
         id: true,
         lotNumber: true,
 
@@ -95,6 +96,7 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+        globalId: true,
         id: true,
         lotNumber: true,
 
@@ -129,6 +131,7 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+        globalId: true,
         id: true,
         lotNumber: true,
 
@@ -182,6 +185,7 @@ export class LotControllerBase {
           createdAt: true,
           createdBy: true,
           externalId: true,
+          globalId: true,
           id: true,
           lotNumber: true,
 
@@ -226,6 +230,7 @@ export class LotControllerBase {
           createdAt: true,
           createdBy: true,
           externalId: true,
+          globalId: true,
           id: true,
           lotNumber: true,
 

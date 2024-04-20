@@ -61,6 +61,7 @@ export class ScheduleOrderQueueControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         productionSchedule: {
@@ -98,6 +99,7 @@ export class ScheduleOrderQueueControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         productionSchedule: {
@@ -134,6 +136,7 @@ export class ScheduleOrderQueueControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         productionSchedule: {
@@ -187,6 +190,7 @@ export class ScheduleOrderQueueControllerBase {
         select: {
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
 
           productionSchedule: {
