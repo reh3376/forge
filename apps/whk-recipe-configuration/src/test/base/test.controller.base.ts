@@ -75,6 +75,7 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         isClassDefinition: true,
 
@@ -121,6 +122,7 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         isClassDefinition: true,
 
@@ -168,6 +170,7 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         isClassDefinition: true,
 
@@ -238,6 +241,7 @@ export class TestControllerBase {
           createdBy: true,
           editedAt: true,
           editedBy: true,
+          globalId: true,
           id: true,
           isClassDefinition: true,
 
@@ -293,6 +297,7 @@ export class TestControllerBase {
           createdBy: true,
           editedAt: true,
           editedBy: true,
+          globalId: true,
           id: true,
           isClassDefinition: true,
 
@@ -346,6 +351,7 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        globalId: true,
         id: true,
         isClassDefinition: true,
 
