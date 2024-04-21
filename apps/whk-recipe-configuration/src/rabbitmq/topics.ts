@@ -19,6 +19,7 @@ export enum MyMessageBrokerTopics {
   WhWhk01Distillery01Unitprocedure = "wh.whk01.distillery01.unitprocedure",
   WhWhk01Distillery01Operation = "wh.whk01.distillery01.operation",
   WhWhk01Distillery01Equipmentphase = "wh.whk01.distillery01.equipmentphase",
+  WhWhk01Distillery01Phaseparameter = "wh.whk01.distillery01.phaseparameter",
   WhWhk01Distillery01Productionschedule = "wh.whk01.distillery01.productionschedule",
   WhWhk01Distillery01Scheduleorder = "wh.whk01.distillery01.scheduleorder",
   WhWhk01Distillery01Schedulequeue = "wh.whk01.distillery01.schedulequeue",
