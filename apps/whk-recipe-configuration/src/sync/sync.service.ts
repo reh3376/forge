@@ -39,13 +39,13 @@ export class SyncService {
         // If the entity does not exist, create a new one with the data
         if (existingEntity) {
             // Update the entity with the new data
-            existingEntity = await this.prisma[entity].update({
+            await this.prisma[entity].update({
                 where: { globalId: globalId},
                 payloadData,
             });
         } else {
             // Create a new entity with the data
-            existingEntity = await this.prisma[entity].create({ payloadData });
+            await this.prisma[entity].create({ payloadData });
         }
     }
 }
