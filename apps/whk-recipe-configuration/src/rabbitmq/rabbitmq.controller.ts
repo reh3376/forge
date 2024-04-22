@@ -1,13 +1,15 @@
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RabbitMQMessage } from "./RabbitMQMessage";
-import {Controller, LoggerService} from "@nestjs/common";
+import {Controller} from "@nestjs/common";
 import {SyncService} from "../sync/sync.service";
+import {PinoLogger} from "nestjs-pino";
 
 @Controller("rabbitmq-controller")
 export class RabbitMQController {
+
   constructor(
       private readonly syncService: SyncService,
-      private readonly logger: LoggerService,
+      private readonly logger: PinoLogger
   ) {}
 
   async processEvent(
@@ -18,7 +20,7 @@ export class RabbitMQController {
     const originalMsg = context.getMessage();
     try {
       await this.syncService.upsertEntity(message.recordName, message)
-      this.logger.log(`Processed ${message.recordName} event`)
+      this.logger.info(`Processed ${message.recordName} event`)
       channel.ack(originalMsg);
     } catch (error) {
       this.logger.error(`Error handling event: ${error}`);
