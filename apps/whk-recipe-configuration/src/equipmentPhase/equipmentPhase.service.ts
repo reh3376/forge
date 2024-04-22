@@ -4,11 +4,14 @@ import { EquipmentPhaseServiceBase } from "./base/equipmentPhase.service.base";
 import {EquipmentPhase, Prisma} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
 import {PhaseParameterWhereUniqueInput} from "../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
+import {MyMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
   constructor(
         protected readonly prisma: PrismaService,
+        protected readonly rabbitProducer: RabbitMQProducerService,
         private logger: PinoLogger,
   ) {
     super(prisma);
@@ -202,7 +205,15 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       }
     }
 
-    return super.createEquipmentPhase(args);
+    const equipmentPhase = await super.createEquipmentPhase(args);
+
+    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
+      event_type: 'create',
+      data: equipmentPhase,
+      recordName: 'EquipmentPhase',
+    });
+    this.logger.info(`Created equipmentPhase & pushed to topic: ${equipmentPhase.name}`);
+    return equipmentPhase;
   }
 
   async updateEquipmentPhase<T extends Prisma.EquipmentPhaseUpdateArgs>(
@@ -256,6 +267,29 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       }
     }
 
-    return super.updateEquipmentPhase(args);
+    const newEquipmentPhase = await super.updateEquipmentPhase(args);
+
+    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
+      event_type: 'update',
+      data: newEquipmentPhase,
+      recordName: 'EquipmentPhase',
+    });
+    this.logger.info(`Updated equipmentPhase & pushed to topic: ${newEquipmentPhase.name}`);
+
+    return newEquipmentPhase;
   }
+
+  async deleteEquipmentPhase<T extends Prisma.EquipmentPhaseDeleteArgs>(
+        args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseDeleteArgs>
+    ): Promise<EquipmentPhase> {
+        const equipmentPhase = await super.deleteEquipmentPhase(args);
+
+        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
+        event_type: 'delete',
+        data: equipmentPhase,
+        recordName: 'EquipmentPhase',
+        });
+        this.logger.info(`Deleted equipmentPhase & pushed to topic: ${equipmentPhase.name}`);
+        return equipmentPhase;
+    }
 }

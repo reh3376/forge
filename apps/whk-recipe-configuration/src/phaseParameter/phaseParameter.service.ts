@@ -1,13 +1,16 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { PhaseParameterServiceBase } from "./base/phaseParameter.service.base";
 import {PinoLogger} from "nestjs-pino";
 import {PhaseParameter, Prisma} from "@prisma/client";
+import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
+import {MyMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class PhaseParameterService extends PhaseParameterServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
+      protected readonly rabbitProducer: RabbitMQProducerService,
       private logger: PinoLogger,
   ) {
     super(prisma);
@@ -137,8 +140,16 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
               throw new BadRequestException(`Provided EquipmentPhase Id does not match the acceptable list for Phase Parameter: ${name}`);
           }
       }
+      const phaseParameter = await super.createPhaseParameter(args);
 
-      return super.createPhaseParameter(args);
+      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+          recordName: 'PhaseParameter',
+          event_type: 'create',
+          data: phaseParameter
+      });
+
+      this.logger.info(`Created Phase Parameter: ${phaseParameter.name} & pushed to topic`);
+      return phaseParameter;
   }
 
   async updatePhaseParameter<T extends Prisma.PhaseParameterUpdateArgs>(
@@ -164,6 +175,15 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
           throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
       }
 
-      return super.updatePhaseParameter(args);
+      const phaseParameterData = await super.updatePhaseParameter(args);
+
+      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+            recordName: 'PhaseParameter',
+            event_type: 'update',
+            data: phaseParameterData
+      });
+
+      this.logger.info(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
+      return phaseParameterData;
   }
 }

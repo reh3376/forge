@@ -3,11 +3,14 @@ import { PrismaService } from "../prisma/prisma.service";
 import { OperationServiceBase } from "./base/operation.service.base";
 import {Operation, Prisma} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
+import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
+import {MyMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class OperationService extends OperationServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
+      protected readonly rabbitProducer: RabbitMQProducerService,
       private logger: PinoLogger,
   ) {
     super(prisma);
@@ -94,7 +97,18 @@ export class OperationService extends OperationServiceBase {
     }
 
     // If EquipmentPhases are acceptable, proceed with the creation
-    return super.createOperation(args);
+    const operationData = await super.createOperation(args);
+
+    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Operation, {
+      recordName: 'Operation',
+      event_type: 'create',
+      data: operationData
+    });
+
+    this.logger.info(`Updated Operation: ${operationData.name} & pushed to topic`);
+    return operationData;
+
+
   }
 
   async updateOperation<T extends Prisma.OperationUpdateArgs>(
@@ -133,6 +147,27 @@ export class OperationService extends OperationServiceBase {
       throw new BadRequestException(`Provided EquipmentPhases do not match acceptable list for Operation: ${name}`);
     }
 
-    return super.updateOperation(args);
+    const operationData = await super.updateOperation(args);
+
+    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Operation, {
+        recordName: 'Operation',
+        event_type: 'update',
+        data: operationData
+        });
+    this.logger.info(`Updated Operation: ${operationData.name} & pushed to topic`);
+    return operationData;
   }
+
+    async deleteOperation<T extends Prisma.OperationDeleteArgs>(
+        args: Prisma.SelectSubset<T, Prisma.OperationDeleteArgs>
+    ): Promise<Operation> {
+        const operation = await super.deleteOperation(args);
+        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Operation, {
+          recordName: 'Operation',
+          event_type: 'delete',
+          data: operation
+        });
+        this.logger.info(`Deleted Operation: ${operation.name} & pushed to topic`);
+        return operation;
+    }
 }
