@@ -1,14 +1,17 @@
 import {BadRequestException, Injectable} from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { UnitProcedureServiceBase } from "./base/unitProcedure.service.base";
-import {Operation, Prisma, UnitProcedure} from "@prisma/client";
+import {PrismaService} from "../prisma/prisma.service";
+import {UnitProcedureServiceBase} from "./base/unitProcedure.service.base";
+import {Prisma, UnitProcedure} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
 import {OperationWhereUniqueInput} from "../operation/base/OperationWhereUniqueInput";
+import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
+import {MyMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class UnitProcedureService extends UnitProcedureServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
+      protected readonly rabbitProducer: RabbitMQProducerService,
       private logger: PinoLogger,
       ) {
     super(prisma);
@@ -49,7 +52,15 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     }
 
     // If operations are acceptable, proceed with the creation
-    return super.createUnitProcedure(args);
+    const createdUnitProcedure = await this.prisma.unitProcedure.create(args);
+
+    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+      recordName: 'UnitProcedure',
+      event_type: 'create',
+      data: createdUnitProcedure
+    });
+    this.logger.info(`Created UnitProcedure: ${createdUnitProcedure.id} & pushed to topic`);
+    return createdUnitProcedure;
   }
 
   async updateUnitProcedure<T extends Prisma.UnitProcedureUpdateArgs>(
