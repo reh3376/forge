@@ -69,7 +69,7 @@ export class ItemReceiptControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
-        glabalId: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -118,7 +118,7 @@ export class ItemReceiptControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
-        glabalId: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -168,7 +168,7 @@ export class ItemReceiptControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
-        glabalId: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -239,7 +239,7 @@ export class ItemReceiptControllerBase {
           createdAt: true,
           createdBy: true,
           driver: true,
-          glabalId: true,
+          globalId: true,
           id: true,
 
           item: {
@@ -297,7 +297,7 @@ export class ItemReceiptControllerBase {
           createdAt: true,
           createdBy: true,
           driver: true,
-          glabalId: true,
+          globalId: true,
           id: true,
 
           item: {
