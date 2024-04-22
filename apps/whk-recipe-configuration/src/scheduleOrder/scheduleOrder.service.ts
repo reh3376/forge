@@ -3,7 +3,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { ScheduleOrderServiceBase } from "./base/scheduleOrder.service.base";
 import {Prisma, ScheduleOrder} from "@prisma/client";
 import {MyMessageBrokerTopics} from "../rabbitmq/topics";
-import {Logger} from "nestjs-pino";
+import {PinoLogger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
       protected readonly rabbitProducer: RabbitMQProducerService,
-      private readonly logger: Logger
+      private readonly logger: PinoLogger
   ) {
     super(prisma);
   }
@@ -23,7 +23,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         event_type: 'create',
         data: scheduleOrder
         });
-        this.logger.log(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
+        this.logger.info(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
 
@@ -34,7 +34,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         event_type: 'update',
         data: scheduleOrder
         });
-        this.logger.log(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
+        this.logger.info(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
 
@@ -45,7 +45,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         event_type: 'delete',
         data: scheduleOrder
         });
-        this.logger.log(`Deleted ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
+        this.logger.info(`Deleted ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
 }

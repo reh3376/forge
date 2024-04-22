@@ -61,7 +61,7 @@ class ItemReceiptOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  glabalId?: SortOrder;
+  globalId?: SortOrder;
 
   @ApiProperty({
     required: false,

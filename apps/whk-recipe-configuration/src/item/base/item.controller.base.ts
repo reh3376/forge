@@ -533,7 +533,7 @@ export class ItemControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
-        glabalId: true,
+        globalId: true,
         id: true,
 
         item: {

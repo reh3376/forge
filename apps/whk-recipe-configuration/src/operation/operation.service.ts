@@ -2,7 +2,7 @@ import {BadRequestException, Injectable} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { OperationServiceBase } from "./base/operation.service.base";
 import {Operation, Prisma} from "@prisma/client";
-import {Logger} from "nestjs-pino";
+import {PinoLogger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 import {MyMessageBrokerTopics} from "../rabbitmq/topics";
 
@@ -11,7 +11,7 @@ export class OperationService extends OperationServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
       protected readonly rabbitProducer: RabbitMQProducerService,
-      private logger: Logger,
+      private logger: PinoLogger,
   ) {
     super(prisma);
   }
@@ -71,11 +71,11 @@ export class OperationService extends OperationServiceBase {
     if (args.data.unitProcedure?.connect?.id) {
       const unitProcedureId = args.data.unitProcedure?.connect?.id;
       const unitProcedure = await this.prisma.unitProcedure.findFirstOrThrow({where: {id: unitProcedureId as string}});
-      this.logger.log(`UnitProcedure: ${unitProcedureId}`);
+      this.logger.info(`UnitProcedure: ${unitProcedureId}`);
 
       // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
       const acceptableUnitProcedures = this.unitProcedureOperationsMap[unitProcedure.name];
-      this.logger.log(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
+      this.logger.info(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
 
       if (!acceptableUnitProcedures) {
         throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
@@ -105,7 +105,7 @@ export class OperationService extends OperationServiceBase {
       data: operationData
     });
 
-    this.logger.log(`Updated Operation: ${operationData.name} & pushed to topic`);
+    this.logger.info(`Updated Operation: ${operationData.name} & pushed to topic`);
     return operationData;
 
 
@@ -115,18 +115,18 @@ export class OperationService extends OperationServiceBase {
       args: Prisma.SelectSubset<T, Prisma.OperationUpdateArgs>
   ): Promise<Operation> {
     const operation = await this.prisma.operation.findFirstOrThrow({where: {id: args.where.id}}) as Operation;
-    this.logger.log(`Updating Operation: ${operation.name}`);
+    this.logger.info(`Updating Operation: ${operation.name}`);
     const name = operation.name as string;
 
     // if unit procedure id is provided, check if it matches the acceptable list for the operation
     if (args.data.unitProcedure?.connect?.id) {
       const unitProcedureId = args.data.unitProcedure?.connect?.id;
       const unitProcedure = await this.prisma.unitProcedure.findFirstOrThrow({where: {id: unitProcedureId as string}});
-      this.logger.log(`UnitProcedure: ${unitProcedureId}`);
+      this.logger.info(`UnitProcedure: ${unitProcedureId}`);
 
       // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
       const acceptableUnitProcedures = this.unitProcedureOperationsMap[unitProcedure.name];
-      this.logger.log(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
+      this.logger.info(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
 
       if (!acceptableUnitProcedures) {
         throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
@@ -137,7 +137,7 @@ export class OperationService extends OperationServiceBase {
     }
 
     const EquipmentPhases = Array.isArray(args.data.equipmentPhases) ? args.data.equipmentPhases.map((equipmentPhase: { name: any; }) => equipmentPhase.name) : [];
-    this.logger.log(`Updating Operation: ${name}`);
+    this.logger.info(`Updating Operation: ${name}`);
     const acceptableEquipmentPhases = this.operationEquipmentPhasesMap[name];
     if (!acceptableEquipmentPhases) {
       throw new BadRequestException(`No EquipmentPhases mapping found for Operation: ${name}`);
@@ -154,7 +154,7 @@ export class OperationService extends OperationServiceBase {
         event_type: 'update',
         data: operationData
         });
-    this.logger.log(`Updated Operation: ${operationData.name} & pushed to topic`);
+    this.logger.info(`Updated Operation: ${operationData.name} & pushed to topic`);
     return operationData;
   }
 
@@ -167,7 +167,7 @@ export class OperationService extends OperationServiceBase {
           event_type: 'delete',
           data: operation
         });
-        this.logger.log(`Deleted Operation: ${operation.name} & pushed to topic`);
+        this.logger.info(`Deleted Operation: ${operation.name} & pushed to topic`);
         return operation;
     }
 }
