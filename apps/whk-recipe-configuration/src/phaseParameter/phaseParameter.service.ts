@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import {BadRequestException, Injectable} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { PhaseParameterServiceBase } from "./base/phaseParameter.service.base";
 import {PinoLogger} from "nestjs-pino";
