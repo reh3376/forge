@@ -68,7 +68,7 @@ class ItemReceiptWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  glabalId?: StringNullableFilter;
+  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
