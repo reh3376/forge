@@ -53,7 +53,7 @@ class ItemReceiptCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  glabalId?: string | null;
+  globalId?: string | null;
 
   @ApiProperty({
     required: true,
