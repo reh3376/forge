@@ -520,7 +520,7 @@ model ItemReceipt {
   createdAt       DateTime               @default(now())
   createdBy       String
   driver          String
-  glabalId        String?                @unique @default(cuid())
+  globalId        String?                @unique @default(cuid())
   id              String                 @id @default(cuid())
   item            Item                   @relation(fields: [itemId], references: [id])
   itemId          String
