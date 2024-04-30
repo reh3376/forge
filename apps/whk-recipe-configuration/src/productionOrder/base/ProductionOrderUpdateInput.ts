@@ -84,7 +84,7 @@ class ProductionOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  customer?: string | null;
+  customer?: string;
 
   @ApiProperty({
     required: false,

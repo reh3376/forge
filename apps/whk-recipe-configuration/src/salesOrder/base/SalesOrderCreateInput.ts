@@ -46,6 +46,14 @@ class SalesOrderCreateInput {
   createdBy!: string;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  customer!: string;
+
+  @ApiProperty({
     required: false,
     type: String,
   })

@@ -66,6 +66,14 @@ class ProductionSchedule {
   createdBy!: string | null;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  customer!: string;
+
+  @ApiProperty({
     required: false,
     type: Number,
   })

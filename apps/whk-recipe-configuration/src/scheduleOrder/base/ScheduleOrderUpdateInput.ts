@@ -43,6 +43,16 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  customers?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
