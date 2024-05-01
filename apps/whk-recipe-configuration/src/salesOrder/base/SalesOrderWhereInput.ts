@@ -59,6 +59,17 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  customer?: StringFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)

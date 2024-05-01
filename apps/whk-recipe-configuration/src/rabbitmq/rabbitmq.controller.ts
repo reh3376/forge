@@ -35,6 +35,7 @@ export class RabbitMQController {
       @Ctx()
           context: RmqContext
   ): Promise<void> {
+    this.logger.debug('Received event', message);
     await this.processEvent(message, context);
   }
 

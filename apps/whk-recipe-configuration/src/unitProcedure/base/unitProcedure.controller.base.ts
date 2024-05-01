@@ -689,6 +689,7 @@ export class UnitProcedureControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        customer: true,
         customerId: true,
         globalId: true,
         id: true,
