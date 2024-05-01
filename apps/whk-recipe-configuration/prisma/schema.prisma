@@ -203,6 +203,7 @@ model Recipe {
   active           Boolean?          @default(true)
   createdAt        DateTime          @default(now())
   createdBy        String
+  customer         String
   customerId       String
   globalId         String?           @unique @default(cuid())
   id               String            @id @default(cuid())
@@ -305,7 +306,7 @@ model ProductionOrder {
   complete        Boolean?                   @default(false)
   createdAt       DateTime                   @default(now())
   createdBy       String
-  customer        String?
+  customer        String
   endDate         DateTime?
   globalId        String?                    @default(cuid())
   id              String                     @id @default(cuid())
@@ -331,6 +332,7 @@ model ProductionOrder {
 model ScheduleOrder {
   createdAt                    DateTime                 @default(now())
   createdBy                    String?
+  customers                    Json?
   estimatedDistillationTime    Int?
   estimatedFermentationTime    Int?
   estimatedMashingTime         Int?
@@ -392,6 +394,7 @@ model ProductionSchedule {
   actualStart     DateTime?
   createdAt       DateTime            @default(now())
   createdBy       String?
+  customer        String
   duration        Int?
   estimatedEnd    DateTime?
   estimatedStart  DateTime?
@@ -410,6 +413,7 @@ model Account {
   address        String
   createdAt      DateTime        @default(now())
   createdBy      String
+  customerCode   String?
   description    String?
   editedBy       String?
   email          String?
@@ -465,6 +469,7 @@ model SalesOrder {
   accountId        String?
   createdAt        DateTime                @default(now())
   createdBy        String
+  customer         String
   globalId         String?                 @unique @default(cuid())
   id               String                  @id @default(cuid())
   itemId           String

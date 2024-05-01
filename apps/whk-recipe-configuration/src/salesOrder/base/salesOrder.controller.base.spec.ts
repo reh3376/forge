@@ -20,6 +20,7 @@ const existingId = "existingId";
 const CREATE_INPUT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  customer: "exampleCustomer",
   globalId: "exampleGlobalId",
   id: "exampleId",
   itemId: "exampleItemId",
@@ -32,6 +33,7 @@ const CREATE_INPUT = {
 const CREATE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  customer: "exampleCustomer",
   globalId: "exampleGlobalId",
   id: "exampleId",
   itemId: "exampleItemId",
@@ -45,6 +47,7 @@ const FIND_MANY_RESULT = [
   {
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
+    customer: "exampleCustomer",
     globalId: "exampleGlobalId",
     id: "exampleId",
     itemId: "exampleItemId",
@@ -58,6 +61,7 @@ const FIND_MANY_RESULT = [
 const FIND_ONE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  customer: "exampleCustomer",
   globalId: "exampleGlobalId",
   id: "exampleId",
   itemId: "exampleItemId",

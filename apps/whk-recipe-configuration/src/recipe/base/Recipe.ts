@@ -60,6 +60,14 @@ class Recipe {
   })
   @IsString()
   @Field(() => String)
+  customer!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
   customerId!: string;
 
   @ApiProperty({
