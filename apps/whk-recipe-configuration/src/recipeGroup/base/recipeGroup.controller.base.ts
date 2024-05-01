@@ -379,6 +379,7 @@ export class RecipeGroupControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        customer: true,
         customerId: true,
         globalId: true,
         id: true,
@@ -490,6 +491,7 @@ export class RecipeGroupControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        customers: true,
         estimatedDistillationTime: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,

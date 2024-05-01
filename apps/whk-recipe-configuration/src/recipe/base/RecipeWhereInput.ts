@@ -56,6 +56,17 @@ class RecipeWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
+  customer?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
   customerId?: StringFilter;
 
   @ApiProperty({
