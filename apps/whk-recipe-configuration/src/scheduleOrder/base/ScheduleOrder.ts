@@ -52,6 +52,16 @@ class ScheduleOrder {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  customers!: JsonValue;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
