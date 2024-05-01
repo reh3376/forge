@@ -31,9 +31,19 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
     async updateItemReceipt<T extends Prisma.ItemReceiptUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ItemReceiptUpdateArgs>): Promise<import(".prisma/client").ItemReceipt> {
       const itemReceipt = await super.updateItemReceipt(args);
 
+      // use the id from the update to get the record in the form we want for the message publishing
+      const itemReceiptPayload = await this.prisma.itemReceipt.findUnique({
+          where: {id: itemReceipt.id},
+          include: {
+            purchaseOrder: true,
+            item: true,
+            tests: true,
+          }
+      });
+
       await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
         event_type: 'update',
-        data: itemReceipt,
+        data: itemReceiptPayload,
         recordName: 'ItemReceipt',
       });
         this.logger.info(`Updated ItemReceipt: ${itemReceipt.id} & pushed to topic`)
