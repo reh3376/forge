@@ -70,15 +70,12 @@ class ProductionOrderCreateInput {
   createdBy!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  customer?: string | null;
+  @Field(() => String)
+  customer!: string;
 
   @ApiProperty({
     required: false,

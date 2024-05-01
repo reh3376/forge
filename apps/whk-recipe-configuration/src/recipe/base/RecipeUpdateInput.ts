@@ -58,6 +58,17 @@ class RecipeUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
+  customer?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
   customerId?: string;
 
   @ApiProperty({
