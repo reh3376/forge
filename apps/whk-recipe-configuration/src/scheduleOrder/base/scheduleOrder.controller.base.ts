@@ -74,6 +74,7 @@ export class ScheduleOrderControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        customers: true,
         estimatedDistillationTime: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
@@ -133,6 +134,7 @@ export class ScheduleOrderControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        customers: true,
         estimatedDistillationTime: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
@@ -191,6 +193,7 @@ export class ScheduleOrderControllerBase {
       select: {
         createdAt: true,
         createdBy: true,
+        customers: true,
         estimatedDistillationTime: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
@@ -276,6 +279,7 @@ export class ScheduleOrderControllerBase {
         select: {
           createdAt: true,
           createdBy: true,
+          customers: true,
           estimatedDistillationTime: true,
           estimatedFermentationTime: true,
           estimatedMashingTime: true,
@@ -342,6 +346,7 @@ export class ScheduleOrderControllerBase {
         select: {
           createdAt: true,
           createdBy: true,
+          customers: true,
           estimatedDistillationTime: true,
           estimatedFermentationTime: true,
           estimatedMashingTime: true,

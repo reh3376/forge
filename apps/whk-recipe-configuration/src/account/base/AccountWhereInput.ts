@@ -64,6 +64,17 @@ class AccountWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
+  customerCode?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
   description?: StringNullableFilter;
 
   @ApiProperty({
