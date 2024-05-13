@@ -10,51 +10,48 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-
 import {
   Prisma,
-  Lot, // @ts-ignore
-  PurchaseOrder,
+  Lot as PrismaLot,
+  PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
 export class LotServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.LotCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.LotCountArgs>
-  ): Promise<number> {
+  async count(args: Omit<Prisma.LotCountArgs, "select">): Promise<number> {
     return this.prisma.lot.count(args);
   }
 
   async lots<T extends Prisma.LotFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotFindManyArgs>
-  ): Promise<Lot[]> {
-    return this.prisma.lot.findMany(args);
+  ): Promise<PrismaLot[]> {
+    return this.prisma.lot.findMany<Prisma.LotFindManyArgs>(args);
   }
   async lot<T extends Prisma.LotFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotFindUniqueArgs>
-  ): Promise<Lot | null> {
+  ): Promise<PrismaLot | null> {
     return this.prisma.lot.findUnique(args);
   }
   async createLot<T extends Prisma.LotCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotCreateArgs>
-  ): Promise<Lot> {
+  ): Promise<PrismaLot> {
     return this.prisma.lot.create<T>(args);
   }
   async updateLot<T extends Prisma.LotUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>
-  ): Promise<Lot> {
+  ): Promise<PrismaLot> {
     return this.prisma.lot.update<T>(args);
   }
   async deleteLot<T extends Prisma.LotDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotDeleteArgs>
-  ): Promise<Lot> {
+  ): Promise<PrismaLot> {
     return this.prisma.lot.delete(args);
   }
 
   async getPurchaseOrderAcceptedLots(
     parentId: string
-  ): Promise<PurchaseOrder | null> {
+  ): Promise<PrismaPurchaseOrder | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
