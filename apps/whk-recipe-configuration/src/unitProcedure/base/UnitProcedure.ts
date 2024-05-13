@@ -26,6 +26,7 @@ import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { Operation } from "../../operation/base/Operation";
 import { Procedure } from "../../procedure/base/Procedure";
 import { Recipe } from "../../recipe/base/Recipe";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 
 @ObjectType()
 class UnitProcedure {
@@ -195,6 +196,15 @@ class UnitProcedure {
     nullable: true,
   })
   revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueue,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueue)
+  @IsOptional()
+  scheduleOrderQueues?: ScheduleOrderQueue | null;
 
   @ApiProperty({
     required: false,

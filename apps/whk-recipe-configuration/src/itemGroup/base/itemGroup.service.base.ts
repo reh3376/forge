@@ -10,52 +10,51 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-
 import {
   Prisma,
-  ItemGroup, // @ts-ignore
-  Item,
+  ItemGroup as PrismaItemGroup,
+  Item as PrismaItem,
 } from "@prisma/client";
 
 export class ItemGroupServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.ItemGroupCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemGroupCountArgs>
+  async count(
+    args: Omit<Prisma.ItemGroupCountArgs, "select">
   ): Promise<number> {
     return this.prisma.itemGroup.count(args);
   }
 
   async itemGroups<T extends Prisma.ItemGroupFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemGroupFindManyArgs>
-  ): Promise<ItemGroup[]> {
-    return this.prisma.itemGroup.findMany(args);
+  ): Promise<PrismaItemGroup[]> {
+    return this.prisma.itemGroup.findMany<Prisma.ItemGroupFindManyArgs>(args);
   }
   async itemGroup<T extends Prisma.ItemGroupFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemGroupFindUniqueArgs>
-  ): Promise<ItemGroup | null> {
+  ): Promise<PrismaItemGroup | null> {
     return this.prisma.itemGroup.findUnique(args);
   }
   async createItemGroup<T extends Prisma.ItemGroupCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemGroupCreateArgs>
-  ): Promise<ItemGroup> {
+  ): Promise<PrismaItemGroup> {
     return this.prisma.itemGroup.create<T>(args);
   }
   async updateItemGroup<T extends Prisma.ItemGroupUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemGroupUpdateArgs>
-  ): Promise<ItemGroup> {
+  ): Promise<PrismaItemGroup> {
     return this.prisma.itemGroup.update<T>(args);
   }
   async deleteItemGroup<T extends Prisma.ItemGroupDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemGroupDeleteArgs>
-  ): Promise<ItemGroup> {
+  ): Promise<PrismaItemGroup> {
     return this.prisma.itemGroup.delete(args);
   }
 
   async findItems(
     parentId: string,
     args: Prisma.ItemFindManyArgs
-  ): Promise<Item[]> {
+  ): Promise<PrismaItem[]> {
     return this.prisma.itemGroup
       .findUniqueOrThrow({
         where: { id: parentId },
