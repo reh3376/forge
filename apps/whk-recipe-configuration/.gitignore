@@ -20,3 +20,5 @@ prisma/migrations/*
 .flaskenv*
 !.env.project
 !.env.vault
+
+newrelic.js
