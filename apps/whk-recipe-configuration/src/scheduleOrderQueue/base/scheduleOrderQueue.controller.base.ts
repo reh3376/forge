@@ -52,6 +52,10 @@ export class ScheduleOrderQueueControllerBase {
       data: {
         ...data,
 
+        nextUnitProcedure: {
+          connect: data.nextUnitProcedure,
+        },
+
         productionSchedule: data.productionSchedule
           ? {
               connect: data.productionSchedule,
@@ -63,6 +67,12 @@ export class ScheduleOrderQueueControllerBase {
         createdBy: true,
         globalId: true,
         id: true,
+
+        nextUnitProcedure: {
+          select: {
+            id: true,
+          },
+        },
 
         productionSchedule: {
           select: {
@@ -102,6 +112,12 @@ export class ScheduleOrderQueueControllerBase {
         globalId: true,
         id: true,
 
+        nextUnitProcedure: {
+          select: {
+            id: true,
+          },
+        },
+
         productionSchedule: {
           select: {
             id: true,
@@ -138,6 +154,12 @@ export class ScheduleOrderQueueControllerBase {
         createdBy: true,
         globalId: true,
         id: true,
+
+        nextUnitProcedure: {
+          select: {
+            id: true,
+          },
+        },
 
         productionSchedule: {
           select: {
@@ -181,6 +203,10 @@ export class ScheduleOrderQueueControllerBase {
         data: {
           ...data,
 
+          nextUnitProcedure: {
+            connect: data.nextUnitProcedure,
+          },
+
           productionSchedule: data.productionSchedule
             ? {
                 connect: data.productionSchedule,
@@ -192,6 +218,12 @@ export class ScheduleOrderQueueControllerBase {
           createdBy: true,
           globalId: true,
           id: true,
+
+          nextUnitProcedure: {
+            select: {
+              id: true,
+            },
+          },
 
           productionSchedule: {
             select: {

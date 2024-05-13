@@ -13,54 +13,56 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  PurchaseOrder, // @ts-ignore
-  Lot, // @ts-ignore
-  ItemReceipt, // @ts-ignore
-  TestParameter, // @ts-ignore
-  Account, // @ts-ignore
-  Asset, // @ts-ignore
-  Item,
+  PurchaseOrder as PrismaPurchaseOrder,
+  Lot as PrismaLot,
+  ItemReceipt as PrismaItemReceipt,
+  TestParameter as PrismaTestParameter,
+  Account as PrismaAccount,
+  Asset as PrismaAsset,
+  Item as PrismaItem,
 } from "@prisma/client";
 
 export class PurchaseOrderServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.PurchaseOrderCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PurchaseOrderCountArgs>
+  async count(
+    args: Omit<Prisma.PurchaseOrderCountArgs, "select">
   ): Promise<number> {
     return this.prisma.purchaseOrder.count(args);
   }
 
   async purchaseOrders<T extends Prisma.PurchaseOrderFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.PurchaseOrderFindManyArgs>
-  ): Promise<PurchaseOrder[]> {
-    return this.prisma.purchaseOrder.findMany(args);
+  ): Promise<PrismaPurchaseOrder[]> {
+    return this.prisma.purchaseOrder.findMany<Prisma.PurchaseOrderFindManyArgs>(
+      args
+    );
   }
   async purchaseOrder<T extends Prisma.PurchaseOrderFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.PurchaseOrderFindUniqueArgs>
-  ): Promise<PurchaseOrder | null> {
+  ): Promise<PrismaPurchaseOrder | null> {
     return this.prisma.purchaseOrder.findUnique(args);
   }
   async createPurchaseOrder<T extends Prisma.PurchaseOrderCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.PurchaseOrderCreateArgs>
-  ): Promise<PurchaseOrder> {
+  ): Promise<PrismaPurchaseOrder> {
     return this.prisma.purchaseOrder.create<T>(args);
   }
   async updatePurchaseOrder<T extends Prisma.PurchaseOrderUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.PurchaseOrderUpdateArgs>
-  ): Promise<PurchaseOrder> {
+  ): Promise<PrismaPurchaseOrder> {
     return this.prisma.purchaseOrder.update<T>(args);
   }
   async deletePurchaseOrder<T extends Prisma.PurchaseOrderDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.PurchaseOrderDeleteArgs>
-  ): Promise<PurchaseOrder> {
+  ): Promise<PrismaPurchaseOrder> {
     return this.prisma.purchaseOrder.delete(args);
   }
 
   async findAcceptedLots(
     parentId: string,
     args: Prisma.LotFindManyArgs
-  ): Promise<Lot[]> {
+  ): Promise<PrismaLot[]> {
     return this.prisma.purchaseOrder
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -71,7 +73,7 @@ export class PurchaseOrderServiceBase {
   async findItemReceipts(
     parentId: string,
     args: Prisma.ItemReceiptFindManyArgs
-  ): Promise<ItemReceipt[]> {
+  ): Promise<PrismaItemReceipt[]> {
     return this.prisma.purchaseOrder
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -82,7 +84,7 @@ export class PurchaseOrderServiceBase {
   async findLotsRejected(
     parentId: string,
     args: Prisma.PurchaseOrderFindManyArgs
-  ): Promise<PurchaseOrder[]> {
+  ): Promise<PrismaPurchaseOrder[]> {
     return this.prisma.purchaseOrder
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -93,7 +95,7 @@ export class PurchaseOrderServiceBase {
   async findQualityTests(
     parentId: string,
     args: Prisma.TestParameterFindManyArgs
-  ): Promise<TestParameter[]> {
+  ): Promise<PrismaTestParameter[]> {
     return this.prisma.purchaseOrder
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -101,7 +103,7 @@ export class PurchaseOrderServiceBase {
       .qualityTests(args);
   }
 
-  async getAccount(parentId: string): Promise<Account | null> {
+  async getAccount(parentId: string): Promise<PrismaAccount | null> {
     return this.prisma.purchaseOrder
       .findUnique({
         where: { id: parentId },
@@ -109,7 +111,7 @@ export class PurchaseOrderServiceBase {
       .account();
   }
 
-  async getAsset(parentId: string): Promise<Asset | null> {
+  async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.purchaseOrder
       .findUnique({
         where: { id: parentId },
@@ -117,7 +119,7 @@ export class PurchaseOrderServiceBase {
       .asset();
   }
 
-  async getItem(parentId: string): Promise<Item | null> {
+  async getItem(parentId: string): Promise<PrismaItem | null> {
     return this.prisma.purchaseOrder
       .findUnique({
         where: { id: parentId },
@@ -127,7 +129,7 @@ export class PurchaseOrderServiceBase {
 
   async getPurchaseOrderRejectedLots(
     parentId: string
-  ): Promise<PurchaseOrder | null> {
+  ): Promise<PrismaPurchaseOrder | null> {
     return this.prisma.purchaseOrder
       .findUnique({
         where: { id: parentId },
