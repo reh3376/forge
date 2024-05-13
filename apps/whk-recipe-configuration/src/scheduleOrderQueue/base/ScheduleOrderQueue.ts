@@ -19,6 +19,7 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 
 @ObjectType()
@@ -57,6 +58,14 @@ class ScheduleOrderQueue {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => UnitProcedure,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  nextUnitProcedure?: UnitProcedure;
 
   @ApiProperty({
     required: false,
