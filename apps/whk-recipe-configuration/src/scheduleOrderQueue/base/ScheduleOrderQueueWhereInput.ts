@@ -15,6 +15,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
@@ -52,6 +53,18 @@ class ScheduleOrderQueueWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  nextUnitProcedure?: UnitProcedureWhereUniqueInput;
 
   @ApiProperty({
     required: false,

@@ -522,6 +522,13 @@ export class BomControllerBase {
         },
 
         revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -653,6 +660,13 @@ export class BomControllerBase {
         },
 
         revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
