@@ -79,6 +79,12 @@ export class UnitProcedureControllerBase {
         procedure: {
           connect: data.procedure,
         },
+
+        scheduleOrderQueues: data.scheduleOrderQueues
+          ? {
+              connect: data.scheduleOrderQueues,
+            }
+          : undefined,
       },
       select: {
         active: true,
@@ -117,6 +123,13 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -179,6 +192,13 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -240,6 +260,13 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -296,6 +323,12 @@ export class UnitProcedureControllerBase {
           procedure: {
             connect: data.procedure,
           },
+
+          scheduleOrderQueues: data.scheduleOrderQueues
+            ? {
+                connect: data.scheduleOrderQueues,
+              }
+            : undefined,
         },
         select: {
           active: true,
@@ -334,6 +367,13 @@ export class UnitProcedureControllerBase {
           },
 
           revision: true,
+
+          scheduleOrderQueues: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,
@@ -403,6 +443,13 @@ export class UnitProcedureControllerBase {
           },
 
           revision: true,
+
+          scheduleOrderQueues: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,
@@ -470,6 +517,13 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,

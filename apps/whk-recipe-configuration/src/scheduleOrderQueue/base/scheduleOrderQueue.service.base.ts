@@ -13,48 +13,61 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  ScheduleOrderQueue, // @ts-ignore
-  ProductionSchedule,
+  ScheduleOrderQueue as PrismaScheduleOrderQueue,
+  UnitProcedure as PrismaUnitProcedure,
+  ProductionSchedule as PrismaProductionSchedule,
 } from "@prisma/client";
 
 export class ScheduleOrderQueueServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.ScheduleOrderQueueCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueCountArgs>
+  async count(
+    args: Omit<Prisma.ScheduleOrderQueueCountArgs, "select">
   ): Promise<number> {
     return this.prisma.scheduleOrderQueue.count(args);
   }
 
   async scheduleOrderQueues<T extends Prisma.ScheduleOrderQueueFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueFindManyArgs>
-  ): Promise<ScheduleOrderQueue[]> {
-    return this.prisma.scheduleOrderQueue.findMany(args);
+  ): Promise<PrismaScheduleOrderQueue[]> {
+    return this.prisma.scheduleOrderQueue.findMany<Prisma.ScheduleOrderQueueFindManyArgs>(
+      args
+    );
   }
   async scheduleOrderQueue<T extends Prisma.ScheduleOrderQueueFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueFindUniqueArgs>
-  ): Promise<ScheduleOrderQueue | null> {
+  ): Promise<PrismaScheduleOrderQueue | null> {
     return this.prisma.scheduleOrderQueue.findUnique(args);
   }
   async createScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueCreateArgs>
-  ): Promise<ScheduleOrderQueue> {
+  ): Promise<PrismaScheduleOrderQueue> {
     return this.prisma.scheduleOrderQueue.create<T>(args);
   }
   async updateScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>
-  ): Promise<ScheduleOrderQueue> {
+  ): Promise<PrismaScheduleOrderQueue> {
     return this.prisma.scheduleOrderQueue.update<T>(args);
   }
   async deleteScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueDeleteArgs>
-  ): Promise<ScheduleOrderQueue> {
+  ): Promise<PrismaScheduleOrderQueue> {
     return this.prisma.scheduleOrderQueue.delete(args);
+  }
+
+  async getNextUnitProcedure(
+    parentId: string
+  ): Promise<PrismaUnitProcedure | null> {
+    return this.prisma.scheduleOrderQueue
+      .findUnique({
+        where: { id: parentId },
+      })
+      .nextUnitProcedure();
   }
 
   async getProductionSchedule(
     parentId: string
-  ): Promise<ProductionSchedule | null> {
+  ): Promise<PrismaProductionSchedule | null> {
     return this.prisma.scheduleOrderQueue
       .findUnique({
         where: { id: parentId },
