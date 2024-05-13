@@ -13,53 +13,51 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  Item, // @ts-ignore
-  Bom, // @ts-ignore
-  ItemReceipt, // @ts-ignore
-  ProductionOrder, // @ts-ignore
-  PurchaseOrder, // @ts-ignore
-  ItemGroup,
+  Item as PrismaItem,
+  Bom as PrismaBom,
+  ItemReceipt as PrismaItemReceipt,
+  ProductionOrder as PrismaProductionOrder,
+  PurchaseOrder as PrismaPurchaseOrder,
+  ItemGroup as PrismaItemGroup,
 } from "@prisma/client";
 
 export class ItemServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.ItemCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemCountArgs>
-  ): Promise<number> {
+  async count(args: Omit<Prisma.ItemCountArgs, "select">): Promise<number> {
     return this.prisma.item.count(args);
   }
 
   async items<T extends Prisma.ItemFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemFindManyArgs>
-  ): Promise<Item[]> {
-    return this.prisma.item.findMany(args);
+  ): Promise<PrismaItem[]> {
+    return this.prisma.item.findMany<Prisma.ItemFindManyArgs>(args);
   }
   async item<T extends Prisma.ItemFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemFindUniqueArgs>
-  ): Promise<Item | null> {
+  ): Promise<PrismaItem | null> {
     return this.prisma.item.findUnique(args);
   }
   async createItem<T extends Prisma.ItemCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemCreateArgs>
-  ): Promise<Item> {
+  ): Promise<PrismaItem> {
     return this.prisma.item.create<T>(args);
   }
   async updateItem<T extends Prisma.ItemUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemUpdateArgs>
-  ): Promise<Item> {
+  ): Promise<PrismaItem> {
     return this.prisma.item.update<T>(args);
   }
   async deleteItem<T extends Prisma.ItemDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemDeleteArgs>
-  ): Promise<Item> {
+  ): Promise<PrismaItem> {
     return this.prisma.item.delete(args);
   }
 
   async findBomsWipItem(
     parentId: string,
     args: Prisma.BomFindManyArgs
-  ): Promise<Bom[]> {
+  ): Promise<PrismaBom[]> {
     return this.prisma.item
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -70,7 +68,7 @@ export class ItemServiceBase {
   async findBomWipItems(
     parentId: string,
     args: Prisma.BomFindManyArgs
-  ): Promise<Bom[]> {
+  ): Promise<PrismaBom[]> {
     return this.prisma.item
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -81,7 +79,7 @@ export class ItemServiceBase {
   async findItemReceipts(
     parentId: string,
     args: Prisma.ItemReceiptFindManyArgs
-  ): Promise<ItemReceipt[]> {
+  ): Promise<PrismaItemReceipt[]> {
     return this.prisma.item
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -92,7 +90,7 @@ export class ItemServiceBase {
   async findProductionOrders(
     parentId: string,
     args: Prisma.ProductionOrderFindManyArgs
-  ): Promise<ProductionOrder[]> {
+  ): Promise<PrismaProductionOrder[]> {
     return this.prisma.item
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -103,7 +101,7 @@ export class ItemServiceBase {
   async findPurchaseOrders(
     parentId: string,
     args: Prisma.PurchaseOrderFindManyArgs
-  ): Promise<PurchaseOrder[]> {
+  ): Promise<PrismaPurchaseOrder[]> {
     return this.prisma.item
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -111,7 +109,7 @@ export class ItemServiceBase {
       .purchaseOrders(args);
   }
 
-  async getItemGroup(parentId: string): Promise<ItemGroup | null> {
+  async getItemGroup(parentId: string): Promise<PrismaItemGroup | null> {
     return this.prisma.item
       .findUnique({
         where: { id: parentId },

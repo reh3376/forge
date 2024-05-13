@@ -25,6 +25,7 @@ import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs
 import { ScheduleOrderQueueFindUniqueArgs } from "./ScheduleOrderQueueFindUniqueArgs";
 import { CreateScheduleOrderQueueArgs } from "./CreateScheduleOrderQueueArgs";
 import { UpdateScheduleOrderQueueArgs } from "./UpdateScheduleOrderQueueArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -95,6 +96,10 @@ export class ScheduleOrderQueueResolverBase {
       data: {
         ...args.data,
 
+        nextUnitProcedure: {
+          connect: args.data.nextUnitProcedure,
+        },
+
         productionSchedule: args.data.productionSchedule
           ? {
               connect: args.data.productionSchedule,
@@ -120,6 +125,10 @@ export class ScheduleOrderQueueResolverBase {
         data: {
           ...args.data,
 
+          nextUnitProcedure: {
+            connect: args.data.nextUnitProcedure,
+          },
+
           productionSchedule: args.data.productionSchedule
             ? {
                 connect: args.data.productionSchedule,
@@ -135,6 +144,27 @@ export class ScheduleOrderQueueResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => UnitProcedure, {
+    nullable: true,
+    name: "nextUnitProcedure",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async getNextUnitProcedure(
+    @graphql.Parent() parent: ScheduleOrderQueue
+  ): Promise<UnitProcedure | null> {
+    const result = await this.service.getNextUnitProcedure(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

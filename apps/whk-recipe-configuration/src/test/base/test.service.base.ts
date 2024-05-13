@@ -10,52 +10,49 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-
 import {
   Prisma,
-  Test, // @ts-ignore
-  ItemReceipt,
+  Test as PrismaTest,
+  ItemReceipt as PrismaItemReceipt,
 } from "@prisma/client";
 
 export class TestServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.TestCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestCountArgs>
-  ): Promise<number> {
+  async count(args: Omit<Prisma.TestCountArgs, "select">): Promise<number> {
     return this.prisma.test.count(args);
   }
 
   async tests<T extends Prisma.TestFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestFindManyArgs>
-  ): Promise<Test[]> {
-    return this.prisma.test.findMany(args);
+  ): Promise<PrismaTest[]> {
+    return this.prisma.test.findMany<Prisma.TestFindManyArgs>(args);
   }
   async test<T extends Prisma.TestFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestFindUniqueArgs>
-  ): Promise<Test | null> {
+  ): Promise<PrismaTest | null> {
     return this.prisma.test.findUnique(args);
   }
   async createTest<T extends Prisma.TestCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestCreateArgs>
-  ): Promise<Test> {
+  ): Promise<PrismaTest> {
     return this.prisma.test.create<T>(args);
   }
   async updateTest<T extends Prisma.TestUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestUpdateArgs>
-  ): Promise<Test> {
+  ): Promise<PrismaTest> {
     return this.prisma.test.update<T>(args);
   }
   async deleteTest<T extends Prisma.TestDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.TestDeleteArgs>
-  ): Promise<Test> {
+  ): Promise<PrismaTest> {
     return this.prisma.test.delete(args);
   }
 
   async findInstances(
     parentId: string,
     args: Prisma.TestFindManyArgs
-  ): Promise<Test[]> {
+  ): Promise<PrismaTest[]> {
     return this.prisma.test
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -63,7 +60,7 @@ export class TestServiceBase {
       .instances(args);
   }
 
-  async getClassId(parentId: string): Promise<Test | null> {
+  async getClassId(parentId: string): Promise<PrismaTest | null> {
     return this.prisma.test
       .findUnique({
         where: { id: parentId },
@@ -71,7 +68,7 @@ export class TestServiceBase {
       .classId();
   }
 
-  async getItemReceipt(parentId: string): Promise<ItemReceipt | null> {
+  async getItemReceipt(parentId: string): Promise<PrismaItemReceipt | null> {
     return this.prisma.test
       .findUnique({
         where: { id: parentId },
