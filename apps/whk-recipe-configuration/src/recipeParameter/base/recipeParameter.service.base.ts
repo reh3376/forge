@@ -10,47 +10,52 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, RecipeParameter } from "@prisma/client";
+import {
+  Prisma,
+  RecipeParameter as PrismaRecipeParameter,
+} from "@prisma/client";
 
 export class RecipeParameterServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.RecipeParameterCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeParameterCountArgs>
+  async count(
+    args: Omit<Prisma.RecipeParameterCountArgs, "select">
   ): Promise<number> {
     return this.prisma.recipeParameter.count(args);
   }
 
   async recipeParameters<T extends Prisma.RecipeParameterFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeParameterFindManyArgs>
-  ): Promise<RecipeParameter[]> {
-    return this.prisma.recipeParameter.findMany(args);
+  ): Promise<PrismaRecipeParameter[]> {
+    return this.prisma.recipeParameter.findMany<Prisma.RecipeParameterFindManyArgs>(
+      args
+    );
   }
   async recipeParameter<T extends Prisma.RecipeParameterFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeParameterFindUniqueArgs>
-  ): Promise<RecipeParameter | null> {
+  ): Promise<PrismaRecipeParameter | null> {
     return this.prisma.recipeParameter.findUnique(args);
   }
   async createRecipeParameter<T extends Prisma.RecipeParameterCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeParameterCreateArgs>
-  ): Promise<RecipeParameter> {
+  ): Promise<PrismaRecipeParameter> {
     return this.prisma.recipeParameter.create<T>(args);
   }
   async updateRecipeParameter<T extends Prisma.RecipeParameterUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeParameterUpdateArgs>
-  ): Promise<RecipeParameter> {
+  ): Promise<PrismaRecipeParameter> {
     return this.prisma.recipeParameter.update<T>(args);
   }
   async deleteRecipeParameter<T extends Prisma.RecipeParameterDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.RecipeParameterDeleteArgs>
-  ): Promise<RecipeParameter> {
+  ): Promise<PrismaRecipeParameter> {
     return this.prisma.recipeParameter.delete(args);
   }
 
   async findRecipeParameters(
     parentId: string,
     args: Prisma.RecipeParameterFindManyArgs
-  ): Promise<RecipeParameter[]> {
+  ): Promise<PrismaRecipeParameter[]> {
     return this.prisma.recipeParameter
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -58,7 +63,7 @@ export class RecipeParameterServiceBase {
       .recipeParameters(args);
   }
 
-  async getClassId(parentId: string): Promise<RecipeParameter | null> {
+  async getClassId(parentId: string): Promise<PrismaRecipeParameter | null> {
     return this.prisma.recipeParameter
       .findUnique({
         where: { id: parentId },
