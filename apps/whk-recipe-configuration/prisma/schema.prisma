@@ -243,42 +243,45 @@ model Bom {
 }
 
 model ScheduleOrderQueue {
-  createdAt          DateTime            @default(now())
-  createdBy          String
-  globalId           String?             @unique @default(cuid())
-  id                 String              @id @default(cuid())
-  productionSchedule ProductionSchedule?
-  queueIndex         Int?                @unique
-  schemaVersion      String?             @default("0001-b")
-  updatedAt          DateTime            @updatedAt
-  updatedBy          String?
+  createdAt           DateTime            @default(now())
+  createdBy           String
+  globalId            String?             @unique @default(cuid())
+  id                  String              @id @default(cuid())
+  nextUnitProcedure   UnitProcedure       @relation(fields: [nextUnitProcedureId], references: [id])
+  nextUnitProcedureId String              @unique
+  productionSchedule  ProductionSchedule?
+  queueIndex          Int?                @unique
+  schemaVersion       String?             @default("0001-b")
+  updatedAt           DateTime            @updatedAt
+  updatedBy           String?
 }
 
 model UnitProcedure {
-  active        Boolean?              @default(true)
-  boms          Bom?                  @relation(name: "BomsOnUnitProcedure", fields: [bomsId], references: [id])
-  bomsId        String?
-  classId       UnitProcedure?        @relation(name: "UnitProcedureClassIdUnitProcedureInstances", fields: [classIdId], references: [id])
-  classIdId     String?
-  createdAt     DateTime              @default(now())
-  createdBy     String
-  description   String?
-  globalId      String?               @unique @default(cuid())
-  id            String                @id @default(cuid())
-  instances     UnitProcedure[]       @relation(name: "UnitProcedureClassIdUnitProcedureInstances")
-  isClassDef    Boolean?              @default(false)
-  name          EnumUnitProcedureName
-  operations    Operation[]
-  path          String?
-  primaryBom    Bom?                  @relation(name: "primaryBom", fields: [primaryBomId], references: [id])
-  primaryBomId  String?
-  procedure     Procedure             @relation(fields: [procedureId], references: [id])
-  procedureId   String
-  recipe        Recipe[]
-  revision      Int?                  @default(0)
-  schemaVersion String?               @default("0001-b")
-  updatedAt     DateTime              @updatedAt
-  updatedBy     String?
+  active              Boolean?              @default(true)
+  boms                Bom?                  @relation(name: "BomsOnUnitProcedure", fields: [bomsId], references: [id])
+  bomsId              String?
+  classId             UnitProcedure?        @relation(name: "UnitProcedureClassIdUnitProcedureInstances", fields: [classIdId], references: [id])
+  classIdId           String?
+  createdAt           DateTime              @default(now())
+  createdBy           String
+  description         String?
+  globalId            String?               @unique @default(cuid())
+  id                  String                @id @default(cuid())
+  instances           UnitProcedure[]       @relation(name: "UnitProcedureClassIdUnitProcedureInstances")
+  isClassDef          Boolean?              @default(false)
+  name                EnumUnitProcedureName
+  operations          Operation[]
+  path                String?
+  primaryBom          Bom?                  @relation(name: "primaryBom", fields: [primaryBomId], references: [id])
+  primaryBomId        String?
+  procedure           Procedure             @relation(fields: [procedureId], references: [id])
+  procedureId         String
+  recipe              Recipe[]
+  revision            Int?                  @default(0)
+  scheduleOrderQueues ScheduleOrderQueue?
+  schemaVersion       String?               @default("0001-b")
+  updatedAt           DateTime              @updatedAt
+  updatedBy           String?
 
   @@unique([name, revision, active])
 }
