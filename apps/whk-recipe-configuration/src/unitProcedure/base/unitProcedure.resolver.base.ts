@@ -32,6 +32,7 @@ import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { Bom } from "../../bom/base/Bom";
 import { Procedure } from "../../procedure/base/Procedure";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { UnitProcedureService } from "../unitProcedure.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => UnitProcedure)
@@ -122,6 +123,12 @@ export class UnitProcedureResolverBase {
         procedure: {
           connect: args.data.procedure,
         },
+
+        scheduleOrderQueues: args.data.scheduleOrderQueues
+          ? {
+              connect: args.data.scheduleOrderQueues,
+            }
+          : undefined,
       },
     });
   }
@@ -163,6 +170,12 @@ export class UnitProcedureResolverBase {
           procedure: {
             connect: args.data.procedure,
           },
+
+          scheduleOrderQueues: args.data.scheduleOrderQueues
+            ? {
+                connect: args.data.scheduleOrderQueues,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -331,6 +344,27 @@ export class UnitProcedureResolverBase {
     @graphql.Parent() parent: UnitProcedure
   ): Promise<Procedure | null> {
     const result = await this.service.getProcedure(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ScheduleOrderQueue, {
+    nullable: true,
+    name: "scheduleOrderQueues",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async getScheduleOrderQueues(
+    @graphql.Parent() parent: UnitProcedure
+  ): Promise<ScheduleOrderQueue | null> {
+    const result = await this.service.getScheduleOrderQueues(parent.id);
 
     if (!result) {
       return null;

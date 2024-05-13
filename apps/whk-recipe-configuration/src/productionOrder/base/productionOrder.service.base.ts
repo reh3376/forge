@@ -13,54 +13,56 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  ProductionOrder, // @ts-ignore
-  Bom, // @ts-ignore
-  Item, // @ts-ignore
-  Recipe, // @ts-ignore
-  RecipeGroup, // @ts-ignore
-  SalesOrder, // @ts-ignore
-  ScheduleOrder,
+  ProductionOrder as PrismaProductionOrder,
+  Bom as PrismaBom,
+  Item as PrismaItem,
+  Recipe as PrismaRecipe,
+  RecipeGroup as PrismaRecipeGroup,
+  SalesOrder as PrismaSalesOrder,
+  ScheduleOrder as PrismaScheduleOrder,
 } from "@prisma/client";
 
 export class ProductionOrderServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.ProductionOrderCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderCountArgs>
+  async count(
+    args: Omit<Prisma.ProductionOrderCountArgs, "select">
   ): Promise<number> {
     return this.prisma.productionOrder.count(args);
   }
 
   async productionOrders<T extends Prisma.ProductionOrderFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderFindManyArgs>
-  ): Promise<ProductionOrder[]> {
-    return this.prisma.productionOrder.findMany(args);
+  ): Promise<PrismaProductionOrder[]> {
+    return this.prisma.productionOrder.findMany<Prisma.ProductionOrderFindManyArgs>(
+      args
+    );
   }
   async productionOrder<T extends Prisma.ProductionOrderFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderFindUniqueArgs>
-  ): Promise<ProductionOrder | null> {
+  ): Promise<PrismaProductionOrder | null> {
     return this.prisma.productionOrder.findUnique(args);
   }
   async createProductionOrder<T extends Prisma.ProductionOrderCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderCreateArgs>
-  ): Promise<ProductionOrder> {
+  ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.create<T>(args);
   }
   async updateProductionOrder<T extends Prisma.ProductionOrderUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderUpdateArgs>
-  ): Promise<ProductionOrder> {
+  ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.update<T>(args);
   }
   async deleteProductionOrder<T extends Prisma.ProductionOrderDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionOrderDeleteArgs>
-  ): Promise<ProductionOrder> {
+  ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.delete(args);
   }
 
   async findBoms(
     parentId: string,
     args: Prisma.BomFindManyArgs
-  ): Promise<Bom[]> {
+  ): Promise<PrismaBom[]> {
     return this.prisma.productionOrder
       .findUniqueOrThrow({
         where: { id: parentId },
@@ -68,7 +70,7 @@ export class ProductionOrderServiceBase {
       .boms(args);
   }
 
-  async getItem(parentId: string): Promise<Item | null> {
+  async getItem(parentId: string): Promise<PrismaItem | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
@@ -76,7 +78,7 @@ export class ProductionOrderServiceBase {
       .item();
   }
 
-  async getRecipe(parentId: string): Promise<Recipe | null> {
+  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
@@ -84,7 +86,7 @@ export class ProductionOrderServiceBase {
       .recipe();
   }
 
-  async getRecipeGroup(parentId: string): Promise<RecipeGroup | null> {
+  async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
@@ -92,7 +94,7 @@ export class ProductionOrderServiceBase {
       .recipeGroup();
   }
 
-  async getSalesOrder(parentId: string): Promise<SalesOrder | null> {
+  async getSalesOrder(parentId: string): Promise<PrismaSalesOrder | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
@@ -100,7 +102,9 @@ export class ProductionOrderServiceBase {
       .salesOrder();
   }
 
-  async getScheduleOrder(parentId: string): Promise<ScheduleOrder | null> {
+  async getScheduleOrder(
+    parentId: string
+  ): Promise<PrismaScheduleOrder | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },

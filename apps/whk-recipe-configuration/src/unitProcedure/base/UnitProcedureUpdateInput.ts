@@ -27,6 +27,7 @@ import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { RecipeUpdateManyWithoutUnitProceduresInput } from "./RecipeUpdateManyWithoutUnitProceduresInput";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @InputType()
 class UnitProcedureUpdateInput {
@@ -206,6 +207,18 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

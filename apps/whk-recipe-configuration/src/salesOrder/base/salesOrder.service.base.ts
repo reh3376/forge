@@ -13,47 +13,47 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  SalesOrder, // @ts-ignore
-  Account, // @ts-ignore
-  ProductionOrder,
+  SalesOrder as PrismaSalesOrder,
+  Account as PrismaAccount,
+  ProductionOrder as PrismaProductionOrder,
 } from "@prisma/client";
 
 export class SalesOrderServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.SalesOrderCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.SalesOrderCountArgs>
+  async count(
+    args: Omit<Prisma.SalesOrderCountArgs, "select">
   ): Promise<number> {
     return this.prisma.salesOrder.count(args);
   }
 
   async salesOrders<T extends Prisma.SalesOrderFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.SalesOrderFindManyArgs>
-  ): Promise<SalesOrder[]> {
-    return this.prisma.salesOrder.findMany(args);
+  ): Promise<PrismaSalesOrder[]> {
+    return this.prisma.salesOrder.findMany<Prisma.SalesOrderFindManyArgs>(args);
   }
   async salesOrder<T extends Prisma.SalesOrderFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.SalesOrderFindUniqueArgs>
-  ): Promise<SalesOrder | null> {
+  ): Promise<PrismaSalesOrder | null> {
     return this.prisma.salesOrder.findUnique(args);
   }
   async createSalesOrder<T extends Prisma.SalesOrderCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.SalesOrderCreateArgs>
-  ): Promise<SalesOrder> {
+  ): Promise<PrismaSalesOrder> {
     return this.prisma.salesOrder.create<T>(args);
   }
   async updateSalesOrder<T extends Prisma.SalesOrderUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.SalesOrderUpdateArgs>
-  ): Promise<SalesOrder> {
+  ): Promise<PrismaSalesOrder> {
     return this.prisma.salesOrder.update<T>(args);
   }
   async deleteSalesOrder<T extends Prisma.SalesOrderDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.SalesOrderDeleteArgs>
-  ): Promise<SalesOrder> {
+  ): Promise<PrismaSalesOrder> {
     return this.prisma.salesOrder.delete(args);
   }
 
-  async getAccount(parentId: string): Promise<Account | null> {
+  async getAccount(parentId: string): Promise<PrismaAccount | null> {
     return this.prisma.salesOrder
       .findUnique({
         where: { id: parentId },
@@ -61,7 +61,9 @@ export class SalesOrderServiceBase {
       .account();
   }
 
-  async getProductionOrders(parentId: string): Promise<ProductionOrder | null> {
+  async getProductionOrders(
+    parentId: string
+  ): Promise<PrismaProductionOrder | null> {
     return this.prisma.salesOrder
       .findUnique({
         where: { id: parentId },
