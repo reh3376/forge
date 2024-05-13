@@ -13,47 +13,51 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import {
   Prisma,
-  ProductionSchedule, // @ts-ignore
-  ScheduleOrder, // @ts-ignore
-  ScheduleOrderQueue,
+  ProductionSchedule as PrismaProductionSchedule,
+  ScheduleOrder as PrismaScheduleOrder,
+  ScheduleOrderQueue as PrismaScheduleOrderQueue,
 } from "@prisma/client";
 
 export class ProductionScheduleServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
-  async count<T extends Prisma.ProductionScheduleCountArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionScheduleCountArgs>
+  async count(
+    args: Omit<Prisma.ProductionScheduleCountArgs, "select">
   ): Promise<number> {
     return this.prisma.productionSchedule.count(args);
   }
 
   async productionSchedules<T extends Prisma.ProductionScheduleFindManyArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionScheduleFindManyArgs>
-  ): Promise<ProductionSchedule[]> {
-    return this.prisma.productionSchedule.findMany(args);
+  ): Promise<PrismaProductionSchedule[]> {
+    return this.prisma.productionSchedule.findMany<Prisma.ProductionScheduleFindManyArgs>(
+      args
+    );
   }
   async productionSchedule<T extends Prisma.ProductionScheduleFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionScheduleFindUniqueArgs>
-  ): Promise<ProductionSchedule | null> {
+  ): Promise<PrismaProductionSchedule | null> {
     return this.prisma.productionSchedule.findUnique(args);
   }
   async createProductionSchedule<T extends Prisma.ProductionScheduleCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionScheduleCreateArgs>
-  ): Promise<ProductionSchedule> {
+  ): Promise<PrismaProductionSchedule> {
     return this.prisma.productionSchedule.create<T>(args);
   }
   async updateProductionSchedule<T extends Prisma.ProductionScheduleUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionScheduleUpdateArgs>
-  ): Promise<ProductionSchedule> {
+  ): Promise<PrismaProductionSchedule> {
     return this.prisma.productionSchedule.update<T>(args);
   }
   async deleteProductionSchedule<T extends Prisma.ProductionScheduleDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.ProductionScheduleDeleteArgs>
-  ): Promise<ProductionSchedule> {
+  ): Promise<PrismaProductionSchedule> {
     return this.prisma.productionSchedule.delete(args);
   }
 
-  async getScheduleOrder(parentId: string): Promise<ScheduleOrder | null> {
+  async getScheduleOrder(
+    parentId: string
+  ): Promise<PrismaScheduleOrder | null> {
     return this.prisma.productionSchedule
       .findUnique({
         where: { id: parentId },
@@ -61,7 +65,9 @@ export class ProductionScheduleServiceBase {
       .scheduleOrder();
   }
 
-  async getScheduleQueue(parentId: string): Promise<ScheduleOrderQueue | null> {
+  async getScheduleQueue(
+    parentId: string
+  ): Promise<PrismaScheduleOrderQueue | null> {
     return this.prisma.productionSchedule
       .findUnique({
         where: { id: parentId },

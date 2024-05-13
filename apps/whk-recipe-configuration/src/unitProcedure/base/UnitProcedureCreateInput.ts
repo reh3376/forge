@@ -27,6 +27,7 @@ import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreateNestedManyWithoutUnitProceduresInput";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @InputType()
 class UnitProcedureCreateInput {
@@ -197,6 +198,18 @@ class UnitProcedureCreateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
