@@ -29,6 +29,9 @@ import { RecipeUpdateInput } from "./RecipeUpdateInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
 import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
@@ -373,6 +376,139 @@ export class RecipeControllerBase {
   ): Promise<void> {
     const data = {
       productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderUnitProcedures")
+  @ApiNestedQuery(ProductionOrderUnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderUnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderUnitProcedures(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const query = plainToClass(
+      ProductionOrderUnitProcedureFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findProductionOrderUnitProcedures(
+      params.id,
+      {
+        ...query,
+        select: {
+          abbreviation: true,
+          bom: true,
+          createdAt: true,
+          customer: true,
+          globalId: true,
+          id: true,
+          name: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+
+          unitProcedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+
+          wipItem: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
         disconnect: body,
       },
     };

@@ -18,12 +18,14 @@ import {
   IsString,
   IsEnum,
 } from "class-validator";
-import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
+import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
+import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
 
 @InputType()
@@ -41,15 +43,15 @@ class ItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => BomUpdateManyWithoutItemsInput,
+    type: () => BomItemUpdateManyWithoutItemsInput,
   })
   @ValidateNested()
-  @Type(() => BomUpdateManyWithoutItemsInput)
+  @Type(() => BomItemUpdateManyWithoutItemsInput)
   @IsOptional()
-  @Field(() => BomUpdateManyWithoutItemsInput, {
+  @Field(() => BomItemUpdateManyWithoutItemsInput, {
     nullable: true,
   })
-  bomsWipItem?: BomUpdateManyWithoutItemsInput;
+  bomItems?: BomItemUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -61,7 +63,7 @@ class ItemUpdateInput {
   @Field(() => BomUpdateManyWithoutItemsInput, {
     nullable: true,
   })
-  bomWipItems?: BomUpdateManyWithoutItemsInput;
+  bomsWipItem?: BomUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -192,6 +194,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

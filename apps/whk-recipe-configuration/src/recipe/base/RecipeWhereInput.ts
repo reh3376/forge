@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
+import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -124,6 +125,18 @@ class RecipeWhereInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
+    nullable: true,
+  })
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,
