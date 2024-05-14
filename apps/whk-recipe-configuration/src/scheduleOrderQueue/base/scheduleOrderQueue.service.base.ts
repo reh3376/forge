@@ -18,6 +18,8 @@ import {
   ProductionSchedule as PrismaProductionSchedule,
 } from "@prisma/client";
 
+import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
+
 export class ScheduleOrderQueueServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
@@ -73,5 +75,8 @@ export class ScheduleOrderQueueServiceBase {
         where: { id: parentId },
       })
       .productionSchedule();
+  }
+  async AdvanceScheduleOrderQueue(args: string): Promise<ScheduleOrderQueue> {
+    throw new Error("Not implemented");
   }
 }
