@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Item } from "../../item/base/Item";
+import { BomItem } from "../../bomItem/base/BomItem";
 import {
   ValidateNested,
   IsOptional,
@@ -22,17 +22,18 @@ import {
 import { Type } from "class-transformer";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Bom {
   @ApiProperty({
-    required: false,
-    type: () => [Item],
+    required: true,
+    type: () => [BomItem],
   })
   @ValidateNested()
-  @Type(() => Item)
+  @Type(() => BomItem)
   @IsOptional()
-  bomItem?: Array<Item>;
+  bomItem?: Array<BomItem>;
 
   @ApiProperty({
     required: true,

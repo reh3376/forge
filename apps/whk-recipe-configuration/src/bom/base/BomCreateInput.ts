@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ItemCreateNestedManyWithoutBomsInput } from "./ItemCreateNestedManyWithoutBomsInput";
+import { BomItemCreateNestedManyWithoutBomsInput } from "./BomItemCreateNestedManyWithoutBomsInput";
 import { ValidateNested, IsOptional, IsString, IsInt } from "class-validator";
 import { Type } from "class-transformer";
 import { ProductionOrderCreateNestedManyWithoutBomsInput } from "./ProductionOrderCreateNestedManyWithoutBomsInput";
@@ -21,16 +21,16 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 @InputType()
 class BomCreateInput {
   @ApiProperty({
-    required: false,
-    type: () => ItemCreateNestedManyWithoutBomsInput,
+    required: true,
+    type: () => BomItemCreateNestedManyWithoutBomsInput,
   })
   @ValidateNested()
-  @Type(() => ItemCreateNestedManyWithoutBomsInput)
+  @Type(() => BomItemCreateNestedManyWithoutBomsInput)
   @IsOptional()
-  @Field(() => ItemCreateNestedManyWithoutBomsInput, {
+  @Field(() => BomItemCreateNestedManyWithoutBomsInput, {
     nullable: true,
   })
-  bomItem?: ItemCreateNestedManyWithoutBomsInput;
+  bomItem?: BomItemCreateNestedManyWithoutBomsInput;
 
   @ApiProperty({
     required: true,
