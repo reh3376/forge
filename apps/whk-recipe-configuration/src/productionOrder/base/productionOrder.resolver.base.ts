@@ -28,6 +28,8 @@ import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
 import { DeleteProductionOrderArgs } from "./DeleteProductionOrderArgs";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -217,6 +219,31 @@ export class ProductionOrderResolverBase {
     @graphql.Args() args: BomFindManyArgs
   ): Promise<Bom[]> {
     const results = await this.service.findBoms(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
+    name: "productionOrderUnitProcedures",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderUnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderUnitProcedures(
+    @graphql.Parent() parent: ProductionOrder,
+    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const results = await this.service.findProductionOrderUnitProcedures(
+      parent.id,
+      args
+    );
 
     if (!results) {
       return [];

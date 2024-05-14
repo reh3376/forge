@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
@@ -130,6 +131,15 @@ class ProductionOrder {
   @ValidateNested()
   @Type(() => Item)
   item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderUnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedure)
+  @IsOptional()
+  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
 
   @ApiProperty({
     required: false,

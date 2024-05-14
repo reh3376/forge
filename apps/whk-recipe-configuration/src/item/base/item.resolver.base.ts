@@ -26,12 +26,16 @@ import { ItemFindUniqueArgs } from "./ItemFindUniqueArgs";
 import { CreateItemArgs } from "./CreateItemArgs";
 import { UpdateItemArgs } from "./UpdateItemArgs";
 import { DeleteItemArgs } from "./DeleteItemArgs";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
@@ -158,6 +162,26 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BomItem], { name: "bomItems" })
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItems(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: BomItemFindManyArgs
+  ): Promise<BomItem[]> {
+    const results = await this.service.findBomItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Bom], { name: "bomsWipItem" })
   @nestAccessControl.UseRoles({
     resource: "Bom",
@@ -169,26 +193,6 @@ export class ItemResolverBase {
     @graphql.Args() args: BomFindManyArgs
   ): Promise<Bom[]> {
     const results = await this.service.findBomsWipItem(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Bom], { name: "bomWipItems" })
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "read",
-    possession: "any",
-  })
-  async findBomWipItems(
-    @graphql.Parent() parent: Item,
-    @graphql.Args() args: BomFindManyArgs
-  ): Promise<Bom[]> {
-    const results = await this.service.findBomWipItems(parent.id, args);
 
     if (!results) {
       return [];
@@ -229,6 +233,31 @@ export class ItemResolverBase {
     @graphql.Args() args: ProductionOrderFindManyArgs
   ): Promise<ProductionOrder[]> {
     const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
+    name: "productionOrderUnitProcedures",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderUnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderUnitProcedures(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const results = await this.service.findProductionOrderUnitProcedures(
+      parent.id,
+      args
+    );
 
     if (!results) {
       return [];

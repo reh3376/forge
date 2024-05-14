@@ -26,6 +26,9 @@ import { Item } from "./Item";
 import { ItemFindManyArgs } from "./ItemFindManyArgs";
 import { ItemWhereUniqueInput } from "./ItemWhereUniqueInput";
 import { ItemUpdateInput } from "./ItemUpdateInput";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
@@ -35,6 +38,9 @@ import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptW
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
@@ -299,6 +305,125 @@ export class ItemControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomItems")
+  @ApiNestedQuery(BomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItems(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<BomItem[]> {
+    const query = plainToClass(BomItemFindManyArgs, request.query);
+    const results = await this.service.findBomItems(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        quantityActual: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItems: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItems: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomsWipItem")
   @ApiNestedQuery(BomFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -396,114 +521,6 @@ export class ItemControllerBase {
   ): Promise<void> {
     const data = {
       bomsWipItem: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/bomWipItems")
-  @ApiNestedQuery(BomFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "read",
-    possession: "any",
-  })
-  async findBomWipItems(
-    @common.Req() request: Request,
-    @common.Param() params: ItemWhereUniqueInput
-  ): Promise<Bom[]> {
-    const query = plainToClass(BomFindManyArgs, request.query);
-    const results = await this.service.findBomWipItems(params.id, {
-      ...query,
-      select: {
-        bomName: true,
-        bomRevision: true,
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        schemaVersion: true,
-
-        wipItem: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/bomWipItems")
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "update",
-    possession: "any",
-  })
-  async connectBomWipItems(
-    @common.Param() params: ItemWhereUniqueInput,
-    @common.Body() body: BomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      bomWipItems: {
-        connect: body,
-      },
-    };
-    await this.service.updateItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/bomWipItems")
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "update",
-    possession: "any",
-  })
-  async updateBomWipItems(
-    @common.Param() params: ItemWhereUniqueInput,
-    @common.Body() body: BomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      bomWipItems: {
-        set: body,
-      },
-    };
-    await this.service.updateItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/bomWipItems")
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectBomWipItems(
-    @common.Param() params: ItemWhereUniqueInput,
-    @common.Body() body: BomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      bomWipItems: {
         disconnect: body,
       },
     };
@@ -763,6 +780,139 @@ export class ItemControllerBase {
   ): Promise<void> {
     const data = {
       productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderUnitProcedures")
+  @ApiNestedQuery(ProductionOrderUnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderUnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderUnitProcedures(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const query = plainToClass(
+      ProductionOrderUnitProcedureFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findProductionOrderUnitProcedures(
+      params.id,
+      {
+        ...query,
+        select: {
+          abbreviation: true,
+          bom: true,
+          createdAt: true,
+          customer: true,
+          globalId: true,
+          id: true,
+          name: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+
+          unitProcedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+
+          wipItem: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderUnitProcedures(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderUnitProcedures(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderUnitProcedures(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
         disconnect: body,
       },
     };
