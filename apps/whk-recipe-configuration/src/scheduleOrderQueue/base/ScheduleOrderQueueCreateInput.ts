@@ -47,6 +47,14 @@ class ScheduleOrderQueueCreateInput {
   nextUnitProcedure!: UnitProcedureWhereUniqueInput;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  nextUnitProcedureName!: string;
+
+  @ApiProperty({
     required: false,
     type: () => ProductionScheduleWhereUniqueInput,
   })

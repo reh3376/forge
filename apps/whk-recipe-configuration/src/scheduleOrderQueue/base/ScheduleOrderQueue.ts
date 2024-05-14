@@ -68,6 +68,14 @@ class ScheduleOrderQueue {
   nextUnitProcedure?: UnitProcedure;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  nextUnitProcedureName!: string;
+
+  @ApiProperty({
     required: false,
     type: () => ProductionSchedule,
   })
