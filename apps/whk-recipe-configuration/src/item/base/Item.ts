@@ -19,12 +19,14 @@ import {
   IsString,
   IsEnum,
 } from "class-validator";
-import { Bom } from "../../bom/base/Bom";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
+import { Bom } from "../../bom/base/Bom";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 
 @ObjectType()
@@ -42,12 +44,12 @@ class Item {
 
   @ApiProperty({
     required: false,
-    type: () => [Bom],
+    type: () => [BomItem],
   })
   @ValidateNested()
-  @Type(() => Bom)
+  @Type(() => BomItem)
   @IsOptional()
-  bomsWipItem?: Array<Bom>;
+  bomItems?: Array<BomItem>;
 
   @ApiProperty({
     required: false,
@@ -56,7 +58,7 @@ class Item {
   @ValidateNested()
   @Type(() => Bom)
   @IsOptional()
-  bomWipItems?: Array<Bom>;
+  bomsWipItem?: Array<Bom>;
 
   @ApiProperty({
     required: true,
@@ -178,6 +180,15 @@ class Item {
   @Type(() => ProductionOrder)
   @IsOptional()
   productionOrders?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderUnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedure)
+  @IsOptional()
+  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
 
   @ApiProperty({
     required: false,

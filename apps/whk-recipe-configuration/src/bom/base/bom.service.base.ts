@@ -14,9 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Bom as PrismaBom,
-  Item as PrismaItem,
+  BomItem as PrismaBomItem,
   ProductionOrder as PrismaProductionOrder,
   UnitProcedure as PrismaUnitProcedure,
+  Item as PrismaItem,
 } from "@prisma/client";
 
 export class BomServiceBase {
@@ -54,8 +55,8 @@ export class BomServiceBase {
 
   async findBomItem(
     parentId: string,
-    args: Prisma.ItemFindManyArgs
-  ): Promise<PrismaItem[]> {
+    args: Prisma.BomItemFindManyArgs
+  ): Promise<PrismaBomItem[]> {
     return this.prisma.bom
       .findUniqueOrThrow({
         where: { id: parentId },
