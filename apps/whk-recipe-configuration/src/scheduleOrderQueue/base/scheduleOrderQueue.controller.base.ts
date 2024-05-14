@@ -254,4 +254,21 @@ export class ScheduleOrderQueueControllerBase {
       throw error;
     }
   }
+
+  @common.Patch("/:id")
+  @swagger.ApiOkResponse({
+    type: ScheduleOrderQueue,
+  })
+  @swagger.ApiNotFoundResponse({
+    type: errors.NotFoundException,
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async AdvanceScheduleOrderQueue(
+    @common.Param()
+    params: string
+  ): Promise<ScheduleOrderQueue> {
+    return this.service.AdvanceScheduleOrderQueue(params);
+  }
 }
