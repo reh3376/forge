@@ -995,6 +995,7 @@ export async function customSeed() {
             queueIndex: i,
             updatedBy: faker.internet.userName(),
             nextUnitProcedure: {connect: {id: unitProcedure.id}},
+            nextUnitProcedureName: unitProcedure.name,
           },
         });
       } catch (error) {
