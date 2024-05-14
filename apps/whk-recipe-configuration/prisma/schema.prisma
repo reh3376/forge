@@ -243,17 +243,18 @@ model Bom {
 }
 
 model ScheduleOrderQueue {
-  createdAt           DateTime            @default(now())
-  createdBy           String
-  globalId            String?             @unique @default(cuid())
-  id                  String              @id @default(cuid())
-  nextUnitProcedure   UnitProcedure       @relation(fields: [nextUnitProcedureId], references: [id])
-  nextUnitProcedureId String              @unique
-  productionSchedule  ProductionSchedule?
-  queueIndex          Int?                @unique
-  schemaVersion       String?             @default("0001-b")
-  updatedAt           DateTime            @updatedAt
-  updatedBy           String?
+  createdAt             DateTime            @default(now())
+  createdBy             String
+  globalId              String?             @unique @default(cuid())
+  id                    String              @id @default(cuid())
+  nextUnitProcedure     UnitProcedure       @relation(fields: [nextUnitProcedureId], references: [id])
+  nextUnitProcedureId   String              @unique
+  nextUnitProcedureName String
+  productionSchedule    ProductionSchedule?
+  queueIndex            Int?                @unique
+  schemaVersion         String?             @default("0001-b")
+  updatedAt             DateTime            @updatedAt
+  updatedBy             String?
 }
 
 model UnitProcedure {

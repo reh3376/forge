@@ -74,6 +74,8 @@ export class ScheduleOrderQueueControllerBase {
           },
         },
 
+        nextUnitProcedureName: true,
+
         productionSchedule: {
           select: {
             id: true,
@@ -118,6 +120,8 @@ export class ScheduleOrderQueueControllerBase {
           },
         },
 
+        nextUnitProcedureName: true,
+
         productionSchedule: {
           select: {
             id: true,
@@ -160,6 +164,8 @@ export class ScheduleOrderQueueControllerBase {
             id: true,
           },
         },
+
+        nextUnitProcedureName: true,
 
         productionSchedule: {
           select: {
@@ -224,6 +230,8 @@ export class ScheduleOrderQueueControllerBase {
               id: true,
             },
           },
+
+          nextUnitProcedureName: true,
 
           productionSchedule: {
             select: {
