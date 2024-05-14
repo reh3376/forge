@@ -15,6 +15,7 @@ import {
   Prisma,
   UnitProcedure as PrismaUnitProcedure,
   Operation as PrismaOperation,
+  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Recipe as PrismaRecipe,
   Bom as PrismaBom,
   Procedure as PrismaProcedure,
@@ -78,6 +79,17 @@ export class UnitProcedureServiceBase {
         where: { id: parentId },
       })
       .operations(args);
+  }
+
+  async findProductionOrderUnitProcedures(
+    parentId: string,
+    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<PrismaProductionOrderUnitProcedure[]> {
+    return this.prisma.unitProcedure
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrderUnitProcedures(args);
   }
 
   async findRecipe(

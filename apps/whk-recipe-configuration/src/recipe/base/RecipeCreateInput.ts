@@ -20,6 +20,7 @@ import {
 } from "class-validator";
 import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { Type } from "class-transformer";
+import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrderCreateNestedManyWithoutRecipesInput";
@@ -103,6 +104,21 @@ class RecipeCreateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(
+    () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: true,

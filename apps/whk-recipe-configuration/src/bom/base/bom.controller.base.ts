@@ -26,9 +26,9 @@ import { Bom } from "./Bom";
 import { BomFindManyArgs } from "./BomFindManyArgs";
 import { BomWhereUniqueInput } from "./BomWhereUniqueInput";
 import { BomUpdateInput } from "./BomUpdateInput";
-import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
-import { Item } from "../../item/base/Item";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -220,39 +220,45 @@ export class BomControllerBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomItem")
-  @ApiNestedQuery(ItemFindManyArgs)
+  @ApiNestedQuery(BomItemFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Item",
+    resource: "BomItem",
     action: "read",
     possession: "any",
   })
   async findBomItem(
     @common.Req() request: Request,
     @common.Param() params: BomWhereUniqueInput
-  ): Promise<Item[]> {
-    const query = plainToClass(ItemFindManyArgs, request.query);
+  ): Promise<BomItem[]> {
+    const query = plainToClass(BomItemFindManyArgs, request.query);
     const results = await this.service.findBomItem(params.id, {
       ...query,
       select: {
-        active: true,
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
-        id: true,
-        itemClass: true,
-        itemDescription: true,
-
-        itemGroup: {
+        bom: {
           select: {
             id: true,
           },
         },
 
-        itemName: true,
-        itemNumber: true,
-        itemRevision: true,
-        itemType: true,
-        schemaVersion: true,
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        quantityActual: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
       },
@@ -273,7 +279,7 @@ export class BomControllerBase {
   })
   async connectBomItem(
     @common.Param() params: BomWhereUniqueInput,
-    @common.Body() body: ItemWhereUniqueInput[]
+    @common.Body() body: BomItemWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       bomItem: {
@@ -295,7 +301,7 @@ export class BomControllerBase {
   })
   async updateBomItem(
     @common.Param() params: BomWhereUniqueInput,
-    @common.Body() body: ItemWhereUniqueInput[]
+    @common.Body() body: BomItemWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       bomItem: {
@@ -317,7 +323,7 @@ export class BomControllerBase {
   })
   async disconnectBomItem(
     @common.Param() params: BomWhereUniqueInput,
-    @common.Body() body: ItemWhereUniqueInput[]
+    @common.Body() body: BomItemWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       bomItem: {

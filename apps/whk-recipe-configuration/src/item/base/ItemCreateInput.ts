@@ -18,12 +18,14 @@ import {
   IsString,
   IsEnum,
 } from "class-validator";
-import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
+import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
+import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput";
 import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
 
 @InputType()
@@ -41,15 +43,15 @@ class ItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => BomCreateNestedManyWithoutItemsInput,
+    type: () => BomItemCreateNestedManyWithoutItemsInput,
   })
   @ValidateNested()
-  @Type(() => BomCreateNestedManyWithoutItemsInput)
+  @Type(() => BomItemCreateNestedManyWithoutItemsInput)
   @IsOptional()
-  @Field(() => BomCreateNestedManyWithoutItemsInput, {
+  @Field(() => BomItemCreateNestedManyWithoutItemsInput, {
     nullable: true,
   })
-  bomsWipItem?: BomCreateNestedManyWithoutItemsInput;
+  bomItems?: BomItemCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -61,7 +63,7 @@ class ItemCreateInput {
   @Field(() => BomCreateNestedManyWithoutItemsInput, {
     nullable: true,
   })
-  bomWipItems?: BomCreateNestedManyWithoutItemsInput;
+  bomsWipItem?: BomCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: true,
@@ -174,6 +176,18 @@ class ItemCreateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -21,6 +22,7 @@ import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
+import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 
 @InputType()
@@ -38,15 +40,15 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => BomListRelationFilter,
+    type: () => BomItemListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => BomListRelationFilter)
+  @Type(() => BomItemListRelationFilter)
   @IsOptional()
-  @Field(() => BomListRelationFilter, {
+  @Field(() => BomItemListRelationFilter, {
     nullable: true,
   })
-  bomsWipItem?: BomListRelationFilter;
+  bomItems?: BomItemListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -58,7 +60,7 @@ class ItemWhereInput {
   @Field(() => BomListRelationFilter, {
     nullable: true,
   })
-  bomWipItems?: BomListRelationFilter;
+  bomsWipItem?: BomListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -200,6 +202,18 @@ class ItemWhereInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
+    nullable: true,
+  })
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -25,12 +25,13 @@ import { BomFindManyArgs } from "./BomFindManyArgs";
 import { BomFindUniqueArgs } from "./BomFindUniqueArgs";
 import { CreateBomArgs } from "./CreateBomArgs";
 import { UpdateBomArgs } from "./UpdateBomArgs";
-import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
-import { Item } from "../../item/base/Item";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { Item } from "../../item/base/Item";
 import { BomService } from "../bom.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Bom)
@@ -131,16 +132,16 @@ export class BomResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Item], { name: "bomItem" })
+  @graphql.ResolveField(() => [BomItem], { name: "bomItem" })
   @nestAccessControl.UseRoles({
-    resource: "Item",
+    resource: "BomItem",
     action: "read",
     possession: "any",
   })
   async findBomItem(
     @graphql.Parent() parent: Bom,
-    @graphql.Args() args: ItemFindManyArgs
-  ): Promise<Item[]> {
+    @graphql.Args() args: BomItemFindManyArgs
+  ): Promise<BomItem[]> {
     const results = await this.service.findBomItem(parent.id, args);
 
     if (!results) {
