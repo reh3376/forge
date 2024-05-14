@@ -68,6 +68,17 @@ class ScheduleOrderQueueWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  nextUnitProcedureName?: StringFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => ProductionScheduleWhereUniqueInput,
   })
   @ValidateNested()

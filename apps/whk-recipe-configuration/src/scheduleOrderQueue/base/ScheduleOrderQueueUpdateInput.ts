@@ -54,6 +54,17 @@ class ScheduleOrderQueueUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  nextUnitProcedureName?: string;
+
+  @ApiProperty({
+    required: false,
     type: () => ProductionScheduleWhereUniqueInput,
   })
   @ValidateNested()
