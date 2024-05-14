@@ -456,6 +456,7 @@ export async function customSeed() {
     for (let i = 0; i < n; i++) {
       const account = getRandomArrayElement(accounts) as any; // Use the previously defined getRandomArrayElement function
       const item = getRandomArrayElement(items) as any;
+      const customer = faker.company.name();
       if (!item) continue; // Skip if no item is found, though this should not happen due to the earlier check
       try {
         await client.salesOrder.create({
@@ -465,7 +466,7 @@ export async function customSeed() {
             orderType: getRandomArrayElement(Object.values(EnumSalesOrderOrderType)) as EnumSalesOrderOrderType,
             quantity: faker.number.int({ min: 1, max: 1000 }),
             createdBy: faker.internet.userName(),
-            // Populate other fields as needed
+            customer: customer,
           },
         });
       } catch (error) {
@@ -814,6 +815,7 @@ export async function customSeed() {
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
       const customerId = getRandomArrayElement(customerIds) as string;
+      const customer = faker.company.name();
 
       try {
         await client.recipe.create({
@@ -827,7 +829,7 @@ export async function customSeed() {
             revision: faker.datatype.number({ min: 0, max: 10 }),
             schemaVersion: "0001-b",
             updatedBy: faker.internet.userName(),
-            // Additional attributes as needed
+            customer: customer,
           },
         });
       } catch (error) {
@@ -870,6 +872,7 @@ export async function customSeed() {
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
       const salesOrder = getRandomArrayElement(salesOrders) as SalesOrder;
+      const customer = faker.company.name();
 
       try {
         await client.productionOrder.create({
@@ -886,7 +889,7 @@ export async function customSeed() {
             startDate: faker.date.past(),
             status: EnumProductionOrderStatus.Planned, // Adjust based on your enum
             // batches: sampleBatches,
-            // Populate other fields as necessary
+            customer: customer,
           },
         });
       } catch (error) {
@@ -951,6 +954,7 @@ export async function customSeed() {
       const estimatedStart = faker.date.soon({days: daysAhead});
       const duration = faker.number.int({min: 1, max: 24}); // duration in hours
       const estimatedEnd = new Date(estimatedStart.getTime() + duration * 60 * 60 * 1000);
+      const customer = faker.company.name();
 
       try {
         await client.productionSchedule.create({
@@ -964,6 +968,7 @@ export async function customSeed() {
             scheduleOrderId: scheduleOrder ? scheduleOrder.id : undefined,
             scheduleQueueId: scheduleQueue ? scheduleQueue.id : undefined,
             updatedBy: faker.internet.userName(),
+            customer: customer,
           },
         });
       } catch (error) {
@@ -976,9 +981,11 @@ export async function customSeed() {
 
   async function seedScheduleOrderQueue(n: number): Promise<void> {
     const productionSchedules = await client.productionSchedule.findMany();
+    const nextUnitProcedure = await client.unitProcedure.findMany();
 
     for (let i = 0; i < n; i++) {
       const productionSchedule = getRandomArrayElement(productionSchedules) as ProductionSchedule;
+        const unitProcedure = getRandomArrayElement(nextUnitProcedure) as UnitProcedure;
 
       try {
         await client.scheduleOrderQueue.create({
@@ -987,6 +994,7 @@ export async function customSeed() {
             productionSchedule: {connect: { id: productionSchedule.id } },
             queueIndex: i,
             updatedBy: faker.internet.userName(),
+            nextUnitProcedure: {connect: {id: unitProcedure.id}},
           },
         });
       } catch (error) {
