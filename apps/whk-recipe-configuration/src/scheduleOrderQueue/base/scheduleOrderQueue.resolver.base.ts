@@ -187,12 +187,4 @@ export class ScheduleOrderQueueResolverBase {
     }
     return result;
   }
-
-  @graphql.Mutation(() => ScheduleOrderQueue)
-  async AdvanceScheduleOrderQueue(
-    @graphql.Args()
-    args: string
-  ): Promise<ScheduleOrderQueue> {
-    return this.service.AdvanceScheduleOrderQueue(args);
-  }
 }
