@@ -4,3 +4,4 @@ export enum MyMessageBrokerTopics {
   WhWhk01Distillery01Asset = "wh.whk01.distillery01.asset",
   WhWhk01Distillery01Item = "wh.whk01.distillery01.item",
 }
+export type AllMessageBrokerTopics = MyMessageBrokerTopics;
