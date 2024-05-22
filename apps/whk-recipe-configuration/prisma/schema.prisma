@@ -125,28 +125,32 @@ model Instruction {
 }
 
 model EquipmentPhase {
-  active                 Boolean?               @default(true)
-  classId                EquipmentPhase?        @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
+  active                 Boolean?                   @default(true)
+  bomItem                BomItem?                   @relation(fields: [bomItemId], references: [id])
+  bomItemId              String?
+  classId                EquipmentPhase?            @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
   classIdId              String?
   className              String?
-  createdAt              DateTime?              @default(now())
+  createdAt              DateTime?                  @default(now())
   createdBy              String
   description            String?
-  editedAt               DateTime?              @updatedAt
+  editedAt               DateTime?                  @updatedAt
   editedBy               String?
-  globalId               String?                @unique @default(cuid())
-  id                     String                 @id @default(cuid())
-  instances              EquipmentPhase[]       @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances")
+  globalId               String?                    @unique @default(cuid())
+  id                     String                     @id @default(cuid())
+  instances              EquipmentPhase[]           @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances")
   instructions           Instruction[]
-  isClassDefinition      Boolean?               @default(false)
+  isClassDefinition      Boolean?                   @default(false)
+  message                String?
   name                   EnumEquipmentPhaseName
-  operation              Operation              @relation(fields: [operationId], references: [id])
+  operation              Operation                  @relation(fields: [operationId], references: [id])
   operationId            String
   operationSequenceIndex Int?
   path                   String?
   phaseParameters        PhaseParameter[]
-  revision               Int?                   @default(0)
-  schemaVersion          String?                @default("0001-b")
+  revision               Int?                       @default(0)
+  schemaVersion          String?                    @default("0001-b")
+  stepType               EnumEquipmentPhaseStepType @default(NotRequired)
   testParameters         TestParameter[]
 
   @@unique([name, revision, active, isClassDefinition])
@@ -252,10 +256,12 @@ model ScheduleOrderQueue {
   nextUnitProcedureId   String              @unique
   nextUnitProcedureName String
   productionSchedule    ProductionSchedule?
-  queueIndex            Int?                @unique
+  queueIndex            Int?
   schemaVersion         String?             @default("0001-b")
   updatedAt             DateTime            @updatedAt
   updatedBy             String?
+
+  @@unique([queueIndex, nextUnitProcedureId])
 }
 
 model UnitProcedure {
@@ -566,19 +572,20 @@ model Lot {
 }
 
 model BomItem {
-  bom            Bom?     @relation(fields: [bomId], references: [id])
-  bomId          String?
-  createdAt      DateTime @default(now())
-  createdBy      String
-  id             String   @id @default(cuid())
-  item           Item     @relation(fields: [itemId], references: [id])
-  itemId         String
-  quantity       Decimal
-  quantityActual Decimal?
-  units          Unit?    @relation(fields: [unitsId], references: [id])
-  unitsId        String?
-  updatedAt      DateTime @updatedAt
-  updatedBy      String?
+  bom             Bom?             @relation(fields: [bomId], references: [id])
+  bomId           String?
+  createdAt       DateTime         @default(now())
+  createdBy       String
+  equipmentPhases EquipmentPhase[]
+  id              String           @id @default(cuid())
+  item            Item             @relation(fields: [itemId], references: [id])
+  itemId          String
+  quantity        Decimal
+  quantityActual  Decimal?
+  units           Unit?            @relation(fields: [unitsId], references: [id])
+  unitsId         String?
+  updatedAt       DateTime         @updatedAt
+  updatedBy       String?
 }
 
 model Unit {
@@ -618,11 +625,10 @@ enum EnumPhaseParameterSetpointType {
 }
 
 enum EnumPhaseParameterStaticName {
-  SteamTemperature
   HoldTime
-  IngredientName
-  IngredientQuantity
-  IngredientUnits
+  Temperature
+  Time
+  Quantity
 }
 
 enum EnumTestParameterTestParamUnits {
@@ -656,7 +662,6 @@ enum EnumRecipeParameterRecipeSetpointType {
 }
 
 enum EnumEquipmentPhaseName {
-  PreSteam
   Steam
   Hold
   BacksetAdd
@@ -683,6 +688,30 @@ enum EnumEquipmentPhaseName {
   StillShutdown
   Cut
   Gauge
+  GrainAdd
+  LiquidAdd
+  Prompt
+}
+
+enum EnumEquipmentPhaseStepType {
+  Water
+  Backset
+  Corn
+  Rye
+  Wheat
+  Malt
+  Premalt
+  Speciality
+  Enzyme
+  Nutrient
+  Yeast
+  Citric
+  Hold
+  Cool
+  NotRequired
+  Heat
+  Vessel
+  Pipe
 }
 
 enum EnumOperationName {

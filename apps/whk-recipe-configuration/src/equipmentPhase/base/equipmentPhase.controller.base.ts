@@ -61,6 +61,12 @@ export class EquipmentPhaseControllerBase {
       data: {
         ...data,
 
+        bomItem: data.bomItem
+          ? {
+              connect: data.bomItem,
+            }
+          : undefined,
+
         classId: data.classId
           ? {
               connect: data.classId,
@@ -73,6 +79,12 @@ export class EquipmentPhaseControllerBase {
       },
       select: {
         active: true,
+
+        bomItem: {
+          select: {
+            id: true,
+          },
+        },
 
         classId: {
           select: {
@@ -89,6 +101,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -101,6 +114,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
   }
@@ -126,6 +140,12 @@ export class EquipmentPhaseControllerBase {
       select: {
         active: true,
 
+        bomItem: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -141,6 +161,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -153,6 +174,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
   }
@@ -177,6 +199,12 @@ export class EquipmentPhaseControllerBase {
       select: {
         active: true,
 
+        bomItem: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -192,6 +220,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -204,6 +233,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (result === null) {
@@ -236,6 +266,12 @@ export class EquipmentPhaseControllerBase {
         data: {
           ...data,
 
+          bomItem: data.bomItem
+            ? {
+                connect: data.bomItem,
+              }
+            : undefined,
+
           classId: data.classId
             ? {
                 connect: data.classId,
@@ -248,6 +284,12 @@ export class EquipmentPhaseControllerBase {
         },
         select: {
           active: true,
+
+          bomItem: {
+            select: {
+              id: true,
+            },
+          },
 
           classId: {
             select: {
@@ -264,6 +306,7 @@ export class EquipmentPhaseControllerBase {
           globalId: true,
           id: true,
           isClassDefinition: true,
+          message: true,
           name: true,
 
           operation: {
@@ -276,6 +319,7 @@ export class EquipmentPhaseControllerBase {
           path: true,
           revision: true,
           schemaVersion: true,
+          stepType: true,
         },
       });
     } catch (error) {
@@ -306,6 +350,12 @@ export class EquipmentPhaseControllerBase {
       select: {
         active: true,
 
+        bomItem: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -321,6 +371,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -333,6 +384,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (results === null) {

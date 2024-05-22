@@ -17,6 +17,7 @@ import {
   Instruction as PrismaInstruction,
   PhaseParameter as PrismaPhaseParameter,
   TestParameter as PrismaTestParameter,
+  BomItem as PrismaBomItem,
   Operation as PrismaOperation,
 } from "@prisma/client";
 
@@ -99,6 +100,14 @@ export class EquipmentPhaseServiceBase {
         where: { id: parentId },
       })
       .testParameters(args);
+  }
+
+  async getBomItem(parentId: string): Promise<PrismaBomItem | null> {
+    return this.prisma.equipmentPhase
+      .findUnique({
+        where: { id: parentId },
+      })
+      .bomItem();
   }
 
   async getClassId(parentId: string): Promise<PrismaEquipmentPhase | null> {

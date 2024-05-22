@@ -12,7 +12,6 @@ https://docs.amplication.com/how-to/custom-code
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum EnumEquipmentPhaseName {
-  PreSteam = "PreSteam",
   Steam = "Steam",
   Hold = "Hold",
   BacksetAdd = "BacksetAdd",
@@ -39,6 +38,9 @@ export enum EnumEquipmentPhaseName {
   StillShutdown = "StillShutdown",
   Cut = "Cut",
   Gauge = "Gauge",
+  GrainAdd = "GrainAdd",
+  LiquidAdd = "LiquidAdd",
+  Prompt = "Prompt",
 }
 
 registerEnumType(EnumEquipmentPhaseName, {

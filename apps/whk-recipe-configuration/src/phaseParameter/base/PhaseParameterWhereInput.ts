@@ -270,12 +270,7 @@ class PhaseParameterWhereInput {
   @Field(() => EnumPhaseParameterStaticName, {
     nullable: true,
   })
-  staticName?:
-    | "SteamTemperature"
-    | "HoldTime"
-    | "IngredientName"
-    | "IngredientQuantity"
-    | "IngredientUnits";
+  staticName?: "HoldTime" | "Temperature" | "Time" | "Quantity";
 
   @ApiProperty({
     required: false,
