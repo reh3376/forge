@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "start": "nest start",
+    "prod-start": "pm2 start dist/main.js",
     "start:watch": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "build": "nest build",
