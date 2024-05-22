@@ -256,7 +256,15 @@ class PhaseParameter {
   @Field(() => EnumPhaseParameterStaticName, {
     nullable: true,
   })
-  staticName?: "HoldTime" | "Temperature" | "Time" | "Quantity" | null;
+  staticName?:
+    | "Temperature"
+    | "Time"
+    | "Quantity"
+    | "Speed"
+    | "FlowRate"
+    | "SprayballTime"
+    | "Level"
+    | null;
 
   @ApiProperty({
     required: true,
