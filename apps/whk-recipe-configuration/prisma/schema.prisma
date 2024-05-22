@@ -625,10 +625,10 @@ enum EnumPhaseParameterSetpointType {
 }
 
 enum EnumPhaseParameterStaticName {
-  HoldTime
   Temperature
   Time
   Quantity
+  Speed
 }
 
 enum EnumTestParameterTestParamUnits {
