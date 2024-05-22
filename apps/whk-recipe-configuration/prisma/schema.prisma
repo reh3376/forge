@@ -159,6 +159,7 @@ model EquipmentPhase {
 model Operation {
   abbreviation           String
   active                 Boolean?          @default(true)
+  auxiliaryPhases        Json?
   classId                Operation?        @relation(name: "OperationClassIdOperationInstances", fields: [classIdId], references: [id])
   classIdId              String?
   createdAt              DateTime?         @default(now())
