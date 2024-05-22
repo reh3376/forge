@@ -2,7 +2,7 @@
 
 import {
   EnumAssetType,
-  EnumEquipmentPhaseName,
+  EnumEquipmentPhaseName, EnumEquipmentPhaseStepType,
   EnumItemItemClass,
   EnumOperationName,
   EnumPhaseParameterSetpointType,
@@ -563,62 +563,43 @@ export async function customSeed() {
 
   // phase paramters
   const equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
-    PreSteam: ['TemperatureSetpoint'],
     CornAdd: [
       'Quantity',
-      'Units',
     ],
     MaltAdd: [
       'Quantity',
-      'Units',
     ],
     RyeAdd: [
       'Quantity',
-      'Units',
     ],
     WheatAdd: [
       'Quantity',
-      'Units',
     ],
     AdditiveAdd: [
       'Quantity',
-      'Units',
-      'ItemName',
     ],
     Prompt: [
-      'Type',
-      'Message',
-      'Header',
-      'Duration',
-      'Units',
-      'Confirmation',
     ],
     Hold: [
-      'Duration',
-      'Units'
+      'Time',
+      'Temperature'
     ],
     Steam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     Cooldown: [
-      'Duration',
-      'Units',
-      'TemperatureSetpoint',
-    ],
-    PhCapture: [
-      'TODO'
+      'Time',
+      'Temperature',
     ],
     Drop: [
-      'FlowSetpoint',
+      'FlowRate',
       'SprayballTime',
-      'FlushTime',
+      'Time',
     ],
     Rinse: [
-      'Duration',
-      'Units',
-      'TemperatureSetpoint',
+      'Time',
+      'Temperature',
     ],
     DropTubToMashCooler: [
       'MashPumpSetpoint',
@@ -627,32 +608,28 @@ export async function customSeed() {
       'MashCoolerEnable',
     ],
     Fill: [
-      'LevelSetpoint',
-      'AgitationSpeed',
-      'TemperatureSetpoint',
+      'Level',
+      'Speed',
+      'Temperature',
     ],
     FermDrop: [
-      'LevelSetpoint',
+      'Level',
     ],
     FermSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     DropLineSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     DropTubSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     CoolerSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     StillRun: [
       'TowerWaterTemperatureSetpoint',
@@ -661,6 +638,14 @@ export async function customSeed() {
       'LowWineProof',
       'HighWineProof',
     ],
+    GrainAdd: [
+      'Quantity',
+    ],
+    LiquidAdd: [
+      'Quantity',
+      'Speed' // Agitator speed
+    ],
+
   }
   async function seedPhaseParameter(total: number): Promise<void> {
     // Fetch EquipmentPhase IDs if needed for linking
@@ -719,30 +704,33 @@ export async function customSeed() {
 
   const operationEquipmentPhasesMap: { [key: string]: string[] } = {
     Cook: [
-      'PreSteam',
-      'Steam',
+      // 'Steam',
       'Hold',
-      'BacksetAdd',
-      'WaterAdd',
+      // 'BacksetAdd',
+      // 'WaterAdd',
       'AdditiveAdd',
-      'CornAdd',
-      'MaltAdd',
-      'RyeAdd',
-      'WheatAdd',
-      'Drop',
-      'PhCapture',
+      // 'CornAdd',
+      // 'MaltAdd',
+      // 'RyeAdd',
+      // 'WheatAdd',
+      // 'Drop',
+      // 'PhCapture',
       'Prompt',
-      'Rinse',
-      'Cooldown',
-      'HotFlush',
-      'CIP',
+      // 'Rinse',
+      // 'Cooldown',
+      // 'HotFlush',
+      // 'CIP',
+      'GrainAdd',
+      'LiquidAdd',
     ],
     FermenterSet: [
       'DropToMashCooler',
       'Fill',
+      'Prompt'
     ],
     Fermenter: [
       'Run',
+      'Prompt'
     ],
     Clean: [
       'FermenterSteam',
@@ -756,6 +744,36 @@ export async function customSeed() {
     Mill: ['Mill'],
   };
 
+  const equipmentPhaseTypeMap: { [key: string]: string | string[] } = {
+    GrainAdd: [
+      'Corn',
+      'Rye',
+      'Malt',
+      'Wheat',
+      'Premalt',
+      'Specialty'
+    ],
+    LiquidAdd: [
+      'Water',
+      'Backset',
+    ],
+    AdditiveAdd: [
+      'Nutrient',
+      'Enzyme',
+      'Yeast',
+      'Citric'
+    ],
+    Hold: [
+      'Hold',
+      'Cool',
+      'Heat',
+    ],
+    Rinse: [
+      'Vessel',
+      'Pipe',
+    ],
+  }
+
   // equipment phase
   async function seedEquipmentPhase(): Promise<void> {
     const operations = await client.operation.findMany();
@@ -768,8 +786,23 @@ export async function customSeed() {
     // Seed class definitions for each EquipmentPhase name
     for (const name of Object.values(EnumEquipmentPhaseName)) {
       // use name to get the key that matches from operationEquipmentPhasesMap
-      const operationName = Object.keys(operationEquipmentPhasesMap).find(key => operationEquipmentPhasesMap[key].includes(name));
+      const operationName = Object.keys(operationEquipmentPhasesMap).find(key => operationEquipmentPhasesMap[key].includes(name)) as string;
       const operation = operations.find(op => op.name === operationName) as Operation;
+
+
+      // use the key to get the equipmentPhaseTypeMap
+      let arrLength = 1;
+      let equipmentPhaseTypeString: string = '';
+      try {
+        arrLength = equipmentPhaseTypeMap[name].length;
+        // equipmentPhaseTypeString = equipmentPhaseTypeMap[operationEquipmentPhasesMap[operationName][faker.number.int({min: 0, max: arrLength - 1 })]] as string;
+        equipmentPhaseTypeString = equipmentPhaseTypeMap[name][faker.number.int({min: 0, max: arrLength - 1 })]
+
+      } catch (error) {
+      }
+
+      // cast string to the value in the Enum
+      let equipmentPhaseType = EnumEquipmentPhaseStepType[equipmentPhaseTypeString as keyof typeof EnumEquipmentPhaseStepType];
       try {
         // const operation = getRandomArrayElement(operations) as any;
         const classDefinition = await client.equipmentPhase.create({
@@ -780,12 +813,16 @@ export async function customSeed() {
             operation: { connect: { id: operation.id } },
             isClassDefinition: true,
             // Additional fields as necessary
+            stepType: equipmentPhaseType,
           },
         });
 
         // Seed instances for the class definition
         const instancesCount = faker.number.int({ min: 1, max: 5 });
         for (let i = 0; i < instancesCount; i++) {
+          equipmentPhaseTypeString = equipmentPhaseTypeMap[name][faker.number.int({min: 0, max: arrLength - 1 })]
+          equipmentPhaseType = EnumEquipmentPhaseStepType[equipmentPhaseTypeString as keyof typeof EnumEquipmentPhaseStepType];
+
           await client.equipmentPhase.create({
             data: {
               createdBy: faker.internet.userName(),
@@ -794,8 +831,12 @@ export async function customSeed() {
               operation: { connect: { id: operation.id } },
               // classId: classDefinition.id,
               isClassDefinition: false,
-              revision: i + 1, // Incremental revisions for instances
+              classId: {
+                  connect: {id: classDefinition.id},
+              },
+              revision: i + 1, // Incremental revis// ions for instances
               // Additional fields as necessary
+              stepType: equipmentPhaseType,
             },
           });
         }
