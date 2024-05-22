@@ -70,6 +70,7 @@ export class OperationControllerBase {
       select: {
         abbreviation: true,
         active: true,
+        auxiliaryPhases: true,
 
         classId: {
           select: {
@@ -120,6 +121,7 @@ export class OperationControllerBase {
       select: {
         abbreviation: true,
         active: true,
+        auxiliaryPhases: true,
 
         classId: {
           select: {
@@ -171,6 +173,7 @@ export class OperationControllerBase {
       select: {
         abbreviation: true,
         active: true,
+        auxiliaryPhases: true,
 
         classId: {
           select: {
@@ -245,6 +248,7 @@ export class OperationControllerBase {
         select: {
           abbreviation: true,
           active: true,
+          auxiliaryPhases: true,
 
           classId: {
             select: {
@@ -431,6 +435,7 @@ export class OperationControllerBase {
       select: {
         abbreviation: true,
         active: true,
+        auxiliaryPhases: true,
 
         classId: {
           select: {
