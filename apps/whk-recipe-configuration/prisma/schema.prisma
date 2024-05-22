@@ -252,10 +252,12 @@ model ScheduleOrderQueue {
   nextUnitProcedureId   String              @unique
   nextUnitProcedureName String
   productionSchedule    ProductionSchedule?
-  queueIndex            Int?                @unique
+  queueIndex            Int?
   schemaVersion         String?             @default("0001-b")
   updatedAt             DateTime            @updatedAt
   updatedBy             String?
+
+  @@unique([queueIndexId, nextUnitProcedureId])
 }
 
 model UnitProcedure {
