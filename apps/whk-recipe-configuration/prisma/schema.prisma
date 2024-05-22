@@ -261,7 +261,7 @@ model ScheduleOrderQueue {
   updatedAt             DateTime            @updatedAt
   updatedBy             String?
 
-  @@unique([queueIndexId, nextUnitProcedureId])
+  @@unique([queueIndex, nextUnitProcedureId])
 }
 
 model UnitProcedure {
