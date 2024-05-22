@@ -22,6 +22,7 @@ import {
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
 import { Bom } from "../../bom/base/Bom";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
@@ -75,6 +76,15 @@ class Item {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: false,

@@ -22,9 +22,11 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
+import { Item } from "../../item/base/Item";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { Operation } from "../../operation/base/Operation";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 
 @ObjectType()
@@ -161,6 +163,26 @@ class EquipmentPhase {
   isClassDefinition!: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message!: string | null;
+
+  @ApiProperty({
     required: true,
     enum: EnumEquipmentPhaseName,
   })
@@ -169,7 +191,6 @@ class EquipmentPhase {
     nullable: true,
   })
   name?:
-    | "PreSteam"
     | "Steam"
     | "Hold"
     | "BacksetAdd"
@@ -195,7 +216,10 @@ class EquipmentPhase {
     | "StillStartup"
     | "StillShutdown"
     | "Cut"
-    | "Gauge";
+    | "Gauge"
+    | "GrainAdd"
+    | "LiquidAdd"
+    | "Prompt";
 
   @ApiProperty({
     required: true,
@@ -257,6 +281,34 @@ class EquipmentPhase {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumEquipmentPhaseStepType,
+  })
+  @IsEnum(EnumEquipmentPhaseStepType)
+  @Field(() => EnumEquipmentPhaseStepType, {
+    nullable: true,
+  })
+  stepType?:
+    | "Water"
+    | "Backset"
+    | "Corn"
+    | "Rye"
+    | "Wheat"
+    | "Malt"
+    | "Premalt"
+    | "Speciality"
+    | "Enzyme"
+    | "Nutrient"
+    | "Yeast"
+    | "Citric"
+    | "Hold"
+    | "Cool"
+    | "NotRequired"
+    | "Heat"
+    | "Vessel"
+    | "Pipe";
 
   @ApiProperty({
     required: false,
