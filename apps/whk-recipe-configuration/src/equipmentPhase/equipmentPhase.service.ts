@@ -19,7 +19,6 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
 
   private operationEquipmentPhasesMap: { [key: string]: string[] } = {
     Cook: [
-      'PreSteam',
       'Steam',
       'Hold',
       'BacksetAdd',
@@ -36,13 +35,17 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       'Cooldown',
       'HotFlush',
       'CIP',
+      'GrainAdd',
+      'LiquidAdd',
     ],
     FermenterSet: [
       'DropToMashCooler',
       'Fill',
+      'Prompt'
     ],
     Fermenter: [
       'Run',
+      'Prompt'
     ],
     Clean: [
       'FermenterSteam',
@@ -57,62 +60,43 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
   };
 
   private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
-    PreSteam: ['TemperatureSetpoint'],
     CornAdd: [
       'Quantity',
-      'Units',
     ],
     MaltAdd: [
       'Quantity',
-      'Units',
     ],
     RyeAdd: [
       'Quantity',
-      'Units',
     ],
     WheatAdd: [
       'Quantity',
-      'Units',
     ],
     AdditiveAdd: [
       'Quantity',
-      'Units',
-      'ItemName',
     ],
     Prompt: [
-      'Type',
-      'Message',
-      'Header',
-      'Duration',
-      'Units',
-      'Confirmation',
     ],
     Hold: [
-      'Duration',
-      'Units'
+      'Time',
+      'Temperature'
     ],
     Steam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     Cooldown: [
-      'Duration',
-      'Units',
-      'TemperatureSetpoint',
-    ],
-    PhCapture: [
-      'TODO'
+      'Time',
+      'Temperature',
     ],
     Drop: [
-      'FlowSetpoint',
+      'FlowRate',
       'SprayballTime',
-      'FlushTime',
+      'Time',
     ],
     Rinse: [
-      'Duration',
-      'Units',
-      'TemperatureSetpoint',
+      'Time',
+      'Temperature',
     ],
     DropTubToMashCooler: [
       'MashPumpSetpoint',
@@ -121,32 +105,28 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       'MashCoolerEnable',
     ],
     Fill: [
-      'LevelSetpoint',
-      'AgitationSpeed',
-      'TemperatureSetpoint',
+      'Level',
+      'Speed',
+      'Temperature',
     ],
     FermDrop: [
-      'LevelSetpoint',
+      'Level',
     ],
     FermSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     DropLineSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     DropTubSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     CoolerSteam: [
-      'TemperatureSetpoint',
-      'Duration',
-      'Units',
+      'Temperature',
+      'Time',
     ],
     StillRun: [
       'TowerWaterTemperatureSetpoint',
@@ -155,12 +135,85 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       'LowWineProof',
       'HighWineProof',
     ],
+    GrainAdd: [
+      'Quantity',
+    ],
+    LiquidAdd: [
+      'Quantity',
+      'Speed' // Agitator speed
+    ],
+
+  }
+
+  private equipmentPhaseTypeMap: { [key: string]: string | string[] } = {
+    // Steam: 'Steam',
+    // BacksetAdd: 'BacksetAdd',
+    // WaterAdd: 'WaterAdd',
+    // CornAdd: 'CornAdd',
+    // MaltAdd: 'MaltAdd',
+    // RyeAdd: 'RyeAdd',
+    // WheatAdd: 'WheatAdd',
+    // Drop: 'Drop',
+    // PhCapture: 'PhCapture',
+    // Prompt: 'Prompt',
+    // Cooldown: 'Cooldown',
+    // HotFlush: 'HotFlush',
+    // CIP: 'CIP',
+    // DropToMashCooler: 'DropToMashCooler',
+    // Fill: 'Fill',
+    // Run: 'Run',
+    // FermenterSteam: 'FermenterSteam',
+    // CoolerSteam: 'CoolerSteam',
+    // DropTubSteam: 'DropTubSteam',
+    // DropLineSteam: 'DropLineSteam',
+    // StillStartup: 'StillStartup',
+    // StillRun: 'StillRun',
+    // StillShutdown: 'StillShutdown',
+    // Cut: 'Cut',
+    // Gauge: 'Gauge',
+    // BarrelFill: 'BarrelFill',
+    // Mill: 'Mill',
+    GrainAdd: [
+        'Corn',
+        'Rye',
+        'Malt',
+        'Wheat',
+        'Premalt',
+        'Specialty'
+    ],
+    LiquidAdd: [
+        'Water',
+        'Backset',
+    ],
+    AdditiveAdd: [
+        'Nutrient',
+        'Enzyme',
+        'Yeast',
+        'Citric'
+    ],
+    Hold: [
+        'Hold',
+        'Cool',
+        'Heat',
+    ],
+    Rinse: [
+        'Vessel',
+        'Pipe',
+    ],
   }
 
   async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
       args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCreateArgs>
   ): Promise<EquipmentPhase> {
     const name = args.data.name as string;
+
+    // check type parameter for compliance with the equipment phase type map
+    const type = args.data.stepType as string;
+    const equipmentPhaseType = this.equipmentPhaseTypeMap[name];
+    // check if type is in the type map
+    if (equipmentPhaseType && Array.isArray(equipmentPhaseType) && !equipmentPhaseType.includes(type)) {
+        throw new BadRequestException(`Equipment Phase Type: ${type} is not supported for entity ${this.constructor.name}`);
+    }
 
     if (args.data.operation?.connect?.id) {
       const operationId = args.data.operation?.connect?.id;
