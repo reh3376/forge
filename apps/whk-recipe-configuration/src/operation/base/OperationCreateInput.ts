@@ -19,6 +19,9 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
@@ -46,6 +49,16 @@ class OperationCreateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  auxiliaryPhases?: InputJsonValue;
 
   @ApiProperty({
     required: false,

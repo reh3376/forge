@@ -624,6 +624,7 @@ export class UnitProcedureControllerBase {
       select: {
         abbreviation: true,
         active: true,
+        auxiliaryPhases: true,
 
         classId: {
           select: {

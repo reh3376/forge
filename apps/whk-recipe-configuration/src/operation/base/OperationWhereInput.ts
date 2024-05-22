@@ -15,6 +15,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { JsonFilter } from "../../util/JsonFilter";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -48,6 +49,17 @@ class OperationWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  auxiliaryPhases?: JsonFilter;
 
   @ApiProperty({
     required: false,
