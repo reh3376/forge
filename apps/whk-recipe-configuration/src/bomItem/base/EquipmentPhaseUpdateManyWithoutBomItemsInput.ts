@@ -14,7 +14,7 @@ import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/Equipm
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class EquipmentPhaseCreateNestedManyWithoutItemsInput {
+class EquipmentPhaseUpdateManyWithoutBomItemsInput {
   @Field(() => [EquipmentPhaseWhereUniqueInput], {
     nullable: true,
   })
@@ -23,6 +23,24 @@ class EquipmentPhaseCreateNestedManyWithoutItemsInput {
     type: () => [EquipmentPhaseWhereUniqueInput],
   })
   connect?: Array<EquipmentPhaseWhereUniqueInput>;
+
+  @Field(() => [EquipmentPhaseWhereUniqueInput], {
+    nullable: true,
+  })
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhaseWhereUniqueInput],
+  })
+  disconnect?: Array<EquipmentPhaseWhereUniqueInput>;
+
+  @Field(() => [EquipmentPhaseWhereUniqueInput], {
+    nullable: true,
+  })
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhaseWhereUniqueInput],
+  })
+  set?: Array<EquipmentPhaseWhereUniqueInput>;
 }
 
-export { EquipmentPhaseCreateNestedManyWithoutItemsInput as EquipmentPhaseCreateNestedManyWithoutItemsInput };
+export { EquipmentPhaseUpdateManyWithoutBomItemsInput as EquipmentPhaseUpdateManyWithoutBomItemsInput };

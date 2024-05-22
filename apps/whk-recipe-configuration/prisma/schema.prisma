@@ -126,6 +126,8 @@ model Instruction {
 
 model EquipmentPhase {
   active                 Boolean?                   @default(true)
+  bomItem                BomItem?                   @relation(fields: [bomItemId], references: [id])
+  bomItemId              String?
   classId                EquipmentPhase?            @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
   classIdId              String?
   className              String?
@@ -139,8 +141,6 @@ model EquipmentPhase {
   instances              EquipmentPhase[]           @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances")
   instructions           Instruction[]
   isClassDefinition      Boolean?                   @default(false)
-  item                   Item?                      @relation(fields: [itemId], references: [id])
-  itemId                 String?
   message                String?
   name                   EnumEquipmentPhaseName
   operation              Operation                  @relation(fields: [operationId], references: [id])
@@ -374,7 +374,6 @@ model Item {
   bomsWipItem                   Bom[]
   createdAt                     DateTime                       @default(now())
   createdBy                     String
-  equipmentPhases               EquipmentPhase[]
   globalId                      String?                        @unique @default(cuid())
   id                            String                         @id @default(cuid())
   itemClass                     EnumItemItemClass
@@ -573,19 +572,20 @@ model Lot {
 }
 
 model BomItem {
-  bom            Bom?     @relation(fields: [bomId], references: [id])
-  bomId          String?
-  createdAt      DateTime @default(now())
-  createdBy      String
-  id             String   @id @default(cuid())
-  item           Item     @relation(fields: [itemId], references: [id])
-  itemId         String
-  quantity       Decimal
-  quantityActual Decimal?
-  units          Unit?    @relation(fields: [unitsId], references: [id])
-  unitsId        String?
-  updatedAt      DateTime @updatedAt
-  updatedBy      String?
+  bom             Bom?             @relation(fields: [bomId], references: [id])
+  bomId           String?
+  createdAt       DateTime         @default(now())
+  createdBy       String
+  equipmentPhases EquipmentPhase[]
+  id              String           @id @default(cuid())
+  item            Item             @relation(fields: [itemId], references: [id])
+  itemId          String
+  quantity        Decimal
+  quantityActual  Decimal?
+  units           Unit?            @relation(fields: [unitsId], references: [id])
+  unitsId         String?
+  updatedAt       DateTime         @updatedAt
+  updatedBy       String?
 }
 
 model Unit {

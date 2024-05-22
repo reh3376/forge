@@ -16,7 +16,6 @@ import {
   Item as PrismaItem,
   BomItem as PrismaBomItem,
   Bom as PrismaBom,
-  EquipmentPhase as PrismaEquipmentPhase,
   ItemReceipt as PrismaItemReceipt,
   ProductionOrder as PrismaProductionOrder,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
@@ -77,17 +76,6 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .bomsWipItem(args);
-  }
-
-  async findEquipmentPhases(
-    parentId: string,
-    args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<PrismaEquipmentPhase[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .equipmentPhases(args);
   }
 
   async findItemReceipts(

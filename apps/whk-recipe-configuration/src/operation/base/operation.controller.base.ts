@@ -302,6 +302,12 @@ export class OperationControllerBase {
       select: {
         active: true,
 
+        bomItem: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -317,13 +323,6 @@ export class OperationControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         message: true,
         name: true,
 

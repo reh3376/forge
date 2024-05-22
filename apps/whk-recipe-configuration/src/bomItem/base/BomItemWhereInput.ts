@@ -15,6 +15,7 @@ import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 import { StringFilter } from "../../util/StringFilter";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
@@ -45,6 +46,18 @@ class BomItemWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,

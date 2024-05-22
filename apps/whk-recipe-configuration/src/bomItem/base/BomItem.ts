@@ -20,6 +20,7 @@ import {
   IsNumber,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Item } from "../../item/base/Item";
 import { Decimal } from "decimal.js";
 import { Unit } from "../../unit/base/Unit";
@@ -50,6 +51,15 @@ class BomItem {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: true,

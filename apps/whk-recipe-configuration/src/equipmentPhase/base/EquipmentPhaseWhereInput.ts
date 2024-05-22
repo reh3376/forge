@@ -14,13 +14,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { EquipmentPhaseListRelationFilter } from "./EquipmentPhaseListRelationFilter";
 import { InstructionListRelationFilter } from "../../instruction/base/InstructionListRelationFilter";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -40,6 +40,18 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomItemWhereUniqueInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -175,18 +187,6 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   isClassDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
