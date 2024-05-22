@@ -19,13 +19,15 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
-import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
 @InputType()
@@ -40,6 +42,18 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomItemWhereUniqueInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -145,6 +159,17 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message?: string | null;
+
+  @ApiProperty({
+    required: false,
     enum: EnumEquipmentPhaseName,
   })
   @IsEnum(EnumEquipmentPhaseName)
@@ -153,7 +178,6 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   name?:
-    | "PreSteam"
     | "Steam"
     | "Hold"
     | "BacksetAdd"
@@ -179,7 +203,10 @@ class EquipmentPhaseUpdateInput {
     | "StillStartup"
     | "StillShutdown"
     | "Cut"
-    | "Gauge";
+    | "Gauge"
+    | "GrainAdd"
+    | "LiquidAdd"
+    | "Prompt";
 
   @ApiProperty({
     required: false,
@@ -248,6 +275,35 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumEquipmentPhaseStepType,
+  })
+  @IsEnum(EnumEquipmentPhaseStepType)
+  @IsOptional()
+  @Field(() => EnumEquipmentPhaseStepType, {
+    nullable: true,
+  })
+  stepType?:
+    | "Water"
+    | "Backset"
+    | "Corn"
+    | "Rye"
+    | "Wheat"
+    | "Malt"
+    | "Premalt"
+    | "Speciality"
+    | "Enzyme"
+    | "Nutrient"
+    | "Yeast"
+    | "Citric"
+    | "Hold"
+    | "Cool"
+    | "NotRequired"
+    | "Heat"
+    | "Vessel"
+    | "Pipe";
 
   @ApiProperty({
     required: false,
