@@ -625,10 +625,13 @@ enum EnumPhaseParameterSetpointType {
 }
 
 enum EnumPhaseParameterStaticName {
-  HoldTime
   Temperature
   Time
   Quantity
+  Speed
+  FlowRate
+  SprayballTime
+  Level
 }
 
 enum EnumTestParameterTestParamUnits {
