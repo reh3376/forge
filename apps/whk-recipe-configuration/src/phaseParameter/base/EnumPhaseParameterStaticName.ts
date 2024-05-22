@@ -12,10 +12,10 @@ https://docs.amplication.com/how-to/custom-code
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum EnumPhaseParameterStaticName {
-  HoldTime = "HoldTime",
   Temperature = "Temperature",
   Time = "Time",
   Quantity = "Quantity",
+  Speed = "Speed",
 }
 
 registerEnumType(EnumPhaseParameterStaticName, {
