@@ -202,6 +202,12 @@ export class InstructionControllerBase {
       select: {
         active: true,
 
+        bomItem: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -217,6 +223,7 @@ export class InstructionControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -229,6 +236,7 @@ export class InstructionControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (results === null) {

@@ -19,6 +19,7 @@ import {
   IsNumber,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { UnitWhereUniqueInput } from "../../unit/base/UnitWhereUniqueInput";
@@ -44,6 +45,18 @@ class BomItemCreateInput {
   @IsString()
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomItemsInput;
 
   @ApiProperty({
     required: true,
