@@ -629,6 +629,9 @@ enum EnumPhaseParameterStaticName {
   Time
   Quantity
   Speed
+  FlowRate
+  SprayballTime
+  Level
 }
 
 enum EnumTestParameterTestParamUnits {
