@@ -37,7 +37,7 @@
     "@nestjs/platform-express": "10.3.7",
     "@nestjs/serve-static": "4.0.2",
     "@nestjs/swagger": "7.3.1",
-    "@prisma/client": "^5.13.0",
+    "@prisma/client": "5.11.0",
     "@types/bcrypt": "5.0.2",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",

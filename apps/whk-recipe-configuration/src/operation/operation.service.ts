@@ -42,13 +42,17 @@ export class OperationService extends OperationServiceBase {
       'Cooldown',
       'HotFlush',
       'CIP',
+      'GrainAdd',
+      'LiquidAdd',
     ],
     FermenterSet: [
       'DropToMashCooler',
       'Fill',
+      'Prompt'
     ],
     Fermenter: [
       'Run',
+
     ],
     Clean: [
       'FermenterSteam',
