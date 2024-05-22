@@ -16,6 +16,9 @@ export enum EnumPhaseParameterStaticName {
   Time = "Time",
   Quantity = "Quantity",
   Speed = "Speed",
+  FlowRate = "FlowRate",
+  SprayballTime = "SprayballTime",
+  Level = "Level",
 }
 
 registerEnumType(EnumPhaseParameterStaticName, {
