@@ -19,11 +19,11 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
-import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
@@ -42,6 +42,18 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomItemWhereUniqueInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -144,18 +156,6 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

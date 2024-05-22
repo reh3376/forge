@@ -17,7 +17,6 @@ import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
@@ -73,18 +72,6 @@ class ItemWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseListRelationFilter)
-  @IsOptional()
-  @Field(() => EquipmentPhaseListRelationFilter, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,

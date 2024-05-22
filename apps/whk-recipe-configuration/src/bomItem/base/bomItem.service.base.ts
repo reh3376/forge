@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   BomItem as PrismaBomItem,
+  EquipmentPhase as PrismaEquipmentPhase,
   Bom as PrismaBom,
   Item as PrismaItem,
   Unit as PrismaUnit,
@@ -50,6 +51,17 @@ export class BomItemServiceBase {
     args: Prisma.SelectSubset<T, Prisma.BomItemDeleteArgs>
   ): Promise<PrismaBomItem> {
     return this.prisma.bomItem.delete(args);
+  }
+
+  async findEquipmentPhases(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<PrismaEquipmentPhase[]> {
+    return this.prisma.bomItem
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .equipmentPhases(args);
   }
 
   async getBom(parentId: string): Promise<PrismaBom | null> {
