@@ -17,62 +17,43 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
   }
 
     private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
-        PreSteam: ['TemperatureSetpoint'],
         CornAdd: [
             'Quantity',
-            'Units',
         ],
         MaltAdd: [
             'Quantity',
-            'Units',
         ],
         RyeAdd: [
             'Quantity',
-            'Units',
         ],
         WheatAdd: [
             'Quantity',
-            'Units',
         ],
         AdditiveAdd: [
             'Quantity',
-            'Units',
-            'ItemName',
         ],
         Prompt: [
-            'Type',
-            'Message',
-            'Header',
-            'Duration',
-            'Units',
-            'Confirmation',
         ],
         Hold: [
-            'Duration',
-            'Units'
+            'Time',
+            'Temperature'
         ],
         Steam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         Cooldown: [
-            'Duration',
-            'Units',
-            'TemperatureSetpoint',
-        ],
-        PhCapture: [
-            'TODO'
+            'Time',
+            'Temperature',
         ],
         Drop: [
-            'FlowSetpoint',
+            'FlowRate',
             'SprayballTime',
-            'FlushTime',
+            'Time',
         ],
         Rinse: [
-            'Duration',
-            'Units',
-            'TemperatureSetpoint',
+            'Time',
+            'Temperature',
         ],
         DropTubToMashCooler: [
             'MashPumpSetpoint',
@@ -81,32 +62,28 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
             'MashCoolerEnable',
         ],
         Fill: [
-            'LevelSetpoint',
-            'AgitationSpeed',
-            'TemperatureSetpoint',
+            'Level',
+            'Speed',
+            'Temperature',
         ],
         FermDrop: [
-            'LevelSetpoint',
+            'Level',
         ],
         FermSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         DropLineSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         DropTubSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         CoolerSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         StillRun: [
             'TowerWaterTemperatureSetpoint',
@@ -115,6 +92,14 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
             'LowWineProof',
             'HighWineProof',
         ],
+        GrainAdd: [
+            'Quantity',
+        ],
+        LiquidAdd: [
+            'Quantity',
+            'Speed' // Agitator speed
+        ],
+
     }
 
   async createPhaseParameter<T extends Prisma.PhaseParameterCreateArgs>(
