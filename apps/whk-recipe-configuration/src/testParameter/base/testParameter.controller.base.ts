@@ -310,6 +310,14 @@ export class TestParameterControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        message: true,
         name: true,
 
         operation: {
@@ -322,6 +330,7 @@ export class TestParameterControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (results === null) {

@@ -21,6 +21,7 @@ import {
 import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
+import { EquipmentPhaseUpdateManyWithoutItemsInput } from "./EquipmentPhaseUpdateManyWithoutItemsInput";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
@@ -75,6 +76,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

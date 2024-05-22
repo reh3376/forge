@@ -317,6 +317,14 @@ export class OperationControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        message: true,
         name: true,
 
         operation: {
@@ -329,6 +337,7 @@ export class OperationControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (results === null) {
