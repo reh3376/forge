@@ -14,10 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   EquipmentPhase as PrismaEquipmentPhase,
+  BomItem as PrismaBomItem,
   Instruction as PrismaInstruction,
   PhaseParameter as PrismaPhaseParameter,
   TestParameter as PrismaTestParameter,
-  BomItem as PrismaBomItem,
   Operation as PrismaOperation,
 } from "@prisma/client";
 
@@ -56,6 +56,17 @@ export class EquipmentPhaseServiceBase {
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseDeleteArgs>
   ): Promise<PrismaEquipmentPhase> {
     return this.prisma.equipmentPhase.delete(args);
+  }
+
+  async findBomItem(
+    parentId: string,
+    args: Prisma.BomItemFindManyArgs
+  ): Promise<PrismaBomItem[]> {
+    return this.prisma.equipmentPhase
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .bomItem(args);
   }
 
   async findInstances(
@@ -100,14 +111,6 @@ export class EquipmentPhaseServiceBase {
         where: { id: parentId },
       })
       .testParameters(args);
-  }
-
-  async getBomItem(parentId: string): Promise<PrismaBomItem | null> {
-    return this.prisma.equipmentPhase
-      .findUnique({
-        where: { id: parentId },
-      })
-      .bomItem();
   }
 
   async getClassId(parentId: string): Promise<PrismaEquipmentPhase | null> {

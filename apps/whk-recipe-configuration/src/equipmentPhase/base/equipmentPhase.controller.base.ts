@@ -26,6 +26,9 @@ import { EquipmentPhase } from "./EquipmentPhase";
 import { EquipmentPhaseFindManyArgs } from "./EquipmentPhaseFindManyArgs";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateInput } from "./EquipmentPhaseUpdateInput";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
 import { Instruction } from "../../instruction/base/Instruction";
 import { InstructionWhereUniqueInput } from "../../instruction/base/InstructionWhereUniqueInput";
@@ -61,12 +64,6 @@ export class EquipmentPhaseControllerBase {
       data: {
         ...data,
 
-        bomItem: data.bomItem
-          ? {
-              connect: data.bomItem,
-            }
-          : undefined,
-
         classId: data.classId
           ? {
               connect: data.classId,
@@ -79,12 +76,6 @@ export class EquipmentPhaseControllerBase {
       },
       select: {
         active: true,
-
-        bomItem: {
-          select: {
-            id: true,
-          },
-        },
 
         classId: {
           select: {
@@ -140,12 +131,6 @@ export class EquipmentPhaseControllerBase {
       select: {
         active: true,
 
-        bomItem: {
-          select: {
-            id: true,
-          },
-        },
-
         classId: {
           select: {
             id: true,
@@ -198,12 +183,6 @@ export class EquipmentPhaseControllerBase {
       where: params,
       select: {
         active: true,
-
-        bomItem: {
-          select: {
-            id: true,
-          },
-        },
 
         classId: {
           select: {
@@ -266,12 +245,6 @@ export class EquipmentPhaseControllerBase {
         data: {
           ...data,
 
-          bomItem: data.bomItem
-            ? {
-                connect: data.bomItem,
-              }
-            : undefined,
-
           classId: data.classId
             ? {
                 connect: data.classId,
@@ -284,12 +257,6 @@ export class EquipmentPhaseControllerBase {
         },
         select: {
           active: true,
-
-          bomItem: {
-            select: {
-              id: true,
-            },
-          },
 
           classId: {
             select: {
@@ -333,6 +300,125 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomItem")
+  @ApiNestedQuery(BomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItem(
+    @common.Req() request: Request,
+    @common.Param() params: EquipmentPhaseWhereUniqueInput
+  ): Promise<BomItem[]> {
+    const query = plainToClass(BomItemFindManyArgs, request.query);
+    const results = await this.service.findBomItem(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        quantityActual: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomItem(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        connect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomItem(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        set: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomItem(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -349,12 +435,6 @@ export class EquipmentPhaseControllerBase {
       ...query,
       select: {
         active: true,
-
-        bomItem: {
-          select: {
-            id: true,
-          },
-        },
 
         classId: {
           select: {
@@ -592,13 +672,6 @@ export class EquipmentPhaseControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-
-        equipmentPhase: {
-          select: {
-            id: true,
-          },
-        },
-
         globalId: true,
         id: true,
         isClassDef: true,

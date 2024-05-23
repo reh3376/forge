@@ -202,12 +202,6 @@ export class InstructionControllerBase {
       select: {
         active: true,
 
-        bomItem: {
-          select: {
-            id: true,
-          },
-        },
-
         classId: {
           select: {
             id: true,
