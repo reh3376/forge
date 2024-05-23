@@ -93,7 +93,7 @@ class PhaseParameterWhereInput {
   @Field(() => EquipmentPhaseListRelationFilter, {
     nullable: true,
   })
-  equipmentPhase?: EquipmentPhaseListRelationFilter;
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,

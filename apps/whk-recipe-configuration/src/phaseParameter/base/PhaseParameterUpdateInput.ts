@@ -95,7 +95,7 @@ class PhaseParameterUpdateInput {
   @Field(() => EquipmentPhaseUpdateManyWithoutPhaseParametersInput, {
     nullable: true,
   })
-  equipmentPhase?: EquipmentPhaseUpdateManyWithoutPhaseParametersInput;
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,

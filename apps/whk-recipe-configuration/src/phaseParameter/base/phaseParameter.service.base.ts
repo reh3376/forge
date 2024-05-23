@@ -54,7 +54,7 @@ export class PhaseParameterServiceBase {
     return this.prisma.phaseParameter.delete(args);
   }
 
-  async findEquipmentPhase(
+  async findEquipmentPhases(
     parentId: string,
     args: Prisma.EquipmentPhaseFindManyArgs
   ): Promise<PrismaEquipmentPhase[]> {
@@ -62,7 +62,7 @@ export class PhaseParameterServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .equipmentPhase(args);
+      .equipmentPhases(args);
   }
 
   async findInstances(

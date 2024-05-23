@@ -26,7 +26,7 @@ model PhaseParameter {
   createdBy              String
   description            String
   editedBy               String?
-  equipmentPhase         EquipmentPhase[]
+  equipmentPhases        EquipmentPhase[]
   globalId               String?                        @unique @default(cuid())
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
