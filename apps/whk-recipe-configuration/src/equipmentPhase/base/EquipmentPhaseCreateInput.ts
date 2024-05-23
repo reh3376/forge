@@ -26,7 +26,6 @@ import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./Equ
 import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./TestParameterCreateNestedManyWithoutEquipmentPhasesInput";
 
@@ -232,18 +231,6 @@ class EquipmentPhaseCreateInput {
     nullable: true,
   })
   path?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,

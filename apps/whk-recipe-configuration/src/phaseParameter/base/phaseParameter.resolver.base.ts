@@ -25,8 +25,6 @@ import { PhaseParameterFindManyArgs } from "./PhaseParameterFindManyArgs";
 import { PhaseParameterFindUniqueArgs } from "./PhaseParameterFindUniqueArgs";
 import { CreatePhaseParameterArgs } from "./CreatePhaseParameterArgs";
 import { UpdatePhaseParameterArgs } from "./UpdatePhaseParameterArgs";
-import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { PhaseParameterService } from "../phaseParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => PhaseParameter)
@@ -136,26 +134,6 @@ export class PhaseParameterResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [EquipmentPhase], { name: "equipmentPhases" })
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "read",
-    possession: "any",
-  })
-  async findEquipmentPhases(
-    @graphql.Parent() parent: PhaseParameter,
-    @graphql.Args() args: EquipmentPhaseFindManyArgs
-  ): Promise<EquipmentPhase[]> {
-    const results = await this.service.findEquipmentPhases(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

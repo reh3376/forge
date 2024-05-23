@@ -29,8 +29,6 @@ import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
 import { Instruction } from "../../instruction/base/Instruction";
-import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
-import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Operation } from "../../operation/base/Operation";
@@ -205,26 +203,6 @@ export class EquipmentPhaseResolverBase {
     @graphql.Args() args: InstructionFindManyArgs
   ): Promise<Instruction[]> {
     const results = await this.service.findInstructions(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [PhaseParameter], { name: "phaseParameters" })
-  @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
-    action: "read",
-    possession: "any",
-  })
-  async findPhaseParameters(
-    @graphql.Parent() parent: EquipmentPhase,
-    @graphql.Args() args: PhaseParameterFindManyArgs
-  ): Promise<PhaseParameter[]> {
-    const results = await this.service.findPhaseParameters(parent.id, args);
 
     if (!results) {
       return [];
