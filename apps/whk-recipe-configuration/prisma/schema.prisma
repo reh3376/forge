@@ -145,7 +145,7 @@ model EquipmentPhase {
   operationId            String
   operationSequenceIndex Int?
   path                   String?
-  phaseParameter         PhaseParameter[]
+  phaseParameters        PhaseParameter[]
   revision               Int?                       @default(0)
   schemaVersion          String?                    @default("0001-b")
   stepType               EnumEquipmentPhaseStepType @default(NotRequired)

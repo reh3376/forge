@@ -243,7 +243,7 @@ class EquipmentPhaseCreateInput {
   @Field(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput, {
     nullable: true,
   })
-  phaseParameter?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
+  phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,
