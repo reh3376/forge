@@ -22,7 +22,7 @@ import {
 } from "class-validator";
 import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { Type } from "class-transformer";
-import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput";
 import { PhaseParameterCreateNestedManyWithoutPhaseParametersInput } from "./PhaseParameterCreateNestedManyWithoutPhaseParametersInput";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
@@ -81,15 +81,15 @@ class PhaseParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseWhereUniqueInput,
+    type: () => EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput,
   })
   @ValidateNested()
-  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput)
   @IsOptional()
-  @Field(() => EquipmentPhaseWhereUniqueInput, {
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput, {
     nullable: true,
   })
-  equipmentPhase?: EquipmentPhaseWhereUniqueInput | null;
+  equipmentPhase?: EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,
