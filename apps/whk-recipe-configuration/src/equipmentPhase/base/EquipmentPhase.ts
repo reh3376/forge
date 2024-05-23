@@ -25,6 +25,7 @@ import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { Operation } from "../../operation/base/Operation";
+import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 
@@ -249,6 +250,15 @@ class EquipmentPhase {
     nullable: true,
   })
   path!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PhaseParameter],
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  phaseParameter?: Array<PhaseParameter>;
 
   @ApiProperty({
     required: false,

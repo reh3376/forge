@@ -24,6 +24,7 @@ import { InstructionListRelationFilter } from "../../instruction/base/Instructio
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { PhaseParameterListRelationFilter } from "../../phaseParameter/base/PhaseParameterListRelationFilter";
 import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 
@@ -271,6 +272,18 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   path?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => PhaseParameterListRelationFilter, {
+    nullable: true,
+  })
+  phaseParameter?: PhaseParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

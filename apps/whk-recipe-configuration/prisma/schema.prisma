@@ -26,6 +26,7 @@ model PhaseParameter {
   createdBy              String
   description            String
   editedBy               String?
+  equipmentPhases        EquipmentPhase[]
   globalId               String?                        @unique @default(cuid())
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
@@ -144,6 +145,7 @@ model EquipmentPhase {
   operationId            String
   operationSequenceIndex Int?
   path                   String?
+  phaseParameter         PhaseParameter[]
   revision               Int?                       @default(0)
   schemaVersion          String?                    @default("0001-b")
   stepType               EnumEquipmentPhaseStepType @default(NotRequired)

@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseUpdateManyWithoutPhaseParametersInput } from "./EquipmentPhaseUpdateManyWithoutPhaseParametersInput";
 import { PhaseParameterUpdateManyWithoutPhaseParametersInput } from "./PhaseParameterUpdateManyWithoutPhaseParametersInput";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
@@ -83,6 +84,18 @@ class PhaseParameterUpdateInput {
     nullable: true,
   })
   editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutPhaseParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutPhaseParametersInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutPhaseParametersInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,

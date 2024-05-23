@@ -32,6 +32,9 @@ import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueIn
 import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
 import { Instruction } from "../../instruction/base/Instruction";
 import { InstructionWhereUniqueInput } from "../../instruction/base/InstructionWhereUniqueInput";
+import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
+import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
@@ -631,6 +634,127 @@ export class EquipmentPhaseControllerBase {
   ): Promise<void> {
     const data = {
       instructions: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/phaseParameter")
+  @ApiNestedQuery(PhaseParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findPhaseParameter(
+    @common.Req() request: Request,
+    @common.Param() params: EquipmentPhaseWhereUniqueInput
+  ): Promise<PhaseParameter[]> {
+    const query = plainToClass(PhaseParameterFindManyArgs, request.query);
+    const results = await this.service.findPhaseParameter(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedBy: true,
+        globalId: true,
+        id: true,
+        isClassDef: true,
+        isStaticParameter: true,
+        itemId: true,
+        name: true,
+        recipeId: true,
+        revision: true,
+        schemaVersion: true,
+        setpointBooleanValue: true,
+        setpointLowerLimit: true,
+        setpointNumericalValue: true,
+        setpointType: true,
+        setpointUpperLimit: true,
+        staticName: true,
+        units: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/phaseParameter")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async connectPhaseParameter(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: PhaseParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      phaseParameter: {
+        connect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/phaseParameter")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async updatePhaseParameter(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: PhaseParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      phaseParameter: {
+        set: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/phaseParameter")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectPhaseParameter(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: PhaseParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      phaseParameter: {
         disconnect: body,
       },
     };
