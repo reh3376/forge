@@ -26,6 +26,9 @@ import { PhaseParameter } from "./PhaseParameter";
 import { PhaseParameterFindManyArgs } from "./PhaseParameterFindManyArgs";
 import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { PhaseParameterUpdateInput } from "./PhaseParameterUpdateInput";
+import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -57,12 +60,6 @@ export class PhaseParameterControllerBase {
               connect: data.classId,
             }
           : undefined,
-
-        equipmentPhase: data.equipmentPhase
-          ? {
-              connect: data.equipmentPhase,
-            }
-          : undefined,
       },
       select: {
         active: true,
@@ -77,13 +74,6 @@ export class PhaseParameterControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-
-        equipmentPhase: {
-          select: {
-            id: true,
-          },
-        },
-
         globalId: true,
         id: true,
         isClassDef: true,
@@ -136,13 +126,6 @@ export class PhaseParameterControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-
-        equipmentPhase: {
-          select: {
-            id: true,
-          },
-        },
-
         globalId: true,
         id: true,
         isClassDef: true,
@@ -194,13 +177,6 @@ export class PhaseParameterControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-
-        equipmentPhase: {
-          select: {
-            id: true,
-          },
-        },
-
         globalId: true,
         id: true,
         isClassDef: true,
@@ -255,12 +231,6 @@ export class PhaseParameterControllerBase {
                 connect: data.classId,
               }
             : undefined,
-
-          equipmentPhase: data.equipmentPhase
-            ? {
-                connect: data.equipmentPhase,
-              }
-            : undefined,
         },
         select: {
           active: true,
@@ -275,13 +245,6 @@ export class PhaseParameterControllerBase {
           createdBy: true,
           description: true,
           editedBy: true,
-
-          equipmentPhase: {
-            select: {
-              id: true,
-            },
-          },
-
           globalId: true,
           id: true,
           isClassDef: true,
@@ -312,6 +275,129 @@ export class PhaseParameterControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/equipmentPhases")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findEquipmentPhases(
+    @common.Req() request: Request,
+    @common.Param() params: PhaseParameterWhereUniqueInput
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findEquipmentPhases(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+        message: true,
+        name: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationSequenceIndex: true,
+        path: true,
+        revision: true,
+        schemaVersion: true,
+        stepType: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectEquipmentPhases(
+    @common.Param() params: PhaseParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        connect: body,
+      },
+    };
+    await this.service.updatePhaseParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateEquipmentPhases(
+    @common.Param() params: PhaseParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        set: body,
+      },
+    };
+    await this.service.updatePhaseParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectEquipmentPhases(
+    @common.Param() params: PhaseParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updatePhaseParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(PhaseParameterFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -339,13 +425,6 @@ export class PhaseParameterControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-
-        equipmentPhase: {
-          select: {
-            id: true,
-          },
-        },
-
         globalId: true,
         id: true,
         isClassDef: true,
