@@ -56,6 +56,7 @@ import { LoggerModule } from "./logger/logger.module";
 
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
+import {SyncModule} from "./sync/sync.module";
 
 @Module({
   controllers: [],
@@ -95,6 +96,7 @@ import { AuthModule } from "./auth/auth.module";
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
+    SyncModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRootAsync({
       useClass: ServeStaticOptionsService,
