@@ -26,7 +26,6 @@ import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./Equipment
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
@@ -241,18 +240,6 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   path?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterUpdateManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterUpdateManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => PhaseParameterUpdateManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,

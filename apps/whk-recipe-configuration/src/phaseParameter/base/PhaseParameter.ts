@@ -24,7 +24,6 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 
@@ -84,15 +83,6 @@ class PhaseParameter {
     nullable: true,
   })
   editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: false,
