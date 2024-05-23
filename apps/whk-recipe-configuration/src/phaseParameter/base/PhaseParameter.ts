@@ -92,7 +92,7 @@ class PhaseParameter {
   @ValidateNested()
   @Type(() => EquipmentPhase)
   @IsOptional()
-  equipmentPhase?: Array<EquipmentPhase>;
+  equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: false,
