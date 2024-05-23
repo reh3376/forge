@@ -1,6 +1,7 @@
 // import {Prisma, PrismaClient} from "@prisma/client";
 
 import {
+  BomItem,
   EnumAssetType,
   EnumEquipmentPhaseName, EnumEquipmentPhaseStepType,
   EnumItemItemClass,
@@ -11,7 +12,7 @@ import {
   EnumTestParameterTestSetpointType,
   EnumUnitProcedureName, EquipmentPhase,
   Item,
-  Operation, Prisma,
+  Operation, PhaseParameter, Prisma,
   PrismaClient,
   ProductionOrder,
   ProductionSchedule,
@@ -24,6 +25,7 @@ import {
 import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
 import {EnumScheduleOrderStatus} from "../src/scheduleOrder/base/EnumScheduleOrderStatus";
+import {connect} from "amqp-connection-manager";
 
 // Function to get a random element from an array
 // function getRandomElement<T>(arr: Array<T>): T | null {
@@ -43,7 +45,7 @@ function getRandomArrayElement<T>(arr: Array<T>): T | undefined {
 
 export async function customSeed() {
   const client = new PrismaClient();
-  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "EquipmentPhase" | "Item" | "ItemGroup" | "Recipe" | "RecipeGroup" | "ScheduleOrder" | "ScheduleOrderQueue" | "ProductionSchedule" | "ProductionOrder"
+  type EntityType = 'User' | "Procedure" | "UnitProcedure" | "Operation" | "TestParameter" | "Bom" | "PhaseParameter" | "BomItem" | "EquipmentPhase" | "Item" | "ItemGroup" | "Recipe" | "RecipeGroup" | "ScheduleOrder" | "ScheduleOrderQueue" | "ProductionSchedule" | "ProductionOrder"
       | "Lot" | "ItemReceipt" | "PurchaseOrder" | "SalesOrder" | "Account" | "Asset";
   type SeedFunction = (n: number) => Promise<void>;
   type SeedFunctions = {
@@ -702,6 +704,32 @@ export async function customSeed() {
     console.log(`${total} PhaseParameters (classes and instances) created.`);
   }
 
+  async function seedBomItem(n: number): Promise<void> {
+    const boms = await client.bom.findMany();
+    const items = await client.item.findMany();
+
+    for (let i = 0; i < n; i++) {
+      const bom = getRandomArrayElement(boms) as any;
+      const item = getRandomArrayElement(items) as any;
+      const quantity = faker.number.float({ min: 0, max: 1000 });
+
+      try {
+        await client.bomItem.create({
+          data: {
+            bom: { connect: { id: bom.id } },
+            item: { connect : {id: item.id}},
+            quantity: quantity,
+            createdBy: faker.internet.userName(),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    console.log(`${n} BOMItems created.`);
+  }
+
   const operationEquipmentPhasesMap: { [key: string]: string[] } = {
     Cook: [
       // 'Steam',
@@ -777,6 +805,8 @@ export async function customSeed() {
   // equipment phase
   async function seedEquipmentPhase(): Promise<void> {
     const operations = await client.operation.findMany();
+    const bomItems = await client.bomItem.findMany();
+    const phaseParameters = await client.phaseParameter.findMany();
 
     if (operations.length === 0) {
       console.warn("No Operations found. Please seed Operations first.");
@@ -787,8 +817,11 @@ export async function customSeed() {
     for (const name of Object.values(EnumEquipmentPhaseName)) {
       // use name to get the key that matches from operationEquipmentPhasesMap
       const operationName = Object.keys(operationEquipmentPhasesMap).find(key => operationEquipmentPhasesMap[key].includes(name)) as string;
-      const operation = operations.find(op => op.name === operationName) as Operation;
-
+      const operation = operations.find(op => op.name === operationName) as Operation
+      const bomItem1 = getRandomArrayElement(bomItems) as BomItem;
+      const bomItem2 = getRandomArrayElement(bomItems) as BomItem;
+      const phaseParameter1 = getRandomArrayElement(phaseParameters) as PhaseParameter;
+      const phaseParameter2 = getRandomArrayElement(phaseParameters) as PhaseParameter;
 
       // use the key to get the equipmentPhaseTypeMap
       let arrLength = 1;
@@ -814,6 +847,8 @@ export async function customSeed() {
             isClassDefinition: true,
             // Additional fields as necessary
             stepType: equipmentPhaseType,
+            bomItem: { connect: {id: bomItem1.id}},
+            phaseParameters: { connect: [{id: phaseParameter1.id}, {id: phaseParameter2.id}]}
           },
         });
 
@@ -908,12 +943,14 @@ export async function customSeed() {
   async function seedProductionOrder(n: number): Promise<void> {
     const items = await client.item.findMany();
     const salesOrders = await client.salesOrder.findMany();
+    const recipes = await client.recipe.findMany();
 
 
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
       const salesOrder = getRandomArrayElement(salesOrders) as SalesOrder;
       const customer = faker.company.name();
+      const recipe = getRandomArrayElement(recipes) as Recipe;
 
       try {
         await client.productionOrder.create({
@@ -931,6 +968,7 @@ export async function customSeed() {
             status: EnumProductionOrderStatus.Planned, // Adjust based on your enum
             // batches: sampleBatches,
             customer: customer,
+            recipe: { connect : {id: recipe.id} },
           },
         });
       } catch (error) {
@@ -1070,6 +1108,7 @@ export async function customSeed() {
     SalesOrder: seedSalesOrder,
     Account: seedAccount,
     Asset: seedAsset,
+    BomItem: seedBomItem,
   }
 
   async function dynamicSeed(entityType: EntityType, n = 10): Promise<void> {
@@ -1098,9 +1137,10 @@ export async function customSeed() {
   await dynamicSeed('ItemReceipt', numberOfEntitiesToSeed);
   await dynamicSeed('Lot', numberOfEntitiesToSeed);
   await dynamicSeed('Bom', numberOfEntitiesToSeed);
-  await dynamicSeed('EquipmentPhase', numberOfEntitiesToSeed);
+  await dynamicSeed('BomItem', numberOfEntitiesToSeed);
   await dynamicSeed('Recipe', numberOfEntitiesToSeed);
   await dynamicSeed('RecipeGroup', numberOfEntitiesToSeed);
+  await dynamicSeed('EquipmentPhase', numberOfEntitiesToSeed);
   await dynamicSeed('ProductionOrder', numberOfEntitiesToSeed);
   await dynamicSeed('ScheduleOrder', numberOfEntitiesToSeed);
   await dynamicSeed('ProductionSchedule', numberOfEntitiesToSeed);
