@@ -44,12 +44,12 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
-    type: () => BomItem,
+    type: () => [BomItem],
   })
   @ValidateNested()
   @Type(() => BomItem)
   @IsOptional()
-  bomItem?: BomItem | null;
+  bomItem?: Array<BomItem>;
 
   @ApiProperty({
     required: false,
