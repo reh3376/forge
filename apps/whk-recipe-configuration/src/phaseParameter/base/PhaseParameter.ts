@@ -87,12 +87,12 @@ class PhaseParameter {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhase,
+    type: () => [EquipmentPhase],
   })
   @ValidateNested()
   @Type(() => EquipmentPhase)
   @IsOptional()
-  equipmentPhase?: EquipmentPhase | null;
+  equipmentPhase?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: false,

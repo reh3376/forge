@@ -94,17 +94,6 @@ class PhaseParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  equipmentPhaseId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   globalId?: SortOrder;
 
   @ApiProperty({

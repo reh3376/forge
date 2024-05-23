@@ -26,8 +26,7 @@ model PhaseParameter {
   createdBy              String
   description            String
   editedBy               String?
-  equipmentPhase         EquipmentPhase?                @relation(fields: [equipmentPhaseId], references: [id])
-  equipmentPhaseId       String?
+  equipmentPhase         EquipmentPhase[]
   globalId               String?                        @unique @default(cuid())
   id                     String                         @id @default(cuid())
   instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
@@ -126,8 +125,7 @@ model Instruction {
 
 model EquipmentPhase {
   active                 Boolean?                   @default(true)
-  bomItem                BomItem?                   @relation(fields: [bomItemId], references: [id])
-  bomItemId              String?
+  bomItem                BomItem[]
   classId                EquipmentPhase?            @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
   classIdId              String?
   className              String?

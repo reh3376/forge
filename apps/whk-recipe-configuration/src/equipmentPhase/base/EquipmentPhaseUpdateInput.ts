@@ -19,7 +19,7 @@ import {
   IsEnum,
   IsInt,
 } from "class-validator";
-import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
+import { BomItemUpdateManyWithoutEquipmentPhasesInput } from "./BomItemUpdateManyWithoutEquipmentPhasesInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
@@ -45,15 +45,15 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => BomItemWhereUniqueInput,
+    type: () => BomItemUpdateManyWithoutEquipmentPhasesInput,
   })
   @ValidateNested()
-  @Type(() => BomItemWhereUniqueInput)
+  @Type(() => BomItemUpdateManyWithoutEquipmentPhasesInput)
   @IsOptional()
-  @Field(() => BomItemWhereUniqueInput, {
+  @Field(() => BomItemUpdateManyWithoutEquipmentPhasesInput, {
     nullable: true,
   })
-  bomItem?: BomItemWhereUniqueInput | null;
+  bomItem?: BomItemUpdateManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,
