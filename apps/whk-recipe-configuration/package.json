@@ -19,6 +19,7 @@
     "compose:down": "docker-compose down --volumes",
     "lint": "eslint './src/**/*.{ts, tsx}'",
     "lint:fix": "eslint --fix './src/**/*.{ts, tsx}'",
+    "ssl:generate": "./scripts/generate-ssl.sh",
     "format": "prettier --write ."
   },
   "dependencies": {
