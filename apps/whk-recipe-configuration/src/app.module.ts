@@ -43,6 +43,10 @@ import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
 import { ProductionOrderUnitProcedureModule } from "./productionOrderUnitProcedure/productionOrderUnitProcedure.module";
+import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
+import { MashDatumModule } from "./mashDatum/mashDatum.module";
+import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
+import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -92,6 +96,10 @@ import { AuthModule } from "./auth/auth.module";
     BomItemModule,
     UnitModule,
     ProductionOrderUnitProcedureModule,
+    FermentationChemistryModule,
+    MashDatumModule,
+    FermentationSettingDatumModule,
+    FermentationDayDatumModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

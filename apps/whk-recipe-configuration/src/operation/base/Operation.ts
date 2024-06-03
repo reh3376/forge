@@ -25,6 +25,10 @@ import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
+import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
+import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
@@ -117,6 +121,33 @@ class Operation {
 
   @ApiProperty({
     required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationSettingDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatum)
+  @IsOptional()
+  fermentationSettingData?: Array<FermentationSettingDatum>;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -153,6 +184,26 @@ class Operation {
     nullable: true,
   })
   isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashDatum],
+  })
+  @ValidateNested()
+  @Type(() => MashDatum)
+  @IsOptional()
+  mashData?: Array<MashDatum>;
 
   @ApiProperty({
     required: true,

@@ -639,6 +639,7 @@ export class UnitProcedureControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        lotId: true,
         name: true,
         path: true,
         procedureSequenceIndex: true,

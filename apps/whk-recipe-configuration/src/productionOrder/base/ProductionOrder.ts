@@ -21,6 +21,8 @@ import {
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Item } from "../../item/base/Item";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Recipe } from "../../recipe/base/Recipe";
@@ -93,6 +95,24 @@ class ProductionOrder {
     nullable: true,
   })
   endDate!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
 
   @ApiProperty({
     required: false,

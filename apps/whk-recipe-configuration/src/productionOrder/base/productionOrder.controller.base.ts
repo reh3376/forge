@@ -29,6 +29,12 @@ import { ProductionOrderUpdateInput } from "./ProductionOrderUpdateInput";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
+import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
@@ -564,6 +570,271 @@ export class ProductionOrderControllerBase {
   ): Promise<void> {
     const data = {
       boms: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/fermentationChemistries")
+  @ApiNestedQuery(FermentationChemistryFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "FermentationChemistry",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationChemistries(
+    @common.Req() request: Request,
+    @common.Param() params: ProductionOrderWhereUniqueInput
+  ): Promise<FermentationChemistry[]> {
+    const query = plainToClass(
+      FermentationChemistryFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findFermentationChemistries(params.id, {
+      ...query,
+      select: {
+        approved: true,
+        approvedBy: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        id: true,
+        lotId: true,
+
+        mashData: {
+          select: {
+            id: true,
+          },
+        },
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        settingData: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/fermentationChemistries")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectFermentationChemistries(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: FermentationChemistryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationChemistries: {
+        connect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/fermentationChemistries")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateFermentationChemistries(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: FermentationChemistryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationChemistries: {
+        set: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/fermentationChemistries")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectFermentationChemistries(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: FermentationChemistryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationChemistries: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/fermentationDayData")
+  @ApiNestedQuery(FermentationDayDatumFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "FermentationDayDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationDayData(
+    @common.Req() request: Request,
+    @common.Param() params: ProductionOrderWhereUniqueInput
+  ): Promise<FermentationDayDatum[]> {
+    const query = plainToClass(FermentationDayDatumFindManyArgs, request.query);
+    const results = await this.service.findFermentationDayData(params.id, {
+      ...query,
+      select: {
+        acid: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        balling: true,
+        createdAt: true,
+        day: true,
+        dryInches: true,
+
+        fermentationChemistry: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
+        lotId: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        pH: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        temperature: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/fermentationDayData")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectFermentationDayData(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationDayData: {
+        connect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/fermentationDayData")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateFermentationDayData(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationDayData: {
+        set: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/fermentationDayData")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectFermentationDayData(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationDayData: {
         disconnect: body,
       },
     };

@@ -21,6 +21,8 @@ import {
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
+import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -88,6 +90,38 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   endDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(
+    () => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(
+    () => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,
