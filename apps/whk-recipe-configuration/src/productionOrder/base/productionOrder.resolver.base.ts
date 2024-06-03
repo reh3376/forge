@@ -28,6 +28,10 @@ import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
 import { DeleteProductionOrderArgs } from "./DeleteProductionOrderArgs";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
+import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Item } from "../../item/base/Item";
@@ -219,6 +223,53 @@ export class ProductionOrderResolverBase {
     @graphql.Args() args: BomFindManyArgs
   ): Promise<Bom[]> {
     const results = await this.service.findBoms(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [FermentationChemistry], {
+    name: "fermentationChemistries",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationChemistry",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationChemistries(
+    @graphql.Parent() parent: ProductionOrder,
+    @graphql.Args() args: FermentationChemistryFindManyArgs
+  ): Promise<FermentationChemistry[]> {
+    const results = await this.service.findFermentationChemistries(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [FermentationDayDatum], {
+    name: "fermentationDayData",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationDayDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationDayData(
+    @graphql.Parent() parent: ProductionOrder,
+    @graphql.Args() args: FermentationDayDatumFindManyArgs
+  ): Promise<FermentationDayDatum[]> {
+    const results = await this.service.findFermentationDayData(parent.id, args);
 
     if (!results) {
       return [];

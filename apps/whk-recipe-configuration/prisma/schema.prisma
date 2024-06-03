@@ -155,28 +155,33 @@ model EquipmentPhase {
 }
 
 model Operation {
-  abbreviation           String
-  active                 Boolean?          @default(true)
-  auxiliaryPhases        Json?
-  classId                Operation?        @relation(name: "OperationClassIdOperationInstances", fields: [classIdId], references: [id])
-  classIdId              String?
-  createdAt              DateTime?         @default(now())
-  createdBy              String
-  description            String
-  editedBy               String?
-  equipmentPhases        EquipmentPhase[]
-  globalId               String?           @default(cuid())
-  id                     String            @id @default(cuid())
-  instances              Operation[]       @relation(name: "OperationClassIdOperationInstances")
-  isClassDefinition      Boolean?          @default(false)
-  name                   EnumOperationName
-  path                   String?
-  procedureSequenceIndex Int               @default(0)
-  revision               Int?              @default(0)
-  schemaVersion          String?           @default("0001-b")
-  unitProcedure          UnitProcedure?    @relation(fields: [unitProcedureId], references: [id])
-  unitProcedureId        String?
-  updatedAt              DateTime?         @updatedAt
+  abbreviation            String
+  active                  Boolean?                   @default(true)
+  auxiliaryPhases         Json?
+  classId                 Operation?                 @relation(name: "OperationClassIdOperationInstances", fields: [classIdId], references: [id])
+  classIdId               String?
+  createdAt               DateTime?                  @default(now())
+  createdBy               String
+  description             String
+  editedBy                String?
+  equipmentPhases         EquipmentPhase[]
+  fermentationChemistries FermentationChemistry[]
+  fermentationDayData     FermentationDayDatum[]
+  fermentationSettingData FermentationSettingDatum[]
+  globalId                String?                    @default(cuid())
+  id                      String                     @id @default(cuid())
+  instances               Operation[]                @relation(name: "OperationClassIdOperationInstances")
+  isClassDefinition       Boolean?                   @default(false)
+  lotId                   String?                    @unique
+  mashData                MashDatum[]
+  name                    EnumOperationName
+  path                    String?
+  procedureSequenceIndex  Int                        @default(0)
+  revision                Int?                       @default(0)
+  schemaVersion           String?                    @default("0001-b")
+  unitProcedure           UnitProcedure?             @relation(fields: [unitProcedureId], references: [id])
+  unitProcedureId         String?
+  updatedAt               DateTime?                  @updatedAt
 
   @@unique([name, revision, active, isClassDefinition])
 }
@@ -319,6 +324,8 @@ model ProductionOrder {
   createdBy                     String
   customer                      String
   endDate                       DateTime?
+  fermentationChemistries       FermentationChemistry[]
+  fermentationDayData           FermentationDayDatum[]
   globalId                      String?                        @default(cuid())
   id                            String                         @id @default(cuid())
   inProcess                     Boolean?                       @default(false)
@@ -516,20 +523,23 @@ model Test {
 }
 
 model Asset {
-  assetPath      String          @unique
-  children       Json?
-  createdAt      DateTime        @default(now())
-  createdBy      String
-  description    String
-  globalId       String?         @unique @default(cuid())
-  id             String          @id @default(cuid())
-  name           String
-  purchaseOrders PurchaseOrder[]
-  revision       Int?            @default(0)
-  schemaVersion  String          @default("0001-alpha")
-  type           EnumAssetType
-  updatedAt      DateTime        @updatedAt
-  updatedBy      String?
+  assetPath               String                  @unique
+  children                Json?
+  createdAt               DateTime                @default(now())
+  createdBy               String
+  description             String
+  fermentationChemistries FermentationChemistry[]
+  fermentationDayData     FermentationDayDatum[]
+  globalId                String?                 @unique @default(cuid())
+  id                      String                  @id @default(cuid())
+  mashData                MashDatum[]
+  name                    String
+  purchaseOrders          PurchaseOrder[]
+  revision                Int?                    @default(0)
+  schemaVersion           String                  @default("0001-alpha")
+  type                    EnumAssetType
+  updatedAt               DateTime                @updatedAt
+  updatedBy               String?
 
   @@unique([name, revision])
 }
@@ -616,6 +626,91 @@ model ProductionOrderUnitProcedure {
   updatedAt         DateTime                                     @updatedAt
   wipItem           Item?                                        @relation(fields: [itemId], references: [id])
   itemId            String?
+}
+
+model FermentationChemistry {
+  approved          Boolean?                  @default(false)
+  approvedBy        String?
+  asset             Asset                     @relation(fields: [assetId], references: [id])
+  assetId           String
+  createdAt         DateTime                  @default(now())
+  dailyData         FermentationDayDatum[]
+  id                String                    @id @default(cuid())
+  lotId             String
+  mashData          MashDatum?
+  operation         Operation                 @relation(fields: [operationId], references: [id])
+  operationId       String
+  productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
+  productionOrderId String?
+  settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
+  settingDataId     String?                   @unique
+  updatedAt         DateTime                  @updatedAt
+}
+
+model MashDatum {
+  asset                   Asset?                 @relation(fields: [assetId], references: [id])
+  assetId                 String?
+  backSetPH               Decimal?
+  backsetVolume           Decimal?
+  balling                 Decimal
+  cornLbs                 Decimal?
+  createdAt               DateTime               @default(now())
+  fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
+  fermentationChemistryId String?                @unique
+  fermenterNumber         Int
+  id                      String                 @id @default(cuid())
+  loggedBy                String
+  lotId                   String
+  maltLbs                 Decimal?
+  operation               Operation?             @relation(fields: [operationId], references: [id])
+  operationId             String?
+  pH                      Decimal?
+  ryeLbs                  Decimal?
+  updatedAt               DateTime               @updatedAt
+  waterVolume             Decimal?
+  wheatLbs                Decimal?
+}
+
+model FermentationSettingDatum {
+  acid                    Decimal?
+  balling                 Decimal?
+  createdAt               DateTime               @default(now())
+  dryInches               Decimal?
+  fermentationChemistries FermentationChemistry?
+  fermenterNumber         Int
+  id                      String                 @id @default(cuid())
+  loggedBy                String
+  lotId                   String
+  operation               Operation?             @relation(fields: [operationId], references: [id])
+  operationId             String?
+  pH                      Decimal?
+  setTime                 DateTime
+  temperature             Decimal
+  updatedAt               DateTime               @updatedAt
+  yeastPitchTime          DateTime
+}
+
+model FermentationDayDatum {
+  acid                    Decimal
+  asset                   Asset?                       @relation(fields: [assetId], references: [id])
+  assetId                 String?
+  balling                 Decimal
+  createdAt               DateTime                     @default(now())
+  day                     EnumFermentationDayDatumDay? @default(First)
+  dryInches               Decimal?
+  fermentationChemistry   FermentationChemistry?       @relation(fields: [fermentationChemistryId], references: [id])
+  fermentationChemistryId String?
+  fermenterNumber         Int
+  id                      String                       @id @default(cuid())
+  loggedBy                String
+  lotId                   String
+  operation               Operation                    @relation(fields: [operationId], references: [id])
+  operationId             String
+  pH                      Decimal
+  productionOrder         ProductionOrder              @relation(fields: [productionOrderId], references: [id])
+  productionOrderId       String
+  temperature             Decimal
+  updatedAt               DateTime                     @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {
@@ -809,4 +904,11 @@ enum EnumProductionOrderUnitProcedureStatus {
   InProgress
   Complete
   Abandoned
+}
+
+enum EnumFermentationDayDatumDay {
+  First
+  Second
+  Third
+  Final
 }

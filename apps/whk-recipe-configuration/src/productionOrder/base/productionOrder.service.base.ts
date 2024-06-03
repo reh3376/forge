@@ -15,6 +15,8 @@ import {
   Prisma,
   ProductionOrder as PrismaProductionOrder,
   Bom as PrismaBom,
+  FermentationChemistry as PrismaFermentationChemistry,
+  FermentationDayDatum as PrismaFermentationDayDatum,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Item as PrismaItem,
   Recipe as PrismaRecipe,
@@ -69,6 +71,28 @@ export class ProductionOrderServiceBase {
         where: { id: parentId },
       })
       .boms(args);
+  }
+
+  async findFermentationChemistries(
+    parentId: string,
+    args: Prisma.FermentationChemistryFindManyArgs
+  ): Promise<PrismaFermentationChemistry[]> {
+    return this.prisma.productionOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationChemistries(args);
+  }
+
+  async findFermentationDayData(
+    parentId: string,
+    args: Prisma.FermentationDayDatumFindManyArgs
+  ): Promise<PrismaFermentationDayDatum[]> {
+    return this.prisma.productionOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationDayData(args);
   }
 
   async findProductionOrderUnitProcedures(

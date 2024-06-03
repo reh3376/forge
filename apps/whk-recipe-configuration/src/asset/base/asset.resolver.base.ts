@@ -26,6 +26,12 @@ import { AssetFindUniqueArgs } from "./AssetFindUniqueArgs";
 import { CreateAssetArgs } from "./CreateAssetArgs";
 import { UpdateAssetArgs } from "./UpdateAssetArgs";
 import { DeleteAssetArgs } from "./DeleteAssetArgs";
+import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
+import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
+import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { AssetService } from "../asset.service";
@@ -138,6 +144,73 @@ export class AssetResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [FermentationChemistry], {
+    name: "fermentationChemistries",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationChemistry",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationChemistries(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: FermentationChemistryFindManyArgs
+  ): Promise<FermentationChemistry[]> {
+    const results = await this.service.findFermentationChemistries(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [FermentationDayDatum], {
+    name: "fermentationDayData",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationDayDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationDayData(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: FermentationDayDatumFindManyArgs
+  ): Promise<FermentationDayDatum[]> {
+    const results = await this.service.findFermentationDayData(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
+  @nestAccessControl.UseRoles({
+    resource: "MashDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findMashData(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: MashDatumFindManyArgs
+  ): Promise<MashDatum[]> {
+    const results = await this.service.findMashData(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

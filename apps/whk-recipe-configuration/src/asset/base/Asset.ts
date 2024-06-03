@@ -23,6 +23,9 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
+import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { EnumAssetType } from "./EnumAssetType";
 
@@ -72,6 +75,24 @@ class Asset {
 
   @ApiProperty({
     required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -88,6 +109,15 @@ class Asset {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashDatum],
+  })
+  @ValidateNested()
+  @Type(() => MashDatum)
+  @IsOptional()
+  mashData?: Array<MashDatum>;
 
   @ApiProperty({
     required: true,

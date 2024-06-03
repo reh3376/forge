@@ -10,9 +10,13 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   Asset as PrismaAsset,
+  FermentationChemistry as PrismaFermentationChemistry,
+  FermentationDayDatum as PrismaFermentationDayDatum,
+  MashDatum as PrismaMashDatum,
   PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
@@ -47,6 +51,39 @@ export class AssetServiceBase {
     args: Prisma.SelectSubset<T, Prisma.AssetDeleteArgs>
   ): Promise<PrismaAsset> {
     return this.prisma.asset.delete(args);
+  }
+
+  async findFermentationChemistries(
+    parentId: string,
+    args: Prisma.FermentationChemistryFindManyArgs
+  ): Promise<PrismaFermentationChemistry[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationChemistries(args);
+  }
+
+  async findFermentationDayData(
+    parentId: string,
+    args: Prisma.FermentationDayDatumFindManyArgs
+  ): Promise<PrismaFermentationDayDatum[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationDayData(args);
+  }
+
+  async findMashData(
+    parentId: string,
+    args: Prisma.MashDatumFindManyArgs
+  ): Promise<PrismaMashDatum[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .mashData(args);
   }
 
   async findPurchaseOrders(
