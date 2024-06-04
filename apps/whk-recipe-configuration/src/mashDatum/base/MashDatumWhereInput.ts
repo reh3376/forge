@@ -14,8 +14,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { DecimalFilter } from "../../util/DecimalFilter";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { StringFilter } from "../../util/StringFilter";
@@ -37,14 +37,14 @@ class MashDatumWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: DecimalFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => DecimalFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => DecimalFilter, {
     nullable: true,
   })
-  backSetPH?: DecimalNullableFilter;
+  backSetPH?: DecimalFilter;
 
   @ApiProperty({
     required: false,
@@ -160,14 +160,14 @@ class MashDatumWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: DecimalFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => DecimalFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => DecimalFilter, {
     nullable: true,
   })
-  pH?: DecimalNullableFilter;
+  pH?: DecimalFilter;
 
   @ApiProperty({
     required: false,
@@ -182,14 +182,14 @@ class MashDatumWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: DecimalFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => DecimalFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => DecimalFilter, {
     nullable: true,
   })
-  waterVolume?: DecimalNullableFilter;
+  waterVolume?: DecimalFilter;
 
   @ApiProperty({
     required: false,

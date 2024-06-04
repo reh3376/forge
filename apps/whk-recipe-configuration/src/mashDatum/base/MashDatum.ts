@@ -37,15 +37,12 @@ class MashDatum {
   asset?: Asset | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsNumber()
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  backSetPH!: Decimal | null;
+  @Field(() => Float)
+  backSetPH!: Decimal;
 
   @ApiProperty({
     required: false,
@@ -147,15 +144,12 @@ class MashDatum {
   operation?: Operation | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsNumber()
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH!: Decimal | null;
+  @Field(() => Float)
+  pH!: Decimal;
 
   @ApiProperty({
     required: false,
@@ -177,15 +171,12 @@ class MashDatum {
   updatedAt!: Date;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsNumber()
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  waterVolume!: Decimal | null;
+  @Field(() => Float)
+  waterVolume!: Decimal;
 
   @ApiProperty({
     required: false,

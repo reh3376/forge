@@ -47,7 +47,7 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  backSetPH?: Decimal | null;
+  backSetPH?: Decimal;
 
   @ApiProperty({
     required: false,
@@ -159,7 +159,7 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  pH?: Decimal | null;
+  pH?: Decimal;
 
   @ApiProperty({
     required: false,
@@ -181,7 +181,7 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  waterVolume?: Decimal | null;
+  waterVolume?: Decimal;
 
   @ApiProperty({
     required: false,
