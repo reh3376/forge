@@ -39,15 +39,12 @@ class MashDatumCreateInput {
   asset?: AssetWhereUniqueInput | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsNumber()
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  backSetPH?: Decimal | null;
+  @Field(() => Float)
+  backSetPH!: Decimal;
 
   @ApiProperty({
     required: false,
@@ -139,15 +136,12 @@ class MashDatumCreateInput {
   operation?: OperationWhereUniqueInput | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsNumber()
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH?: Decimal | null;
+  @Field(() => Float)
+  pH!: Decimal;
 
   @ApiProperty({
     required: false,
@@ -161,15 +155,12 @@ class MashDatumCreateInput {
   ryeLbs?: Decimal | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsNumber()
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  waterVolume?: Decimal | null;
+  @Field(() => Float)
+  waterVolume!: Decimal;
 
   @ApiProperty({
     required: false,

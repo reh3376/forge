@@ -650,7 +650,7 @@ model FermentationChemistry {
 model MashDatum {
   asset                   Asset?                 @relation(fields: [assetId], references: [id])
   assetId                 String?
-  backSetPH               Decimal?
+  backSetPH               Decimal
   backsetVolume           Decimal?
   balling                 Decimal
   cornLbs                 Decimal?
@@ -664,10 +664,10 @@ model MashDatum {
   maltLbs                 Decimal?
   operation               Operation?             @relation(fields: [operationId], references: [id])
   operationId             String?
-  pH                      Decimal?
+  pH                      Decimal
   ryeLbs                  Decimal?
   updatedAt               DateTime               @updatedAt
-  waterVolume             Decimal?
+  waterVolume             Decimal
   wheatLbs                Decimal?
 }
 
