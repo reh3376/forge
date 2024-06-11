@@ -236,6 +236,7 @@ class PurchaseOrderCreateInput {
     | "ReceiptComplete"
     | "PurchaseOrderComplete"
     | "InitializedNotReceived"
+    | "ReceivedTested"
     | null;
 
   @ApiProperty({

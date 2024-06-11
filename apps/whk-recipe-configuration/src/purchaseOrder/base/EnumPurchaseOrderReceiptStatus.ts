@@ -17,6 +17,7 @@ export enum EnumPurchaseOrderReceiptStatus {
   ReceiptComplete = "ReceiptComplete",
   PurchaseOrderComplete = "PurchaseOrderComplete",
   InitializedNotReceived = "InitializedNotReceived",
+  ReceivedTested = "ReceivedTested",
 }
 
 registerEnumType(EnumPurchaseOrderReceiptStatus, {

@@ -864,6 +864,7 @@ enum EnumPurchaseOrderReceiptStatus {
   ReceiptComplete
   PurchaseOrderComplete
   InitializedNotReceived
+  ReceivedTested
 }
 
 enum EnumSalesOrderOrderType {

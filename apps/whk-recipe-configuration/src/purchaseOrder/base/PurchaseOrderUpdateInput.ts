@@ -254,6 +254,7 @@ class PurchaseOrderUpdateInput {
     | "ReceiptComplete"
     | "PurchaseOrderComplete"
     | "InitializedNotReceived"
+    | "ReceivedTested"
     | null;
 
   @ApiProperty({

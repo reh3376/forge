@@ -284,7 +284,8 @@ class PurchaseOrderWhereInput {
     | "ReceiptInProgress"
     | "ReceiptComplete"
     | "PurchaseOrderComplete"
-    | "InitializedNotReceived";
+    | "InitializedNotReceived"
+    | "ReceivedTested";
 
   @ApiProperty({
     required: false,
