@@ -244,6 +244,7 @@ class PurchaseOrder {
     | "ReceiptComplete"
     | "PurchaseOrderComplete"
     | "InitializedNotReceived"
+    | "ReceivedTested"
     | null;
 
   @ApiProperty({
