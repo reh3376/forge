@@ -30,30 +30,28 @@ export class EquipmentPhaseServiceBase {
     return this.prisma.equipmentPhase.count(args);
   }
 
-  async equipmentPhases<T extends Prisma.EquipmentPhaseFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseFindManyArgs>
+  async equipmentPhases(
+    args: Prisma.EquipmentPhaseFindManyArgs
   ): Promise<PrismaEquipmentPhase[]> {
-    return this.prisma.equipmentPhase.findMany<Prisma.EquipmentPhaseFindManyArgs>(
-      args
-    );
+    return this.prisma.equipmentPhase.findMany(args);
   }
-  async equipmentPhase<T extends Prisma.EquipmentPhaseFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseFindUniqueArgs>
+  async equipmentPhase(
+    args: Prisma.EquipmentPhaseFindUniqueArgs
   ): Promise<PrismaEquipmentPhase | null> {
     return this.prisma.equipmentPhase.findUnique(args);
   }
-  async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCreateArgs>
+  async createEquipmentPhase(
+    args: Prisma.EquipmentPhaseCreateArgs
   ): Promise<PrismaEquipmentPhase> {
-    return this.prisma.equipmentPhase.create<T>(args);
+    return this.prisma.equipmentPhase.create(args);
   }
-  async updateEquipmentPhase<T extends Prisma.EquipmentPhaseUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseUpdateArgs>
+  async updateEquipmentPhase(
+    args: Prisma.EquipmentPhaseUpdateArgs
   ): Promise<PrismaEquipmentPhase> {
-    return this.prisma.equipmentPhase.update<T>(args);
+    return this.prisma.equipmentPhase.update(args);
   }
-  async deleteEquipmentPhase<T extends Prisma.EquipmentPhaseDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseDeleteArgs>
+  async deleteEquipmentPhase(
+    args: Prisma.EquipmentPhaseDeleteArgs
   ): Promise<PrismaEquipmentPhase> {
     return this.prisma.equipmentPhase.delete(args);
   }

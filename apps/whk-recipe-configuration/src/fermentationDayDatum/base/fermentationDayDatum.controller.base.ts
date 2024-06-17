@@ -45,6 +45,9 @@ export class FermentationDayDatumControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: FermentationDayDatumCreateInput,
+  })
   async createFermentationDayDatum(
     @common.Body() data: FermentationDayDatumCreateInput
   ): Promise<FermentationDayDatum> {
@@ -259,6 +262,9 @@ export class FermentationDayDatumControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: FermentationDayDatumUpdateInput,
   })
   async updateFermentationDayDatum(
     @common.Param() params: FermentationDayDatumWhereUniqueInput,

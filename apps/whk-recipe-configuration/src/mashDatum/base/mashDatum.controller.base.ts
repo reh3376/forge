@@ -45,6 +45,9 @@ export class MashDatumControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: MashDatumCreateInput,
+  })
   async createMashDatum(
     @common.Body() data: MashDatumCreateInput
   ): Promise<MashDatum> {
@@ -240,6 +243,9 @@ export class MashDatumControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: MashDatumUpdateInput,
   })
   async updateMashDatum(
     @common.Param() params: MashDatumWhereUniqueInput,

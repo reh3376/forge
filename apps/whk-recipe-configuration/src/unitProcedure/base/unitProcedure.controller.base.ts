@@ -54,6 +54,9 @@ export class UnitProcedureControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: UnitProcedureCreateInput,
+  })
   async createUnitProcedure(
     @common.Body() data: UnitProcedureCreateInput
   ): Promise<UnitProcedure> {
@@ -294,6 +297,9 @@ export class UnitProcedureControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: UnitProcedureUpdateInput,
   })
   async updateUnitProcedure(
     @common.Param() params: UnitProcedureWhereUniqueInput,

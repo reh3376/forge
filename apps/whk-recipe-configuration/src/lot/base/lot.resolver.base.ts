@@ -26,7 +26,10 @@ import { LotFindUniqueArgs } from "./LotFindUniqueArgs";
 import { CreateLotArgs } from "./CreateLotArgs";
 import { UpdateLotArgs } from "./UpdateLotArgs";
 import { DeleteLotArgs } from "./DeleteLotArgs";
+import { Item } from "../../item/base/Item";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { Recipe } from "../../recipe/base/Recipe";
 import { LotService } from "../lot.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Lot)
@@ -90,9 +93,27 @@ export class LotResolverBase {
       data: {
         ...args.data,
 
+        item: args.data.item
+          ? {
+              connect: args.data.item,
+            }
+          : undefined,
+
+        productionOrder: args.data.productionOrder
+          ? {
+              connect: args.data.productionOrder,
+            }
+          : undefined,
+
         purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
           ? {
               connect: args.data.purchaseOrderAcceptedLots,
+            }
+          : undefined,
+
+        recipe: args.data.recipe
+          ? {
+              connect: args.data.recipe,
             }
           : undefined,
       },
@@ -113,9 +134,27 @@ export class LotResolverBase {
         data: {
           ...args.data,
 
+          item: args.data.item
+            ? {
+                connect: args.data.item,
+              }
+            : undefined,
+
+          productionOrder: args.data.productionOrder
+            ? {
+                connect: args.data.productionOrder,
+              }
+            : undefined,
+
           purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
             ? {
                 connect: args.data.purchaseOrderAcceptedLots,
+              }
+            : undefined,
+
+          recipe: args.data.recipe
+            ? {
+                connect: args.data.recipe,
               }
             : undefined,
         },
@@ -150,6 +189,46 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Item, {
+    nullable: true,
+    name: "item",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async getItem(@graphql.Parent() parent: Lot): Promise<Item | null> {
+    const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrder, {
+    nullable: true,
+    name: "productionOrder",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrder(
+    @graphql.Parent() parent: Lot
+  ): Promise<ProductionOrder | null> {
+    const result = await this.service.getProductionOrder(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => PurchaseOrder, {
     nullable: true,
     name: "purchaseOrderAcceptedLots",
@@ -163,6 +242,25 @@ export class LotResolverBase {
     @graphql.Parent() parent: Lot
   ): Promise<PurchaseOrder | null> {
     const result = await this.service.getPurchaseOrderAcceptedLots(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Recipe, {
+    nullable: true,
+    name: "recipe",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async getRecipe(@graphql.Parent() parent: Lot): Promise<Recipe | null> {
+    const result = await this.service.getRecipe(parent.id);
 
     if (!result) {
       return null;

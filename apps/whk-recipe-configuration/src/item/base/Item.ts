@@ -25,6 +25,7 @@ import { Bom } from "../../bom/base/Bom";
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
@@ -171,6 +172,15 @@ class Item {
   @IsString()
   @Field(() => String)
   itemType!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 
   @ApiProperty({
     required: false,

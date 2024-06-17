@@ -29,38 +29,28 @@ export class FermentationDayDatumServiceBase {
     return this.prisma.fermentationDayDatum.count(args);
   }
 
-  async fermentationDayData<T extends Prisma.FermentationDayDatumFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.FermentationDayDatumFindManyArgs>
+  async fermentationDayData(
+    args: Prisma.FermentationDayDatumFindManyArgs
   ): Promise<PrismaFermentationDayDatum[]> {
-    return this.prisma.fermentationDayDatum.findMany<Prisma.FermentationDayDatumFindManyArgs>(
-      args
-    );
+    return this.prisma.fermentationDayDatum.findMany(args);
   }
-  async fermentationDayDatum<
-    T extends Prisma.FermentationDayDatumFindUniqueArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationDayDatumFindUniqueArgs>
+  async fermentationDayDatum(
+    args: Prisma.FermentationDayDatumFindUniqueArgs
   ): Promise<PrismaFermentationDayDatum | null> {
     return this.prisma.fermentationDayDatum.findUnique(args);
   }
-  async createFermentationDayDatum<
-    T extends Prisma.FermentationDayDatumCreateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationDayDatumCreateArgs>
+  async createFermentationDayDatum(
+    args: Prisma.FermentationDayDatumCreateArgs
   ): Promise<PrismaFermentationDayDatum> {
-    return this.prisma.fermentationDayDatum.create<T>(args);
+    return this.prisma.fermentationDayDatum.create(args);
   }
-  async updateFermentationDayDatum<
-    T extends Prisma.FermentationDayDatumUpdateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationDayDatumUpdateArgs>
+  async updateFermentationDayDatum(
+    args: Prisma.FermentationDayDatumUpdateArgs
   ): Promise<PrismaFermentationDayDatum> {
-    return this.prisma.fermentationDayDatum.update<T>(args);
+    return this.prisma.fermentationDayDatum.update(args);
   }
-  async deleteFermentationDayDatum<
-    T extends Prisma.FermentationDayDatumDeleteArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationDayDatumDeleteArgs>
+  async deleteFermentationDayDatum(
+    args: Prisma.FermentationDayDatumDeleteArgs
   ): Promise<PrismaFermentationDayDatum> {
     return this.prisma.fermentationDayDatum.delete(args);
   }
