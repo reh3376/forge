@@ -1,7 +1,7 @@
 import { ClientProxy } from "@nestjs/microservices";
 import { MqttMessage } from "./types";
 import { Inject, OnModuleInit } from "@nestjs/common";
-import { MyMessageBrokerTopics } from "./topics";
+import { WhMessageBrokerTopics } from "./topics";
 
 export class MqttProducerService implements OnModuleInit {
   constructor(
@@ -9,7 +9,7 @@ export class MqttProducerService implements OnModuleInit {
   ) {}
 
   async publish(
-    topic: MyMessageBrokerTopics,
+    topic: WhMessageBrokerTopics,
     message: MqttMessage
   ): Promise<void> {
     return await new Promise((resolve, reject) => {
