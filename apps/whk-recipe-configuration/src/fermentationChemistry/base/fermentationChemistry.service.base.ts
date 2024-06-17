@@ -31,40 +31,28 @@ export class FermentationChemistryServiceBase {
     return this.prisma.fermentationChemistry.count(args);
   }
 
-  async fermentationChemistries<
-    T extends Prisma.FermentationChemistryFindManyArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationChemistryFindManyArgs>
+  async fermentationChemistries(
+    args: Prisma.FermentationChemistryFindManyArgs
   ): Promise<PrismaFermentationChemistry[]> {
-    return this.prisma.fermentationChemistry.findMany<Prisma.FermentationChemistryFindManyArgs>(
-      args
-    );
+    return this.prisma.fermentationChemistry.findMany(args);
   }
-  async fermentationChemistry<
-    T extends Prisma.FermentationChemistryFindUniqueArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationChemistryFindUniqueArgs>
+  async fermentationChemistry(
+    args: Prisma.FermentationChemistryFindUniqueArgs
   ): Promise<PrismaFermentationChemistry | null> {
     return this.prisma.fermentationChemistry.findUnique(args);
   }
-  async createFermentationChemistry<
-    T extends Prisma.FermentationChemistryCreateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationChemistryCreateArgs>
+  async createFermentationChemistry(
+    args: Prisma.FermentationChemistryCreateArgs
   ): Promise<PrismaFermentationChemistry> {
-    return this.prisma.fermentationChemistry.create<T>(args);
+    return this.prisma.fermentationChemistry.create(args);
   }
-  async updateFermentationChemistry<
-    T extends Prisma.FermentationChemistryUpdateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationChemistryUpdateArgs>
+  async updateFermentationChemistry(
+    args: Prisma.FermentationChemistryUpdateArgs
   ): Promise<PrismaFermentationChemistry> {
-    return this.prisma.fermentationChemistry.update<T>(args);
+    return this.prisma.fermentationChemistry.update(args);
   }
-  async deleteFermentationChemistry<
-    T extends Prisma.FermentationChemistryDeleteArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationChemistryDeleteArgs>
+  async deleteFermentationChemistry(
+    args: Prisma.FermentationChemistryDeleteArgs
   ): Promise<PrismaFermentationChemistry> {
     return this.prisma.fermentationChemistry.delete(args);
   }

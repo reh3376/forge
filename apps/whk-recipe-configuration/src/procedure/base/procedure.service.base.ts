@@ -25,28 +25,28 @@ export class ProcedureServiceBase {
     return this.prisma.procedure.count(args);
   }
 
-  async procedures<T extends Prisma.ProcedureFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProcedureFindManyArgs>
+  async procedures(
+    args: Prisma.ProcedureFindManyArgs
   ): Promise<PrismaProcedure[]> {
-    return this.prisma.procedure.findMany<Prisma.ProcedureFindManyArgs>(args);
+    return this.prisma.procedure.findMany(args);
   }
-  async procedure<T extends Prisma.ProcedureFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProcedureFindUniqueArgs>
+  async procedure(
+    args: Prisma.ProcedureFindUniqueArgs
   ): Promise<PrismaProcedure | null> {
     return this.prisma.procedure.findUnique(args);
   }
-  async createProcedure<T extends Prisma.ProcedureCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProcedureCreateArgs>
+  async createProcedure(
+    args: Prisma.ProcedureCreateArgs
   ): Promise<PrismaProcedure> {
-    return this.prisma.procedure.create<T>(args);
+    return this.prisma.procedure.create(args);
   }
-  async updateProcedure<T extends Prisma.ProcedureUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProcedureUpdateArgs>
+  async updateProcedure(
+    args: Prisma.ProcedureUpdateArgs
   ): Promise<PrismaProcedure> {
-    return this.prisma.procedure.update<T>(args);
+    return this.prisma.procedure.update(args);
   }
-  async deleteProcedure<T extends Prisma.ProcedureDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProcedureDeleteArgs>
+  async deleteProcedure(
+    args: Prisma.ProcedureDeleteArgs
   ): Promise<PrismaProcedure> {
     return this.prisma.procedure.delete(args);
   }

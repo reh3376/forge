@@ -23,29 +23,19 @@ export class TestServiceBase {
     return this.prisma.test.count(args);
   }
 
-  async tests<T extends Prisma.TestFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestFindManyArgs>
-  ): Promise<PrismaTest[]> {
-    return this.prisma.test.findMany<Prisma.TestFindManyArgs>(args);
+  async tests(args: Prisma.TestFindManyArgs): Promise<PrismaTest[]> {
+    return this.prisma.test.findMany(args);
   }
-  async test<T extends Prisma.TestFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestFindUniqueArgs>
-  ): Promise<PrismaTest | null> {
+  async test(args: Prisma.TestFindUniqueArgs): Promise<PrismaTest | null> {
     return this.prisma.test.findUnique(args);
   }
-  async createTest<T extends Prisma.TestCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestCreateArgs>
-  ): Promise<PrismaTest> {
-    return this.prisma.test.create<T>(args);
+  async createTest(args: Prisma.TestCreateArgs): Promise<PrismaTest> {
+    return this.prisma.test.create(args);
   }
-  async updateTest<T extends Prisma.TestUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestUpdateArgs>
-  ): Promise<PrismaTest> {
-    return this.prisma.test.update<T>(args);
+  async updateTest(args: Prisma.TestUpdateArgs): Promise<PrismaTest> {
+    return this.prisma.test.update(args);
   }
-  async deleteTest<T extends Prisma.TestDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestDeleteArgs>
-  ): Promise<PrismaTest> {
+  async deleteTest(args: Prisma.TestDeleteArgs): Promise<PrismaTest> {
     return this.prisma.test.delete(args);
   }
 

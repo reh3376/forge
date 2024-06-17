@@ -35,6 +35,9 @@ import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemist
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
@@ -56,6 +59,9 @@ export class ProductionOrderControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ProductionOrderCreateInput,
   })
   async createProductionOrder(
     @common.Body() data: ProductionOrderCreateInput
@@ -298,6 +304,9 @@ export class ProductionOrderControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ProductionOrderUpdateInput,
   })
   async updateProductionOrder(
     @common.Param() params: ProductionOrderWhereUniqueInput,
@@ -835,6 +844,132 @@ export class ProductionOrderControllerBase {
   ): Promise<void> {
     const data = {
       fermentationDayData: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lots")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @common.Req() request: Request,
+    @common.Param() params: ProductionOrderWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLots(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        externalId: true,
+        globalId: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotNumber: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectLots(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        connect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateLots(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        set: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLots(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
         disconnect: body,
       },
     };

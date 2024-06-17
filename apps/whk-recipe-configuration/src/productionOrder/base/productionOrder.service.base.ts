@@ -17,6 +17,7 @@ import {
   Bom as PrismaBom,
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
+  Lot as PrismaLot,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Item as PrismaItem,
   Recipe as PrismaRecipe,
@@ -34,30 +35,28 @@ export class ProductionOrderServiceBase {
     return this.prisma.productionOrder.count(args);
   }
 
-  async productionOrders<T extends Prisma.ProductionOrderFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderFindManyArgs>
+  async productionOrders(
+    args: Prisma.ProductionOrderFindManyArgs
   ): Promise<PrismaProductionOrder[]> {
-    return this.prisma.productionOrder.findMany<Prisma.ProductionOrderFindManyArgs>(
-      args
-    );
+    return this.prisma.productionOrder.findMany(args);
   }
-  async productionOrder<T extends Prisma.ProductionOrderFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderFindUniqueArgs>
+  async productionOrder(
+    args: Prisma.ProductionOrderFindUniqueArgs
   ): Promise<PrismaProductionOrder | null> {
     return this.prisma.productionOrder.findUnique(args);
   }
-  async createProductionOrder<T extends Prisma.ProductionOrderCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderCreateArgs>
+  async createProductionOrder(
+    args: Prisma.ProductionOrderCreateArgs
   ): Promise<PrismaProductionOrder> {
-    return this.prisma.productionOrder.create<T>(args);
+    return this.prisma.productionOrder.create(args);
   }
-  async updateProductionOrder<T extends Prisma.ProductionOrderUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderUpdateArgs>
+  async updateProductionOrder(
+    args: Prisma.ProductionOrderUpdateArgs
   ): Promise<PrismaProductionOrder> {
-    return this.prisma.productionOrder.update<T>(args);
+    return this.prisma.productionOrder.update(args);
   }
-  async deleteProductionOrder<T extends Prisma.ProductionOrderDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderDeleteArgs>
+  async deleteProductionOrder(
+    args: Prisma.ProductionOrderDeleteArgs
   ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.delete(args);
   }
@@ -93,6 +92,17 @@ export class ProductionOrderServiceBase {
         where: { id: parentId },
       })
       .fermentationDayData(args);
+  }
+
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.productionOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
   }
 
   async findProductionOrderUnitProcedures(

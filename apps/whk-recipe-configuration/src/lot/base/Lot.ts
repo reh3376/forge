@@ -13,7 +13,10 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsString, IsOptional, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
+import { Item } from "../../item/base/Item";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Lot {
@@ -67,6 +70,15 @@ class Lot {
   id!: string;
 
   @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -76,12 +88,30 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: () => ProductionOrder,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrder?: ProductionOrder | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrder,
   })
   @ValidateNested()
   @Type(() => PurchaseOrder)
   @IsOptional()
   purchaseOrderAcceptedLots?: PurchaseOrder | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Recipe,
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipe?: Recipe | null;
 
   @ApiProperty({
     required: false,

@@ -27,30 +27,28 @@ export class ProductionScheduleServiceBase {
     return this.prisma.productionSchedule.count(args);
   }
 
-  async productionSchedules<T extends Prisma.ProductionScheduleFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionScheduleFindManyArgs>
+  async productionSchedules(
+    args: Prisma.ProductionScheduleFindManyArgs
   ): Promise<PrismaProductionSchedule[]> {
-    return this.prisma.productionSchedule.findMany<Prisma.ProductionScheduleFindManyArgs>(
-      args
-    );
+    return this.prisma.productionSchedule.findMany(args);
   }
-  async productionSchedule<T extends Prisma.ProductionScheduleFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionScheduleFindUniqueArgs>
+  async productionSchedule(
+    args: Prisma.ProductionScheduleFindUniqueArgs
   ): Promise<PrismaProductionSchedule | null> {
     return this.prisma.productionSchedule.findUnique(args);
   }
-  async createProductionSchedule<T extends Prisma.ProductionScheduleCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionScheduleCreateArgs>
+  async createProductionSchedule(
+    args: Prisma.ProductionScheduleCreateArgs
   ): Promise<PrismaProductionSchedule> {
-    return this.prisma.productionSchedule.create<T>(args);
+    return this.prisma.productionSchedule.create(args);
   }
-  async updateProductionSchedule<T extends Prisma.ProductionScheduleUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionScheduleUpdateArgs>
+  async updateProductionSchedule(
+    args: Prisma.ProductionScheduleUpdateArgs
   ): Promise<PrismaProductionSchedule> {
-    return this.prisma.productionSchedule.update<T>(args);
+    return this.prisma.productionSchedule.update(args);
   }
-  async deleteProductionSchedule<T extends Prisma.ProductionScheduleDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProductionScheduleDeleteArgs>
+  async deleteProductionSchedule(
+    args: Prisma.ProductionScheduleDeleteArgs
   ): Promise<PrismaProductionSchedule> {
     return this.prisma.productionSchedule.delete(args);
   }

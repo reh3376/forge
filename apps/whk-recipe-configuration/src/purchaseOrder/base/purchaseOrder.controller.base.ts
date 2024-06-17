@@ -54,6 +54,9 @@ export class PurchaseOrderControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: PurchaseOrderCreateInput,
+  })
   async createPurchaseOrder(
     @common.Body() data: PurchaseOrderCreateInput
   ): Promise<PurchaseOrder> {
@@ -281,6 +284,9 @@ export class PurchaseOrderControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: PurchaseOrderUpdateInput,
+  })
   async updatePurchaseOrder(
     @common.Param() params: PurchaseOrderWhereUniqueInput,
     @common.Body() data: PurchaseOrderUpdateInput
@@ -463,9 +469,28 @@ export class PurchaseOrderControllerBase {
         externalId: true,
         globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
           select: {
             id: true,
           },

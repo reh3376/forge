@@ -27,30 +27,28 @@ export class TestParameterServiceBase {
     return this.prisma.testParameter.count(args);
   }
 
-  async testParameters<T extends Prisma.TestParameterFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestParameterFindManyArgs>
+  async testParameters(
+    args: Prisma.TestParameterFindManyArgs
   ): Promise<PrismaTestParameter[]> {
-    return this.prisma.testParameter.findMany<Prisma.TestParameterFindManyArgs>(
-      args
-    );
+    return this.prisma.testParameter.findMany(args);
   }
-  async testParameter<T extends Prisma.TestParameterFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestParameterFindUniqueArgs>
+  async testParameter(
+    args: Prisma.TestParameterFindUniqueArgs
   ): Promise<PrismaTestParameter | null> {
     return this.prisma.testParameter.findUnique(args);
   }
-  async createTestParameter<T extends Prisma.TestParameterCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestParameterCreateArgs>
+  async createTestParameter(
+    args: Prisma.TestParameterCreateArgs
   ): Promise<PrismaTestParameter> {
-    return this.prisma.testParameter.create<T>(args);
+    return this.prisma.testParameter.create(args);
   }
-  async updateTestParameter<T extends Prisma.TestParameterUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestParameterUpdateArgs>
+  async updateTestParameter(
+    args: Prisma.TestParameterUpdateArgs
   ): Promise<PrismaTestParameter> {
-    return this.prisma.testParameter.update<T>(args);
+    return this.prisma.testParameter.update(args);
   }
-  async deleteTestParameter<T extends Prisma.TestParameterDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.TestParameterDeleteArgs>
+  async deleteTestParameter(
+    args: Prisma.TestParameterDeleteArgs
   ): Promise<PrismaTestParameter> {
     return this.prisma.testParameter.delete(args);
   }

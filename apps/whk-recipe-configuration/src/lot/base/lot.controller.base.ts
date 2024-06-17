@@ -45,14 +45,35 @@ export class LotControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: LotCreateInput,
+  })
   async createLot(@common.Body() data: LotCreateInput): Promise<Lot> {
     return await this.service.createLot({
       data: {
         ...data,
 
+        item: data.item
+          ? {
+              connect: data.item,
+            }
+          : undefined,
+
+        productionOrder: data.productionOrder
+          ? {
+              connect: data.productionOrder,
+            }
+          : undefined,
+
         purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
           ? {
               connect: data.purchaseOrderAcceptedLots,
+            }
+          : undefined,
+
+        recipe: data.recipe
+          ? {
+              connect: data.recipe,
             }
           : undefined,
       },
@@ -62,9 +83,28 @@ export class LotControllerBase {
         externalId: true,
         globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
           select: {
             id: true,
           },
@@ -98,9 +138,28 @@ export class LotControllerBase {
         externalId: true,
         globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
           select: {
             id: true,
           },
@@ -133,9 +192,28 @@ export class LotControllerBase {
         externalId: true,
         globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
           select: {
             id: true,
           },
@@ -165,6 +243,9 @@ export class LotControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: LotUpdateInput,
+  })
   async updateLot(
     @common.Param() params: LotWhereUniqueInput,
     @common.Body() data: LotUpdateInput
@@ -175,9 +256,27 @@ export class LotControllerBase {
         data: {
           ...data,
 
+          item: data.item
+            ? {
+                connect: data.item,
+              }
+            : undefined,
+
+          productionOrder: data.productionOrder
+            ? {
+                connect: data.productionOrder,
+              }
+            : undefined,
+
           purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
             ? {
                 connect: data.purchaseOrderAcceptedLots,
+              }
+            : undefined,
+
+          recipe: data.recipe
+            ? {
+                connect: data.recipe,
               }
             : undefined,
         },
@@ -187,9 +286,28 @@ export class LotControllerBase {
           externalId: true,
           globalId: true,
           id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
           lotNumber: true,
 
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
           purchaseOrderAcceptedLots: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
             select: {
               id: true,
             },
@@ -232,9 +350,28 @@ export class LotControllerBase {
           externalId: true,
           globalId: true,
           id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
           lotNumber: true,
 
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
           purchaseOrderAcceptedLots: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
             select: {
               id: true,
             },

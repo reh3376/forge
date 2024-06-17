@@ -48,6 +48,9 @@ export class PhaseParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: PhaseParameterCreateInput,
+  })
   async createPhaseParameter(
     @common.Body() data: PhaseParameterCreateInput
   ): Promise<PhaseParameter> {
@@ -215,6 +218,9 @@ export class PhaseParameterControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: PhaseParameterUpdateInput,
   })
   async updatePhaseParameter(
     @common.Param() params: PhaseParameterWhereUniqueInput,

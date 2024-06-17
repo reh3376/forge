@@ -57,6 +57,9 @@ export class AssetControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: AssetCreateInput,
+  })
   async createAsset(@common.Body() data: AssetCreateInput): Promise<Asset> {
     return await this.service.createAsset({
       data: data,
@@ -164,6 +167,9 @@ export class AssetControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: AssetUpdateInput,
   })
   async updateAsset(
     @common.Param() params: AssetWhereUniqueInput,

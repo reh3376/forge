@@ -48,6 +48,9 @@ export class ItemReceiptControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemReceiptCreateInput,
+  })
   async createItemReceipt(
     @common.Body() data: ItemReceiptCreateInput
   ): Promise<ItemReceipt> {
@@ -214,6 +217,9 @@ export class ItemReceiptControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ItemReceiptUpdateInput,
   })
   async updateItemReceipt(
     @common.Param() params: ItemReceiptWhereUniqueInput,

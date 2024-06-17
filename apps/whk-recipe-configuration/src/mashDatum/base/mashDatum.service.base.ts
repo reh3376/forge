@@ -28,28 +28,28 @@ export class MashDatumServiceBase {
     return this.prisma.mashDatum.count(args);
   }
 
-  async mashData<T extends Prisma.MashDatumFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.MashDatumFindManyArgs>
+  async mashData(
+    args: Prisma.MashDatumFindManyArgs
   ): Promise<PrismaMashDatum[]> {
-    return this.prisma.mashDatum.findMany<Prisma.MashDatumFindManyArgs>(args);
+    return this.prisma.mashDatum.findMany(args);
   }
-  async mashDatum<T extends Prisma.MashDatumFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.MashDatumFindUniqueArgs>
+  async mashDatum(
+    args: Prisma.MashDatumFindUniqueArgs
   ): Promise<PrismaMashDatum | null> {
     return this.prisma.mashDatum.findUnique(args);
   }
-  async createMashDatum<T extends Prisma.MashDatumCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.MashDatumCreateArgs>
+  async createMashDatum(
+    args: Prisma.MashDatumCreateArgs
   ): Promise<PrismaMashDatum> {
-    return this.prisma.mashDatum.create<T>(args);
+    return this.prisma.mashDatum.create(args);
   }
-  async updateMashDatum<T extends Prisma.MashDatumUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.MashDatumUpdateArgs>
+  async updateMashDatum(
+    args: Prisma.MashDatumUpdateArgs
   ): Promise<PrismaMashDatum> {
-    return this.prisma.mashDatum.update<T>(args);
+    return this.prisma.mashDatum.update(args);
   }
-  async deleteMashDatum<T extends Prisma.MashDatumDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.MashDatumDeleteArgs>
+  async deleteMashDatum(
+    args: Prisma.MashDatumDeleteArgs
   ): Promise<PrismaMashDatum> {
     return this.prisma.mashDatum.delete(args);
   }

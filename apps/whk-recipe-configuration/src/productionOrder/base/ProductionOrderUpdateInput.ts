@@ -24,6 +24,7 @@ import { Type } from "class-transformer";
 import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./FermentationChemistryUpdateManyWithoutProductionOrdersInput";
 import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { LotUpdateManyWithoutProductionOrdersInput } from "./LotUpdateManyWithoutProductionOrdersInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -157,6 +158,18 @@ class ProductionOrderUpdateInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  lots?: LotUpdateManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,

@@ -45,6 +45,9 @@ export class TestControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestCreateInput,
+  })
   async createTest(@common.Body() data: TestCreateInput): Promise<Test> {
     return await this.service.createTest({
       data: {
@@ -205,6 +208,9 @@ export class TestControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: TestUpdateInput,
   })
   async updateTest(
     @common.Param() params: TestWhereUniqueInput,

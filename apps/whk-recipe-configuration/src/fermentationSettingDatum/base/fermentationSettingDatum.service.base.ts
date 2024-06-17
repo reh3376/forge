@@ -27,40 +27,28 @@ export class FermentationSettingDatumServiceBase {
     return this.prisma.fermentationSettingDatum.count(args);
   }
 
-  async fermentationSettingData<
-    T extends Prisma.FermentationSettingDatumFindManyArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationSettingDatumFindManyArgs>
+  async fermentationSettingData(
+    args: Prisma.FermentationSettingDatumFindManyArgs
   ): Promise<PrismaFermentationSettingDatum[]> {
-    return this.prisma.fermentationSettingDatum.findMany<Prisma.FermentationSettingDatumFindManyArgs>(
-      args
-    );
+    return this.prisma.fermentationSettingDatum.findMany(args);
   }
-  async fermentationSettingDatum<
-    T extends Prisma.FermentationSettingDatumFindUniqueArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationSettingDatumFindUniqueArgs>
+  async fermentationSettingDatum(
+    args: Prisma.FermentationSettingDatumFindUniqueArgs
   ): Promise<PrismaFermentationSettingDatum | null> {
     return this.prisma.fermentationSettingDatum.findUnique(args);
   }
-  async createFermentationSettingDatum<
-    T extends Prisma.FermentationSettingDatumCreateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationSettingDatumCreateArgs>
+  async createFermentationSettingDatum(
+    args: Prisma.FermentationSettingDatumCreateArgs
   ): Promise<PrismaFermentationSettingDatum> {
-    return this.prisma.fermentationSettingDatum.create<T>(args);
+    return this.prisma.fermentationSettingDatum.create(args);
   }
-  async updateFermentationSettingDatum<
-    T extends Prisma.FermentationSettingDatumUpdateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationSettingDatumUpdateArgs>
+  async updateFermentationSettingDatum(
+    args: Prisma.FermentationSettingDatumUpdateArgs
   ): Promise<PrismaFermentationSettingDatum> {
-    return this.prisma.fermentationSettingDatum.update<T>(args);
+    return this.prisma.fermentationSettingDatum.update(args);
   }
-  async deleteFermentationSettingDatum<
-    T extends Prisma.FermentationSettingDatumDeleteArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.FermentationSettingDatumDeleteArgs>
+  async deleteFermentationSettingDatum(
+    args: Prisma.FermentationSettingDatumDeleteArgs
   ): Promise<PrismaFermentationSettingDatum> {
     return this.prisma.fermentationSettingDatum.delete(args);
   }

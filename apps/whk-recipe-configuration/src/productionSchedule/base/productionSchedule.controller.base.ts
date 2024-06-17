@@ -45,6 +45,9 @@ export class ProductionScheduleControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ProductionScheduleCreateInput,
+  })
   async createProductionSchedule(
     @common.Body() data: ProductionScheduleCreateInput
   ): Promise<ProductionSchedule> {
@@ -209,6 +212,9 @@ export class ProductionScheduleControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ProductionScheduleUpdateInput,
   })
   async updateProductionSchedule(
     @common.Param() params: ProductionScheduleWhereUniqueInput,

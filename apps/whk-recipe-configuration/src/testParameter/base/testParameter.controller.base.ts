@@ -51,6 +51,9 @@ export class TestParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestParameterCreateInput,
+  })
   async createTestParameter(
     @common.Body() data: TestParameterCreateInput
   ): Promise<TestParameter> {
@@ -218,6 +221,9 @@ export class TestParameterControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: TestParameterUpdateInput,
   })
   async updateTestParameter(
     @common.Param() params: TestParameterWhereUniqueInput,

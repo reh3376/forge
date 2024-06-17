@@ -27,29 +27,19 @@ export class AssetServiceBase {
     return this.prisma.asset.count(args);
   }
 
-  async assets<T extends Prisma.AssetFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetFindManyArgs>
-  ): Promise<PrismaAsset[]> {
-    return this.prisma.asset.findMany<Prisma.AssetFindManyArgs>(args);
+  async assets(args: Prisma.AssetFindManyArgs): Promise<PrismaAsset[]> {
+    return this.prisma.asset.findMany(args);
   }
-  async asset<T extends Prisma.AssetFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetFindUniqueArgs>
-  ): Promise<PrismaAsset | null> {
+  async asset(args: Prisma.AssetFindUniqueArgs): Promise<PrismaAsset | null> {
     return this.prisma.asset.findUnique(args);
   }
-  async createAsset<T extends Prisma.AssetCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetCreateArgs>
-  ): Promise<PrismaAsset> {
-    return this.prisma.asset.create<T>(args);
+  async createAsset(args: Prisma.AssetCreateArgs): Promise<PrismaAsset> {
+    return this.prisma.asset.create(args);
   }
-  async updateAsset<T extends Prisma.AssetUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetUpdateArgs>
-  ): Promise<PrismaAsset> {
-    return this.prisma.asset.update<T>(args);
+  async updateAsset(args: Prisma.AssetUpdateArgs): Promise<PrismaAsset> {
+    return this.prisma.asset.update(args);
   }
-  async deleteAsset<T extends Prisma.AssetDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetDeleteArgs>
-  ): Promise<PrismaAsset> {
+  async deleteAsset(args: Prisma.AssetDeleteArgs): Promise<PrismaAsset> {
     return this.prisma.asset.delete(args);
   }
 

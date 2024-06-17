@@ -28,30 +28,28 @@ export class RecipeGroupServiceBase {
     return this.prisma.recipeGroup.count(args);
   }
 
-  async recipeGroups<T extends Prisma.RecipeGroupFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeGroupFindManyArgs>
+  async recipeGroups(
+    args: Prisma.RecipeGroupFindManyArgs
   ): Promise<PrismaRecipeGroup[]> {
-    return this.prisma.recipeGroup.findMany<Prisma.RecipeGroupFindManyArgs>(
-      args
-    );
+    return this.prisma.recipeGroup.findMany(args);
   }
-  async recipeGroup<T extends Prisma.RecipeGroupFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeGroupFindUniqueArgs>
+  async recipeGroup(
+    args: Prisma.RecipeGroupFindUniqueArgs
   ): Promise<PrismaRecipeGroup | null> {
     return this.prisma.recipeGroup.findUnique(args);
   }
-  async createRecipeGroup<T extends Prisma.RecipeGroupCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeGroupCreateArgs>
+  async createRecipeGroup(
+    args: Prisma.RecipeGroupCreateArgs
   ): Promise<PrismaRecipeGroup> {
-    return this.prisma.recipeGroup.create<T>(args);
+    return this.prisma.recipeGroup.create(args);
   }
-  async updateRecipeGroup<T extends Prisma.RecipeGroupUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeGroupUpdateArgs>
+  async updateRecipeGroup(
+    args: Prisma.RecipeGroupUpdateArgs
   ): Promise<PrismaRecipeGroup> {
-    return this.prisma.recipeGroup.update<T>(args);
+    return this.prisma.recipeGroup.update(args);
   }
-  async deleteRecipeGroup<T extends Prisma.RecipeGroupDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeGroupDeleteArgs>
+  async deleteRecipeGroup(
+    args: Prisma.RecipeGroupDeleteArgs
   ): Promise<PrismaRecipeGroup> {
     return this.prisma.recipeGroup.delete(args);
   }

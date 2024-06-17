@@ -18,8 +18,9 @@ import {
   ValidateNested,
   IsInt,
 } from "class-validator";
-import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
+import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { Type } from "class-transformer";
+import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -92,6 +93,18 @@ class RecipeCreateInput {
   @IsString()
   @Field(() => String)
   itemId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

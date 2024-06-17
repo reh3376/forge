@@ -48,6 +48,9 @@ export class FermentationChemistryControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: FermentationChemistryCreateInput,
+  })
   async createFermentationChemistry(
     @common.Body() data: FermentationChemistryCreateInput
   ): Promise<FermentationChemistry> {
@@ -260,6 +263,9 @@ export class FermentationChemistryControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: FermentationChemistryUpdateInput,
   })
   async updateFermentationChemistry(
     @common.Param() params: FermentationChemistryWhereUniqueInput,

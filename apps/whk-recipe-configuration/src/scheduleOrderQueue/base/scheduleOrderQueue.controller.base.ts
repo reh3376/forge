@@ -45,6 +45,9 @@ export class ScheduleOrderQueueControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ScheduleOrderQueueCreateInput,
+  })
   async createScheduleOrderQueue(
     @common.Body() data: ScheduleOrderQueueCreateInput
   ): Promise<ScheduleOrderQueue> {
@@ -198,6 +201,9 @@ export class ScheduleOrderQueueControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ScheduleOrderQueueUpdateInput,
   })
   async updateScheduleOrderQueue(
     @common.Param() params: ScheduleOrderQueueWhereUniqueInput,

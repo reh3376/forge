@@ -10,10 +10,14 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   Lot as PrismaLot,
+  Item as PrismaItem,
+  ProductionOrder as PrismaProductionOrder,
   PurchaseOrder as PrismaPurchaseOrder,
+  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class LotServiceBase {
@@ -23,30 +27,38 @@ export class LotServiceBase {
     return this.prisma.lot.count(args);
   }
 
-  async lots<T extends Prisma.LotFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.LotFindManyArgs>
-  ): Promise<PrismaLot[]> {
-    return this.prisma.lot.findMany<Prisma.LotFindManyArgs>(args);
+  async lots(args: Prisma.LotFindManyArgs): Promise<PrismaLot[]> {
+    return this.prisma.lot.findMany(args);
   }
-  async lot<T extends Prisma.LotFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.LotFindUniqueArgs>
-  ): Promise<PrismaLot | null> {
+  async lot(args: Prisma.LotFindUniqueArgs): Promise<PrismaLot | null> {
     return this.prisma.lot.findUnique(args);
   }
-  async createLot<T extends Prisma.LotCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.LotCreateArgs>
-  ): Promise<PrismaLot> {
-    return this.prisma.lot.create<T>(args);
+  async createLot(args: Prisma.LotCreateArgs): Promise<PrismaLot> {
+    return this.prisma.lot.create(args);
   }
-  async updateLot<T extends Prisma.LotUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>
-  ): Promise<PrismaLot> {
-    return this.prisma.lot.update<T>(args);
+  async updateLot(args: Prisma.LotUpdateArgs): Promise<PrismaLot> {
+    return this.prisma.lot.update(args);
   }
-  async deleteLot<T extends Prisma.LotDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.LotDeleteArgs>
-  ): Promise<PrismaLot> {
+  async deleteLot(args: Prisma.LotDeleteArgs): Promise<PrismaLot> {
     return this.prisma.lot.delete(args);
+  }
+
+  async getItem(parentId: string): Promise<PrismaItem | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .item();
+  }
+
+  async getProductionOrder(
+    parentId: string
+  ): Promise<PrismaProductionOrder | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .productionOrder();
   }
 
   async getPurchaseOrderAcceptedLots(
@@ -57,5 +69,13 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .purchaseOrderAcceptedLots();
+  }
+
+  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .recipe();
   }
 }
