@@ -23,29 +23,21 @@ export class BarrelServiceBase {
     return this.prisma.barrel.count(args);
   }
 
-  async barrels<T extends Prisma.BarrelFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BarrelFindManyArgs>
-  ): Promise<PrismaBarrel[]> {
-    return this.prisma.barrel.findMany<Prisma.BarrelFindManyArgs>(args);
+  async barrels(args: Prisma.BarrelFindManyArgs): Promise<PrismaBarrel[]> {
+    return this.prisma.barrel.findMany(args);
   }
-  async barrel<T extends Prisma.BarrelFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BarrelFindUniqueArgs>
+  async barrel(
+    args: Prisma.BarrelFindUniqueArgs
   ): Promise<PrismaBarrel | null> {
     return this.prisma.barrel.findUnique(args);
   }
-  async createBarrel<T extends Prisma.BarrelCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BarrelCreateArgs>
-  ): Promise<PrismaBarrel> {
-    return this.prisma.barrel.create<T>(args);
+  async createBarrel(args: Prisma.BarrelCreateArgs): Promise<PrismaBarrel> {
+    return this.prisma.barrel.create(args);
   }
-  async updateBarrel<T extends Prisma.BarrelUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BarrelUpdateArgs>
-  ): Promise<PrismaBarrel> {
-    return this.prisma.barrel.update<T>(args);
+  async updateBarrel(args: Prisma.BarrelUpdateArgs): Promise<PrismaBarrel> {
+    return this.prisma.barrel.update(args);
   }
-  async deleteBarrel<T extends Prisma.BarrelDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BarrelDeleteArgs>
-  ): Promise<PrismaBarrel> {
+  async deleteBarrel(args: Prisma.BarrelDeleteArgs): Promise<PrismaBarrel> {
     return this.prisma.barrel.delete(args);
   }
 
