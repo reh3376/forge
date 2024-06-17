@@ -1,1 +1,1 @@
-export enum MyMessageBrokerTopics {}
+export enum WhMessageBrokerTopics {}
