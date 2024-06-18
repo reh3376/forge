@@ -276,8 +276,21 @@ export class AssetControllerBase {
           },
         },
 
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         lotId: true,
 
         mashData: {

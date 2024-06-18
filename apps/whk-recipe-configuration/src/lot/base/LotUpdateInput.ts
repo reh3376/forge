@@ -11,15 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested } from "class-validator";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { BatchUpdateManyWithoutLotsInput } from "./BatchUpdateManyWithoutLotsInput";
+import {
+  ValidateNested,
+  IsOptional,
+  IsString,
+  IsBoolean,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class LotUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchUpdateManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchUpdateManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => BatchUpdateManyWithoutLotsInput, {
+    nullable: true,
+  })
+  batches?: BatchUpdateManyWithoutLotsInput;
+
   @ApiProperty({
     required: false,
     type: String,
@@ -44,6 +63,18 @@ class LotUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -52,6 +83,17 @@ class LotUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isRawMaterial?: boolean | null;
 
   @ApiProperty({
     required: false,

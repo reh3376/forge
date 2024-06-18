@@ -243,6 +243,12 @@ export class RecipeGroupControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,

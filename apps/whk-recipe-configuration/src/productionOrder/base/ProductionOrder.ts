@@ -14,9 +14,9 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Bom } from "../../bom/base/Bom";
 import {
   ValidateNested,
-  IsOptional,
   IsString,
   IsBoolean,
+  IsOptional,
   IsDate,
   IsEnum,
 } from "class-validator";
@@ -36,12 +36,11 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 class ProductionOrder {
   @ApiProperty({
     required: true,
-    type: () => [Bom],
+    type: () => Bom,
   })
   @ValidateNested()
   @Type(() => Bom)
-  @IsOptional()
-  boms?: Array<Bom>;
+  boms?: Bom;
 
   @ApiProperty({
     required: true,

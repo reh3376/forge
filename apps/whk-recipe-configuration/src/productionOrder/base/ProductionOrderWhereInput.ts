@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
 import { StringFilter } from "../../util/StringFilter";
@@ -34,15 +34,15 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 class ProductionOrderWhereInput {
   @ApiProperty({
     required: false,
-    type: () => BomListRelationFilter,
+    type: () => BomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => BomListRelationFilter)
+  @Type(() => BomWhereUniqueInput)
   @IsOptional()
-  @Field(() => BomListRelationFilter, {
+  @Field(() => BomWhereUniqueInput, {
     nullable: true,
   })
-  boms?: BomListRelationFilter;
+  boms?: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,

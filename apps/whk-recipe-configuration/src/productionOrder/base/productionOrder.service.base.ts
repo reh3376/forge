@@ -14,11 +14,11 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ProductionOrder as PrismaProductionOrder,
-  Bom as PrismaBom,
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   Lot as PrismaLot,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
+  Bom as PrismaBom,
   Item as PrismaItem,
   Recipe as PrismaRecipe,
   RecipeGroup as PrismaRecipeGroup,
@@ -59,17 +59,6 @@ export class ProductionOrderServiceBase {
     args: Prisma.ProductionOrderDeleteArgs
   ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.delete(args);
-  }
-
-  async findBoms(
-    parentId: string,
-    args: Prisma.BomFindManyArgs
-  ): Promise<PrismaBom[]> {
-    return this.prisma.productionOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .boms(args);
   }
 
   async findFermentationChemistries(
@@ -114,6 +103,14 @@ export class ProductionOrderServiceBase {
         where: { id: parentId },
       })
       .productionOrderUnitProcedures(args);
+  }
+
+  async getBoms(parentId: string): Promise<PrismaBom | null> {
+    return this.prisma.productionOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .boms();
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {

@@ -22,6 +22,8 @@ import {
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { Lot } from "../../lot/base/Lot";
 
 @ObjectType()
 class Batch {
@@ -71,12 +73,30 @@ class Batch {
   customers!: JsonValue;
 
   @ApiProperty({
+    required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Lot,
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lot?: Lot | null;
 
   @ApiProperty({
     required: false,

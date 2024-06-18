@@ -26,9 +26,6 @@ import { ProductionOrder } from "./ProductionOrder";
 import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderWhereUniqueInput } from "./ProductionOrderWhereUniqueInput";
 import { ProductionOrderUpdateInput } from "./ProductionOrderUpdateInput";
-import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
-import { Bom } from "../../bom/base/Bom";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
@@ -70,6 +67,10 @@ export class ProductionOrderControllerBase {
       data: {
         ...data,
 
+        boms: {
+          connect: data.boms,
+        },
+
         item: {
           connect: data.item,
         },
@@ -97,6 +98,12 @@ export class ProductionOrderControllerBase {
           : undefined,
       },
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
@@ -167,6 +174,12 @@ export class ProductionOrderControllerBase {
     return this.service.productionOrders({
       ...args,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
@@ -236,6 +249,12 @@ export class ProductionOrderControllerBase {
     const result = await this.service.productionOrder({
       where: params,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
@@ -318,6 +337,10 @@ export class ProductionOrderControllerBase {
         data: {
           ...data,
 
+          boms: {
+            connect: data.boms,
+          },
+
           item: {
             connect: data.item,
           },
@@ -345,6 +368,12 @@ export class ProductionOrderControllerBase {
             : undefined,
         },
         select: {
+          boms: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           complete: true,
           createdAt: true,
@@ -422,6 +451,12 @@ export class ProductionOrderControllerBase {
       return await this.service.deleteProductionOrder({
         where: params,
         select: {
+          boms: {
+            select: {
+              id: true,
+            },
+          },
+
           className: true,
           complete: true,
           createdAt: true,
@@ -482,114 +517,6 @@ export class ProductionOrderControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/boms")
-  @ApiNestedQuery(BomFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "read",
-    possession: "any",
-  })
-  async findBoms(
-    @common.Req() request: Request,
-    @common.Param() params: ProductionOrderWhereUniqueInput
-  ): Promise<Bom[]> {
-    const query = plainToClass(BomFindManyArgs, request.query);
-    const results = await this.service.findBoms(params.id, {
-      ...query,
-      select: {
-        bomName: true,
-        bomRevision: true,
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        schemaVersion: true,
-
-        wipItem: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/boms")
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async connectBoms(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: BomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      boms: {
-        connect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/boms")
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async updateBoms(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: BomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      boms: {
-        set: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/boms")
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectBoms(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: BomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      boms: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationChemistries")
   @ApiNestedQuery(FermentationChemistryFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -617,8 +544,21 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         lotId: true,
 
         mashData: {
@@ -873,8 +813,16 @@ export class ProductionOrderControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
 
         item: {
           select: {

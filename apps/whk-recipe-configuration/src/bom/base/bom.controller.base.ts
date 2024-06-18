@@ -360,6 +360,12 @@ export class BomControllerBase {
     const results = await this.service.findProductionOrder(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,

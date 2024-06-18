@@ -26,6 +26,9 @@ import { Batch } from "./Batch";
 import { BatchFindManyArgs } from "./BatchFindManyArgs";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { BatchUpdateInput } from "./BatchUpdateInput";
+import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -53,6 +56,12 @@ export class BatchControllerBase {
       data: {
         ...data,
 
+        lot: data.lot
+          ? {
+              connect: data.lot,
+            }
+          : undefined,
+
         parent: data.parent
           ? {
               connect: data.parent,
@@ -65,6 +74,12 @@ export class BatchControllerBase {
         createdAt: true,
         customers: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
 
         parent: {
           select: {
@@ -102,6 +117,12 @@ export class BatchControllerBase {
         customers: true,
         id: true,
 
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         parent: {
           select: {
             id: true,
@@ -138,6 +159,12 @@ export class BatchControllerBase {
         createdAt: true,
         customers: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
 
         parent: {
           select: {
@@ -183,6 +210,12 @@ export class BatchControllerBase {
         data: {
           ...data,
 
+          lot: data.lot
+            ? {
+                connect: data.lot,
+              }
+            : undefined,
+
           parent: data.parent
             ? {
                 connect: data.parent,
@@ -195,6 +228,12 @@ export class BatchControllerBase {
           createdAt: true,
           customers: true,
           id: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
 
           parent: {
             select: {
@@ -241,6 +280,12 @@ export class BatchControllerBase {
           customers: true,
           id: true,
 
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
           parent: {
             select: {
               id: true,
@@ -283,6 +328,12 @@ export class BatchControllerBase {
         createdAt: true,
         customers: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
 
         parent: {
           select: {
@@ -359,6 +410,152 @@ export class BatchControllerBase {
   ): Promise<void> {
     const data = {
       children: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/fermentationChemistries")
+  @ApiNestedQuery(FermentationChemistryFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "FermentationChemistry",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationChemistries(
+    @common.Req() request: Request,
+    @common.Param() params: BatchWhereUniqueInput
+  ): Promise<FermentationChemistry[]> {
+    const query = plainToClass(
+      FermentationChemistryFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findFermentationChemistries(params.id, {
+      ...query,
+      select: {
+        approved: true,
+        approvedBy: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotId: true,
+
+        mashData: {
+          select: {
+            id: true,
+          },
+        },
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        settingData: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/fermentationChemistries")
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async connectFermentationChemistries(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: FermentationChemistryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationChemistries: {
+        connect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/fermentationChemistries")
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async updateFermentationChemistries(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: FermentationChemistryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationChemistries: {
+        set: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/fermentationChemistries")
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectFermentationChemistries(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: FermentationChemistryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      fermentationChemistries: {
         disconnect: body,
       },
     };

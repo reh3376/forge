@@ -16,6 +16,8 @@ import {
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   Asset as PrismaAsset,
+  Batch as PrismaBatch,
+  Lot as PrismaLot,
   MashDatum as PrismaMashDatum,
   Operation as PrismaOperation,
   ProductionOrder as PrismaProductionOrder,
@@ -74,6 +76,22 @@ export class FermentationChemistryServiceBase {
         where: { id: parentId },
       })
       .asset();
+  }
+
+  async getBatch(parentId: string): Promise<PrismaBatch | null> {
+    return this.prisma.fermentationChemistry
+      .findUnique({
+        where: { id: parentId },
+      })
+      .batch();
+  }
+
+  async getLot(parentId: string): Promise<PrismaLot | null> {
+    return this.prisma.fermentationChemistry
+      .findUnique({
+        where: { id: parentId },
+      })
+      .lot();
   }
 
   async getMashData(parentId: string): Promise<PrismaMashDatum | null> {

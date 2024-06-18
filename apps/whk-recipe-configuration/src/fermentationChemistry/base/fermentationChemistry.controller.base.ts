@@ -62,6 +62,16 @@ export class FermentationChemistryControllerBase {
           connect: data.asset,
         },
 
+        batch: {
+          connect: data.batch,
+        },
+
+        lot: data.lot
+          ? {
+              connect: data.lot,
+            }
+          : undefined,
+
         mashData: {
           connect: data.mashData,
         },
@@ -92,8 +102,21 @@ export class FermentationChemistryControllerBase {
           },
         },
 
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         lotId: true,
 
         mashData: {
@@ -153,8 +176,21 @@ export class FermentationChemistryControllerBase {
           },
         },
 
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         lotId: true,
 
         mashData: {
@@ -213,8 +249,21 @@ export class FermentationChemistryControllerBase {
           },
         },
 
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         lotId: true,
 
         mashData: {
@@ -281,6 +330,16 @@ export class FermentationChemistryControllerBase {
             connect: data.asset,
           },
 
+          batch: {
+            connect: data.batch,
+          },
+
+          lot: data.lot
+            ? {
+                connect: data.lot,
+              }
+            : undefined,
+
           mashData: {
             connect: data.mashData,
           },
@@ -311,8 +370,21 @@ export class FermentationChemistryControllerBase {
             },
           },
 
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
           id: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
           lotId: true,
 
           mashData: {
@@ -379,8 +451,21 @@ export class FermentationChemistryControllerBase {
             },
           },
 
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
           id: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
           lotId: true,
 
           mashData: {

@@ -17,6 +17,8 @@ import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { BatchUpdateManyWithoutBatchesInput } from "./BatchUpdateManyWithoutBatchesInput";
 import { Type } from "class-transformer";
+import { FermentationChemistryUpdateManyWithoutBatchesInput } from "./FermentationChemistryUpdateManyWithoutBatchesInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 
 @InputType()
@@ -63,6 +65,30 @@ class BatchUpdateInput {
     nullable: true,
   })
   customers?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryUpdateManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutBatchesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

@@ -11,8 +11,16 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, IsOptional, ValidateNested } from "class-validator";
+import { Batch } from "../../batch/base/Batch";
+import {
+  ValidateNested,
+  IsOptional,
+  IsDate,
+  IsString,
+  IsBoolean,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
@@ -20,6 +28,15 @@ import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Lot {
+  @ApiProperty({
+    required: true,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
+
   @ApiProperty({
     required: true,
   })
@@ -52,6 +69,15 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistry,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: FermentationChemistry | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -68,6 +94,17 @@ class Lot {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isRawMaterial!: boolean | null;
 
   @ApiProperty({
     required: false,

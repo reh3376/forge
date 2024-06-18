@@ -26,6 +26,9 @@ import { Lot } from "./Lot";
 import { LotFindManyArgs } from "./LotFindManyArgs";
 import { LotWhereUniqueInput } from "./LotWhereUniqueInput";
 import { LotUpdateInput } from "./LotUpdateInput";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -52,6 +55,12 @@ export class LotControllerBase {
     return await this.service.createLot({
       data: {
         ...data,
+
+        fermentationChemistries: data.fermentationChemistries
+          ? {
+              connect: data.fermentationChemistries,
+            }
+          : undefined,
 
         item: data.item
           ? {
@@ -81,8 +90,16 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
 
         item: {
           select: {
@@ -136,8 +153,16 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
 
         item: {
           select: {
@@ -190,8 +215,16 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
 
         item: {
           select: {
@@ -256,6 +289,12 @@ export class LotControllerBase {
         data: {
           ...data,
 
+          fermentationChemistries: data.fermentationChemistries
+            ? {
+                connect: data.fermentationChemistries,
+              }
+            : undefined,
+
           item: data.item
             ? {
                 connect: data.item,
@@ -284,8 +323,16 @@ export class LotControllerBase {
           createdAt: true,
           createdBy: true,
           externalId: true,
+
+          fermentationChemistries: {
+            select: {
+              id: true,
+            },
+          },
+
           globalId: true,
           id: true,
+          isRawMaterial: true,
 
           item: {
             select: {
@@ -348,8 +395,16 @@ export class LotControllerBase {
           createdAt: true,
           createdBy: true,
           externalId: true,
+
+          fermentationChemistries: {
+            select: {
+              id: true,
+            },
+          },
+
           globalId: true,
           id: true,
+          isRawMaterial: true,
 
           item: {
             select: {
@@ -389,5 +444,118 @@ export class LotControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batches")
+  @ApiNestedQuery(BatchFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @common.Req() request: Request,
+    @common.Param() params: LotWhereUniqueInput
+  ): Promise<Batch[]> {
+    const query = plainToClass(BatchFindManyArgs, request.query);
+    const results = await this.service.findBatches(params.id, {
+      ...query,
+      select: {
+        batchData: true,
+        batchId: true,
+        createdAt: true,
+        customers: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        revision: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatches(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        connect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatches(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        set: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatches(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }
