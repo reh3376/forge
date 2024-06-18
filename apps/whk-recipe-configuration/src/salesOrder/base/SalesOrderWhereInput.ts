@@ -12,12 +12,11 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
-import { ValidateNested, IsOptional, IsEnum } from "class-validator";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 
@@ -103,14 +102,14 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumSalesOrderOrderType,
+    type: StringFilter,
   })
-  @IsEnum(EnumSalesOrderOrderType)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => EnumSalesOrderOrderType, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+  orderType?: StringFilter;
 
   @ApiProperty({
     required: false,

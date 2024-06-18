@@ -17,11 +17,9 @@ import {
   IsOptional,
   IsDate,
   IsString,
-  IsEnum,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 
 @ObjectType()
@@ -88,13 +86,11 @@ class SalesOrder {
 
   @ApiProperty({
     required: true,
-    enum: EnumSalesOrderOrderType,
+    type: String,
   })
-  @IsEnum(EnumSalesOrderOrderType)
-  @Field(() => EnumSalesOrderOrderType, {
-    nullable: true,
-  })
-  orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+  @IsString()
+  @Field(() => String)
+  orderType!: string;
 
   @ApiProperty({
     required: false,
