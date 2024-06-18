@@ -127,17 +127,6 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  grainType?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   id?: SortOrder;
 
   @ApiProperty({
@@ -172,6 +161,17 @@ class PurchaseOrderOrderByInput {
     nullable: true,
   })
   orderQuantity?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  purchaseOrderGroup?: SortOrder;
 
   @ApiProperty({
     required: false,

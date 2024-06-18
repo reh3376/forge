@@ -1094,7 +1094,6 @@ export class ItemControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -1105,6 +1104,7 @@ export class ItemControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 

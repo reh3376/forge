@@ -120,14 +120,6 @@ class PurchaseOrderCreateInput {
 
   @ApiProperty({
     required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  grainType!: string;
-
-  @ApiProperty({
-    required: true,
     type: () => ItemWhereUniqueInput,
   })
   @ValidateNested()
@@ -174,6 +166,14 @@ class PurchaseOrderCreateInput {
   @IsInt()
   @Field(() => Number)
   orderQuantity!: number;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  purchaseOrderGroup!: string;
 
   @ApiProperty({
     required: false,

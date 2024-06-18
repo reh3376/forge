@@ -449,7 +449,6 @@ model PurchaseOrder {
   editedAt                    DateTime?                       @updatedAt
   editedBy                    String?
   globalId                    String?                         @unique @default(cuid())
-  grainType                   String
   id                          String                          @id @default(cuid())
   item                        Item                            @relation(fields: [itemId], references: [id])
   itemId                      String
@@ -457,6 +456,7 @@ model PurchaseOrder {
   lotsRejected                PurchaseOrder[]                 @relation(name: "lotsRejected")
   name                        String
   orderQuantity               Int
+  purchaseOrderGroup          String
   purchaseOrderReceiptDate    DateTime?
   purchaseOrderReceived       Boolean?                        @default(false)
   purchaseOrderRejectedLots   PurchaseOrder?                  @relation(name: "lotsRejected", fields: [purchaseOrderRejectedLotsId], references: [id])

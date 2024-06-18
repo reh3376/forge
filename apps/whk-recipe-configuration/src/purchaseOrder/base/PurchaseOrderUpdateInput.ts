@@ -126,17 +126,6 @@ class PurchaseOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  grainType?: string;
-
-  @ApiProperty({
-    required: false,
     type: () => ItemWhereUniqueInput,
   })
   @ValidateNested()
@@ -192,6 +181,17 @@ class PurchaseOrderUpdateInput {
     nullable: true,
   })
   orderQuantity?: number;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  purchaseOrderGroup?: string;
 
   @ApiProperty({
     required: false,
