@@ -10,7 +10,13 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, Batch as PrismaBatch } from "@prisma/client";
+
+import {
+  Prisma,
+  Batch as PrismaBatch,
+  FermentationChemistry as PrismaFermentationChemistry,
+  Lot as PrismaLot,
+} from "@prisma/client";
 
 export class BatchServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -44,6 +50,25 @@ export class BatchServiceBase {
         where: { id: parentId },
       })
       .children(args);
+  }
+
+  async findFermentationChemistries(
+    parentId: string,
+    args: Prisma.FermentationChemistryFindManyArgs
+  ): Promise<PrismaFermentationChemistry[]> {
+    return this.prisma.batch
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationChemistries(args);
+  }
+
+  async getLot(parentId: string): Promise<PrismaLot | null> {
+    return this.prisma.batch
+      .findUnique({
+        where: { id: parentId },
+      })
+      .lot();
   }
 
   async getParent(parentId: string): Promise<PrismaBatch | null> {

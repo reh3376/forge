@@ -16,6 +16,8 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { BatchListRelationFilter } from "./BatchListRelationFilter";
+import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
@@ -68,6 +70,18 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationChemistryListRelationFilter, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -76,6 +90,18 @@ class BatchWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput;
 
   @ApiProperty({
     required: false,

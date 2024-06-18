@@ -461,8 +461,21 @@ export class OperationControllerBase {
           },
         },
 
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         lotId: true,
 
         mashData: {

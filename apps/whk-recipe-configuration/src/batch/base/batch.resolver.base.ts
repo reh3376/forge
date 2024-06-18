@@ -26,6 +26,9 @@ import { BatchFindUniqueArgs } from "./BatchFindUniqueArgs";
 import { CreateBatchArgs } from "./CreateBatchArgs";
 import { UpdateBatchArgs } from "./UpdateBatchArgs";
 import { DeleteBatchArgs } from "./DeleteBatchArgs";
+import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { Lot } from "../../lot/base/Lot";
 import { BatchService } from "../batch.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Batch)
@@ -91,6 +94,12 @@ export class BatchResolverBase {
       data: {
         ...args.data,
 
+        lot: args.data.lot
+          ? {
+              connect: args.data.lot,
+            }
+          : undefined,
+
         parent: args.data.parent
           ? {
               connect: args.data.parent,
@@ -115,6 +124,12 @@ export class BatchResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          lot: args.data.lot
+            ? {
+                connect: args.data.lot,
+              }
+            : undefined,
 
           parent: args.data.parent
             ? {
@@ -172,6 +187,50 @@ export class BatchResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [FermentationChemistry], {
+    name: "fermentationChemistries",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationChemistry",
+    action: "read",
+    possession: "any",
+  })
+  async findFermentationChemistries(
+    @graphql.Parent() parent: Batch,
+    @graphql.Args() args: FermentationChemistryFindManyArgs
+  ): Promise<FermentationChemistry[]> {
+    const results = await this.service.findFermentationChemistries(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Lot, {
+    nullable: true,
+    name: "lot",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async getLot(@graphql.Parent() parent: Batch): Promise<Lot | null> {
+    const result = await this.service.getLot(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

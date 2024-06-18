@@ -317,7 +317,8 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
-  boms                          Bom[]
+  boms                          Bom                            @relation(fields: [bomsId], references: [id])
+  bomsId                        String
   className                     String
   complete                      Boolean?                       @default(false)
   createdAt                     DateTime                       @default(now())
@@ -555,22 +556,25 @@ model ItemReceipt {
 }
 
 model Lot {
-  createdAt                   DateTime         @default(now())
+  batches                     Batch[]
+  createdAt                   DateTime               @default(now())
   createdBy                   String?
-  externalId                  String?          @unique
-  globalId                    String?          @unique @default(cuid())
-  id                          String           @id @default(cuid())
-  item                        Item?            @relation(fields: [itemId], references: [id])
+  externalId                  String?                @unique
+  fermentationChemistries     FermentationChemistry?
+  globalId                    String?                @unique @default(cuid())
+  id                          String                 @id @default(cuid())
+  isRawMaterial               Boolean?               @default(false)
+  item                        Item?                  @relation(fields: [itemId], references: [id])
   itemId                      String?
-  lotNumber                   String           @unique
-  productionOrder             ProductionOrder? @relation(fields: [productionOrderId], references: [id])
+  lotNumber                   String                 @unique
+  productionOrder             ProductionOrder?       @relation(fields: [productionOrderId], references: [id])
   productionOrderId           String?
-  purchaseOrderAcceptedLots   PurchaseOrder?   @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
+  purchaseOrderAcceptedLots   PurchaseOrder?         @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
   purchaseOrderAcceptedLotsId String?
-  recipe                      Recipe?          @relation(fields: [recipeId], references: [id])
+  recipe                      Recipe?                @relation(fields: [recipeId], references: [id])
   recipeId                    String?
-  schemaVersion               String?          @default("0001-b")
-  updatedAt                   DateTime         @updatedAt
+  schemaVersion               String?                @default("0001-b")
+  updatedAt                   DateTime               @updatedAt
 }
 
 model BomItem {
@@ -627,9 +631,13 @@ model FermentationChemistry {
   approvedBy        String?
   asset             Asset                     @relation(fields: [assetId], references: [id])
   assetId           String
+  batch             Batch                     @relation(fields: [batchId], references: [id])
+  batchId           String
   createdAt         DateTime                  @default(now())
   dailyData         FermentationDayDatum[]
   id                String                    @id @default(cuid())
+  lot               Lot?                      @relation(fields: [lotId], references: [id])
+  lotId             String?                   @unique
   lotId             String
   mashData          MashDatum?
   operation         Operation                 @relation(fields: [operationId], references: [id])
@@ -708,17 +716,20 @@ model FermentationDayDatum {
 }
 
 model Batch {
-  batchData Json?
-  batchId   String   @unique
-  children  Batch[]  @relation(name: "parent")
-  createdAt DateTime @default(now())
-  customers Json?
-  id        String   @id @default(cuid())
-  parent    Batch?   @relation(name: "parent", fields: [parentId], references: [id])
-  parentId  String?
-  quantity  Int?
-  revision  Int?     @default(0)
-  updatedAt DateTime @updatedAt
+  batchData               Json?
+  batchId                 String                  @unique
+  children                Batch[]                 @relation(name: "parent")
+  createdAt               DateTime                @default(now())
+  customers               Json?
+  fermentationChemistries FermentationChemistry[]
+  id                      String                  @id @default(cuid())
+  lot                     Lot?                    @relation(fields: [lotId], references: [id])
+  lotId                   String?
+  parent                  Batch?                  @relation(name: "parent", fields: [parentId], references: [id])
+  parentId                String?
+  quantity                Int?
+  revision                Int?                    @default(0)
+  updatedAt               DateTime                @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {

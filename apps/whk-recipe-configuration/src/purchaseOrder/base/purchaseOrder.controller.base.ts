@@ -467,8 +467,16 @@ export class PurchaseOrderControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
 
         item: {
           select: {

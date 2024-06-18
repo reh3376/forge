@@ -19,7 +19,9 @@ import {
 } from "class-validator";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput } from "./FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUniqueInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -59,6 +61,15 @@ class FermentationChemistryCreateInput {
   asset!: AssetWhereUniqueInput;
 
   @ApiProperty({
+    required: true,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @Field(() => BatchWhereUniqueInput)
+  batch!: BatchWhereUniqueInput;
+
+  @ApiProperty({
     required: false,
     type: () =>
       FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput,
@@ -77,6 +88,18 @@ class FermentationChemistryCreateInput {
     }
   )
   dailyData?: FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,

@@ -29,6 +29,8 @@ import { DeleteFermentationChemistryArgs } from "./DeleteFermentationChemistryAr
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Asset } from "../../asset/base/Asset";
+import { Batch } from "../../batch/base/Batch";
+import { Lot } from "../../lot/base/Lot";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -106,6 +108,16 @@ export class FermentationChemistryResolverBase {
           connect: args.data.asset,
         },
 
+        batch: {
+          connect: args.data.batch,
+        },
+
+        lot: args.data.lot
+          ? {
+              connect: args.data.lot,
+            }
+          : undefined,
+
         mashData: {
           connect: args.data.mashData,
         },
@@ -148,6 +160,16 @@ export class FermentationChemistryResolverBase {
           asset: {
             connect: args.data.asset,
           },
+
+          batch: {
+            connect: args.data.batch,
+          },
+
+          lot: args.data.lot
+            ? {
+                connect: args.data.lot,
+              }
+            : undefined,
 
           mashData: {
             connect: args.data.mashData,
@@ -235,6 +257,48 @@ export class FermentationChemistryResolverBase {
     @graphql.Parent() parent: FermentationChemistry
   ): Promise<Asset | null> {
     const result = await this.service.getAsset(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Batch, {
+    nullable: true,
+    name: "batch",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async getBatch(
+    @graphql.Parent() parent: FermentationChemistry
+  ): Promise<Batch | null> {
+    const result = await this.service.getBatch(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Lot, {
+    nullable: true,
+    name: "lot",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async getLot(
+    @graphql.Parent() parent: FermentationChemistry
+  ): Promise<Lot | null> {
+    const result = await this.service.getLot(parent.id);
 
     if (!result) {
       return null;

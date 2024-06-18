@@ -26,8 +26,6 @@ import { ProductionOrderFindUniqueArgs } from "./ProductionOrderFindUniqueArgs";
 import { CreateProductionOrderArgs } from "./CreateProductionOrderArgs";
 import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
 import { DeleteProductionOrderArgs } from "./DeleteProductionOrderArgs";
-import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
-import { Bom } from "../../bom/base/Bom";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
@@ -36,6 +34,7 @@ import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -110,6 +109,10 @@ export class ProductionOrderResolverBase {
       data: {
         ...args.data,
 
+        boms: {
+          connect: args.data.boms,
+        },
+
         item: {
           connect: args.data.item,
         },
@@ -154,6 +157,10 @@ export class ProductionOrderResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          boms: {
+            connect: args.data.boms,
+          },
 
           item: {
             connect: args.data.item,
@@ -211,26 +218,6 @@ export class ProductionOrderResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Bom], { name: "boms" })
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "read",
-    possession: "any",
-  })
-  async findBoms(
-    @graphql.Parent() parent: ProductionOrder,
-    @graphql.Args() args: BomFindManyArgs
-  ): Promise<Bom[]> {
-    const results = await this.service.findBoms(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -323,6 +310,27 @@ export class ProductionOrderResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Bom, {
+    nullable: true,
+    name: "boms",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async getBoms(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<Bom | null> {
+    const result = await this.service.getBoms(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

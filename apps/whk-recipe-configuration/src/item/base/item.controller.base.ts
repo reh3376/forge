@@ -680,8 +680,16 @@ export class ItemControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
 
         item: {
           select: {
@@ -803,6 +811,12 @@ export class ItemControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
