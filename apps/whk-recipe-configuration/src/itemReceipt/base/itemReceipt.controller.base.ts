@@ -81,6 +81,8 @@ export class ItemReceiptControllerBase {
           },
         },
 
+        loadId: true,
+
         purchaseOrder: {
           select: {
             id: true,
@@ -129,6 +131,8 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        loadId: true,
 
         purchaseOrder: {
           select: {
@@ -179,6 +183,8 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        loadId: true,
 
         purchaseOrder: {
           select: {
@@ -254,6 +260,8 @@ export class ItemReceiptControllerBase {
             },
           },
 
+          loadId: true,
+
           purchaseOrder: {
             select: {
               id: true,
@@ -311,6 +319,8 @@ export class ItemReceiptControllerBase {
               id: true,
             },
           },
+
+          loadId: true,
 
           purchaseOrder: {
             select: {
