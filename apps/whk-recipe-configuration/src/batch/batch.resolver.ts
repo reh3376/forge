@@ -3,15 +3,15 @@ import * as nestAccessControl from "nest-access-control";
 import * as gqlACGuard from "../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
-import { ProductionScheduleResolverBase } from "./base/productionSchedule.resolver.base";
-import { ProductionSchedule } from "./base/ProductionSchedule";
-import { ProductionScheduleService } from "./productionSchedule.service";
+import { BatchResolverBase } from "./base/batch.resolver.base";
+import { Batch } from "./base/Batch";
+import { BatchService } from "./batch.service";
 
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
-@graphql.Resolver(() => ProductionSchedule)
-export class ProductionScheduleResolver extends ProductionScheduleResolverBase {
+@graphql.Resolver(() => Batch)
+export class BatchResolver extends BatchResolverBase {
   constructor(
-    protected readonly service: ProductionScheduleService,
+    protected readonly service: BatchService,
     @nestAccessControl.InjectRolesBuilder()
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {

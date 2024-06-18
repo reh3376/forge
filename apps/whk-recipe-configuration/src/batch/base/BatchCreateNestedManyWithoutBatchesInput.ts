@@ -9,20 +9,20 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ArgsType, Field } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
+import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionScheduleWhereInput } from "./ProductionScheduleWhereInput";
-import { Type } from "class-transformer";
 
-@ArgsType()
-class ProductionScheduleCountArgs {
+@InputType()
+class BatchCreateNestedManyWithoutBatchesInput {
+  @Field(() => [BatchWhereUniqueInput], {
+    nullable: true,
+  })
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereInput,
+    type: () => [BatchWhereUniqueInput],
   })
-  @Field(() => ProductionScheduleWhereInput, { nullable: true })
-  @Type(() => ProductionScheduleWhereInput)
-  where?: ProductionScheduleWhereInput;
+  connect?: Array<BatchWhereUniqueInput>;
 }
 
-export { ProductionScheduleCountArgs as ProductionScheduleCountArgs };
+export { BatchCreateNestedManyWithoutBatchesInput as BatchCreateNestedManyWithoutBatchesInput };

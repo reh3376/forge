@@ -12,80 +12,52 @@ import { ACLModule } from "../../auth/acl.module";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { map } from "rxjs";
-import { ProductionScheduleController } from "../productionSchedule.controller";
-import { ProductionScheduleService } from "../productionSchedule.service";
+import { BatchController } from "../batch.controller";
+import { BatchService } from "../batch.service";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  actualEnd: new Date(),
-  actualStart: new Date(),
+  batchId: "exampleBatchId",
   createdAt: new Date(),
-  createdBy: "exampleCreatedBy",
-  customer: "exampleCustomer",
-  duration: 42,
-  estimatedEnd: new Date(),
-  estimatedStart: new Date(),
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  schemaVersion: "exampleSchemaVersion",
+  quantity: 42,
+  revision: 42,
   updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
-  actualEnd: new Date(),
-  actualStart: new Date(),
+  batchId: "exampleBatchId",
   createdAt: new Date(),
-  createdBy: "exampleCreatedBy",
-  customer: "exampleCustomer",
-  duration: 42,
-  estimatedEnd: new Date(),
-  estimatedStart: new Date(),
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  schemaVersion: "exampleSchemaVersion",
+  quantity: 42,
+  revision: 42,
   updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
-    actualEnd: new Date(),
-    actualStart: new Date(),
+    batchId: "exampleBatchId",
     createdAt: new Date(),
-    createdBy: "exampleCreatedBy",
-    customer: "exampleCustomer",
-    duration: 42,
-    estimatedEnd: new Date(),
-    estimatedStart: new Date(),
-    globalId: "exampleGlobalId",
     id: "exampleId",
-    schemaVersion: "exampleSchemaVersion",
+    quantity: 42,
+    revision: 42,
     updatedAt: new Date(),
-    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
-  actualEnd: new Date(),
-  actualStart: new Date(),
+  batchId: "exampleBatchId",
   createdAt: new Date(),
-  createdBy: "exampleCreatedBy",
-  customer: "exampleCustomer",
-  duration: 42,
-  estimatedEnd: new Date(),
-  estimatedStart: new Date(),
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  schemaVersion: "exampleSchemaVersion",
+  quantity: 42,
+  revision: 42,
   updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {
-  createProductionSchedule() {
+  createBatch() {
     return CREATE_RESULT;
   },
-  productionSchedules: () => FIND_MANY_RESULT,
-  productionSchedule: ({ where }: { where: { id: string } }) => {
+  batches: () => FIND_MANY_RESULT,
+  batch: ({ where }: { where: { id: string } }) => {
     switch (where.id) {
       case existingId:
         return FIND_ONE_RESULT;
@@ -127,18 +99,18 @@ const aclValidateRequestInterceptor = {
   },
 };
 
-describe("ProductionSchedule", () => {
+describe("Batch", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         {
-          provide: ProductionScheduleService,
+          provide: BatchService,
           useValue: service,
         },
       ],
-      controllers: [ProductionScheduleController],
+      controllers: [BatchController],
       imports: [ACLModule],
     })
       .overrideGuard(DefaultAuthGuard)
@@ -155,42 +127,34 @@ describe("ProductionSchedule", () => {
     await app.init();
   });
 
-  test("POST /productionSchedules", async () => {
+  test("POST /batches", async () => {
     await request(app.getHttpServer())
-      .post("/productionSchedules")
+      .post("/batches")
       .send(CREATE_INPUT)
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
-        actualEnd: CREATE_RESULT.actualEnd.toISOString(),
-        actualStart: CREATE_RESULT.actualStart.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        estimatedEnd: CREATE_RESULT.estimatedEnd.toISOString(),
-        estimatedStart: CREATE_RESULT.estimatedStart.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
 
-  test("GET /productionSchedules", async () => {
+  test("GET /batches", async () => {
     await request(app.getHttpServer())
-      .get("/productionSchedules")
+      .get("/batches")
       .expect(HttpStatus.OK)
       .expect([
         {
           ...FIND_MANY_RESULT[0],
-          actualEnd: FIND_MANY_RESULT[0].actualEnd.toISOString(),
-          actualStart: FIND_MANY_RESULT[0].actualStart.toISOString(),
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          estimatedEnd: FIND_MANY_RESULT[0].estimatedEnd.toISOString(),
-          estimatedStart: FIND_MANY_RESULT[0].estimatedStart.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
   });
 
-  test("GET /productionSchedules/:id non existing", async () => {
+  test("GET /batches/:id non existing", async () => {
     await request(app.getHttpServer())
-      .get(`${"/productionSchedules"}/${nonExistingId}`)
+      .get(`${"/batches"}/${nonExistingId}`)
       .expect(HttpStatus.NOT_FOUND)
       .expect({
         statusCode: HttpStatus.NOT_FOUND,
@@ -199,39 +163,31 @@ describe("ProductionSchedule", () => {
       });
   });
 
-  test("GET /productionSchedules/:id existing", async () => {
+  test("GET /batches/:id existing", async () => {
     await request(app.getHttpServer())
-      .get(`${"/productionSchedules"}/${existingId}`)
+      .get(`${"/batches"}/${existingId}`)
       .expect(HttpStatus.OK)
       .expect({
         ...FIND_ONE_RESULT,
-        actualEnd: FIND_ONE_RESULT.actualEnd.toISOString(),
-        actualStart: FIND_ONE_RESULT.actualStart.toISOString(),
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        estimatedEnd: FIND_ONE_RESULT.estimatedEnd.toISOString(),
-        estimatedStart: FIND_ONE_RESULT.estimatedStart.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
 
-  test("POST /productionSchedules existing resource", async () => {
+  test("POST /batches existing resource", async () => {
     const agent = request(app.getHttpServer());
     await agent
-      .post("/productionSchedules")
+      .post("/batches")
       .send(CREATE_INPUT)
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
-        actualEnd: CREATE_RESULT.actualEnd.toISOString(),
-        actualStart: CREATE_RESULT.actualStart.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        estimatedEnd: CREATE_RESULT.estimatedEnd.toISOString(),
-        estimatedStart: CREATE_RESULT.estimatedStart.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {
         agent
-          .post("/productionSchedules")
+          .post("/batches")
           .send(CREATE_INPUT)
           .expect(HttpStatus.CONFLICT)
           .expect({

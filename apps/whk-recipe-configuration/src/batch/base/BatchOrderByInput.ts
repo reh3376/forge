@@ -18,7 +18,7 @@ import { SortOrder } from "../../util/SortOrder";
   isAbstract: true,
   description: undefined,
 })
-class ProductionScheduleOrderByInput {
+class BatchOrderByInput {
   @ApiProperty({
     required: false,
     enum: ["asc", "desc"],
@@ -28,7 +28,7 @@ class ProductionScheduleOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  actualEnd?: SortOrder;
+  batchData?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -39,7 +39,7 @@ class ProductionScheduleOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  actualStart?: SortOrder;
+  batchId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -61,62 +61,7 @@ class ProductionScheduleOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  createdBy?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  customer?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  duration?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  estimatedEnd?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  estimatedStart?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  globalId?: SortOrder;
+  customers?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +83,7 @@ class ProductionScheduleOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  scheduleOrderId?: SortOrder;
+  parentId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -149,7 +94,7 @@ class ProductionScheduleOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  scheduleQueueId?: SortOrder;
+  quantity?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -160,7 +105,7 @@ class ProductionScheduleOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  schemaVersion?: SortOrder;
+  revision?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -172,17 +117,6 @@ class ProductionScheduleOrderByInput {
     nullable: true,
   })
   updatedAt?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  updatedBy?: SortOrder;
 }
 
-export { ProductionScheduleOrderByInput as ProductionScheduleOrderByInput };
+export { BatchOrderByInput as BatchOrderByInput };

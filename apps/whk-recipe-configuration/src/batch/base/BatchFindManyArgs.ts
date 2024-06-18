@@ -11,32 +11,32 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ArgsType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionScheduleWhereInput } from "./ProductionScheduleWhereInput";
+import { BatchWhereInput } from "./BatchWhereInput";
 import { IsOptional, ValidateNested, IsInt } from "class-validator";
 import { Type } from "class-transformer";
-import { ProductionScheduleOrderByInput } from "./ProductionScheduleOrderByInput";
+import { BatchOrderByInput } from "./BatchOrderByInput";
 
 @ArgsType()
-class ProductionScheduleFindManyArgs {
+class BatchFindManyArgs {
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereInput,
+    type: () => BatchWhereInput,
   })
   @IsOptional()
   @ValidateNested()
-  @Field(() => ProductionScheduleWhereInput, { nullable: true })
-  @Type(() => ProductionScheduleWhereInput)
-  where?: ProductionScheduleWhereInput;
+  @Field(() => BatchWhereInput, { nullable: true })
+  @Type(() => BatchWhereInput)
+  where?: BatchWhereInput;
 
   @ApiProperty({
     required: false,
-    type: [ProductionScheduleOrderByInput],
+    type: [BatchOrderByInput],
   })
   @IsOptional()
   @ValidateNested({ each: true })
-  @Field(() => [ProductionScheduleOrderByInput], { nullable: true })
-  @Type(() => ProductionScheduleOrderByInput)
-  orderBy?: Array<ProductionScheduleOrderByInput>;
+  @Field(() => [BatchOrderByInput], { nullable: true })
+  @Type(() => BatchOrderByInput)
+  orderBy?: Array<BatchOrderByInput>;
 
   @ApiProperty({
     required: false,
@@ -59,4 +59,4 @@ class ProductionScheduleFindManyArgs {
   take?: number;
 }
 
-export { ProductionScheduleFindManyArgs as ProductionScheduleFindManyArgs };
+export { BatchFindManyArgs as BatchFindManyArgs };

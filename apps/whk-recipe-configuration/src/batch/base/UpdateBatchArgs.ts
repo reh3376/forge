@@ -11,30 +11,30 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ArgsType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionScheduleWhereUniqueInput } from "./ProductionScheduleWhereUniqueInput";
+import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { ProductionScheduleUpdateInput } from "./ProductionScheduleUpdateInput";
+import { BatchUpdateInput } from "./BatchUpdateInput";
 
 @ArgsType()
-class UpdateProductionScheduleArgs {
+class UpdateBatchArgs {
   @ApiProperty({
     required: true,
-    type: () => ProductionScheduleWhereUniqueInput,
+    type: () => BatchWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleWhereUniqueInput)
-  @Field(() => ProductionScheduleWhereUniqueInput, { nullable: false })
-  where!: ProductionScheduleWhereUniqueInput;
+  @Type(() => BatchWhereUniqueInput)
+  @Field(() => BatchWhereUniqueInput, { nullable: false })
+  where!: BatchWhereUniqueInput;
 
   @ApiProperty({
     required: true,
-    type: () => ProductionScheduleUpdateInput,
+    type: () => BatchUpdateInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleUpdateInput)
-  @Field(() => ProductionScheduleUpdateInput, { nullable: false })
-  data!: ProductionScheduleUpdateInput;
+  @Type(() => BatchUpdateInput)
+  @Field(() => BatchUpdateInput, { nullable: false })
+  data!: BatchUpdateInput;
 }
 
-export { UpdateProductionScheduleArgs as UpdateProductionScheduleArgs };
+export { UpdateBatchArgs as UpdateBatchArgs };

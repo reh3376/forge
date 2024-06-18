@@ -58,12 +58,6 @@ export class ScheduleOrderQueueControllerBase {
         nextUnitProcedure: {
           connect: data.nextUnitProcedure,
         },
-
-        productionSchedule: data.productionSchedule
-          ? {
-              connect: data.productionSchedule,
-            }
-          : undefined,
       },
       select: {
         createdAt: true,
@@ -78,13 +72,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
-
-        productionSchedule: {
-          select: {
-            id: true,
-          },
-        },
-
         queueIndex: true,
         schemaVersion: true,
         updatedAt: true,
@@ -124,13 +111,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
-
-        productionSchedule: {
-          select: {
-            id: true,
-          },
-        },
-
         queueIndex: true,
         schemaVersion: true,
         updatedAt: true,
@@ -169,13 +149,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
-
-        productionSchedule: {
-          select: {
-            id: true,
-          },
-        },
-
         queueIndex: true,
         schemaVersion: true,
         updatedAt: true,
@@ -218,12 +191,6 @@ export class ScheduleOrderQueueControllerBase {
           nextUnitProcedure: {
             connect: data.nextUnitProcedure,
           },
-
-          productionSchedule: data.productionSchedule
-            ? {
-                connect: data.productionSchedule,
-              }
-            : undefined,
         },
         select: {
           createdAt: true,
@@ -238,13 +205,6 @@ export class ScheduleOrderQueueControllerBase {
           },
 
           nextUnitProcedureName: true,
-
-          productionSchedule: {
-            select: {
-              id: true,
-            },
-          },
-
           queueIndex: true,
           schemaVersion: true,
           updatedAt: true,
