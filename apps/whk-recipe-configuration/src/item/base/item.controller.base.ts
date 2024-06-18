@@ -569,6 +569,8 @@ export class ItemControllerBase {
           },
         },
 
+        loadId: true,
+
         purchaseOrder: {
           select: {
             id: true,

@@ -610,6 +610,8 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        loadId: true,
+
         purchaseOrder: {
           select: {
             id: true,

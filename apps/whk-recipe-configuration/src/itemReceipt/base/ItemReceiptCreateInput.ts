@@ -15,6 +15,7 @@ import {
   IsString,
   IsOptional,
   ValidateNested,
+  IsInt,
   IsNumber,
   IsBoolean,
   IsEnum,
@@ -63,6 +64,17 @@ class ItemReceiptCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  loadId?: number | null;
 
   @ApiProperty({
     required: false,
