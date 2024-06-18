@@ -1,0 +1,812 @@
+[
+  {
+    "role": "administrators",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "User",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "User",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "User",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "User",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "User",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Lot",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Lot",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Lot",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Lot",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Lot",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Barrel",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Barrel",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Barrel",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Barrel",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "administrators",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "developers",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "finance",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "maintenance",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "managers",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisors",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "warehousing",
+    "resource": "Barrel",
+    "action": "read:any",
+    "attributes": "*"
+  }
+]
