@@ -104,7 +104,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -115,6 +114,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -171,7 +171,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -182,6 +181,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -237,7 +237,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -248,6 +247,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -337,7 +337,6 @@ export class PurchaseOrderControllerBase {
           editedAt: true,
           editedBy: true,
           globalId: true,
-          grainType: true,
           id: true,
 
           item: {
@@ -348,6 +347,7 @@ export class PurchaseOrderControllerBase {
 
           name: true,
           orderQuantity: true,
+          purchaseOrderGroup: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -411,7 +411,6 @@ export class PurchaseOrderControllerBase {
           editedAt: true,
           editedBy: true,
           globalId: true,
-          grainType: true,
           id: true,
 
           item: {
@@ -422,6 +421,7 @@ export class PurchaseOrderControllerBase {
 
           name: true,
           orderQuantity: true,
+          purchaseOrderGroup: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -729,7 +729,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -740,6 +739,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 

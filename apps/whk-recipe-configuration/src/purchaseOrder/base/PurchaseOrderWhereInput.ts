@@ -153,17 +153,6 @@ class PurchaseOrderWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  grainType?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
   id?: StringFilter;
 
   @ApiProperty({
@@ -223,6 +212,17 @@ class PurchaseOrderWhereInput {
     nullable: true,
   })
   orderQuantity?: IntFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  purchaseOrderGroup?: StringFilter;
 
   @ApiProperty({
     required: false,

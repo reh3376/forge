@@ -279,7 +279,6 @@ export class AccountControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -290,6 +289,7 @@ export class AccountControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
