@@ -58,12 +58,6 @@ export class ScheduleOrderControllerBase {
       data: {
         ...data,
 
-        productionSchedules: data.productionSchedules
-          ? {
-              connect: data.productionSchedules,
-            }
-          : undefined,
-
         recipeGroup: {
           connect: data.recipeGroup,
         },
@@ -75,23 +69,23 @@ export class ScheduleOrderControllerBase {
           : undefined,
       },
       select: {
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
         createdBy: true,
         customers: true,
+        duration: true,
+        durationUnits: true,
         estimatedDistillationTime: true,
+        estimatedEnd: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
         estimatedProcessing: true,
+        estimatedStart: true,
         estimatedTotalProductionTime: true,
         globalId: true,
         id: true,
         productionOrderAllocation: true,
-
-        productionSchedules: {
-          select: {
-            id: true,
-          },
-        },
 
         recipeGroup: {
           select: {
@@ -135,23 +129,23 @@ export class ScheduleOrderControllerBase {
     return this.service.scheduleOrders({
       ...args,
       select: {
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
         createdBy: true,
         customers: true,
+        duration: true,
+        durationUnits: true,
         estimatedDistillationTime: true,
+        estimatedEnd: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
         estimatedProcessing: true,
+        estimatedStart: true,
         estimatedTotalProductionTime: true,
         globalId: true,
         id: true,
         productionOrderAllocation: true,
-
-        productionSchedules: {
-          select: {
-            id: true,
-          },
-        },
 
         recipeGroup: {
           select: {
@@ -194,23 +188,23 @@ export class ScheduleOrderControllerBase {
     const result = await this.service.scheduleOrder({
       where: params,
       select: {
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
         createdBy: true,
         customers: true,
+        duration: true,
+        durationUnits: true,
         estimatedDistillationTime: true,
+        estimatedEnd: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
         estimatedProcessing: true,
+        estimatedStart: true,
         estimatedTotalProductionTime: true,
         globalId: true,
         id: true,
         productionOrderAllocation: true,
-
-        productionSchedules: {
-          select: {
-            id: true,
-          },
-        },
 
         recipeGroup: {
           select: {
@@ -266,12 +260,6 @@ export class ScheduleOrderControllerBase {
         data: {
           ...data,
 
-          productionSchedules: data.productionSchedules
-            ? {
-                connect: data.productionSchedules,
-              }
-            : undefined,
-
           recipeGroup: {
             connect: data.recipeGroup,
           },
@@ -283,23 +271,23 @@ export class ScheduleOrderControllerBase {
             : undefined,
         },
         select: {
+          actualEnd: true,
+          actualStart: true,
           createdAt: true,
           createdBy: true,
           customers: true,
+          duration: true,
+          durationUnits: true,
           estimatedDistillationTime: true,
+          estimatedEnd: true,
           estimatedFermentationTime: true,
           estimatedMashingTime: true,
           estimatedProcessing: true,
+          estimatedStart: true,
           estimatedTotalProductionTime: true,
           globalId: true,
           id: true,
           productionOrderAllocation: true,
-
-          productionSchedules: {
-            select: {
-              id: true,
-            },
-          },
 
           recipeGroup: {
             select: {
@@ -350,23 +338,23 @@ export class ScheduleOrderControllerBase {
       return await this.service.deleteScheduleOrder({
         where: params,
         select: {
+          actualEnd: true,
+          actualStart: true,
           createdAt: true,
           createdBy: true,
           customers: true,
+          duration: true,
+          durationUnits: true,
           estimatedDistillationTime: true,
+          estimatedEnd: true,
           estimatedFermentationTime: true,
           estimatedMashingTime: true,
           estimatedProcessing: true,
+          estimatedStart: true,
           estimatedTotalProductionTime: true,
           globalId: true,
           id: true,
           productionOrderAllocation: true,
-
-          productionSchedules: {
-            select: {
-              id: true,
-            },
-          },
 
           recipeGroup: {
             select: {

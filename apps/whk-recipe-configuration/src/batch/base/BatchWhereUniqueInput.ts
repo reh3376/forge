@@ -14,7 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
 
 @InputType()
-class ProductionScheduleWhereUniqueInput {
+class BatchWhereUniqueInput {
   @ApiProperty({
     required: true,
     type: String,
@@ -24,4 +24,4 @@ class ProductionScheduleWhereUniqueInput {
   id!: string;
 }
 
-export { ProductionScheduleWhereUniqueInput as ProductionScheduleWhereUniqueInput };
+export { BatchWhereUniqueInput as BatchWhereUniqueInput };

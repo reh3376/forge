@@ -15,7 +15,6 @@ import {
   Prisma,
   ScheduleOrder as PrismaScheduleOrder,
   ProductionOrder as PrismaProductionOrder,
-  ProductionSchedule as PrismaProductionSchedule,
   RecipeGroup as PrismaRecipeGroup,
   Recipe as PrismaRecipe,
 } from "@prisma/client";
@@ -64,16 +63,6 @@ export class ScheduleOrderServiceBase {
         where: { id: parentId },
       })
       .productionOrders(args);
-  }
-
-  async getProductionSchedules(
-    parentId: string
-  ): Promise<PrismaProductionSchedule | null> {
-    return this.prisma.scheduleOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .productionSchedules();
   }
 
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {

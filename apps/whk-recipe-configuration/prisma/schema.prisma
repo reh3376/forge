@@ -253,17 +253,16 @@ model Bom {
 }
 
 model ScheduleOrderQueue {
-  createdAt             DateTime            @default(now())
+  createdAt             DateTime      @default(now())
   createdBy             String
-  globalId              String?             @unique @default(cuid())
-  id                    String              @id @default(cuid())
-  nextUnitProcedure     UnitProcedure       @relation(fields: [nextUnitProcedureId], references: [id])
-  nextUnitProcedureId   String              @unique
+  globalId              String?       @unique @default(cuid())
+  id                    String        @id @default(cuid())
+  nextUnitProcedure     UnitProcedure @relation(fields: [nextUnitProcedureId], references: [id])
+  nextUnitProcedureId   String        @unique
   nextUnitProcedureName String
-  productionSchedule    ProductionSchedule?
   queueIndex            Int?
-  schemaVersion         String?             @default("0001-b")
-  updatedAt             DateTime            @updatedAt
+  schemaVersion         String?       @default("0001-b")
+  updatedAt             DateTime      @updatedAt
   updatedBy             String?
 
   @@unique([queueIndex, nextUnitProcedureId])
@@ -351,19 +350,24 @@ model ProductionOrder {
 }
 
 model ScheduleOrder {
+  actualEnd                    DateTime?
+  actualStart                  DateTime?
   createdAt                    DateTime                 @default(now())
   createdBy                    String?
   customers                    Json?
+  duration                     Decimal?
+  durationUnits                String?                  @default("Hours")
   estimatedDistillationTime    Int?
+  estimatedEnd                 DateTime?
   estimatedFermentationTime    Int?
   estimatedMashingTime         Int?
   estimatedProcessing          Int?
+  estimatedStart               DateTime?
   estimatedTotalProductionTime Int?
   globalId                     String?                  @unique @default(cuid())
   id                           String                   @id @default(cuid())
   productionOrderAllocation    Json
   productionOrders             ProductionOrder[]
-  productionSchedules          ProductionSchedule?
   recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                String
   recipeName                   String
@@ -410,26 +414,6 @@ model ItemGroup {
   items       Item[]
   name        String
   updatedAt   DateTime @updatedAt
-}
-
-model ProductionSchedule {
-  actualEnd       DateTime?
-  actualStart     DateTime?
-  createdAt       DateTime            @default(now())
-  createdBy       String?
-  customer        String
-  duration        Int?
-  estimatedEnd    DateTime?
-  estimatedStart  DateTime?
-  globalId        String?             @unique @default(cuid())
-  id              String              @id @default(cuid())
-  scheduleOrder   ScheduleOrder?      @relation(fields: [scheduleOrderId], references: [id])
-  scheduleOrderId String?             @unique
-  scheduleQueue   ScheduleOrderQueue? @relation(fields: [scheduleQueueId], references: [id])
-  scheduleQueueId String?             @unique
-  schemaVersion   String?             @default("0001-alpha")
-  updatedAt       DateTime            @updatedAt
-  updatedBy       String?
 }
 
 model Account {
@@ -721,6 +705,20 @@ model FermentationDayDatum {
   productionOrderId       String
   temperature             Decimal
   updatedAt               DateTime                     @updatedAt
+}
+
+model Batch {
+  batchData Json?
+  batchId   String   @unique
+  children  Batch[]  @relation(name: "parent")
+  createdAt DateTime @default(now())
+  customers Json?
+  id        String   @id @default(cuid())
+  parent    Batch?   @relation(name: "parent", fields: [parentId], references: [id])
+  parentId  String?
+  quantity  Int?
+  revision  Int?     @default(0)
+  updatedAt DateTime @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {

@@ -14,7 +14,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
-import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderQueueCreateInput {
@@ -53,18 +52,6 @@ class ScheduleOrderQueueCreateInput {
   @IsString()
   @Field(() => String)
   nextUnitProcedureName!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionScheduleWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionScheduleWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionScheduleWhereUniqueInput, {
-    nullable: true,
-  })
-  productionSchedule?: ProductionScheduleWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

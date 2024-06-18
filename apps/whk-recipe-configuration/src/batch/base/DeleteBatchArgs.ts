@@ -11,20 +11,20 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ArgsType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionScheduleWhereUniqueInput } from "./ProductionScheduleWhereUniqueInput";
+import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 @ArgsType()
-class ProductionScheduleFindUniqueArgs {
+class DeleteBatchArgs {
   @ApiProperty({
     required: true,
-    type: () => ProductionScheduleWhereUniqueInput,
+    type: () => BatchWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleWhereUniqueInput)
-  @Field(() => ProductionScheduleWhereUniqueInput, { nullable: false })
-  where!: ProductionScheduleWhereUniqueInput;
+  @Type(() => BatchWhereUniqueInput)
+  @Field(() => BatchWhereUniqueInput, { nullable: false })
+  where!: BatchWhereUniqueInput;
 }
 
-export { ProductionScheduleFindUniqueArgs as ProductionScheduleFindUniqueArgs };
+export { DeleteBatchArgs as DeleteBatchArgs };

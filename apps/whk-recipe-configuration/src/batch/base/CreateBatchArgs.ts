@@ -11,20 +11,20 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ArgsType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionScheduleCreateInput } from "./ProductionScheduleCreateInput";
+import { BatchCreateInput } from "./BatchCreateInput";
 import { ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 @ArgsType()
-class CreateProductionScheduleArgs {
+class CreateBatchArgs {
   @ApiProperty({
     required: true,
-    type: () => ProductionScheduleCreateInput,
+    type: () => BatchCreateInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleCreateInput)
-  @Field(() => ProductionScheduleCreateInput, { nullable: false })
-  data!: ProductionScheduleCreateInput;
+  @Type(() => BatchCreateInput)
+  @Field(() => BatchCreateInput, { nullable: false })
+  data!: BatchCreateInput;
 }
 
-export { CreateProductionScheduleArgs as CreateProductionScheduleArgs };
+export { CreateBatchArgs as CreateBatchArgs };

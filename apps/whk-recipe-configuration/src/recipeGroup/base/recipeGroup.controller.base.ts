@@ -495,23 +495,23 @@ export class RecipeGroupControllerBase {
     const results = await this.service.findScheduleOrders(params.id, {
       ...query,
       select: {
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
         createdBy: true,
         customers: true,
+        duration: true,
+        durationUnits: true,
         estimatedDistillationTime: true,
+        estimatedEnd: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
         estimatedProcessing: true,
+        estimatedStart: true,
         estimatedTotalProductionTime: true,
         globalId: true,
         id: true,
         productionOrderAllocation: true,
-
-        productionSchedules: {
-          select: {
-            id: true,
-          },
-        },
 
         recipeGroup: {
           select: {

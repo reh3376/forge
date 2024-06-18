@@ -11,46 +11,46 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionScheduleWhereInput } from "./ProductionScheduleWhereInput";
+import { BatchWhereInput } from "./BatchWhereInput";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 
 @InputType()
-class ProductionScheduleListRelationFilter {
+class BatchListRelationFilter {
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereInput,
+    type: () => BatchWhereInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleWhereInput)
+  @Type(() => BatchWhereInput)
   @IsOptional()
-  @Field(() => ProductionScheduleWhereInput, {
+  @Field(() => BatchWhereInput, {
     nullable: true,
   })
-  every?: ProductionScheduleWhereInput;
+  every?: BatchWhereInput;
 
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereInput,
+    type: () => BatchWhereInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleWhereInput)
+  @Type(() => BatchWhereInput)
   @IsOptional()
-  @Field(() => ProductionScheduleWhereInput, {
+  @Field(() => BatchWhereInput, {
     nullable: true,
   })
-  some?: ProductionScheduleWhereInput;
+  some?: BatchWhereInput;
 
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereInput,
+    type: () => BatchWhereInput,
   })
   @ValidateNested()
-  @Type(() => ProductionScheduleWhereInput)
+  @Type(() => BatchWhereInput)
   @IsOptional()
-  @Field(() => ProductionScheduleWhereInput, {
+  @Field(() => BatchWhereInput, {
     nullable: true,
   })
-  none?: ProductionScheduleWhereInput;
+  none?: BatchWhereInput;
 }
-export { ProductionScheduleListRelationFilter as ProductionScheduleListRelationFilter };
+export { BatchListRelationFilter as BatchListRelationFilter };
