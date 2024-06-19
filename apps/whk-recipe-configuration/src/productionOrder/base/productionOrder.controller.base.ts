@@ -559,8 +559,6 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        lotId: true,
-
         mashData: {
           select: {
             id: true,

@@ -22,7 +22,6 @@ const CREATE_INPUT = {
   approvedBy: "exampleApprovedBy",
   createdAt: new Date(),
   id: "exampleId",
-  lotId: "exampleLotId",
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
@@ -30,7 +29,6 @@ const CREATE_RESULT = {
   approvedBy: "exampleApprovedBy",
   createdAt: new Date(),
   id: "exampleId",
-  lotId: "exampleLotId",
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
@@ -39,7 +37,6 @@ const FIND_MANY_RESULT = [
     approvedBy: "exampleApprovedBy",
     createdAt: new Date(),
     id: "exampleId",
-    lotId: "exampleLotId",
     updatedAt: new Date(),
   },
 ];
@@ -48,7 +45,6 @@ const FIND_ONE_RESULT = {
   approvedBy: "exampleApprovedBy",
   createdAt: new Date(),
   id: "exampleId",
-  lotId: "exampleLotId",
   updatedAt: new Date(),
 };
 

@@ -463,8 +463,6 @@ export class BatchControllerBase {
           },
         },
 
-        lotId: true,
-
         mashData: {
           select: {
             id: true,
