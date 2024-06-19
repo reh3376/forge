@@ -476,8 +476,6 @@ export class OperationControllerBase {
           },
         },
 
-        lotId: true,
-
         mashData: {
           select: {
             id: true,

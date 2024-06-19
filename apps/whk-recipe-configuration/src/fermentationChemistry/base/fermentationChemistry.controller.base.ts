@@ -117,8 +117,6 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        lotId: true,
-
         mashData: {
           select: {
             id: true,
@@ -191,8 +189,6 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        lotId: true,
-
         mashData: {
           select: {
             id: true,
@@ -263,8 +259,6 @@ export class FermentationChemistryControllerBase {
             id: true,
           },
         },
-
-        lotId: true,
 
         mashData: {
           select: {
@@ -385,8 +379,6 @@ export class FermentationChemistryControllerBase {
             },
           },
 
-          lotId: true,
-
           mashData: {
             select: {
               id: true,
@@ -465,8 +457,6 @@ export class FermentationChemistryControllerBase {
               id: true,
             },
           },
-
-          lotId: true,
 
           mashData: {
             select: {

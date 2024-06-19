@@ -291,8 +291,6 @@ export class AssetControllerBase {
           },
         },
 
-        lotId: true,
-
         mashData: {
           select: {
             id: true,

@@ -105,17 +105,6 @@ class FermentationChemistryUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lotId?: string;
-
-  @ApiProperty({
-    required: false,
     type: () => MashDatumWhereUniqueInput,
   })
   @ValidateNested()

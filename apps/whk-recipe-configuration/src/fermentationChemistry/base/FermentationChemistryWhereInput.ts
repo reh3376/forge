@@ -110,17 +110,6 @@ class FermentationChemistryWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  lotId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => MashDatumWhereUniqueInput,
   })
   @ValidateNested()
