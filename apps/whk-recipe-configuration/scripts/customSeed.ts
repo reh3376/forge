@@ -887,11 +887,13 @@ export async function customSeed() {
   async function seedRecipe(n: number): Promise<void> {
     const items = await client.item.findMany();
     const customerIds = ["CUST-1001", "CUST-1002", "CUST-1003"];  // Example customer IDs
+    const unitProcedures = await client.unitProcedure.findMany();
 
     for (let i = 0; i < n; i++) {
       const item = getRandomArrayElement(items) as Item;
       const customerId = getRandomArrayElement(customerIds) as string;
       const customer = faker.company.name();
+      const UnitProcedure = getRandomArrayElement(unitProcedures) as UnitProcedure;
 
       try {
         await client.recipe.create({
@@ -906,6 +908,7 @@ export async function customSeed() {
             schemaVersion: "0001-b",
             updatedBy: faker.internet.userName(),
             customer: customer,
+            unitProcedures: { connect: {id: UnitProcedure.id}}
           },
         });
       } catch (error) {
