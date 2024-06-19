@@ -16,7 +16,6 @@ import {
   MashDatum as PrismaMashDatum,
   Asset as PrismaAsset,
   FermentationChemistry as PrismaFermentationChemistry,
-  Operation as PrismaOperation,
 } from "@prisma/client";
 
 export class MashDatumServiceBase {
@@ -70,13 +69,5 @@ export class MashDatumServiceBase {
         where: { id: parentId },
       })
       .fermentationChemistry();
-  }
-
-  async getOperation(parentId: string): Promise<PrismaOperation | null> {
-    return this.prisma.mashDatum
-      .findUnique({
-        where: { id: parentId },
-      })
-      .operation();
   }
 }

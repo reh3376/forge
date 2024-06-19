@@ -61,17 +61,9 @@ export class MashDatumControllerBase {
             }
           : undefined,
 
-        fermentationChemistry: data.fermentationChemistry
-          ? {
-              connect: data.fermentationChemistry,
-            }
-          : undefined,
-
-        operation: data.operation
-          ? {
-              connect: data.operation,
-            }
-          : undefined,
+        fermentationChemistry: {
+          connect: data.fermentationChemistry,
+        },
       },
       select: {
         asset: {
@@ -97,13 +89,6 @@ export class MashDatumControllerBase {
         loggedBy: true,
         lotId: true,
         maltLbs: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         pH: true,
         ryeLbs: true,
         updatedAt: true,
@@ -153,13 +138,6 @@ export class MashDatumControllerBase {
         loggedBy: true,
         lotId: true,
         maltLbs: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         pH: true,
         ryeLbs: true,
         updatedAt: true,
@@ -210,13 +188,6 @@ export class MashDatumControllerBase {
         loggedBy: true,
         lotId: true,
         maltLbs: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         pH: true,
         ryeLbs: true,
         updatedAt: true,
@@ -263,17 +234,9 @@ export class MashDatumControllerBase {
               }
             : undefined,
 
-          fermentationChemistry: data.fermentationChemistry
-            ? {
-                connect: data.fermentationChemistry,
-              }
-            : undefined,
-
-          operation: data.operation
-            ? {
-                connect: data.operation,
-              }
-            : undefined,
+          fermentationChemistry: {
+            connect: data.fermentationChemistry,
+          },
         },
         select: {
           asset: {
@@ -299,13 +262,6 @@ export class MashDatumControllerBase {
           loggedBy: true,
           lotId: true,
           maltLbs: true,
-
-          operation: {
-            select: {
-              id: true,
-            },
-          },
-
           pH: true,
           ryeLbs: true,
           updatedAt: true,
@@ -364,13 +320,6 @@ export class MashDatumControllerBase {
           loggedBy: true,
           lotId: true,
           maltLbs: true,
-
-          operation: {
-            select: {
-              id: true,
-            },
-          },
-
           pH: true,
           ryeLbs: true,
           updatedAt: true,

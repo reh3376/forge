@@ -28,7 +28,6 @@ import { UpdateMashDatumArgs } from "./UpdateMashDatumArgs";
 import { DeleteMashDatumArgs } from "./DeleteMashDatumArgs";
 import { Asset } from "../../asset/base/Asset";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { Operation } from "../../operation/base/Operation";
 import { MashDatumService } from "../mashDatum.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => MashDatum)
@@ -104,17 +103,9 @@ export class MashDatumResolverBase {
             }
           : undefined,
 
-        fermentationChemistry: args.data.fermentationChemistry
-          ? {
-              connect: args.data.fermentationChemistry,
-            }
-          : undefined,
-
-        operation: args.data.operation
-          ? {
-              connect: args.data.operation,
-            }
-          : undefined,
+        fermentationChemistry: {
+          connect: args.data.fermentationChemistry,
+        },
       },
     });
   }
@@ -141,17 +132,9 @@ export class MashDatumResolverBase {
               }
             : undefined,
 
-          fermentationChemistry: args.data.fermentationChemistry
-            ? {
-                connect: args.data.fermentationChemistry,
-              }
-            : undefined,
-
-          operation: args.data.operation
-            ? {
-                connect: args.data.operation,
-              }
-            : undefined,
+          fermentationChemistry: {
+            connect: args.data.fermentationChemistry,
+          },
         },
       });
     } catch (error) {
@@ -218,27 +201,6 @@ export class MashDatumResolverBase {
     @graphql.Parent() parent: MashDatum
   ): Promise<FermentationChemistry | null> {
     const result = await this.service.getFermentationChemistry(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Operation, {
-    nullable: true,
-    name: "operation",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "read",
-    possession: "any",
-  })
-  async getOperation(
-    @graphql.Parent() parent: MashDatum
-  ): Promise<Operation | null> {
-    const result = await this.service.getOperation(parent.id);
 
     if (!result) {
       return null;

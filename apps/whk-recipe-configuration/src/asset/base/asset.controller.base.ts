@@ -563,13 +563,6 @@ export class AssetControllerBase {
         loggedBy: true,
         lotId: true,
         maltLbs: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
         pH: true,
         ryeLbs: true,
         updatedAt: true,

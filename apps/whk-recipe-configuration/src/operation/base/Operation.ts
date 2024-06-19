@@ -28,7 +28,6 @@ import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
@@ -195,15 +194,6 @@ class Operation {
     nullable: true,
   })
   lotId!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [MashDatum],
-  })
-  @ValidateNested()
-  @Type(() => MashDatum)
-  @IsOptional()
-  mashData?: Array<MashDatum>;
 
   @ApiProperty({
     required: true,

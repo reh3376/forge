@@ -177,7 +177,6 @@ model Operation {
   instances               Operation[]                @relation(name: "OperationClassIdOperationInstances")
   isClassDefinition       Boolean?                   @default(false)
   lotId                   String?                    @unique
-  mashData                MashDatum[]
   name                    EnumOperationName
   path                    String?
   procedureSequenceIndex  Int                        @default(0)
@@ -638,7 +637,7 @@ model FermentationChemistry {
   id                String                    @id @default(cuid())
   lot               Lot?                      @relation(fields: [lotId], references: [id])
   lotId             String?                   @unique
-  mashData          MashDatum?
+  mashData          MashDatum?                @relation(fields: [mashDatumId], references: [id])
   operation         Operation                 @relation(fields: [operationId], references: [id])
   operationId       String
   productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
@@ -646,30 +645,28 @@ model FermentationChemistry {
   settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
   settingDataId     String?                   @unique
   updatedAt         DateTime                  @updatedAt
+  mashDatumId       String?
 }
 
 model MashDatum {
-  asset                   Asset?                 @relation(fields: [assetId], references: [id])
-  assetId                 String?
-  backSetPH               Decimal
-  backsetVolume           Decimal?
-  balling                 Decimal
-  cornLbs                 Decimal?
-  createdAt               DateTime               @default(now())
-  fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
-  fermentationChemistryId String?                @unique
-  fermenterNumber         Int
-  id                      String                 @id @default(cuid())
-  loggedBy                String
-  lotId                   String
-  maltLbs                 Decimal?
-  operation               Operation?             @relation(fields: [operationId], references: [id])
-  operationId             String?
-  pH                      Decimal
-  ryeLbs                  Decimal?
-  updatedAt               DateTime               @updatedAt
-  waterVolume             Decimal
-  wheatLbs                Decimal?
+  asset                 Asset?                 @relation(fields: [assetId], references: [id])
+  assetId               String?
+  backSetPH             Decimal
+  backsetVolume         Decimal?
+  balling               Decimal
+  cornLbs               Decimal?
+  createdAt             DateTime               @default(now())
+  fermentationChemistry FermentationChemistry?
+  fermenterNumber       Int
+  id                    String                 @id @default(cuid())
+  loggedBy              String
+  lotId                 String
+  maltLbs               Decimal?
+  pH                    Decimal
+  ryeLbs                Decimal?
+  updatedAt             DateTime               @updatedAt
+  waterVolume           Decimal
+  wheatLbs              Decimal?
 }
 
 model FermentationSettingDatum {
