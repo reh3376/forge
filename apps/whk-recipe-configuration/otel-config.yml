@@ -20,6 +20,10 @@ exporters:
     endpoint: jaeger:4317 # This is the default port for Jaeger
     tls:
       insecure: true
+#  jaeger:
+#    endpoint: jaeger:14250
+#    tls:
+#      insecure: true
 
 extensions:
   health_check:
