@@ -799,14 +799,21 @@ export class EquipmentPhaseControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -817,6 +824,8 @@ export class EquipmentPhaseControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

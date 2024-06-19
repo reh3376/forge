@@ -56,17 +56,19 @@ model TestParameter {
   createdAt                DateTime                           @default(now())
   createdBy                String
   description              String?
-  editedAt                 DateTime?                          @updatedAt
-  editedBy                 String?
   equipmentPhases          EquipmentPhase[]
   globalId                 String?                            @default(cuid())
   id                       String                             @id @default(cuid())
   instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
   isClassDef               Boolean?                           @default(false)
+  itemReceipt              ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
+  itemReceiptId            String?
   name                     String
   purchaseOrder            PurchaseOrder[]
   schemaVersion            String?
   testDetails              String?
+  testedAt                 DateTime?
+  testedBy                 String?
   testParamRevision        String?
   testParamUnits           EnumTestParameterTestParamUnits?
   testPass                 Boolean?
@@ -77,6 +79,8 @@ model TestParameter {
   testSetpointUpperLimit   Float?
   testSetpointValue        Float?
   tooltip                  String?
+  updatedAt                DateTime?                          @updatedAt
+  updatedBy                String?
 }
 
 model RecipeParameter {
@@ -491,23 +495,18 @@ model SalesOrder {
 }
 
 model Test {
-  active            Boolean      @default(true)
-  classId           Test?        @relation(name: "TestClassIdTestInstances", fields: [classIdId], references: [id])
-  classIdId         String?
-  createdAt         DateTime     @default(now())
+  active            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
   createdBy         String
-  editedAt          DateTime?    @updatedAt
+  editedAt          DateTime? @updatedAt
   editedBy          String?
-  globalId          String?      @unique @default(cuid())
-  id                String       @id @default(cuid())
-  instances         Test[]       @relation(name: "TestClassIdTestInstances")
-  isClassDefinition Boolean?     @default(false)
-  itemReceipt       ItemReceipt? @relation(fields: [itemReceiptId], references: [id])
-  itemReceiptId     String?
+  globalId          String?   @unique @default(cuid())
+  id                String    @id @default(cuid())
+  isClassDefinition Boolean?  @default(false)
   schemaVersion     String?
   testDescription   String?
   testName          String
-  testRevision      Int?         @default(0)
+  testRevision      Int?      @default(0)
 }
 
 model Asset {
@@ -548,7 +547,7 @@ model ItemReceipt {
   schemaVersion   String?                @default("0001-b")
   status          EnumItemReceiptStatus? @default(InProgress)
   supplierLot     String?
-  tests           Test[]
+  tests           TestParameter[]
   units           String
   updatedAt       DateTime               @updatedAt
   updatedBy       String?
@@ -901,6 +900,8 @@ enum EnumAssetType {
 enum EnumItemReceiptStatus {
   InProgress
   Complete
+  Rejected
+  Hold
 }
 
 enum EnumProductionOrderUnitProcedureAbbreviation {

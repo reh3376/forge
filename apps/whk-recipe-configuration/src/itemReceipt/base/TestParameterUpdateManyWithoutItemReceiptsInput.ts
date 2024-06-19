@@ -10,37 +10,37 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { TestWhereUniqueInput } from "./TestWhereUniqueInput";
+import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class TestUpdateManyWithoutTestsInput {
-  @Field(() => [TestWhereUniqueInput], {
+class TestParameterUpdateManyWithoutItemReceiptsInput {
+  @Field(() => [TestParameterWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [TestWhereUniqueInput],
+    type: () => [TestParameterWhereUniqueInput],
   })
-  connect?: Array<TestWhereUniqueInput>;
+  connect?: Array<TestParameterWhereUniqueInput>;
 
-  @Field(() => [TestWhereUniqueInput], {
+  @Field(() => [TestParameterWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [TestWhereUniqueInput],
+    type: () => [TestParameterWhereUniqueInput],
   })
-  disconnect?: Array<TestWhereUniqueInput>;
+  disconnect?: Array<TestParameterWhereUniqueInput>;
 
-  @Field(() => [TestWhereUniqueInput], {
+  @Field(() => [TestParameterWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [TestWhereUniqueInput],
+    type: () => [TestParameterWhereUniqueInput],
   })
-  set?: Array<TestWhereUniqueInput>;
+  set?: Array<TestParameterWhereUniqueInput>;
 }
 
-export { TestUpdateManyWithoutTestsInput as TestUpdateManyWithoutTestsInput };
+export { TestParameterUpdateManyWithoutItemReceiptsInput as TestParameterUpdateManyWithoutItemReceiptsInput };

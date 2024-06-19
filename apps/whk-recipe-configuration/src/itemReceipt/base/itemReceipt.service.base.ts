@@ -14,7 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ItemReceipt as PrismaItemReceipt,
-  Test as PrismaTest,
+  TestParameter as PrismaTestParameter,
   Item as PrismaItem,
   PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
@@ -56,8 +56,8 @@ export class ItemReceiptServiceBase {
 
   async findTests(
     parentId: string,
-    args: Prisma.TestFindManyArgs
-  ): Promise<PrismaTest[]> {
+    args: Prisma.TestParameterFindManyArgs
+  ): Promise<PrismaTestParameter[]> {
     return this.prisma.itemReceipt
       .findUniqueOrThrow({
         where: { id: parentId },

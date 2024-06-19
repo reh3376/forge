@@ -25,7 +25,7 @@ import { Type } from "class-transformer";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { TestCreateNestedManyWithoutItemReceiptsInput } from "./TestCreateNestedManyWithoutItemReceiptsInput";
+import { TestParameterCreateNestedManyWithoutItemReceiptsInput } from "./TestParameterCreateNestedManyWithoutItemReceiptsInput";
 
 @InputType()
 class ItemReceiptCreateInput {
@@ -127,7 +127,7 @@ class ItemReceiptCreateInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | null;
+  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
 
   @ApiProperty({
     required: false,
@@ -142,15 +142,15 @@ class ItemReceiptCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestCreateNestedManyWithoutItemReceiptsInput,
+    type: () => TestParameterCreateNestedManyWithoutItemReceiptsInput,
   })
   @ValidateNested()
-  @Type(() => TestCreateNestedManyWithoutItemReceiptsInput)
+  @Type(() => TestParameterCreateNestedManyWithoutItemReceiptsInput)
   @IsOptional()
-  @Field(() => TestCreateNestedManyWithoutItemReceiptsInput, {
+  @Field(() => TestParameterCreateNestedManyWithoutItemReceiptsInput, {
     nullable: true,
   })
-  tests?: TestCreateNestedManyWithoutItemReceiptsInput;
+  tests?: TestParameterCreateNestedManyWithoutItemReceiptsInput;
 
   @ApiProperty({
     required: true,

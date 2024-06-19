@@ -10,11 +10,7 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import {
-  Prisma,
-  Test as PrismaTest,
-  ItemReceipt as PrismaItemReceipt,
-} from "@prisma/client";
+import { Prisma, Test as PrismaTest } from "@prisma/client";
 
 export class TestServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -37,32 +33,5 @@ export class TestServiceBase {
   }
   async deleteTest(args: Prisma.TestDeleteArgs): Promise<PrismaTest> {
     return this.prisma.test.delete(args);
-  }
-
-  async findInstances(
-    parentId: string,
-    args: Prisma.TestFindManyArgs
-  ): Promise<PrismaTest[]> {
-    return this.prisma.test
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .instances(args);
-  }
-
-  async getClassId(parentId: string): Promise<PrismaTest | null> {
-    return this.prisma.test
-      .findUnique({
-        where: { id: parentId },
-      })
-      .classId();
-  }
-
-  async getItemReceipt(parentId: string): Promise<PrismaItemReceipt | null> {
-    return this.prisma.test
-      .findUnique({
-        where: { id: parentId },
-      })
-      .itemReceipt();
   }
 }

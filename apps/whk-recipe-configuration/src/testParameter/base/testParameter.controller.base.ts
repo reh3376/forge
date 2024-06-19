@@ -66,6 +66,12 @@ export class TestParameterControllerBase {
               connect: data.classId,
             }
           : undefined,
+
+        itemReceipt: data.itemReceipt
+          ? {
+              connect: data.itemReceipt,
+            }
+          : undefined,
       },
       select: {
         active: true,
@@ -79,14 +85,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -97,6 +110,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -131,14 +146,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -149,6 +171,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -182,14 +206,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -200,6 +231,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -240,6 +273,12 @@ export class TestParameterControllerBase {
                 connect: data.classId,
               }
             : undefined,
+
+          itemReceipt: data.itemReceipt
+            ? {
+                connect: data.itemReceipt,
+              }
+            : undefined,
         },
         select: {
           active: true,
@@ -253,14 +292,21 @@ export class TestParameterControllerBase {
           createdAt: true,
           createdBy: true,
           description: true,
-          editedAt: true,
-          editedBy: true,
           globalId: true,
           id: true,
           isClassDef: true,
+
+          itemReceipt: {
+            select: {
+              id: true,
+            },
+          },
+
           name: true,
           schemaVersion: true,
           testDetails: true,
+          testedAt: true,
+          testedBy: true,
           testParamRevision: true,
           testParamUnits: true,
           testPass: true,
@@ -271,6 +317,8 @@ export class TestParameterControllerBase {
           testSetpointUpperLimit: true,
           testSetpointValue: true,
           tooltip: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -433,14 +481,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -451,6 +506,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
