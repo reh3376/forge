@@ -108,7 +108,7 @@ class FermentationChemistryCreateInput {
   @ValidateNested()
   @Type(() => MashDatumWhereUniqueInput)
   @Field(() => MashDatumWhereUniqueInput)
-  mashData!: MashDatumWhereUniqueInput | null;
+  mashData!: MashDatumWhereUniqueInput;
 
   @ApiProperty({
     required: true,
