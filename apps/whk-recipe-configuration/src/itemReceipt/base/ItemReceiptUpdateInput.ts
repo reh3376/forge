@@ -25,7 +25,7 @@ import { Type } from "class-transformer";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { TestUpdateManyWithoutItemReceiptsInput } from "./TestUpdateManyWithoutItemReceiptsInput";
+import { TestParameterUpdateManyWithoutItemReceiptsInput } from "./TestParameterUpdateManyWithoutItemReceiptsInput";
 
 @InputType()
 class ItemReceiptUpdateInput {
@@ -139,7 +139,7 @@ class ItemReceiptUpdateInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | null;
+  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
 
   @ApiProperty({
     required: false,
@@ -154,15 +154,15 @@ class ItemReceiptUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestUpdateManyWithoutItemReceiptsInput,
+    type: () => TestParameterUpdateManyWithoutItemReceiptsInput,
   })
   @ValidateNested()
-  @Type(() => TestUpdateManyWithoutItemReceiptsInput)
+  @Type(() => TestParameterUpdateManyWithoutItemReceiptsInput)
   @IsOptional()
-  @Field(() => TestUpdateManyWithoutItemReceiptsInput, {
+  @Field(() => TestParameterUpdateManyWithoutItemReceiptsInput, {
     nullable: true,
   })
-  tests?: TestUpdateManyWithoutItemReceiptsInput;
+  tests?: TestParameterUpdateManyWithoutItemReceiptsInput;
 
   @ApiProperty({
     required: false,
