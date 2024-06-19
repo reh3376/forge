@@ -23,7 +23,6 @@ import {
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { Operation } from "../../operation/base/Operation";
 
 @ObjectType()
 class MashDatum {
@@ -83,12 +82,11 @@ class MashDatum {
   createdAt!: Date;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: () => FermentationChemistry,
   })
   @ValidateNested()
   @Type(() => FermentationChemistry)
-  @IsOptional()
   fermentationChemistry?: FermentationChemistry | null;
 
   @ApiProperty({
@@ -133,15 +131,6 @@ class MashDatum {
     nullable: true,
   })
   maltLbs!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Operation,
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  @IsOptional()
-  operation?: Operation | null;
 
   @ApiProperty({
     required: true,

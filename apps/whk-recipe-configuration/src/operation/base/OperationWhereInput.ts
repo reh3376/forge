@@ -24,7 +24,6 @@ import { FermentationChemistryListRelationFilter } from "../../fermentationChemi
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { FermentationSettingDatumListRelationFilter } from "../../fermentationSettingDatum/base/FermentationSettingDatumListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
-import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
 import { EnumOperationName } from "./EnumOperationName";
 import { IntFilter } from "../../util/IntFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -224,18 +223,6 @@ class OperationWhereInput {
     nullable: true,
   })
   lotId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashData?: MashDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

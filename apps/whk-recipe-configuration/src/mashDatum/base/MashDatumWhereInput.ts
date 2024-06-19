@@ -19,7 +19,6 @@ import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 
 @InputType()
 class MashDatumWhereInput {
@@ -145,18 +144,6 @@ class MashDatumWhereInput {
     nullable: true,
   })
   maltLbs?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,

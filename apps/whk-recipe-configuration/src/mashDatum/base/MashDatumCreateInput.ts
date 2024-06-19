@@ -22,7 +22,6 @@ import {
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 
 @InputType()
 class MashDatumCreateInput {
@@ -77,16 +76,13 @@ class MashDatumCreateInput {
   cornLbs?: Decimal | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: () => FermentationChemistryWhereUniqueInput,
   })
   @ValidateNested()
   @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistry?: FermentationChemistryWhereUniqueInput | null;
+  @Field(() => FermentationChemistryWhereUniqueInput)
+  fermentationChemistry!: FermentationChemistryWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -122,18 +118,6 @@ class MashDatumCreateInput {
     nullable: true,
   })
   maltLbs?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,

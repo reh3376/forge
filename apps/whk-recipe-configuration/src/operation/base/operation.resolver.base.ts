@@ -33,8 +33,6 @@ import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/bas
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { FermentationSettingDatumFindManyArgs } from "../../fermentationSettingDatum/base/FermentationSettingDatumFindManyArgs";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { OperationService } from "../operation.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -263,26 +261,6 @@ export class OperationResolverBase {
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
     const results = await this.service.findInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
-  @nestAccessControl.UseRoles({
-    resource: "MashDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashData(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: MashDatumFindManyArgs
-  ): Promise<MashDatum[]> {
-    const results = await this.service.findMashData(parent.id, args);
 
     if (!results) {
       return [];
