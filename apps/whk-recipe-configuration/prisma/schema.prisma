@@ -637,7 +637,8 @@ model FermentationChemistry {
   id                String                    @id @default(cuid())
   lot               Lot?                      @relation(fields: [lotId], references: [id])
   lotId             String?                   @unique
-  mashData          MashDatum?                @relation(fields: [mashDatumId], references: [id])
+  mashData          MashDatum                 @relation(fields: [mashDataId], references: [id])
+  mashDataId        String                    @unique
   operation         Operation                 @relation(fields: [operationId], references: [id])
   operationId       String
   productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
@@ -645,7 +646,6 @@ model FermentationChemistry {
   settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
   settingDataId     String?                   @unique
   updatedAt         DateTime                  @updatedAt
-  mashDatumId       String?
 }
 
 model MashDatum {

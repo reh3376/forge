@@ -113,7 +113,7 @@ class FermentationChemistryUpdateInput {
   @Field(() => MashDatumWhereUniqueInput, {
     nullable: true,
   })
-  mashData?: MashDatumWhereUniqueInput | null;
+  mashData?: MashDatumWhereUniqueInput;
 
   @ApiProperty({
     required: false,
