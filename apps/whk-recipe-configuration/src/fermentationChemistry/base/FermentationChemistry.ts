@@ -23,6 +23,7 @@ import { Type } from "class-transformer";
 import { Batch } from "../../batch/base/Batch";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Lot } from "../../lot/base/Lot";
+import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
@@ -100,6 +101,15 @@ class FermentationChemistry {
   @Type(() => Lot)
   @IsOptional()
   lot?: Lot | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashDatum],
+  })
+  @ValidateNested()
+  @Type(() => MashDatum)
+  @IsOptional()
+  mashData?: Array<MashDatum>;
 
   @ApiProperty({
     required: true,

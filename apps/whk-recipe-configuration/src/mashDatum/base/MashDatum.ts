@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 
 @ObjectType()
 class MashDatum {
@@ -79,6 +80,15 @@ class MashDatum {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistry,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistry?: FermentationChemistry | null;
 
   @ApiProperty({
     required: true,

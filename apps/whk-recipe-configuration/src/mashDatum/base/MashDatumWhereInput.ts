@@ -16,6 +16,7 @@ import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { StringFilter } from "../../util/StringFilter";
 
@@ -76,6 +77,18 @@ class MashDatumWhereInput {
     nullable: true,
   })
   cornLbs?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistry?: FermentationChemistryWhereUniqueInput;
 
   @ApiProperty({
     required: false,

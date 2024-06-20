@@ -22,6 +22,7 @@ import { Type } from "class-transformer";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput } from "./FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { MashDatumUpdateManyWithoutFermentationChemistriesInput } from "./MashDatumUpdateManyWithoutFermentationChemistriesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
@@ -101,6 +102,18 @@ class FermentationChemistryUpdateInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumUpdateManyWithoutFermentationChemistriesInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumUpdateManyWithoutFermentationChemistriesInput)
+  @IsOptional()
+  @Field(() => MashDatumUpdateManyWithoutFermentationChemistriesInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumUpdateManyWithoutFermentationChemistriesInput;
 
   @ApiProperty({
     required: false,

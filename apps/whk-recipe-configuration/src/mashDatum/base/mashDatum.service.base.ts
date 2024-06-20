@@ -10,10 +10,12 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   MashDatum as PrismaMashDatum,
   Asset as PrismaAsset,
+  FermentationChemistry as PrismaFermentationChemistry,
 } from "@prisma/client";
 
 export class MashDatumServiceBase {
@@ -57,5 +59,15 @@ export class MashDatumServiceBase {
         where: { id: parentId },
       })
       .asset();
+  }
+
+  async getFermentationChemistry(
+    parentId: string
+  ): Promise<PrismaFermentationChemistry | null> {
+    return this.prisma.mashDatum
+      .findUnique({
+        where: { id: parentId },
+      })
+      .fermentationChemistry();
   }
 }
