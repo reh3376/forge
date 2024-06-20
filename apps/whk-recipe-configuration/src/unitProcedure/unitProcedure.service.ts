@@ -28,7 +28,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
   async createUnitProcedure<T extends Prisma.UnitProcedureCreateArgs>(args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>): Promise<import(".prisma/client").UnitProcedure> {
     const unitProcedure = await super.createUnitProcedure(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
       event_type: 'create',
       data: unitProcedure,
       recordName: 'UnitProcedure',
@@ -61,7 +61,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
   async deleteUnitProcedure<T extends Prisma.UnitProcedureDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.UnitProcedureDeleteArgs>): Promise<import(".prisma/client").UnitProcedure> {
     const unitProcedure = await super.deleteUnitProcedure(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
       event_type: 'delete',
       data: unitProcedure,
       recordName: 'UnitProcedure',
