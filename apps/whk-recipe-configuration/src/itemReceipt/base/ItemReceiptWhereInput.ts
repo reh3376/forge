@@ -17,7 +17,7 @@ import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { IntFilter } from "../../util/IntFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
@@ -96,14 +96,14 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => IntFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => IntFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  loadId?: IntFilter;
+  loadId?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
