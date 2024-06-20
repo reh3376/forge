@@ -54,6 +54,9 @@ export class PurchaseOrderControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: PurchaseOrderCreateInput,
+  })
   async createPurchaseOrder(
     @common.Body() data: PurchaseOrderCreateInput
   ): Promise<PurchaseOrder> {
@@ -101,7 +104,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -112,6 +114,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -168,7 +171,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -179,6 +181,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -234,7 +237,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -245,6 +247,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -280,6 +283,9 @@ export class PurchaseOrderControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: PurchaseOrderUpdateInput,
   })
   async updatePurchaseOrder(
     @common.Param() params: PurchaseOrderWhereUniqueInput,
@@ -331,7 +337,6 @@ export class PurchaseOrderControllerBase {
           editedAt: true,
           editedBy: true,
           globalId: true,
-          grainType: true,
           id: true,
 
           item: {
@@ -342,6 +347,7 @@ export class PurchaseOrderControllerBase {
 
           name: true,
           orderQuantity: true,
+          purchaseOrderGroup: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -405,7 +411,6 @@ export class PurchaseOrderControllerBase {
           editedAt: true,
           editedBy: true,
           globalId: true,
-          grainType: true,
           id: true,
 
           item: {
@@ -416,6 +421,7 @@ export class PurchaseOrderControllerBase {
 
           name: true,
           orderQuantity: true,
+          purchaseOrderGroup: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -461,11 +467,38 @@ export class PurchaseOrderControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
+        isRawMaterial: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
           select: {
             id: true,
           },
@@ -704,7 +737,6 @@ export class PurchaseOrderControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -715,6 +747,7 @@ export class PurchaseOrderControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -832,14 +865,21 @@ export class PurchaseOrderControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -850,6 +890,8 @@ export class PurchaseOrderControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

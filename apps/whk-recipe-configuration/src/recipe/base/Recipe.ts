@@ -20,6 +20,7 @@ import {
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -108,6 +109,15 @@ class Recipe {
   @IsString()
   @Field(() => String)
   itemId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 
   @ApiProperty({
     required: false,

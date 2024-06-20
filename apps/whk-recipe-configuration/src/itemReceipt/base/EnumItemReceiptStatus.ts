@@ -14,6 +14,8 @@ import { registerEnumType } from "@nestjs/graphql";
 export enum EnumItemReceiptStatus {
   InProgress = "InProgress",
   Complete = "Complete",
+  Rejected = "Rejected",
+  Hold = "Hold",
 }
 
 registerEnumType(EnumItemReceiptStatus, {

@@ -18,11 +18,12 @@ import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { JsonFilter } from "../../util/JsonFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
@@ -87,28 +88,6 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeNullableFilter,
-  })
-  @Type(() => DateTimeNullableFilter)
-  @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
-    nullable: true,
-  })
-  editedAt?: DateTimeNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  editedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => EquipmentPhaseListRelationFilter,
   })
   @ValidateNested()
@@ -166,6 +145,18 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceiptWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemReceiptWhereUniqueInput, {
+    nullable: true,
+  })
+  itemReceipt?: ItemReceiptWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -208,6 +199,28 @@ class TestParameterWhereInput {
     nullable: true,
   })
   testDetails?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  testedAt?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  testedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -285,6 +298,28 @@ class TestParameterWhereInput {
     nullable: true,
   })
   tooltip?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  updatedAt?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 }
 
 export { TestParameterWhereInput as TestParameterWhereInput };

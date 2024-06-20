@@ -48,6 +48,9 @@ export class BomItemControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomItemCreateInput,
+  })
   async createBomItem(
     @common.Body() data: BomItemCreateInput
   ): Promise<BomItem> {
@@ -78,6 +81,7 @@ export class BomItemControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -126,6 +130,7 @@ export class BomItemControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -175,6 +180,7 @@ export class BomItemControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -218,6 +224,9 @@ export class BomItemControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomItemUpdateInput,
+  })
   async updateBomItem(
     @common.Param() params: BomItemWhereUniqueInput,
     @common.Body() data: BomItemUpdateInput
@@ -251,6 +260,7 @@ export class BomItemControllerBase {
             },
           },
 
+          consumedAt: true,
           createdAt: true,
           createdBy: true,
           id: true,
@@ -308,6 +318,7 @@ export class BomItemControllerBase {
             },
           },
 
+          consumedAt: true,
           createdAt: true,
           createdBy: true,
           id: true,

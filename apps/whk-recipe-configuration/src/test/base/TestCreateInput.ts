@@ -11,17 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsBoolean,
-  ValidateNested,
-  IsOptional,
-  IsString,
-  IsInt,
-} from "class-validator";
-import { TestWhereUniqueInput } from "./TestWhereUniqueInput";
-import { Type } from "class-transformer";
-import { TestCreateNestedManyWithoutTestsInput } from "./TestCreateNestedManyWithoutTestsInput";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
+import { IsBoolean, IsString, IsOptional, IsInt } from "class-validator";
 
 @InputType()
 class TestCreateInput {
@@ -32,18 +22,6 @@ class TestCreateInput {
   @IsBoolean()
   @Field(() => Boolean)
   active!: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -77,18 +55,6 @@ class TestCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestCreateNestedManyWithoutTestsInput,
-  })
-  @ValidateNested()
-  @Type(() => TestCreateNestedManyWithoutTestsInput)
-  @IsOptional()
-  @Field(() => TestCreateNestedManyWithoutTestsInput, {
-    nullable: true,
-  })
-  instances?: TestCreateNestedManyWithoutTestsInput;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -97,18 +63,6 @@ class TestCreateInput {
     nullable: true,
   })
   isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
-    nullable: true,
-  })
-  itemReceipt?: ItemReceiptWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

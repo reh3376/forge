@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { UnitProcedureServiceBase } from "./base/unitProcedure.service.base";
-import { Prisma, UnitProcedure } from "@prisma/client";
-import { PinoLogger } from "nestjs-pino";
-import { OperationWhereUniqueInput } from "../operation/base/OperationWhereUniqueInput";
-import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
-import { MyMessageBrokerTopics } from "../rabbitmq/topics";
+
+import {BadRequestException, Injectable} from "@nestjs/common";
+import {PrismaService} from "../prisma/prisma.service";
+import {UnitProcedureServiceBase} from "./base/unitProcedure.service.base";
+import {Prisma, UnitProcedure} from "@prisma/client";
+import {PinoLogger} from "nestjs-pino";
+import {OperationWhereUniqueInput} from "../operation/base/OperationWhereUniqueInput";
+import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class UnitProcedureService extends UnitProcedureServiceBase {
@@ -47,7 +48,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
       }
     });
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
       event_type: 'update',
       data: unitProcedurePayload,
       recordName: 'UnitProcedure',

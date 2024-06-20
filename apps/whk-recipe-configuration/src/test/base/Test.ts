@@ -13,14 +13,12 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
-  ValidateNested,
-  IsOptional,
   IsDate,
   IsString,
+  IsOptional,
   IsInt,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 
 @ObjectType()
 class Test {
@@ -31,15 +29,6 @@ class Test {
   @IsBoolean()
   @Field(() => Boolean)
   active!: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => Test,
-  })
-  @ValidateNested()
-  @Type(() => Test)
-  @IsOptional()
-  classId?: Test | null;
 
   @ApiProperty({
     required: true,
@@ -100,15 +89,6 @@ class Test {
 
   @ApiProperty({
     required: false,
-    type: () => [Test],
-  })
-  @ValidateNested()
-  @Type(() => Test)
-  @IsOptional()
-  instances?: Array<Test>;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -117,15 +97,6 @@ class Test {
     nullable: true,
   })
   isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceipt,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceipt)
-  @IsOptional()
-  itemReceipt?: ItemReceipt | null;
 
   @ApiProperty({
     required: false,

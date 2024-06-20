@@ -28,6 +28,28 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  actualEnd?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  actualStart?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   createdAt?: SortOrder;
 
   @ApiProperty({
@@ -61,7 +83,40 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  duration?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  durationUnits?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   estimatedDistillationTime?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  estimatedEnd?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -95,6 +150,17 @@ class ScheduleOrderOrderByInput {
     nullable: true,
   })
   estimatedProcessing?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  estimatedStart?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -139,17 +205,6 @@ class ScheduleOrderOrderByInput {
     nullable: true,
   })
   productionOrderAllocation?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  productionSchedulesId?: SortOrder;
 
   @ApiProperty({
     required: false,
