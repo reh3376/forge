@@ -17,8 +17,8 @@ import {
   IsOptional,
   IsString,
   IsDate,
-  IsEnum,
   IsNumber,
+  IsEnum,
 } from "class-validator";
 import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -26,7 +26,6 @@ import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./Equi
 import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderCreateNestedManyWithoutTestParametersInput } from "./PurchaseOrderCreateNestedManyWithoutTestParametersInput";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -207,15 +206,12 @@ class TestParameterCreateInput {
   testParamRevision?: string | null;
 
   @ApiProperty({
-    required: false,
-    enum: EnumTestParameterTestParamUnits,
+    required: true,
+    type: String,
   })
-  @IsEnum(EnumTestParameterTestParamUnits)
-  @IsOptional()
-  @Field(() => EnumTestParameterTestParamUnits, {
-    nullable: true,
-  })
-  testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
+  @IsString()
+  @Field(() => String)
+  testParamUnits!: string;
 
   @ApiProperty({
     required: false,
