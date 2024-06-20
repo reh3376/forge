@@ -4,7 +4,7 @@ import { ItemServiceBase } from "./base/item.service.base";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 import {PinoLogger} from "nestjs-pino";
 import {Prisma} from "@prisma/client";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class ItemService extends ItemServiceBase {
@@ -18,7 +18,7 @@ export class ItemService extends ItemServiceBase {
   async createItem<T extends Prisma.ItemCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ItemCreateArgs>): Promise<import(".prisma/client").Item> {
     const item = await super.createItem(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Item, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Item, {
       event_type: 'create',
       data: item,
       recordName: 'Item',
@@ -38,7 +38,7 @@ export class ItemService extends ItemServiceBase {
       }
     });
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Item, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Item, {
       event_type: 'update',
       data: itemPayload,
       recordName: 'Item',
@@ -51,7 +51,7 @@ export class ItemService extends ItemServiceBase {
   async deleteItem<T extends Prisma.ItemDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.ItemDeleteArgs>): Promise<import(".prisma/client").Item> {
     const item = await super.deleteItem(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Item, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Item, {
       event_type: 'delete',
       data: item,
       recordName: 'Item',
