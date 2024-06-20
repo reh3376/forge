@@ -25,7 +25,7 @@ import { Item } from "../../item/base/Item";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { Test } from "../../test/base/Test";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 
 @ObjectType()
 class ItemReceipt {
@@ -128,7 +128,7 @@ class ItemReceipt {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | null;
+  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
 
   @ApiProperty({
     required: false,
@@ -143,12 +143,12 @@ class ItemReceipt {
 
   @ApiProperty({
     required: false,
-    type: () => [Test],
+    type: () => [TestParameter],
   })
   @ValidateNested()
-  @Type(() => Test)
+  @Type(() => TestParameter)
   @IsOptional()
-  tests?: Array<Test>;
+  tests?: Array<TestParameter>;
 
   @ApiProperty({
     required: true,

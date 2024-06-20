@@ -21,8 +21,11 @@ import {
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
+import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./FermentationChemistryCreateNestedManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { FermentationDayDatumCreateNestedManyWithoutAssetsInput } from "./FermentationDayDatumCreateNestedManyWithoutAssetsInput";
+import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
+import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
 import { EnumAssetType } from "./EnumAssetType";
 
 @InputType()
@@ -63,6 +66,30 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -71,6 +98,18 @@ class AssetCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: true,

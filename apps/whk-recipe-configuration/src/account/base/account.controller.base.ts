@@ -51,6 +51,9 @@ export class AccountControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: AccountCreateInput,
+  })
   async createAccount(
     @common.Body() data: AccountCreateInput
   ): Promise<Account> {
@@ -160,6 +163,9 @@ export class AccountControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: AccountUpdateInput,
   })
   async updateAccount(
     @common.Param() params: AccountWhereUniqueInput,
@@ -273,7 +279,6 @@ export class AccountControllerBase {
         editedAt: true,
         editedBy: true,
         globalId: true,
-        grainType: true,
         id: true,
 
         item: {
@@ -284,6 +289,7 @@ export class AccountControllerBase {
 
         name: true,
         orderQuantity: true,
+        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 

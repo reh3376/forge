@@ -24,6 +24,7 @@ import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWitho
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
+import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput";
 import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
@@ -164,6 +165,18 @@ class ItemCreateInput {
   @IsString()
   @Field(() => String)
   itemType!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ItemReceiptServiceBase } from "./base/itemReceipt.service.base";
 import {Prisma} from "@prisma/client";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 import {PinoLogger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 
@@ -19,7 +19,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
     async createItemReceipt<T extends Prisma.ItemReceiptCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ItemReceiptCreateArgs>): Promise<import(".prisma/client").ItemReceipt> {
       const itemReceipt = await super.createItemReceipt(args);
 
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
         event_type: 'create',
         data: itemReceipt,
         recordName: 'ItemReceipt',
@@ -41,7 +41,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           }
       });
 
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
         event_type: 'update',
         data: itemReceiptPayload,
         recordName: 'ItemReceipt',
@@ -54,7 +54,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
     async deleteItemReceipt<T extends Prisma.ItemReceiptDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.ItemReceiptDeleteArgs>): Promise<import(".prisma/client").ItemReceipt> {
       const itemReceipt = await super.deleteItemReceipt(args);
 
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
         event_type: 'delete',
         data: itemReceipt,
         recordName: 'ItemReceipt',

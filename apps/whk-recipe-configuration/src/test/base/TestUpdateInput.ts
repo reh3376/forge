@@ -11,17 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
-  IsString,
-  IsInt,
-} from "class-validator";
-import { TestWhereUniqueInput } from "./TestWhereUniqueInput";
-import { Type } from "class-transformer";
-import { TestUpdateManyWithoutTestsInput } from "./TestUpdateManyWithoutTestsInput";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
+import { IsBoolean, IsOptional, IsString, IsInt } from "class-validator";
 
 @InputType()
 class TestUpdateInput {
@@ -35,18 +25,6 @@ class TestUpdateInput {
     nullable: true,
   })
   active?: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -83,18 +61,6 @@ class TestUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestUpdateManyWithoutTestsInput,
-  })
-  @ValidateNested()
-  @Type(() => TestUpdateManyWithoutTestsInput)
-  @IsOptional()
-  @Field(() => TestUpdateManyWithoutTestsInput, {
-    nullable: true,
-  })
-  instances?: TestUpdateManyWithoutTestsInput;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -103,18 +69,6 @@ class TestUpdateInput {
     nullable: true,
   })
   isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
-    nullable: true,
-  })
-  itemReceipt?: ItemReceiptWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

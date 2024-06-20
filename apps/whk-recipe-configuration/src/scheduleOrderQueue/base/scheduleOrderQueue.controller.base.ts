@@ -45,6 +45,9 @@ export class ScheduleOrderQueueControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ScheduleOrderQueueCreateInput,
+  })
   async createScheduleOrderQueue(
     @common.Body() data: ScheduleOrderQueueCreateInput
   ): Promise<ScheduleOrderQueue> {
@@ -55,12 +58,6 @@ export class ScheduleOrderQueueControllerBase {
         nextUnitProcedure: {
           connect: data.nextUnitProcedure,
         },
-
-        productionSchedule: data.productionSchedule
-          ? {
-              connect: data.productionSchedule,
-            }
-          : undefined,
       },
       select: {
         createdAt: true,
@@ -75,13 +72,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
-
-        productionSchedule: {
-          select: {
-            id: true,
-          },
-        },
-
         queueIndex: true,
         schemaVersion: true,
         updatedAt: true,
@@ -121,13 +111,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
-
-        productionSchedule: {
-          select: {
-            id: true,
-          },
-        },
-
         queueIndex: true,
         schemaVersion: true,
         updatedAt: true,
@@ -166,13 +149,6 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
-
-        productionSchedule: {
-          select: {
-            id: true,
-          },
-        },
-
         queueIndex: true,
         schemaVersion: true,
         updatedAt: true,
@@ -199,6 +175,9 @@ export class ScheduleOrderQueueControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ScheduleOrderQueueUpdateInput,
+  })
   async updateScheduleOrderQueue(
     @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
     @common.Body() data: ScheduleOrderQueueUpdateInput
@@ -212,12 +191,6 @@ export class ScheduleOrderQueueControllerBase {
           nextUnitProcedure: {
             connect: data.nextUnitProcedure,
           },
-
-          productionSchedule: data.productionSchedule
-            ? {
-                connect: data.productionSchedule,
-              }
-            : undefined,
         },
         select: {
           createdAt: true,
@@ -232,13 +205,6 @@ export class ScheduleOrderQueueControllerBase {
           },
 
           nextUnitProcedureName: true,
-
-          productionSchedule: {
-            select: {
-              id: true,
-            },
-          },
-
           queueIndex: true,
           schemaVersion: true,
           updatedAt: true,
