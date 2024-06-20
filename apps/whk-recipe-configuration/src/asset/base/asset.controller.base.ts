@@ -291,12 +291,6 @@ export class AssetControllerBase {
           },
         },
 
-        mashData: {
-          select: {
-            id: true,
-          },
-        },
-
         operation: {
           select: {
             id: true,
@@ -551,13 +545,6 @@ export class AssetControllerBase {
         balling: true,
         cornLbs: true,
         createdAt: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
         fermenterNumber: true,
         id: true,
         loggedBy: true,

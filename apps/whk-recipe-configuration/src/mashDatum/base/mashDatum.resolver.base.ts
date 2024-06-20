@@ -27,7 +27,6 @@ import { CreateMashDatumArgs } from "./CreateMashDatumArgs";
 import { UpdateMashDatumArgs } from "./UpdateMashDatumArgs";
 import { DeleteMashDatumArgs } from "./DeleteMashDatumArgs";
 import { Asset } from "../../asset/base/Asset";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { MashDatumService } from "../mashDatum.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => MashDatum)
@@ -102,10 +101,6 @@ export class MashDatumResolverBase {
               connect: args.data.asset,
             }
           : undefined,
-
-        fermentationChemistry: {
-          connect: args.data.fermentationChemistry,
-        },
       },
     });
   }
@@ -131,10 +126,6 @@ export class MashDatumResolverBase {
                 connect: args.data.asset,
               }
             : undefined,
-
-          fermentationChemistry: {
-            connect: args.data.fermentationChemistry,
-          },
         },
       });
     } catch (error) {
@@ -180,27 +171,6 @@ export class MashDatumResolverBase {
   })
   async getAsset(@graphql.Parent() parent: MashDatum): Promise<Asset | null> {
     const result = await this.service.getAsset(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => FermentationChemistry, {
-    nullable: true,
-    name: "fermentationChemistry",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async getFermentationChemistry(
-    @graphql.Parent() parent: MashDatum
-  ): Promise<FermentationChemistry | null> {
-    const result = await this.service.getFermentationChemistry(parent.id);
 
     if (!result) {
       return null;

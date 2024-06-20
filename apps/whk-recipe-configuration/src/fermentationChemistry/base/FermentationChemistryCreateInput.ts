@@ -22,7 +22,6 @@ import { Type } from "class-transformer";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput } from "./FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUniqueInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
@@ -100,18 +99,6 @@ class FermentationChemistryCreateInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashDatumWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumWhereUniqueInput)
-  @IsOptional()
-  @Field(() => MashDatumWhereUniqueInput, {
-    nullable: true,
-  })
-  mashData?: MashDatumWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,

@@ -11,18 +11,15 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-
 import {
   IsDate,
   IsString,
   IsOptional,
   ValidateNested,
-  IsInt,
   IsNumber,
   IsBoolean,
   IsEnum,
 } from "class-validator";
-
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
@@ -82,17 +79,6 @@ class ItemReceipt {
   @ValidateNested()
   @Type(() => Item)
   item?: Item;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  loadId!: number | null;
 
   @ApiProperty({
     required: false,

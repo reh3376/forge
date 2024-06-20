@@ -72,12 +72,6 @@ export class FermentationChemistryControllerBase {
             }
           : undefined,
 
-        mashData: data.mashData
-          ? {
-              connect: data.mashData,
-            }
-          : undefined,
-
         operation: {
           connect: data.operation,
         },
@@ -114,12 +108,6 @@ export class FermentationChemistryControllerBase {
         id: true,
 
         lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        mashData: {
           select: {
             id: true,
           },
@@ -191,12 +179,6 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        mashData: {
-          select: {
-            id: true,
-          },
-        },
-
         operation: {
           select: {
             id: true,
@@ -257,12 +239,6 @@ export class FermentationChemistryControllerBase {
         id: true,
 
         lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        mashData: {
           select: {
             id: true,
           },
@@ -336,12 +312,6 @@ export class FermentationChemistryControllerBase {
               }
             : undefined,
 
-          mashData: data.mashData
-            ? {
-                connect: data.mashData,
-              }
-            : undefined,
-
           operation: {
             connect: data.operation,
           },
@@ -378,12 +348,6 @@ export class FermentationChemistryControllerBase {
           id: true,
 
           lot: {
-            select: {
-              id: true,
-            },
-          },
-
-          mashData: {
             select: {
               id: true,
             },
@@ -457,12 +421,6 @@ export class FermentationChemistryControllerBase {
           id: true,
 
           lot: {
-            select: {
-              id: true,
-            },
-          },
-
-          mashData: {
             select: {
               id: true,
             },
