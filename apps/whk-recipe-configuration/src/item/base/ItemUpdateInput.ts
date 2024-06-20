@@ -24,6 +24,7 @@ import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput
 import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
+import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
@@ -182,6 +183,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   itemType?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  lots?: LotUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

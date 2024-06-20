@@ -20,7 +20,6 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 
 @ObjectType()
 class ScheduleOrderQueue {
@@ -74,15 +73,6 @@ class ScheduleOrderQueue {
   @IsString()
   @Field(() => String)
   nextUnitProcedureName!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionSchedule,
-  })
-  @ValidateNested()
-  @Type(() => ProductionSchedule)
-  @IsOptional()
-  productionSchedule?: ProductionSchedule | null;
 
   @ApiProperty({
     required: false,

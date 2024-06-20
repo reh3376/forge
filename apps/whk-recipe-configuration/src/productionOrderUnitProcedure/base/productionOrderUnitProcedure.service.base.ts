@@ -29,46 +29,28 @@ export class ProductionOrderUnitProcedureServiceBase {
     return this.prisma.productionOrderUnitProcedure.count(args);
   }
 
-  async productionOrderUnitProcedures<
-    T extends Prisma.ProductionOrderUnitProcedureFindManyArgs
-  >(
-    args: Prisma.SelectSubset<
-      T,
-      Prisma.ProductionOrderUnitProcedureFindManyArgs
-    >
+  async productionOrderUnitProcedures(
+    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
   ): Promise<PrismaProductionOrderUnitProcedure[]> {
-    return this.prisma.productionOrderUnitProcedure.findMany<Prisma.ProductionOrderUnitProcedureFindManyArgs>(
-      args
-    );
+    return this.prisma.productionOrderUnitProcedure.findMany(args);
   }
-  async productionOrderUnitProcedure<
-    T extends Prisma.ProductionOrderUnitProcedureFindUniqueArgs
-  >(
-    args: Prisma.SelectSubset<
-      T,
-      Prisma.ProductionOrderUnitProcedureFindUniqueArgs
-    >
+  async productionOrderUnitProcedure(
+    args: Prisma.ProductionOrderUnitProcedureFindUniqueArgs
   ): Promise<PrismaProductionOrderUnitProcedure | null> {
     return this.prisma.productionOrderUnitProcedure.findUnique(args);
   }
-  async createProductionOrderUnitProcedure<
-    T extends Prisma.ProductionOrderUnitProcedureCreateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderUnitProcedureCreateArgs>
+  async createProductionOrderUnitProcedure(
+    args: Prisma.ProductionOrderUnitProcedureCreateArgs
   ): Promise<PrismaProductionOrderUnitProcedure> {
-    return this.prisma.productionOrderUnitProcedure.create<T>(args);
+    return this.prisma.productionOrderUnitProcedure.create(args);
   }
-  async updateProductionOrderUnitProcedure<
-    T extends Prisma.ProductionOrderUnitProcedureUpdateArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderUnitProcedureUpdateArgs>
+  async updateProductionOrderUnitProcedure(
+    args: Prisma.ProductionOrderUnitProcedureUpdateArgs
   ): Promise<PrismaProductionOrderUnitProcedure> {
-    return this.prisma.productionOrderUnitProcedure.update<T>(args);
+    return this.prisma.productionOrderUnitProcedure.update(args);
   }
-  async deleteProductionOrderUnitProcedure<
-    T extends Prisma.ProductionOrderUnitProcedureDeleteArgs
-  >(
-    args: Prisma.SelectSubset<T, Prisma.ProductionOrderUnitProcedureDeleteArgs>
+  async deleteProductionOrderUnitProcedure(
+    args: Prisma.ProductionOrderUnitProcedureDeleteArgs
   ): Promise<PrismaProductionOrderUnitProcedure> {
     return this.prisma.productionOrderUnitProcedure.delete(args);
   }

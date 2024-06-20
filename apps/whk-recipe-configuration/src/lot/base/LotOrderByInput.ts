@@ -61,6 +61,17 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  fermentationChemistriesId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   globalId?: SortOrder;
 
   @ApiProperty({
@@ -83,6 +94,28 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  isRawMaterial?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  itemId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   lotNumber?: SortOrder;
 
   @ApiProperty({
@@ -94,7 +127,29 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  productionOrderId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   purchaseOrderAcceptedLotsId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  recipeId?: SortOrder;
 
   @ApiProperty({
     required: false,

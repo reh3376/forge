@@ -16,6 +16,7 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { Recipe } from "./Recipe";
@@ -113,6 +114,18 @@ class RecipeWhereInput {
     nullable: true,
   })
   itemId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
+  @IsOptional()
+  @Field(() => LotListRelationFilter, {
+    nullable: true,
+  })
+  lots?: LotListRelationFilter;
 
   @ApiProperty({
     required: false,

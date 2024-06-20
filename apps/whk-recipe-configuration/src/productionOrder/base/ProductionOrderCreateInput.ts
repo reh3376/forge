@@ -11,17 +11,20 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomCreateNestedManyWithoutProductionOrdersInput } from "./BomCreateNestedManyWithoutProductionOrdersInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
   ValidateNested,
-  IsOptional,
   IsString,
   IsBoolean,
+  IsOptional,
   IsDate,
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
+import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { LotCreateNestedManyWithoutProductionOrdersInput } from "./LotCreateNestedManyWithoutProductionOrdersInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -33,15 +36,12 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 class ProductionOrderCreateInput {
   @ApiProperty({
     required: true,
-    type: () => BomCreateNestedManyWithoutProductionOrdersInput,
+    type: () => BomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => BomCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(() => BomCreateNestedManyWithoutProductionOrdersInput, {
-    nullable: true,
-  })
-  boms?: BomCreateNestedManyWithoutProductionOrdersInput;
+  @Type(() => BomWhereUniqueInput)
+  @Field(() => BomWhereUniqueInput)
+  boms!: BomWhereUniqueInput;
 
   @ApiProperty({
     required: true,
@@ -91,6 +91,38 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () =>
+      FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(
+    () => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(
+    () => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -119,6 +151,18 @@ class ProductionOrderCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,

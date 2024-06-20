@@ -16,6 +16,7 @@ import {
   ValidateNested,
   IsOptional,
   IsString,
+  IsDate,
   IsEnum,
   IsNumber,
 } from "class-validator";
@@ -23,6 +24,7 @@ import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
 import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderCreateNestedManyWithoutTestParametersInput } from "./PurchaseOrderCreateNestedManyWithoutTestParametersInput";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
@@ -73,17 +75,6 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: () => EquipmentPhaseCreateNestedManyWithoutTestParametersInput,
   })
   @ValidateNested()
@@ -129,6 +120,18 @@ class TestParameterCreateInput {
   isClassDef?: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: () => ItemReceiptWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemReceiptWhereUniqueInput, {
+    nullable: true,
+  })
+  itemReceipt?: ItemReceiptWhereUniqueInput | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -169,6 +172,28 @@ class TestParameterCreateInput {
     nullable: true,
   })
   testDetails?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  testedAt?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -278,6 +303,17 @@ class TestParameterCreateInput {
     nullable: true,
   })
   tooltip?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { TestParameterCreateInput as TestParameterCreateInput };

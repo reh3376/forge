@@ -26,6 +26,9 @@ import { Recipe } from "./Recipe";
 import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { RecipeUpdateInput } from "./RecipeUpdateInput";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -56,6 +59,9 @@ export class RecipeControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: RecipeCreateInput,
   })
   async createRecipe(@common.Body() data: RecipeCreateInput): Promise<Recipe> {
     return await this.service.createRecipe({
@@ -197,6 +203,9 @@ export class RecipeControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: RecipeUpdateInput,
+  })
   async updateRecipe(
     @common.Param() params: RecipeWhereUniqueInput,
     @common.Body() data: RecipeUpdateInput
@@ -248,6 +257,140 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lots")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLots(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        id: true,
+        isRawMaterial: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotNumber: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectLots(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateLots(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLots(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -263,6 +406,12 @@ export class RecipeControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
@@ -535,23 +684,23 @@ export class RecipeControllerBase {
     const results = await this.service.findScheduleOrders(params.id, {
       ...query,
       select: {
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
         createdBy: true,
         customers: true,
+        duration: true,
+        durationUnits: true,
         estimatedDistillationTime: true,
+        estimatedEnd: true,
         estimatedFermentationTime: true,
         estimatedMashingTime: true,
         estimatedProcessing: true,
+        estimatedStart: true,
         estimatedTotalProductionTime: true,
         globalId: true,
         id: true,
         productionOrderAllocation: true,
-
-        productionSchedules: {
-          select: {
-            id: true,
-          },
-        },
 
         recipeGroup: {
           select: {

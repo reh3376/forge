@@ -15,6 +15,7 @@ import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
   ValidateNested,
   IsOptional,
+  IsDate,
   IsString,
   IsNumber,
 } from "class-validator";
@@ -37,6 +38,17 @@ class BomItemCreateInput {
     nullable: true,
   })
   bom?: BomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  consumedAt?: Date | null;
 
   @ApiProperty({
     required: true,

@@ -57,6 +57,9 @@ export class EquipmentPhaseControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: EquipmentPhaseCreateInput,
+  })
   async createEquipmentPhase(
     @common.Body() data: EquipmentPhaseCreateInput
   ): Promise<EquipmentPhase> {
@@ -235,6 +238,9 @@ export class EquipmentPhaseControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: EquipmentPhaseUpdateInput,
+  })
   async updateEquipmentPhase(
     @common.Param() params: EquipmentPhaseWhereUniqueInput,
     @common.Body() data: EquipmentPhaseUpdateInput
@@ -321,6 +327,7 @@ export class EquipmentPhaseControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -792,14 +799,21 @@ export class EquipmentPhaseControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -810,6 +824,8 @@ export class EquipmentPhaseControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

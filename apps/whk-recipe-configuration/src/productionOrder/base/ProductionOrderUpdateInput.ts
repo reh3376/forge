@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomUpdateManyWithoutProductionOrdersInput } from "./BomUpdateManyWithoutProductionOrdersInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
   ValidateNested,
   IsOptional,
@@ -21,7 +21,10 @@ import {
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./FermentationChemistryUpdateManyWithoutProductionOrdersInput";
+import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { LotUpdateManyWithoutProductionOrdersInput } from "./LotUpdateManyWithoutProductionOrdersInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -33,15 +36,15 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 class ProductionOrderUpdateInput {
   @ApiProperty({
     required: false,
-    type: () => BomUpdateManyWithoutProductionOrdersInput,
+    type: () => BomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => BomUpdateManyWithoutProductionOrdersInput)
+  @Type(() => BomWhereUniqueInput)
   @IsOptional()
-  @Field(() => BomUpdateManyWithoutProductionOrdersInput, {
+  @Field(() => BomWhereUniqueInput, {
     nullable: true,
   })
-  boms?: BomUpdateManyWithoutProductionOrdersInput;
+  boms?: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -100,6 +103,30 @@ class ProductionOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryUpdateManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -131,6 +158,18 @@ class ProductionOrderUpdateInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  lots?: LotUpdateManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,

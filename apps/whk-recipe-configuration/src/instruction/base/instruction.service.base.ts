@@ -26,30 +26,28 @@ export class InstructionServiceBase {
     return this.prisma.instruction.count(args);
   }
 
-  async instructions<T extends Prisma.InstructionFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.InstructionFindManyArgs>
+  async instructions(
+    args: Prisma.InstructionFindManyArgs
   ): Promise<PrismaInstruction[]> {
-    return this.prisma.instruction.findMany<Prisma.InstructionFindManyArgs>(
-      args
-    );
+    return this.prisma.instruction.findMany(args);
   }
-  async instruction<T extends Prisma.InstructionFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.InstructionFindUniqueArgs>
+  async instruction(
+    args: Prisma.InstructionFindUniqueArgs
   ): Promise<PrismaInstruction | null> {
     return this.prisma.instruction.findUnique(args);
   }
-  async createInstruction<T extends Prisma.InstructionCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.InstructionCreateArgs>
+  async createInstruction(
+    args: Prisma.InstructionCreateArgs
   ): Promise<PrismaInstruction> {
-    return this.prisma.instruction.create<T>(args);
+    return this.prisma.instruction.create(args);
   }
-  async updateInstruction<T extends Prisma.InstructionUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.InstructionUpdateArgs>
+  async updateInstruction(
+    args: Prisma.InstructionUpdateArgs
   ): Promise<PrismaInstruction> {
-    return this.prisma.instruction.update<T>(args);
+    return this.prisma.instruction.update(args);
   }
-  async deleteInstruction<T extends Prisma.InstructionDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.InstructionDeleteArgs>
+  async deleteInstruction(
+    args: Prisma.InstructionDeleteArgs
   ): Promise<PrismaInstruction> {
     return this.prisma.instruction.delete(args);
   }

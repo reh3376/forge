@@ -25,6 +25,9 @@ import { InputJsonValue } from "../../types";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
+import { FermentationChemistryUpdateManyWithoutOperationsInput } from "./FermentationChemistryUpdateManyWithoutOperationsInput";
+import { FermentationDayDatumUpdateManyWithoutOperationsInput } from "./FermentationDayDatumUpdateManyWithoutOperationsInput";
+import { FermentationSettingDatumUpdateManyWithoutOperationsInput } from "./FermentationSettingDatumUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -122,6 +125,42 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationSettingDatumUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatumUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationSettingDatumUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationSettingData?: FermentationSettingDatumUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -153,6 +192,17 @@ class OperationUpdateInput {
     nullable: true,
   })
   isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId?: string | null;
 
   @ApiProperty({
     required: false,
