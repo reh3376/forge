@@ -636,6 +636,7 @@ model FermentationChemistry {
   id                String                    @id @default(cuid())
   lot               Lot?                      @relation(fields: [lotId], references: [id])
   lotId             String?                   @unique
+  mashData          MashDatum[]
   operation         Operation                 @relation(fields: [operationId], references: [id])
   operationId       String
   productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
@@ -646,23 +647,25 @@ model FermentationChemistry {
 }
 
 model MashDatum {
-  asset           Asset?   @relation(fields: [assetId], references: [id])
-  assetId         String?
-  backSetPH       Decimal
-  backsetVolume   Decimal?
-  balling         Decimal
-  cornLbs         Decimal?
-  createdAt       DateTime @default(now())
-  fermenterNumber Int
-  id              String   @id @default(cuid())
-  loggedBy        String
-  lotId           String
-  maltLbs         Decimal?
-  pH              Decimal
-  ryeLbs          Decimal?
-  updatedAt       DateTime @updatedAt
-  waterVolume     Decimal
-  wheatLbs        Decimal?
+  asset                   Asset?                 @relation(fields: [assetId], references: [id])
+  assetId                 String?
+  backSetPH               Decimal
+  backsetVolume           Decimal?
+  balling                 Decimal
+  cornLbs                 Decimal?
+  createdAt               DateTime               @default(now())
+  fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
+  fermentationChemistryId String?
+  fermenterNumber         Int
+  id                      String                 @id @default(cuid())
+  loggedBy                String
+  lotId                   String
+  maltLbs                 Decimal?
+  pH                      Decimal
+  ryeLbs                  Decimal?
+  updatedAt               DateTime               @updatedAt
+  waterVolume             Decimal
+  wheatLbs                Decimal?
 }
 
 model FermentationSettingDatum {
