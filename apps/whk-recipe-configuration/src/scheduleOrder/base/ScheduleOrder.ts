@@ -9,12 +9,13 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field } from "@nestjs/graphql";
+import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
-  IsString,
   IsOptional,
+  IsString,
+  IsNumber,
   IsInt,
   ValidateNested,
   IsEnum,
@@ -23,14 +24,36 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { Decimal } from "decimal.js";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { Recipe } from "../../recipe/base/Recipe";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @ObjectType()
 class ScheduleOrder {
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualEnd!: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualStart!: Date | null;
+
   @ApiProperty({
     required: true,
   })
@@ -64,12 +87,45 @@ class ScheduleOrder {
     required: false,
     type: Number,
   })
+  @IsNumber()
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  duration!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  durationUnits!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
   @IsInt()
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
   estimatedDistillationTime!: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedEnd!: Date | null;
 
   @ApiProperty({
     required: false,
@@ -103,6 +159,17 @@ class ScheduleOrder {
     nullable: true,
   })
   estimatedProcessing!: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedStart!: Date | null;
 
   @ApiProperty({
     required: false,
@@ -149,15 +216,6 @@ class ScheduleOrder {
   @Type(() => ProductionOrder)
   @IsOptional()
   productionOrders?: Array<ProductionOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionSchedule,
-  })
-  @ValidateNested()
-  @Type(() => ProductionSchedule)
-  @IsOptional()
-  productionSchedules?: ProductionSchedule | null;
 
   @ApiProperty({
     required: true,

@@ -26,9 +26,9 @@ import { ItemReceipt } from "./ItemReceipt";
 import { ItemReceiptFindManyArgs } from "./ItemReceiptFindManyArgs";
 import { ItemReceiptWhereUniqueInput } from "./ItemReceiptWhereUniqueInput";
 import { ItemReceiptUpdateInput } from "./ItemReceiptUpdateInput";
-import { TestFindManyArgs } from "../../test/base/TestFindManyArgs";
-import { Test } from "../../test/base/Test";
-import { TestWhereUniqueInput } from "../../test/base/TestWhereUniqueInput";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
+import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -47,6 +47,9 @@ export class ItemReceiptControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ItemReceiptCreateInput,
   })
   async createItemReceipt(
     @common.Body() data: ItemReceiptCreateInput
@@ -215,6 +218,9 @@ export class ItemReceiptControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemReceiptUpdateInput,
+  })
   async updateItemReceipt(
     @common.Param() params: ItemReceiptWhereUniqueInput,
     @common.Body() data: ItemReceiptUpdateInput
@@ -336,17 +342,17 @@ export class ItemReceiptControllerBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/tests")
-  @ApiNestedQuery(TestFindManyArgs)
+  @ApiNestedQuery(TestParameterFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Test",
+    resource: "TestParameter",
     action: "read",
     possession: "any",
   })
   async findTests(
     @common.Req() request: Request,
     @common.Param() params: ItemReceiptWhereUniqueInput
-  ): Promise<Test[]> {
-    const query = plainToClass(TestFindManyArgs, request.query);
+  ): Promise<TestParameter[]> {
+    const query = plainToClass(TestParameterFindManyArgs, request.query);
     const results = await this.service.findTests(params.id, {
       ...query,
       select: {
@@ -360,11 +366,10 @@ export class ItemReceiptControllerBase {
 
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        description: true,
         globalId: true,
         id: true,
-        isClassDefinition: true,
+        isClassDef: true,
 
         itemReceipt: {
           select: {
@@ -372,10 +377,23 @@ export class ItemReceiptControllerBase {
           },
         },
 
+        name: true,
         schemaVersion: true,
-        testDescription: true,
-        testName: true,
-        testRevision: true,
+        testDetails: true,
+        testedAt: true,
+        testedBy: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -394,7 +412,7 @@ export class ItemReceiptControllerBase {
   })
   async connectTests(
     @common.Param() params: ItemReceiptWhereUniqueInput,
-    @common.Body() body: TestWhereUniqueInput[]
+    @common.Body() body: TestParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       tests: {
@@ -416,7 +434,7 @@ export class ItemReceiptControllerBase {
   })
   async updateTests(
     @common.Param() params: ItemReceiptWhereUniqueInput,
-    @common.Body() body: TestWhereUniqueInput[]
+    @common.Body() body: TestParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       tests: {
@@ -438,7 +456,7 @@ export class ItemReceiptControllerBase {
   })
   async disconnectTests(
     @common.Param() params: ItemReceiptWhereUniqueInput,
-    @common.Body() body: TestWhereUniqueInput[]
+    @common.Body() body: TestParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       tests: {

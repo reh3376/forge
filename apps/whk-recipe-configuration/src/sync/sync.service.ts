@@ -26,7 +26,6 @@ export class SyncService {
             purchaseOrder: this.prisma.purchaseOrder,
             salesOrder: this.prisma.salesOrder,
             productionOrder: this.prisma.productionOrder,
-            productionSchedule: this.prisma.productionSchedule,
             asset: this.prisma.asset,
             recipe: this.prisma.recipe,
             bom: this.prisma.bom,

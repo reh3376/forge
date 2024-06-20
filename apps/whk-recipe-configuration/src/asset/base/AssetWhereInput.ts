@@ -16,7 +16,10 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { JsonFilter } from "../../util/JsonFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
+import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumAssetType } from "./EnumAssetType";
@@ -80,6 +83,30 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationChemistryListRelationFilter, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationDayDatumListRelationFilter, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -99,6 +126,18 @@ class AssetWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => MashDatumListRelationFilter, {
+    nullable: true,
+  })
+  mashData?: MashDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -21,7 +21,7 @@ import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/Purchase
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { TestListRelationFilter } from "../../test/base/TestListRelationFilter";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 
 @InputType()
@@ -147,7 +147,7 @@ class ItemReceiptWhereInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete";
+  status?: "InProgress" | "Complete" | "Rejected" | "Hold";
 
   @ApiProperty({
     required: false,
@@ -162,15 +162,15 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestListRelationFilter,
+    type: () => TestParameterListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => TestListRelationFilter)
+  @Type(() => TestParameterListRelationFilter)
   @IsOptional()
-  @Field(() => TestListRelationFilter, {
+  @Field(() => TestParameterListRelationFilter, {
     nullable: true,
   })
-  tests?: TestListRelationFilter;
+  tests?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -10,9 +10,13 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   Asset as PrismaAsset,
+  FermentationChemistry as PrismaFermentationChemistry,
+  FermentationDayDatum as PrismaFermentationDayDatum,
+  MashDatum as PrismaMashDatum,
   PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
@@ -23,30 +27,53 @@ export class AssetServiceBase {
     return this.prisma.asset.count(args);
   }
 
-  async assets<T extends Prisma.AssetFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetFindManyArgs>
-  ): Promise<PrismaAsset[]> {
-    return this.prisma.asset.findMany<Prisma.AssetFindManyArgs>(args);
+  async assets(args: Prisma.AssetFindManyArgs): Promise<PrismaAsset[]> {
+    return this.prisma.asset.findMany(args);
   }
-  async asset<T extends Prisma.AssetFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetFindUniqueArgs>
-  ): Promise<PrismaAsset | null> {
+  async asset(args: Prisma.AssetFindUniqueArgs): Promise<PrismaAsset | null> {
     return this.prisma.asset.findUnique(args);
   }
-  async createAsset<T extends Prisma.AssetCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetCreateArgs>
-  ): Promise<PrismaAsset> {
-    return this.prisma.asset.create<T>(args);
+  async createAsset(args: Prisma.AssetCreateArgs): Promise<PrismaAsset> {
+    return this.prisma.asset.create(args);
   }
-  async updateAsset<T extends Prisma.AssetUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetUpdateArgs>
-  ): Promise<PrismaAsset> {
-    return this.prisma.asset.update<T>(args);
+  async updateAsset(args: Prisma.AssetUpdateArgs): Promise<PrismaAsset> {
+    return this.prisma.asset.update(args);
   }
-  async deleteAsset<T extends Prisma.AssetDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AssetDeleteArgs>
-  ): Promise<PrismaAsset> {
+  async deleteAsset(args: Prisma.AssetDeleteArgs): Promise<PrismaAsset> {
     return this.prisma.asset.delete(args);
+  }
+
+  async findFermentationChemistries(
+    parentId: string,
+    args: Prisma.FermentationChemistryFindManyArgs
+  ): Promise<PrismaFermentationChemistry[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationChemistries(args);
+  }
+
+  async findFermentationDayData(
+    parentId: string,
+    args: Prisma.FermentationDayDatumFindManyArgs
+  ): Promise<PrismaFermentationDayDatum[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationDayData(args);
+  }
+
+  async findMashData(
+    parentId: string,
+    args: Prisma.MashDatumFindManyArgs
+  ): Promise<PrismaMashDatum[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .mashData(args);
   }
 
   async findPurchaseOrders(

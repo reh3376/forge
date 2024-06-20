@@ -12,15 +12,8 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
-import {
-  ValidateNested,
-  IsOptional,
-  IsString,
-  IsEnum,
-  IsInt,
-} from "class-validator";
+import { ValidateNested, IsOptional, IsString, IsInt } from "class-validator";
 import { Type } from "class-transformer";
-import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @InputType()
@@ -83,14 +76,14 @@ class SalesOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumSalesOrderOrderType,
+    type: String,
   })
-  @IsEnum(EnumSalesOrderOrderType)
+  @IsString()
   @IsOptional()
-  @Field(() => EnumSalesOrderOrderType, {
+  @Field(() => String, {
     nullable: true,
   })
-  orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+  orderType?: string;
 
   @ApiProperty({
     required: false,

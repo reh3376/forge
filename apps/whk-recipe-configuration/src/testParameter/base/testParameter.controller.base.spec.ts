@@ -22,14 +22,14 @@ const CREATE_INPUT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
-  editedAt: new Date(),
-  editedBy: "exampleEditedBy",
   globalId: "exampleGlobalId",
   id: "exampleId",
   isClassDef: "true",
   name: "exampleName",
   schemaVersion: "exampleSchemaVersion",
   testDetails: "exampleTestDetails",
+  testedAt: new Date(),
+  testedBy: "exampleTestedBy",
   testParamRevision: "exampleTestParamRevision",
   testPass: "true",
   testSetpointBooleanValue: "true",
@@ -37,20 +37,22 @@ const CREATE_INPUT = {
   testSetpointUpperLimit: 42.42,
   testSetpointValue: 42.42,
   tooltip: "exampleTooltip",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
   active: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
-  editedAt: new Date(),
-  editedBy: "exampleEditedBy",
   globalId: "exampleGlobalId",
   id: "exampleId",
   isClassDef: "true",
   name: "exampleName",
   schemaVersion: "exampleSchemaVersion",
   testDetails: "exampleTestDetails",
+  testedAt: new Date(),
+  testedBy: "exampleTestedBy",
   testParamRevision: "exampleTestParamRevision",
   testPass: "true",
   testSetpointBooleanValue: "true",
@@ -58,6 +60,8 @@ const CREATE_RESULT = {
   testSetpointUpperLimit: 42.42,
   testSetpointValue: 42.42,
   tooltip: "exampleTooltip",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
@@ -65,14 +69,14 @@ const FIND_MANY_RESULT = [
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     description: "exampleDescription",
-    editedAt: new Date(),
-    editedBy: "exampleEditedBy",
     globalId: "exampleGlobalId",
     id: "exampleId",
     isClassDef: "true",
     name: "exampleName",
     schemaVersion: "exampleSchemaVersion",
     testDetails: "exampleTestDetails",
+    testedAt: new Date(),
+    testedBy: "exampleTestedBy",
     testParamRevision: "exampleTestParamRevision",
     testPass: "true",
     testSetpointBooleanValue: "true",
@@ -80,6 +84,8 @@ const FIND_MANY_RESULT = [
     testSetpointUpperLimit: 42.42,
     testSetpointValue: 42.42,
     tooltip: "exampleTooltip",
+    updatedAt: new Date(),
+    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -87,14 +93,14 @@ const FIND_ONE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
-  editedAt: new Date(),
-  editedBy: "exampleEditedBy",
   globalId: "exampleGlobalId",
   id: "exampleId",
   isClassDef: "true",
   name: "exampleName",
   schemaVersion: "exampleSchemaVersion",
   testDetails: "exampleTestDetails",
+  testedAt: new Date(),
+  testedBy: "exampleTestedBy",
   testParamRevision: "exampleTestParamRevision",
   testPass: "true",
   testSetpointBooleanValue: "true",
@@ -102,6 +108,8 @@ const FIND_ONE_RESULT = {
   testSetpointUpperLimit: 42.42,
   testSetpointValue: 42.42,
   tooltip: "exampleTooltip",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {
@@ -187,7 +195,8 @@ describe("TestParameter", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        editedAt: CREATE_RESULT.editedAt.toISOString(),
+        testedAt: CREATE_RESULT.testedAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -199,7 +208,8 @@ describe("TestParameter", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          editedAt: FIND_MANY_RESULT[0].editedAt.toISOString(),
+          testedAt: FIND_MANY_RESULT[0].testedAt.toISOString(),
+          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
   });
@@ -222,7 +232,8 @@ describe("TestParameter", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        editedAt: FIND_ONE_RESULT.editedAt.toISOString(),
+        testedAt: FIND_ONE_RESULT.testedAt.toISOString(),
+        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -235,7 +246,8 @@ describe("TestParameter", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        editedAt: CREATE_RESULT.editedAt.toISOString(),
+        testedAt: CREATE_RESULT.testedAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {
         agent
