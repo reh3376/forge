@@ -3,7 +3,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { ProductionOrderServiceBase } from "./base/productionOrder.service.base";
 import {Logger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 import {Prisma} from "@prisma/client";
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
 
     async createProductionOrder<T extends Prisma.ProductionOrderCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderCreateArgs>): Promise<import(".prisma/client").ProductionOrder> {
         const productionOrder = await super.createProductionOrder(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
         recordName: 'ProductionOrder',
         event_type: 'create',
         data: productionOrder
@@ -29,7 +29,7 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
 
     async updateProductionOrder<T extends Prisma.ProductionOrderUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderUpdateArgs>): Promise<import(".prisma/client").ProductionOrder> {
         const productionOrder = await super.updateProductionOrder(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
         recordName: 'ProductionOrder',
         event_type: 'update',
         data: productionOrder
@@ -40,7 +40,7 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
 
     async deleteProductionOrder<T extends Prisma.ProductionOrderDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderDeleteArgs>): Promise<import(".prisma/client").ProductionOrder> {
         const productionOrder = await super.deleteProductionOrder(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
         recordName: 'ProductionOrder',
         event_type: 'delete',
         data: productionOrder
