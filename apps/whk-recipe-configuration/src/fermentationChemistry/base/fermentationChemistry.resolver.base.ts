@@ -118,9 +118,11 @@ export class FermentationChemistryResolverBase {
             }
           : undefined,
 
-        mashData: {
-          connect: args.data.mashData,
-        },
+        mashData: args.data.mashData
+          ? {
+              connect: args.data.mashData,
+            }
+          : undefined,
 
         operation: {
           connect: args.data.operation,
@@ -171,9 +173,11 @@ export class FermentationChemistryResolverBase {
               }
             : undefined,
 
-          mashData: {
-            connect: args.data.mashData,
-          },
+          mashData: args.data.mashData
+            ? {
+                connect: args.data.mashData,
+              }
+            : undefined,
 
           operation: {
             connect: args.data.operation,

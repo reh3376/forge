@@ -102,13 +102,16 @@ class FermentationChemistryCreateInput {
   lot?: LotWhereUniqueInput | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: () => MashDatumWhereUniqueInput,
   })
   @ValidateNested()
   @Type(() => MashDatumWhereUniqueInput)
-  @Field(() => MashDatumWhereUniqueInput)
-  mashData!: MashDatumWhereUniqueInput;
+  @IsOptional()
+  @Field(() => MashDatumWhereUniqueInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
