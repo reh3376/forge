@@ -72,9 +72,11 @@ export class FermentationChemistryControllerBase {
             }
           : undefined,
 
-        mashData: {
-          connect: data.mashData,
-        },
+        mashData: data.mashData
+          ? {
+              connect: data.mashData,
+            }
+          : undefined,
 
         operation: {
           connect: data.operation,
@@ -334,9 +336,11 @@ export class FermentationChemistryControllerBase {
               }
             : undefined,
 
-          mashData: {
-            connect: data.mashData,
-          },
+          mashData: data.mashData
+            ? {
+                connect: data.mashData,
+              }
+            : undefined,
 
           operation: {
             connect: data.operation,

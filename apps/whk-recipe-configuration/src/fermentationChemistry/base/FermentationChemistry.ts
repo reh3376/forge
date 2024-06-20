@@ -103,12 +103,13 @@ class FermentationChemistry {
   lot?: Lot | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: () => MashDatum,
   })
   @ValidateNested()
   @Type(() => MashDatum)
-  mashData?: MashDatum;
+  @IsOptional()
+  mashData?: MashDatum | null;
 
   @ApiProperty({
     required: true,
