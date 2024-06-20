@@ -5,7 +5,7 @@ import {Prisma, UnitProcedure} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
 import {OperationWhereUniqueInput} from "../operation/base/OperationWhereUniqueInput";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class UnitProcedureService extends UnitProcedureServiceBase {
@@ -54,7 +54,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     // If operations are acceptable, proceed with the creation
     const createdUnitProcedure = await this.prisma.unitProcedure.create(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
       recordName: 'UnitProcedure',
       event_type: 'create',
       data: createdUnitProcedure

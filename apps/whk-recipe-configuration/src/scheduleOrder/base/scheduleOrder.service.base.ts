@@ -15,7 +15,6 @@ import {
   Prisma,
   ScheduleOrder as PrismaScheduleOrder,
   ProductionOrder as PrismaProductionOrder,
-  ProductionSchedule as PrismaProductionSchedule,
   RecipeGroup as PrismaRecipeGroup,
   Recipe as PrismaRecipe,
 } from "@prisma/client";
@@ -29,30 +28,28 @@ export class ScheduleOrderServiceBase {
     return this.prisma.scheduleOrder.count(args);
   }
 
-  async scheduleOrders<T extends Prisma.ScheduleOrderFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ScheduleOrderFindManyArgs>
+  async scheduleOrders(
+    args: Prisma.ScheduleOrderFindManyArgs
   ): Promise<PrismaScheduleOrder[]> {
-    return this.prisma.scheduleOrder.findMany<Prisma.ScheduleOrderFindManyArgs>(
-      args
-    );
+    return this.prisma.scheduleOrder.findMany(args);
   }
-  async scheduleOrder<T extends Prisma.ScheduleOrderFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ScheduleOrderFindUniqueArgs>
+  async scheduleOrder(
+    args: Prisma.ScheduleOrderFindUniqueArgs
   ): Promise<PrismaScheduleOrder | null> {
     return this.prisma.scheduleOrder.findUnique(args);
   }
-  async createScheduleOrder<T extends Prisma.ScheduleOrderCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ScheduleOrderCreateArgs>
+  async createScheduleOrder(
+    args: Prisma.ScheduleOrderCreateArgs
   ): Promise<PrismaScheduleOrder> {
-    return this.prisma.scheduleOrder.create<T>(args);
+    return this.prisma.scheduleOrder.create(args);
   }
-  async updateScheduleOrder<T extends Prisma.ScheduleOrderUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ScheduleOrderUpdateArgs>
+  async updateScheduleOrder(
+    args: Prisma.ScheduleOrderUpdateArgs
   ): Promise<PrismaScheduleOrder> {
-    return this.prisma.scheduleOrder.update<T>(args);
+    return this.prisma.scheduleOrder.update(args);
   }
-  async deleteScheduleOrder<T extends Prisma.ScheduleOrderDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ScheduleOrderDeleteArgs>
+  async deleteScheduleOrder(
+    args: Prisma.ScheduleOrderDeleteArgs
   ): Promise<PrismaScheduleOrder> {
     return this.prisma.scheduleOrder.delete(args);
   }
@@ -66,16 +63,6 @@ export class ScheduleOrderServiceBase {
         where: { id: parentId },
       })
       .productionOrders(args);
-  }
-
-  async getProductionSchedules(
-    parentId: string
-  ): Promise<PrismaProductionSchedule | null> {
-    return this.prisma.scheduleOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .productionSchedules();
   }
 
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {

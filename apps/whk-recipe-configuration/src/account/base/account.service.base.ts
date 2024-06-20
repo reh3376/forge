@@ -25,29 +25,21 @@ export class AccountServiceBase {
     return this.prisma.account.count(args);
   }
 
-  async accounts<T extends Prisma.AccountFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AccountFindManyArgs>
-  ): Promise<PrismaAccount[]> {
-    return this.prisma.account.findMany<Prisma.AccountFindManyArgs>(args);
+  async accounts(args: Prisma.AccountFindManyArgs): Promise<PrismaAccount[]> {
+    return this.prisma.account.findMany(args);
   }
-  async account<T extends Prisma.AccountFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AccountFindUniqueArgs>
+  async account(
+    args: Prisma.AccountFindUniqueArgs
   ): Promise<PrismaAccount | null> {
     return this.prisma.account.findUnique(args);
   }
-  async createAccount<T extends Prisma.AccountCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AccountCreateArgs>
-  ): Promise<PrismaAccount> {
-    return this.prisma.account.create<T>(args);
+  async createAccount(args: Prisma.AccountCreateArgs): Promise<PrismaAccount> {
+    return this.prisma.account.create(args);
   }
-  async updateAccount<T extends Prisma.AccountUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AccountUpdateArgs>
-  ): Promise<PrismaAccount> {
-    return this.prisma.account.update<T>(args);
+  async updateAccount(args: Prisma.AccountUpdateArgs): Promise<PrismaAccount> {
+    return this.prisma.account.update(args);
   }
-  async deleteAccount<T extends Prisma.AccountDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.AccountDeleteArgs>
-  ): Promise<PrismaAccount> {
+  async deleteAccount(args: Prisma.AccountDeleteArgs): Promise<PrismaAccount> {
     return this.prisma.account.delete(args);
   }
 

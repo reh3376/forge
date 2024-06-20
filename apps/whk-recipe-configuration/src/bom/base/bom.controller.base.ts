@@ -54,6 +54,9 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomCreateInput,
+  })
   async createBom(@common.Body() data: BomCreateInput): Promise<Bom> {
     return await this.service.createBom({
       data: {
@@ -175,6 +178,9 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomUpdateInput,
+  })
   async updateBom(
     @common.Param() params: BomWhereUniqueInput,
     @common.Body() data: BomUpdateInput
@@ -240,6 +246,7 @@ export class BomControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -353,6 +360,12 @@ export class BomControllerBase {
     const results = await this.service.findProductionOrder(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
