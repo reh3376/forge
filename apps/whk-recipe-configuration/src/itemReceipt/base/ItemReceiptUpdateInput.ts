@@ -83,7 +83,7 @@ class ItemReceiptUpdateInput {
   @Field(() => Number, {
     nullable: true,
   })
-  loadId?: number | null;
+  loadId?: number;
 
   @ApiProperty({
     required: false,

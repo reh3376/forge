@@ -84,15 +84,12 @@ class ItemReceipt {
   item?: Item;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
   @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  loadId!: number | null;
+  @Field(() => Number)
+  loadId!: number;
 
   @ApiProperty({
     required: false,
