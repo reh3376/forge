@@ -17,14 +17,13 @@ import {
   IsOptional,
   IsDate,
   IsString,
-  IsEnum,
   IsNumber,
+  IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
@@ -206,15 +205,12 @@ class TestParameter {
   testParamRevision!: string | null;
 
   @ApiProperty({
-    required: false,
-    enum: EnumTestParameterTestParamUnits,
+    required: true,
+    type: String,
   })
-  @IsEnum(EnumTestParameterTestParamUnits)
-  @IsOptional()
-  @Field(() => EnumTestParameterTestParamUnits, {
-    nullable: true,
-  })
-  testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail" | null;
+  @IsString()
+  @Field(() => String)
+  testParamUnits!: string;
 
   @ApiProperty({
     required: false,

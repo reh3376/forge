@@ -70,7 +70,7 @@ model TestParameter {
   testedAt                 DateTime?
   testedBy                 String?
   testParamRevision        String?
-  testParamUnits           EnumTestParameterTestParamUnits?
+  testParamUnits           String
   testPass                 Boolean?
   testResult               Json?
   testSetpointBooleanValue Boolean?                           @default(true)
@@ -538,6 +538,7 @@ model ItemReceipt {
   id              String                 @id @default(cuid())
   item            Item                   @relation(fields: [itemId], references: [id])
   itemId          String
+  loadId          Int?                   @default(autoincrement())
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   quantity        Decimal
@@ -740,14 +741,6 @@ enum EnumPhaseParameterStaticName {
   FlowRate
   SprayballTime
   Level
-}
-
-enum EnumTestParameterTestParamUnits {
-  Lbs
-  Perc
-  Gal
-  Bu
-  PassFail
 }
 
 enum EnumTestParameterTestSetpointType {

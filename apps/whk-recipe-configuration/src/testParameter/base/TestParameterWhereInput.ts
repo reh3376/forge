@@ -24,7 +24,6 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { JsonFilter } from "../../util/JsonFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
@@ -235,14 +234,14 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumTestParameterTestParamUnits,
+    type: StringFilter,
   })
-  @IsEnum(EnumTestParameterTestParamUnits)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => EnumTestParameterTestParamUnits, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail";
+  testParamUnits?: StringFilter;
 
   @ApiProperty({
     required: false,
