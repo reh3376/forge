@@ -538,7 +538,7 @@ model ItemReceipt {
   id              String                 @id @default(cuid())
   item            Item                   @relation(fields: [itemId], references: [id])
   itemId          String
-  loadId          Int?                   @unique @default(autoincrement())
+  loadId          Int                    @unique @default(autoincrement())
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   quantity        Decimal
