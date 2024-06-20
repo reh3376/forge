@@ -3,7 +3,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { TestParameterServiceBase } from "./base/testParameter.service.base";
 import {Logger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 import {Prisma} from "@prisma/client";
 
 @Injectable()
@@ -18,7 +18,7 @@ export class TestParameterService extends TestParameterServiceBase {
 
     async createTestParameter<T extends Prisma.TestParameterCreateArgs>(args: Prisma.SelectSubset<T, Prisma.TestParameterCreateArgs>): Promise<import(".prisma/client").TestParameter> {
         const testParameter = await super.createTestParameter(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Testparameter, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Testparameter, {
         recordName: 'TestParameter',
         event_type: 'create',
         data: testParameter
@@ -29,7 +29,7 @@ export class TestParameterService extends TestParameterServiceBase {
 
     async updateTestParameter<T extends Prisma.TestParameterUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.TestParameterUpdateArgs>): Promise<import(".prisma/client").TestParameter> {
         const testParameter = await super.updateTestParameter(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Testparameter, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Testparameter, {
         recordName: 'TestParameter',
         event_type: 'update',
         data: testParameter
@@ -40,7 +40,7 @@ export class TestParameterService extends TestParameterServiceBase {
 
     async deleteTestParameter<T extends Prisma.TestParameterDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.TestParameterDeleteArgs>): Promise<import(".prisma/client").TestParameter> {
         const testParameter = await super.deleteTestParameter(args);
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Testparameter, {
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Testparameter, {
         recordName: 'TestParameter',
         event_type: 'delete',
         data: testParameter

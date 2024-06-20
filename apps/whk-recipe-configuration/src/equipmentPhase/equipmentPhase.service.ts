@@ -5,7 +5,7 @@ import {EquipmentPhase, Prisma} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
 import {PhaseParameterWhereUniqueInput} from "../phaseParameter/base/PhaseParameterWhereUniqueInput";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
@@ -260,7 +260,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
 
     const equipmentPhase = await super.createEquipmentPhase(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
       event_type: 'create',
       data: equipmentPhase,
       recordName: 'EquipmentPhase',
@@ -322,7 +322,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
 
     const newEquipmentPhase = await super.updateEquipmentPhase(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
       event_type: 'update',
       data: newEquipmentPhase,
       recordName: 'EquipmentPhase',
@@ -337,7 +337,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     ): Promise<EquipmentPhase> {
         const equipmentPhase = await super.deleteEquipmentPhase(args);
 
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Equipmentphase, {
         event_type: 'delete',
         data: equipmentPhase,
         recordName: 'EquipmentPhase',
