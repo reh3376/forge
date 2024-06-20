@@ -1,3 +1,4 @@
+
 import {BadRequestException, Injectable} from "@nestjs/common";
 import {PrismaService} from "../prisma/prisma.service";
 import {UnitProcedureServiceBase} from "./base/unitProcedure.service.base";
@@ -10,10 +11,10 @@ import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 @Injectable()
 export class UnitProcedureService extends UnitProcedureServiceBase {
   constructor(
-      protected readonly prisma: PrismaService,
-      protected readonly rabbitProducer: RabbitMQProducerService,
-      private logger: PinoLogger,
-      ) {
+    protected readonly prisma: PrismaService,
+    protected readonly rabbitProducer: RabbitMQProducerService,
+    private logger: PinoLogger,
+  ) {
     super(prisma);
   }
   private unitProcedureOperationsMap: { [key: string]: string[] } = {
@@ -24,77 +25,49 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     Milling01: ['Mill'],
   };
 
-  async createUnitProcedure<T extends Prisma.UnitProcedureCreateArgs>(
-      args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>
-  ): Promise<UnitProcedure> {
-    const name = args.data.name as string;
-    const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
-    if (operations.length) {
-      const operationsData = await Promise.all(
-          operations.map(async (operation) => {
-            const operationRecord = await this.prisma.operation.findUnique({
-              where: { id: operation.id },
-            }) as any;
-            return { name: operationRecord.name, id: operationRecord.id };
-          })
-      );
-      this.logger.info(`Provided operations: ${operationsData}`);
-      const acceptableOperations = this.unitProcedureOperationsMap[name];
-      this.logger.info(`Acceptable operations: ${acceptableOperations}`);
-
-      if (!acceptableOperations) {
-        throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
-      }
-
-      if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
-        throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
-      }
-    }
-
-    // If operations are acceptable, proceed with the creation
-    const createdUnitProcedure = await this.prisma.unitProcedure.create(args);
+  async createUnitProcedure<T extends Prisma.UnitProcedureCreateArgs>(args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>): Promise<import(".prisma/client").UnitProcedure> {
+    const unitProcedure = await super.createUnitProcedure(args);
 
     await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
-      recordName: 'UnitProcedure',
       event_type: 'create',
-      data: createdUnitProcedure
+      data: unitProcedure,
+      recordName: 'UnitProcedure',
     });
-    this.logger.info(`Created UnitProcedure: ${createdUnitProcedure.id} & pushed to topic`);
-    return createdUnitProcedure;
+    this.logger.info(`Updated UnitProcedure: ${unitProcedure.id} & pushed to topic`)
+    return unitProcedure;
   }
 
-  async updateUnitProcedure<T extends Prisma.UnitProcedureUpdateArgs>(
-      args: Prisma.SelectSubset<T, Prisma.UnitProcedureUpdateArgs>
-  ): Promise<UnitProcedure> {
-    const unitProcedure = await this.prisma.unitProcedure.findFirstOrThrow({where: {id: args.where.id}}) as UnitProcedure;
-    this.logger.info(`Updating Operation: ${unitProcedure.name}`);
-    const name = unitProcedure.name as string;
-    const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
+  async updateUnitProcedure<T extends Prisma.UnitProcedureUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.UnitProcedureUpdateArgs>): Promise<import(".prisma/client").UnitProcedure> {
+    const unitProcedure = await super.updateUnitProcedure(args);
 
-    this.logger.info(`Provided operations: ${operations}`);
-    if (operations.length) {
-      this.logger.info(`Provided operations: ${operations}`);
-      const operationsData = await Promise.all(
-          operations.map(async (operation) => {
-            const operationRecord = await this.prisma.operation.findUnique({
-              where: { id: operation.id },
-            }) as any;
-            return { name: operationRecord.name, id: operationRecord.id };
-          })
-      );
-
-      this.logger.info(`Provided operations: ${operationsData}`);
-      const acceptableOperations = this.unitProcedureOperationsMap[name];
-      this.logger.info(`Acceptable operations: ${acceptableOperations}`);
-      if (!acceptableOperations) {
-        throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
+    // use the id from the update to get the record in the form we want for the message publishing
+    const unitProcedurePayload = await this.prisma.unitProcedure.findUnique({
+      where: { id: unitProcedure.id },
+      include: {
+        operations: true,
       }
+    });
 
-      if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
-        throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
-      }
-    }
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+      event_type: 'update',
+      data: unitProcedurePayload,
+      recordName: 'UnitProcedure',
+    });
+    this.logger.info(`Updated UnitProcedure: ${unitProcedure.id} & pushed to topic`)
 
-    return super.updateUnitProcedure(args);
+    return unitProcedure;
+  }
+
+  async deleteUnitProcedure<T extends Prisma.UnitProcedureDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.UnitProcedureDeleteArgs>): Promise<import(".prisma/client").UnitProcedure> {
+    const unitProcedure = await super.deleteUnitProcedure(args);
+
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Unitprocedure, {
+      event_type: 'delete',
+      data: unitProcedure,
+      recordName: 'UnitProcedure',
+    });
+    this.logger.info(`Deleted UnitProcedure: ${unitProcedure.id} & pushed to topic`)
+
+    return unitProcedure;
   }
 }
