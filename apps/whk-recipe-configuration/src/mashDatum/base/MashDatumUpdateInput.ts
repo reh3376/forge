@@ -21,7 +21,6 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 
 @InputType()
 class MashDatumUpdateInput {
@@ -80,18 +79,6 @@ class MashDatumUpdateInput {
     nullable: true,
   })
   cornLbs?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistry?: FermentationChemistryWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

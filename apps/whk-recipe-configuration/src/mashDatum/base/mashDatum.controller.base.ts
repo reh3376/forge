@@ -60,10 +60,6 @@ export class MashDatumControllerBase {
               connect: data.asset,
             }
           : undefined,
-
-        fermentationChemistry: {
-          connect: data.fermentationChemistry,
-        },
       },
       select: {
         asset: {
@@ -77,13 +73,6 @@ export class MashDatumControllerBase {
         balling: true,
         cornLbs: true,
         createdAt: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
         fermenterNumber: true,
         id: true,
         loggedBy: true,
@@ -126,13 +115,6 @@ export class MashDatumControllerBase {
         balling: true,
         cornLbs: true,
         createdAt: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
         fermenterNumber: true,
         id: true,
         loggedBy: true,
@@ -176,13 +158,6 @@ export class MashDatumControllerBase {
         balling: true,
         cornLbs: true,
         createdAt: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
         fermenterNumber: true,
         id: true,
         loggedBy: true,
@@ -233,10 +208,6 @@ export class MashDatumControllerBase {
                 connect: data.asset,
               }
             : undefined,
-
-          fermentationChemistry: {
-            connect: data.fermentationChemistry,
-          },
         },
         select: {
           asset: {
@@ -250,13 +221,6 @@ export class MashDatumControllerBase {
           balling: true,
           cornLbs: true,
           createdAt: true,
-
-          fermentationChemistry: {
-            select: {
-              id: true,
-            },
-          },
-
           fermenterNumber: true,
           id: true,
           loggedBy: true,
@@ -308,13 +272,6 @@ export class MashDatumControllerBase {
           balling: true,
           cornLbs: true,
           createdAt: true,
-
-          fermentationChemistry: {
-            select: {
-              id: true,
-            },
-          },
-
           fermenterNumber: true,
           id: true,
           loggedBy: true,

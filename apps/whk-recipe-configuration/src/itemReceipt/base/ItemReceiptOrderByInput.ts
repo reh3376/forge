@@ -94,17 +94,6 @@ class ItemReceiptOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  loadId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   purchaseOrderId?: SortOrder;
 
   @ApiProperty({
