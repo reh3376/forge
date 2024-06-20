@@ -10,10 +10,10 @@ import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 @Injectable()
 export class UnitProcedureService extends UnitProcedureServiceBase {
   constructor(
-      protected readonly prisma: PrismaService,
-      protected readonly rabbitProducer: RabbitMQProducerService,
-      private logger: PinoLogger,
-      ) {
+    protected readonly prisma: PrismaService,
+    protected readonly rabbitProducer: RabbitMQProducerService,
+    private logger: PinoLogger,
+  ) {
     super(prisma);
   }
   private unitProcedureOperationsMap: { [key: string]: string[] } = {
