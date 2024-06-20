@@ -27,29 +27,19 @@ export class BomServiceBase {
     return this.prisma.bom.count(args);
   }
 
-  async boms<T extends Prisma.BomFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomFindManyArgs>
-  ): Promise<PrismaBom[]> {
-    return this.prisma.bom.findMany<Prisma.BomFindManyArgs>(args);
+  async boms(args: Prisma.BomFindManyArgs): Promise<PrismaBom[]> {
+    return this.prisma.bom.findMany(args);
   }
-  async bom<T extends Prisma.BomFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomFindUniqueArgs>
-  ): Promise<PrismaBom | null> {
+  async bom(args: Prisma.BomFindUniqueArgs): Promise<PrismaBom | null> {
     return this.prisma.bom.findUnique(args);
   }
-  async createBom<T extends Prisma.BomCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomCreateArgs>
-  ): Promise<PrismaBom> {
-    return this.prisma.bom.create<T>(args);
+  async createBom(args: Prisma.BomCreateArgs): Promise<PrismaBom> {
+    return this.prisma.bom.create(args);
   }
-  async updateBom<T extends Prisma.BomUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomUpdateArgs>
-  ): Promise<PrismaBom> {
-    return this.prisma.bom.update<T>(args);
+  async updateBom(args: Prisma.BomUpdateArgs): Promise<PrismaBom> {
+    return this.prisma.bom.update(args);
   }
-  async deleteBom<T extends Prisma.BomDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomDeleteArgs>
-  ): Promise<PrismaBom> {
+  async deleteBom(args: Prisma.BomDeleteArgs): Promise<PrismaBom> {
     return this.prisma.bom.delete(args);
   }
 

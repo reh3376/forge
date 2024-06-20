@@ -21,8 +21,11 @@ import {
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
+import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
+import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
+import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 import { EnumAssetType } from "./EnumAssetType";
 
 @InputType()
@@ -72,6 +75,30 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -80,6 +107,18 @@ class AssetUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,

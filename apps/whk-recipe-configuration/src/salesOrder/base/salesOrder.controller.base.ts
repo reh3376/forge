@@ -45,6 +45,9 @@ export class SalesOrderControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: SalesOrderCreateInput,
+  })
   async createSalesOrder(
     @common.Body() data: SalesOrderCreateInput
   ): Promise<SalesOrder> {
@@ -204,6 +207,9 @@ export class SalesOrderControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: SalesOrderUpdateInput,
   })
   async updateSalesOrder(
     @common.Param() params: SalesOrderWhereUniqueInput,

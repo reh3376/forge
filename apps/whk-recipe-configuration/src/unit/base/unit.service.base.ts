@@ -23,29 +23,19 @@ export class UnitServiceBase {
     return this.prisma.unit.count(args);
   }
 
-  async units<T extends Prisma.UnitFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitFindManyArgs>
-  ): Promise<PrismaUnit[]> {
-    return this.prisma.unit.findMany<Prisma.UnitFindManyArgs>(args);
+  async units(args: Prisma.UnitFindManyArgs): Promise<PrismaUnit[]> {
+    return this.prisma.unit.findMany(args);
   }
-  async unit<T extends Prisma.UnitFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitFindUniqueArgs>
-  ): Promise<PrismaUnit | null> {
+  async unit(args: Prisma.UnitFindUniqueArgs): Promise<PrismaUnit | null> {
     return this.prisma.unit.findUnique(args);
   }
-  async createUnit<T extends Prisma.UnitCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitCreateArgs>
-  ): Promise<PrismaUnit> {
-    return this.prisma.unit.create<T>(args);
+  async createUnit(args: Prisma.UnitCreateArgs): Promise<PrismaUnit> {
+    return this.prisma.unit.create(args);
   }
-  async updateUnit<T extends Prisma.UnitUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitUpdateArgs>
-  ): Promise<PrismaUnit> {
-    return this.prisma.unit.update<T>(args);
+  async updateUnit(args: Prisma.UnitUpdateArgs): Promise<PrismaUnit> {
+    return this.prisma.unit.update(args);
   }
-  async deleteUnit<T extends Prisma.UnitDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitDeleteArgs>
-  ): Promise<PrismaUnit> {
+  async deleteUnit(args: Prisma.UnitDeleteArgs): Promise<PrismaUnit> {
     return this.prisma.unit.delete(args);
   }
 

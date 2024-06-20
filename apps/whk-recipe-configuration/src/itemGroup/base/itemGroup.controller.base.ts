@@ -48,6 +48,9 @@ export class ItemGroupControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemGroupCreateInput,
+  })
   async createItemGroup(
     @common.Body() data: ItemGroupCreateInput
   ): Promise<ItemGroup> {
@@ -136,6 +139,9 @@ export class ItemGroupControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ItemGroupUpdateInput,
   })
   async updateItemGroup(
     @common.Param() params: ItemGroupWhereUniqueInput,

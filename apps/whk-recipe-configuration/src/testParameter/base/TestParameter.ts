@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
 import { IsJSONValue } from "../../validators";
@@ -77,28 +78,6 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  editedAt!: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
     type: () => [EquipmentPhase],
   })
   @ValidateNested()
@@ -146,6 +125,15 @@ class TestParameter {
   isClassDef!: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: () => ItemReceipt,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipt?: ItemReceipt | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -183,6 +171,28 @@ class TestParameter {
     nullable: true,
   })
   testDetails!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  testedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testedBy!: string | null;
 
   @ApiProperty({
     required: false,
@@ -292,6 +302,28 @@ class TestParameter {
     nullable: true,
   })
   tooltip!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  updatedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { TestParameter as TestParameter };

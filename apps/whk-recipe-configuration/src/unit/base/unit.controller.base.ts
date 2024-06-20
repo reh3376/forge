@@ -48,6 +48,9 @@ export class UnitControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: UnitCreateInput,
+  })
   async createUnit(@common.Body() data: UnitCreateInput): Promise<Unit> {
     return await this.service.createUnit({
       data: data,
@@ -138,6 +141,9 @@ export class UnitControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: UnitUpdateInput,
+  })
   async updateUnit(
     @common.Param() params: UnitWhereUniqueInput,
     @common.Body() data: UnitUpdateInput
@@ -225,6 +231,7 @@ export class UnitControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,

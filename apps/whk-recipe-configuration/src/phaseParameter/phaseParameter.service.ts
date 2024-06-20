@@ -4,7 +4,7 @@ import { PhaseParameterServiceBase } from "./base/phaseParameter.service.base";
 import {PinoLogger} from "nestjs-pino";
 import {PhaseParameter, Prisma} from "@prisma/client";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 import {EquipmentPhase} from "../equipmentPhase/base/EquipmentPhase";
 import {
     EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput
@@ -142,7 +142,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
       }
       const phaseParameter = await super.createPhaseParameter(args);
 
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
           recordName: 'PhaseParameter',
           event_type: 'create',
           data: phaseParameter
@@ -167,7 +167,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
           }
           phaseParameterData = await super.updatePhaseParameter(args);
 
-          await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+          await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
               recordName: 'PhaseParameter',
               event_type: 'update',
               data: phaseParameterData
@@ -195,7 +195,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
 
           phaseParameterData = await super.updatePhaseParameter(args);
 
-          await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+          await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
                 recordName: 'PhaseParameter',
                 event_type: 'update',
                 data: phaseParameterData

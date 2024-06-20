@@ -137,14 +137,6 @@ class PurchaseOrder {
   })
   @IsString()
   @Field(() => String)
-  grainType!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
   id!: string;
 
   @ApiProperty({
@@ -188,6 +180,14 @@ class PurchaseOrder {
   @IsInt()
   @Field(() => Number)
   orderQuantity!: number;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  purchaseOrderGroup!: string;
 
   @ApiProperty({
     required: false,
@@ -244,6 +244,7 @@ class PurchaseOrder {
     | "ReceiptComplete"
     | "PurchaseOrderComplete"
     | "InitializedNotReceived"
+    | "ReceivedTested"
     | null;
 
   @ApiProperty({
