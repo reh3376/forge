@@ -70,7 +70,7 @@ model TestParameter {
   testedAt                 DateTime?
   testedBy                 String?
   testParamRevision        String?
-  testParamUnits           EnumTestParameterTestParamUnits?
+  testParamUnits           String
   testPass                 Boolean?
   testResult               Json?
   testSetpointBooleanValue Boolean?                           @default(true)
@@ -741,14 +741,6 @@ enum EnumPhaseParameterStaticName {
   FlowRate
   SprayballTime
   Level
-}
-
-enum EnumTestParameterTestParamUnits {
-  Lbs
-  Perc
-  Gal
-  Bu
-  PassFail
 }
 
 enum EnumTestParameterTestSetpointType {
