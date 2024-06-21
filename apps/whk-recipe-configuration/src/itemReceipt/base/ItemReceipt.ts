@@ -19,8 +19,8 @@ import {
   ValidateNested,
   IsInt,
   IsNumber,
-  IsBoolean,
   IsEnum,
+  IsBoolean,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -113,17 +113,6 @@ class ItemReceipt {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  receiptAccepted!: boolean | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -163,6 +152,17 @@ class ItemReceipt {
   @Type(() => TestParameter)
   @IsOptional()
   tests?: Array<TestParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testsPassed!: boolean | null;
 
   @ApiProperty({
     required: true,
