@@ -542,11 +542,11 @@ model ItemReceipt {
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   quantity        Decimal
-  receiptAccepted Boolean?               @default(false)
   schemaVersion   String?                @default("0001-b")
   status          EnumItemReceiptStatus? @default(InProgress)
   supplierLot     String?
   tests           TestParameter[]
+  testsPassed     Boolean?               @default(false)
   units           String
   updatedAt       DateTime               @updatedAt
   updatedBy       String?

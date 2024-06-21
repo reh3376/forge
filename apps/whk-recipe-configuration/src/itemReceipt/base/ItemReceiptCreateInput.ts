@@ -17,8 +17,8 @@ import {
   ValidateNested,
   IsInt,
   IsNumber,
-  IsBoolean,
   IsEnum,
+  IsBoolean,
 } from "class-validator";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -98,17 +98,6 @@ class ItemReceiptCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  receiptAccepted?: boolean | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -151,6 +140,17 @@ class ItemReceiptCreateInput {
     nullable: true,
   })
   tests?: TestParameterCreateNestedManyWithoutItemReceiptsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testsPassed?: boolean | null;
 
   @ApiProperty({
     required: true,

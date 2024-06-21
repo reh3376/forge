@@ -619,10 +619,10 @@ export class PurchaseOrderControllerBase {
         },
 
         quantity: true,
-        receiptAccepted: true,
         schemaVersion: true,
         status: true,
         supplierLot: true,
+        testsPassed: true,
         units: true,
         updatedAt: true,
         updatedBy: true,
