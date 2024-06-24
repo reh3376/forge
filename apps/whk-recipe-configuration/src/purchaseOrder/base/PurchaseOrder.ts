@@ -12,15 +12,19 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { Lot } from "../../lot/base/Lot";
+
 import {
   ValidateNested,
   IsOptional,
   IsString,
+  MaxLength,
   IsBoolean,
   IsDate,
   IsInt,
+  Max,
   IsEnum,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { Account } from "../../account/base/Account";
 import { Asset } from "../../asset/base/Asset";
@@ -62,6 +66,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -95,6 +100,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -114,6 +120,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -125,6 +132,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -170,6 +178,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   name!: string;
 
@@ -178,6 +187,7 @@ class PurchaseOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   orderQuantity!: number;
 
@@ -186,6 +196,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   purchaseOrderGroup!: string;
 
@@ -252,6 +263,7 @@ class PurchaseOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -263,6 +275,7 @@ class PurchaseOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -274,6 +287,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -285,6 +299,7 @@ class PurchaseOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   units!: string;
 }

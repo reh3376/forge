@@ -15,9 +15,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsInt,
+  Max,
   IsNumber,
   IsEnum,
   IsBoolean,
@@ -45,6 +47,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -53,6 +56,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   driver!: string;
 
@@ -61,6 +65,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -88,6 +93,7 @@ class ItemReceipt {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -108,6 +114,7 @@ class ItemReceipt {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   quantity!: Decimal;
 
@@ -116,6 +123,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -138,6 +146,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -169,6 +178,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   units!: string;
 
@@ -185,6 +195,7 @@ class ItemReceipt {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -196,6 +207,7 @@ class ItemReceipt {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -207,6 +219,7 @@ class ItemReceipt {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,

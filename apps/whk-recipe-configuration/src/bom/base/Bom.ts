@@ -16,7 +16,9 @@ import {
   ValidateNested,
   IsOptional,
   IsString,
+  MaxLength,
   IsInt,
+  Max,
   IsDate,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -40,6 +42,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   bomName!: string;
 
@@ -48,6 +51,7 @@ class Bom {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -59,6 +63,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -78,6 +83,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -94,6 +100,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -105,6 +112,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -133,6 +141,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

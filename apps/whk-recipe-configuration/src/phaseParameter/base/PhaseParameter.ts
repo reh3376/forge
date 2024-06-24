@@ -18,7 +18,9 @@ import {
   ValidateNested,
   IsDate,
   IsString,
+  MaxLength,
   IsInt,
+  Max,
   IsNumber,
   IsEnum,
 } from "class-validator";
@@ -63,6 +65,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -71,6 +74,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   description!: string;
 
@@ -79,6 +83,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -99,6 +104,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -146,6 +152,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -157,6 +164,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   name!: string;
 
@@ -165,6 +173,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -176,6 +185,7 @@ class PhaseParameter {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -187,6 +197,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -209,6 +220,7 @@ class PhaseParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -220,6 +232,7 @@ class PhaseParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -241,6 +254,7 @@ class PhaseParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -271,6 +285,7 @@ class PhaseParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(8)
   @Field(() => String)
   units!: string;
 

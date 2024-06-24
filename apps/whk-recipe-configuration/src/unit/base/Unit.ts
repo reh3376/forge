@@ -17,6 +17,7 @@ import {
   ValidateNested,
   IsDate,
   IsString,
+  MaxLength,
 } from "class-validator";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
@@ -56,6 +57,7 @@ class Unit {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -75,6 +77,7 @@ class Unit {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -86,6 +89,7 @@ class Unit {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

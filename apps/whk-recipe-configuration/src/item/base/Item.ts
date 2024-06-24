@@ -17,6 +17,7 @@ import {
   ValidateNested,
   IsDate,
   IsString,
+  MaxLength,
   IsEnum,
 } from "class-validator";
 import { BomItem } from "../../bomItem/base/BomItem";
@@ -74,6 +75,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -82,6 +84,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -117,6 +120,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -137,6 +141,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   itemName!: string;
 
@@ -145,6 +150,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   itemNumber!: string;
 
@@ -162,6 +168,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @Field(() => String)
   itemRevision!: string;
 
@@ -170,6 +177,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   itemType!: string;
 
@@ -214,6 +222,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -233,6 +242,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

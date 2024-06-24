@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   ValidateNested,
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   IsNumber,
+  Max,
   IsEnum,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
@@ -61,6 +65,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -69,6 +74,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -89,6 +95,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -137,6 +144,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   name!: string;
 
@@ -154,6 +162,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -165,6 +174,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -187,6 +197,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -198,6 +209,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -209,6 +221,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   testParamUnits!: string;
 
@@ -249,6 +262,7 @@ class TestParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -271,6 +285,7 @@ class TestParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -282,6 +297,7 @@ class TestParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -293,6 +309,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -315,6 +332,7 @@ class TestParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

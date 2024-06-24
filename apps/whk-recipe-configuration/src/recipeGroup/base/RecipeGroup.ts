@@ -14,9 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -38,6 +40,7 @@ class RecipeGroup {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -46,6 +49,7 @@ class RecipeGroup {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -74,6 +78,7 @@ class RecipeGroup {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   recipe!: string;
 
@@ -91,6 +96,7 @@ class RecipeGroup {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -111,6 +117,7 @@ class RecipeGroup {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -130,6 +137,7 @@ class RecipeGroup {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsNumber,
+  Max,
   ValidateNested,
   IsOptional,
   IsDate,
   IsEnum,
   IsInt,
   IsString,
+  MaxLength,
 } from "class-validator";
+
 import { Decimal } from "decimal.js";
 import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
@@ -35,6 +39,7 @@ class FermentationDayDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   acid!: Decimal;
 
@@ -52,6 +57,7 @@ class FermentationDayDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   balling!: Decimal;
 
@@ -79,6 +85,7 @@ class FermentationDayDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -99,6 +106,7 @@ class FermentationDayDatum {
     type: Number,
   })
   @IsInt()
+  @Max(100)
   @Field(() => Number)
   fermenterNumber!: number;
 
@@ -115,6 +123,7 @@ class FermentationDayDatum {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   loggedBy!: string;
 
@@ -123,6 +132,7 @@ class FermentationDayDatum {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   lotId!: string;
 
@@ -139,6 +149,7 @@ class FermentationDayDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @Field(() => Float)
   pH!: Decimal;
 
@@ -155,6 +166,7 @@ class FermentationDayDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(212)
   @Field(() => Float)
   temperature!: Decimal;
 

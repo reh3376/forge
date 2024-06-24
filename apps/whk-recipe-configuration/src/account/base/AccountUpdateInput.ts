@@ -11,7 +11,14 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
+import {
+  IsString,
+  MaxLength,
+  IsOptional,
+  ValidateNested,
+  IsInt,
+  Max,
+} from "class-validator";
 import { PurchaseOrderUpdateManyWithoutAccountsInput } from "./PurchaseOrderUpdateManyWithoutAccountsInput";
 import { Type } from "class-transformer";
 import { SalesOrderUpdateManyWithoutAccountsInput } from "./SalesOrderUpdateManyWithoutAccountsInput";
@@ -23,6 +30,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -34,6 +42,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -45,6 +54,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -56,6 +66,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -67,6 +78,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -78,6 +90,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -89,6 +102,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -100,6 +114,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -123,6 +138,7 @@ class AccountUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -146,6 +162,7 @@ class AccountUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

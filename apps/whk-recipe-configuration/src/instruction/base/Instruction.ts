@@ -11,14 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 
@@ -48,6 +52,7 @@ class Instruction {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -56,6 +61,7 @@ class Instruction {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -76,6 +82,7 @@ class Instruction {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   filePath!: string;
 
@@ -84,6 +91,7 @@ class Instruction {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -103,6 +111,7 @@ class Instruction {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -114,6 +123,7 @@ class Instruction {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @Field(() => Number)
   revision!: number;
 
@@ -122,6 +132,7 @@ class Instruction {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

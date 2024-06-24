@@ -16,6 +16,7 @@ import {
   ValidateNested,
   IsOptional,
   IsString,
+  MaxLength,
   IsBoolean,
   IsDate,
   IsEnum,
@@ -51,6 +52,7 @@ class ProductionOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -73,6 +75,7 @@ class ProductionOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -84,6 +87,7 @@ class ProductionOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -130,6 +134,7 @@ class ProductionOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -253,6 +258,7 @@ class ProductionOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -14,9 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
@@ -36,6 +38,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -44,6 +47,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -71,6 +75,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   nextUnitProcedureName!: string;
 
@@ -79,6 +84,7 @@ class ScheduleOrderQueue {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -90,6 +96,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -109,6 +116,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
