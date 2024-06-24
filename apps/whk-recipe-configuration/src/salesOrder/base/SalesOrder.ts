@@ -17,7 +17,9 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -46,6 +48,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -54,6 +57,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -62,6 +66,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -81,6 +86,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   itemId!: string;
 
@@ -89,6 +95,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   orderType!: string;
 
@@ -106,6 +113,7 @@ class SalesOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   quantity!: number;
 
@@ -114,6 +122,7 @@ class SalesOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   revision!: number;
 
@@ -122,6 +131,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -141,6 +151,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

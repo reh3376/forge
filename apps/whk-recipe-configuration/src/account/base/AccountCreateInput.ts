@@ -11,7 +11,14 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
+import {
+  IsString,
+  MaxLength,
+  IsOptional,
+  ValidateNested,
+  IsInt,
+  Max,
+} from "class-validator";
 import { PurchaseOrderCreateNestedManyWithoutAccountsInput } from "./PurchaseOrderCreateNestedManyWithoutAccountsInput";
 import { Type } from "class-transformer";
 import { SalesOrderCreateNestedManyWithoutAccountsInput } from "./SalesOrderCreateNestedManyWithoutAccountsInput";
@@ -23,6 +30,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   address!: string;
 
@@ -31,6 +39,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -39,6 +48,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -50,6 +60,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -61,6 +72,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -72,6 +84,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -83,6 +96,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -94,6 +108,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   name!: string;
 
@@ -114,6 +129,7 @@ class AccountCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   revision!: number;
 
@@ -134,6 +150,7 @@ class AccountCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

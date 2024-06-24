@@ -13,10 +13,12 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
+  MaxLength,
   IsDate,
   IsOptional,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
@@ -29,6 +31,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   address!: string;
 
@@ -45,6 +48,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -53,6 +57,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -64,6 +69,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -75,6 +81,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -86,6 +93,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -97,6 +105,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -116,6 +125,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   name!: string;
 
@@ -133,6 +143,7 @@ class Account {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   revision!: number;
 
@@ -150,6 +161,7 @@ class Account {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

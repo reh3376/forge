@@ -11,14 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsNumber,
+  Max,
   IsOptional,
   ValidateNested,
   IsEnum,
   IsInt,
   IsString,
+  MaxLength,
 } from "class-validator";
+
 import { Decimal } from "decimal.js";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -34,6 +38,7 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -57,6 +62,7 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -79,6 +85,7 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -102,6 +109,7 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(100)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -113,6 +121,7 @@ class FermentationDayDatumUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -124,6 +133,7 @@ class FermentationDayDatumUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -147,6 +157,7 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -170,6 +181,7 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(212)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,

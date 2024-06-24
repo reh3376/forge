@@ -16,6 +16,7 @@ import {
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsEnum,
 } from "class-validator";
 import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
@@ -71,6 +72,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -79,6 +81,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -104,6 +107,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -127,6 +131,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   itemName!: string;
 
@@ -135,6 +140,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   itemNumber!: string;
 
@@ -155,6 +161,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @Field(() => String)
   itemRevision!: string;
 
@@ -163,6 +170,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   itemType!: string;
 
@@ -219,6 +227,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -230,6 +239,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -11,14 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsNumber,
+  Max,
   IsOptional,
   ValidateNested,
   IsInt,
   IsString,
+  MaxLength,
   IsDate,
 } from "class-validator";
+
 import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -31,6 +35,7 @@ class FermentationSettingDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -42,6 +47,7 @@ class FermentationSettingDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(100)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -53,6 +59,7 @@ class FermentationSettingDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(1000)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -76,6 +83,7 @@ class FermentationSettingDatumCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(100)
   @Field(() => Number)
   fermenterNumber!: number;
 
@@ -84,6 +92,7 @@ class FermentationSettingDatumCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   loggedBy!: string;
 
@@ -92,6 +101,7 @@ class FermentationSettingDatumCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   lotId!: string;
 
@@ -112,6 +122,7 @@ class FermentationSettingDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -131,6 +142,7 @@ class FermentationSettingDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(212)
   @Field(() => Float)
   temperature!: Decimal;
 
