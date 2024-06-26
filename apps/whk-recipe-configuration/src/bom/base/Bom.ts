@@ -12,6 +12,7 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BomItem } from "../../bomItem/base/BomItem";
+
 import {
   ValidateNested,
   IsOptional,
@@ -20,11 +21,13 @@ import {
   IsInt,
   Max,
   IsDate,
+  IsBoolean,
 } from "class-validator";
+
 import { Type } from "class-transformer";
+import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Bom {
@@ -57,6 +60,18 @@ class Bom {
     nullable: true,
   })
   bomRevision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bomType!: string | null;
 
   @ApiProperty({
     required: false,
@@ -109,6 +124,40 @@ class Bom {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveEndDate!: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveStartDate!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId!: string | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -126,6 +175,37 @@ class Bom {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  inactive!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes!: string | null;
 
   @ApiProperty({
     required: false,
@@ -165,14 +245,6 @@ class Bom {
   @Type(() => UnitProcedure)
   @IsOptional()
   unitProceduresPrimary?: Array<UnitProcedure>;
-
-  @ApiProperty({
-    required: true,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  wipItem?: Item;
 }
 
 export { Bom as Bom };

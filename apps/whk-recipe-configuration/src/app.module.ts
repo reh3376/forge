@@ -32,7 +32,7 @@ import { ProductionOrderModule } from "./productionOrder/productionOrder.module"
 import { ScheduleOrderModule } from "./scheduleOrder/scheduleOrder.module";
 import { ItemModule } from "./item/item.module";
 import { ItemGroupModule } from "./itemGroup/itemGroup.module";
-import { AccountModule } from "./account/account.module";
+import { CustomerModule } from "./customer/customer.module";
 import { PurchaseOrderModule } from "./purchaseOrder/purchaseOrder.module";
 import { SalesOrderModule } from "./salesOrder/salesOrder.module";
 import { TestModule } from "./test/test.module";
@@ -47,6 +47,7 @@ import { MashDatumModule } from "./mashDatum/mashDatum.module";
 import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
 import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
 import { BatchModule } from "./batch/batch.module";
+import { VendorModule } from "./vendor/vendor.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -87,7 +88,7 @@ import { AuthModule } from "./auth/auth.module";
     ScheduleOrderModule,
     ItemModule,
     ItemGroupModule,
-    AccountModule,
+    CustomerModule,
     PurchaseOrderModule,
     SalesOrderModule,
     TestModule,
@@ -102,6 +103,7 @@ import { AuthModule } from "./auth/auth.module";
     FermentationSettingDatumModule,
     FermentationDayDatumModule,
     BatchModule,
+    VendorModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

@@ -654,12 +654,6 @@ export class AssetControllerBase {
     const results = await this.service.findPurchaseOrders(params.id, {
       ...query,
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -670,20 +664,11 @@ export class AssetControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
-        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -697,7 +682,10 @@ export class AssetControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

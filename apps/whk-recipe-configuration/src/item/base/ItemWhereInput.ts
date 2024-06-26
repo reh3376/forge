@@ -13,18 +13,20 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { IsOptional, ValidateNested } from "class-validator";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
+import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class ItemWhereInput {
@@ -76,6 +78,17 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  erpId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -98,20 +111,14 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumItemItemClass,
+    type: StringNullableFilter,
   })
-  @IsEnum(EnumItemItemClass)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => EnumItemItemClass, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  itemClass?:
-    | "Inventory"
-    | "Assembly"
-    | "LotNumberedAssembly"
-    | "SerializedAssembly"
-    | "LotNumberedInventory"
-    | "SerializedInventory";
+  itemClass?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -172,14 +179,14 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  itemRevision?: StringFilter;
+  itemRevision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -242,6 +249,18 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => SalesOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => SalesOrderListRelationFilter, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -261,6 +280,18 @@ class ItemWhereInput {
     nullable: true,
   })
   updatedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput;
 }
 
 export { ItemWhereInput as ItemWhereInput };

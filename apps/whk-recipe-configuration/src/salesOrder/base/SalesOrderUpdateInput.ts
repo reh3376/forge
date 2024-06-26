@@ -11,32 +11,24 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
 import {
-  ValidateNested,
-  IsOptional,
   IsString,
   MaxLength,
+  IsOptional,
+  ValidateNested,
   IsInt,
   Max,
 } from "class-validator";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { Type } from "class-transformer";
+import { ItemUpdateManyWithoutSalesOrdersInput } from "./ItemUpdateManyWithoutSalesOrdersInput";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @InputType()
 class SalesOrderUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: () => AccountWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AccountWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AccountWhereUniqueInput, {
-    nullable: true,
-  })
-  account?: AccountWhereUniqueInput | null;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -51,6 +43,18 @@ class SalesOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -59,7 +63,19 @@ class SalesOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  customer?: string;
+  customerCode?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -71,19 +87,29 @@ class SalesOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  globalId?: string;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => ItemUpdateManyWithoutSalesOrdersInput,
   })
-  @IsString()
-  @MaxLength(256)
+  @ValidateNested()
+  @Type(() => ItemUpdateManyWithoutSalesOrdersInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => ItemUpdateManyWithoutSalesOrdersInput, {
     nullable: true,
   })
-  itemId?: string;
+  item?: ItemUpdateManyWithoutSalesOrdersInput;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems?: InputJsonValue;
 
   @ApiProperty({
     required: false,
