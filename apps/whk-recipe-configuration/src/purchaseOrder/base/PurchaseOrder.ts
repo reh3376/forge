@@ -20,16 +20,18 @@ import {
   MaxLength,
   IsBoolean,
   IsDate,
+  IsEnum,
   IsInt,
   Max,
-  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Account } from "../../account/base/Account";
 import { Asset } from "../../asset/base/Asset";
 import { Item } from "../../item/base/Item";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { JsonValue } from "type-fest";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 
@@ -43,14 +45,6 @@ class PurchaseOrder {
   @Type(() => Lot)
   @IsOptional()
   acceptedLots?: Array<Lot>;
-
-  @ApiProperty({
-    required: true,
-    type: () => Account,
-  })
-  @ValidateNested()
-  @Type(() => Account)
-  account?: Account;
 
   @ApiProperty({
     required: false,
@@ -105,39 +99,22 @@ class PurchaseOrder {
   createdBy!: string;
 
   @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  editedAt!: Date | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
+  @MaxLength(100)
+  @Field(() => String)
+  erpId!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
+  @Field(() => String)
+  globalId!: string;
 
   @ApiProperty({
     required: true,
@@ -149,11 +126,12 @@ class PurchaseOrder {
 
   @ApiProperty({
     required: true,
-    type: () => Item,
+    type: () => [Item],
   })
   @ValidateNested()
   @Type(() => Item)
-  item?: Item;
+  @IsOptional()
+  item?: Array<Item>;
 
   @ApiProperty({
     required: false,
@@ -163,6 +141,16 @@ class PurchaseOrder {
   @Type(() => ItemReceipt)
   @IsOptional()
   itemReceipts?: Array<ItemReceipt>;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems!: JsonValue;
 
   @ApiProperty({
     required: false,
@@ -181,24 +169,6 @@ class PurchaseOrder {
   @MaxLength(256)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @Field(() => Number)
-  orderQuantity!: number;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  purchaseOrderGroup!: string;
 
   @ApiProperty({
     required: false,
@@ -296,12 +266,47 @@ class PurchaseOrder {
 
   @ApiProperty({
     required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @Field(() => Number)
+  totalOrderQuantity!: number;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @Field(() => String)
-  units!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  transactionGroup!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  updatedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { PurchaseOrder as PurchaseOrder };

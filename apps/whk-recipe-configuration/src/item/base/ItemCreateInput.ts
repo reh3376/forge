@@ -17,18 +17,20 @@ import {
   ValidateNested,
   IsString,
   MaxLength,
-  IsEnum,
+  IsInt,
+  Max,
 } from "class-validator";
 import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
-import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
 import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput";
 import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
+import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class ItemCreateInput {
@@ -77,6 +79,15 @@ class ItemCreateInput {
   createdBy!: string;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  erpId!: string;
+
+  @ApiProperty({
     required: false,
     type: String,
   })
@@ -89,18 +100,16 @@ class ItemCreateInput {
   globalId?: string | null;
 
   @ApiProperty({
-    required: true,
-    enum: EnumItemItemClass,
+    required: false,
+    type: String,
   })
-  @IsEnum(EnumItemItemClass)
-  @Field(() => EnumItemItemClass)
-  itemClass!:
-    | "Inventory"
-    | "Assembly"
-    | "LotNumberedAssembly"
-    | "SerializedAssembly"
-    | "LotNumberedInventory"
-    | "SerializedInventory";
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemClass?: string | null;
 
   @ApiProperty({
     required: false,
@@ -140,7 +149,7 @@ class ItemCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(1000)
   @Field(() => String)
   itemNumber!: string;
 
@@ -157,13 +166,16 @@ class ItemCreateInput {
   itemReceipts?: ItemReceiptCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(4)
-  @Field(() => String)
-  itemRevision!: string;
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  itemRevision?: number | null;
 
   @ApiProperty({
     required: true,
@@ -224,6 +236,18 @@ class ItemCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => SalesOrderCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => SalesOrderCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -245,6 +269,18 @@ class ItemCreateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput | null;
 }
 
 export { ItemCreateInput as ItemCreateInput };
