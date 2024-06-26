@@ -50,6 +50,17 @@ class BomOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  bomType?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   className?: SortOrder;
 
   @ApiProperty({
@@ -105,6 +116,39 @@ class BomOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  effectiveEndDate?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  effectiveStartDate?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  erpId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   globalId?: SortOrder;
 
   @ApiProperty({
@@ -127,7 +171,7 @@ class BomOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  schemaVersion?: SortOrder;
+  inactive?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +182,29 @@ class BomOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  wipItemId?: SortOrder;
+  itemId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  notes?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  schemaVersion?: SortOrder;
 }
 
 export { BomOrderByInput as BomOrderByInput };

@@ -20,9 +20,9 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 
 @InputType()
@@ -130,17 +130,6 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  receiptAccepted?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -183,6 +172,17 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   tests?: TestParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  testsPassed?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,

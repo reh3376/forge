@@ -225,6 +225,7 @@ export class ItemGroupControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        erpId: true,
         globalId: true,
         id: true,
         itemClass: true,
@@ -243,6 +244,12 @@ export class ItemGroupControllerBase {
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

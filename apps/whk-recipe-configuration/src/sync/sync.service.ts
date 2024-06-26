@@ -29,7 +29,6 @@ export class SyncService {
             asset: this.prisma.asset,
             recipe: this.prisma.recipe,
             bom: this.prisma.bom,
-            account: this.prisma.account,
         };
     }
 

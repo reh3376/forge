@@ -15,9 +15,12 @@ import { IsJSONValue } from "../../validators";
 import {
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsDate,
   IsInt,
+  Min,
+  Max,
 } from "class-validator";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
@@ -42,6 +45,7 @@ class Batch {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   batchId!: string;
 
@@ -112,6 +116,8 @@ class Batch {
     type: Number,
   })
   @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -123,6 +129,7 @@ class Batch {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
