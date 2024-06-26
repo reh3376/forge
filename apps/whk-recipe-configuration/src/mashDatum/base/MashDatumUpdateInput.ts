@@ -16,8 +16,10 @@ import {
   ValidateNested,
   IsOptional,
   IsNumber,
+  Max,
   IsInt,
   IsString,
+  MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
@@ -42,6 +44,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -53,6 +56,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -64,6 +68,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(100)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -75,6 +80,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -98,6 +104,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(1000)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -109,6 +116,7 @@ class MashDatumUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -120,6 +128,7 @@ class MashDatumUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -131,6 +140,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -142,6 +152,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -153,6 +164,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -164,6 +176,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -175,6 +188,7 @@ class MashDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,

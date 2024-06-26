@@ -26,6 +26,9 @@ import { SalesOrder } from "./SalesOrder";
 import { SalesOrderFindManyArgs } from "./SalesOrderFindManyArgs";
 import { SalesOrderWhereUniqueInput } from "./SalesOrderWhereUniqueInput";
 import { SalesOrderUpdateInput } from "./SalesOrderUpdateInput";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -55,9 +58,9 @@ export class SalesOrderControllerBase {
       data: {
         ...data,
 
-        account: data.account
+        customer: data.customer
           ? {
-              connect: data.account,
+              connect: data.customer,
             }
           : undefined,
 
@@ -68,18 +71,20 @@ export class SalesOrderControllerBase {
           : undefined,
       },
       select: {
-        account: {
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
           select: {
             id: true,
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        customer: true,
+        customerCode: true,
+        erpId: true,
         globalId: true,
         id: true,
-        itemId: true,
+        lineItems: true,
         orderType: true,
 
         productionOrders: {
@@ -114,18 +119,20 @@ export class SalesOrderControllerBase {
     return this.service.salesOrders({
       ...args,
       select: {
-        account: {
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
           select: {
             id: true,
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        customer: true,
+        customerCode: true,
+        erpId: true,
         globalId: true,
         id: true,
-        itemId: true,
+        lineItems: true,
         orderType: true,
 
         productionOrders: {
@@ -161,18 +168,20 @@ export class SalesOrderControllerBase {
     const result = await this.service.salesOrder({
       where: params,
       select: {
-        account: {
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
           select: {
             id: true,
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        customer: true,
+        customerCode: true,
+        erpId: true,
         globalId: true,
         id: true,
-        itemId: true,
+        lineItems: true,
         orderType: true,
 
         productionOrders: {
@@ -221,9 +230,9 @@ export class SalesOrderControllerBase {
         data: {
           ...data,
 
-          account: data.account
+          customer: data.customer
             ? {
-                connect: data.account,
+                connect: data.customer,
               }
             : undefined,
 
@@ -234,18 +243,20 @@ export class SalesOrderControllerBase {
             : undefined,
         },
         select: {
-          account: {
+          createdAt: true,
+          createdBy: true,
+
+          customer: {
             select: {
               id: true,
             },
           },
 
-          createdAt: true,
-          createdBy: true,
-          customer: true,
+          customerCode: true,
+          erpId: true,
           globalId: true,
           id: true,
-          itemId: true,
+          lineItems: true,
           orderType: true,
 
           productionOrders: {
@@ -289,18 +300,20 @@ export class SalesOrderControllerBase {
       return await this.service.deleteSalesOrder({
         where: params,
         select: {
-          account: {
+          createdAt: true,
+          createdBy: true,
+
+          customer: {
             select: {
               id: true,
             },
           },
 
-          createdAt: true,
-          createdBy: true,
-          customer: true,
+          customerCode: true,
+          erpId: true,
           globalId: true,
           id: true,
-          itemId: true,
+          lineItems: true,
           orderType: true,
 
           productionOrders: {
@@ -324,5 +337,125 @@ export class SalesOrderControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/item")
+  @ApiNestedQuery(ItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findItem(
+    @common.Req() request: Request,
+    @common.Param() params: SalesOrderWhereUniqueInput
+  ): Promise<Item[]> {
+    const query = plainToClass(ItemFindManyArgs, request.query);
+    const results = await this.service.findItem(params.id, {
+      ...query,
+      select: {
+        active: true,
+        createdAt: true,
+        createdBy: true,
+        erpId: true,
+        globalId: true,
+        id: true,
+        itemClass: true,
+        itemDescription: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemName: true,
+        itemNumber: true,
+        itemRevision: true,
+        itemType: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "SalesOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectItem(
+    @common.Param() params: SalesOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        connect: body,
+      },
+    };
+    await this.service.updateSalesOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "SalesOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateItem(
+    @common.Param() params: SalesOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        set: body,
+      },
+    };
+    await this.service.updateSalesOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "SalesOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectItem(
+    @common.Param() params: SalesOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateSalesOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

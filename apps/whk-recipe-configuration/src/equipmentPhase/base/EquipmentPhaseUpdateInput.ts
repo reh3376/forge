@@ -11,14 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { BomItemUpdateManyWithoutEquipmentPhasesInput } from "./BomItemUpdateManyWithoutEquipmentPhasesInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
@@ -72,6 +76,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -83,6 +88,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -94,6 +100,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -105,6 +112,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -116,6 +124,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -162,6 +171,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -225,6 +235,7 @@ class EquipmentPhaseUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -236,6 +247,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -259,6 +271,7 @@ class EquipmentPhaseUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -270,6 +283,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

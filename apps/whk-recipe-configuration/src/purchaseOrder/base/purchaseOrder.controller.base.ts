@@ -29,6 +29,9 @@ import { PurchaseOrderUpdateInput } from "./PurchaseOrderUpdateInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
@@ -64,19 +67,11 @@ export class PurchaseOrderControllerBase {
       data: {
         ...data,
 
-        account: {
-          connect: data.account,
-        },
-
         asset: data.asset
           ? {
               connect: data.asset,
             }
           : undefined,
-
-        item: {
-          connect: data.item,
-        },
 
         purchaseOrderRejectedLots: data.purchaseOrderRejectedLots
           ? {
@@ -85,12 +80,6 @@ export class PurchaseOrderControllerBase {
           : undefined,
       },
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -101,20 +90,11 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
-        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -128,7 +108,10 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -152,12 +135,6 @@ export class PurchaseOrderControllerBase {
     return this.service.purchaseOrders({
       ...args,
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -168,20 +145,11 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
-        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -195,7 +163,10 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -218,12 +189,6 @@ export class PurchaseOrderControllerBase {
     const result = await this.service.purchaseOrder({
       where: params,
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -234,20 +199,11 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
-        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -261,7 +217,10 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -297,19 +256,11 @@ export class PurchaseOrderControllerBase {
         data: {
           ...data,
 
-          account: {
-            connect: data.account,
-          },
-
           asset: data.asset
             ? {
                 connect: data.asset,
               }
             : undefined,
-
-          item: {
-            connect: data.item,
-          },
 
           purchaseOrderRejectedLots: data.purchaseOrderRejectedLots
             ? {
@@ -318,12 +269,6 @@ export class PurchaseOrderControllerBase {
             : undefined,
         },
         select: {
-          account: {
-            select: {
-              id: true,
-            },
-          },
-
           asset: {
             select: {
               id: true,
@@ -334,20 +279,11 @@ export class PurchaseOrderControllerBase {
           complete: true,
           createdAt: true,
           createdBy: true,
-          editedAt: true,
-          editedBy: true,
+          erpId: true,
           globalId: true,
           id: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
+          lineItems: true,
           name: true,
-          orderQuantity: true,
-          purchaseOrderGroup: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -361,7 +297,10 @@ export class PurchaseOrderControllerBase {
           receivedQuantity: true,
           revision: true,
           schemaVersion: true,
-          units: true,
+          totalOrderQuantity: true,
+          transactionGroup: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -392,12 +331,6 @@ export class PurchaseOrderControllerBase {
       return await this.service.deletePurchaseOrder({
         where: params,
         select: {
-          account: {
-            select: {
-              id: true,
-            },
-          },
-
           asset: {
             select: {
               id: true,
@@ -408,20 +341,11 @@ export class PurchaseOrderControllerBase {
           complete: true,
           createdAt: true,
           createdBy: true,
-          editedAt: true,
-          editedBy: true,
+          erpId: true,
           globalId: true,
           id: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
+          lineItems: true,
           name: true,
-          orderQuantity: true,
-          purchaseOrderGroup: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -435,7 +359,10 @@ export class PurchaseOrderControllerBase {
           receivedQuantity: true,
           revision: true,
           schemaVersion: true,
-          units: true,
+          totalOrderQuantity: true,
+          transactionGroup: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -583,6 +510,126 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/item")
+  @ApiNestedQuery(ItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findItem(
+    @common.Req() request: Request,
+    @common.Param() params: PurchaseOrderWhereUniqueInput
+  ): Promise<Item[]> {
+    const query = plainToClass(ItemFindManyArgs, request.query);
+    const results = await this.service.findItem(params.id, {
+      ...query,
+      select: {
+        active: true,
+        createdAt: true,
+        createdBy: true,
+        erpId: true,
+        globalId: true,
+        id: true,
+        itemClass: true,
+        itemDescription: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemName: true,
+        itemNumber: true,
+        itemRevision: true,
+        itemType: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectItem(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        connect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateItem(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        set: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectItem(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        disconnect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/itemReceipts")
   @ApiNestedQuery(ItemReceiptFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -619,10 +666,10 @@ export class PurchaseOrderControllerBase {
         },
 
         quantity: true,
-        receiptAccepted: true,
         schemaVersion: true,
         status: true,
         supplierLot: true,
+        testsPassed: true,
         units: true,
         updatedAt: true,
         updatedBy: true,
@@ -720,12 +767,6 @@ export class PurchaseOrderControllerBase {
     const results = await this.service.findLotsRejected(params.id, {
       ...query,
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -736,20 +777,11 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
-        purchaseOrderGroup: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -763,7 +795,10 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
