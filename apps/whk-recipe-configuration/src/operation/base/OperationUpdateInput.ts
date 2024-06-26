@@ -11,14 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsOptional,
   IsBoolean,
   ValidateNested,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -39,6 +43,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -83,6 +88,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -94,6 +100,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -105,6 +112,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -164,6 +172,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -198,6 +207,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -228,6 +238,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -239,6 +250,7 @@ class OperationUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -250,6 +262,7 @@ class OperationUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -261,6 +274,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

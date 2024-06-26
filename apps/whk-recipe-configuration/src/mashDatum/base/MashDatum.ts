@@ -12,14 +12,18 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { Asset } from "../../asset/base/Asset";
+
 import {
   ValidateNested,
   IsOptional,
   IsNumber,
+  Max,
   IsDate,
   IsInt,
   IsString,
+  MaxLength,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
@@ -40,6 +44,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @Field(() => Float)
   backSetPH!: Decimal;
 
@@ -48,6 +53,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -59,6 +65,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(100)
   @Field(() => Float)
   balling!: Decimal;
 
@@ -67,6 +74,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -95,6 +103,7 @@ class MashDatum {
     type: Number,
   })
   @IsInt()
+  @Max(1000)
   @Field(() => Number)
   fermenterNumber!: number;
 
@@ -111,6 +120,7 @@ class MashDatum {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   loggedBy!: string;
 
@@ -119,6 +129,7 @@ class MashDatum {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   lotId!: string;
 
@@ -127,6 +138,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -138,6 +150,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @Field(() => Float)
   pH!: Decimal;
 
@@ -146,6 +159,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -165,6 +179,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   waterVolume!: Decimal;
 
@@ -173,6 +188,7 @@ class MashDatum {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,

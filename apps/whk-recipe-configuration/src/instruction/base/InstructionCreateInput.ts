@@ -15,8 +15,10 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { EquipmentPhaseCreateNestedManyWithoutInstructionsInput } from "./EquipmentPhaseCreateNestedManyWithoutInstructionsInput";
 import { Type } from "class-transformer";
@@ -39,6 +41,7 @@ class InstructionCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -47,6 +50,7 @@ class InstructionCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -70,6 +74,7 @@ class InstructionCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   filePath!: string;
 
@@ -78,6 +83,7 @@ class InstructionCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -89,6 +95,7 @@ class InstructionCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -100,6 +107,7 @@ class InstructionCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @Field(() => Number)
   revision!: number;
 
@@ -108,6 +116,7 @@ class InstructionCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -28,17 +28,6 @@ class SalesOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  accountId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   createdAt?: SortOrder;
 
   @ApiProperty({
@@ -61,7 +50,29 @@ class SalesOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  customer?: SortOrder;
+  customerId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  customerCode?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  erpId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -94,7 +105,7 @@ class SalesOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  itemId?: SortOrder;
+  lineItems?: SortOrder;
 
   @ApiProperty({
     required: false,
