@@ -60,9 +60,13 @@ async function main() {
     AppModule,
     getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
   );
-
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+    bufferLogs: true
+  });
 
   app.useGlobalInterceptors(new NewrelicInterceptor());
+  app.useLogger(app.get(Logger));
 
   app.setGlobalPrefix("api");
   app.useGlobalPipes(
