@@ -22,3 +22,6 @@ prisma/migrations/*
 !.env.vault
 
 newrelic.js
+
+nr-security-home/*
+newrelic_agent.log
