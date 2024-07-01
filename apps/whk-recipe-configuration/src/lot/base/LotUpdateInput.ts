@@ -16,6 +16,7 @@ import {
   ValidateNested,
   IsOptional,
   IsString,
+  MaxLength,
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -44,6 +45,7 @@ class LotUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -55,6 +57,7 @@ class LotUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -78,6 +81,7 @@ class LotUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -112,6 +116,7 @@ class LotUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -159,6 +164,7 @@ class LotUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

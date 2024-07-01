@@ -61,6 +61,17 @@ class ItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  erpId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   globalId?: SortOrder;
 
   @ApiProperty({
@@ -183,6 +194,17 @@ class ItemOrderByInput {
     nullable: true,
   })
   updatedBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  vendorId?: SortOrder;
 }
 
 export { ItemOrderByInput as ItemOrderByInput };

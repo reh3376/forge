@@ -240,19 +240,25 @@ model Bom {
   bomItem               BomItem[]
   bomName               String
   bomRevision           Int?              @default(0)
+  bomType               String?
   className             String?
   createdAt             DateTime          @default(now())
   createdBy             String
   editedAt              DateTime          @updatedAt
   editedBy              String?
+  effectiveEndDate      DateTime?
+  effectiveStartDate    DateTime?         @default(now())
+  erpId                 String?           @unique
   globalId              String?           @unique @default(cuid())
   id                    String            @id @default(cuid())
+  inactive              Boolean?          @default(false)
+  item                  Item              @relation(fields: [itemId], references: [id])
+  itemId                String
+  notes                 String?
   productionOrder       ProductionOrder[]
   schemaVersion         String?           @default("0001-alpha")
   unitProcedure         UnitProcedure[]   @relation(name: "BomsOnUnitProcedure")
   unitProceduresPrimary UnitProcedure[]   @relation(name: "primaryBom")
-  wipItem               Item              @relation(fields: [wipItemId], references: [id])
-  wipItemId             String
 }
 
 model ScheduleOrderQueue {
@@ -385,29 +391,33 @@ model ScheduleOrder {
 }
 
 model Item {
-  active                        Boolean?                       @default(false)
+  active                        Boolean?                       @default(true)
   bomItems                      BomItem[]
   bomsWipItem                   Bom[]
   createdAt                     DateTime                       @default(now())
   createdBy                     String
+  erpId                         String                         @unique
   globalId                      String?                        @unique @default(cuid())
   id                            String                         @id @default(cuid())
-  itemClass                     EnumItemItemClass
+  itemClass                     String?
   itemDescription               String?
   itemGroup                     ItemGroup?                     @relation(fields: [itemGroupId], references: [id])
   itemGroupId                   String?
   itemName                      String
   itemNumber                    String
   itemReceipts                  ItemReceipt[]
-  itemRevision                  String
+  itemRevision                  Int?                           @default(0)
   itemType                      String
   lots                          Lot[]
   productionOrders              ProductionOrder[]
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   purchaseOrders                PurchaseOrder[]
+  salesOrders                   SalesOrder[]
   schemaVersion                 String?
   updatedAt                     DateTime                       @updatedAt
   updatedBy                     String?
+  vendor                        Vendor?                        @relation(fields: [vendorId], references: [id])
+  vendorId                      String?
 }
 
 model ItemGroup {
@@ -420,47 +430,42 @@ model ItemGroup {
   updatedAt   DateTime @updatedAt
 }
 
-model Account {
-  address        String
-  createdAt      DateTime        @default(now())
-  createdBy      String
-  customerCode   String?
-  description    String?
-  editedBy       String?
-  email          String?
-  globalId       String?         @unique @default(cuid())
-  id             String          @id @default(cuid())
-  name           String
-  purchaseOrders PurchaseOrder[]
-  revision       Int             @default(0)
-  salesOrders    SalesOrder[]
-  schemaVersion  String?         @default("0001-alpha")
-  updatedAt      DateTime        @updatedAt
+model Customer {
+  address       String
+  createdAt     DateTime     @default(now())
+  createdBy     String
+  customerCode  String?
+  description   String?
+  editedBy      String?
+  email         String?
+  globalId      String?      @unique @default(cuid())
+  id            String       @id @default(cuid())
+  name          String
+  phone         String?
+  revision      Int          @default(0)
+  salesOrders   SalesOrder[]
+  schemaVersion String?      @default("0001-alpha")
+  updatedAt     DateTime     @updatedAt
 
   @@unique([revision, name])
 }
 
 model PurchaseOrder {
   acceptedLots                Lot[]
-  account                     Account                         @relation(fields: [accountId], references: [id])
-  accountId                   String
   asset                       Asset?                          @relation(fields: [assetId], references: [id])
   assetId                     String?
   className                   String?
   complete                    Boolean?                        @default(false)
   createdAt                   DateTime?                       @default(now())
   createdBy                   String
-  editedAt                    DateTime?                       @updatedAt
-  editedBy                    String?
-  globalId                    String?                         @unique @default(cuid())
+  erpId                       String                          @unique
+  globalId                    String                          @unique @default(cuid())
   id                          String                          @id @default(cuid())
-  item                        Item                            @relation(fields: [itemId], references: [id])
-  itemId                      String
+  item                        Item[]
   itemReceipts                ItemReceipt[]
+  lineItems                   Json?
   lotsRejected                PurchaseOrder[]                 @relation(name: "lotsRejected")
   name                        String
-  orderQuantity               Int
-  purchaseOrderGroup          String
   purchaseOrderReceiptDate    DateTime?
   purchaseOrderReceived       Boolean?                        @default(false)
   purchaseOrderRejectedLots   PurchaseOrder?                  @relation(name: "lotsRejected", fields: [purchaseOrderRejectedLotsId], references: [id])
@@ -470,20 +475,25 @@ model PurchaseOrder {
   receivedQuantity            Int?
   revision                    Int?                            @default(0)
   schemaVersion               String?
-  units                       String
+  totalOrderQuantity          Int
+  transactionGroup            String?
+  updatedAt                   DateTime?                       @updatedAt
+  updatedBy                   String?
 
-  @@unique([name, revision, accountId])
+  @@unique([name, revision])
 }
 
 model SalesOrder {
-  account          Account?         @relation(fields: [accountId], references: [id])
-  accountId        String?
   createdAt        DateTime         @default(now())
   createdBy        String
-  customer         String
-  globalId         String?          @unique @default(cuid())
+  customer         Customer?        @relation(fields: [customerId], references: [id])
+  customerId       String?
+  customerCode     String
+  erpId            String?          @unique
+  globalId         String           @unique @default(cuid())
   id               String           @id @default(cuid())
-  itemId           String
+  item             Item[]
+  lineItems        Json?
   orderType        String
   productionOrders ProductionOrder?
   quantity         Int
@@ -542,11 +552,11 @@ model ItemReceipt {
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   quantity        Decimal
-  receiptAccepted Boolean?               @default(false)
   schemaVersion   String?                @default("0001-b")
   status          EnumItemReceiptStatus? @default(InProgress)
   supplierLot     String?
   tests           TestParameter[]
+  testsPassed     Boolean?               @default(false)
   units           String
   updatedAt       DateTime               @updatedAt
   updatedBy       String?
@@ -728,6 +738,21 @@ model Batch {
   updatedAt               DateTime                @updatedAt
 }
 
+model Vendor {
+  active             Boolean? @default(true)
+  additionalDetails  Json?
+  contactInformation Json?
+  createdAt          DateTime @default(now())
+  createdBy          String
+  erpId              String?  @unique
+  globalId           String?  @unique @default(cuid())
+  id                 String   @id @default(cuid())
+  items              Item[]
+  name               String?
+  updatedAt          DateTime @updatedAt
+  updatedBy          String?
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
@@ -854,15 +879,6 @@ enum EnumScheduleOrderStatus {
   Scheduled
   InProgress
   Complete
-}
-
-enum EnumItemItemClass {
-  Inventory
-  Assembly
-  LotNumberedAssembly
-  SerializedAssembly
-  LotNumberedInventory
-  SerializedInventory
 }
 
 enum EnumPurchaseOrderReceiptStatus {

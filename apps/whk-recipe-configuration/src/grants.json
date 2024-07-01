@@ -2551,151 +2551,151 @@
   },
   {
     "role": "admin",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "manager",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "operator",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "supervisor",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:own",
     "attributes": "*"
   },
   {
     "role": "admin",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "manager",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "operator",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "supervisor",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "create:any",
     "attributes": "*"
   },
   {
     "role": "admin",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "manager",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "operator",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "supervisor",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "update:any",
     "attributes": "*"
   },
   {
     "role": "admin",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "manager",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "operator",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "supervisor",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "delete:any",
     "attributes": "*"
   },
   {
     "role": "admin",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "manager",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "operator",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "supervisor",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "user",
-    "resource": "Account",
+    "resource": "Customer",
     "action": "read:any",
     "attributes": "*"
   },
@@ -4796,6 +4796,156 @@
   {
     "role": "user",
     "resource": "Batch",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Vendor",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Vendor",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Vendor",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Vendor",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Vendor",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Vendor",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Vendor",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Vendor",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Vendor",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Vendor",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Vendor",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Vendor",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Vendor",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Vendor",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Vendor",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Vendor",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Vendor",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Vendor",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Vendor",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Vendor",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "Vendor",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "Vendor",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "Vendor",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "Vendor",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "Vendor",
     "action": "read:any",
     "attributes": "*"
   }

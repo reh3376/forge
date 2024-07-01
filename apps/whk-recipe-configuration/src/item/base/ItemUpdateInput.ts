@@ -16,18 +16,21 @@ import {
   IsOptional,
   ValidateNested,
   IsString,
-  IsEnum,
+  MaxLength,
+  IsInt,
+  Max,
 } from "class-validator";
 import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
-import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
 import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
+import { SalesOrderUpdateManyWithoutItemsInput } from "./SalesOrderUpdateManyWithoutItemsInput";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class ItemUpdateInput {
@@ -71,6 +74,7 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -82,6 +86,19 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -90,26 +107,22 @@ class ItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumItemItemClass,
+    type: String,
   })
-  @IsEnum(EnumItemItemClass)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => EnumItemItemClass, {
+  @Field(() => String, {
     nullable: true,
   })
-  itemClass?:
-    | "Inventory"
-    | "Assembly"
-    | "LotNumberedAssembly"
-    | "SerializedAssembly"
-    | "LotNumberedInventory"
-    | "SerializedInventory";
+  itemClass?: string | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -133,6 +146,7 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -144,6 +158,7 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -164,20 +179,22 @@ class ItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
+  @IsInt()
+  @Max(9999)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Number, {
     nullable: true,
   })
-  itemRevision?: string;
+  itemRevision?: number | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -234,9 +251,22 @@ class ItemUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => SalesOrderUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => SalesOrderUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -248,11 +278,24 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput | null;
 }
 
 export { ItemUpdateInput as ItemUpdateInput };

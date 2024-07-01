@@ -15,6 +15,7 @@ import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
   ValidateNested,
   IsString,
+  MaxLength,
   IsBoolean,
   IsOptional,
   IsDate,
@@ -48,6 +49,7 @@ class ProductionOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   className!: string;
 
@@ -67,6 +69,7 @@ class ProductionOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -75,6 +78,7 @@ class ProductionOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -126,6 +130,7 @@ class ProductionOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -245,6 +250,7 @@ class ProductionOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

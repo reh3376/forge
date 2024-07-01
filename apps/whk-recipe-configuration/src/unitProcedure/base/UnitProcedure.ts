@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsDate,
   IsString,
+  MaxLength,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
@@ -73,6 +77,7 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -81,6 +86,7 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -92,6 +98,7 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -155,6 +162,7 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -201,6 +209,7 @@ class UnitProcedure {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -221,6 +230,7 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -240,6 +250,7 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

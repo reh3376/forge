@@ -17,7 +17,9 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   IsNumber,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
@@ -60,6 +62,7 @@ class BomItem {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -93,6 +96,7 @@ class BomItem {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   quantity!: Decimal;
 
@@ -101,6 +105,7 @@ class BomItem {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -129,6 +134,7 @@ class BomItem {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

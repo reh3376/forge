@@ -15,8 +15,10 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { Type } from "class-transformer";
@@ -45,6 +47,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -53,6 +56,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -61,6 +65,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   customerId!: string;
 
@@ -69,6 +74,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -80,6 +86,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -91,6 +98,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   itemId!: string;
 
@@ -138,6 +146,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   Recipe!: string;
 
@@ -158,6 +167,7 @@ class RecipeCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -181,6 +191,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -204,6 +215,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

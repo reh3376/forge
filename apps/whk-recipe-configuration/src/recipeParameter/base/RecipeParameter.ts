@@ -15,11 +15,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsDate,
   IsEnum,
   IsNumber,
+  Max,
   IsInt,
 } from "class-validator";
 
@@ -45,6 +47,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -65,6 +68,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   className!: string;
 
@@ -81,6 +85,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -100,6 +105,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -111,6 +117,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -141,6 +148,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   itemId!: string;
 
@@ -149,6 +157,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -169,6 +178,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   recipeParamName!: string;
 
@@ -209,6 +219,7 @@ class RecipeParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -230,6 +241,7 @@ class RecipeParameter {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -241,6 +253,7 @@ class RecipeParameter {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -252,6 +265,7 @@ class RecipeParameter {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

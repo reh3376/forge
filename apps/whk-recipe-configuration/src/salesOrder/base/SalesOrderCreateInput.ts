@@ -11,65 +11,103 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
-import { ValidateNested, IsOptional, IsString, IsInt } from "class-validator";
+import {
+  IsString,
+  MaxLength,
+  ValidateNested,
+  IsOptional,
+  IsInt,
+  Max,
+} from "class-validator";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { Type } from "class-transformer";
+import { ItemCreateNestedManyWithoutSalesOrdersInput } from "./ItemCreateNestedManyWithoutSalesOrdersInput";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @InputType()
 class SalesOrderCreateInput {
   @ApiProperty({
-    required: false,
-    type: () => AccountWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AccountWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AccountWhereUniqueInput, {
-    nullable: true,
-  })
-  account?: AccountWhereUniqueInput | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
   @ApiProperty({
+    required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
-  customer!: string;
+  customerCode!: string;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  erpId?: string | null;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
-  itemId!: string;
+  globalId!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => ItemCreateNestedManyWithoutSalesOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemCreateNestedManyWithoutSalesOrdersInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutSalesOrdersInput, {
+    nullable: true,
+  })
+  item?: ItemCreateNestedManyWithoutSalesOrdersInput;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems?: InputJsonValue;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   orderType!: string;
 
@@ -90,6 +128,7 @@ class SalesOrderCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   quantity!: number;
 
@@ -98,6 +137,7 @@ class SalesOrderCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   revision!: number;
 
@@ -106,6 +146,7 @@ class SalesOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -117,6 +158,7 @@ class SalesOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
