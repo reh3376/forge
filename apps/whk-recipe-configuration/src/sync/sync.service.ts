@@ -1,7 +1,6 @@
 import {Injectable, OnModuleInit, } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {PrismaService} from "../prisma/prisma.service";
-import { AccountCreateInput } from '../account/base/AccountCreateInput';
 import { ItemCreateInput } from '../item/base/ItemCreateInput';
 import { SalesOrderCreateInput } from '../salesOrder/base/SalesOrderCreateInput';
 import { PurchaseOrderCreateInput } from '../purchaseOrder/base/PurchaseOrderCreateInput';
@@ -10,13 +9,14 @@ import { ItemReceiptUpdateInput } from '../itemReceipt/base/ItemReceiptUpdateInp
 import { PurchaseOrderUpdateInput } from '../purchaseOrder/base/PurchaseOrderUpdateInput';
 import { SalesOrderUpdateInput } from '../salesOrder/base/SalesOrderUpdateInput';
 import { ItemUpdateInput } from '../item/base/ItemUpdateInput';
-import { AccountUpdateInput } from '../account/base/AccountUpdateInput';
 import { PinoLogger } from 'nestjs-pino';
 
 import * as path from "path";
 import * as fs from "fs";
 import { Expose, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { CustomerUpdateInput } from '../customer/base/CustomerUpdateInput';
+import { CustomerCreateInput } from 'src/customer/base/CustomerCreateInput';
 
 @Injectable()
 export class SyncService implements OnModuleInit {
@@ -47,7 +47,7 @@ export class SyncService implements OnModuleInit {
             purchaseorder: PurchaseOrderUpdateInput,
             salesorder: SalesOrderUpdateInput,
             item: ItemUpdateInput,
-            customer: AccountUpdateInput,
+            customer: CustomerUpdateInput,
             // vendor: VendorUpdateInput,
         }
 
@@ -56,7 +56,7 @@ export class SyncService implements OnModuleInit {
             purchaseorder: PurchaseOrderCreateInput,
             salesorder: SalesOrderCreateInput,
             item: ItemCreateInput,
-            customer: AccountCreateInput,
+            customer: CustomerCreateInput,
             // vendor: VendorCreateInput,
         }
     }
