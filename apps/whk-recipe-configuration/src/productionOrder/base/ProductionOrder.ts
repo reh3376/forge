@@ -15,6 +15,7 @@ import { Bom } from "../../bom/base/Bom";
 import {
   ValidateNested,
   IsString,
+  MaxLength,
   IsBoolean,
   IsOptional,
   IsDate,
@@ -47,6 +48,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   className!: string;
 
@@ -74,6 +76,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -82,6 +85,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -119,6 +123,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -221,6 +226,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

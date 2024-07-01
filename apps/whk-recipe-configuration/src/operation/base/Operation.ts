@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsDate,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
@@ -38,6 +42,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @Field(() => String)
   abbreviation!: string;
 
@@ -87,6 +92,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -95,6 +101,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   description!: string;
 
@@ -103,6 +110,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -150,6 +158,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -189,6 +198,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -218,6 +228,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -229,6 +240,7 @@ class Operation {
     type: Number,
   })
   @IsInt()
+  @Max(999)
   @Field(() => Number)
   procedureSequenceIndex!: number;
 
@@ -237,6 +249,7 @@ class Operation {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -248,6 +261,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

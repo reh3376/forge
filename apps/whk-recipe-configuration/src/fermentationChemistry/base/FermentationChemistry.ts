@@ -15,6 +15,7 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsDate,
 } from "class-validator";
@@ -46,6 +47,7 @@ class FermentationChemistry {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -28,17 +28,6 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  accountId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   assetId?: SortOrder;
 
   @ApiProperty({
@@ -94,18 +83,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  editedAt?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  editedBy?: SortOrder;
+  erpId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +116,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  itemId?: SortOrder;
+  lineItems?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -150,28 +128,6 @@ class PurchaseOrderOrderByInput {
     nullable: true,
   })
   name?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  orderQuantity?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  purchaseOrderGroup?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -259,7 +215,40 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  units?: SortOrder;
+  totalOrderQuantity?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  transactionGroup?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  updatedAt?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  updatedBy?: SortOrder;
 }
 
 export { PurchaseOrderOrderByInput as PurchaseOrderOrderByInput };

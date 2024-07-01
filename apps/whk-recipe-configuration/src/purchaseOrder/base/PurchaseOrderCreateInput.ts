@@ -12,20 +12,26 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { LotCreateNestedManyWithoutPurchaseOrdersInput } from "./LotCreateNestedManyWithoutPurchaseOrdersInput";
+
 import {
   ValidateNested,
   IsOptional,
   IsString,
+  MaxLength,
   IsBoolean,
-  IsInt,
   IsDate,
   IsEnum,
+  IsInt,
+  Max,
 } from "class-validator";
+
 import { Type } from "class-transformer";
-import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { ItemCreateNestedManyWithoutPurchaseOrdersInput } from "./ItemCreateNestedManyWithoutPurchaseOrdersInput";
 import { ItemReceiptCreateNestedManyWithoutPurchaseOrdersInput } from "./ItemReceiptCreateNestedManyWithoutPurchaseOrdersInput";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 import { PurchaseOrderCreateNestedManyWithoutPurchaseOrdersInput } from "./PurchaseOrderCreateNestedManyWithoutPurchaseOrdersInput";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
 import { TestParameterCreateNestedManyWithoutPurchaseOrdersInput } from "./TestParameterCreateNestedManyWithoutPurchaseOrdersInput";
@@ -46,15 +52,6 @@ class PurchaseOrderCreateInput {
   acceptedLots?: LotCreateNestedManyWithoutPurchaseOrdersInput;
 
   @ApiProperty({
-    required: true,
-    type: () => AccountWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AccountWhereUniqueInput)
-  @Field(() => AccountWhereUniqueInput)
-  account!: AccountWhereUniqueInput;
-
-  @ApiProperty({
     required: false,
     type: () => AssetWhereUniqueInput,
   })
@@ -71,6 +68,7 @@ class PurchaseOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -93,39 +91,39 @@ class PurchaseOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
+  @MaxLength(100)
+  @Field(() => String)
+  erpId!: string;
 
   @ApiProperty({
     required: true,
-    type: () => ItemWhereUniqueInput,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  globalId!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => ItemCreateNestedManyWithoutPurchaseOrdersInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @Field(() => ItemWhereUniqueInput)
-  item!: ItemWhereUniqueInput;
+  @Type(() => ItemCreateNestedManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  item?: ItemCreateNestedManyWithoutPurchaseOrdersInput;
 
   @ApiProperty({
     required: false,
@@ -138,6 +136,16 @@ class PurchaseOrderCreateInput {
     nullable: true,
   })
   itemReceipts?: ItemReceiptCreateNestedManyWithoutPurchaseOrdersInput;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems?: InputJsonValue;
 
   @ApiProperty({
     required: false,
@@ -156,24 +164,9 @@ class PurchaseOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Field(() => Number)
-  orderQuantity!: number;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  purchaseOrderGroup!: string;
 
   @ApiProperty({
     required: false,
@@ -244,6 +237,7 @@ class PurchaseOrderCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -255,6 +249,7 @@ class PurchaseOrderCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -266,6 +261,7 @@ class PurchaseOrderCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -274,11 +270,36 @@ class PurchaseOrderCreateInput {
 
   @ApiProperty({
     required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @Field(() => Number)
+  totalOrderQuantity!: number;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @Field(() => String)
-  units!: string;
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  transactionGroup?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { PurchaseOrderCreateInput as PurchaseOrderCreateInput };

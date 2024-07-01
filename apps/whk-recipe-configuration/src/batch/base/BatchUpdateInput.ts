@@ -12,7 +12,15 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsJSONValue } from "../../validators";
-import { IsOptional, IsString, ValidateNested, IsInt } from "class-validator";
+import {
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateNested,
+  IsInt,
+  Min,
+  Max,
+} from "class-validator";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { BatchUpdateManyWithoutBatchesInput } from "./BatchUpdateManyWithoutBatchesInput";
@@ -38,6 +46,7 @@ class BatchUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -107,6 +116,8 @@ class BatchUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -118,6 +129,7 @@ class BatchUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
