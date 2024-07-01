@@ -16,8 +16,10 @@ import {
   ValidateNested,
   IsOptional,
   IsNumber,
+  Max,
   IsInt,
   IsString,
+  MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
@@ -42,6 +44,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @Field(() => Float)
   backSetPH!: Decimal;
 
@@ -50,6 +53,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -61,6 +65,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(100)
   @Field(() => Float)
   balling!: Decimal;
 
@@ -69,6 +74,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -92,6 +98,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(1000)
   @Field(() => Number)
   fermenterNumber!: number;
 
@@ -100,6 +107,7 @@ class MashDatumCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   loggedBy!: string;
 
@@ -108,6 +116,7 @@ class MashDatumCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   lotId!: string;
 
@@ -116,6 +125,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -127,6 +137,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(14)
   @Field(() => Float)
   pH!: Decimal;
 
@@ -135,6 +146,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -146,6 +158,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   waterVolume!: Decimal;
 
@@ -154,6 +167,7 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,

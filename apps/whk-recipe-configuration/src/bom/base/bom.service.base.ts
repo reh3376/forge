@@ -87,11 +87,11 @@ export class BomServiceBase {
       .unitProceduresPrimary(args);
   }
 
-  async getWipItem(parentId: string): Promise<PrismaItem | null> {
+  async getItem(parentId: string): Promise<PrismaItem | null> {
     return this.prisma.bom
       .findUnique({
         where: { id: parentId },
       })
-      .wipItem();
+      .item();
   }
 }

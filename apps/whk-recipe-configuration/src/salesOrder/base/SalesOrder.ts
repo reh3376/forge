@@ -11,28 +11,25 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Account } from "../../account/base/Account";
 import {
-  ValidateNested,
-  IsOptional,
   IsDate,
   IsString,
+  MaxLength,
+  ValidateNested,
+  IsOptional,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { Customer } from "../../customer/base/Customer";
+import { Item } from "../../item/base/Item";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { JsonValue } from "type-fest";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 
 @ObjectType()
 class SalesOrder {
-  @ApiProperty({
-    required: false,
-    type: () => Account,
-  })
-  @ValidateNested()
-  @Type(() => Account)
-  @IsOptional()
-  account?: Account | null;
-
   @ApiProperty({
     required: true,
   })
@@ -46,27 +43,48 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Customer,
+  })
+  @ValidateNested()
+  @Type(() => Customer)
+  @IsOptional()
+  customer?: Customer | null;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
-  customer!: string;
+  customerCode!: string;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId!: string | null;
+  erpId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  globalId!: string;
 
   @ApiProperty({
     required: true,
@@ -78,17 +96,29 @@ class SalesOrder {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => [Item],
   })
-  @IsString()
-  @Field(() => String)
-  itemId!: string;
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Array<Item>;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems!: JsonValue;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   orderType!: string;
 
@@ -106,6 +136,7 @@ class SalesOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   quantity!: number;
 
@@ -114,6 +145,7 @@ class SalesOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @Field(() => Number)
   revision!: number;
 
@@ -122,6 +154,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -141,6 +174,7 @@ class SalesOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

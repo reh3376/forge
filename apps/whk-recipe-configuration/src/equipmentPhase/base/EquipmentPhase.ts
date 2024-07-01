@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsDate,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
@@ -65,6 +69,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -87,6 +92,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -95,6 +101,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -117,6 +124,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -128,6 +136,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -176,6 +185,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -234,6 +244,7 @@ class EquipmentPhase {
     type: Number,
   })
   @IsInt()
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -245,6 +256,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -265,6 +277,7 @@ class EquipmentPhase {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -276,6 +289,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

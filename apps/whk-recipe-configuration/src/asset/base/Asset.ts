@@ -11,14 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsOptional,
   IsDate,
   ValidateNested,
   IsInt,
+  Max,
   IsEnum,
 } from "class-validator";
+
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
@@ -36,6 +40,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   assetPath!: string;
 
@@ -62,6 +67,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -70,6 +76,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   description!: string;
 
@@ -96,6 +103,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -124,6 +132,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   name!: string;
 
@@ -141,6 +150,7 @@ class Asset {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -152,6 +162,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   schemaVersion!: string;
 
@@ -186,6 +197,7 @@ class Asset {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -15,8 +15,10 @@ import {
   IsBoolean,
   IsDate,
   IsString,
+  MaxLength,
   IsOptional,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -43,6 +45,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -62,6 +65,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -73,6 +77,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -103,6 +108,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -114,6 +120,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -125,6 +132,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   testName!: string;
 
@@ -133,6 +141,7 @@ class Test {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,

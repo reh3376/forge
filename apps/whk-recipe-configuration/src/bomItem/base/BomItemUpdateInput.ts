@@ -17,7 +17,9 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   IsNumber,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutBomItemsInput } from "./EquipmentPhaseUpdateManyWithoutBomItemsInput";
@@ -55,6 +57,7 @@ class BomItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -90,6 +93,7 @@ class BomItemUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -101,6 +105,7 @@ class BomItemUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -124,6 +129,7 @@ class BomItemUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

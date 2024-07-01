@@ -17,6 +17,7 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -50,6 +51,7 @@ class Lot {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -61,6 +63,7 @@ class Lot {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -81,6 +84,7 @@ class Lot {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -120,6 +124,7 @@ class Lot {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   lotNumber!: string;
 
@@ -155,6 +160,7 @@ class Lot {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -12,17 +12,22 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BomItem } from "../../bomItem/base/BomItem";
+
 import {
   ValidateNested,
   IsOptional,
   IsString,
+  MaxLength,
   IsInt,
+  Max,
   IsDate,
+  IsBoolean,
 } from "class-validator";
+
 import { Type } from "class-transformer";
+import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Bom {
@@ -40,6 +45,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   bomName!: string;
 
@@ -48,6 +54,7 @@ class Bom {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -59,6 +66,19 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bomType!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -78,6 +98,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -94,6 +115,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -102,9 +124,44 @@ class Bom {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveEndDate!: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveStartDate!: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -121,6 +178,37 @@ class Bom {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  inactive!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes!: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [ProductionOrder],
   })
   @ValidateNested()
@@ -133,6 +221,7 @@ class Bom {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -156,14 +245,6 @@ class Bom {
   @Type(() => UnitProcedure)
   @IsOptional()
   unitProceduresPrimary?: Array<UnitProcedure>;
-
-  @ApiProperty({
-    required: true,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  wipItem?: Item;
 }
 
 export { Bom as Bom };
