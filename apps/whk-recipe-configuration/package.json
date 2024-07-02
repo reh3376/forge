@@ -8,7 +8,7 @@
     "start:dev:debug": "nest start --debug --watch",
     "build": "nest build",
     "test": "jest",
-    "dev:seed": "ts-node scripts/seedDev.ts",
+    "dev:seed": "ts-node scripts/seedDevelopment.ts",
     "prod:seed": "ts-node scripts/seedProduction.ts",
     "db:prod:deploy": "prisma migrate dev --create-only --name",
     "db:prod:usecaution:init": "run-s \"db:dev:migrate-save -- --name 'initial version'\"",
