@@ -12,20 +12,43 @@ export class RabbitMQController {
       private readonly logger: PinoLogger
   ) {}
 
+  private extractDataFromMessage(message: RabbitMQMessage): any {
+    let data;
+
+    if (typeof message === 'string') {
+      data = JSON.parse(message);
+    } else if (Buffer.isBuffer(message)) {
+      data = JSON.parse(message.toString());
+    } else if (typeof message === 'object') {
+      data = message;
+    } else {
+      this.logger.error(`Unsupported message type: ${typeof message}`)
+      throw new Error('Unsupported message type');
+    }
+
+    return data;
+  }
+  
   async processEvent(
       message: RabbitMQMessage,
       context: RmqContext
   ): Promise<void> {
-    const channel = context.getChannelRef();
-    const originalMsg = context.getMessage();
-    try {
-      await this.syncService.upsertEntity(message.recordName, message)
-      this.logger.info(`Processed ${message.recordName} event`)
-      channel.ack(originalMsg);
-    } catch (error) {
-      this.logger.error(`Error handling event: ${error}`);
-      channel.ack(originalMsg);
-    }
+    this.logger.info(`Event Received for record Name ${JSON.stringify(message.data.recordName)}`);
+    // try {
+      const eventType: string = message.data.event_type;
+      if (eventType === 'create') {
+          await this.syncService.upsertEntity(message.data.recordName, message);
+          return;
+      } else if (eventType === 'update') {
+          await this.syncService.upsertEntity(message.data.recordName, message);
+          return;
+      } else if (eventType === 'delete') {
+          await this.syncService.deleteEntity(message.data.recordName, message);
+          return;
+      }
+    // } catch (error) {
+    //   this.logger.error(`Error handling event: ${error}`);
+    // }
   }
 
   @EventPattern("wh.whk01.distillery01.asset")
@@ -111,16 +134,6 @@ export class RabbitMQController {
 
   @EventPattern("wh.whk01.distillery01.recipe")
   async onWhWhk01Distillery01Recipe(
-      @Payload()
-          message: RabbitMQMessage,
-      @Ctx()
-          context: RmqContext
-  ): Promise<void> {
-    await this.processEvent(message, context);
-  }
-
-  @EventPattern("wh.whk01.distillery01.barrel")
-  async onWhWhk01Distillery01Barrel(
       @Payload()
           message: RabbitMQMessage,
       @Ctx()
