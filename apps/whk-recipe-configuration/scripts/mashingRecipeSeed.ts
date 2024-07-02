@@ -4,7 +4,6 @@ import {
   BomItem,
   EnumAssetType,
   EnumEquipmentPhaseName, EnumEquipmentPhaseStepType,
-  EnumItemItemClass,
   EnumOperationName,
   EnumPhaseParameterSetpointType,
   EnumProcedureName, EnumProductionOrderStatus,
@@ -109,11 +108,11 @@ export async function customSeed() {
       const name = faker.company.name();
       const revision = faker.number.int({ min: 0, max: 10 });
       // Ensure uniqueness for combination of revision and name if necessary
-      const address = faker.location.streetAddress();
-      const createdBy = faker.internet.userName();
-      const description = faker.datatype.boolean() ? faker.company.catchPhrase() : undefined;
-      const editedBy = faker.datatype.boolean() ? faker.internet.userName() : undefined;
-      const email = faker.datatype.boolean() ? faker.internet.email() : undefined;
+      const address = '1234 Western Circle';
+      const createdBy = 'pmannion';
+      const description = 'Western Spirits Beverage Company';
+      const editedBy = 'pmannion';
+      const email = 'tim@western.com';
 
       try {
         await client.customer.create({
@@ -143,43 +142,36 @@ export async function customSeed() {
     const procedureNames = Object.values(EnumProcedureName);
 
     try {
-      // Step 1: Seed class definitions
-      for (const name of procedureNames) {
-        const classDefinition = await client.procedure.create({
-          data: {
-            createdBy: faker.internet.userName(),
-            description: faker.lorem.sentences(),
-            name,
-            isClassDefinition: true,
-            revision: 0, // Starting revision for class definitions
+      const classProcedure = await client.procedure.create({
+        data: {
+          name: 'Line1',
+          createdBy: 'pmannion',
+          description: 'WH - WHK01 - Line01',
+          isClassDefinition: true,
+          revision: 0,
+        }
+      })
+      // Use the id to link to the class def
+      const classProcedureId = classProcedure.id;
+      // Create the instances
+      await client.procedure.create({
+        data: {
+          name: 'Line1',
+          classId: {
+            connect: {
+              id: classProcedureId
+            }
           },
-        });
-        classDefinitions.push(classDefinition);
-      }
+          revision: 0,
+          createdBy: 'pmannion',
+          description: 'WH - WHK01 - Line01',
+          isClassDefinition: false,
+        }
+      })
     } catch (error) {
       console.error(error);
     }
-    try {
-      // Step 2: Seed instances for each class definition
-      for (const classDefinition of classDefinitions) {
-        await client.procedure.create({
-          data: {
-            createdBy: faker.internet.userName(),
-            description: faker.lorem.sentences(),
-            name: classDefinition.name,
-            // classId: classDefinition.id,
-            isClassDefinition: false,
-            revision: faker.number.int({min: 1, max: 10}), // Assume instances can have varying revisions
-            // Optionally set active and other fields as necessary
-          },
-        });
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
-    console.log(`Procedures seeded: ${procedureNames.length} class definitions and ${n * procedureNames.length} instances.`);
-  }
+  } 
 
   // Unit Procedure
   async function seedUnitProcedure(): Promise<void> {
@@ -191,45 +183,35 @@ export async function customSeed() {
     }
 
     // Seed class definitions for each UnitProcedure name
-    for (const name of Object.values(EnumUnitProcedureName)) {
-      const procedureId = getRandomArrayElement(procedureIds);
-      try {
-        await client.unitProcedure.create({
-          data: {
-            createdBy: faker.internet.userName(),
-            name: name,
-            isClassDef: true,
-            procedure: {connect: {id: procedureId}},
-            revision: 0, // Initial revision for class definitions
-            // Additional fields as necessary
-          },
-        });
-      } catch (error) {
-        console.error(error);
-      }
+    try{
+      // seed the class definitions
+      const procedureId = (await client.procedure.findMany()).map(procedure => procedure.id)[0];
+      const mash = await client.unitProcedure.create({
+        data: {
+          name: 'Mashing01',
+          createdBy: 'pmannion',
+          description: 'Mashing Procedure',
+          isClassDef: true,
+          revision: 0,
+          procedure: {connect: {id: procedureId}},
+        } 
+      })
 
-      // Seed instances for the class definition
-      const instancesCount = faker.number.int({min: 1, max: 5});
-      for (let i = 0; i < instancesCount; i++) {
-        try {
-          await client.unitProcedure.create({
-            data: {
-              createdBy: faker.internet.userName(),
-              name: name, // Same name as class definition
-              isClassDef: false,
-              // classId: classDefinition.id,
-              procedure: {connect: {id: procedureId}},
-              revision: i + 1, // Incremental revisions for instances
-              // Additional fields as necessary
-            },
-          });
-        } catch (error) {
-          console.error(error);
+      // seed instance
+      await client.unitProcedure.create({
+        data: {
+          name: 'Mashing01',
+          createdBy: 'pmannion',
+          description: 'Mashing Procedure',
+          isClassDef: false,
+          revision: 0,
+          procedure: {connect: {id: procedureId}},
+          classId: {connect: {id: mash.id}},
         }
-      }
+      })
+    } catch (error) {
+      console.error(error);
     }
-
-    console.log("UnitProcedures seeded.");
   }
 
   const unitProcedureOperationsMap: { [key: string]: string[] } = {
@@ -242,58 +224,51 @@ export async function customSeed() {
 
   // operation
   async function seedOperation(): Promise<void> {
-    const unitProcedures = await client.unitProcedure.findMany();
+    const unitProcedures = await client.unitProcedure.findMany(
+      {
+        where: {
+          name: {
+            equals: 'Mashing01'
+          }
+        }
+      }
+    );
 
     if (unitProcedures.length === 0) {
       console.warn("No UnitProcedures found. Please seed UnitProcedures first.");
       return;
     }
 
-    // Seed class definitions for each Operation name
-    for (const name of Object.values(EnumOperationName)) {
-      // use the name (which is a value in the mapping) to get the key that matches from unitProcedureOperationsMap
-      const unitProcedureName = Object.keys(unitProcedureOperationsMap).find(key => unitProcedureOperationsMap[key].includes(name));
-      const unitProcedure = unitProcedures.find(up => up.name === unitProcedureName) as UnitProcedure;
-      // const unitProcedure = getRandomArrayElement(unitProcedures) as any;
-      try {
-        const classDefinition = await client.operation.create({
-          data: {
-            createdBy: faker.internet.userName(),
-            description: faker.commerce.productDescription(),
-            name,
-            abbreviation: faker.lorem.word(),
-            path: `/${faker.helpers.slugify(name)}`,
-            isClassDefinition: true,
-            unitProcedure: {connect: {id: unitProcedure.id}},
-            // Additional fields as necessary
-          },
-        });
-
-        // Seed a few instances for the class definition
-        const instancesCount = faker.number.int({ min: 1, max: 5 });
-        for (let i = 0; i < instancesCount; i++) {
-          await client.operation.create({
-            data: {
-              createdBy: faker.internet.userName(),
-              description: `${classDefinition.description} - instance ${i + 1}`,
-              name, // Same name as class definition
-              path: classDefinition.path + `/instance-${i + 1}`,
-              isClassDefinition: false,
-              abbreviation: faker.lorem.word(),
-              // classId: classDefinition.id,
-              unitProcedure: { connect: { id: unitProcedure.id } },
-              revision: i + 1, // Incremental revisions for instances
-              // Additional fields as necessary
-            },
-          });
-        }
-      } catch (error) {
-        console.error(error);
+    // Seed class definitions for mashing
+    const cookDef = await client.operation.create({
+      data: {
+        name: 'Cook',
+        createdBy: 'pmannion',
+        description: 'Cooking Procedure',
+        isClassDefinition: true,
+        revision: 0,
+        abbreviation: 'MAS',
+        path: 'WH/WHK01/Distillery01/Mashing01/Cook',
       }
-    }
+    })
 
-    console.log("Operations seeded successfully.");
+    // seed instance for number of cooks per mash
+    for (let i = 0; i < 10; i++) {
+      await client.operation.create({
+        data: {
+        name: 'Cook',
+        createdBy: 'pmannion',
+        description: 'Cooking Procedure',
+        isClassDefinition: false,
+        revision: 0,
+        classId: {connect: {id: cookDef.id}},
+        abbreviation: 'MAS',
+        path: 'WH/WHK01/Distillery01/Mashing01/Cook',
+      }
+    })
   }
+
+  
 
   // Test Parameter Handling
   async function seedTestParameterClasses(n: number=10): Promise<string[]> {

@@ -66,7 +66,7 @@ async function main() {
   // });
 
   app.useGlobalInterceptors(new NewrelicInterceptor());
-  app.useLogger(app.get(Logger));
+  // app.useLogger(app.get(Logger));
 
   app.setGlobalPrefix("api");
   app.useGlobalPipes(
