@@ -29,6 +29,9 @@ import { ScheduleOrderUpdateInput } from "./ScheduleOrderUpdateInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -522,6 +525,121 @@ export class ScheduleOrderControllerBase {
   ): Promise<void> {
     const data = {
       productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/scheduleOrderQueues")
+  @ApiNestedQuery(ScheduleOrderQueueFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrderQueues(
+    @common.Req() request: Request,
+    @common.Param() params: ScheduleOrderWhereUniqueInput
+  ): Promise<ScheduleOrderQueue[]> {
+    const query = plainToClass(ScheduleOrderQueueFindManyArgs, request.query);
+    const results = await this.service.findScheduleOrderQueues(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+
+        nextUnitProcedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        nextUnitProcedureName: true,
+        queueIndex: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/scheduleOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectScheduleOrderQueues(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
+        connect: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/scheduleOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateScheduleOrderQueues(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
+        set: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/scheduleOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectScheduleOrderQueues(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
         disconnect: body,
       },
     };
