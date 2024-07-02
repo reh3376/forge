@@ -185,8 +185,6 @@ model Operation {
   unitProcedure           UnitProcedure?             @relation(fields: [unitProcedureId], references: [id])
   unitProcedureId         String?
   updatedAt               DateTime?                  @updatedAt
-
-  @@unique([name, revision, active, isClassDefinition])
 }
 
 model Procedure {
@@ -262,16 +260,18 @@ model Bom {
 }
 
 model ScheduleOrderQueue {
-  createdAt             DateTime      @default(now())
+  createdAt             DateTime       @default(now())
   createdBy             String
-  globalId              String?       @unique @default(cuid())
-  id                    String        @id @default(cuid())
-  nextUnitProcedure     UnitProcedure @relation(fields: [nextUnitProcedureId], references: [id])
-  nextUnitProcedureId   String        @unique
+  globalId              String?        @unique @default(cuid())
+  id                    String         @id @default(cuid())
+  nextUnitProcedure     UnitProcedure  @relation(fields: [nextUnitProcedureId], references: [id])
+  nextUnitProcedureId   String         @unique
   nextUnitProcedureName String
   queueIndex            Int?
-  schemaVersion         String?       @default("0001-b")
-  updatedAt             DateTime      @updatedAt
+  scheduleOrder         ScheduleOrder? @relation(fields: [scheduleOrderId], references: [id])
+  scheduleOrderId       String?
+  schemaVersion         String?        @default("0001-b")
+  updatedAt             DateTime       @updatedAt
   updatedBy             String?
 
   @@unique([queueIndex, nextUnitProcedureId])
@@ -381,6 +381,7 @@ model ScheduleOrder {
   recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                String
   recipeName                   String
+  scheduleOrderQueues          ScheduleOrderQueue[]
   scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
   scheduleOrderRecipeId        String?
   status                       EnumScheduleOrderStatus? @default(Created)

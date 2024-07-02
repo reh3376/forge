@@ -21,6 +21,7 @@ import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
@@ -236,6 +237,18 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   recipeName?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueListRelationFilter)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueListRelationFilter, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,
