@@ -38,7 +38,7 @@ export class SyncService implements OnModuleInit {
             itemreceipt: this.prisma.itemReceipt,
             purchaseorder: this.prisma.purchaseOrder,
             salesorder: this.prisma.salesOrder,
-            customer: this.prisma.account,
+            customer: this.prisma.customer,
             // vendor: this.prisma.vendor,
         };
 
