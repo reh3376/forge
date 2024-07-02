@@ -31,6 +31,7 @@ import { JsonValue } from "type-fest";
 import { Decimal } from "decimal.js";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { Recipe } from "../../recipe/base/Recipe";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
@@ -246,6 +247,15 @@ class ScheduleOrder {
   @MaxLength(16)
   @Field(() => String)
   recipeName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ScheduleOrderQueue],
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueue)
+  @IsOptional()
+  scheduleOrderQueues?: Array<ScheduleOrderQueue>;
 
   @ApiProperty({
     required: false,

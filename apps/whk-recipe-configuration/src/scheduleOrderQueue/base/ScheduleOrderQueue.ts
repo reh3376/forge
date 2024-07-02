@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class ScheduleOrderQueue {
@@ -90,6 +91,15 @@ class ScheduleOrderQueue {
     nullable: true,
   })
   queueIndex!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrder,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrder?: ScheduleOrder | null;
 
   @ApiProperty({
     required: false,
