@@ -31,6 +31,7 @@ import { InputJsonValue } from "../../types";
 import { Decimal } from "decimal.js";
 import { ProductionOrderUpdateManyWithoutScheduleOrdersInput } from "./ProductionOrderUpdateManyWithoutScheduleOrdersInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput } from "./ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
@@ -243,6 +244,18 @@ class ScheduleOrderUpdateInput {
     nullable: true,
   })
   recipeName?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput;
 
   @ApiProperty({
     required: false,
