@@ -28,6 +28,8 @@ import { UpdateScheduleOrderArgs } from "./UpdateScheduleOrderArgs";
 import { DeleteScheduleOrderArgs } from "./DeleteScheduleOrderArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { Recipe } from "../../recipe/base/Recipe";
 import { ScheduleOrderService } from "../scheduleOrder.service";
@@ -182,6 +184,28 @@ export class ScheduleOrderResolverBase {
     @graphql.Args() args: ProductionOrderFindManyArgs
   ): Promise<ProductionOrder[]> {
     const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ScheduleOrderQueue], {
+    name: "scheduleOrderQueues",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrderQueues(
+    @graphql.Parent() parent: ScheduleOrder,
+    @graphql.Args() args: ScheduleOrderQueueFindManyArgs
+  ): Promise<ScheduleOrderQueue[]> {
+    const results = await this.service.findScheduleOrderQueues(parent.id, args);
 
     if (!results) {
       return [];
