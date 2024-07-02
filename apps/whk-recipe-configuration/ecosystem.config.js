@@ -26,7 +26,7 @@ module.exports = {
       // repo: 'https://pmannion2:@github.com/WhiskeyHouse/whk-mes.git',
       path: '/usr/local/src/repos/whk-mes-backend',
       'post-deploy':
-        'cd apps/whk-recipe-configuration npm install && npm run build && pm2 reload ecosystem.config.js --env production',
+        'cd apps/whk-recipe-configuration && npm install && npm run build && pm2 reload ecosystem.config.js --env production',
       key: '~/.ssh/id_ed25519', // Specify the SSH key to use
     },
   },
