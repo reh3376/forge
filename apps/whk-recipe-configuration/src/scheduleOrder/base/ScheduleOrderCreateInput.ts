@@ -31,6 +31,7 @@ import { InputJsonValue } from "../../types";
 import { Decimal } from "decimal.js";
 import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput } from "./ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
@@ -234,6 +235,18 @@ class ScheduleOrderCreateInput {
   @MaxLength(16)
   @Field(() => String)
   recipeName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput;
 
   @ApiProperty({
     required: false,
