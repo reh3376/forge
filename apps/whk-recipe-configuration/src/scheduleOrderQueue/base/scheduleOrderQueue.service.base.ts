@@ -15,6 +15,7 @@ import {
   Prisma,
   ScheduleOrderQueue as PrismaScheduleOrderQueue,
   UnitProcedure as PrismaUnitProcedure,
+  ScheduleOrder as PrismaScheduleOrder,
 } from "@prisma/client";
 
 export class ScheduleOrderQueueServiceBase {
@@ -60,5 +61,15 @@ export class ScheduleOrderQueueServiceBase {
         where: { id: parentId },
       })
       .nextUnitProcedure();
+  }
+
+  async getScheduleOrder(
+    parentId: string
+  ): Promise<PrismaScheduleOrder | null> {
+    return this.prisma.scheduleOrderQueue
+      .findUnique({
+        where: { id: parentId },
+      })
+      .scheduleOrder();
   }
 }

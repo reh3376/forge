@@ -28,7 +28,7 @@ export class RabbitMQController {
 
     return data;
   }
-
+  
   async processEvent(
       message: RabbitMQMessage,
       context: RmqContext
