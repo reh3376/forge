@@ -8,6 +8,8 @@ import { OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./filters/HttpExceptions.filter";
 import { AppModule } from "./app.module";
 import { connectMicroservices } from "./connectMicroservices";
+import { NewrelicInterceptor } from './newrelic.interceptor';
+
 import {
   swaggerPath,
   swaggerDocumentOptions,
@@ -58,6 +60,9 @@ async function main() {
     AppModule,
     getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
   );
+
+
+  app.useGlobalInterceptors(new NewrelicInterceptor());
 
   app.setGlobalPrefix("api");
   app.useGlobalPipes(
