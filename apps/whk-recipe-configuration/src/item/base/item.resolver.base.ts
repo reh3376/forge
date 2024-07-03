@@ -42,7 +42,6 @@ import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrde
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
-import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -107,12 +106,6 @@ export class ItemResolverBase {
       data: {
         ...args.data,
 
-        itemGroup: args.data.itemGroup
-          ? {
-              connect: args.data.itemGroup,
-            }
-          : undefined,
-
         vendor: args.data.vendor
           ? {
               connect: args.data.vendor,
@@ -135,12 +128,6 @@ export class ItemResolverBase {
         ...args,
         data: {
           ...args.data,
-
-          itemGroup: args.data.itemGroup
-            ? {
-                connect: args.data.itemGroup,
-              }
-            : undefined,
 
           vendor: args.data.vendor
             ? {
@@ -341,27 +328,6 @@ export class ItemResolverBase {
     }
 
     return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ItemGroup, {
-    nullable: true,
-    name: "itemGroup",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
-    action: "read",
-    possession: "any",
-  })
-  async getItemGroup(
-    @graphql.Parent() parent: Item
-  ): Promise<ItemGroup | null> {
-    const result = await this.service.getItemGroup(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
