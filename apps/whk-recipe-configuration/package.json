@@ -11,6 +11,7 @@
     "dev:seed": "ts-node scripts/seedDev.ts",
     "dev:seed": "ts-node scripts/seedDevelopment.ts",
     "prod:seed": "ts-node scripts/seedProduction.ts",
+    "prod:seed:mash": "ts-node scripts/mashingRecipeSeed.ts",
     "db:prod:deploy": "prisma migrate dev --create-only --name",
     "db:prod:usecaution:init": "run-s \"db:dev:migrate-save -- --name 'initial version'\"",
     "db:dev:init": "run-s \"db:dev:migrate-save -- --name 'initial version'\" db:dev:migrate-up dev:seed",
@@ -105,6 +106,8 @@
     "moduleNameMapper": {
       "@app/custom-validators": "<rootDir>/src/validators"
     },
-    "modulePathIgnorePatterns": ["<rootDir>/dist/"]
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
   }
 }
