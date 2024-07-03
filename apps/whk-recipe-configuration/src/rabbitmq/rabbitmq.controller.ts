@@ -72,16 +72,6 @@ export class RabbitMQController {
     await this.processEvent(message, context);
   }
 
-  @EventPattern("wh.whk01.distillery01.itemgroup")
-  async onWhWhk01Distillery01ItemGroup(
-      @Payload()
-          message: RabbitMQMessage,
-      @Ctx()
-          context: RmqContext
-  ): Promise<void> {
-    await this.processEvent(message, context);
-  }
-
   @EventPattern("wh.whk01.distillery01.purchaseorder")
   async onWhWhk01Distillery01Purchaseorder(
       @Payload()
