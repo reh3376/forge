@@ -16,6 +16,7 @@ import {
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
 } from "class-validator";
 import { BomItemCreateNestedManyWithoutUnitsInput } from "./BomItemCreateNestedManyWithoutUnitsInput";
 import { Type } from "class-transformer";
@@ -50,6 +51,7 @@ class UnitCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -61,6 +63,7 @@ class UnitCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -72,6 +75,7 @@ class UnitCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

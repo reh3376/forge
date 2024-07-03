@@ -11,17 +11,41 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested } from "class-validator";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
+import {
+  ValidateNested,
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsBoolean,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class LotCreateInput {
+  @ApiProperty({
+    required: true,
+    type: () => BatchCreateNestedManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutLotsInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutLotsInput;
+
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -33,6 +57,7 @@ class LotCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -41,9 +66,22 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -51,12 +89,48 @@ class LotCreateInput {
   globalId?: string | null;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isRawMaterial?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   lotNumber!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -72,9 +146,22 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  recipe?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

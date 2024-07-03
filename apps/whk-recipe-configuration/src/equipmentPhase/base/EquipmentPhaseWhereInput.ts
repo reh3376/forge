@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
@@ -24,6 +25,7 @@ import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { PhaseParameterListRelationFilter } from "../../phaseParameter/base/PhaseParameterListRelationFilter";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 
 @InputType()
@@ -38,6 +40,18 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => BomItemListRelationFilter, {
+    nullable: true,
+  })
+  bomItem?: BomItemListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -176,6 +190,17 @@ class EquipmentPhaseWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  message?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     enum: EnumEquipmentPhaseName,
   })
   @IsEnum(EnumEquipmentPhaseName)
@@ -184,7 +209,6 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   name?:
-    | "PreSteam"
     | "Steam"
     | "Hold"
     | "BacksetAdd"
@@ -210,7 +234,10 @@ class EquipmentPhaseWhereInput {
     | "StillStartup"
     | "StillShutdown"
     | "Cut"
-    | "Gauge";
+    | "Gauge"
+    | "GrainAdd"
+    | "LiquidAdd"
+    | "Prompt";
 
   @ApiProperty({
     required: false,
@@ -279,6 +306,35 @@ class EquipmentPhaseWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumEquipmentPhaseStepType,
+  })
+  @IsEnum(EnumEquipmentPhaseStepType)
+  @IsOptional()
+  @Field(() => EnumEquipmentPhaseStepType, {
+    nullable: true,
+  })
+  stepType?:
+    | "Water"
+    | "Backset"
+    | "Corn"
+    | "Rye"
+    | "Wheat"
+    | "Malt"
+    | "Premalt"
+    | "Speciality"
+    | "Enzyme"
+    | "Nutrient"
+    | "Yeast"
+    | "Citric"
+    | "Hold"
+    | "Cool"
+    | "NotRequired"
+    | "Heat"
+    | "Vessel"
+    | "Pipe";
 
   @ApiProperty({
     required: false,

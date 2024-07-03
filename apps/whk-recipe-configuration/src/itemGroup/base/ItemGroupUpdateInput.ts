@@ -11,9 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested } from "class-validator";
-import { ItemUpdateManyWithoutItemGroupsInput } from "./ItemUpdateManyWithoutItemGroupsInput";
-import { Type } from "class-transformer";
+import { IsString, MaxLength, IsOptional } from "class-validator";
 
 @InputType()
 class ItemGroupUpdateInput {
@@ -22,6 +20,7 @@ class ItemGroupUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -33,6 +32,7 @@ class ItemGroupUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -41,21 +41,10 @@ class ItemGroupUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemUpdateManyWithoutItemGroupsInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemUpdateManyWithoutItemGroupsInput)
-  @IsOptional()
-  @Field(() => ItemUpdateManyWithoutItemGroupsInput, {
-    nullable: true,
-  })
-  items?: ItemUpdateManyWithoutItemGroupsInput;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -4,7 +4,7 @@ import { OperationServiceBase } from "./base/operation.service.base";
 import {Operation, Prisma} from "@prisma/client";
 import {PinoLogger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 
 @Injectable()
 export class OperationService extends OperationServiceBase {
@@ -42,13 +42,17 @@ export class OperationService extends OperationServiceBase {
       'Cooldown',
       'HotFlush',
       'CIP',
+      'GrainAdd',
+      'LiquidAdd',
     ],
     FermenterSet: [
       'DropToMashCooler',
       'Fill',
+      'Prompt'
     ],
     Fermenter: [
       'Run',
+
     ],
     Clean: [
       'FermenterSteam',
@@ -99,7 +103,7 @@ export class OperationService extends OperationServiceBase {
     // If EquipmentPhases are acceptable, proceed with the creation
     const operationData = await super.createOperation(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Operation, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Operation, {
       recordName: 'Operation',
       event_type: 'create',
       data: operationData
@@ -149,7 +153,7 @@ export class OperationService extends OperationServiceBase {
 
     const operationData = await super.updateOperation(args);
 
-    await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Operation, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Operation, {
         recordName: 'Operation',
         event_type: 'update',
         data: operationData
@@ -162,7 +166,7 @@ export class OperationService extends OperationServiceBase {
         args: Prisma.SelectSubset<T, Prisma.OperationDeleteArgs>
     ): Promise<Operation> {
         const operation = await super.deleteOperation(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Operation, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Operation, {
           recordName: 'Operation',
           event_type: 'delete',
           data: operation

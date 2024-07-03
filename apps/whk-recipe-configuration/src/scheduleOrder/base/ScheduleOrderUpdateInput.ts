@@ -9,22 +9,29 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field } from "@nestjs/graphql";
+import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
-  IsString,
+  IsDate,
   IsOptional,
+  IsString,
+  MaxLength,
+  IsNumber,
+  Max,
   IsInt,
   ValidateNested,
   IsEnum,
 } from "class-validator";
+
+import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { Decimal } from "decimal.js";
 import { ProductionOrderUpdateManyWithoutScheduleOrdersInput } from "./ProductionOrderUpdateManyWithoutScheduleOrdersInput";
-import { Type } from "class-transformer";
-import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput } from "./ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
@@ -32,9 +39,32 @@ import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 class ScheduleOrderUpdateInput {
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualEnd?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualStart?: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -55,7 +85,32 @@ class ScheduleOrderUpdateInput {
     required: false,
     type: Number,
   })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  duration?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  durationUnits?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -64,9 +119,21 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedEnd?: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -78,6 +145,7 @@ class ScheduleOrderUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -89,6 +157,7 @@ class ScheduleOrderUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -97,9 +166,21 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedStart?: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -111,6 +192,7 @@ class ScheduleOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -141,18 +223,6 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionScheduleWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionScheduleWhereUniqueInput, {
-    nullable: true,
-  })
-  productionSchedules?: ProductionScheduleWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: () => RecipeGroupWhereUniqueInput,
   })
   @ValidateNested()
@@ -168,11 +238,24 @@ class ScheduleOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   recipeName?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput;
 
   @ApiProperty({
     required: false,
@@ -202,6 +285,7 @@ class ScheduleOrderUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -213,6 +297,7 @@ class ScheduleOrderUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -224,6 +309,7 @@ class ScheduleOrderUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

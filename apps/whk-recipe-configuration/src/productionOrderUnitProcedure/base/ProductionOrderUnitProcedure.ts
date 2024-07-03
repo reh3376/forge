@@ -17,6 +17,7 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   ValidateNested,
 } from "class-validator";
 import { IsJSONValue } from "../../validators";
@@ -64,6 +65,7 @@ class ProductionOrderUnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -72,6 +74,7 @@ class ProductionOrderUnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -91,6 +94,7 @@ class ProductionOrderUnitProcedure {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   name!: string;
 

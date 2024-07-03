@@ -11,20 +11,26 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsDate,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
+import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
 import { Instruction } from "../../instruction/base/Instruction";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { Operation } from "../../operation/base/Operation";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 
 @ObjectType()
@@ -42,6 +48,15 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
+    type: () => [BomItem],
+  })
+  @ValidateNested()
+  @Type(() => BomItem)
+  @IsOptional()
+  bomItem?: Array<BomItem>;
+
+  @ApiProperty({
+    required: false,
     type: () => EquipmentPhase,
   })
   @ValidateNested()
@@ -54,6 +69,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -76,6 +92,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -84,6 +101,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -106,6 +124,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -117,6 +136,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -161,6 +181,18 @@ class EquipmentPhase {
   isClassDefinition!: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message!: string | null;
+
+  @ApiProperty({
     required: true,
     enum: EnumEquipmentPhaseName,
   })
@@ -169,7 +201,6 @@ class EquipmentPhase {
     nullable: true,
   })
   name?:
-    | "PreSteam"
     | "Steam"
     | "Hold"
     | "BacksetAdd"
@@ -195,7 +226,10 @@ class EquipmentPhase {
     | "StillStartup"
     | "StillShutdown"
     | "Cut"
-    | "Gauge";
+    | "Gauge"
+    | "GrainAdd"
+    | "LiquidAdd"
+    | "Prompt";
 
   @ApiProperty({
     required: true,
@@ -210,6 +244,7 @@ class EquipmentPhase {
     type: Number,
   })
   @IsInt()
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -221,6 +256,7 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -241,6 +277,7 @@ class EquipmentPhase {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -252,11 +289,40 @@ class EquipmentPhase {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumEquipmentPhaseStepType,
+  })
+  @IsEnum(EnumEquipmentPhaseStepType)
+  @Field(() => EnumEquipmentPhaseStepType, {
+    nullable: true,
+  })
+  stepType?:
+    | "Water"
+    | "Backset"
+    | "Corn"
+    | "Rye"
+    | "Wheat"
+    | "Malt"
+    | "Premalt"
+    | "Speciality"
+    | "Enzyme"
+    | "Nutrient"
+    | "Yeast"
+    | "Citric"
+    | "Hold"
+    | "Cool"
+    | "NotRequired"
+    | "Heat"
+    | "Vessel"
+    | "Pipe";
 
   @ApiProperty({
     required: false,

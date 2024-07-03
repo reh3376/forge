@@ -15,10 +15,14 @@ import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
   ValidateNested,
   IsOptional,
+  IsDate,
   IsString,
+  MaxLength,
   IsNumber,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { UnitWhereUniqueInput } from "../../unit/base/UnitWhereUniqueInput";
@@ -38,12 +42,36 @@ class BomItemCreateInput {
   bom?: BomWhereUniqueInput | null;
 
   @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  consumedAt?: Date | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomItemsInput;
 
   @ApiProperty({
     required: true,
@@ -59,6 +87,7 @@ class BomItemCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   quantity!: Decimal;
 
@@ -67,6 +96,7 @@ class BomItemCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -90,6 +120,7 @@ class BomItemCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

@@ -11,10 +11,17 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested, IsInt } from "class-validator";
+import {
+  IsString,
+  MaxLength,
+  IsOptional,
+  ValidateNested,
+  IsInt,
+  Max,
+} from "class-validator";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
-import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderQueueUpdateInput {
@@ -23,6 +30,7 @@ class ScheduleOrderQueueUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -34,6 +42,7 @@ class ScheduleOrderQueueUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -57,6 +66,7 @@ class ScheduleOrderQueueUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -65,21 +75,10 @@ class ScheduleOrderQueueUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionScheduleWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionScheduleWhereUniqueInput, {
-    nullable: true,
-  })
-  productionSchedule?: ProductionScheduleWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -88,9 +87,22 @@ class ScheduleOrderQueueUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ScheduleOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -102,6 +114,7 @@ class ScheduleOrderQueueUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

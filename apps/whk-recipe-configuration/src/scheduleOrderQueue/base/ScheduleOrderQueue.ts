@@ -14,13 +14,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class ScheduleOrderQueue {
@@ -37,6 +39,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -45,6 +48,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -72,23 +76,16 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   nextUnitProcedureName!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionSchedule,
-  })
-  @ValidateNested()
-  @Type(() => ProductionSchedule)
-  @IsOptional()
-  productionSchedule?: ProductionSchedule | null;
 
   @ApiProperty({
     required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -97,9 +94,19 @@ class ScheduleOrderQueue {
 
   @ApiProperty({
     required: false,
+    type: () => ScheduleOrder,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrder?: ScheduleOrder | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -119,6 +126,7 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

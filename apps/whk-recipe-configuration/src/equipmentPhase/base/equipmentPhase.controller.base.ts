@@ -26,6 +26,9 @@ import { EquipmentPhase } from "./EquipmentPhase";
 import { EquipmentPhaseFindManyArgs } from "./EquipmentPhaseFindManyArgs";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateInput } from "./EquipmentPhaseUpdateInput";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
 import { Instruction } from "../../instruction/base/Instruction";
 import { InstructionWhereUniqueInput } from "../../instruction/base/InstructionWhereUniqueInput";
@@ -53,6 +56,9 @@ export class EquipmentPhaseControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: EquipmentPhaseCreateInput,
   })
   async createEquipmentPhase(
     @common.Body() data: EquipmentPhaseCreateInput
@@ -89,6 +95,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -101,6 +108,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
   }
@@ -141,6 +149,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -153,6 +162,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
   }
@@ -192,6 +202,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -204,6 +215,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (result === null) {
@@ -225,6 +237,9 @@ export class EquipmentPhaseControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: EquipmentPhaseUpdateInput,
   })
   async updateEquipmentPhase(
     @common.Param() params: EquipmentPhaseWhereUniqueInput,
@@ -264,6 +279,7 @@ export class EquipmentPhaseControllerBase {
           globalId: true,
           id: true,
           isClassDefinition: true,
+          message: true,
           name: true,
 
           operation: {
@@ -276,6 +292,7 @@ export class EquipmentPhaseControllerBase {
           path: true,
           revision: true,
           schemaVersion: true,
+          stepType: true,
         },
       });
     } catch (error) {
@@ -286,6 +303,126 @@ export class EquipmentPhaseControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomItem")
+  @ApiNestedQuery(BomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItem(
+    @common.Req() request: Request,
+    @common.Param() params: EquipmentPhaseWhereUniqueInput
+  ): Promise<BomItem[]> {
+    const query = plainToClass(BomItemFindManyArgs, request.query);
+    const results = await this.service.findBomItem(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        quantityActual: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomItem(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        connect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomItem(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        set: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomItem")
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomItem(
+    @common.Param() params: EquipmentPhaseWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateEquipmentPhase({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -321,6 +458,7 @@ export class EquipmentPhaseControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -333,6 +471,7 @@ export class EquipmentPhaseControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (results === null) {
@@ -540,13 +679,6 @@ export class EquipmentPhaseControllerBase {
         createdBy: true,
         description: true,
         editedBy: true,
-
-        equipmentPhase: {
-          select: {
-            id: true,
-          },
-        },
-
         globalId: true,
         id: true,
         isClassDef: true,
@@ -667,14 +799,21 @@ export class EquipmentPhaseControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -685,6 +824,8 @@ export class EquipmentPhaseControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

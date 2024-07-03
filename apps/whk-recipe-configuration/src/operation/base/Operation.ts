@@ -11,17 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsDate,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
+import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
@@ -32,6 +42,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @Field(() => String)
   abbreviation!: string;
 
@@ -45,6 +56,16 @@ class Operation {
     nullable: true,
   })
   active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  auxiliaryPhases!: JsonValue;
 
   @ApiProperty({
     required: false,
@@ -71,6 +92,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -79,6 +101,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   description!: string;
 
@@ -87,6 +110,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -104,9 +128,37 @@ class Operation {
 
   @ApiProperty({
     required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationSettingDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatum)
+  @IsOptional()
+  fermentationSettingData?: Array<FermentationSettingDatum>;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -142,6 +194,18 @@ class Operation {
   isClassDefinition!: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId!: string | null;
+
+  @ApiProperty({
     required: true,
     enum: EnumOperationName,
   })
@@ -164,6 +228,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -175,6 +240,7 @@ class Operation {
     type: Number,
   })
   @IsInt()
+  @Max(999)
   @Field(() => Number)
   procedureSequenceIndex!: number;
 
@@ -183,6 +249,7 @@ class Operation {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -194,6 +261,7 @@ class Operation {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

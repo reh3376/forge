@@ -20,51 +20,75 @@ const existingId = "existingId";
 const CREATE_INPUT = {
   bomName: "exampleBomName",
   bomRevision: 42,
+  bomType: "exampleBomType",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  effectiveEndDate: new Date(),
+  effectiveStartDate: new Date(),
+  erpId: "exampleErpId",
   globalId: "exampleGlobalId",
   id: "exampleId",
+  inactive: "true",
+  notes: "exampleNotes",
   schemaVersion: "exampleSchemaVersion",
 };
 const CREATE_RESULT = {
   bomName: "exampleBomName",
   bomRevision: 42,
+  bomType: "exampleBomType",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  effectiveEndDate: new Date(),
+  effectiveStartDate: new Date(),
+  erpId: "exampleErpId",
   globalId: "exampleGlobalId",
   id: "exampleId",
+  inactive: "true",
+  notes: "exampleNotes",
   schemaVersion: "exampleSchemaVersion",
 };
 const FIND_MANY_RESULT = [
   {
     bomName: "exampleBomName",
     bomRevision: 42,
+    bomType: "exampleBomType",
     className: "exampleClassName",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     editedAt: new Date(),
     editedBy: "exampleEditedBy",
+    effectiveEndDate: new Date(),
+    effectiveStartDate: new Date(),
+    erpId: "exampleErpId",
     globalId: "exampleGlobalId",
     id: "exampleId",
+    inactive: "true",
+    notes: "exampleNotes",
     schemaVersion: "exampleSchemaVersion",
   },
 ];
 const FIND_ONE_RESULT = {
   bomName: "exampleBomName",
   bomRevision: 42,
+  bomType: "exampleBomType",
   className: "exampleClassName",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  effectiveEndDate: new Date(),
+  effectiveStartDate: new Date(),
+  erpId: "exampleErpId",
   globalId: "exampleGlobalId",
   id: "exampleId",
+  inactive: "true",
+  notes: "exampleNotes",
   schemaVersion: "exampleSchemaVersion",
 };
 
@@ -152,6 +176,8 @@ describe("Bom", () => {
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         editedAt: CREATE_RESULT.editedAt.toISOString(),
+        effectiveEndDate: CREATE_RESULT.effectiveEndDate.toISOString(),
+        effectiveStartDate: CREATE_RESULT.effectiveStartDate.toISOString(),
       });
   });
 
@@ -164,6 +190,9 @@ describe("Bom", () => {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           editedAt: FIND_MANY_RESULT[0].editedAt.toISOString(),
+          effectiveEndDate: FIND_MANY_RESULT[0].effectiveEndDate.toISOString(),
+          effectiveStartDate:
+            FIND_MANY_RESULT[0].effectiveStartDate.toISOString(),
         },
       ]);
   });
@@ -187,6 +216,8 @@ describe("Bom", () => {
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         editedAt: FIND_ONE_RESULT.editedAt.toISOString(),
+        effectiveEndDate: FIND_ONE_RESULT.effectiveEndDate.toISOString(),
+        effectiveStartDate: FIND_ONE_RESULT.effectiveStartDate.toISOString(),
       });
   });
 
@@ -200,6 +231,8 @@ describe("Bom", () => {
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         editedAt: CREATE_RESULT.editedAt.toISOString(),
+        effectiveEndDate: CREATE_RESULT.effectiveEndDate.toISOString(),
+        effectiveStartDate: CREATE_RESULT.effectiveStartDate.toISOString(),
       })
       .then(function () {
         agent

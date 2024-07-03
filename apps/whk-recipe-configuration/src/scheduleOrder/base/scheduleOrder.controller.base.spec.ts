@@ -18,12 +18,18 @@ import { ScheduleOrderService } from "../scheduleOrder.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  actualEnd: new Date(),
+  actualStart: new Date(),
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  duration: 42.424242424,
+  durationUnits: "exampleDurationUnits",
   estimatedDistillationTime: 42,
+  estimatedEnd: new Date(),
   estimatedFermentationTime: 42,
   estimatedMashingTime: 42,
   estimatedProcessing: 42,
+  estimatedStart: new Date(),
   estimatedTotalProductionTime: 42,
   globalId: "exampleGlobalId",
   id: "exampleId",
@@ -34,12 +40,18 @@ const CREATE_INPUT = {
   updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
+  actualEnd: new Date(),
+  actualStart: new Date(),
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  duration: 42.424242424,
+  durationUnits: "exampleDurationUnits",
   estimatedDistillationTime: 42,
+  estimatedEnd: new Date(),
   estimatedFermentationTime: 42,
   estimatedMashingTime: 42,
   estimatedProcessing: 42,
+  estimatedStart: new Date(),
   estimatedTotalProductionTime: 42,
   globalId: "exampleGlobalId",
   id: "exampleId",
@@ -51,12 +63,18 @@ const CREATE_RESULT = {
 };
 const FIND_MANY_RESULT = [
   {
+    actualEnd: new Date(),
+    actualStart: new Date(),
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
+    duration: 42.424242424,
+    durationUnits: "exampleDurationUnits",
     estimatedDistillationTime: 42,
+    estimatedEnd: new Date(),
     estimatedFermentationTime: 42,
     estimatedMashingTime: 42,
     estimatedProcessing: 42,
+    estimatedStart: new Date(),
     estimatedTotalProductionTime: 42,
     globalId: "exampleGlobalId",
     id: "exampleId",
@@ -68,12 +86,18 @@ const FIND_MANY_RESULT = [
   },
 ];
 const FIND_ONE_RESULT = {
+  actualEnd: new Date(),
+  actualStart: new Date(),
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  duration: 42.424242424,
+  durationUnits: "exampleDurationUnits",
   estimatedDistillationTime: 42,
+  estimatedEnd: new Date(),
   estimatedFermentationTime: 42,
   estimatedMashingTime: 42,
   estimatedProcessing: 42,
+  estimatedStart: new Date(),
   estimatedTotalProductionTime: 42,
   globalId: "exampleGlobalId",
   id: "exampleId",
@@ -166,7 +190,11 @@ describe("ScheduleOrder", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
+        actualEnd: CREATE_RESULT.actualEnd.toISOString(),
+        actualStart: CREATE_RESULT.actualStart.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        estimatedEnd: CREATE_RESULT.estimatedEnd.toISOString(),
+        estimatedStart: CREATE_RESULT.estimatedStart.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
@@ -178,7 +206,11 @@ describe("ScheduleOrder", () => {
       .expect([
         {
           ...FIND_MANY_RESULT[0],
+          actualEnd: FIND_MANY_RESULT[0].actualEnd.toISOString(),
+          actualStart: FIND_MANY_RESULT[0].actualStart.toISOString(),
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
+          estimatedEnd: FIND_MANY_RESULT[0].estimatedEnd.toISOString(),
+          estimatedStart: FIND_MANY_RESULT[0].estimatedStart.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
@@ -201,7 +233,11 @@ describe("ScheduleOrder", () => {
       .expect(HttpStatus.OK)
       .expect({
         ...FIND_ONE_RESULT,
+        actualEnd: FIND_ONE_RESULT.actualEnd.toISOString(),
+        actualStart: FIND_ONE_RESULT.actualStart.toISOString(),
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
+        estimatedEnd: FIND_ONE_RESULT.estimatedEnd.toISOString(),
+        estimatedStart: FIND_ONE_RESULT.estimatedStart.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
@@ -214,7 +250,11 @@ describe("ScheduleOrder", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
+        actualEnd: CREATE_RESULT.actualEnd.toISOString(),
+        actualStart: CREATE_RESULT.actualStart.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        estimatedEnd: CREATE_RESULT.estimatedEnd.toISOString(),
+        estimatedStart: CREATE_RESULT.estimatedStart.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {

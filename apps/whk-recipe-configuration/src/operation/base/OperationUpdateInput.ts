@@ -11,17 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsOptional,
   IsBoolean,
   ValidateNested,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
+import { FermentationChemistryUpdateManyWithoutOperationsInput } from "./FermentationChemistryUpdateManyWithoutOperationsInput";
+import { FermentationDayDatumUpdateManyWithoutOperationsInput } from "./FermentationDayDatumUpdateManyWithoutOperationsInput";
+import { FermentationSettingDatumUpdateManyWithoutOperationsInput } from "./FermentationSettingDatumUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -33,6 +43,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -52,6 +63,16 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  auxiliaryPhases?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
     type: () => OperationWhereUniqueInput,
   })
   @ValidateNested()
@@ -67,6 +88,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -78,6 +100,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -89,6 +112,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -109,9 +133,46 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationSettingDatumUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatumUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationSettingDatumUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationSettingData?: FermentationSettingDatumUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -143,6 +204,18 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId?: string | null;
+
+  @ApiProperty({
+    required: false,
     enum: EnumOperationName,
   })
   @IsEnum(EnumOperationName)
@@ -165,6 +238,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -176,6 +250,7 @@ class OperationUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -187,6 +262,7 @@ class OperationUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -198,6 +274,7 @@ class OperationUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

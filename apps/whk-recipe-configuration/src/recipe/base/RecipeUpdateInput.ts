@@ -15,11 +15,14 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
-import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
+import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { Type } from "class-transformer";
+import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -44,6 +47,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -55,6 +59,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -66,6 +71,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -77,6 +83,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -88,6 +95,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -99,11 +107,24 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   itemId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  lots?: LotUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
@@ -134,6 +155,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -157,6 +179,7 @@ class RecipeUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -180,6 +203,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -203,6 +227,7 @@ class RecipeUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
