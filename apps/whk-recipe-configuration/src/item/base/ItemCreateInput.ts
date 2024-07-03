@@ -23,7 +23,6 @@ import {
 import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
-import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
 import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
@@ -125,15 +124,15 @@ class ItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemGroupWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemGroupWhereUniqueInput)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => ItemGroupWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  itemGroup?: ItemGroupWhereUniqueInput | null;
+  itemGroup?: string | null;
 
   @ApiProperty({
     required: true,

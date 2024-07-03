@@ -10,11 +10,7 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import {
-  Prisma,
-  ItemGroup as PrismaItemGroup,
-  Item as PrismaItem,
-} from "@prisma/client";
+import { Prisma, ItemGroup as PrismaItemGroup } from "@prisma/client";
 
 export class ItemGroupServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -49,16 +45,5 @@ export class ItemGroupServiceBase {
     args: Prisma.ItemGroupDeleteArgs
   ): Promise<PrismaItemGroup> {
     return this.prisma.itemGroup.delete(args);
-  }
-
-  async findItems(
-    parentId: string,
-    args: Prisma.ItemFindManyArgs
-  ): Promise<PrismaItem[]> {
-    return this.prisma.itemGroup
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .items(args);
   }
 }
