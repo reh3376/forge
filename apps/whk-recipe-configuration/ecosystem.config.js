@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'whk-mes-backend',
       script: 'dist/main.js',
-      instances: 'max', // Or specify the number of instances you want
+      instances: '2', // Or specify the number of instances you want
       exec_mode: 'cluster', // Use cluster mode for load balancing
       watch: true, // Enable watch to restart on file changes
       env: {
@@ -12,8 +12,8 @@ module.exports = {
       env_production: {
         NODE_ENV: 'production',
       },
-      max_memory_restart: '500M', // Restart if it exceeds 500MB
-      max_cpu: 50, // Restart if CPU usage exceeds 50%
+      // max_memory_restart: '500M', // Restart if it exceeds 500MB
+      // max_cpu: 50, // Restart if CPU usage exceeds 50%
     },
   ],
 
