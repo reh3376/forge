@@ -31,30 +31,28 @@ export class UnitProcedureServiceBase {
     return this.prisma.unitProcedure.count(args);
   }
 
-  async unitProcedures<T extends Prisma.UnitProcedureFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitProcedureFindManyArgs>
+  async unitProcedures(
+    args: Prisma.UnitProcedureFindManyArgs
   ): Promise<PrismaUnitProcedure[]> {
-    return this.prisma.unitProcedure.findMany<Prisma.UnitProcedureFindManyArgs>(
-      args
-    );
+    return this.prisma.unitProcedure.findMany(args);
   }
-  async unitProcedure<T extends Prisma.UnitProcedureFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitProcedureFindUniqueArgs>
+  async unitProcedure(
+    args: Prisma.UnitProcedureFindUniqueArgs
   ): Promise<PrismaUnitProcedure | null> {
     return this.prisma.unitProcedure.findUnique(args);
   }
-  async createUnitProcedure<T extends Prisma.UnitProcedureCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>
+  async createUnitProcedure(
+    args: Prisma.UnitProcedureCreateArgs
   ): Promise<PrismaUnitProcedure> {
-    return this.prisma.unitProcedure.create<T>(args);
+    return this.prisma.unitProcedure.create(args);
   }
-  async updateUnitProcedure<T extends Prisma.UnitProcedureUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitProcedureUpdateArgs>
+  async updateUnitProcedure(
+    args: Prisma.UnitProcedureUpdateArgs
   ): Promise<PrismaUnitProcedure> {
-    return this.prisma.unitProcedure.update<T>(args);
+    return this.prisma.unitProcedure.update(args);
   }
-  async deleteUnitProcedure<T extends Prisma.UnitProcedureDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.UnitProcedureDeleteArgs>
+  async deleteUnitProcedure(
+    args: Prisma.UnitProcedureDeleteArgs
   ): Promise<PrismaUnitProcedure> {
     return this.prisma.unitProcedure.delete(args);
   }

@@ -14,14 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
-  ValidateNested,
   IsString,
+  MaxLength,
   IsInt,
+  Max,
 } from "class-validator";
-import { TestWhereUniqueInput } from "./TestWhereUniqueInput";
-import { Type } from "class-transformer";
-import { TestUpdateManyWithoutTestsInput } from "./TestUpdateManyWithoutTestsInput";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 
 @InputType()
 class TestUpdateInput {
@@ -38,21 +35,10 @@ class TestUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -64,6 +50,7 @@ class TestUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -75,23 +62,12 @@ class TestUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestUpdateManyWithoutTestsInput,
-  })
-  @ValidateNested()
-  @Type(() => TestUpdateManyWithoutTestsInput)
-  @IsOptional()
-  @Field(() => TestUpdateManyWithoutTestsInput, {
-    nullable: true,
-  })
-  instances?: TestUpdateManyWithoutTestsInput;
 
   @ApiProperty({
     required: false,
@@ -106,21 +82,10 @@ class TestUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemReceiptWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
-    nullable: true,
-  })
-  itemReceipt?: ItemReceiptWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -132,6 +97,7 @@ class TestUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -143,6 +109,7 @@ class TestUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -154,6 +121,7 @@ class TestUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,

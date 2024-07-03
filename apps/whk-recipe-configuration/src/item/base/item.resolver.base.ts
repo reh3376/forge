@@ -32,13 +32,18 @@ import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
+import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Item)
@@ -107,6 +112,12 @@ export class ItemResolverBase {
               connect: args.data.itemGroup,
             }
           : undefined,
+
+        vendor: args.data.vendor
+          ? {
+              connect: args.data.vendor,
+            }
+          : undefined,
       },
     });
   }
@@ -128,6 +139,12 @@ export class ItemResolverBase {
           itemGroup: args.data.itemGroup
             ? {
                 connect: args.data.itemGroup,
+              }
+            : undefined,
+
+          vendor: args.data.vendor
+            ? {
+                connect: args.data.vendor,
               }
             : undefined,
         },
@@ -222,6 +239,26 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Lot], { name: "lots" })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLots(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
   @nestAccessControl.UseRoles({
     resource: "ProductionOrder",
@@ -287,6 +324,26 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [SalesOrder], { name: "salesOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "SalesOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findSalesOrders(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: SalesOrderFindManyArgs
+  ): Promise<SalesOrder[]> {
+    const results = await this.service.findSalesOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => ItemGroup, {
     nullable: true,
     name: "itemGroup",
@@ -300,6 +357,25 @@ export class ItemResolverBase {
     @graphql.Parent() parent: Item
   ): Promise<ItemGroup | null> {
     const result = await this.service.getItemGroup(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Vendor, {
+    nullable: true,
+    name: "vendor",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Vendor",
+    action: "read",
+    possession: "any",
+  })
+  async getVendor(@graphql.Parent() parent: Item): Promise<Vendor | null> {
+    const result = await this.service.getVendor(parent.id);
 
     if (!result) {
       return null;

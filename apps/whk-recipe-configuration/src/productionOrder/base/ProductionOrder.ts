@@ -14,14 +14,18 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Bom } from "../../bom/base/Bom";
 import {
   ValidateNested,
-  IsOptional,
   IsString,
+  MaxLength,
   IsBoolean,
+  IsOptional,
   IsDate,
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Item } from "../../item/base/Item";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -33,18 +37,18 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 class ProductionOrder {
   @ApiProperty({
     required: true,
-    type: () => [Bom],
+    type: () => Bom,
   })
   @ValidateNested()
   @Type(() => Bom)
-  @IsOptional()
-  boms?: Array<Bom>;
+  boms?: Bom;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   className!: string;
 
@@ -72,6 +76,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -80,6 +85,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -96,9 +102,28 @@ class ProductionOrder {
 
   @ApiProperty({
     required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -131,6 +156,15 @@ class ProductionOrder {
   @ValidateNested()
   @Type(() => Item)
   item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 
   @ApiProperty({
     required: false,
@@ -192,6 +226,7 @@ class ProductionOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

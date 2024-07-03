@@ -94,7 +94,7 @@ class ScheduleOrderQueueOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  productionScheduleId?: SortOrder;
+  queueIndex?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -105,7 +105,7 @@ class ScheduleOrderQueueOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  queueIndex?: SortOrder;
+  scheduleOrderId?: SortOrder;
 
   @ApiProperty({
     required: false,

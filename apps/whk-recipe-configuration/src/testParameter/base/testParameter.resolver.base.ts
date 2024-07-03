@@ -29,6 +29,7 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { TestParameterService } from "../testParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => TestParameter)
@@ -103,6 +104,12 @@ export class TestParameterResolverBase {
               connect: args.data.classId,
             }
           : undefined,
+
+        itemReceipt: args.data.itemReceipt
+          ? {
+              connect: args.data.itemReceipt,
+            }
+          : undefined,
       },
     });
   }
@@ -126,6 +133,12 @@ export class TestParameterResolverBase {
           classId: args.data.classId
             ? {
                 connect: args.data.classId,
+              }
+            : undefined,
+
+          itemReceipt: args.data.itemReceipt
+            ? {
+                connect: args.data.itemReceipt,
               }
             : undefined,
         },
@@ -214,6 +227,27 @@ export class TestParameterResolverBase {
     @graphql.Parent() parent: TestParameter
   ): Promise<TestParameter | null> {
     const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ItemReceipt, {
+    nullable: true,
+    name: "itemReceipt",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "read",
+    possession: "any",
+  })
+  async getItemReceipt(
+    @graphql.Parent() parent: TestParameter
+  ): Promise<ItemReceipt | null> {
+    const result = await this.service.getItemReceipt(parent.id);
 
     if (!result) {
       return null;

@@ -35,6 +35,9 @@ import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -44,6 +47,9 @@ import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOr
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -63,6 +69,9 @@ export class ItemControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemCreateInput,
+  })
   async createItem(@common.Body() data: ItemCreateInput): Promise<Item> {
     return await this.service.createItem({
       data: {
@@ -73,11 +82,18 @@ export class ItemControllerBase {
               connect: data.itemGroup,
             }
           : undefined,
+
+        vendor: data.vendor
+          ? {
+              connect: data.vendor,
+            }
+          : undefined,
       },
       select: {
         active: true,
         createdAt: true,
         createdBy: true,
+        erpId: true,
         globalId: true,
         id: true,
         itemClass: true,
@@ -96,6 +112,12 @@ export class ItemControllerBase {
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -120,6 +142,7 @@ export class ItemControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        erpId: true,
         globalId: true,
         id: true,
         itemClass: true,
@@ -138,6 +161,12 @@ export class ItemControllerBase {
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -163,6 +192,7 @@ export class ItemControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        erpId: true,
         globalId: true,
         id: true,
         itemClass: true,
@@ -181,6 +211,12 @@ export class ItemControllerBase {
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -203,6 +239,9 @@ export class ItemControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemUpdateInput,
+  })
   async updateItem(
     @common.Param() params: ItemWhereUniqueInput,
     @common.Body() data: ItemUpdateInput
@@ -218,11 +257,18 @@ export class ItemControllerBase {
                 connect: data.itemGroup,
               }
             : undefined,
+
+          vendor: data.vendor
+            ? {
+                connect: data.vendor,
+              }
+            : undefined,
         },
         select: {
           active: true,
           createdAt: true,
           createdBy: true,
+          erpId: true,
           globalId: true,
           id: true,
           itemClass: true,
@@ -241,6 +287,12 @@ export class ItemControllerBase {
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,
+
+          vendor: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -274,6 +326,7 @@ export class ItemControllerBase {
           active: true,
           createdAt: true,
           createdBy: true,
+          erpId: true,
           globalId: true,
           id: true,
           itemClass: true,
@@ -292,6 +345,12 @@ export class ItemControllerBase {
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,
+
+          vendor: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -326,6 +385,7 @@ export class ItemControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -441,20 +501,27 @@ export class ItemControllerBase {
       select: {
         bomName: true,
         bomRevision: true,
+        bomType: true,
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        effectiveEndDate: true,
+        effectiveStartDate: true,
+        erpId: true,
         globalId: true,
         id: true,
-        schemaVersion: true,
+        inactive: true,
 
-        wipItem: {
+        item: {
           select: {
             id: true,
           },
         },
+
+        notes: true,
+        schemaVersion: true,
       },
     });
     if (results === null) {
@@ -559,6 +626,8 @@ export class ItemControllerBase {
           },
         },
 
+        loadId: true,
+
         purchaseOrder: {
           select: {
             id: true,
@@ -566,10 +635,10 @@ export class ItemControllerBase {
         },
 
         quantity: true,
-        receiptAccepted: true,
         schemaVersion: true,
         status: true,
         supplierLot: true,
+        testsPassed: true,
         units: true,
         updatedAt: true,
         updatedBy: true,
@@ -652,6 +721,140 @@ export class ItemControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lots")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLots(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        externalId: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        id: true,
+        isRawMaterial: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotNumber: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectLots(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateLots(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLots(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -667,6 +870,12 @@ export class ItemControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,
@@ -939,12 +1148,6 @@ export class ItemControllerBase {
     const results = await this.service.findPurchaseOrders(params.id, {
       ...query,
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -955,20 +1158,11 @@ export class ItemControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
-        grainType: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -982,7 +1176,10 @@ export class ItemControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -1049,6 +1246,125 @@ export class ItemControllerBase {
   ): Promise<void> {
     const data = {
       purchaseOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/salesOrders")
+  @ApiNestedQuery(SalesOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "SalesOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findSalesOrders(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<SalesOrder[]> {
+    const query = plainToClass(SalesOrderFindManyArgs, request.query);
+    const results = await this.service.findSalesOrders(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        erpId: true,
+        globalId: true,
+        id: true,
+        lineItems: true,
+        orderType: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/salesOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectSalesOrders(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: SalesOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      salesOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/salesOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateSalesOrders(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: SalesOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      salesOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/salesOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectSalesOrders(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: SalesOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      salesOrders: {
         disconnect: body,
       },
     };

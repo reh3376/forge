@@ -48,6 +48,9 @@ export class ItemGroupControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemGroupCreateInput,
+  })
   async createItemGroup(
     @common.Body() data: ItemGroupCreateInput
   ): Promise<ItemGroup> {
@@ -137,6 +140,9 @@ export class ItemGroupControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemGroupUpdateInput,
+  })
   async updateItemGroup(
     @common.Param() params: ItemGroupWhereUniqueInput,
     @common.Body() data: ItemGroupUpdateInput
@@ -219,6 +225,7 @@ export class ItemGroupControllerBase {
         active: true,
         createdAt: true,
         createdBy: true,
+        erpId: true,
         globalId: true,
         id: true,
         itemClass: true,
@@ -237,6 +244,12 @@ export class ItemGroupControllerBase {
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
