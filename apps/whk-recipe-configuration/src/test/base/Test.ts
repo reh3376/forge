@@ -13,14 +13,14 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
-  ValidateNested,
-  IsOptional,
   IsDate,
   IsString,
+  MaxLength,
+  IsOptional,
   IsInt,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 
 @ObjectType()
 class Test {
@@ -31,15 +31,6 @@ class Test {
   @IsBoolean()
   @Field(() => Boolean)
   active!: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => Test,
-  })
-  @ValidateNested()
-  @Type(() => Test)
-  @IsOptional()
-  classId?: Test | null;
 
   @ApiProperty({
     required: true,
@@ -54,6 +45,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -73,6 +65,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -84,6 +77,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -100,15 +94,6 @@ class Test {
 
   @ApiProperty({
     required: false,
-    type: () => [Test],
-  })
-  @ValidateNested()
-  @Type(() => Test)
-  @IsOptional()
-  instances?: Array<Test>;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -120,18 +105,10 @@ class Test {
 
   @ApiProperty({
     required: false,
-    type: () => ItemReceipt,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceipt)
-  @IsOptional()
-  itemReceipt?: ItemReceipt | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -143,6 +120,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -154,6 +132,7 @@ class Test {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   testName!: string;
 
@@ -162,6 +141,7 @@ class Test {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,

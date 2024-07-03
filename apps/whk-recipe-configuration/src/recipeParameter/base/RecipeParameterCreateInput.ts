@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsEnum,
   IsNumber,
+  Max,
   IsInt,
 } from "class-validator";
+
 import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { RecipeParameterCreateNestedManyWithoutRecipeParametersInput } from "./RecipeParameterCreateNestedManyWithoutRecipeParametersInput";
@@ -44,6 +48,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -67,6 +72,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   className!: string;
 
@@ -75,6 +81,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -83,6 +90,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -94,6 +102,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -116,6 +125,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   itemId!: string;
 
@@ -124,6 +134,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -147,6 +158,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   recipeParamName!: string;
 
@@ -187,6 +199,7 @@ class RecipeParameterCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -206,6 +219,7 @@ class RecipeParameterCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -217,6 +231,7 @@ class RecipeParameterCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -228,6 +243,7 @@ class RecipeParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

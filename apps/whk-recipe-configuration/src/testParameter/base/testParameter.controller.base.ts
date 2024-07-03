@@ -51,6 +51,9 @@ export class TestParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestParameterCreateInput,
+  })
   async createTestParameter(
     @common.Body() data: TestParameterCreateInput
   ): Promise<TestParameter> {
@@ -61,6 +64,12 @@ export class TestParameterControllerBase {
         classId: data.classId
           ? {
               connect: data.classId,
+            }
+          : undefined,
+
+        itemReceipt: data.itemReceipt
+          ? {
+              connect: data.itemReceipt,
             }
           : undefined,
       },
@@ -76,14 +85,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -94,6 +110,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -128,14 +146,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -146,6 +171,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -179,14 +206,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -197,6 +231,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -219,6 +255,9 @@ export class TestParameterControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestParameterUpdateInput,
+  })
   async updateTestParameter(
     @common.Param() params: TestParameterWhereUniqueInput,
     @common.Body() data: TestParameterUpdateInput
@@ -234,6 +273,12 @@ export class TestParameterControllerBase {
                 connect: data.classId,
               }
             : undefined,
+
+          itemReceipt: data.itemReceipt
+            ? {
+                connect: data.itemReceipt,
+              }
+            : undefined,
         },
         select: {
           active: true,
@@ -247,14 +292,21 @@ export class TestParameterControllerBase {
           createdAt: true,
           createdBy: true,
           description: true,
-          editedAt: true,
-          editedBy: true,
           globalId: true,
           id: true,
           isClassDef: true,
+
+          itemReceipt: {
+            select: {
+              id: true,
+            },
+          },
+
           name: true,
           schemaVersion: true,
           testDetails: true,
+          testedAt: true,
+          testedBy: true,
           testParamRevision: true,
           testParamUnits: true,
           testPass: true,
@@ -265,6 +317,8 @@ export class TestParameterControllerBase {
           testSetpointUpperLimit: true,
           testSetpointValue: true,
           tooltip: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -310,6 +364,7 @@ export class TestParameterControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -322,6 +377,7 @@ export class TestParameterControllerBase {
         path: true,
         revision: true,
         schemaVersion: true,
+        stepType: true,
       },
     });
     if (results === null) {
@@ -425,14 +481,21 @@ export class TestParameterControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        editedAt: true,
-        editedBy: true,
         globalId: true,
         id: true,
         isClassDef: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         schemaVersion: true,
         testDetails: true,
+        testedAt: true,
+        testedBy: true,
         testParamRevision: true,
         testParamUnits: true,
         testPass: true,
@@ -443,6 +506,8 @@ export class TestParameterControllerBase {
         testSetpointUpperLimit: true,
         testSetpointValue: true,
         tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -535,12 +600,6 @@ export class TestParameterControllerBase {
     const results = await this.service.findPurchaseOrder(params.id, {
       ...query,
       select: {
-        account: {
-          select: {
-            id: true,
-          },
-        },
-
         asset: {
           select: {
             id: true,
@@ -551,20 +610,11 @@ export class TestParameterControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        editedAt: true,
-        editedBy: true,
+        erpId: true,
         globalId: true,
-        grainType: true,
         id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
+        lineItems: true,
         name: true,
-        orderQuantity: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -578,7 +628,10 @@ export class TestParameterControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        units: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

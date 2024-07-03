@@ -94,6 +94,17 @@ class ItemReceiptOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  loadId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   purchaseOrderId?: SortOrder;
 
   @ApiProperty({
@@ -106,17 +117,6 @@ class ItemReceiptOrderByInput {
     nullable: true,
   })
   quantity?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  receiptAccepted?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -150,6 +150,17 @@ class ItemReceiptOrderByInput {
     nullable: true,
   })
   supplierLot?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  testsPassed?: SortOrder;
 
   @ApiProperty({
     required: false,

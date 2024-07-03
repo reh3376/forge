@@ -15,8 +15,10 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
 import { EquipmentPhaseUpdateManyWithoutInstructionsInput } from "./EquipmentPhaseUpdateManyWithoutInstructionsInput";
 import { Type } from "class-transformer";
@@ -39,6 +41,7 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -50,6 +53,7 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -73,6 +77,7 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -84,6 +89,7 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -95,6 +101,7 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -106,6 +113,7 @@ class InstructionUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -117,6 +125,7 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

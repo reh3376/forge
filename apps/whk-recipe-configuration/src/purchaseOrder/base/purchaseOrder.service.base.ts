@@ -15,11 +15,10 @@ import {
   Prisma,
   PurchaseOrder as PrismaPurchaseOrder,
   Lot as PrismaLot,
+  Item as PrismaItem,
   ItemReceipt as PrismaItemReceipt,
   TestParameter as PrismaTestParameter,
-  Account as PrismaAccount,
   Asset as PrismaAsset,
-  Item as PrismaItem,
 } from "@prisma/client";
 
 export class PurchaseOrderServiceBase {
@@ -31,30 +30,28 @@ export class PurchaseOrderServiceBase {
     return this.prisma.purchaseOrder.count(args);
   }
 
-  async purchaseOrders<T extends Prisma.PurchaseOrderFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PurchaseOrderFindManyArgs>
+  async purchaseOrders(
+    args: Prisma.PurchaseOrderFindManyArgs
   ): Promise<PrismaPurchaseOrder[]> {
-    return this.prisma.purchaseOrder.findMany<Prisma.PurchaseOrderFindManyArgs>(
-      args
-    );
+    return this.prisma.purchaseOrder.findMany(args);
   }
-  async purchaseOrder<T extends Prisma.PurchaseOrderFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PurchaseOrderFindUniqueArgs>
+  async purchaseOrder(
+    args: Prisma.PurchaseOrderFindUniqueArgs
   ): Promise<PrismaPurchaseOrder | null> {
     return this.prisma.purchaseOrder.findUnique(args);
   }
-  async createPurchaseOrder<T extends Prisma.PurchaseOrderCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PurchaseOrderCreateArgs>
+  async createPurchaseOrder(
+    args: Prisma.PurchaseOrderCreateArgs
   ): Promise<PrismaPurchaseOrder> {
-    return this.prisma.purchaseOrder.create<T>(args);
+    return this.prisma.purchaseOrder.create(args);
   }
-  async updatePurchaseOrder<T extends Prisma.PurchaseOrderUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PurchaseOrderUpdateArgs>
+  async updatePurchaseOrder(
+    args: Prisma.PurchaseOrderUpdateArgs
   ): Promise<PrismaPurchaseOrder> {
-    return this.prisma.purchaseOrder.update<T>(args);
+    return this.prisma.purchaseOrder.update(args);
   }
-  async deletePurchaseOrder<T extends Prisma.PurchaseOrderDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PurchaseOrderDeleteArgs>
+  async deletePurchaseOrder(
+    args: Prisma.PurchaseOrderDeleteArgs
   ): Promise<PrismaPurchaseOrder> {
     return this.prisma.purchaseOrder.delete(args);
   }
@@ -68,6 +65,17 @@ export class PurchaseOrderServiceBase {
         where: { id: parentId },
       })
       .acceptedLots(args);
+  }
+
+  async findItem(
+    parentId: string,
+    args: Prisma.ItemFindManyArgs
+  ): Promise<PrismaItem[]> {
+    return this.prisma.purchaseOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .item(args);
   }
 
   async findItemReceipts(
@@ -103,28 +111,12 @@ export class PurchaseOrderServiceBase {
       .qualityTests(args);
   }
 
-  async getAccount(parentId: string): Promise<PrismaAccount | null> {
-    return this.prisma.purchaseOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .account();
-  }
-
   async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.purchaseOrder
       .findUnique({
         where: { id: parentId },
       })
       .asset();
-  }
-
-  async getItem(parentId: string): Promise<PrismaItem | null> {
-    return this.prisma.purchaseOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .item();
   }
 
   async getPurchaseOrderRejectedLots(

@@ -18,12 +18,12 @@ import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
-import { EnumTestParameterTestParamUnits } from "./EnumTestParameterTestParamUnits";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
@@ -87,28 +87,6 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeNullableFilter,
-  })
-  @Type(() => DateTimeNullableFilter)
-  @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
-    nullable: true,
-  })
-  editedAt?: DateTimeNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  editedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => EquipmentPhaseListRelationFilter,
   })
   @ValidateNested()
@@ -166,6 +144,18 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceiptWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemReceiptWhereUniqueInput, {
+    nullable: true,
+  })
+  itemReceipt?: ItemReceiptWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -211,6 +201,28 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  testedAt?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  testedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -222,14 +234,14 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumTestParameterTestParamUnits,
+    type: StringFilter,
   })
-  @IsEnum(EnumTestParameterTestParamUnits)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => EnumTestParameterTestParamUnits, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  testParamUnits?: "Lbs" | "Perc" | "Gal" | "Bu" | "PassFail";
+  testParamUnits?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -285,6 +297,28 @@ class TestParameterWhereInput {
     nullable: true,
   })
   tooltip?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  updatedAt?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 }
 
 export { TestParameterWhereInput as TestParameterWhereInput };

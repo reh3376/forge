@@ -11,21 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
-import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+
+import { BomItemCreateNestedManyWithoutEquipmentPhasesInput } from "./BomItemCreateNestedManyWithoutEquipmentPhasesInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput";
 import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./TestParameterCreateNestedManyWithoutEquipmentPhasesInput";
 
 @InputType()
@@ -40,6 +46,18 @@ class EquipmentPhaseCreateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => BomItemCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemCreateNestedManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,
@@ -58,6 +76,7 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -69,6 +88,7 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -77,6 +97,7 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -88,6 +109,7 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -99,6 +121,7 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -141,13 +164,24 @@ class EquipmentPhaseCreateInput {
   isClassDefinition?: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message?: string | null;
+
+  @ApiProperty({
     required: true,
     enum: EnumEquipmentPhaseName,
   })
   @IsEnum(EnumEquipmentPhaseName)
   @Field(() => EnumEquipmentPhaseName)
   name!:
-    | "PreSteam"
     | "Steam"
     | "Hold"
     | "BacksetAdd"
@@ -173,7 +207,10 @@ class EquipmentPhaseCreateInput {
     | "StillStartup"
     | "StillShutdown"
     | "Cut"
-    | "Gauge";
+    | "Gauge"
+    | "GrainAdd"
+    | "LiquidAdd"
+    | "Prompt";
 
   @ApiProperty({
     required: true,
@@ -189,6 +226,7 @@ class EquipmentPhaseCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -200,6 +238,7 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -223,6 +262,7 @@ class EquipmentPhaseCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -234,11 +274,38 @@ class EquipmentPhaseCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumEquipmentPhaseStepType,
+  })
+  @IsEnum(EnumEquipmentPhaseStepType)
+  @Field(() => EnumEquipmentPhaseStepType)
+  stepType!:
+    | "Water"
+    | "Backset"
+    | "Corn"
+    | "Rye"
+    | "Wheat"
+    | "Malt"
+    | "Premalt"
+    | "Speciality"
+    | "Enzyme"
+    | "Nutrient"
+    | "Yeast"
+    | "Citric"
+    | "Hold"
+    | "Cool"
+    | "NotRequired"
+    | "Heat"
+    | "Vessel"
+    | "Pipe";
 
   @ApiProperty({
     required: false,

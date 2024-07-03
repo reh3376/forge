@@ -11,18 +11,22 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsInt,
+  Max,
   IsNumber,
   IsEnum,
 } from "class-validator";
+
 import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { Type } from "class-transformer";
-import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { EquipmentPhaseUpdateManyWithoutPhaseParametersInput } from "./EquipmentPhaseUpdateManyWithoutPhaseParametersInput";
 import { PhaseParameterUpdateManyWithoutPhaseParametersInput } from "./PhaseParameterUpdateManyWithoutPhaseParametersInput";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
@@ -57,6 +61,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -68,6 +73,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -79,6 +85,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -87,21 +94,22 @@ class PhaseParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseWhereUniqueInput,
+    type: () => EquipmentPhaseUpdateManyWithoutPhaseParametersInput,
   })
   @ValidateNested()
-  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @Type(() => EquipmentPhaseUpdateManyWithoutPhaseParametersInput)
   @IsOptional()
-  @Field(() => EquipmentPhaseWhereUniqueInput, {
+  @Field(() => EquipmentPhaseUpdateManyWithoutPhaseParametersInput, {
     nullable: true,
   })
-  equipmentPhase?: EquipmentPhaseWhereUniqueInput | null;
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -147,6 +155,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -158,6 +167,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -169,6 +179,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -180,6 +191,7 @@ class PhaseParameterUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -191,6 +203,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -213,6 +226,7 @@ class PhaseParameterUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -224,6 +238,7 @@ class PhaseParameterUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -246,6 +261,7 @@ class PhaseParameterUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -262,11 +278,13 @@ class PhaseParameterUpdateInput {
     nullable: true,
   })
   staticName?:
-    | "SteamTemperature"
-    | "HoldTime"
-    | "IngredientName"
-    | "IngredientQuantity"
-    | "IngredientUnits"
+    | "Temperature"
+    | "Time"
+    | "Quantity"
+    | "Speed"
+    | "FlowRate"
+    | "SprayballTime"
+    | "Level"
     | null;
 
   @ApiProperty({
@@ -274,6 +292,7 @@ class PhaseParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(8)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

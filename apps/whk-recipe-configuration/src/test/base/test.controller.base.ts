@@ -45,32 +45,14 @@ export class TestControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestCreateInput,
+  })
   async createTest(@common.Body() data: TestCreateInput): Promise<Test> {
     return await this.service.createTest({
-      data: {
-        ...data,
-
-        classId: data.classId
-          ? {
-              connect: data.classId,
-            }
-          : undefined,
-
-        itemReceipt: data.itemReceipt
-          ? {
-              connect: data.itemReceipt,
-            }
-          : undefined,
-      },
+      data: data,
       select: {
         active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
         createdBy: true,
         editedAt: true,
@@ -78,13 +60,6 @@ export class TestControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        itemReceipt: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         testDescription: true,
         testName: true,
@@ -111,13 +86,6 @@ export class TestControllerBase {
       ...args,
       select: {
         active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
         createdBy: true,
         editedAt: true,
@@ -125,13 +93,6 @@ export class TestControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        itemReceipt: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         testDescription: true,
         testName: true,
@@ -159,13 +120,6 @@ export class TestControllerBase {
       where: params,
       select: {
         active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
         createdBy: true,
         editedAt: true,
@@ -173,13 +127,6 @@ export class TestControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        itemReceipt: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         testDescription: true,
         testName: true,
@@ -206,6 +153,9 @@ export class TestControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: TestUpdateInput,
+  })
   async updateTest(
     @common.Param() params: TestWhereUniqueInput,
     @common.Body() data: TestUpdateInput
@@ -213,30 +163,9 @@ export class TestControllerBase {
     try {
       return await this.service.updateTest({
         where: params,
-        data: {
-          ...data,
-
-          classId: data.classId
-            ? {
-                connect: data.classId,
-              }
-            : undefined,
-
-          itemReceipt: data.itemReceipt
-            ? {
-                connect: data.itemReceipt,
-              }
-            : undefined,
-        },
+        data: data,
         select: {
           active: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
           createdAt: true,
           createdBy: true,
           editedAt: true,
@@ -244,13 +173,6 @@ export class TestControllerBase {
           globalId: true,
           id: true,
           isClassDefinition: true,
-
-          itemReceipt: {
-            select: {
-              id: true,
-            },
-          },
-
           schemaVersion: true,
           testDescription: true,
           testName: true,
@@ -286,13 +208,6 @@ export class TestControllerBase {
         where: params,
         select: {
           active: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
           createdAt: true,
           createdBy: true,
           editedAt: true,
@@ -300,13 +215,6 @@ export class TestControllerBase {
           globalId: true,
           id: true,
           isClassDefinition: true,
-
-          itemReceipt: {
-            select: {
-              id: true,
-            },
-          },
-
           schemaVersion: true,
           testDescription: true,
           testName: true,
@@ -321,123 +229,5 @@ export class TestControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/instances")
-  @ApiNestedQuery(TestFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "read",
-    possession: "any",
-  })
-  async findInstances(
-    @common.Req() request: Request,
-    @common.Param() params: TestWhereUniqueInput
-  ): Promise<Test[]> {
-    const query = plainToClass(TestFindManyArgs, request.query);
-    const results = await this.service.findInstances(params.id, {
-      ...query,
-      select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        createdBy: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-
-        itemReceipt: {
-          select: {
-            id: true,
-          },
-        },
-
-        schemaVersion: true,
-        testDescription: true,
-        testName: true,
-        testRevision: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "update",
-    possession: "any",
-  })
-  async connectInstances(
-    @common.Param() params: TestWhereUniqueInput,
-    @common.Body() body: TestWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        connect: body,
-      },
-    };
-    await this.service.updateTest({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "update",
-    possession: "any",
-  })
-  async updateInstances(
-    @common.Param() params: TestWhereUniqueInput,
-    @common.Body() body: TestWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        set: body,
-      },
-    };
-    await this.service.updateTest({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectInstances(
-    @common.Param() params: TestWhereUniqueInput,
-    @common.Body() body: TestWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateTest({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 }

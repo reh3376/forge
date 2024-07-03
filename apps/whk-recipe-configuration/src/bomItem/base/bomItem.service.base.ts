@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   BomItem as PrismaBomItem,
+  EquipmentPhase as PrismaEquipmentPhase,
   Bom as PrismaBom,
   Item as PrismaItem,
   Unit as PrismaUnit,
@@ -26,30 +27,33 @@ export class BomItemServiceBase {
     return this.prisma.bomItem.count(args);
   }
 
-  async bomItems<T extends Prisma.BomItemFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomItemFindManyArgs>
-  ): Promise<PrismaBomItem[]> {
-    return this.prisma.bomItem.findMany<Prisma.BomItemFindManyArgs>(args);
+  async bomItems(args: Prisma.BomItemFindManyArgs): Promise<PrismaBomItem[]> {
+    return this.prisma.bomItem.findMany(args);
   }
-  async bomItem<T extends Prisma.BomItemFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomItemFindUniqueArgs>
+  async bomItem(
+    args: Prisma.BomItemFindUniqueArgs
   ): Promise<PrismaBomItem | null> {
     return this.prisma.bomItem.findUnique(args);
   }
-  async createBomItem<T extends Prisma.BomItemCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomItemCreateArgs>
-  ): Promise<PrismaBomItem> {
-    return this.prisma.bomItem.create<T>(args);
+  async createBomItem(args: Prisma.BomItemCreateArgs): Promise<PrismaBomItem> {
+    return this.prisma.bomItem.create(args);
   }
-  async updateBomItem<T extends Prisma.BomItemUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomItemUpdateArgs>
-  ): Promise<PrismaBomItem> {
-    return this.prisma.bomItem.update<T>(args);
+  async updateBomItem(args: Prisma.BomItemUpdateArgs): Promise<PrismaBomItem> {
+    return this.prisma.bomItem.update(args);
   }
-  async deleteBomItem<T extends Prisma.BomItemDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.BomItemDeleteArgs>
-  ): Promise<PrismaBomItem> {
+  async deleteBomItem(args: Prisma.BomItemDeleteArgs): Promise<PrismaBomItem> {
     return this.prisma.bomItem.delete(args);
+  }
+
+  async findEquipmentPhases(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<PrismaEquipmentPhase[]> {
+    return this.prisma.bomItem
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .equipmentPhases(args);
   }
 
   async getBom(parentId: string): Promise<PrismaBom | null> {

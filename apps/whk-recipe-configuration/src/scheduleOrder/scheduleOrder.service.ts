@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ScheduleOrderServiceBase } from "./base/scheduleOrder.service.base";
 import {Prisma, ScheduleOrder} from "@prisma/client";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 import {PinoLogger} from "nestjs-pino";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 
@@ -18,7 +18,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
 
     async createScheduleOrder<T extends Prisma.ScheduleOrderCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderCreateArgs>): Promise<ScheduleOrder> {
         const scheduleOrder = await super.createScheduleOrder(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
         recordName: 'ScheduleOrder',
         event_type: 'create',
         data: scheduleOrder
@@ -29,7 +29,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
 
     async updateScheduleOrder<T extends Prisma.ScheduleOrderUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderUpdateArgs>): Promise<ScheduleOrder> {
         const scheduleOrder = await super.updateScheduleOrder(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
         recordName: 'ScheduleOrder',
         event_type: 'update',
         data: scheduleOrder
@@ -40,7 +40,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
 
     async deleteScheduleOrder<T extends Prisma.ScheduleOrderDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderDeleteArgs>): Promise<ScheduleOrder> {
         const scheduleOrder = await super.deleteScheduleOrder(args);
-        await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
         recordName: 'ScheduleOrder',
         event_type: 'delete',
         data: scheduleOrder

@@ -26,9 +26,6 @@ import { ItemGroup } from "./ItemGroup";
 import { ItemGroupFindManyArgs } from "./ItemGroupFindManyArgs";
 import { ItemGroupWhereUniqueInput } from "./ItemGroupWhereUniqueInput";
 import { ItemGroupUpdateInput } from "./ItemGroupUpdateInput";
-import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
-import { Item } from "../../item/base/Item";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -47,6 +44,9 @@ export class ItemGroupControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ItemGroupCreateInput,
   })
   async createItemGroup(
     @common.Body() data: ItemGroupCreateInput
@@ -137,6 +137,9 @@ export class ItemGroupControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ItemGroupUpdateInput,
+  })
   async updateItemGroup(
     @common.Param() params: ItemGroupWhereUniqueInput,
     @common.Body() data: ItemGroupUpdateInput
@@ -198,118 +201,5 @@ export class ItemGroupControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/items")
-  @ApiNestedQuery(ItemFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async findItems(
-    @common.Req() request: Request,
-    @common.Param() params: ItemGroupWhereUniqueInput
-  ): Promise<Item[]> {
-    const query = plainToClass(ItemFindManyArgs, request.query);
-    const results = await this.service.findItems(params.id, {
-      ...query,
-      select: {
-        active: true,
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
-        id: true,
-        itemClass: true,
-        itemDescription: true,
-
-        itemGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        itemName: true,
-        itemNumber: true,
-        itemRevision: true,
-        itemType: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/items")
-  @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
-    action: "update",
-    possession: "any",
-  })
-  async connectItems(
-    @common.Param() params: ItemGroupWhereUniqueInput,
-    @common.Body() body: ItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      items: {
-        connect: body,
-      },
-    };
-    await this.service.updateItemGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/items")
-  @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
-    action: "update",
-    possession: "any",
-  })
-  async updateItems(
-    @common.Param() params: ItemGroupWhereUniqueInput,
-    @common.Body() body: ItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      items: {
-        set: body,
-      },
-    };
-    await this.service.updateItemGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/items")
-  @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectItems(
-    @common.Param() params: ItemGroupWhereUniqueInput,
-    @common.Body() body: ItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      items: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateItemGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 }

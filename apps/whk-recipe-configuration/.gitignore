@@ -3,6 +3,7 @@
 /node_modules
 /dist
 .DS_Store
+/uploads
 
 # test coverage
 /coverage/*
@@ -22,3 +23,6 @@ prisma/migrations/*
 !.env.vault
 
 newrelic.js
+
+nr-security-home/*
+newrelic_agent.log

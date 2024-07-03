@@ -45,6 +45,9 @@ export class ProductionOrderUnitProcedureControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: ProductionOrderUnitProcedureCreateInput,
+  })
   async createProductionOrderUnitProcedure(
     @common.Body() data: ProductionOrderUnitProcedureCreateInput
   ): Promise<ProductionOrderUnitProcedure> {
@@ -251,6 +254,9 @@ export class ProductionOrderUnitProcedureControllerBase {
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ProductionOrderUnitProcedureUpdateInput,
   })
   async updateProductionOrderUnitProcedure(
     @common.Param() params: ProductionOrderUnitProcedureWhereUniqueInput,

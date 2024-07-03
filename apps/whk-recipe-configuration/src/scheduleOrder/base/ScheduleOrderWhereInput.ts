@@ -11,20 +11,44 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
-import { ProductionScheduleWhereUniqueInput } from "../../productionSchedule/base/ProductionScheduleWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @InputType()
 class ScheduleOrderWhereInput {
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  actualEnd?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  actualStart?: DateTimeNullableFilter;
+
   @ApiProperty({
     required: false,
     type: StringNullableFilter,
@@ -49,6 +73,28 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  duration?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  durationUnits?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: IntNullableFilter,
   })
   @Type(() => IntNullableFilter)
@@ -57,6 +103,17 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   estimatedDistillationTime?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  estimatedEnd?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -90,6 +147,17 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   estimatedProcessing?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  estimatedStart?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -149,18 +217,6 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionScheduleWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionScheduleWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionScheduleWhereUniqueInput, {
-    nullable: true,
-  })
-  productionSchedules?: ProductionScheduleWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: () => RecipeGroupWhereUniqueInput,
   })
   @ValidateNested()
@@ -181,6 +237,18 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   recipeName?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueListRelationFilter)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueListRelationFilter, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,

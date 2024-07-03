@@ -32,13 +32,17 @@ import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
 import { Bom } from "../../bom/base/Bom";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
-import { ItemGroup } from "../../itemGroup/base/ItemGroup";
+import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Item)
@@ -102,9 +106,9 @@ export class ItemResolverBase {
       data: {
         ...args.data,
 
-        itemGroup: args.data.itemGroup
+        vendor: args.data.vendor
           ? {
-              connect: args.data.itemGroup,
+              connect: args.data.vendor,
             }
           : undefined,
       },
@@ -125,9 +129,9 @@ export class ItemResolverBase {
         data: {
           ...args.data,
 
-          itemGroup: args.data.itemGroup
+          vendor: args.data.vendor
             ? {
-                connect: args.data.itemGroup,
+                connect: args.data.vendor,
               }
             : undefined,
         },
@@ -222,6 +226,26 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Lot], { name: "lots" })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLots(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
   @nestAccessControl.UseRoles({
     resource: "ProductionOrder",
@@ -287,19 +311,37 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ItemGroup, {
-    nullable: true,
-    name: "itemGroup",
-  })
+  @graphql.ResolveField(() => [SalesOrder], { name: "salesOrders" })
   @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
+    resource: "SalesOrder",
     action: "read",
     possession: "any",
   })
-  async getItemGroup(
-    @graphql.Parent() parent: Item
-  ): Promise<ItemGroup | null> {
-    const result = await this.service.getItemGroup(parent.id);
+  async findSalesOrders(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: SalesOrderFindManyArgs
+  ): Promise<SalesOrder[]> {
+    const results = await this.service.findSalesOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Vendor, {
+    nullable: true,
+    name: "vendor",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Vendor",
+    action: "read",
+    possession: "any",
+  })
+  async getVendor(@graphql.Parent() parent: Item): Promise<Vendor | null> {
+    const result = await this.service.getVendor(parent.id);
 
     if (!result) {
       return null;

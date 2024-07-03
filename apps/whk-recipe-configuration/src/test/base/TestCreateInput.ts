@@ -13,15 +13,12 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
-  ValidateNested,
-  IsOptional,
   IsString,
+  MaxLength,
+  IsOptional,
   IsInt,
+  Max,
 } from "class-validator";
-import { TestWhereUniqueInput } from "./TestWhereUniqueInput";
-import { Type } from "class-transformer";
-import { TestCreateNestedManyWithoutTestsInput } from "./TestCreateNestedManyWithoutTestsInput";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 
 @InputType()
 class TestCreateInput {
@@ -34,22 +31,11 @@ class TestCreateInput {
   active!: boolean;
 
   @ApiProperty({
-    required: false,
-    type: () => TestWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestWhereUniqueInput | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -58,6 +44,7 @@ class TestCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -69,23 +56,12 @@ class TestCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestCreateNestedManyWithoutTestsInput,
-  })
-  @ValidateNested()
-  @Type(() => TestCreateNestedManyWithoutTestsInput)
-  @IsOptional()
-  @Field(() => TestCreateNestedManyWithoutTestsInput, {
-    nullable: true,
-  })
-  instances?: TestCreateNestedManyWithoutTestsInput;
 
   @ApiProperty({
     required: false,
@@ -100,21 +76,10 @@ class TestCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemReceiptWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
-    nullable: true,
-  })
-  itemReceipt?: ItemReceiptWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -126,6 +91,7 @@ class TestCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -137,6 +103,7 @@ class TestCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   testName!: string;
 
@@ -145,6 +112,7 @@ class TestCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
