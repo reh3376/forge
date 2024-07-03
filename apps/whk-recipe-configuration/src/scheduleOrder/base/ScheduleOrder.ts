@@ -9,28 +9,56 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field } from "@nestjs/graphql";
+import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsDate,
-  IsString,
   IsOptional,
+  IsString,
+  MaxLength,
+  IsNumber,
+  Max,
   IsInt,
   ValidateNested,
   IsEnum,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { Decimal } from "decimal.js";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { Recipe } from "../../recipe/base/Recipe";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @ObjectType()
 class ScheduleOrder {
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualEnd!: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualStart!: Date | null;
+
   @ApiProperty({
     required: true,
   })
@@ -44,6 +72,7 @@ class ScheduleOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -64,7 +93,32 @@ class ScheduleOrder {
     required: false,
     type: Number,
   })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  duration!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  durationUnits!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -73,9 +127,21 @@ class ScheduleOrder {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedEnd!: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -87,6 +153,7 @@ class ScheduleOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -98,6 +165,7 @@ class ScheduleOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -106,9 +174,21 @@ class ScheduleOrder {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedStart!: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -120,6 +200,7 @@ class ScheduleOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -151,15 +232,6 @@ class ScheduleOrder {
   productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
-    required: false,
-    type: () => ProductionSchedule,
-  })
-  @ValidateNested()
-  @Type(() => ProductionSchedule)
-  @IsOptional()
-  productionSchedules?: ProductionSchedule | null;
-
-  @ApiProperty({
     required: true,
     type: () => RecipeGroup,
   })
@@ -172,8 +244,18 @@ class ScheduleOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   recipeName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ScheduleOrderQueue],
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueue)
+  @IsOptional()
+  scheduleOrderQueues?: Array<ScheduleOrderQueue>;
 
   @ApiProperty({
     required: false,
@@ -200,6 +282,7 @@ class ScheduleOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -211,6 +294,7 @@ class ScheduleOrder {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -230,6 +314,7 @@ class ScheduleOrder {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

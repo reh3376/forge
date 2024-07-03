@@ -13,15 +13,12 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
-import { TestWhereUniqueInput } from "./TestWhereUniqueInput";
+import { IsOptional } from "class-validator";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { TestListRelationFilter } from "./TestListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
@@ -36,18 +33,6 @@ class TestWhereInput {
     nullable: true,
   })
   active?: BooleanFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -117,18 +102,6 @@ class TestWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => TestListRelationFilter)
-  @IsOptional()
-  @Field(() => TestListRelationFilter, {
-    nullable: true,
-  })
-  instances?: TestListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: BooleanNullableFilter,
   })
   @Type(() => BooleanNullableFilter)
@@ -137,18 +110,6 @@ class TestWhereInput {
     nullable: true,
   })
   isClassDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
-    nullable: true,
-  })
-  itemReceipt?: ItemReceiptWhereUniqueInput;
 
   @ApiProperty({
     required: false,

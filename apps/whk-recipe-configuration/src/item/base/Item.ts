@@ -11,23 +11,29 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsDate,
   IsString,
-  IsEnum,
+  MaxLength,
+  IsInt,
+  Max,
 } from "class-validator";
+
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
 import { Bom } from "../../bom/base/Bom";
-import { EnumItemItemClass } from "./EnumItemItemClass";
 import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
 class Item {
@@ -73,14 +79,25 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  erpId!: string;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -96,26 +113,23 @@ class Item {
   id!: string;
 
   @ApiProperty({
-    required: true,
-    enum: EnumItemItemClass,
+    required: false,
+    type: String,
   })
-  @IsEnum(EnumItemItemClass)
-  @Field(() => EnumItemItemClass, {
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
     nullable: true,
   })
-  itemClass?:
-    | "Inventory"
-    | "Assembly"
-    | "LotNumberedAssembly"
-    | "SerializedAssembly"
-    | "LotNumberedInventory"
-    | "SerializedInventory";
+  itemClass!: string | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -136,6 +150,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   itemName!: string;
 
@@ -144,6 +159,7 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   itemNumber!: string;
 
@@ -157,20 +173,34 @@ class Item {
   itemReceipts?: Array<ItemReceipt>;
 
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: Number,
   })
-  @IsString()
-  @Field(() => String)
-  itemRevision!: string;
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  itemRevision!: number | null;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   itemType!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 
   @ApiProperty({
     required: false,
@@ -201,9 +231,19 @@ class Item {
 
   @ApiProperty({
     required: false,
+    type: () => [SalesOrder],
+  })
+  @ValidateNested()
+  @Type(() => SalesOrder)
+  @IsOptional()
+  salesOrders?: Array<SalesOrder>;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -223,11 +263,21 @@ class Item {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Vendor,
+  })
+  @ValidateNested()
+  @Type(() => Vendor)
+  @IsOptional()
+  vendor?: Vendor | null;
 }
 
 export { Item as Item };

@@ -26,8 +26,8 @@ import { ItemReceiptFindUniqueArgs } from "./ItemReceiptFindUniqueArgs";
 import { CreateItemReceiptArgs } from "./CreateItemReceiptArgs";
 import { UpdateItemReceiptArgs } from "./UpdateItemReceiptArgs";
 import { DeleteItemReceiptArgs } from "./DeleteItemReceiptArgs";
-import { TestFindManyArgs } from "../../test/base/TestFindManyArgs";
-import { Test } from "../../test/base/Test";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Item } from "../../item/base/Item";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { ItemReceiptService } from "../itemReceipt.service";
@@ -171,16 +171,16 @@ export class ItemReceiptResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Test], { name: "tests" })
+  @graphql.ResolveField(() => [TestParameter], { name: "tests" })
   @nestAccessControl.UseRoles({
-    resource: "Test",
+    resource: "TestParameter",
     action: "read",
     possession: "any",
   })
   async findTests(
     @graphql.Parent() parent: ItemReceipt,
-    @graphql.Args() args: TestFindManyArgs
-  ): Promise<Test[]> {
+    @graphql.Args() args: TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
     const results = await this.service.findTests(parent.id, args);
 
     if (!results) {

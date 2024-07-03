@@ -95,8 +95,8 @@ export class BomResolverBase {
       data: {
         ...args.data,
 
-        wipItem: {
-          connect: args.data.wipItem,
+        item: {
+          connect: args.data.item,
         },
       },
     });
@@ -116,8 +116,8 @@ export class BomResolverBase {
         data: {
           ...args.data,
 
-          wipItem: {
-            connect: args.data.wipItem,
+          item: {
+            connect: args.data.item,
           },
         },
       });
@@ -219,15 +219,15 @@ export class BomResolverBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Item, {
     nullable: true,
-    name: "wipItem",
+    name: "item",
   })
   @nestAccessControl.UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
   })
-  async getWipItem(@graphql.Parent() parent: Bom): Promise<Item | null> {
-    const result = await this.service.getWipItem(parent.id);
+  async getItem(@graphql.Parent() parent: Bom): Promise<Item | null> {
+    const result = await this.service.getItem(parent.id);
 
     if (!result) {
       return null;

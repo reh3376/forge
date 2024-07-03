@@ -28,13 +28,13 @@ import { UpdatePurchaseOrderArgs } from "./UpdatePurchaseOrderArgs";
 import { DeletePurchaseOrderArgs } from "./DeletePurchaseOrderArgs";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
-import { Account } from "../../account/base/Account";
 import { Asset } from "../../asset/base/Asset";
-import { Item } from "../../item/base/Item";
 import { PurchaseOrderService } from "../purchaseOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => PurchaseOrder)
@@ -104,19 +104,11 @@ export class PurchaseOrderResolverBase {
       data: {
         ...args.data,
 
-        account: {
-          connect: args.data.account,
-        },
-
         asset: args.data.asset
           ? {
               connect: args.data.asset,
             }
           : undefined,
-
-        item: {
-          connect: args.data.item,
-        },
 
         purchaseOrderRejectedLots: args.data.purchaseOrderRejectedLots
           ? {
@@ -143,19 +135,11 @@ export class PurchaseOrderResolverBase {
         data: {
           ...args.data,
 
-          account: {
-            connect: args.data.account,
-          },
-
           asset: args.data.asset
             ? {
                 connect: args.data.asset,
               }
             : undefined,
-
-          item: {
-            connect: args.data.item,
-          },
 
           purchaseOrderRejectedLots: args.data.purchaseOrderRejectedLots
             ? {
@@ -207,6 +191,26 @@ export class PurchaseOrderResolverBase {
     @graphql.Args() args: LotFindManyArgs
   ): Promise<Lot[]> {
     const results = await this.service.findAcceptedLots(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Item], { name: "item" })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findItem(
+    @graphql.Parent() parent: PurchaseOrder,
+    @graphql.Args() args: ItemFindManyArgs
+  ): Promise<Item[]> {
+    const results = await this.service.findItem(parent.id, args);
 
     if (!results) {
       return [];
@@ -276,27 +280,6 @@ export class PurchaseOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Account, {
-    nullable: true,
-    name: "account",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Account",
-    action: "read",
-    possession: "any",
-  })
-  async getAccount(
-    @graphql.Parent() parent: PurchaseOrder
-  ): Promise<Account | null> {
-    const result = await this.service.getAccount(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Asset, {
     nullable: true,
     name: "asset",
@@ -310,25 +293,6 @@ export class PurchaseOrderResolverBase {
     @graphql.Parent() parent: PurchaseOrder
   ): Promise<Asset | null> {
     const result = await this.service.getAsset(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Item, {
-    nullable: true,
-    name: "item",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async getItem(@graphql.Parent() parent: PurchaseOrder): Promise<Item | null> {
-    const result = await this.service.getItem(parent.id);
 
     if (!result) {
       return null;
