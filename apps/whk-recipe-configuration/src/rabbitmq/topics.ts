@@ -1,4 +1,4 @@
-export enum MyMessageBrokerTopics {
+export enum WhMessageBrokerTopics {
   WhWhk01Distillery01Purchaseorder = "wh.whk01.distillery01.purchaseorder",
   WhWhk01Distillery01Productionorder = "wh.whk01.distillery01.productionorder",
   WhWhk01Distillery01Asset = "wh.whk01.distillery01.asset",
@@ -29,4 +29,4 @@ export enum MyMessageBrokerTopics {
   WhWhk01Distillery01Batch = "wh.whk01.distillery01.batch",
   WhWhk01Distillery01Vendor = "wh.whk01.distillery01.vendor",
 }
-export type AllMessageBrokerTopics = MyMessageBrokerTopics;
+export type AllMessageBrokerTopics = WhMessageBrokerTopics;

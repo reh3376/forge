@@ -11,20 +11,25 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
+  IsInt,
+  Max,
   IsNumber,
-  IsBoolean,
   IsEnum,
+  IsBoolean,
 } from "class-validator";
+
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { TestCreateNestedManyWithoutItemReceiptsInput } from "./TestCreateNestedManyWithoutItemReceiptsInput";
+import { TestParameterCreateNestedManyWithoutItemReceiptsInput } from "./TestParameterCreateNestedManyWithoutItemReceiptsInput";
 
 @InputType()
 class ItemReceiptCreateInput {
@@ -33,6 +38,7 @@ class ItemReceiptCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
 
@@ -41,6 +47,7 @@ class ItemReceiptCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   driver!: string;
 
@@ -49,6 +56,7 @@ class ItemReceiptCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -63,6 +71,18 @@ class ItemReceiptCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  loadId?: number | null;
 
   @ApiProperty({
     required: false,
@@ -81,25 +101,16 @@ class ItemReceiptCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   quantity!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  receiptAccepted?: boolean | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -115,13 +126,14 @@ class ItemReceiptCreateInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | null;
+  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -130,21 +142,33 @@ class ItemReceiptCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestCreateNestedManyWithoutItemReceiptsInput,
+    type: () => TestParameterCreateNestedManyWithoutItemReceiptsInput,
   })
   @ValidateNested()
-  @Type(() => TestCreateNestedManyWithoutItemReceiptsInput)
+  @Type(() => TestParameterCreateNestedManyWithoutItemReceiptsInput)
   @IsOptional()
-  @Field(() => TestCreateNestedManyWithoutItemReceiptsInput, {
+  @Field(() => TestParameterCreateNestedManyWithoutItemReceiptsInput, {
     nullable: true,
   })
-  tests?: TestCreateNestedManyWithoutItemReceiptsInput;
+  tests?: TestParameterCreateNestedManyWithoutItemReceiptsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testsPassed?: boolean | null;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   units!: string;
 
@@ -153,6 +177,7 @@ class ItemReceiptCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -164,6 +189,7 @@ class ItemReceiptCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -175,6 +201,7 @@ class ItemReceiptCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,

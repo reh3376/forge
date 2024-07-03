@@ -11,30 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AccountWhereUniqueInput } from "../../account/base/AccountWhereUniqueInput";
-import { ValidateNested, IsOptional, IsEnum } from "class-validator";
-import { Type } from "class-transformer";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { Type } from "class-transformer";
+import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EnumSalesOrderOrderType } from "./EnumSalesOrderOrderType";
+import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
+import { JsonFilter } from "../../util/JsonFilter";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 
 @InputType()
 class SalesOrderWhereInput {
-  @ApiProperty({
-    required: false,
-    type: () => AccountWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AccountWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AccountWhereUniqueInput, {
-    nullable: true,
-  })
-  account?: AccountWhereUniqueInput;
-
   @ApiProperty({
     required: false,
     type: DateTimeFilter,
@@ -59,6 +48,18 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -66,7 +67,7 @@ class SalesOrderWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  customer?: StringFilter;
+  customerCode?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -77,7 +78,18 @@ class SalesOrderWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
+  erpId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  globalId?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -92,6 +104,29 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemListRelationFilter, {
+    nullable: true,
+  })
+  item?: ItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  lineItems?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -99,18 +134,7 @@ class SalesOrderWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  itemId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumSalesOrderOrderType,
-  })
-  @IsEnum(EnumSalesOrderOrderType)
-  @IsOptional()
-  @Field(() => EnumSalesOrderOrderType, {
-    nullable: true,
-  })
-  orderType?: "TopFilledBarrels" | "BulkProofGallons" | "SideFilledBarrels";
+  orderType?: StringFilter;
 
   @ApiProperty({
     required: false,

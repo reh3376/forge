@@ -54,32 +54,42 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomCreateInput,
+  })
   async createBom(@common.Body() data: BomCreateInput): Promise<Bom> {
     return await this.service.createBom({
       data: {
         ...data,
 
-        wipItem: {
-          connect: data.wipItem,
+        item: {
+          connect: data.item,
         },
       },
       select: {
         bomName: true,
         bomRevision: true,
+        bomType: true,
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        effectiveEndDate: true,
+        effectiveStartDate: true,
+        erpId: true,
         globalId: true,
         id: true,
-        schemaVersion: true,
+        inactive: true,
 
-        wipItem: {
+        item: {
           select: {
             id: true,
           },
         },
+
+        notes: true,
+        schemaVersion: true,
       },
     });
   }
@@ -103,20 +113,27 @@ export class BomControllerBase {
       select: {
         bomName: true,
         bomRevision: true,
+        bomType: true,
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        effectiveEndDate: true,
+        effectiveStartDate: true,
+        erpId: true,
         globalId: true,
         id: true,
-        schemaVersion: true,
+        inactive: true,
 
-        wipItem: {
+        item: {
           select: {
             id: true,
           },
         },
+
+        notes: true,
+        schemaVersion: true,
       },
     });
   }
@@ -139,20 +156,27 @@ export class BomControllerBase {
       select: {
         bomName: true,
         bomRevision: true,
+        bomType: true,
         className: true,
         createdAt: true,
         createdBy: true,
         editedAt: true,
         editedBy: true,
+        effectiveEndDate: true,
+        effectiveStartDate: true,
+        erpId: true,
         globalId: true,
         id: true,
-        schemaVersion: true,
+        inactive: true,
 
-        wipItem: {
+        item: {
           select: {
             id: true,
           },
         },
+
+        notes: true,
+        schemaVersion: true,
       },
     });
     if (result === null) {
@@ -175,6 +199,9 @@ export class BomControllerBase {
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
+  @swagger.ApiBody({
+    type: BomUpdateInput,
+  })
   async updateBom(
     @common.Param() params: BomWhereUniqueInput,
     @common.Body() data: BomUpdateInput
@@ -185,27 +212,34 @@ export class BomControllerBase {
         data: {
           ...data,
 
-          wipItem: {
-            connect: data.wipItem,
+          item: {
+            connect: data.item,
           },
         },
         select: {
           bomName: true,
           bomRevision: true,
+          bomType: true,
           className: true,
           createdAt: true,
           createdBy: true,
           editedAt: true,
           editedBy: true,
+          effectiveEndDate: true,
+          effectiveStartDate: true,
+          erpId: true,
           globalId: true,
           id: true,
-          schemaVersion: true,
+          inactive: true,
 
-          wipItem: {
+          item: {
             select: {
               id: true,
             },
           },
+
+          notes: true,
+          schemaVersion: true,
         },
       });
     } catch (error) {
@@ -240,6 +274,7 @@ export class BomControllerBase {
           },
         },
 
+        consumedAt: true,
         createdAt: true,
         createdBy: true,
         id: true,
@@ -353,6 +388,12 @@ export class BomControllerBase {
     const results = await this.service.findProductionOrder(params.id, {
       ...query,
       select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
         className: true,
         complete: true,
         createdAt: true,

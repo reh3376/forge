@@ -11,20 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
+  MaxLength,
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
+import { FermentationChemistryCreateNestedManyWithoutOperationsInput } from "./FermentationChemistryCreateNestedManyWithoutOperationsInput";
+import { FermentationDayDatumCreateNestedManyWithoutOperationsInput } from "./FermentationDayDatumCreateNestedManyWithoutOperationsInput";
+import { FermentationSettingDatumCreateNestedManyWithoutOperationsInput } from "./FermentationSettingDatumCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
@@ -36,6 +43,7 @@ class OperationCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(4)
   @Field(() => String)
   abbreviation!: string;
 
@@ -77,6 +85,7 @@ class OperationCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -85,6 +94,7 @@ class OperationCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @Field(() => String)
   description!: string;
 
@@ -93,6 +103,7 @@ class OperationCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -113,9 +124,46 @@ class OperationCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationSettingDatumCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatumCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationSettingDatumCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationSettingData?: FermentationSettingDatumCreateNestedManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -146,6 +194,18 @@ class OperationCreateInput {
   isClassDefinition?: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId?: string | null;
+
+  @ApiProperty({
     required: true,
     enum: EnumOperationName,
   })
@@ -166,6 +226,7 @@ class OperationCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -177,6 +238,7 @@ class OperationCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(999)
   @Field(() => Number)
   procedureSequenceIndex!: number;
 
@@ -185,6 +247,7 @@ class OperationCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -196,6 +259,7 @@ class OperationCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

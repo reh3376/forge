@@ -15,6 +15,9 @@ import {
   Prisma,
   Operation as PrismaOperation,
   EquipmentPhase as PrismaEquipmentPhase,
+  FermentationChemistry as PrismaFermentationChemistry,
+  FermentationDayDatum as PrismaFermentationDayDatum,
+  FermentationSettingDatum as PrismaFermentationSettingDatum,
   UnitProcedure as PrismaUnitProcedure,
 } from "@prisma/client";
 
@@ -27,28 +30,28 @@ export class OperationServiceBase {
     return this.prisma.operation.count(args);
   }
 
-  async operations<T extends Prisma.OperationFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.OperationFindManyArgs>
+  async operations(
+    args: Prisma.OperationFindManyArgs
   ): Promise<PrismaOperation[]> {
-    return this.prisma.operation.findMany<Prisma.OperationFindManyArgs>(args);
+    return this.prisma.operation.findMany(args);
   }
-  async operation<T extends Prisma.OperationFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.OperationFindUniqueArgs>
+  async operation(
+    args: Prisma.OperationFindUniqueArgs
   ): Promise<PrismaOperation | null> {
     return this.prisma.operation.findUnique(args);
   }
-  async createOperation<T extends Prisma.OperationCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.OperationCreateArgs>
+  async createOperation(
+    args: Prisma.OperationCreateArgs
   ): Promise<PrismaOperation> {
-    return this.prisma.operation.create<T>(args);
+    return this.prisma.operation.create(args);
   }
-  async updateOperation<T extends Prisma.OperationUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.OperationUpdateArgs>
+  async updateOperation(
+    args: Prisma.OperationUpdateArgs
   ): Promise<PrismaOperation> {
-    return this.prisma.operation.update<T>(args);
+    return this.prisma.operation.update(args);
   }
-  async deleteOperation<T extends Prisma.OperationDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.OperationDeleteArgs>
+  async deleteOperation(
+    args: Prisma.OperationDeleteArgs
   ): Promise<PrismaOperation> {
     return this.prisma.operation.delete(args);
   }
@@ -62,6 +65,39 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .equipmentPhases(args);
+  }
+
+  async findFermentationChemistries(
+    parentId: string,
+    args: Prisma.FermentationChemistryFindManyArgs
+  ): Promise<PrismaFermentationChemistry[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationChemistries(args);
+  }
+
+  async findFermentationDayData(
+    parentId: string,
+    args: Prisma.FermentationDayDatumFindManyArgs
+  ): Promise<PrismaFermentationDayDatum[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationDayData(args);
+  }
+
+  async findFermentationSettingData(
+    parentId: string,
+    args: Prisma.FermentationSettingDatumFindManyArgs
+  ): Promise<PrismaFermentationSettingDatum[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationSettingData(args);
   }
 
   async findInstances(

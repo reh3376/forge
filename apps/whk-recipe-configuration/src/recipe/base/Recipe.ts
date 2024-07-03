@@ -11,15 +11,20 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
+
 import { Type } from "class-transformer";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -52,6 +57,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -60,6 +66,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -68,6 +75,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   customerId!: string;
 
@@ -76,6 +84,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -95,6 +104,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -106,8 +116,18 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   itemId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 
   @ApiProperty({
     required: false,
@@ -132,6 +152,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   Recipe!: string;
 
@@ -149,6 +170,7 @@ class Recipe {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -169,6 +191,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -197,6 +220,7 @@ class Recipe {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
