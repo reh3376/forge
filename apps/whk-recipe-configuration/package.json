@@ -8,7 +8,6 @@
     "start:dev:debug": "nest start --debug --watch",
     "build": "nest build",
     "test": "jest",
-    "dev:seed": "ts-node scripts/seedDev.ts",
     "dev:seed": "ts-node scripts/seedDevelopment.ts",
     "prod:seed": "ts-node scripts/seedProduction.ts",
     "prod:seed:mash": "ts-node scripts/mashingRecipeSeed.ts",
