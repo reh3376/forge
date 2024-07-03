@@ -1049,9 +1049,11 @@ export async function mashingRecipeSeed() {
 
   async function seedScheduleOrderQueue(n: number): Promise<void> {
     const nextUnitProcedure = await client.unitProcedure.findMany();
+    const scheduleOrders = await client.scheduleOrder.findMany();
 
     for (let i = 0; i < n; i++) {
         const unitProcedure = getRandomArrayElement(nextUnitProcedure) as UnitProcedure;
+        const scheduleOrder = getRandomArrayElement(scheduleOrders) as ScheduleOrder;
 
       try {
         await client.scheduleOrderQueue.create({
@@ -1062,7 +1064,7 @@ export async function mashingRecipeSeed() {
             updatedBy: faker.internet.userName(),
             nextUnitProcedure: {connect: {id: unitProcedure.id}},
             nextUnitProcedureName: unitProcedure.name,
-            // scheduleOrder: {connect: {id: scheduleOrder.id}},
+            scheduleOrder: {connect: {id: scheduleOrder.id}},
           },
         });
       } catch (error) {
