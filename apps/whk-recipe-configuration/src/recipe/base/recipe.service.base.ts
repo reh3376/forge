@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Recipe as PrismaRecipe,
+  Lot as PrismaLot,
   ProductionOrder as PrismaProductionOrder,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   ScheduleOrder as PrismaScheduleOrder,
@@ -28,30 +29,33 @@ export class RecipeServiceBase {
     return this.prisma.recipe.count(args);
   }
 
-  async recipes<T extends Prisma.RecipeFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeFindManyArgs>
-  ): Promise<PrismaRecipe[]> {
-    return this.prisma.recipe.findMany<Prisma.RecipeFindManyArgs>(args);
+  async recipes(args: Prisma.RecipeFindManyArgs): Promise<PrismaRecipe[]> {
+    return this.prisma.recipe.findMany(args);
   }
-  async recipe<T extends Prisma.RecipeFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeFindUniqueArgs>
+  async recipe(
+    args: Prisma.RecipeFindUniqueArgs
   ): Promise<PrismaRecipe | null> {
     return this.prisma.recipe.findUnique(args);
   }
-  async createRecipe<T extends Prisma.RecipeCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeCreateArgs>
-  ): Promise<PrismaRecipe> {
-    return this.prisma.recipe.create<T>(args);
+  async createRecipe(args: Prisma.RecipeCreateArgs): Promise<PrismaRecipe> {
+    return this.prisma.recipe.create(args);
   }
-  async updateRecipe<T extends Prisma.RecipeUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeUpdateArgs>
-  ): Promise<PrismaRecipe> {
-    return this.prisma.recipe.update<T>(args);
+  async updateRecipe(args: Prisma.RecipeUpdateArgs): Promise<PrismaRecipe> {
+    return this.prisma.recipe.update(args);
   }
-  async deleteRecipe<T extends Prisma.RecipeDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.RecipeDeleteArgs>
-  ): Promise<PrismaRecipe> {
+  async deleteRecipe(args: Prisma.RecipeDeleteArgs): Promise<PrismaRecipe> {
     return this.prisma.recipe.delete(args);
+  }
+
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
   }
 
   async findProductionOrders(

@@ -17,10 +17,12 @@ import {
   BomItem as PrismaBomItem,
   Bom as PrismaBom,
   ItemReceipt as PrismaItemReceipt,
+  Lot as PrismaLot,
   ProductionOrder as PrismaProductionOrder,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   PurchaseOrder as PrismaPurchaseOrder,
-  ItemGroup as PrismaItemGroup,
+  SalesOrder as PrismaSalesOrder,
+  Vendor as PrismaVendor,
 } from "@prisma/client";
 
 export class ItemServiceBase {
@@ -30,29 +32,19 @@ export class ItemServiceBase {
     return this.prisma.item.count(args);
   }
 
-  async items<T extends Prisma.ItemFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemFindManyArgs>
-  ): Promise<PrismaItem[]> {
-    return this.prisma.item.findMany<Prisma.ItemFindManyArgs>(args);
+  async items(args: Prisma.ItemFindManyArgs): Promise<PrismaItem[]> {
+    return this.prisma.item.findMany(args);
   }
-  async item<T extends Prisma.ItemFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemFindUniqueArgs>
-  ): Promise<PrismaItem | null> {
+  async item(args: Prisma.ItemFindUniqueArgs): Promise<PrismaItem | null> {
     return this.prisma.item.findUnique(args);
   }
-  async createItem<T extends Prisma.ItemCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemCreateArgs>
-  ): Promise<PrismaItem> {
-    return this.prisma.item.create<T>(args);
+  async createItem(args: Prisma.ItemCreateArgs): Promise<PrismaItem> {
+    return this.prisma.item.create(args);
   }
-  async updateItem<T extends Prisma.ItemUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemUpdateArgs>
-  ): Promise<PrismaItem> {
-    return this.prisma.item.update<T>(args);
+  async updateItem(args: Prisma.ItemUpdateArgs): Promise<PrismaItem> {
+    return this.prisma.item.update(args);
   }
-  async deleteItem<T extends Prisma.ItemDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ItemDeleteArgs>
-  ): Promise<PrismaItem> {
+  async deleteItem(args: Prisma.ItemDeleteArgs): Promise<PrismaItem> {
     return this.prisma.item.delete(args);
   }
 
@@ -89,6 +81,17 @@ export class ItemServiceBase {
       .itemReceipts(args);
   }
 
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
+  }
+
   async findProductionOrders(
     parentId: string,
     args: Prisma.ProductionOrderFindManyArgs
@@ -122,11 +125,22 @@ export class ItemServiceBase {
       .purchaseOrders(args);
   }
 
-  async getItemGroup(parentId: string): Promise<PrismaItemGroup | null> {
+  async findSalesOrders(
+    parentId: string,
+    args: Prisma.SalesOrderFindManyArgs
+  ): Promise<PrismaSalesOrder[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .salesOrders(args);
+  }
+
+  async getVendor(parentId: string): Promise<PrismaVendor | null> {
     return this.prisma.item
       .findUnique({
         where: { id: parentId },
       })
-      .itemGroup();
+      .vendor();
   }
 }

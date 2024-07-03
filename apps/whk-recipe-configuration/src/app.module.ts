@@ -1,3 +1,4 @@
+import { RabbitMQModule } from "./rabbitmq/rabbitmq.module";
 import { Module } from "@nestjs/common";
 
 import {
@@ -31,8 +32,7 @@ import { ProductionOrderModule } from "./productionOrder/productionOrder.module"
 import { ScheduleOrderModule } from "./scheduleOrder/scheduleOrder.module";
 import { ItemModule } from "./item/item.module";
 import { ItemGroupModule } from "./itemGroup/itemGroup.module";
-import { ProductionScheduleModule } from "./productionSchedule/productionSchedule.module";
-import { AccountModule } from "./account/account.module";
+import { CustomerModule } from "./customer/customer.module";
 import { PurchaseOrderModule } from "./purchaseOrder/purchaseOrder.module";
 import { SalesOrderModule } from "./salesOrder/salesOrder.module";
 import { TestModule } from "./test/test.module";
@@ -42,9 +42,16 @@ import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
 import { ProductionOrderUnitProcedureModule } from "./productionOrderUnitProcedure/productionOrderUnitProcedure.module";
+import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
+import { MashDatumModule } from "./mashDatum/mashDatum.module";
+import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
+import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
+import { BatchModule } from "./batch/batch.module";
+import { VendorModule } from "./vendor/vendor.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
+import { StorageModule } from "./storage/storage.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { ServeStaticOptionsService } from "./serveStaticOptions.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -60,6 +67,8 @@ import {SyncModule} from "./sync/sync.module";
 @Module({
   controllers: [],
   imports: [
+    StorageModule,
+    RabbitMQModule,
     ACLModule,
     AuthModule,
     LoggerModule,
@@ -80,8 +89,7 @@ import {SyncModule} from "./sync/sync.module";
     ScheduleOrderModule,
     ItemModule,
     ItemGroupModule,
-    ProductionScheduleModule,
-    AccountModule,
+    CustomerModule,
     PurchaseOrderModule,
     SalesOrderModule,
     TestModule,
@@ -91,6 +99,12 @@ import {SyncModule} from "./sync/sync.module";
     BomItemModule,
     UnitModule,
     ProductionOrderUnitProcedureModule,
+    FermentationChemistryModule,
+    MashDatumModule,
+    FermentationSettingDatumModule,
+    FermentationDayDatumModule,
+    BatchModule,
+    VendorModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

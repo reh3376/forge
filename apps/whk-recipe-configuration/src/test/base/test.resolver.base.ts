@@ -26,7 +26,6 @@ import { TestFindUniqueArgs } from "./TestFindUniqueArgs";
 import { CreateTestArgs } from "./CreateTestArgs";
 import { UpdateTestArgs } from "./UpdateTestArgs";
 import { DeleteTestArgs } from "./DeleteTestArgs";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { TestService } from "../test.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Test)
@@ -87,21 +86,7 @@ export class TestResolverBase {
   async createTest(@graphql.Args() args: CreateTestArgs): Promise<Test> {
     return await this.service.createTest({
       ...args,
-      data: {
-        ...args.data,
-
-        classId: args.data.classId
-          ? {
-              connect: args.data.classId,
-            }
-          : undefined,
-
-        itemReceipt: args.data.itemReceipt
-          ? {
-              connect: args.data.itemReceipt,
-            }
-          : undefined,
-      },
+      data: args.data,
     });
   }
 
@@ -116,21 +101,7 @@ export class TestResolverBase {
     try {
       return await this.service.updateTest({
         ...args,
-        data: {
-          ...args.data,
-
-          classId: args.data.classId
-            ? {
-                connect: args.data.classId,
-              }
-            : undefined,
-
-          itemReceipt: args.data.itemReceipt
-            ? {
-                connect: args.data.itemReceipt,
-              }
-            : undefined,
-        },
+        data: args.data,
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -159,65 +130,5 @@ export class TestResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Test], { name: "instances" })
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "read",
-    possession: "any",
-  })
-  async findInstances(
-    @graphql.Parent() parent: Test,
-    @graphql.Args() args: TestFindManyArgs
-  ): Promise<Test[]> {
-    const results = await this.service.findInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Test, {
-    nullable: true,
-    name: "classId",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "read",
-    possession: "any",
-  })
-  async getClassId(@graphql.Parent() parent: Test): Promise<Test | null> {
-    const result = await this.service.getClassId(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ItemReceipt, {
-    nullable: true,
-    name: "itemReceipt",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ItemReceipt",
-    action: "read",
-    possession: "any",
-  })
-  async getItemReceipt(
-    @graphql.Parent() parent: Test
-  ): Promise<ItemReceipt | null> {
-    const result = await this.service.getItemReceipt(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 }

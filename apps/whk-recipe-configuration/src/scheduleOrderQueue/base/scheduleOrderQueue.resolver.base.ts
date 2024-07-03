@@ -26,7 +26,7 @@ import { ScheduleOrderQueueFindUniqueArgs } from "./ScheduleOrderQueueFindUnique
 import { CreateScheduleOrderQueueArgs } from "./CreateScheduleOrderQueueArgs";
 import { UpdateScheduleOrderQueueArgs } from "./UpdateScheduleOrderQueueArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { ProductionSchedule } from "../../productionSchedule/base/ProductionSchedule";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ScheduleOrderQueue)
@@ -100,9 +100,9 @@ export class ScheduleOrderQueueResolverBase {
           connect: args.data.nextUnitProcedure,
         },
 
-        productionSchedule: args.data.productionSchedule
+        scheduleOrder: args.data.scheduleOrder
           ? {
-              connect: args.data.productionSchedule,
+              connect: args.data.scheduleOrder,
             }
           : undefined,
       },
@@ -129,9 +129,9 @@ export class ScheduleOrderQueueResolverBase {
             connect: args.data.nextUnitProcedure,
           },
 
-          productionSchedule: args.data.productionSchedule
+          scheduleOrder: args.data.scheduleOrder
             ? {
-                connect: args.data.productionSchedule,
+                connect: args.data.scheduleOrder,
               }
             : undefined,
         },
@@ -168,19 +168,19 @@ export class ScheduleOrderQueueResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ProductionSchedule, {
+  @graphql.ResolveField(() => ScheduleOrder, {
     nullable: true,
-    name: "productionSchedule",
+    name: "scheduleOrder",
   })
   @nestAccessControl.UseRoles({
-    resource: "ProductionSchedule",
+    resource: "ScheduleOrder",
     action: "read",
     possession: "any",
   })
-  async getProductionSchedule(
+  async getScheduleOrder(
     @graphql.Parent() parent: ScheduleOrderQueue
-  ): Promise<ProductionSchedule | null> {
-    const result = await this.service.getProductionSchedule(parent.id);
+  ): Promise<ScheduleOrder | null> {
+    const result = await this.service.getScheduleOrder(parent.id);
 
     if (!result) {
       return null;

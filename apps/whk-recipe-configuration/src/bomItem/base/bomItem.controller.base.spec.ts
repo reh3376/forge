@@ -18,6 +18,7 @@ import { BomItemService } from "../bomItem.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  consumedAt: new Date(),
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   id: "exampleId",
@@ -27,6 +28,7 @@ const CREATE_INPUT = {
   updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
+  consumedAt: new Date(),
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   id: "exampleId",
@@ -37,6 +39,7 @@ const CREATE_RESULT = {
 };
 const FIND_MANY_RESULT = [
   {
+    consumedAt: new Date(),
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     id: "exampleId",
@@ -47,6 +50,7 @@ const FIND_MANY_RESULT = [
   },
 ];
 const FIND_ONE_RESULT = {
+  consumedAt: new Date(),
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   id: "exampleId",
@@ -138,6 +142,7 @@ describe("BomItem", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
+        consumedAt: CREATE_RESULT.consumedAt.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
@@ -150,6 +155,7 @@ describe("BomItem", () => {
       .expect([
         {
           ...FIND_MANY_RESULT[0],
+          consumedAt: FIND_MANY_RESULT[0].consumedAt.toISOString(),
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
@@ -173,6 +179,7 @@ describe("BomItem", () => {
       .expect(HttpStatus.OK)
       .expect({
         ...FIND_ONE_RESULT,
+        consumedAt: FIND_ONE_RESULT.consumedAt.toISOString(),
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
@@ -186,6 +193,7 @@ describe("BomItem", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
+        consumedAt: CREATE_RESULT.consumedAt.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })

@@ -15,11 +15,14 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
   IsInt,
+  Max,
 } from "class-validator";
-import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
+import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { Type } from "class-transformer";
+import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -44,6 +47,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
 
@@ -52,6 +56,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(3)
   @Field(() => String)
   customer!: string;
 
@@ -60,6 +65,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   customerId!: string;
 
@@ -68,6 +74,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -79,6 +86,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -90,8 +98,21 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(16)
   @Field(() => String)
   itemId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
@@ -125,6 +146,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
   Recipe!: string;
 
@@ -145,6 +167,7 @@ class RecipeCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -168,6 +191,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -191,6 +215,7 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

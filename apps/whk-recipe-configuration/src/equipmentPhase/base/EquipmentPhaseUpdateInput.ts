@@ -11,21 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsBoolean,
   IsOptional,
   ValidateNested,
   IsString,
+  MaxLength,
   IsEnum,
   IsInt,
+  Max,
 } from "class-validator";
-import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+
+import { BomItemUpdateManyWithoutEquipmentPhasesInput } from "./BomItemUpdateManyWithoutEquipmentPhasesInput";
 import { Type } from "class-transformer";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
 import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
 import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
 @InputType()
@@ -40,6 +46,18 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemUpdateManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemUpdateManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => BomItemUpdateManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemUpdateManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,
@@ -58,6 +76,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -69,6 +88,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -80,6 +100,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -91,6 +112,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -102,6 +124,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -145,6 +168,18 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message?: string | null;
+
+  @ApiProperty({
+    required: false,
     enum: EnumEquipmentPhaseName,
   })
   @IsEnum(EnumEquipmentPhaseName)
@@ -153,7 +188,6 @@ class EquipmentPhaseUpdateInput {
     nullable: true,
   })
   name?:
-    | "PreSteam"
     | "Steam"
     | "Hold"
     | "BacksetAdd"
@@ -179,7 +213,10 @@ class EquipmentPhaseUpdateInput {
     | "StillStartup"
     | "StillShutdown"
     | "Cut"
-    | "Gauge";
+    | "Gauge"
+    | "GrainAdd"
+    | "LiquidAdd"
+    | "Prompt";
 
   @ApiProperty({
     required: false,
@@ -198,6 +235,7 @@ class EquipmentPhaseUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -209,6 +247,7 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -232,6 +271,7 @@ class EquipmentPhaseUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -243,11 +283,41 @@ class EquipmentPhaseUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumEquipmentPhaseStepType,
+  })
+  @IsEnum(EnumEquipmentPhaseStepType)
+  @IsOptional()
+  @Field(() => EnumEquipmentPhaseStepType, {
+    nullable: true,
+  })
+  stepType?:
+    | "Water"
+    | "Backset"
+    | "Corn"
+    | "Rye"
+    | "Wheat"
+    | "Malt"
+    | "Premalt"
+    | "Speciality"
+    | "Enzyme"
+    | "Nutrient"
+    | "Yeast"
+    | "Citric"
+    | "Hold"
+    | "Cool"
+    | "NotRequired"
+    | "Heat"
+    | "Vessel"
+    | "Pipe";
 
   @ApiProperty({
     required: false,

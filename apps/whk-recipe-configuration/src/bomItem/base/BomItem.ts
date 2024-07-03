@@ -17,9 +17,12 @@ import {
   IsOptional,
   IsDate,
   IsString,
+  MaxLength,
   IsNumber,
+  Max,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Item } from "../../item/base/Item";
 import { Decimal } from "decimal.js";
 import { Unit } from "../../unit/base/Unit";
@@ -36,6 +39,17 @@ class BomItem {
   bom?: Bom | null;
 
   @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  consumedAt!: Date | null;
+
+  @ApiProperty({
     required: true,
   })
   @IsDate()
@@ -48,8 +62,18 @@ class BomItem {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
     required: true,
@@ -72,6 +96,7 @@ class BomItem {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @Field(() => Float)
   quantity!: Decimal;
 
@@ -80,6 +105,7 @@ class BomItem {
     type: Number,
   })
   @IsNumber()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
@@ -108,6 +134,7 @@ class BomItem {
     type: String,
   })
   @IsString()
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

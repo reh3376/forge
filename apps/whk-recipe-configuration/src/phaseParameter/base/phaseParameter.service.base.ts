@@ -26,32 +26,41 @@ export class PhaseParameterServiceBase {
     return this.prisma.phaseParameter.count(args);
   }
 
-  async phaseParameters<T extends Prisma.PhaseParameterFindManyArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PhaseParameterFindManyArgs>
+  async phaseParameters(
+    args: Prisma.PhaseParameterFindManyArgs
   ): Promise<PrismaPhaseParameter[]> {
-    return this.prisma.phaseParameter.findMany<Prisma.PhaseParameterFindManyArgs>(
-      args
-    );
+    return this.prisma.phaseParameter.findMany(args);
   }
-  async phaseParameter<T extends Prisma.PhaseParameterFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PhaseParameterFindUniqueArgs>
+  async phaseParameter(
+    args: Prisma.PhaseParameterFindUniqueArgs
   ): Promise<PrismaPhaseParameter | null> {
     return this.prisma.phaseParameter.findUnique(args);
   }
-  async createPhaseParameter<T extends Prisma.PhaseParameterCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PhaseParameterCreateArgs>
+  async createPhaseParameter(
+    args: Prisma.PhaseParameterCreateArgs
   ): Promise<PrismaPhaseParameter> {
-    return this.prisma.phaseParameter.create<T>(args);
+    return this.prisma.phaseParameter.create(args);
   }
-  async updatePhaseParameter<T extends Prisma.PhaseParameterUpdateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PhaseParameterUpdateArgs>
+  async updatePhaseParameter(
+    args: Prisma.PhaseParameterUpdateArgs
   ): Promise<PrismaPhaseParameter> {
-    return this.prisma.phaseParameter.update<T>(args);
+    return this.prisma.phaseParameter.update(args);
   }
-  async deletePhaseParameter<T extends Prisma.PhaseParameterDeleteArgs>(
-    args: Prisma.SelectSubset<T, Prisma.PhaseParameterDeleteArgs>
+  async deletePhaseParameter(
+    args: Prisma.PhaseParameterDeleteArgs
   ): Promise<PrismaPhaseParameter> {
     return this.prisma.phaseParameter.delete(args);
+  }
+
+  async findEquipmentPhases(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<PrismaEquipmentPhase[]> {
+    return this.prisma.phaseParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .equipmentPhases(args);
   }
 
   async findInstances(
@@ -71,15 +80,5 @@ export class PhaseParameterServiceBase {
         where: { id: parentId },
       })
       .classId();
-  }
-
-  async getEquipmentPhase(
-    parentId: string
-  ): Promise<PrismaEquipmentPhase | null> {
-    return this.prisma.phaseParameter
-      .findUnique({
-        where: { id: parentId },
-      })
-      .equipmentPhase();
   }
 }

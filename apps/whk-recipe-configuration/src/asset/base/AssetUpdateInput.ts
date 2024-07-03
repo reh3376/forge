@@ -13,16 +13,21 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
+  MaxLength,
   IsOptional,
   ValidateNested,
   IsInt,
+  Max,
   IsEnum,
 } from "class-validator";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
+import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
+import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
+import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 import { EnumAssetType } from "./EnumAssetType";
 
 @InputType()
@@ -32,6 +37,7 @@ class AssetUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -53,6 +59,7 @@ class AssetUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -64,6 +71,7 @@ class AssetUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -72,9 +80,34 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => FermentationChemistryUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -83,9 +116,22 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => MashDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -109,6 +155,7 @@ class AssetUpdateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -120,6 +167,7 @@ class AssetUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
@@ -150,6 +198,7 @@ class AssetUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,

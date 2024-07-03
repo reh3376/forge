@@ -4,7 +4,12 @@ import { PhaseParameterServiceBase } from "./base/phaseParameter.service.base";
 import {PinoLogger} from "nestjs-pino";
 import {PhaseParameter, Prisma} from "@prisma/client";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {MyMessageBrokerTopics} from "../rabbitmq/topics";
+import {WhMessageBrokerTopics} from "../rabbitmq/topics";
+import {EquipmentPhase} from "../equipmentPhase/base/EquipmentPhase";
+import {
+    EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput
+} from "./base/EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput";
+import {EquipmentPhaseWhereUniqueInput} from "../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @Injectable()
 export class PhaseParameterService extends PhaseParameterServiceBase {
@@ -17,62 +22,42 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
   }
 
     private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
-        PreSteam: ['TemperatureSetpoint'],
         CornAdd: [
             'Quantity',
-            'Units',
         ],
         MaltAdd: [
             'Quantity',
-            'Units',
         ],
         RyeAdd: [
             'Quantity',
-            'Units',
         ],
         WheatAdd: [
             'Quantity',
-            'Units',
         ],
         AdditiveAdd: [
             'Quantity',
-            'Units',
-            'ItemName',
         ],
-        Prompt: [
-            'Type',
-            'Message',
-            'Header',
-            'Duration',
-            'Units',
-            'Confirmation',
-        ],
+        Prompt: [],
         Hold: [
-            'Duration',
-            'Units'
+            'Time',
+            'Temperature'
         ],
         Steam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         Cooldown: [
-            'Duration',
-            'Units',
-            'TemperatureSetpoint',
-        ],
-        PhCapture: [
-            'TODO'
+            'Time',
+            'Temperature',
         ],
         Drop: [
-            'FlowSetpoint',
+            'FlowRate',
             'SprayballTime',
-            'FlushTime',
+            'Time',
         ],
         Rinse: [
-            'Duration',
-            'Units',
-            'TemperatureSetpoint',
+            'Time',
+            'Temperature',
         ],
         DropTubToMashCooler: [
             'MashPumpSetpoint',
@@ -81,32 +66,28 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
             'MashCoolerEnable',
         ],
         Fill: [
-            'LevelSetpoint',
-            'AgitationSpeed',
-            'TemperatureSetpoint',
+            'Level',
+            'Speed',
+            'Temperature',
         ],
         FermDrop: [
-            'LevelSetpoint',
+            'Level',
         ],
         FermSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         DropLineSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         DropTubSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         CoolerSteam: [
-            'TemperatureSetpoint',
-            'Duration',
-            'Units',
+            'Temperature',
+            'Time',
         ],
         StillRun: [
             'TowerWaterTemperatureSetpoint',
@@ -115,6 +96,32 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
             'LowWineProof',
             'HighWineProof',
         ],
+        GrainAdd: [
+            'Quantity',
+        ],
+        LiquidAdd: [
+            'Quantity',
+            'Speed' // Agitator speed
+        ],
+
+    }
+
+    private async validateEquipmentPhase(equipmentPhaseId: string, name: string): Promise<void> {
+        const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: equipmentPhaseId}});
+        this.logger.info(`equipmentPhase: ${equipmentPhaseId}`);
+
+        // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
+        const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
+        this.logger.info(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
+
+        if (!acceptableEquipmentPhases) {
+            throw new BadRequestException(`No Equipment Phase mapping found for Phase Parameter: ${name}`);
+        }
+
+        this.logger.info(`Result of includes: ${acceptableEquipmentPhases.includes(name)}`);
+        if (!acceptableEquipmentPhases.includes(name)) {
+            throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
+        }
     }
 
   async createPhaseParameter<T extends Prisma.PhaseParameterCreateArgs>(
@@ -124,25 +131,18 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
       this.logger.info(`Updating Equipment Phase: ${name}`);
 
       // if unit procedure id is provided, check if it matches the acceptable list for the operation
-      if (args.data.equipmentPhase?.connect?.id) {
-          const equipmentPhaseId = args.data.equipmentPhase?.connect?.id;
-          const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: equipmentPhaseId as string}});
-          this.logger.info(`equipmentPhase: ${equipmentPhaseId}`);
-
-          // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
-          const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
-          this.logger.info(`Acceptable Equipment Phases: ${acceptableEquipmentPhases}`);
-
-          if (!acceptableEquipmentPhases) {
-              throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
-          }
-          if (!acceptableEquipmentPhases.includes(args.data.name)) {
-              throw new BadRequestException(`Provided EquipmentPhase Id does not match the acceptable list for Phase Parameter: ${name}`);
+      if (args.data.equipmentPhases?.connect) {
+          if (Array.isArray(args.data.equipmentPhases?.connect)) {
+              for (const equipmentPhaseInput of args.data.equipmentPhases.connect) {
+                  // args.data.equipmentPhases.connect.forEach((equipmentPhaseInput: EquipmentPhaseWhereUniqueInput) => {
+                  const equipmentPhaseId = equipmentPhaseInput.id as string;
+                  await this.validateEquipmentPhase(equipmentPhaseId, name);
+              }
           }
       }
       const phaseParameter = await super.createPhaseParameter(args);
 
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
           recordName: 'PhaseParameter',
           event_type: 'create',
           data: phaseParameter
@@ -158,32 +158,52 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
       const phaseParameter = await this.prisma.phaseParameter.findFirstOrThrow({where: {id: args.where.id}}) as PhaseParameter;
       this.logger.info(`Updating Phase Parameter: ${phaseParameter.name}`);
       const name = phaseParameter.name as string;
-      const equipmentPhaseId = args.data.equipmentPhase?.connect?.id;
-      const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: equipmentPhaseId as string}});
-      this.logger.info(`equipmentPhase: ${equipmentPhaseId}`);
+      let phaseParameterData = phaseParameter;
+      if (Array.isArray(args.data.equipmentPhases?.connect)) {
+          for (const equipmentPhaseInput of args.data.equipmentPhases.connect) {
+              // args.data.equipmentPhases.connect.forEach((equipmentPhaseInput: EquipmentPhaseWhereUniqueInput) => {
+              const equipmentPhaseId = equipmentPhaseInput.id as string;
+              await this.validateEquipmentPhase(equipmentPhaseId, name);
+          }
+          phaseParameterData = await super.updatePhaseParameter(args);
 
-      // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
-      const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
-      this.logger.info(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
+          await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+              recordName: 'PhaseParameter',
+              event_type: 'update',
+              data: phaseParameterData
+          });
 
-      if (!acceptableEquipmentPhases) {
-          throw new BadRequestException(`No Equipment Phase mapping found for Phase Parameter: ${name}`);
+          this.logger.info(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
+          return phaseParameterData;
+      } else {
+          const equipmentPhaseId = args.data.equipmentPhases?.connect?.id;
+          const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: equipmentPhaseId as string}});
+          this.logger.info(`equipmentPhase: ${equipmentPhaseId}`);
+
+          // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
+          const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
+          this.logger.info(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
+
+          if (!acceptableEquipmentPhases) {
+              throw new BadRequestException(`No Equipment Phase mapping found for Phase Parameter: ${name}`);
+          }
+
+          this.logger.info(`Result of includes: ${acceptableEquipmentPhases.includes(phaseParameter.name)}`);
+          if (!acceptableEquipmentPhases.includes(phaseParameter.name)) {
+              throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
+          }
+
+          phaseParameterData = await super.updatePhaseParameter(args);
+
+          await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
+                recordName: 'PhaseParameter',
+                event_type: 'update',
+                data: phaseParameterData
+          });
+
+          this.logger.info(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
       }
-
-      this.logger.info(`Result of includes: ${acceptableEquipmentPhases.includes(phaseParameter.name)}`);
-      if (!acceptableEquipmentPhases.includes(phaseParameter.name)) {
-          throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
-      }
-
-      const phaseParameterData = await super.updatePhaseParameter(args);
-
-      await this.rabbitProducer.emitMessage(MyMessageBrokerTopics.WhWhk01Distillery01Phaseparameter, {
-            recordName: 'PhaseParameter',
-            event_type: 'update',
-            data: phaseParameterData
-      });
-
-      this.logger.info(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
       return phaseParameterData;
+
   }
 }

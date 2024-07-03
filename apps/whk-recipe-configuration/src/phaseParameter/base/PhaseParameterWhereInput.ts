@@ -17,7 +17,7 @@ import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -85,15 +85,15 @@ class PhaseParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseWhereUniqueInput,
+    type: () => EquipmentPhaseListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @Type(() => EquipmentPhaseListRelationFilter)
   @IsOptional()
-  @Field(() => EquipmentPhaseWhereUniqueInput, {
+  @Field(() => EquipmentPhaseListRelationFilter, {
     nullable: true,
   })
-  equipmentPhase?: EquipmentPhaseWhereUniqueInput;
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -271,11 +271,13 @@ class PhaseParameterWhereInput {
     nullable: true,
   })
   staticName?:
-    | "SteamTemperature"
-    | "HoldTime"
-    | "IngredientName"
-    | "IngredientQuantity"
-    | "IngredientUnits";
+    | "Temperature"
+    | "Time"
+    | "Quantity"
+    | "Speed"
+    | "FlowRate"
+    | "SprayballTime"
+    | "Level";
 
   @ApiProperty({
     required: false,
