@@ -19,6 +19,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 
@@ -103,6 +104,18 @@ class BomItemWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput;
 
   @ApiProperty({
     required: false,

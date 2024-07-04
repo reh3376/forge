@@ -24,6 +24,7 @@ import {
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { Decimal } from "decimal.js";
 
 @InputType()
@@ -92,6 +93,18 @@ class BomItemCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
