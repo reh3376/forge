@@ -20,6 +20,7 @@ import {
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { BomItemUpdateManyWithoutLotsInput } from "./BomItemUpdateManyWithoutLotsInput";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -39,6 +40,18 @@ class LotUpdateInput {
     nullable: true,
   })
   batches?: BatchUpdateManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemUpdateManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemUpdateManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => BomItemUpdateManyWithoutLotsInput, {
+    nullable: true,
+  })
+  bomItems?: BomItemUpdateManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,

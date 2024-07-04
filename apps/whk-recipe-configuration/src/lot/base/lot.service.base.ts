@@ -15,6 +15,7 @@ import {
   Prisma,
   Lot as PrismaLot,
   Batch as PrismaBatch,
+  BomItem as PrismaBomItem,
   FermentationChemistry as PrismaFermentationChemistry,
   Item as PrismaItem,
   ProductionOrder as PrismaProductionOrder,
@@ -54,6 +55,17 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .batches(args);
+  }
+
+  async findBomItems(
+    parentId: string,
+    args: Prisma.BomItemFindManyArgs
+  ): Promise<PrismaBomItem[]> {
+    return this.prisma.lot
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .bomItems(args);
   }
 
   async getFermentationChemistries(

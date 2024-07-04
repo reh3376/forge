@@ -286,6 +286,12 @@ export class BomControllerBase {
           },
         },
 
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         quantityActual: true,
         units: true,
