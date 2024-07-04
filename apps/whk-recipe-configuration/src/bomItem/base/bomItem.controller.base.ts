@@ -78,6 +78,7 @@ export class BomItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -121,6 +122,7 @@ export class BomItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -165,6 +167,7 @@ export class BomItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -233,6 +236,7 @@ export class BomItemControllerBase {
           consumedAt: true,
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
 
           item: {
@@ -285,6 +289,7 @@ export class BomItemControllerBase {
           consumedAt: true,
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
 
           item: {

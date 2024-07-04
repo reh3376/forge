@@ -73,6 +73,18 @@ class BomItemCreateInput {
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomItemsInput;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
     required: true,
     type: () => ItemWhereUniqueInput,
   })
