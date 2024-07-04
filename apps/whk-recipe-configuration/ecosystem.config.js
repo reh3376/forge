@@ -12,6 +12,8 @@ module.exports = {
       env_production: {
         NODE_ENV: 'production',
       },
+      max_memory_restart: '500M', // Restart if it exceeds 500MB
+      max_cpu: 50, // Restart if CPU usage exceeds 50%
       // max_memory_restart: '500M', // Restart if it exceeds 500MB
       // max_cpu: 50, // Restart if CPU usage exceeds 50%
     },

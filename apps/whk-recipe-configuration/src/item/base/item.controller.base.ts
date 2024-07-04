@@ -77,12 +77,6 @@ export class ItemControllerBase {
       data: {
         ...data,
 
-        itemGroup: data.itemGroup
-          ? {
-              connect: data.itemGroup,
-            }
-          : undefined,
-
         vendor: data.vendor
           ? {
               connect: data.vendor,
@@ -98,13 +92,7 @@ export class ItemControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
-
-        itemGroup: {
-          select: {
-            id: true,
-          },
-        },
-
+        itemGroup: true,
         itemName: true,
         itemNumber: true,
         itemRevision: true,
@@ -147,13 +135,7 @@ export class ItemControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
-
-        itemGroup: {
-          select: {
-            id: true,
-          },
-        },
-
+        itemGroup: true,
         itemName: true,
         itemNumber: true,
         itemRevision: true,
@@ -197,13 +179,7 @@ export class ItemControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
-
-        itemGroup: {
-          select: {
-            id: true,
-          },
-        },
-
+        itemGroup: true,
         itemName: true,
         itemNumber: true,
         itemRevision: true,
@@ -252,12 +228,6 @@ export class ItemControllerBase {
         data: {
           ...data,
 
-          itemGroup: data.itemGroup
-            ? {
-                connect: data.itemGroup,
-              }
-            : undefined,
-
           vendor: data.vendor
             ? {
                 connect: data.vendor,
@@ -273,13 +243,7 @@ export class ItemControllerBase {
           id: true,
           itemClass: true,
           itemDescription: true,
-
-          itemGroup: {
-            select: {
-              id: true,
-            },
-          },
-
+          itemGroup: true,
           itemName: true,
           itemNumber: true,
           itemRevision: true,
@@ -331,13 +295,7 @@ export class ItemControllerBase {
           id: true,
           itemClass: true,
           itemDescription: true,
-
-          itemGroup: {
-            select: {
-              id: true,
-            },
-          },
-
+          itemGroup: true,
           itemName: true,
           itemNumber: true,
           itemRevision: true,
