@@ -493,7 +493,7 @@ model SalesOrder {
   id               String           @id @default(cuid())
   item             Item[]
   lineItems        Json?
-  orderType        String
+  orderType        String?
   productionOrders ProductionOrder?
   quantity         Int
   revision         Int              @default(0)
