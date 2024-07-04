@@ -14,12 +14,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
-  ValidateNested,
   IsDate,
   IsString,
   MaxLength,
 } from "class-validator";
-import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
 
 @ObjectType()
@@ -34,15 +32,6 @@ class Unit {
     nullable: true,
   })
   active!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [BomItem],
-  })
-  @ValidateNested()
-  @Type(() => BomItem)
-  @IsOptional()
-  bomItem?: Array<BomItem>;
 
   @ApiProperty({
     required: true,

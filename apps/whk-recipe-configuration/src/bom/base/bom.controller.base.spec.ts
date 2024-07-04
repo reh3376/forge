@@ -19,7 +19,7 @@ const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
   bomName: "exampleBomName",
-  bomRevision: 42,
+  bomRevision: "exampleBomRevision",
   bomType: "exampleBomType",
   className: "exampleClassName",
   createdAt: new Date(),
@@ -37,7 +37,7 @@ const CREATE_INPUT = {
 };
 const CREATE_RESULT = {
   bomName: "exampleBomName",
-  bomRevision: 42,
+  bomRevision: "exampleBomRevision",
   bomType: "exampleBomType",
   className: "exampleClassName",
   createdAt: new Date(),
@@ -56,7 +56,7 @@ const CREATE_RESULT = {
 const FIND_MANY_RESULT = [
   {
     bomName: "exampleBomName",
-    bomRevision: 42,
+    bomRevision: "exampleBomRevision",
     bomType: "exampleBomType",
     className: "exampleClassName",
     createdAt: new Date(),
@@ -75,7 +75,7 @@ const FIND_MANY_RESULT = [
 ];
 const FIND_ONE_RESULT = {
   bomName: "exampleBomName",
-  bomRevision: 42,
+  bomRevision: "exampleBomRevision",
   bomType: "exampleBomType",
   className: "exampleClassName",
   createdAt: new Date(),

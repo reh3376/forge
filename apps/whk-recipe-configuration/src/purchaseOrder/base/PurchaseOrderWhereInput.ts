@@ -27,7 +27,6 @@ import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { IntFilter } from "../../util/IntFilter";
 
 @InputType()
 class PurchaseOrderWhereInput {
@@ -288,14 +287,14 @@ class PurchaseOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => IntFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => IntFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  totalOrderQuantity?: IntFilter;
+  totalOrderQuantity?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
