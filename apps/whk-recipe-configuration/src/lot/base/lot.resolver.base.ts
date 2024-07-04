@@ -28,6 +28,8 @@ import { UpdateLotArgs } from "./UpdateLotArgs";
 import { DeleteLotArgs } from "./DeleteLotArgs";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -215,6 +217,26 @@ export class LotResolverBase {
     @graphql.Args() args: BatchFindManyArgs
   ): Promise<Batch[]> {
     const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BomItem], { name: "bomItems" })
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItems(
+    @graphql.Parent() parent: Lot,
+    @graphql.Args() args: BomItemFindManyArgs
+  ): Promise<BomItem[]> {
+    const results = await this.service.findBomItems(parent.id, args);
 
     if (!results) {
       return [];
