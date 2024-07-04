@@ -21,6 +21,7 @@ import {
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -37,6 +38,15 @@ class Lot {
   @Type(() => Batch)
   @IsOptional()
   batches?: Array<Batch>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BomItem],
+  })
+  @ValidateNested()
+  @Type(() => BomItem)
+  @IsOptional()
+  bomItems?: Array<BomItem>;
 
   @ApiProperty({
     required: true,

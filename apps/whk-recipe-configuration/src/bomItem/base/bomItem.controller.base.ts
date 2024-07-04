@@ -67,6 +67,12 @@ export class BomItemControllerBase {
         item: {
           connect: data.item,
         },
+
+        lot: data.lot
+          ? {
+              connect: data.lot,
+            }
+          : undefined,
       },
       select: {
         bom: {
@@ -82,6 +88,12 @@ export class BomItemControllerBase {
         id: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: {
           select: {
             id: true,
           },
@@ -131,6 +143,12 @@ export class BomItemControllerBase {
           },
         },
 
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         quantityActual: true,
         units: true,
@@ -171,6 +189,12 @@ export class BomItemControllerBase {
         id: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: {
           select: {
             id: true,
           },
@@ -225,6 +249,12 @@ export class BomItemControllerBase {
           item: {
             connect: data.item,
           },
+
+          lot: data.lot
+            ? {
+                connect: data.lot,
+              }
+            : undefined,
         },
         select: {
           bom: {
@@ -240,6 +270,12 @@ export class BomItemControllerBase {
           id: true,
 
           item: {
+            select: {
+              id: true,
+            },
+          },
+
+          lot: {
             select: {
               id: true,
             },
@@ -293,6 +329,12 @@ export class BomItemControllerBase {
           id: true,
 
           item: {
+            select: {
+              id: true,
+            },
+          },
+
+          lot: {
             select: {
               id: true,
             },

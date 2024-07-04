@@ -565,6 +565,7 @@ model ItemReceipt {
 
 model Lot {
   batches                     Batch[]
+  bomItems                    BomItem[]
   createdAt                   DateTime               @default(now())
   createdBy                   String?
   externalId                  String?                @unique
@@ -596,6 +597,8 @@ model BomItem {
   id              String           @id @default(cuid())
   item            Item             @relation(fields: [itemId], references: [id])
   itemId          String
+  lot             Lot?             @relation(fields: [lotId], references: [id])
+  lotId           String?
   quantity        Decimal
   quantityActual  Decimal?
   units           String?
