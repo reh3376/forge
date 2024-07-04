@@ -20,7 +20,6 @@ import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/Equi
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { UnitWhereUniqueInput } from "../../unit/base/UnitWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
@@ -118,15 +117,14 @@ class BomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => UnitWhereUniqueInput,
+    type: StringNullableFilter,
   })
-  @ValidateNested()
-  @Type(() => UnitWhereUniqueInput)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => UnitWhereUniqueInput, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  units?: UnitWhereUniqueInput;
+  units?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

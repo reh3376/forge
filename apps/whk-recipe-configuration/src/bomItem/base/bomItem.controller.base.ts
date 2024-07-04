@@ -67,12 +67,6 @@ export class BomItemControllerBase {
         item: {
           connect: data.item,
         },
-
-        units: data.units
-          ? {
-              connect: data.units,
-            }
-          : undefined,
       },
       select: {
         bom: {
@@ -94,13 +88,7 @@ export class BomItemControllerBase {
 
         quantity: true,
         quantityActual: true,
-
-        units: {
-          select: {
-            id: true,
-          },
-        },
-
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -143,13 +131,7 @@ export class BomItemControllerBase {
 
         quantity: true,
         quantityActual: true,
-
-        units: {
-          select: {
-            id: true,
-          },
-        },
-
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -193,13 +175,7 @@ export class BomItemControllerBase {
 
         quantity: true,
         quantityActual: true,
-
-        units: {
-          select: {
-            id: true,
-          },
-        },
-
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -246,12 +222,6 @@ export class BomItemControllerBase {
           item: {
             connect: data.item,
           },
-
-          units: data.units
-            ? {
-                connect: data.units,
-              }
-            : undefined,
         },
         select: {
           bom: {
@@ -273,13 +243,7 @@ export class BomItemControllerBase {
 
           quantity: true,
           quantityActual: true,
-
-          units: {
-            select: {
-              id: true,
-            },
-          },
-
+          units: true,
           updatedAt: true,
           updatedBy: true,
         },
@@ -331,13 +295,7 @@ export class BomItemControllerBase {
 
           quantity: true,
           quantityActual: true,
-
-          units: {
-            select: {
-              id: true,
-            },
-          },
-
+          units: true,
           updatedAt: true,
           updatedBy: true,
         },

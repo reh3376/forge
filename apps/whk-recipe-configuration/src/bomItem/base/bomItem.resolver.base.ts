@@ -30,7 +30,6 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
-import { Unit } from "../../unit/base/Unit";
 import { BomItemService } from "../bomItem.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => BomItem)
@@ -109,12 +108,6 @@ export class BomItemResolverBase {
         item: {
           connect: args.data.item,
         },
-
-        units: args.data.units
-          ? {
-              connect: args.data.units,
-            }
-          : undefined,
       },
     });
   }
@@ -144,12 +137,6 @@ export class BomItemResolverBase {
           item: {
             connect: args.data.item,
           },
-
-          units: args.data.units
-            ? {
-                connect: args.data.units,
-              }
-            : undefined,
         },
       });
     } catch (error) {
@@ -234,25 +221,6 @@ export class BomItemResolverBase {
   })
   async getItem(@graphql.Parent() parent: BomItem): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Unit, {
-    nullable: true,
-    name: "units",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "read",
-    possession: "any",
-  })
-  async getUnits(@graphql.Parent() parent: BomItem): Promise<Unit | null> {
-    const result = await this.service.getUnits(parent.id);
 
     if (!result) {
       return null;
