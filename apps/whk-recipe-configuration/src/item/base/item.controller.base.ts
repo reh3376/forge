@@ -355,6 +355,12 @@ export class ItemControllerBase {
           },
         },
 
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
         quantityActual: true,
         units: true,

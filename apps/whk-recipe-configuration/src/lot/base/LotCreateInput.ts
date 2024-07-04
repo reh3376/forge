@@ -20,6 +20,7 @@ import {
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedManyWithoutLotsInput";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -39,6 +40,18 @@ class LotCreateInput {
     nullable: true,
   })
   batches?: BatchCreateNestedManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemCreateNestedManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemCreateNestedManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => BomItemCreateNestedManyWithoutLotsInput, {
+    nullable: true,
+  })
+  bomItems?: BomItemCreateNestedManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,
