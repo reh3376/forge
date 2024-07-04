@@ -121,7 +121,7 @@ class SalesOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  orderType?: string;
+  orderType?: string | null;
 
   @ApiProperty({
     required: false,
