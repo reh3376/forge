@@ -487,7 +487,7 @@ model SalesOrder {
   createdBy        String
   customer         Customer?        @relation(fields: [customerId], references: [id])
   customerId       String?
-  customerCode     String
+  customerCode     String?
   erpId            String?          @unique
   globalId         String           @unique @default(cuid())
   id               String           @id @default(cuid())
