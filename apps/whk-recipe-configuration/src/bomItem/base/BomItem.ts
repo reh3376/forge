@@ -24,6 +24,7 @@ import {
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Item } from "../../item/base/Item";
+import { Lot } from "../../lot/base/Lot";
 import { Decimal } from "decimal.js";
 
 @ObjectType()
@@ -101,6 +102,15 @@ class BomItem {
   @ValidateNested()
   @Type(() => Item)
   item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: () => Lot,
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lot?: Lot | null;
 
   @ApiProperty({
     required: true,

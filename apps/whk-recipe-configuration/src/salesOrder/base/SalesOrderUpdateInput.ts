@@ -63,7 +63,7 @@ class SalesOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  customerCode?: string;
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,

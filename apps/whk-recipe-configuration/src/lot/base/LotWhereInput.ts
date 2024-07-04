@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
+import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
@@ -37,6 +38,18 @@ class LotWhereInput {
     nullable: true,
   })
   batches?: BatchListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => BomItemListRelationFilter, {
+    nullable: true,
+  })
+  bomItems?: BomItemListRelationFilter;
 
   @ApiProperty({
     required: false,

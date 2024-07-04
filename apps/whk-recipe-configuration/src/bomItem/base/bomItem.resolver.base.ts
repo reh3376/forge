@@ -30,6 +30,7 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
+import { Lot } from "../../lot/base/Lot";
 import { BomItemService } from "../bomItem.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => BomItem)
@@ -108,6 +109,12 @@ export class BomItemResolverBase {
         item: {
           connect: args.data.item,
         },
+
+        lot: args.data.lot
+          ? {
+              connect: args.data.lot,
+            }
+          : undefined,
       },
     });
   }
@@ -137,6 +144,12 @@ export class BomItemResolverBase {
           item: {
             connect: args.data.item,
           },
+
+          lot: args.data.lot
+            ? {
+                connect: args.data.lot,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -221,6 +234,25 @@ export class BomItemResolverBase {
   })
   async getItem(@graphql.Parent() parent: BomItem): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Lot, {
+    nullable: true,
+    name: "lot",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async getLot(@graphql.Parent() parent: BomItem): Promise<Lot | null> {
+    const result = await this.service.getLot(parent.id);
 
     if (!result) {
       return null;
