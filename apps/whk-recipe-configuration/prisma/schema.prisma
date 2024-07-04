@@ -402,8 +402,7 @@ model Item {
   id                            String                         @id @default(cuid())
   itemClass                     String?
   itemDescription               String?
-  itemGroup                     ItemGroup?                     @relation(fields: [itemGroupId], references: [id])
-  itemGroupId                   String?
+  itemGroup                     String?
   itemName                      String
   itemNumber                    String
   itemReceipts                  ItemReceipt[]
@@ -426,7 +425,6 @@ model ItemGroup {
   description String?
   globalId    String?  @unique @default(cuid())
   id          String   @id @default(cuid())
-  items       Item[]
   name        String
   updatedAt   DateTime @updatedAt
 }

@@ -26,7 +26,6 @@ import {
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
 import { Bom } from "../../bom/base/Bom";
-import { ItemGroup } from "../../itemGroup/base/ItemGroup";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -138,12 +137,15 @@ class Item {
 
   @ApiProperty({
     required: false,
-    type: () => ItemGroup,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemGroup)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  itemGroup?: ItemGroup | null;
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemGroup!: string | null;
 
   @ApiProperty({
     required: true,

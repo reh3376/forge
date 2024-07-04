@@ -22,7 +22,6 @@ import {
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   PurchaseOrder as PrismaPurchaseOrder,
   SalesOrder as PrismaSalesOrder,
-  ItemGroup as PrismaItemGroup,
   Vendor as PrismaVendor,
 } from "@prisma/client";
 
@@ -135,14 +134,6 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .salesOrders(args);
-  }
-
-  async getItemGroup(parentId: string): Promise<PrismaItemGroup | null> {
-    return this.prisma.item
-      .findUnique({
-        where: { id: parentId },
-      })
-      .itemGroup();
   }
 
   async getVendor(parentId: string): Promise<PrismaVendor | null> {

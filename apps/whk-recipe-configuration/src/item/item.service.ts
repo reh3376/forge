@@ -33,9 +33,6 @@ export class ItemService extends ItemServiceBase {
     // use the id from the update to get the record in the form we want for the message publishing
     const itemPayload = await this.prisma.item.findUnique({
       where: {id: item.id},
-      include: {
-        itemGroup: true,
-      }
     });
 
     await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Item, {
