@@ -112,6 +112,16 @@ export class RabbitMQController {
     await this.processEvent(message, context);
   }
 
+  @EventPattern("wh.whk01.distillery01.bomitem")
+  async onWhWhk01Distillery01BomItem(
+      @Payload()
+          message: RabbitMQMessage,
+      @Ctx()
+          context: RmqContext
+  ): Promise<void> {
+    await this.processEvent(message, context);
+  }
+
   @EventPattern("wh.whk01.distillery01.bom")
   async onWhWhk01Distillery01Bom(
       @Payload()
@@ -124,6 +134,26 @@ export class RabbitMQController {
 
   @EventPattern("wh.whk01.distillery01.recipe")
   async onWhWhk01Distillery01Recipe(
+      @Payload()
+          message: RabbitMQMessage,
+      @Ctx()
+          context: RmqContext
+  ): Promise<void> {
+    await this.processEvent(message, context);
+  }
+
+  @EventPattern("wh.whk01.distillery01.vendor")
+  async onWhWhk01Distillery01Vendor(
+      @Payload()
+          message: RabbitMQMessage,
+      @Ctx()
+          context: RmqContext
+  ): Promise<void> {
+    await this.processEvent(message, context);
+  }
+
+  @EventPattern("wh.whk01.distillery01.customer")
+  async onWhWhk01Distillery01Customer(
       @Payload()
           message: RabbitMQMessage,
       @Ctx()

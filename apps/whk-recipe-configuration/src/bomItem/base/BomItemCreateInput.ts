@@ -21,7 +21,7 @@ import {
   IsNumber,
   Max,
 } from "class-validator";
-import { Type } from "class-transformer";
+import { Expose, Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Decimal } from "decimal.js";
@@ -91,6 +91,7 @@ class BomItemCreateInput {
   @ValidateNested()
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
+  @Expose()
   item!: ItemWhereUniqueInput;
 
   @ApiProperty({
