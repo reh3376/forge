@@ -330,6 +330,7 @@ export class EquipmentPhaseControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {

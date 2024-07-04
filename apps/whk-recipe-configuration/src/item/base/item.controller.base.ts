@@ -346,6 +346,7 @@ export class ItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {

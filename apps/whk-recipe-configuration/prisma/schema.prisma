@@ -592,6 +592,7 @@ model BomItem {
   createdAt       DateTime         @default(now())
   createdBy       String
   equipmentPhases EquipmentPhase[]
+  globalId        String?          @unique @default(cuid())
   id              String           @id @default(cuid())
   item            Item             @relation(fields: [itemId], references: [id])
   itemId          String
