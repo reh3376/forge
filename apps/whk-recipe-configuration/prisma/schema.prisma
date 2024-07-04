@@ -474,7 +474,7 @@ model PurchaseOrder {
   receivedQuantity            Int?
   revision                    Int?                            @default(0)
   schemaVersion               String?
-  totalOrderQuantity          Int
+  totalOrderQuantity          Int?
   transactionGroup            String?
   updatedAt                   DateTime?                       @updatedAt
   updatedBy                   String?
