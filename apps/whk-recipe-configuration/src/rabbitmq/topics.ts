@@ -9,6 +9,7 @@ export enum WhMessageBrokerTopics {
   WhWhk01Distillery01Salesorder = "wh.whk01.distillery01.salesorder",
   WhWhk01Distillery01Account = "wh.whk01.distillery01.account",
   WhWhk01Distillery01Bom = "wh.whk01.distillery01.bom",
+  WhWhk01Distillery01Bomitem = "wh.whk01.distillery01.bomitem",
   WhWhk01Distillery01Recipe = "wh.whk01.distillery01.recipe",
   WhWhk01Distillery01Productionorderunitprocedure = "wh.whk01.distillery01.productionorderunitprocedure",
   WhWhk01Distillery01Barrel = "wh.whk01.distillery01.barrel",
