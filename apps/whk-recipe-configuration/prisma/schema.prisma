@@ -237,7 +237,7 @@ model Recipe {
 model Bom {
   bomItem               BomItem[]
   bomName               String
-  bomRevision           Int?              @default(0)
+  bomRevision           String
   bomType               String?
   className             String?
   createdAt             DateTime          @default(now())
@@ -474,7 +474,7 @@ model PurchaseOrder {
   receivedQuantity            Int?
   revision                    Int?                            @default(0)
   schemaVersion               String?
-  totalOrderQuantity          Int
+  totalOrderQuantity          Int?
   transactionGroup            String?
   updatedAt                   DateTime?                       @updatedAt
   updatedBy                   String?
@@ -592,26 +592,25 @@ model BomItem {
   createdAt       DateTime         @default(now())
   createdBy       String
   equipmentPhases EquipmentPhase[]
+  globalId        String?          @unique @default(cuid())
   id              String           @id @default(cuid())
   item            Item             @relation(fields: [itemId], references: [id])
   itemId          String
   quantity        Decimal
   quantityActual  Decimal?
-  units           Unit?            @relation(fields: [unitsId], references: [id])
-  unitsId         String?
+  units           String?
   updatedAt       DateTime         @updatedAt
   updatedBy       String?
 }
 
 model Unit {
-  active    Boolean?  @default(true)
-  bomItem   BomItem[]
-  createdAt DateTime  @default(now())
-  globalId  String?   @default(cuid())
-  id        String    @id @default(cuid())
+  active    Boolean? @default(true)
+  createdAt DateTime @default(now())
+  globalId  String?  @default(cuid())
+  id        String   @id @default(cuid())
   name      String?
   unitType  String?
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model ProductionOrderUnitProcedure {

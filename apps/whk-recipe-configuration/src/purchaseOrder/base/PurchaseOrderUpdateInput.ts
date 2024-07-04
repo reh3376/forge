@@ -290,7 +290,7 @@ class PurchaseOrderUpdateInput {
   @Field(() => Number, {
     nullable: true,
   })
-  totalOrderQuantity?: number;
+  totalOrderQuantity?: number | null;
 
   @ApiProperty({
     required: false,
