@@ -18,7 +18,6 @@ import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelatio
 import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
@@ -133,15 +132,14 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemGroupWhereUniqueInput,
+    type: StringNullableFilter,
   })
-  @ValidateNested()
-  @Type(() => ItemGroupWhereUniqueInput)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => ItemGroupWhereUniqueInput, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  itemGroup?: ItemGroupWhereUniqueInput;
+  itemGroup?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

@@ -26,8 +26,6 @@ import { ItemGroupFindUniqueArgs } from "./ItemGroupFindUniqueArgs";
 import { CreateItemGroupArgs } from "./CreateItemGroupArgs";
 import { UpdateItemGroupArgs } from "./UpdateItemGroupArgs";
 import { DeleteItemGroupArgs } from "./DeleteItemGroupArgs";
-import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
-import { Item } from "../../item/base/Item";
 import { ItemGroupService } from "../itemGroup.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ItemGroup)
@@ -142,25 +140,5 @@ export class ItemGroupResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Item], { name: "items" })
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async findItems(
-    @graphql.Parent() parent: ItemGroup,
-    @graphql.Args() args: ItemFindManyArgs
-  ): Promise<Item[]> {
-    const results = await this.service.findItems(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 }

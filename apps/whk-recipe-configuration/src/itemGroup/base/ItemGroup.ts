@@ -11,15 +11,8 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsDate,
-  IsString,
-  MaxLength,
-  IsOptional,
-  ValidateNested,
-} from "class-validator";
+import { IsDate, IsString, MaxLength, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class ItemGroup {
@@ -62,15 +55,6 @@ class ItemGroup {
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Item],
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  items?: Array<Item>;
 
   @ApiProperty({
     required: true,

@@ -533,13 +533,7 @@ export class PurchaseOrderControllerBase {
         id: true,
         itemClass: true,
         itemDescription: true,
-
-        itemGroup: {
-          select: {
-            id: true,
-          },
-        },
-
+        itemGroup: true,
         itemName: true,
         itemNumber: true,
         itemRevision: true,

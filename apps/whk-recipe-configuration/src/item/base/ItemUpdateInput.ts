@@ -23,7 +23,6 @@ import {
 import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
-import { ItemGroupWhereUniqueInput } from "../../itemGroup/base/ItemGroupWhereUniqueInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
 import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
@@ -131,15 +130,15 @@ class ItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemGroupWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemGroupWhereUniqueInput)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => ItemGroupWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  itemGroup?: ItemGroupWhereUniqueInput | null;
+  itemGroup?: string | null;
 
   @ApiProperty({
     required: false,

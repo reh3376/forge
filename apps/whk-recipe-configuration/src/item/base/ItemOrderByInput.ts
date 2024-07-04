@@ -116,7 +116,7 @@ class ItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  itemGroupId?: SortOrder;
+  itemGroup?: SortOrder;
 
   @ApiProperty({
     required: false,

@@ -239,67 +239,7 @@ export async function mashingRecipeSeed() {
       console.warn("No UnitProcedures found. Please seed UnitProcedures first.");
       return;
     }
-    try {
-
-      // Seed class definitions for mashing
-      const cookDef = await client.operation.create({
-        data: {
-          name: 'Cook',
-          createdBy: 'pmannion',
-          description: 'Cooking Procedure',
-          isClassDefinition: true,
-          revision: 0,
-          abbreviation: 'MAS',
-          path: 'WH/WHK01/Distillery01/Mashing01/Cook',
-        }
-      })
-
-      // seed instance for number of cooks per mash
-      for (let i = 0; i < 10; i++) {
-        await client.operation.create({
-          data: {
-          name: 'Cook',
-          createdBy: 'pmannion',
-          description: 'Cooking Procedure',
-          isClassDefinition: false,
-          revision: 0,
-          classId: {connect: {id: cookDef.id}},
-          abbreviation: 'MAS',
-          path: 'WH/WHK01/Distillery01/Mashing01/Cook',
-          }
-        })
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  
-
-  // // Test Parameter Handling
-  // async function seedTestParameterClasses(n: number=10): Promise<string[]> {
-  //   const classIds = [];
-  //   // First, create class definitions
-  //   for (let i = 0; i < n; i++) {
-  //     const testParameter = await client.testParameter.create({
-  //       data: {
-  //         name: faker.commerce.productName() + " Class",
-  //         createdBy: faker.internet.userName(),
-  //         isClassDef: true,
-  //         active: faker.datatype.boolean(),
-  //         description: faker.commerce.productDescription(),
-  //         // Populate other fields as necessary, focusing on those relevant for class definitions
-  //       },
-  //     });
-  //     classIds.push(testParameter.id);
-  //   }
-  //   return classIds;
-  // }
-
-  // async function seedTestParameterInstances(classIds: string[], n: number=10): Promise<void> {
-  //   // Then, create instances linked to the class definitions
-  //   for (const classId of classIds) {
-  //     for (let i = 0; i < n; i++) {
+    
   //       await client.testParameter.create({
   //         data: {
   //           name: faker.commerce.productName(),
@@ -362,7 +302,7 @@ export async function mashingRecipeSeed() {
           createdBy: faker.internet.userName(),
           itemClass: faker.word.noun(),
           itemDescription: faker.commerce.productDescription(),
-          itemGroup: itemGroup ? { connect: { id: itemGroup.id } } : undefined,
+//           itemGroup: itemGroup ? { connect: { id: itemGroup.id } } : undefined,
           itemName: itemName,
           itemNumber: itemNumber,
           itemRevision: parseInt(itemRevision.replace('Rev-', '')),
@@ -377,6 +317,7 @@ export async function mashingRecipeSeed() {
 
     console.log(`${n} Item records created.`);
   }
+
 
   // async function seedPurchaseOrder(n: number): Promise<void> {
   //   // Assuming accounts, assets, and items have been seeded and their IDs are retrievable
