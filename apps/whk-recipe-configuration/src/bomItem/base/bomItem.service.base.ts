@@ -17,7 +17,6 @@ import {
   EquipmentPhase as PrismaEquipmentPhase,
   Bom as PrismaBom,
   Item as PrismaItem,
-  Unit as PrismaUnit,
 } from "@prisma/client";
 
 export class BomItemServiceBase {
@@ -70,13 +69,5 @@ export class BomItemServiceBase {
         where: { id: parentId },
       })
       .item();
-  }
-
-  async getUnits(parentId: string): Promise<PrismaUnit | null> {
-    return this.prisma.bomItem
-      .findUnique({
-        where: { id: parentId },
-      })
-      .units();
   }
 }

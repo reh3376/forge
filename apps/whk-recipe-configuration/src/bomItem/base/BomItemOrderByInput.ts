@@ -116,7 +116,7 @@ class BomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  unitsId?: SortOrder;
+  units?: SortOrder;
 
   @ApiProperty({
     required: false,

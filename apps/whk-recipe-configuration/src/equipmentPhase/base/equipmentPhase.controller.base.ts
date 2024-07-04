@@ -340,13 +340,7 @@ export class EquipmentPhaseControllerBase {
 
         quantity: true,
         quantityActual: true,
-
-        units: {
-          select: {
-            id: true,
-          },
-        },
-
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },

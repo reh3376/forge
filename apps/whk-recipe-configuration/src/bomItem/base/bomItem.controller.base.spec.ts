@@ -24,6 +24,7 @@ const CREATE_INPUT = {
   id: "exampleId",
   quantity: 42.424242424,
   quantityActual: 42.424242424,
+  units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
@@ -34,6 +35,7 @@ const CREATE_RESULT = {
   id: "exampleId",
   quantity: 42.424242424,
   quantityActual: 42.424242424,
+  units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
@@ -45,6 +47,7 @@ const FIND_MANY_RESULT = [
     id: "exampleId",
     quantity: 42.424242424,
     quantityActual: 42.424242424,
+    units: "exampleUnits",
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
   },
@@ -56,6 +59,7 @@ const FIND_ONE_RESULT = {
   id: "exampleId",
   quantity: 42.424242424,
   quantityActual: 42.424242424,
+  units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
