@@ -25,7 +25,6 @@ import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Item } from "../../item/base/Item";
 import { Decimal } from "decimal.js";
-import { Unit } from "../../unit/base/Unit";
 
 @ObjectType()
 class BomItem {
@@ -76,6 +75,18 @@ class BomItem {
   equipmentPhases?: Array<EquipmentPhase>;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -114,12 +125,15 @@ class BomItem {
 
   @ApiProperty({
     required: false,
-    type: () => Unit,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Unit)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  units?: Unit | null;
+  @Field(() => String, {
+    nullable: true,
+  })
+  units!: string | null;
 
   @ApiProperty({
     required: true,

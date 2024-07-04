@@ -25,7 +25,6 @@ import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutBomItemsInput } from "./EquipmentPhaseUpdateManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Decimal } from "decimal.js";
-import { UnitWhereUniqueInput } from "../../unit/base/UnitWhereUniqueInput";
 
 @InputType()
 class BomItemUpdateInput {
@@ -78,6 +77,18 @@ class BomItemUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => ItemWhereUniqueInput,
   })
   @ValidateNested()
@@ -114,15 +125,15 @@ class BomItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => UnitWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => UnitWhereUniqueInput)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => UnitWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  units?: UnitWhereUniqueInput | null;
+  units?: string | null;
 
   @ApiProperty({
     required: false,
