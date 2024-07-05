@@ -188,46 +188,4 @@ export class TestControllerBase {
       throw error;
     }
   }
-
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Test })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteTest(
-    @common.Param() params: TestWhereUniqueInput
-  ): Promise<Test | null> {
-    try {
-      return await this.service.deleteTest({
-        where: params,
-        select: {
-          active: true,
-          createdAt: true,
-          createdBy: true,
-          editedAt: true,
-          editedBy: true,
-          globalId: true,
-          id: true,
-          isClassDefinition: true,
-          schemaVersion: true,
-          testDescription: true,
-          testName: true,
-          testRevision: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
 }

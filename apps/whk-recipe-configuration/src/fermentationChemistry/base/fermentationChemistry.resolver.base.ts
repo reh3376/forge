@@ -25,7 +25,6 @@ import { FermentationChemistryFindManyArgs } from "./FermentationChemistryFindMa
 import { FermentationChemistryFindUniqueArgs } from "./FermentationChemistryFindUniqueArgs";
 import { CreateFermentationChemistryArgs } from "./CreateFermentationChemistryArgs";
 import { UpdateFermentationChemistryArgs } from "./UpdateFermentationChemistryArgs";
-import { DeleteFermentationChemistryArgs } from "./DeleteFermentationChemistryArgs";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
@@ -185,27 +184,6 @@ export class FermentationChemistryResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => FermentationChemistry)
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteFermentationChemistry(
-    @graphql.Args() args: DeleteFermentationChemistryArgs
-  ): Promise<FermentationChemistry | null> {
-    try {
-      return await this.service.deleteFermentationChemistry(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

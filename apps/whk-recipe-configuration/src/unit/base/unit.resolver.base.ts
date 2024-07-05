@@ -25,7 +25,6 @@ import { UnitFindManyArgs } from "./UnitFindManyArgs";
 import { UnitFindUniqueArgs } from "./UnitFindUniqueArgs";
 import { CreateUnitArgs } from "./CreateUnitArgs";
 import { UpdateUnitArgs } from "./UpdateUnitArgs";
-import { DeleteUnitArgs } from "./DeleteUnitArgs";
 import { UnitService } from "../unit.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Unit)
@@ -103,25 +102,6 @@ export class UnitResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Unit)
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteUnit(@graphql.Args() args: DeleteUnitArgs): Promise<Unit | null> {
-    try {
-      return await this.service.deleteUnit(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

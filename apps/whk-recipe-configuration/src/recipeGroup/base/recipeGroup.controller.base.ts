@@ -188,45 +188,6 @@ export class RecipeGroupControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: RecipeGroup })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteRecipeGroup(
-    @common.Param() params: RecipeGroupWhereUniqueInput
-  ): Promise<RecipeGroup | null> {
-    try {
-      return await this.service.deleteRecipeGroup({
-        where: params,
-        select: {
-          createdAt: true,
-          createdBy: true,
-          globalId: true,
-          id: true,
-          recipe: true,
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
@@ -253,7 +214,14 @@ export class RecipeGroupControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,

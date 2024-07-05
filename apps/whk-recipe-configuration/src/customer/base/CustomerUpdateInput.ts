@@ -15,12 +15,13 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  ValidateNested,
 } from "class-validator";
-import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { Type } from "class-transformer";
+import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
 
 @InputType()
 class CustomerUpdateInput {
@@ -131,6 +132,18 @@ class CustomerUpdateInput {
     nullable: true,
   })
   phone?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

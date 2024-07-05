@@ -25,7 +25,6 @@ import { AssetFindManyArgs } from "./AssetFindManyArgs";
 import { AssetFindUniqueArgs } from "./AssetFindUniqueArgs";
 import { CreateAssetArgs } from "./CreateAssetArgs";
 import { UpdateAssetArgs } from "./UpdateAssetArgs";
-import { DeleteAssetArgs } from "./DeleteAssetArgs";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
@@ -115,27 +114,6 @@ export class AssetResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Asset)
-  @nestAccessControl.UseRoles({
-    resource: "Asset",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteAsset(
-    @graphql.Args() args: DeleteAssetArgs
-  ): Promise<Asset | null> {
-    try {
-      return await this.service.deleteAsset(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
