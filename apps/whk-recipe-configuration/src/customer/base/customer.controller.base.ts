@@ -26,6 +26,9 @@ import { Customer } from "./Customer";
 import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
 import { CustomerWhereUniqueInput } from "./CustomerWhereUniqueInput";
 import { CustomerUpdateInput } from "./CustomerUpdateInput";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
@@ -55,15 +58,7 @@ export class CustomerControllerBase {
     @common.Body() data: CustomerCreateInput
   ): Promise<Customer> {
     return await this.service.createCustomer({
-      data: {
-        ...data,
-
-        productionOrders: data.productionOrders
-          ? {
-              connect: data.productionOrders,
-            }
-          : undefined,
-      },
+      data: data,
       select: {
         address: true,
         createdAt: true,
@@ -76,13 +71,6 @@ export class CustomerControllerBase {
         id: true,
         name: true,
         phone: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -118,13 +106,6 @@ export class CustomerControllerBase {
         id: true,
         name: true,
         phone: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -161,13 +142,6 @@ export class CustomerControllerBase {
         id: true,
         name: true,
         phone: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -203,15 +177,7 @@ export class CustomerControllerBase {
     try {
       return await this.service.updateCustomer({
         where: params,
-        data: {
-          ...data,
-
-          productionOrders: data.productionOrders
-            ? {
-                connect: data.productionOrders,
-              }
-            : undefined,
-        },
+        data: data,
         select: {
           address: true,
           createdAt: true,
@@ -224,13 +190,6 @@ export class CustomerControllerBase {
           id: true,
           name: true,
           phone: true,
-
-          productionOrders: {
-            select: {
-              id: true,
-            },
-          },
-
           revision: true,
           schemaVersion: true,
           updatedAt: true,
@@ -244,6 +203,158 @@ export class CustomerControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrders")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @common.Req() request: Request,
+    @common.Param() params: CustomerWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrders(params.id, {
+      ...query,
+      select: {
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        endDate: true,
+        globalId: true,
+        id: true,
+        inProcess: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduled: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        startDate: true,
+        status: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
