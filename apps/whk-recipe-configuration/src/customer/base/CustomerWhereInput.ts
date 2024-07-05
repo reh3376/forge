@@ -16,7 +16,7 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
 
@@ -145,15 +145,15 @@ class CustomerWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderWhereUniqueInput,
+    type: () => ProductionOrderListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
+  @Type(() => ProductionOrderListRelationFilter)
   @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
+  @Field(() => ProductionOrderListRelationFilter, {
     nullable: true,
   })
-  productionOrders?: ProductionOrderWhereUniqueInput;
+  productionOrders?: ProductionOrderListRelationFilter;
 
   @ApiProperty({
     required: false,

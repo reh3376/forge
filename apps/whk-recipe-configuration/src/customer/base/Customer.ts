@@ -143,12 +143,12 @@ class Customer {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrder,
+    type: () => [ProductionOrder],
   })
   @ValidateNested()
   @Type(() => ProductionOrder)
   @IsOptional()
-  productionOrders?: ProductionOrder | null;
+  productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
     required: true,
