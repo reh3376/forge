@@ -16,12 +16,13 @@ import {
   ValidateNested,
   IsString,
   MaxLength,
-  IsBoolean,
   IsOptional,
+  IsBoolean,
   IsDate,
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
 import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
@@ -45,13 +46,16 @@ class ProductionOrderCreateInput {
   boms!: BomWhereUniqueInput;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @Field(() => String)
-  className!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  className?: string | null;
 
   @ApiProperty({
     required: false,
@@ -75,12 +79,24 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: true,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @Field(() => CustomerWhereUniqueInput)
+  customer!: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -258,12 +274,15 @@ class ProductionOrderCreateInput {
   schemaVersion?: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
   })
   @IsDate()
   @Type(() => Date)
-  @Field(() => Date)
-  startDate!: Date;
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  startDate?: Date | null;
 
   @ApiProperty({
     required: false,

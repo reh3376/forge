@@ -83,7 +83,18 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  customer?: SortOrder;
+  customerId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  customerCode?: SortOrder;
 
   @ApiProperty({
     required: false,

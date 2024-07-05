@@ -22,6 +22,7 @@ import {
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./FermentationChemistryUpdateManyWithoutProductionOrdersInput";
 import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
@@ -57,7 +58,7 @@ class ProductionOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  className?: string;
+  className?: string | null;
 
   @ApiProperty({
     required: false,
@@ -84,6 +85,18 @@ class ProductionOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -92,7 +105,7 @@ class ProductionOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  customer?: string;
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -274,7 +287,7 @@ class ProductionOrderUpdateInput {
   @Field(() => Date, {
     nullable: true,
   })
-  startDate?: Date;
+  startDate?: Date | null;
 
   @ApiProperty({
     required: false,
