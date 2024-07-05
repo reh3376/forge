@@ -282,63 +282,6 @@ export class SalesOrderControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: SalesOrder })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "SalesOrder",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteSalesOrder(
-    @common.Param() params: SalesOrderWhereUniqueInput
-  ): Promise<SalesOrder | null> {
-    try {
-      return await this.service.deleteSalesOrder({
-        where: params,
-        select: {
-          createdAt: true,
-          createdBy: true,
-
-          customer: {
-            select: {
-              id: true,
-            },
-          },
-
-          customerCode: true,
-          erpId: true,
-          globalId: true,
-          id: true,
-          lineItems: true,
-          orderType: true,
-
-          productionOrders: {
-            select: {
-              id: true,
-            },
-          },
-
-          quantity: true,
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/item")
   @ApiNestedQuery(ItemFindManyArgs)

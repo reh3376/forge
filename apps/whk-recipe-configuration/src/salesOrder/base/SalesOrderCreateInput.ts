@@ -51,13 +51,16 @@ class SalesOrderCreateInput {
   customer?: CustomerWhereUniqueInput | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(3)
-  @Field(() => String)
-  customerCode!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -103,13 +106,16 @@ class SalesOrderCreateInput {
   lineItems?: InputJsonValue;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @Field(() => String)
-  orderType!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  orderType?: string | null;
 
   @ApiProperty({
     required: false,

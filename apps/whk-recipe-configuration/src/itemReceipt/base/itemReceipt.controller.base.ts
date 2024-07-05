@@ -290,66 +290,6 @@ export class ItemReceiptControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: ItemReceipt })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "ItemReceipt",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteItemReceipt(
-    @common.Param() params: ItemReceiptWhereUniqueInput
-  ): Promise<ItemReceipt | null> {
-    try {
-      return await this.service.deleteItemReceipt({
-        where: params,
-        select: {
-          createdAt: true,
-          createdBy: true,
-          driver: true,
-          globalId: true,
-          id: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
-          loadId: true,
-
-          purchaseOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          quantity: true,
-          schemaVersion: true,
-          status: true,
-          supplierLot: true,
-          testsPassed: true,
-          units: true,
-          updatedAt: true,
-          updatedBy: true,
-          weighIn: true,
-          weighOut: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/tests")
   @ApiNestedQuery(TestParameterFindManyArgs)

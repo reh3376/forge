@@ -10,19 +10,20 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
+import { IsString } from "class-validator";
 
 @InputType()
-class BomItemCreateNestedManyWithoutUnitsInput {
-  @Field(() => [BomItemWhereUniqueInput], {
-    nullable: true,
-  })
+class ItemWhereUniqueInput {
   @ApiProperty({
-    required: false,
-    type: () => [BomItemWhereUniqueInput],
+    required: true,
+    type: String,
   })
-  connect?: Array<BomItemWhereUniqueInput>;
+  @IsString()
+  @Field(() => String)
+  @Expose()
+  id!: string;
 }
 
-export { BomItemCreateNestedManyWithoutUnitsInput as BomItemCreateNestedManyWithoutUnitsInput };
+export { ItemWhereUniqueInput as ItemWhereUniqueInput };

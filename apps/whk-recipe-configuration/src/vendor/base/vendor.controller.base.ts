@@ -188,47 +188,6 @@ export class VendorControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Vendor })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Vendor",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteVendor(
-    @common.Param() params: VendorWhereUniqueInput
-  ): Promise<Vendor | null> {
-    try {
-      return await this.service.deleteVendor({
-        where: params,
-        select: {
-          active: true,
-          additionalDetails: true,
-          contactInformation: true,
-          createdAt: true,
-          createdBy: true,
-          erpId: true,
-          globalId: true,
-          id: true,
-          name: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/items")
   @ApiNestedQuery(ItemFindManyArgs)

@@ -15,12 +15,13 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  ValidateNested,
 } from "class-validator";
-import { SalesOrderCreateNestedManyWithoutCustomersInput } from "./SalesOrderCreateNestedManyWithoutCustomersInput";
+import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
 import { Type } from "class-transformer";
+import { SalesOrderCreateNestedManyWithoutCustomersInput } from "./SalesOrderCreateNestedManyWithoutCustomersInput";
 
 @InputType()
 class CustomerCreateInput {
@@ -122,6 +123,18 @@ class CustomerCreateInput {
     nullable: true,
   })
   phone?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderCreateNestedManyWithoutCustomersInput;
 
   @ApiProperty({
     required: true,

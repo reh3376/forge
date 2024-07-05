@@ -25,7 +25,8 @@ import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
 import { CustomerFindUniqueArgs } from "./CustomerFindUniqueArgs";
 import { CreateCustomerArgs } from "./CreateCustomerArgs";
 import { UpdateCustomerArgs } from "./UpdateCustomerArgs";
-import { DeleteCustomerArgs } from "./DeleteCustomerArgs";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { CustomerService } from "../customer.service";
@@ -123,25 +124,24 @@ export class CustomerResolverBase {
     }
   }
 
-  @graphql.Mutation(() => Customer)
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
   @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "delete",
+    resource: "ProductionOrder",
+    action: "read",
     possession: "any",
   })
-  async deleteCustomer(
-    @graphql.Args() args: DeleteCustomerArgs
-  ): Promise<Customer | null> {
-    try {
-      return await this.service.deleteCustomer(args);
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
+  async findProductionOrders(
+    @graphql.Parent() parent: Customer,
+    @graphql.Args() args: ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
     }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

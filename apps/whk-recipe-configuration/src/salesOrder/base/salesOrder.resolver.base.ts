@@ -25,7 +25,6 @@ import { SalesOrderFindManyArgs } from "./SalesOrderFindManyArgs";
 import { SalesOrderFindUniqueArgs } from "./SalesOrderFindUniqueArgs";
 import { CreateSalesOrderArgs } from "./CreateSalesOrderArgs";
 import { UpdateSalesOrderArgs } from "./UpdateSalesOrderArgs";
-import { DeleteSalesOrderArgs } from "./DeleteSalesOrderArgs";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { Customer } from "../../customer/base/Customer";
@@ -143,27 +142,6 @@ export class SalesOrderResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => SalesOrder)
-  @nestAccessControl.UseRoles({
-    resource: "SalesOrder",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteSalesOrder(
-    @graphql.Args() args: DeleteSalesOrderArgs
-  ): Promise<SalesOrder | null> {
-    try {
-      return await this.service.deleteSalesOrder(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

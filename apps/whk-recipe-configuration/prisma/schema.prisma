@@ -237,7 +237,7 @@ model Recipe {
 model Bom {
   bomItem               BomItem[]
   bomName               String
-  bomRevision           Int?              @default(0)
+  bomRevision           String
   bomType               String?
   className             String?
   createdAt             DateTime          @default(now())
@@ -328,11 +328,13 @@ model RecipeGroup {
 model ProductionOrder {
   boms                          Bom                            @relation(fields: [bomsId], references: [id])
   bomsId                        String
-  className                     String
+  className                     String?
   complete                      Boolean?                       @default(false)
   createdAt                     DateTime                       @default(now())
   createdBy                     String
-  customer                      String
+  customer                      Customer                       @relation(fields: [customerId], references: [id])
+  customerId                    String
+  customerCode                  String?
   endDate                       DateTime?
   fermentationChemistries       FermentationChemistry[]
   fermentationDayData           FermentationDayDatum[]
@@ -353,7 +355,7 @@ model ProductionOrder {
   scheduleOrder                 ScheduleOrder?                 @relation(fields: [scheduleOrderId], references: [id])
   scheduleOrderId               String?
   schemaVersion                 String?                        @default("0001-alpha")
-  startDate                     DateTime
+  startDate                     DateTime?                      @default(now())
   status                        EnumProductionOrderStatus?     @default(Initiated)
   updatedAt                     DateTime                       @updatedAt
   updatedBy                     DateTime?
@@ -430,21 +432,22 @@ model ItemGroup {
 }
 
 model Customer {
-  address       String
-  createdAt     DateTime     @default(now())
-  createdBy     String
-  customerCode  String?
-  description   String?
-  editedBy      String?
-  email         String?
-  globalId      String?      @unique @default(cuid())
-  id            String       @id @default(cuid())
-  name          String
-  phone         String?
-  revision      Int          @default(0)
-  salesOrders   SalesOrder[]
-  schemaVersion String?      @default("0001-alpha")
-  updatedAt     DateTime     @updatedAt
+  address          String
+  createdAt        DateTime          @default(now())
+  createdBy        String
+  customerCode     String?
+  description      String?
+  editedBy         String?
+  email            String?
+  globalId         String?           @unique @default(cuid())
+  id               String            @id @default(cuid())
+  name             String
+  phone            String?
+  productionOrders ProductionOrder[]
+  revision         Int               @default(0)
+  salesOrders      SalesOrder[]
+  schemaVersion    String?           @default("0001-alpha")
+  updatedAt        DateTime          @updatedAt
 
   @@unique([revision, name])
 }
@@ -474,7 +477,7 @@ model PurchaseOrder {
   receivedQuantity            Int?
   revision                    Int?                            @default(0)
   schemaVersion               String?
-  totalOrderQuantity          Int
+  totalOrderQuantity          Int?
   transactionGroup            String?
   updatedAt                   DateTime?                       @updatedAt
   updatedBy                   String?
@@ -487,13 +490,13 @@ model SalesOrder {
   createdBy        String
   customer         Customer?        @relation(fields: [customerId], references: [id])
   customerId       String?
-  customerCode     String
+  customerCode     String?
   erpId            String?          @unique
   globalId         String           @unique @default(cuid())
   id               String           @id @default(cuid())
   item             Item[]
   lineItems        Json?
-  orderType        String
+  orderType        String?
   productionOrders ProductionOrder?
   quantity         Int
   revision         Int              @default(0)
@@ -565,6 +568,7 @@ model ItemReceipt {
 
 model Lot {
   batches                     Batch[]
+  bomItems                    BomItem[]
   createdAt                   DateTime               @default(now())
   createdBy                   String?
   externalId                  String?                @unique
@@ -592,26 +596,27 @@ model BomItem {
   createdAt       DateTime         @default(now())
   createdBy       String
   equipmentPhases EquipmentPhase[]
+  globalId        String?          @unique @default(cuid())
   id              String           @id @default(cuid())
   item            Item             @relation(fields: [itemId], references: [id])
   itemId          String
+  lot             Lot?             @relation(fields: [lotId], references: [id])
+  lotId           String?
   quantity        Decimal
   quantityActual  Decimal?
-  units           Unit?            @relation(fields: [unitsId], references: [id])
-  unitsId         String?
+  units           String?
   updatedAt       DateTime         @updatedAt
   updatedBy       String?
 }
 
 model Unit {
-  active    Boolean?  @default(true)
-  bomItem   BomItem[]
-  createdAt DateTime  @default(now())
-  globalId  String?   @default(cuid())
-  id        String    @id @default(cuid())
+  active    Boolean? @default(true)
+  createdAt DateTime @default(now())
+  globalId  String?  @default(cuid())
+  id        String   @id @default(cuid())
   name      String?
   unitType  String?
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model ProductionOrderUnitProcedure {
