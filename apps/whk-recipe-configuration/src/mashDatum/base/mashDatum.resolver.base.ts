@@ -25,7 +25,6 @@ import { MashDatumFindManyArgs } from "./MashDatumFindManyArgs";
 import { MashDatumFindUniqueArgs } from "./MashDatumFindUniqueArgs";
 import { CreateMashDatumArgs } from "./CreateMashDatumArgs";
 import { UpdateMashDatumArgs } from "./UpdateMashDatumArgs";
-import { DeleteMashDatumArgs } from "./DeleteMashDatumArgs";
 import { Asset } from "../../asset/base/Asset";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { MashDatumService } from "../mashDatum.service";
@@ -141,27 +140,6 @@ export class MashDatumResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => MashDatum)
-  @nestAccessControl.UseRoles({
-    resource: "MashDatum",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteMashDatum(
-    @graphql.Args() args: DeleteMashDatumArgs
-  ): Promise<MashDatum | null> {
-    try {
-      return await this.service.deleteMashDatum(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

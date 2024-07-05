@@ -71,6 +71,10 @@ export class ProductionOrderControllerBase {
           connect: data.boms,
         },
 
+        customer: {
+          connect: data.customer,
+        },
+
         item: {
           connect: data.item,
         },
@@ -108,7 +112,14 @@ export class ProductionOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,
@@ -184,7 +195,14 @@ export class ProductionOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,
@@ -259,7 +277,14 @@ export class ProductionOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,
@@ -341,6 +366,10 @@ export class ProductionOrderControllerBase {
             connect: data.boms,
           },
 
+          customer: {
+            connect: data.customer,
+          },
+
           item: {
             connect: data.item,
           },
@@ -378,90 +407,14 @@ export class ProductionOrderControllerBase {
           complete: true,
           createdAt: true,
           createdBy: true,
-          customer: true,
-          endDate: true,
-          globalId: true,
-          id: true,
-          inProcess: true,
 
-          item: {
+          customer: {
             select: {
               id: true,
             },
           },
 
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipeGroup: {
-            select: {
-              id: true,
-            },
-          },
-
-          salesOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          scheduled: true,
-
-          scheduleOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          schemaVersion: true,
-          startDate: true,
-          status: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: ProductionOrder })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteProductionOrder(
-    @common.Param() params: ProductionOrderWhereUniqueInput
-  ): Promise<ProductionOrder | null> {
-    try {
-      return await this.service.deleteProductionOrder({
-        where: params,
-        select: {
-          boms: {
-            select: {
-              id: true,
-            },
-          },
-
-          className: true,
-          complete: true,
-          createdAt: true,
-          createdBy: true,
-          customer: true,
+          customerCode: true,
           endDate: true,
           globalId: true,
           id: true,

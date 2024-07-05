@@ -16,11 +16,12 @@ import {
   MaxLength,
   IsDate,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 
 @ObjectType()
@@ -139,6 +140,15 @@ class Customer {
     nullable: true,
   })
   phone!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
     required: true,

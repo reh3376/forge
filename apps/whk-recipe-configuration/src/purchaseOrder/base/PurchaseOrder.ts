@@ -265,13 +265,16 @@ class PurchaseOrder {
   schemaVersion!: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: Number,
   })
   @IsInt()
   @Max(99999999999)
-  @Field(() => Number)
-  totalOrderQuantity!: number;
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalOrderQuantity!: number | null;
 
   @ApiProperty({
     required: false,

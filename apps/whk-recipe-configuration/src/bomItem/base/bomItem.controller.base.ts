@@ -68,9 +68,9 @@ export class BomItemControllerBase {
           connect: data.item,
         },
 
-        units: data.units
+        lot: data.lot
           ? {
-              connect: data.units,
+              connect: data.lot,
             }
           : undefined,
       },
@@ -84,6 +84,7 @@ export class BomItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -92,15 +93,15 @@ export class BomItemControllerBase {
           },
         },
 
-        quantity: true,
-        quantityActual: true,
-
-        units: {
+        lot: {
           select: {
             id: true,
           },
         },
 
+        quantity: true,
+        quantityActual: true,
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -133,6 +134,7 @@ export class BomItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -141,15 +143,15 @@ export class BomItemControllerBase {
           },
         },
 
-        quantity: true,
-        quantityActual: true,
-
-        units: {
+        lot: {
           select: {
             id: true,
           },
         },
 
+        quantity: true,
+        quantityActual: true,
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -183,6 +185,7 @@ export class BomItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -191,15 +194,15 @@ export class BomItemControllerBase {
           },
         },
 
-        quantity: true,
-        quantityActual: true,
-
-        units: {
+        lot: {
           select: {
             id: true,
           },
         },
 
+        quantity: true,
+        quantityActual: true,
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -247,9 +250,9 @@ export class BomItemControllerBase {
             connect: data.item,
           },
 
-          units: data.units
+          lot: data.lot
             ? {
-                connect: data.units,
+                connect: data.lot,
               }
             : undefined,
         },
@@ -263,6 +266,7 @@ export class BomItemControllerBase {
           consumedAt: true,
           createdAt: true,
           createdBy: true,
+          globalId: true,
           id: true,
 
           item: {
@@ -271,59 +275,7 @@ export class BomItemControllerBase {
             },
           },
 
-          quantity: true,
-          quantityActual: true,
-
-          units: {
-            select: {
-              id: true,
-            },
-          },
-
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: BomItem })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "BomItem",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteBomItem(
-    @common.Param() params: BomItemWhereUniqueInput
-  ): Promise<BomItem | null> {
-    try {
-      return await this.service.deleteBomItem({
-        where: params,
-        select: {
-          bom: {
-            select: {
-              id: true,
-            },
-          },
-
-          consumedAt: true,
-          createdAt: true,
-          createdBy: true,
-          id: true,
-
-          item: {
+          lot: {
             select: {
               id: true,
             },
@@ -331,13 +283,7 @@ export class BomItemControllerBase {
 
           quantity: true,
           quantityActual: true,
-
-          units: {
-            select: {
-              id: true,
-            },
-          },
-
+          units: true,
           updatedAt: true,
           updatedBy: true,
         },

@@ -25,7 +25,6 @@ import { ScheduleOrderFindManyArgs } from "./ScheduleOrderFindManyArgs";
 import { ScheduleOrderFindUniqueArgs } from "./ScheduleOrderFindUniqueArgs";
 import { CreateScheduleOrderArgs } from "./CreateScheduleOrderArgs";
 import { UpdateScheduleOrderArgs } from "./UpdateScheduleOrderArgs";
-import { DeleteScheduleOrderArgs } from "./DeleteScheduleOrderArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
@@ -141,27 +140,6 @@ export class ScheduleOrderResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => ScheduleOrder)
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrder",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteScheduleOrder(
-    @graphql.Args() args: DeleteScheduleOrderArgs
-  ): Promise<ScheduleOrder | null> {
-    try {
-      return await this.service.deleteScheduleOrder(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

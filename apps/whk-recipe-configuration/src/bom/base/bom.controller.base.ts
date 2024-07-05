@@ -277,6 +277,7 @@ export class BomControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -285,15 +286,15 @@ export class BomControllerBase {
           },
         },
 
-        quantity: true,
-        quantityActual: true,
-
-        units: {
+        lot: {
           select: {
             id: true,
           },
         },
 
+        quantity: true,
+        quantityActual: true,
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -398,7 +399,14 @@ export class BomControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,

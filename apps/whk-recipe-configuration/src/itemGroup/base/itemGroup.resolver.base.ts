@@ -25,7 +25,6 @@ import { ItemGroupFindManyArgs } from "./ItemGroupFindManyArgs";
 import { ItemGroupFindUniqueArgs } from "./ItemGroupFindUniqueArgs";
 import { CreateItemGroupArgs } from "./CreateItemGroupArgs";
 import { UpdateItemGroupArgs } from "./UpdateItemGroupArgs";
-import { DeleteItemGroupArgs } from "./DeleteItemGroupArgs";
 import { ItemGroupService } from "../itemGroup.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ItemGroup)
@@ -111,27 +110,6 @@ export class ItemGroupResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => ItemGroup)
-  @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteItemGroup(
-    @graphql.Args() args: DeleteItemGroupArgs
-  ): Promise<ItemGroup | null> {
-    try {
-      return await this.service.deleteItemGroup(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

@@ -25,12 +25,11 @@ import { BomItemFindManyArgs } from "./BomItemFindManyArgs";
 import { BomItemFindUniqueArgs } from "./BomItemFindUniqueArgs";
 import { CreateBomItemArgs } from "./CreateBomItemArgs";
 import { UpdateBomItemArgs } from "./UpdateBomItemArgs";
-import { DeleteBomItemArgs } from "./DeleteBomItemArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
-import { Unit } from "../../unit/base/Unit";
+import { Lot } from "../../lot/base/Lot";
 import { BomItemService } from "../bomItem.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => BomItem)
@@ -110,9 +109,9 @@ export class BomItemResolverBase {
           connect: args.data.item,
         },
 
-        units: args.data.units
+        lot: args.data.lot
           ? {
-              connect: args.data.units,
+              connect: args.data.lot,
             }
           : undefined,
       },
@@ -145,34 +144,13 @@ export class BomItemResolverBase {
             connect: args.data.item,
           },
 
-          units: args.data.units
+          lot: args.data.lot
             ? {
-                connect: args.data.units,
+                connect: args.data.lot,
               }
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => BomItem)
-  @nestAccessControl.UseRoles({
-    resource: "BomItem",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteBomItem(
-    @graphql.Args() args: DeleteBomItemArgs
-  ): Promise<BomItem | null> {
-    try {
-      return await this.service.deleteBomItem(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
@@ -242,17 +220,17 @@ export class BomItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Unit, {
+  @graphql.ResolveField(() => Lot, {
     nullable: true,
-    name: "units",
+    name: "lot",
   })
   @nestAccessControl.UseRoles({
-    resource: "Unit",
+    resource: "Lot",
     action: "read",
     possession: "any",
   })
-  async getUnits(@graphql.Parent() parent: BomItem): Promise<Unit | null> {
-    const result = await this.service.getUnits(parent.id);
+  async getLot(@graphql.Parent() parent: BomItem): Promise<Lot | null> {
+    const result = await this.service.getLot(parent.id);
 
     if (!result) {
       return null;

@@ -25,7 +25,6 @@ import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderFindUniqueArgs } from "./ProductionOrderFindUniqueArgs";
 import { CreateProductionOrderArgs } from "./CreateProductionOrderArgs";
 import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
-import { DeleteProductionOrderArgs } from "./DeleteProductionOrderArgs";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
@@ -35,6 +34,7 @@ import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Bom } from "../../bom/base/Bom";
+import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -113,6 +113,10 @@ export class ProductionOrderResolverBase {
           connect: args.data.boms,
         },
 
+        customer: {
+          connect: args.data.customer,
+        },
+
         item: {
           connect: args.data.item,
         },
@@ -162,6 +166,10 @@ export class ProductionOrderResolverBase {
             connect: args.data.boms,
           },
 
+          customer: {
+            connect: args.data.customer,
+          },
+
           item: {
             connect: args.data.item,
           },
@@ -189,27 +197,6 @@ export class ProductionOrderResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => ProductionOrder)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteProductionOrder(
-    @graphql.Args() args: DeleteProductionOrderArgs
-  ): Promise<ProductionOrder | null> {
-    try {
-      return await this.service.deleteProductionOrder(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
@@ -326,6 +313,27 @@ export class ProductionOrderResolverBase {
     @graphql.Parent() parent: ProductionOrder
   ): Promise<Bom | null> {
     const result = await this.service.getBoms(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Customer, {
+    nullable: true,
+    name: "customer",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "read",
+    possession: "any",
+  })
+  async getCustomer(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<Customer | null> {
+    const result = await this.service.getCustomer(parent.id);
 
     if (!result) {
       return null;

@@ -25,7 +25,6 @@ import { FermentationSettingDatumFindManyArgs } from "./FermentationSettingDatum
 import { FermentationSettingDatumFindUniqueArgs } from "./FermentationSettingDatumFindUniqueArgs";
 import { CreateFermentationSettingDatumArgs } from "./CreateFermentationSettingDatumArgs";
 import { UpdateFermentationSettingDatumArgs } from "./UpdateFermentationSettingDatumArgs";
-import { DeleteFermentationSettingDatumArgs } from "./DeleteFermentationSettingDatumArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Operation } from "../../operation/base/Operation";
 import { FermentationSettingDatumService } from "../fermentationSettingDatum.service";
@@ -141,27 +140,6 @@ export class FermentationSettingDatumResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => FermentationSettingDatum)
-  @nestAccessControl.UseRoles({
-    resource: "FermentationSettingDatum",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteFermentationSettingDatum(
-    @graphql.Args() args: DeleteFermentationSettingDatumArgs
-  ): Promise<FermentationSettingDatum | null> {
-    try {
-      return await this.service.deleteFermentationSettingDatum(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

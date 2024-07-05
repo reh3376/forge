@@ -57,13 +57,16 @@ class SalesOrder {
   customer?: Customer | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(3)
-  @Field(() => String)
-  customerCode!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode!: string | null;
 
   @ApiProperty({
     required: false,
@@ -114,13 +117,16 @@ class SalesOrder {
   lineItems!: JsonValue;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @Field(() => String)
-  orderType!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  orderType!: string | null;
 
   @ApiProperty({
     required: false,

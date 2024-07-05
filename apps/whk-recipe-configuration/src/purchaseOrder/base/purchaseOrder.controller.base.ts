@@ -313,68 +313,6 @@ export class PurchaseOrderControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: PurchaseOrder })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deletePurchaseOrder(
-    @common.Param() params: PurchaseOrderWhereUniqueInput
-  ): Promise<PurchaseOrder | null> {
-    try {
-      return await this.service.deletePurchaseOrder({
-        where: params,
-        select: {
-          asset: {
-            select: {
-              id: true,
-            },
-          },
-
-          className: true,
-          complete: true,
-          createdAt: true,
-          createdBy: true,
-          erpId: true,
-          globalId: true,
-          id: true,
-          lineItems: true,
-          name: true,
-          purchaseOrderReceiptDate: true,
-          purchaseOrderReceived: true,
-
-          purchaseOrderRejectedLots: {
-            select: {
-              id: true,
-            },
-          },
-
-          receiptStatus: true,
-          receivedQuantity: true,
-          revision: true,
-          schemaVersion: true,
-          totalOrderQuantity: true,
-          transactionGroup: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/acceptedLots")
   @ApiNestedQuery(LotFindManyArgs)
