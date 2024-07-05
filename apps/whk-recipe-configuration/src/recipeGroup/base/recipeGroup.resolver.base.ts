@@ -25,7 +25,6 @@ import { RecipeGroupFindManyArgs } from "./RecipeGroupFindManyArgs";
 import { RecipeGroupFindUniqueArgs } from "./RecipeGroupFindUniqueArgs";
 import { CreateRecipeGroupArgs } from "./CreateRecipeGroupArgs";
 import { UpdateRecipeGroupArgs } from "./UpdateRecipeGroupArgs";
-import { DeleteRecipeGroupArgs } from "./DeleteRecipeGroupArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
@@ -117,27 +116,6 @@ export class RecipeGroupResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => RecipeGroup)
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteRecipeGroup(
-    @graphql.Args() args: DeleteRecipeGroupArgs
-  ): Promise<RecipeGroup | null> {
-    try {
-      return await this.service.deleteRecipeGroup(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

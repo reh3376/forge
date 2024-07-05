@@ -25,7 +25,6 @@ import { ItemReceiptFindManyArgs } from "./ItemReceiptFindManyArgs";
 import { ItemReceiptFindUniqueArgs } from "./ItemReceiptFindUniqueArgs";
 import { CreateItemReceiptArgs } from "./CreateItemReceiptArgs";
 import { UpdateItemReceiptArgs } from "./UpdateItemReceiptArgs";
-import { DeleteItemReceiptArgs } from "./DeleteItemReceiptArgs";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Item } from "../../item/base/Item";
@@ -139,27 +138,6 @@ export class ItemReceiptResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => ItemReceipt)
-  @nestAccessControl.UseRoles({
-    resource: "ItemReceipt",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteItemReceipt(
-    @graphql.Args() args: DeleteItemReceiptArgs
-  ): Promise<ItemReceipt | null> {
-    try {
-      return await this.service.deleteItemReceipt(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

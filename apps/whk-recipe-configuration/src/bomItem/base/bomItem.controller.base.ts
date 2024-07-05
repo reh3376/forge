@@ -298,65 +298,6 @@ export class BomItemControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: BomItem })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "BomItem",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteBomItem(
-    @common.Param() params: BomItemWhereUniqueInput
-  ): Promise<BomItem | null> {
-    try {
-      return await this.service.deleteBomItem({
-        where: params,
-        select: {
-          bom: {
-            select: {
-              id: true,
-            },
-          },
-
-          consumedAt: true,
-          createdAt: true,
-          createdBy: true,
-          globalId: true,
-          id: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
-          lot: {
-            select: {
-              id: true,
-            },
-          },
-
-          quantity: true,
-          quantityActual: true,
-          units: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/equipmentPhases")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
