@@ -44,8 +44,6 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
   async purchaseOrdersWithLineItems(
     @common.Req() request: Request
   ): Promise<PurchaseOrder[]> {
-    // const args = plainToClass(PurchaseOrderFindManyArgs, request.query);
-
     // use raw sql to get purchase orders with line items
     const query = `
     SELECT
@@ -60,9 +58,11 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
     li.rate as lineItemRate,
     i.*
 FROM "PurchaseOrder" po
-CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" ("itemName" text,
-                                                                    "rate" text,
-    "quantity" text)
+CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" (
+    "itemName" text,
+    "rate" text,
+    "quantity" text
+  )
 LEFT JOIN "Item" i on i."itemNumber" = li."itemName";
     `;
     const purchaseOrders = await this.prisma.$queryRaw<PurchaseOrder[]>(Prisma.sql([query]));
@@ -86,8 +86,6 @@ LEFT JOIN "Item" i on i."itemNumber" = li."itemName";
     @common.Param() params: PurchaseOrderWhereUniqueInput
 
   ): Promise<PurchaseOrder | null> {
-    // const args = plainToClass(PurchaseOrderFindManyArgs, request.query);
-
     // use raw sql to get purchase orders with line items
     const query = `
     SELECT
