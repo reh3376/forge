@@ -55,7 +55,15 @@ export class CustomerControllerBase {
     @common.Body() data: CustomerCreateInput
   ): Promise<Customer> {
     return await this.service.createCustomer({
-      data: data,
+      data: {
+        ...data,
+
+        productionOrders: data.productionOrders
+          ? {
+              connect: data.productionOrders,
+            }
+          : undefined,
+      },
       select: {
         address: true,
         createdAt: true,
@@ -68,6 +76,13 @@ export class CustomerControllerBase {
         id: true,
         name: true,
         phone: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -103,6 +118,13 @@ export class CustomerControllerBase {
         id: true,
         name: true,
         phone: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -139,6 +161,13 @@ export class CustomerControllerBase {
         id: true,
         name: true,
         phone: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -174,51 +203,15 @@ export class CustomerControllerBase {
     try {
       return await this.service.updateCustomer({
         where: params,
-        data: data,
-        select: {
-          address: true,
-          createdAt: true,
-          createdBy: true,
-          customerCode: true,
-          description: true,
-          editedBy: true,
-          email: true,
-          globalId: true,
-          id: true,
-          name: true,
-          phone: true,
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
+        data: {
+          ...data,
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Customer })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteCustomer(
-    @common.Param() params: CustomerWhereUniqueInput
-  ): Promise<Customer | null> {
-    try {
-      return await this.service.deleteCustomer({
-        where: params,
+          productionOrders: data.productionOrders
+            ? {
+                connect: data.productionOrders,
+              }
+            : undefined,
+        },
         select: {
           address: true,
           createdAt: true,
@@ -231,6 +224,13 @@ export class CustomerControllerBase {
           id: true,
           name: true,
           phone: true,
+
+          productionOrders: {
+            select: {
+              id: true,
+            },
+          },
+
           revision: true,
           schemaVersion: true,
           updatedAt: true,

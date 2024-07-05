@@ -25,7 +25,6 @@ import { PurchaseOrderFindManyArgs } from "./PurchaseOrderFindManyArgs";
 import { PurchaseOrderFindUniqueArgs } from "./PurchaseOrderFindUniqueArgs";
 import { CreatePurchaseOrderArgs } from "./CreatePurchaseOrderArgs";
 import { UpdatePurchaseOrderArgs } from "./UpdatePurchaseOrderArgs";
-import { DeletePurchaseOrderArgs } from "./DeletePurchaseOrderArgs";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
@@ -148,27 +147,6 @@ export class PurchaseOrderResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => PurchaseOrder)
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "delete",
-    possession: "any",
-  })
-  async deletePurchaseOrder(
-    @graphql.Args() args: DeletePurchaseOrderArgs
-  ): Promise<PurchaseOrder | null> {
-    try {
-      return await this.service.deletePurchaseOrder(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
