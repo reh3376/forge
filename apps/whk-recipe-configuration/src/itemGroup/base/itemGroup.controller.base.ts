@@ -166,40 +166,4 @@ export class ItemGroupControllerBase {
       throw error;
     }
   }
-
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: ItemGroup })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "ItemGroup",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteItemGroup(
-    @common.Param() params: ItemGroupWhereUniqueInput
-  ): Promise<ItemGroup | null> {
-    try {
-      return await this.service.deleteItemGroup({
-        where: params,
-        select: {
-          createdAt: true,
-          description: true,
-          globalId: true,
-          id: true,
-          name: true,
-          updatedAt: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
 }

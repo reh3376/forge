@@ -168,41 +168,4 @@ export class UnitControllerBase {
       throw error;
     }
   }
-
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Unit })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteUnit(
-    @common.Param() params: UnitWhereUniqueInput
-  ): Promise<Unit | null> {
-    try {
-      return await this.service.deleteUnit({
-        where: params,
-        select: {
-          active: true,
-          createdAt: true,
-          globalId: true,
-          id: true,
-          name: true,
-          unitType: true,
-          updatedAt: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
 }

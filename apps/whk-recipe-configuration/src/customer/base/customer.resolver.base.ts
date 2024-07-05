@@ -25,9 +25,9 @@ import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
 import { CustomerFindUniqueArgs } from "./CustomerFindUniqueArgs";
 import { CreateCustomerArgs } from "./CreateCustomerArgs";
 import { UpdateCustomerArgs } from "./UpdateCustomerArgs";
-import { DeleteCustomerArgs } from "./DeleteCustomerArgs";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { CustomerService } from "../customer.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Customer)
@@ -94,7 +94,15 @@ export class CustomerResolverBase {
   ): Promise<Customer> {
     return await this.service.createCustomer({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        productionOrders: args.data.productionOrders
+          ? {
+              connect: args.data.productionOrders,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -111,29 +119,16 @@ export class CustomerResolverBase {
     try {
       return await this.service.updateCustomer({
         ...args,
-        data: args.data,
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
+        data: {
+          ...args.data,
 
-  @graphql.Mutation(() => Customer)
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteCustomer(
-    @graphql.Args() args: DeleteCustomerArgs
-  ): Promise<Customer | null> {
-    try {
-      return await this.service.deleteCustomer(args);
+          productionOrders: args.data.productionOrders
+            ? {
+                connect: args.data.productionOrders,
+              }
+            : undefined,
+        },
+      });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
@@ -162,5 +157,26 @@ export class CustomerResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrder, {
+    nullable: true,
+    name: "productionOrders",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrders(
+    @graphql.Parent() parent: Customer
+  ): Promise<ProductionOrder | null> {
+    const result = await this.service.getProductionOrders(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

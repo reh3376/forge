@@ -25,7 +25,6 @@ import { ItemFindManyArgs } from "./ItemFindManyArgs";
 import { ItemFindUniqueArgs } from "./ItemFindUniqueArgs";
 import { CreateItemArgs } from "./CreateItemArgs";
 import { UpdateItemArgs } from "./UpdateItemArgs";
-import { DeleteItemArgs } from "./DeleteItemArgs";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
@@ -136,25 +135,6 @@ export class ItemResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Item)
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteItem(@graphql.Args() args: DeleteItemArgs): Promise<Item | null> {
-    try {
-      return await this.service.deleteItem(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
