@@ -323,73 +323,6 @@ export class ScheduleOrderControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: ScheduleOrder })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrder",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteScheduleOrder(
-    @common.Param() params: ScheduleOrderWhereUniqueInput
-  ): Promise<ScheduleOrder | null> {
-    try {
-      return await this.service.deleteScheduleOrder({
-        where: params,
-        select: {
-          actualEnd: true,
-          actualStart: true,
-          createdAt: true,
-          createdBy: true,
-          customers: true,
-          duration: true,
-          durationUnits: true,
-          estimatedDistillationTime: true,
-          estimatedEnd: true,
-          estimatedFermentationTime: true,
-          estimatedMashingTime: true,
-          estimatedProcessing: true,
-          estimatedStart: true,
-          estimatedTotalProductionTime: true,
-          globalId: true,
-          id: true,
-          productionOrderAllocation: true,
-
-          recipeGroup: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipeName: true,
-
-          scheduleOrderRecipe: {
-            select: {
-              id: true,
-            },
-          },
-
-          status: true,
-          totalBarrels: true,
-          totalProofGallons: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
@@ -416,7 +349,14 @@ export class ScheduleOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,

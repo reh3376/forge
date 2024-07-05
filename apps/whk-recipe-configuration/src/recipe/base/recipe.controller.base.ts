@@ -416,7 +416,14 @@ export class RecipeControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,

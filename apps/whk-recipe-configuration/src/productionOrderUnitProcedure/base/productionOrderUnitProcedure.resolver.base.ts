@@ -25,7 +25,6 @@ import { ProductionOrderUnitProcedureFindManyArgs } from "./ProductionOrderUnitP
 import { ProductionOrderUnitProcedureFindUniqueArgs } from "./ProductionOrderUnitProcedureFindUniqueArgs";
 import { CreateProductionOrderUnitProcedureArgs } from "./CreateProductionOrderUnitProcedureArgs";
 import { UpdateProductionOrderUnitProcedureArgs } from "./UpdateProductionOrderUnitProcedureArgs";
-import { DeleteProductionOrderUnitProcedureArgs } from "./DeleteProductionOrderUnitProcedureArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
@@ -167,27 +166,6 @@ export class ProductionOrderUnitProcedureResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => ProductionOrderUnitProcedure)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteProductionOrderUnitProcedure(
-    @graphql.Args() args: DeleteProductionOrderUnitProcedureArgs
-  ): Promise<ProductionOrderUnitProcedure | null> {
-    try {
-      return await this.service.deleteProductionOrderUnitProcedure(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

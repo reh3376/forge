@@ -256,57 +256,6 @@ export class BatchControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Batch })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Batch",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteBatch(
-    @common.Param() params: BatchWhereUniqueInput
-  ): Promise<Batch | null> {
-    try {
-      return await this.service.deleteBatch({
-        where: params,
-        select: {
-          batchData: true,
-          batchId: true,
-          createdAt: true,
-          customers: true,
-          id: true,
-
-          lot: {
-            select: {
-              id: true,
-            },
-          },
-
-          parent: {
-            select: {
-              id: true,
-            },
-          },
-
-          quantity: true,
-          revision: true,
-          updatedAt: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/children")
   @ApiNestedQuery(BatchFindManyArgs)
