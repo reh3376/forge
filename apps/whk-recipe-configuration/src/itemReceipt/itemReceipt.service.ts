@@ -17,7 +17,13 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   }
 
     async createItemReceipt<T extends Prisma.ItemReceiptCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ItemReceiptCreateArgs>): Promise<import(".prisma/client").ItemReceipt> {
-      const itemReceipt = await super.createItemReceipt(args);
+      const itemReceipt = await super.createItemReceipt({
+        data: args.data,
+        include: {
+          item: true,
+          purchaseOrder: true,
+        }
+      });
 
       await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
         event_type: 'create',
