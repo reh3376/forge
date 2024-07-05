@@ -205,49 +205,6 @@ export class AssetControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Asset })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Asset",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteAsset(
-    @common.Param() params: AssetWhereUniqueInput
-  ): Promise<Asset | null> {
-    try {
-      return await this.service.deleteAsset({
-        where: params,
-        select: {
-          assetPath: true,
-          children: true,
-          createdAt: true,
-          createdBy: true,
-          description: true,
-          globalId: true,
-          id: true,
-          name: true,
-          revision: true,
-          schemaVersion: true,
-          type: true,
-          updatedAt: true,
-          updatedBy: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationChemistries")
   @ApiNestedQuery(FermentationChemistryFindManyArgs)

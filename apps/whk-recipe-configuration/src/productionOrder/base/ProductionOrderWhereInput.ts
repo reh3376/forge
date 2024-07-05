@@ -14,12 +14,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
-import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
@@ -27,7 +28,6 @@ import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
-import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
 @InputType()
@@ -46,14 +46,14 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  className?: StringFilter;
+  className?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -79,14 +79,26 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: () => CustomerWhereUniqueInput,
   })
-  @Type(() => StringFilter)
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => CustomerWhereUniqueInput, {
     nullable: true,
   })
-  customer?: StringFilter;
+  customer?: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  customerCode?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -264,14 +276,14 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeFilter,
+    type: DateTimeNullableFilter,
   })
-  @Type(() => DateTimeFilter)
+  @Type(() => DateTimeNullableFilter)
   @IsOptional()
-  @Field(() => DateTimeFilter, {
+  @Field(() => DateTimeNullableFilter, {
     nullable: true,
   })
-  startDate?: DateTimeFilter;
+  startDate?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,

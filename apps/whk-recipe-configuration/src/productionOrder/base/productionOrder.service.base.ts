@@ -19,6 +19,7 @@ import {
   Lot as PrismaLot,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Bom as PrismaBom,
+  Customer as PrismaCustomer,
   Item as PrismaItem,
   Recipe as PrismaRecipe,
   RecipeGroup as PrismaRecipeGroup,
@@ -111,6 +112,14 @@ export class ProductionOrderServiceBase {
         where: { id: parentId },
       })
       .boms();
+  }
+
+  async getCustomer(parentId: string): Promise<PrismaCustomer | null> {
+    return this.prisma.productionOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .customer();
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {

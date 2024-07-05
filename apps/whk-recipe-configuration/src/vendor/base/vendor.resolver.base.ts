@@ -25,7 +25,6 @@ import { VendorFindManyArgs } from "./VendorFindManyArgs";
 import { VendorFindUniqueArgs } from "./VendorFindUniqueArgs";
 import { CreateVendorArgs } from "./CreateVendorArgs";
 import { UpdateVendorArgs } from "./UpdateVendorArgs";
-import { DeleteVendorArgs } from "./DeleteVendorArgs";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { VendorService } from "../vendor.service";
@@ -109,27 +108,6 @@ export class VendorResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Vendor)
-  @nestAccessControl.UseRoles({
-    resource: "Vendor",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteVendor(
-    @graphql.Args() args: DeleteVendorArgs
-  ): Promise<Vendor | null> {
-    try {
-      return await this.service.deleteVendor(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

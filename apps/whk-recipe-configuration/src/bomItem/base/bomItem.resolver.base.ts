@@ -25,7 +25,6 @@ import { BomItemFindManyArgs } from "./BomItemFindManyArgs";
 import { BomItemFindUniqueArgs } from "./BomItemFindUniqueArgs";
 import { CreateBomItemArgs } from "./CreateBomItemArgs";
 import { UpdateBomItemArgs } from "./UpdateBomItemArgs";
-import { DeleteBomItemArgs } from "./DeleteBomItemArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Bom } from "../../bom/base/Bom";
@@ -152,27 +151,6 @@ export class BomItemResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => BomItem)
-  @nestAccessControl.UseRoles({
-    resource: "BomItem",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteBomItem(
-    @graphql.Args() args: DeleteBomItemArgs
-  ): Promise<BomItem | null> {
-    try {
-      return await this.service.deleteBomItem(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
