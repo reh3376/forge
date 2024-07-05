@@ -17,6 +17,14 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   }
 
     async createItemReceipt<T extends Prisma.ItemReceiptCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ItemReceiptCreateArgs>): Promise<import(".prisma/client").ItemReceipt> {
+      // get the grain tests statically for now. 
+      const grainTests = await this.prisma.testParameter.findMany({
+        where: {
+          active: true,
+          isClassDef: true,
+        }
+      });
+      
       const itemReceipt = await super.createItemReceipt({
         data: args.data,
         include: {
@@ -24,6 +32,28 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           purchaseOrder: true,
         }
       });
+
+      // create the grain test instances 
+      for (const test of grainTests) {
+        await this.prisma.testParameter.create({
+          data: {
+            testParamUnits: test.testParamUnits,
+            name: test.name,
+            createdBy: args.data.createdBy,
+            testSetpointType: test.testSetpointType,
+            testParamRevision: test.testParamRevision,
+            testSetpointBooleanValue: test.testSetpointBooleanValue,
+            testSetpointLowerLimit: test.testSetpointLowerLimit,
+            testSetpointUpperLimit: test.testSetpointUpperLimit,
+            testSetpointValue: test.testSetpointValue,
+            active: true,
+            isClassDef: false,
+            classId: { connect: { id: test.id } },
+            itemReceipt: { connect: { id: itemReceipt.id } },
+          }
+        });
+      }
+
 
       await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
         event_type: 'create',
