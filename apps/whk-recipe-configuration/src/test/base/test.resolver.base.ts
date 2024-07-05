@@ -25,7 +25,6 @@ import { TestFindManyArgs } from "./TestFindManyArgs";
 import { TestFindUniqueArgs } from "./TestFindUniqueArgs";
 import { CreateTestArgs } from "./CreateTestArgs";
 import { UpdateTestArgs } from "./UpdateTestArgs";
-import { DeleteTestArgs } from "./DeleteTestArgs";
 import { TestService } from "../test.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Test)
@@ -103,25 +102,6 @@ export class TestResolverBase {
         ...args,
         data: args.data,
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Test)
-  @nestAccessControl.UseRoles({
-    resource: "Test",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteTest(@graphql.Args() args: DeleteTestArgs): Promise<Test | null> {
-    try {
-      return await this.service.deleteTest(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
