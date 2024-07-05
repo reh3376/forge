@@ -19,7 +19,7 @@ import {
   IsInt,
   Max,
 } from "class-validator";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
 import { Type } from "class-transformer";
 import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
 
@@ -135,15 +135,15 @@ class CustomerUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderWhereUniqueInput,
+    type: () => ProductionOrderUpdateManyWithoutCustomersInput,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
+  @Type(() => ProductionOrderUpdateManyWithoutCustomersInput)
   @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
+  @Field(() => ProductionOrderUpdateManyWithoutCustomersInput, {
     nullable: true,
   })
-  productionOrders?: ProductionOrderWhereUniqueInput | null;
+  productionOrders?: ProductionOrderUpdateManyWithoutCustomersInput;
 
   @ApiProperty({
     required: false,
