@@ -29,6 +29,9 @@ import { LotUpdateInput } from "./LotUpdateInput";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -374,78 +377,6 @@ export class LotControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Lot })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Lot",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteLot(
-    @common.Param() params: LotWhereUniqueInput
-  ): Promise<Lot | null> {
-    try {
-      return await this.service.deleteLot({
-        where: params,
-        select: {
-          createdAt: true,
-          createdBy: true,
-          externalId: true,
-
-          fermentationChemistries: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
-          id: true,
-          isRawMaterial: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
-          lotNumber: true,
-
-          productionOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          purchaseOrderAcceptedLots: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
-          schemaVersion: true,
-          updatedAt: true,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/batches")
   @ApiNestedQuery(BatchFindManyArgs)
@@ -549,6 +480,127 @@ export class LotControllerBase {
   ): Promise<void> {
     const data = {
       batches: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/bomItems")
+  @ApiNestedQuery(BomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItems(
+    @common.Req() request: Request,
+    @common.Param() params: LotWhereUniqueInput
+  ): Promise<BomItem[]> {
+    const query = plainToClass(BomItemFindManyArgs, request.query);
+    const results = await this.service.findBomItems(params.id, {
+      ...query,
+      select: {
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        quantityActual: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/bomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async connectBomItems(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/bomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async updateBomItems(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItems: {
+        set: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/bomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBomItems(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      bomItems: {
         disconnect: body,
       },
     };

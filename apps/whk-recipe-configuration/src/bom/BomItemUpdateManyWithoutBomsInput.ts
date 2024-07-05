@@ -10,11 +10,12 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
+import { BomItemWhereUniqueInput } from "../bomItem/BomItemWhereUniqueInput";
+import { Expose } from "class-transformer";
 
 @InputType()
-class BomItemUpdateManyWithoutUnitsInput {
+class BomItemUpdateManyWithoutBomsInput {
   @Field(() => [BomItemWhereUniqueInput], {
     nullable: true,
   })
@@ -22,6 +23,7 @@ class BomItemUpdateManyWithoutUnitsInput {
     required: false,
     type: () => [BomItemWhereUniqueInput],
   })
+  @Expose()
   connect?: Array<BomItemWhereUniqueInput>;
 
   @Field(() => [BomItemWhereUniqueInput], {
@@ -31,6 +33,7 @@ class BomItemUpdateManyWithoutUnitsInput {
     required: false,
     type: () => [BomItemWhereUniqueInput],
   })
+  @Expose()
   disconnect?: Array<BomItemWhereUniqueInput>;
 
   @Field(() => [BomItemWhereUniqueInput], {
@@ -40,7 +43,8 @@ class BomItemUpdateManyWithoutUnitsInput {
     required: false,
     type: () => [BomItemWhereUniqueInput],
   })
+  @Expose()
   set?: Array<BomItemWhereUniqueInput>;
 }
 
-export { BomItemUpdateManyWithoutUnitsInput as BomItemUpdateManyWithoutUnitsInput };
+export { BomItemUpdateManyWithoutBomsInput as BomItemUpdateManyWithoutBomsInput };

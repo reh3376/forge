@@ -25,7 +25,6 @@ import { BatchFindManyArgs } from "./BatchFindManyArgs";
 import { BatchFindUniqueArgs } from "./BatchFindUniqueArgs";
 import { CreateBatchArgs } from "./CreateBatchArgs";
 import { UpdateBatchArgs } from "./UpdateBatchArgs";
-import { DeleteBatchArgs } from "./DeleteBatchArgs";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
@@ -138,27 +137,6 @@ export class BatchResolverBase {
             : undefined,
         },
       });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @graphql.Mutation(() => Batch)
-  @nestAccessControl.UseRoles({
-    resource: "Batch",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteBatch(
-    @graphql.Args() args: DeleteBatchArgs
-  ): Promise<Batch | null> {
-    try {
-      return await this.service.deleteBatch(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(

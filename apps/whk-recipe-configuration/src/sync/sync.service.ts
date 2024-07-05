@@ -18,6 +18,12 @@ import { Expose, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CustomerUpdateInput } from '../customer/base/CustomerUpdateInput';
 import { CustomerCreateInput } from 'src/customer/base/CustomerCreateInput';
+import { BomCreateInput } from '../bom/BomCreateInput';
+import { BomUpdateInput } from '../bom/BomUpdateInput';
+import { BomItemCreateInput } from '../bomItem/BomItemCreateInput';
+import { BomItemUpdateInput } from '../bomItem/BomItemUpdateInput';
+import { VendorUpdateInput } from '../vendor/base/VendorUpdateInput';
+import { VendorCreateInput } from '../vendor/base/VendorCreateInput';
 
 @Injectable()
 export class SyncService implements OnModuleInit {
@@ -40,7 +46,9 @@ export class SyncService implements OnModuleInit {
             purchaseorder: this.prisma.purchaseOrder,
             salesorder: this.prisma.salesOrder,
             customer: this.prisma.customer,
-            // vendor: this.prisma.vendor,
+            vendor: this.prisma.vendor,
+            bom: this.prisma.bom,
+            bomitem: this.prisma.bomItem,
         };
 
         this.entityUpdateInputMap = {
@@ -49,7 +57,9 @@ export class SyncService implements OnModuleInit {
             salesorder: SalesOrderUpdateInput,
             item: ItemUpdateInput,
             customer: CustomerUpdateInput,
-            // vendor: VendorUpdateInput,
+            vendor: VendorUpdateInput,
+            bom: BomCreateInput,
+            bomitem: BomItemCreateInput,
         }
 
         this.entityCreateInputMap = {
@@ -58,7 +68,9 @@ export class SyncService implements OnModuleInit {
             salesorder: SalesOrderCreateInput,
             item: ItemCreateInput,
             customer: CustomerCreateInput,
-            // vendor: VendorCreateInput,
+            vendor: VendorCreateInput,
+            bom: BomCreateInput,
+            bomitem: BomItemCreateInput,
         }
     }
 
@@ -142,49 +154,35 @@ export class SyncService implements OnModuleInit {
         };
     }
 
-    private async handleNestedRelations(entityName: string, payloadData: Record<string, any>): Promise<Record<string, any>> {
-        // For each nested relation, convert it to the Prisma format and replace the original one in the payload data
-        const modelRelations = await this.loadAndParseSchema(entityName);
-        if (modelRelations.relations.length > 0) {
-            // // first "best effort" attempt to convert the nested relations to the Prisma format
-            // for (const nestedRelation of modelRelations.relations) {
-            //     try {
-            //         // check nestedRelation for data in the field
-            //         if (payloadData[nestedRelation.field]) {
-            //             await this.upsertEntity(nestedRelation.field, payloadData[nestedRelation.field]);
-            //         }
-            //     } catch (error: unknown) {
-            //         this.logger.warn(`Error upserting nested entity: ${error}`);
-            //     }
-            // }
-            // convert the payload data to the Prisma format requried for the outer entity
-            modelRelations.relations.forEach((relation: { field: string, type: string; }) => {
-                if (payloadData[relation.field]) {
-                    try {
-                        if (relation.type === 'one') {
-                            // "one" transform, use unique class
-                            // if the field is not found, remove the field from the payload
-                            const convertedFieldPayload = this.convertToWhereUniquePrismaFormat(relation.field, payloadData[relation.field]);
-                            if (Object.keys(convertedFieldPayload).length > 0) {
-                                payloadData[relation.field] = convertedFieldPayload;
-                            } else {
-                                delete payloadData[relation.field];
-                            }
-                            this.logger.debug(`Nested relation one payload: ${payloadData[relation.field]}`);
-                        } else if (relation.type === 'many') {
-                            // "many" transform, use connect class
-                            payloadData[relation.field] = this.convertToConnectPrismaFormat(relation.field, payloadData[relation.field]);
-                            this.logger.debug(`Nested relation many payload: ${payloadData[relation.field]}`);
-                        }
-                    } catch (error: unknown) {
-                        this.logger.warn(`Error handling nested entity ${relation.field} - ${error}`)
-                    }
-                }
-            });
+    public async handleNestedRelations(entityName: string, payloadData: Record<string, any>): Promise<Record<string, any>> {
+      // For each nested relation, convert it to the Prisma format and replace the original one in the payload data
+      const modelRelations = await this.loadAndParseSchema(entityName);
+      if (modelRelations.relations.length > 0) {
+          for (const relation of modelRelations.relations) {
+              try {
+                  if (relation.type === 'one') {
+                      // "one" transform, use unique class
+                      // if the field is not found, remove the field from the payload
+                      const convertedFieldPayload = await this.convertToWhereUniquePrismaFormat(relation.field, payloadData[relation.field]) ?? {};
+                      if (Object.keys(convertedFieldPayload).length > 0) {
+                          payloadData[relation.field] = convertedFieldPayload;
+                      } else {
+                          delete payloadData[relation.field];
+                      }
+                      this.logger.debug(`Nested relation one payload: ${payloadData[relation.field]}`);
+                  } else if (relation.type === 'many') {
+                      // "many" transform, use connect class
+                      payloadData[relation.field] = await this.convertToConnectPrismaFormat(relation.field, payloadData[relation.field]);
+                      this.logger.debug(`Nested relation many payload: ${payloadData[relation.field]}`);
+                  }
+              } catch (error: unknown) {
+                  this.logger.warn(`Error handling nested entity ${relation.field} - ${error}`)
+              }
+          }
+      }
+      return { modelRelations: modelRelations, payloadData: payloadData };
+  }
 
-        }
-        return { modelRelations: modelRelations, payloadData: payloadData };
-    }
 
     private async validatePayload(entity: string, payload: Record<string, any>): Promise<any> {
         const ExposedClass = this.extendWithExpose(this.entityUpdateInputMap[entity.toLowerCase()]);
@@ -192,14 +190,14 @@ export class SyncService implements OnModuleInit {
         this.logger.debug(`Exposed class instance: ${JSON.stringify(testExposedClassInstance)}`);
         // Use the new class with the plainToInstance function
         const instance: any = plainToInstance(ExposedClass, payload, {
-            enableImplicitConversion: true,
+            enableImplicitConversion: false,
             excludeExtraneousValues: true  // Ensures only defined fields are included
         });
 
-        const errors = await validate(instance);
-        if (errors.length > 0) {
-            throw new Error("Validation failed. Errors: " + errors);
-        }
+        // const errors = await validate(instance);
+        // if (errors.length > 0) {
+        //     throw new Error("Validation failed. Errors: " + errors);
+        // }
 
         // Loop through the fields, if the field value is null or an empty list, omit
         const filteredInstance = Object.fromEntries(
@@ -307,25 +305,79 @@ export class SyncService implements OnModuleInit {
         }
     }
 
-    private convertToConnectPrismaFormat(nestedEntityName: string, nestedEntity: Record<string, unknown>): Record<string, unknown> {
-        // get the id from the nested entity via the globalId field
-        const globalId = nestedEntity.globalId;
-        const id = this.prismaEntityMap[nestedEntityName.toLowerCase()].findUnique({ where: { globalId: globalId } }).id;
-        // Convert the entity to the "{connect: {id: ...}}" format
-        return { connect: { id: id } };
+    private toSingular(entityName: string): string {
+        if (entityName.endsWith('ies')) {
+            return entityName.slice(0, -3) + 'y';
+        } else if (entityName.endsWith('es')) {
+            return entityName.slice(0, -2);
+        } else if (entityName.endsWith('s')) {
+            return entityName.slice(0, -1);
+        }
+        return entityName; 
     }
 
-    private convertToWhereUniquePrismaFormat(nestedEntityName: string, nestedEntity: Record<string, unknown>): Record<string, unknown> {
-        // get the id from the nested entity via the globalId field
-        this.logger.debug(`Nested entity ${nestedEntity}`)
-        const globalId = nestedEntity.globalId;
-        const id = this.prismaEntityMap[nestedEntityName.toLowerCase()].findUnique({ where: { globalId: globalId } }).id;
-        // Convert the entity to the "{where: {id:...}}" format
-        // if the id is not found, return an empty object
-        if (!id) {
-            return {};
-        } else {
-            return { where: { id: id } };
+    private async convertToConnectPrismaFormat(nestedEntityName: string, nestedEntities: Record<string, unknown>): Promise<Record<string, unknown> | undefined> {
+      // loop through the nested plural entity
+      let inst = [];
+      if (nestedEntities !== undefined) {
+        if (Array.isArray(nestedEntities)) {
+            for (const nestedEntity of nestedEntities) {
+                const globalId = (nestedEntity as any).globalId;
+                const singularEntityName = this.toSingular(nestedEntityName).toLowerCase();
+                const item = await this.prismaEntityMap[singularEntityName].findUnique({ where: { globalId: globalId } });
+                const id = item?.id;
+
+                // append {id: id} to the inst array
+                if (id) {
+                    inst.push({ id: id });
+                }
+            }
+        } else if ( nestedEntities.length) {
+          for (const nestedEntityKey in nestedEntities) {
+              const nestedEntity = nestedEntities[nestedEntityKey];
+              const globalId = (nestedEntity as any).globalId;
+              const singularEntityName = this.toSingular(nestedEntityName).toLowerCase();
+              const item = await this.prismaEntityMap[singularEntityName].findUnique({ where: { globalId: globalId } });
+              const id = item?.id;
+
+              // append {id: id} to the inst array
+              if (id) {
+                  inst.push({ id: id });
+              }
+          }
+        }
+        // Convert the entity to the "{connect: {id: ...}}" format
+        if (inst.length > 0) {
+            return {
+                connect: inst
+            };
         }
     }
+  }
+
+  private async convertToWhereUniquePrismaFormat(nestedEntityName: string, nestedEntity: Record<string, unknown>): Promise<void | Record<string, unknown>> {
+      // get the id from the nested entity via the globalId field
+      try {
+          this.logger.debug(`Nested entity ${nestedEntity}`)
+          const globalId = nestedEntity.globalId;
+          const item = await this.prismaEntityMap[nestedEntityName.toLowerCase()].findUnique({ where: { globalId: globalId } })
+          const id = item?.id;
+          // Convert the entity to the "{where: {id:...}}" format
+          // if the id is not found, return an empty object
+          if (!id) {
+              return {};
+          } else {
+            //   return { id: id };
+            return {
+                connect: { id: id }
+            };
+          }
+      } catch (error) {
+          if (error instanceof TypeError && error.message.includes("globalId")) {
+              this.logger.info("TypeError: 'globalId' does not exist on the nestedEntity object.");
+          } else {
+              throw error; // rethrow the error if it's not the expected type error
+          }
+      }
+  }
 }

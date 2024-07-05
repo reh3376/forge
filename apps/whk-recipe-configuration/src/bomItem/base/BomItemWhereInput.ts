@@ -17,11 +17,11 @@ import { Type } from "class-transformer";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { UnitWhereUniqueInput } from "../../unit/base/UnitWhereUniqueInput";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class BomItemWhereInput {
@@ -73,6 +73,17 @@ class BomItemWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -93,6 +104,18 @@ class BomItemWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -118,15 +141,14 @@ class BomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => UnitWhereUniqueInput,
+    type: StringNullableFilter,
   })
-  @ValidateNested()
-  @Type(() => UnitWhereUniqueInput)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => UnitWhereUniqueInput, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  units?: UnitWhereUniqueInput;
+  units?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

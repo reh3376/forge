@@ -25,9 +25,10 @@ import { LotFindManyArgs } from "./LotFindManyArgs";
 import { LotFindUniqueArgs } from "./LotFindUniqueArgs";
 import { CreateLotArgs } from "./CreateLotArgs";
 import { UpdateLotArgs } from "./UpdateLotArgs";
-import { DeleteLotArgs } from "./DeleteLotArgs";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -184,25 +185,6 @@ export class LotResolverBase {
     }
   }
 
-  @graphql.Mutation(() => Lot)
-  @nestAccessControl.UseRoles({
-    resource: "Lot",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteLot(@graphql.Args() args: DeleteLotArgs): Promise<Lot | null> {
-    try {
-      return await this.service.deleteLot(args);
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "batches" })
   @nestAccessControl.UseRoles({
@@ -215,6 +197,26 @@ export class LotResolverBase {
     @graphql.Args() args: BatchFindManyArgs
   ): Promise<Batch[]> {
     const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BomItem], { name: "bomItems" })
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findBomItems(
+    @graphql.Parent() parent: Lot,
+    @graphql.Args() args: BomItemFindManyArgs
+  ): Promise<BomItem[]> {
+    const results = await this.service.findBomItems(parent.id, args);
 
     if (!results) {
       return [];

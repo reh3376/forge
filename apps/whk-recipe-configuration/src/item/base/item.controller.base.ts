@@ -269,58 +269,6 @@ export class ItemControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Item })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteItem(
-    @common.Param() params: ItemWhereUniqueInput
-  ): Promise<Item | null> {
-    try {
-      return await this.service.deleteItem({
-        where: params,
-        select: {
-          active: true,
-          createdAt: true,
-          createdBy: true,
-          erpId: true,
-          globalId: true,
-          id: true,
-          itemClass: true,
-          itemDescription: true,
-          itemGroup: true,
-          itemName: true,
-          itemNumber: true,
-          itemRevision: true,
-          itemType: true,
-          schemaVersion: true,
-          updatedAt: true,
-          updatedBy: true,
-
-          vendor: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
-  }
-
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomItems")
   @ApiNestedQuery(BomItemFindManyArgs)
@@ -346,6 +294,7 @@ export class ItemControllerBase {
         consumedAt: true,
         createdAt: true,
         createdBy: true,
+        globalId: true,
         id: true,
 
         item: {
@@ -354,15 +303,15 @@ export class ItemControllerBase {
           },
         },
 
-        quantity: true,
-        quantityActual: true,
-
-        units: {
+        lot: {
           select: {
             id: true,
           },
         },
 
+        quantity: true,
+        quantityActual: true,
+        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -838,7 +787,14 @@ export class ItemControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
         endDate: true,
         globalId: true,
         id: true,

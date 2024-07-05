@@ -25,9 +25,6 @@ import { UnitFindManyArgs } from "./UnitFindManyArgs";
 import { UnitFindUniqueArgs } from "./UnitFindUniqueArgs";
 import { CreateUnitArgs } from "./CreateUnitArgs";
 import { UpdateUnitArgs } from "./UpdateUnitArgs";
-import { DeleteUnitArgs } from "./DeleteUnitArgs";
-import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
-import { BomItem } from "../../bomItem/base/BomItem";
 import { UnitService } from "../unit.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Unit)
@@ -113,44 +110,5 @@ export class UnitResolverBase {
       }
       throw error;
     }
-  }
-
-  @graphql.Mutation(() => Unit)
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "delete",
-    possession: "any",
-  })
-  async deleteUnit(@graphql.Args() args: DeleteUnitArgs): Promise<Unit | null> {
-    try {
-      return await this.service.deleteUnit(args);
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [BomItem], { name: "bomItem" })
-  @nestAccessControl.UseRoles({
-    resource: "BomItem",
-    action: "read",
-    possession: "any",
-  })
-  async findBomItem(
-    @graphql.Parent() parent: Unit,
-    @graphql.Args() args: BomItemFindManyArgs
-  ): Promise<BomItem[]> {
-    const results = await this.service.findBomItem(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 }
