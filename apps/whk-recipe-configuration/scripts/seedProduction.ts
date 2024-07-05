@@ -25,14 +25,15 @@ async function seed(bcryptSalt: Salt) {
 
   const client = new PrismaClient();
 
-  const data = {
-    const { MES_USER, MES_PASSWORD } = process.env;
+  const { MES_USER, MES_PASSWORD } = process.env;
 
-    if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
-      throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD environment variables must be defined");
-    }
-    username: "admin",
-    password: await hash("admin", bcryptSalt),
+  if (!MES_USER || !MES_PASSWORD) {
+    throw new Error("MES_USER and MES_PASSWORD environment variables must be defined");
+  }
+
+  const data = {
+    username: MES_USER,
+    password: await hash(MES_PASSWORD, bcryptSalt),
     roles: ["user"],
   };
 
