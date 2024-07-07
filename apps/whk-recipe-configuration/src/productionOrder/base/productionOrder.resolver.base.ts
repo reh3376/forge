@@ -109,8 +109,8 @@ export class ProductionOrderResolverBase {
       data: {
         ...args.data,
 
-        boms: {
-          connect: args.data.boms,
+        bom: {
+          connect: args.data.bom,
         },
 
         customer: {
@@ -162,8 +162,8 @@ export class ProductionOrderResolverBase {
         data: {
           ...args.data,
 
-          boms: {
-            connect: args.data.boms,
+          bom: {
+            connect: args.data.bom,
           },
 
           customer: {
@@ -302,17 +302,15 @@ export class ProductionOrderResolverBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Bom, {
     nullable: true,
-    name: "boms",
+    name: "bom",
   })
   @nestAccessControl.UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
   })
-  async getBoms(
-    @graphql.Parent() parent: ProductionOrder
-  ): Promise<Bom | null> {
-    const result = await this.service.getBoms(parent.id);
+  async getBom(@graphql.Parent() parent: ProductionOrder): Promise<Bom | null> {
+    const result = await this.service.getBom(parent.id);
 
     if (!result) {
       return null;

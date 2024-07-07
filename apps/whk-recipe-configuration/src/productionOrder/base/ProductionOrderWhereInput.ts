@@ -42,7 +42,7 @@ class ProductionOrderWhereInput {
   @Field(() => BomWhereUniqueInput, {
     nullable: true,
   })
-  boms?: BomWhereUniqueInput;
+  bom?: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,

@@ -42,7 +42,7 @@ class ProductionOrder {
   })
   @ValidateNested()
   @Type(() => Bom)
-  boms?: Bom;
+  bom?: Bom;
 
   @ApiProperty({
     required: false,

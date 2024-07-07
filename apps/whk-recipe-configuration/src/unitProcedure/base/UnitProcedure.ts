@@ -13,12 +13,12 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
-  IsDate,
   IsString,
   MaxLength,
+  IsOptional,
+  IsBoolean,
+  ValidateNested,
+  IsDate,
   IsEnum,
   IsInt,
   Max,
@@ -35,6 +35,18 @@ import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQ
 
 @ObjectType()
 class UnitProcedure {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  abbreviation!: string | null;
+
   @ApiProperty({
     required: false,
     type: Boolean,

@@ -389,7 +389,7 @@ export class BomControllerBase {
     const results = await this.service.findProductionOrder(params.id, {
       ...query,
       select: {
-        boms: {
+        bom: {
           select: {
             id: true,
           },
@@ -541,6 +541,7 @@ export class BomControllerBase {
     const results = await this.service.findUnitProcedure(params.id, {
       ...query,
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {
@@ -679,6 +680,7 @@ export class BomControllerBase {
     const results = await this.service.findUnitProceduresPrimary(params.id, {
       ...query,
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {
