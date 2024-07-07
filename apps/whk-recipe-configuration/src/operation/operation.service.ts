@@ -19,7 +19,7 @@ export class OperationService extends OperationServiceBase {
     Mashing01: ['Cook', 'Clean'],
     Fermentation01: ['FermenterSet', 'Fermenter', 'Clean'],
     Distillation01: ['StillRun', 'Clean'],
-    Processing01: ['TankProcessing', 'Barreling'],
+    Processing01: ['BlendingTank', 'Barreling', 'CisternTank'],
     Milling01: ['Mill'],
   };
 
@@ -61,7 +61,8 @@ export class OperationService extends OperationServiceBase {
       'DropLineSteam'
     ],
     StillRun: ['StillStartup', 'StillRun', 'StillShutdown'],
-    TankProcessing: ['Cut', 'Hold', 'Gauge'],
+    BlendingTank: ['Cut', 'Hold', 'Gauge'],
+    CisternTank: ['Cut', 'Hold', 'Gauge'],
     Barreling: ['BarrelFill'],
     Mill: ['Mill'],
   };

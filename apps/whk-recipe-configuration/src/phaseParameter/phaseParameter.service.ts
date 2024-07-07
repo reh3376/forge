@@ -128,17 +128,21 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
       args: Prisma.SelectSubset<T, Prisma.PhaseParameterCreateArgs>
       ): Promise<PhaseParameter> {
       const name = args.data.name as string;
-      this.logger.info(`Updating Equipment Phase: ${name}`);
+      this.logger.info(`Creating Equipment Phase: ${name}`);
 
       // if unit procedure id is provided, check if it matches the acceptable list for the operation
-      if (args.data.equipmentPhases?.connect) {
-          if (Array.isArray(args.data.equipmentPhases?.connect)) {
-              for (const equipmentPhaseInput of args.data.equipmentPhases.connect) {
-                  // args.data.equipmentPhases.connect.forEach((equipmentPhaseInput: EquipmentPhaseWhereUniqueInput) => {
-                  const equipmentPhaseId = equipmentPhaseInput.id as string;
-                  await this.validateEquipmentPhase(equipmentPhaseId, name);
+      try {
+          if (args.data.equipmentPhases?.connect) {
+              if (Array.isArray(args.data.equipmentPhases?.connect)) {
+                  for (const equipmentPhaseInput of args.data.equipmentPhases.connect) {
+                      // args.data.equipmentPhases.connect.forEach((equipmentPhaseInput: EquipmentPhaseWhereUniqueInput) => {
+                      const equipmentPhaseId = equipmentPhaseInput.id as string;
+                      await this.validateEquipmentPhase(equipmentPhaseId, name);
+                  }
               }
           }
+      } catch (error) {
+        this.logger.info(`Phase Parameter being created without Equipment Phase: ${error}`);
       }
       const phaseParameter = await super.createPhaseParameter(args);
 
