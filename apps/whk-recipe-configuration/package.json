@@ -5,7 +5,7 @@
     "start": "nest start",
     "prod-start": "pm2 start dist/main.js --name whk-mes",
     "start:dev:watch": "nest start --watch",
-    "start:dev:debug": "nest start --debug --watch",
+    "start:dev:debug": "nest start --debug --watch -e 'node -r newrelic'",
     "build": "nest build",
     "test": "jest",
     "dev:seed": "ts-node scripts/seedDevelopment.ts",
@@ -55,6 +55,7 @@
     "@nestjs/swagger": "7.4.0",
     "@prisma/client": "5.11.0",
     "@types/bcrypt": "5.0.2",
+    "@newrelic/apollo-server-plugin": "latest",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",
     "bcrypt": "5.1.1",
@@ -70,7 +71,7 @@
     "mime-types": "^2.1.35",
     "minimatch": "^9.0.4",
     "nest-access-control": "^3.1.0",
-    "nestjs-pino": "^3.5.0",
+    "nest-winston": "^1.10.0",
     "newrelic": "latest",
     "npm-run-all": "4.1.5",
     "openai": "^4.57.0",
@@ -80,7 +81,8 @@
     "reflect-metadata": "0.1.13",
     "ts-node": "10.9.2",
     "type-fest": "2.19.0",
-    "validator": "13.12.0"
+    "validator": "13.12.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.5",

@@ -1,15 +1,15 @@
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RabbitMQMessage } from "./RabbitMQMessage";
-import {Controller} from "@nestjs/common";
+import {Controller, Inject, Logger} from "@nestjs/common";
 import {SyncService} from "../sync/sync.service";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Controller("rabbitmq-controller")
 export class RabbitMQController {
 
   constructor(
       private readonly syncService: SyncService,
-      private readonly logger: PinoLogger
+      @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {}
 
   private extractDataFromMessage(message: RabbitMQMessage): any {
@@ -33,7 +33,7 @@ export class RabbitMQController {
       message: RabbitMQMessage,
       context: RmqContext
   ): Promise<void> {
-    this.logger.info(`Event Received for record Name ${JSON.stringify(message.data.recordName)}`);
+    this.logger.log(`Event Received for record Name ${JSON.stringify(message.data.recordName)}`);
     // try {
       const eventType: string = message.data.event_type;
       if (eventType === 'create') {
