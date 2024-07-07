@@ -39,6 +39,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           data: {
             testParamUnits: test.testParamUnits,
             name: test.name,
+            description: test.description,
             createdBy: args.data.createdBy,
             testSetpointType: test.testSetpointType,
             testParamRevision: test.testParamRevision,
@@ -60,7 +61,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         data: itemReceipt,
         recordName: 'ItemReceipt',
       });
-      this.logger.info(`Updated ItemReceipt: ${itemReceipt.id} & pushed to topic`)
+      this.logger.info(`Created ItemReceipt: ${itemReceipt.id} & pushed to topic`)
       return itemReceipt;
     }
 
@@ -73,7 +74,6 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           include: {
             purchaseOrder: true,
             item: true,
-            tests: true,
           }
       });
 
@@ -82,7 +82,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         data: itemReceiptPayload,
         recordName: 'ItemReceipt',
       });
-        this.logger.info(`Updated ItemReceipt: ${itemReceipt.id} & pushed to topic`)
+      this.logger.info(`Updated ItemReceipt: ${itemReceipt.id} & pushed to topic`)
 
       return itemReceipt;
     }
