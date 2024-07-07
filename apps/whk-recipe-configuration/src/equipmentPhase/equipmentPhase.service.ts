@@ -54,7 +54,8 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       'DropLineSteam'
     ],
     StillRun: ['StillStartup', 'StillRun', 'StillShutdown'],
-    TankProcessing: ['Cut', 'Hold', 'Gauge'],
+    CisternTank: ['Cut', 'Hold', 'Gauge'],
+    BlendingTank: ['Cut', 'Hold', 'Gauge'],
     Barreling: ['BarrelFill'],
     Mill: ['Mill'],
   };
