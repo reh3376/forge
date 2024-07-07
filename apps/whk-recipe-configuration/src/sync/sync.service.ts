@@ -1,5 +1,5 @@
 
-import {Injectable, OnModuleInit, } from '@nestjs/common';
+import {Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {PrismaService} from "../prisma/prisma.service";
 import { ItemCreateInput } from '../item/base/ItemCreateInput';
@@ -10,7 +10,7 @@ import { ItemReceiptUpdateInput } from '../itemReceipt/base/ItemReceiptUpdateInp
 import { PurchaseOrderUpdateInput } from '../purchaseOrder/base/PurchaseOrderUpdateInput';
 import { SalesOrderUpdateInput } from '../salesOrder/base/SalesOrderUpdateInput';
 import { ItemUpdateInput } from '../item/base/ItemUpdateInput';
-import { PinoLogger } from 'nestjs-pino';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import * as path from "path";
 import * as fs from "fs";
@@ -34,7 +34,7 @@ export class SyncService implements OnModuleInit {
 
     constructor(
         private configService: ConfigService,
-        private readonly logger: PinoLogger,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
         // private readonly moduleRef: ModuleRef,
         private readonly prisma: PrismaService,
     ) {
@@ -374,7 +374,7 @@ export class SyncService implements OnModuleInit {
           }
       } catch (error) {
           if (error instanceof TypeError && error.message.includes("globalId")) {
-              this.logger.info("TypeError: 'globalId' does not exist on the nestedEntity object.");
+              this.logger.log("TypeError: 'globalId' does not exist on the nestedEntity object.");
           } else {
               throw error; // rethrow the error if it's not the expected type error
           }
