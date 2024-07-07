@@ -155,7 +155,7 @@ model EquipmentPhase {
   stepType               EnumEquipmentPhaseStepType @default(NotRequired)
   testParameters         TestParameter[]
 
-  @@unique([name, revision, active, isClassDefinition])
+  @@unique([name, revision, active, isClassDefinition, stepType])
 }
 
 model Operation {
@@ -278,6 +278,7 @@ model ScheduleOrderQueue {
 }
 
 model UnitProcedure {
+  abbreviation                  String?
   active                        Boolean?                       @default(true)
   boms                          Bom?                           @relation(name: "BomsOnUnitProcedure", fields: [bomsId], references: [id])
   bomsId                        String?
@@ -326,8 +327,8 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
-  boms                          Bom                            @relation(fields: [bomsId], references: [id])
-  bomsId                        String
+  bom                           Bom                            @relation(fields: [bomId], references: [id])
+  bomId                         String
   className                     String?
   complete                      Boolean?                       @default(false)
   createdAt                     DateTime                       @default(now())

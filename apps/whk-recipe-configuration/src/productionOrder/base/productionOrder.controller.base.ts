@@ -67,8 +67,8 @@ export class ProductionOrderControllerBase {
       data: {
         ...data,
 
-        boms: {
-          connect: data.boms,
+        bom: {
+          connect: data.bom,
         },
 
         customer: {
@@ -102,7 +102,7 @@ export class ProductionOrderControllerBase {
           : undefined,
       },
       select: {
-        boms: {
+        bom: {
           select: {
             id: true,
           },
@@ -185,7 +185,7 @@ export class ProductionOrderControllerBase {
     return this.service.productionOrders({
       ...args,
       select: {
-        boms: {
+        bom: {
           select: {
             id: true,
           },
@@ -267,7 +267,7 @@ export class ProductionOrderControllerBase {
     const result = await this.service.productionOrder({
       where: params,
       select: {
-        boms: {
+        bom: {
           select: {
             id: true,
           },
@@ -362,8 +362,8 @@ export class ProductionOrderControllerBase {
         data: {
           ...data,
 
-          boms: {
-            connect: data.boms,
+          bom: {
+            connect: data.bom,
           },
 
           customer: {
@@ -397,7 +397,7 @@ export class ProductionOrderControllerBase {
             : undefined,
         },
         select: {
-          boms: {
+          bom: {
             select: {
               id: true,
             },

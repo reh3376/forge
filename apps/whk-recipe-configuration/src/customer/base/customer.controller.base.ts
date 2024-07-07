@@ -221,7 +221,7 @@ export class CustomerControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
-        boms: {
+        bom: {
           select: {
             id: true,
           },

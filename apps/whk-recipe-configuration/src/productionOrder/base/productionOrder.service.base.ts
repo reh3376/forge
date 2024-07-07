@@ -106,12 +106,12 @@ export class ProductionOrderServiceBase {
       .productionOrderUnitProcedures(args);
   }
 
-  async getBoms(parentId: string): Promise<PrismaBom | null> {
+  async getBom(parentId: string): Promise<PrismaBom | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
       })
-      .boms();
+      .bom();
   }
 
   async getCustomer(parentId: string): Promise<PrismaCustomer | null> {

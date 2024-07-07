@@ -93,6 +93,7 @@ export class UnitProcedureControllerBase {
           : undefined,
       },
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {
@@ -162,6 +163,7 @@ export class UnitProcedureControllerBase {
     return this.service.unitProcedures({
       ...args,
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {
@@ -230,6 +232,7 @@ export class UnitProcedureControllerBase {
     const result = await this.service.unitProcedure({
       where: params,
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {
@@ -340,6 +343,7 @@ export class UnitProcedureControllerBase {
             : undefined,
         },
         select: {
+          abbreviation: true,
           active: true,
 
           boms: {
@@ -414,6 +418,7 @@ export class UnitProcedureControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {

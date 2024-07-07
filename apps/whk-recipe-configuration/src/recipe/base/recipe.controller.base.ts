@@ -406,7 +406,7 @@ export class RecipeControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
-        boms: {
+        bom: {
           select: {
             id: true,
           },
@@ -820,6 +820,7 @@ export class RecipeControllerBase {
     const results = await this.service.findUnitProcedures(params.id, {
       ...query,
       select: {
+        abbreviation: true,
         active: true,
 
         boms: {

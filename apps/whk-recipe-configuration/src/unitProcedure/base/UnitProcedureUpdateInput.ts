@@ -13,11 +13,11 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
   IsString,
   MaxLength,
+  IsOptional,
+  IsBoolean,
+  ValidateNested,
   IsEnum,
   IsInt,
   Max,
@@ -36,6 +36,18 @@ import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/bas
 
 @InputType()
 class UnitProcedureUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  abbreviation?: string | null;
+
   @ApiProperty({
     required: false,
     type: Boolean,

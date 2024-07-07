@@ -43,7 +43,7 @@ class ProductionOrderCreateInput {
   @ValidateNested()
   @Type(() => BomWhereUniqueInput)
   @Field(() => BomWhereUniqueInput)
-  boms!: BomWhereUniqueInput;
+  bom!: BomWhereUniqueInput;
 
   @ApiProperty({
     required: false,
