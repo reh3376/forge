@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ItemServiceBase } from "./base/item.service.base";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import {Prisma} from "@prisma/client";
 import {WhMessageBrokerTopics} from "../rabbitmq/topics";
 
@@ -11,7 +11,7 @@ export class ItemService extends ItemServiceBase {
   constructor(
         protected readonly prisma: PrismaService,
         protected readonly rabbitProducer: RabbitMQProducerService,
-        private logger: PinoLogger,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     super(prisma);
   }
@@ -23,7 +23,7 @@ export class ItemService extends ItemServiceBase {
       data: item,
       recordName: 'Item',
     });
-    this.logger.info(`Updated Item: ${item.id} & pushed to topic`)
+    this.logger.log(`Updated Item: ${item.id} & pushed to topic`)
     return item;
   }
 
@@ -40,7 +40,7 @@ export class ItemService extends ItemServiceBase {
       data: itemPayload,
       recordName: 'Item',
     });
-    this.logger.info(`Updated Item: ${item.id} & pushed to topic`)
+    this.logger.log(`Updated Item: ${item.id} & pushed to topic`)
 
     return item;
   }
@@ -53,7 +53,7 @@ export class ItemService extends ItemServiceBase {
       data: item,
       recordName: 'Item',
     });
-    this.logger.info(`Deleted Item: ${item.id} & pushed to topic`)
+    this.logger.log(`Deleted Item: ${item.id} & pushed to topic`)
 
     return item;
   }

@@ -1,7 +1,7 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
+import {BadRequestException, Inject, Injectable, Logger} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { PhaseParameterServiceBase } from "./base/phaseParameter.service.base";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import {PhaseParameter, Prisma} from "@prisma/client";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 import {WhMessageBrokerTopics} from "../rabbitmq/topics";
@@ -16,7 +16,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
       protected readonly rabbitProducer: RabbitMQProducerService,
-      private logger: PinoLogger,
+      @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     super(prisma);
   }
@@ -108,17 +108,17 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
 
     private async validateEquipmentPhase(equipmentPhaseId: string, name: string): Promise<void> {
         const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: equipmentPhaseId}});
-        this.logger.info(`equipmentPhase: ${equipmentPhaseId}`);
+        this.logger.log(`equipmentPhase: ${equipmentPhaseId}`);
 
         // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
         const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
-        this.logger.info(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
+        this.logger.log(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
 
         if (!acceptableEquipmentPhases) {
             throw new BadRequestException(`No Equipment Phase mapping found for Phase Parameter: ${name}`);
         }
 
-        this.logger.info(`Result of includes: ${acceptableEquipmentPhases.includes(name)}`);
+        this.logger.log(`Result of includes: ${acceptableEquipmentPhases.includes(name)}`);
         if (!acceptableEquipmentPhases.includes(name)) {
             throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
         }
@@ -128,7 +128,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
       args: Prisma.SelectSubset<T, Prisma.PhaseParameterCreateArgs>
       ): Promise<PhaseParameter> {
       const name = args.data.name as string;
-      this.logger.info(`Creating Equipment Phase: ${name}`);
+      this.logger.log(`Creating Equipment Phase: ${name}`);
 
       // if unit procedure id is provided, check if it matches the acceptable list for the operation
       try {
@@ -142,7 +142,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
               }
           }
       } catch (error) {
-        this.logger.info(`Phase Parameter being created without Equipment Phase: ${error}`);
+        this.logger.log(`Phase Parameter being created without Equipment Phase: ${error}`);
       }
       const phaseParameter = await super.createPhaseParameter(args);
 
@@ -152,7 +152,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
           data: phaseParameter
       });
 
-      this.logger.info(`Created Phase Parameter: ${phaseParameter.name} & pushed to topic`);
+      this.logger.log(`Created Phase Parameter: ${phaseParameter.name} & pushed to topic`);
       return phaseParameter;
   }
 
@@ -160,7 +160,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
       args: Prisma.SelectSubset<T, Prisma.PhaseParameterUpdateArgs>
       ): Promise<PhaseParameter> {
       const phaseParameter = await this.prisma.phaseParameter.findFirstOrThrow({where: {id: args.where.id}}) as PhaseParameter;
-      this.logger.info(`Updating Phase Parameter: ${phaseParameter.name}`);
+      this.logger.log(`Updating Phase Parameter: ${phaseParameter.name}`);
       const name = phaseParameter.name as string;
       let phaseParameterData = phaseParameter;
       if (Array.isArray(args.data.equipmentPhases?.connect)) {
@@ -179,22 +179,22 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
               data: phaseParameterData
           });
 
-          this.logger.info(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
+          this.logger.log(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
           return phaseParameterData;
       } else {
           const equipmentPhaseId = args.data.equipmentPhases?.connect?.id;
           const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: equipmentPhaseId as string}});
-          this.logger.info(`equipmentPhase: ${equipmentPhaseId}`);
+          this.logger.log(`equipmentPhase: ${equipmentPhaseId}`);
 
           // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
           const acceptableEquipmentPhases = this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
-          this.logger.info(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
+          this.logger.log(`Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`);
 
           if (!acceptableEquipmentPhases) {
               throw new BadRequestException(`No Equipment Phase mapping found for Phase Parameter: ${name}`);
           }
 
-          this.logger.info(`Result of includes: ${acceptableEquipmentPhases.includes(phaseParameter.name)}`);
+          this.logger.log(`Result of includes: ${acceptableEquipmentPhases.includes(phaseParameter.name)}`);
           if (!acceptableEquipmentPhases.includes(phaseParameter.name)) {
               throw new BadRequestException(`Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`);
           }
@@ -207,7 +207,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
                 data: phaseParameterData
           });
 
-          this.logger.info(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
+          this.logger.log(`Updated Phase Parameter: ${phaseParameterData.name} & pushed to topic`);
       }
       return phaseParameterData;
 

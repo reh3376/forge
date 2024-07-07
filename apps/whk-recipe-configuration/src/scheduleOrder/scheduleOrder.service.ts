@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ScheduleOrderServiceBase } from "./base/scheduleOrder.service.base";
 import {Prisma, ScheduleOrder} from "@prisma/client";
 import {WhMessageBrokerTopics} from "../rabbitmq/topics";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
   constructor(
       protected readonly prisma: PrismaService,
       protected readonly rabbitProducer: RabbitMQProducerService,
-      private readonly logger: PinoLogger
+      @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {
     super(prisma);
   }
@@ -23,7 +23,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         event_type: 'create',
         data: scheduleOrder
         });
-        this.logger.info(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
+        this.logger.log(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
 
@@ -34,7 +34,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         event_type: 'update',
         data: scheduleOrder
         });
-        this.logger.info(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
+        this.logger.log(`Updated ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
 
@@ -45,7 +45,7 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         event_type: 'delete',
         data: scheduleOrder
         });
-        this.logger.info(`Deleted ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
+        this.logger.log(`Deleted ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
 }
