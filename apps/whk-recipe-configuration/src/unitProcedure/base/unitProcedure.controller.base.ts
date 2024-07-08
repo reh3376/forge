@@ -694,8 +694,6 @@ export class UnitProcedureControllerBase {
         revision: true,
         active: true,
         customerCode: true,
-        itemId: true,
-        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -713,6 +711,12 @@ export class UnitProcedureControllerBase {
         },
 
         parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
           select: {
             id: true,
           },

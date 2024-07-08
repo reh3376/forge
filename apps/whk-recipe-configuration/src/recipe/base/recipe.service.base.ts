@@ -22,6 +22,7 @@ import {
   RecipeGroup as PrismaRecipeGroup,
   Customer as PrismaCustomer,
   PhaseParameter as PrismaPhaseParameter,
+  Item as PrismaItem,
 } from "@prisma/client";
 
 export class RecipeServiceBase {
@@ -126,5 +127,13 @@ export class RecipeServiceBase {
         where: { id: parentId },
       })
       .parameters();
+  }
+
+  async getItem(parentId: string): Promise<PrismaItem | null> {
+    return this.prisma.recipe
+      .findUnique({
+        where: { id: parentId },
+      })
+      .item();
   }
 }

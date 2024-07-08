@@ -32,6 +32,7 @@ import { Customer } from "../../customer/base/Customer";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Lot } from "../../lot/base/Lot";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Recipe {
@@ -132,27 +133,6 @@ class Recipe {
     type: String,
   })
   @IsString()
-  @MaxLength(16)
-  @Field(() => String)
-  itemId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemDescription!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
   @MaxLength(1000)
   @Field(() => String)
   Recipe!: string;
@@ -239,6 +219,15 @@ class Recipe {
   @Type(() => PhaseParameter)
   @IsOptional()
   parameters?: PhaseParameter | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
 }
 
 export { Recipe as Recipe };

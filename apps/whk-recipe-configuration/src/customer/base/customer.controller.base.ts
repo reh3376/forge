@@ -503,8 +503,6 @@ export class CustomerControllerBase {
         revision: true,
         active: true,
         customerCode: true,
-        itemId: true,
-        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -522,6 +520,12 @@ export class CustomerControllerBase {
         },
 
         parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
           select: {
             id: true,
           },

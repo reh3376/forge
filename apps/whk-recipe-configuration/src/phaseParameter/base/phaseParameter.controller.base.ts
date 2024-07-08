@@ -557,8 +557,6 @@ export class PhaseParameterControllerBase {
         revision: true,
         active: true,
         customerCode: true,
-        itemId: true,
-        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -576,6 +574,12 @@ export class PhaseParameterControllerBase {
         },
 
         parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
           select: {
             id: true,
           },

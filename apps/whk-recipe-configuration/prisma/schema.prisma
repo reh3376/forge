@@ -216,8 +216,6 @@ model Recipe {
   revision                      Int?                           @default(0)
   active                        Boolean?                       @default(true)
   customerCode                  String?
-  itemId                        String
-  itemDescription               String?
   Recipe                        String
   recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                 String?
@@ -231,6 +229,8 @@ model Recipe {
   lots                          Lot[]
   parameters                    PhaseParameter?                @relation(fields: [parameterId], references: [id])
   parameterId                   String?
+  item                          Item?                          @relation(fields: [itemId], references: [id])
+  itemId                        String?
 
   @@unique([itemId, customerId])
 }
@@ -420,6 +420,7 @@ model Item {
   salesOrders                   SalesOrder[]
   vendor                        Vendor?                        @relation(fields: [vendorId], references: [id])
   vendorId                      String?
+  recipes                       Recipe[]
 }
 
 model ItemGroup {
