@@ -21,7 +21,6 @@ import {
   IsDate,
 } from "class-validator";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { Expose, Type } from "class-transformer";

@@ -46,7 +46,7 @@ model PhaseParameter {
   globalId               String?                        @unique @default(cuid())
   equipmentPhases        EquipmentPhase[]
 
-  @@unique([name, revision, isClassDef, equipmentPhaseId])
+  // @@unique([name, revision, isClassDef, equipmentPhases])
 }
 
 model TestParameter {
