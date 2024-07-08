@@ -374,7 +374,7 @@ export class SyncService implements OnModuleInit {
           }
       } catch (error) {
           if (error instanceof TypeError && error.message.includes("globalId")) {
-              this.logger.log("TypeError: 'globalId' does not exist on the nestedEntity object.");
+              this.logger.debug("TypeError: 'globalId' does not exist on the nestedEntity object.");
           } else {
               throw error; // rethrow the error if it's not the expected type error
           }
