@@ -25,20 +25,20 @@ import { ItemFindManyArgs } from "./ItemFindManyArgs";
 import { ItemFindUniqueArgs } from "./ItemFindUniqueArgs";
 import { CreateItemArgs } from "./CreateItemArgs";
 import { UpdateItemArgs } from "./UpdateItemArgs";
-import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
-import { BomItem } from "../../bomItem/base/BomItem";
-import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
-import { Bom } from "../../bom/base/Bom";
-import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
-import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
-import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
+import { Bom } from "../../bom/base/Bom";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { Vendor } from "../../vendor/base/Vendor";
@@ -146,17 +146,17 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [BomItem], { name: "bomItems" })
+  @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
   @nestAccessControl.UseRoles({
-    resource: "BomItem",
+    resource: "ProductionOrder",
     action: "read",
     possession: "any",
   })
-  async findBomItems(
+  async findProductionOrders(
     @graphql.Parent() parent: Item,
-    @graphql.Args() args: BomItemFindManyArgs
-  ): Promise<BomItem[]> {
-    const results = await this.service.findBomItems(parent.id, args);
+    @graphql.Args() args: ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    const results = await this.service.findProductionOrders(parent.id, args);
 
     if (!results) {
       return [];
@@ -186,6 +186,26 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrders(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    const results = await this.service.findPurchaseOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ItemReceipt], { name: "itemReceipts" })
   @nestAccessControl.UseRoles({
     resource: "ItemReceipt",
@@ -206,37 +226,17 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Lot], { name: "lots" })
+  @graphql.ResolveField(() => [BomItem], { name: "bomItems" })
   @nestAccessControl.UseRoles({
-    resource: "Lot",
+    resource: "BomItem",
     action: "read",
     possession: "any",
   })
-  async findLots(
+  async findBomItems(
     @graphql.Parent() parent: Item,
-    @graphql.Args() args: LotFindManyArgs
-  ): Promise<Lot[]> {
-    const results = await this.service.findLots(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrders(
-    @graphql.Parent() parent: Item,
-    @graphql.Args() args: ProductionOrderFindManyArgs
-  ): Promise<ProductionOrder[]> {
-    const results = await this.service.findProductionOrders(parent.id, args);
+    @graphql.Args() args: BomItemFindManyArgs
+  ): Promise<BomItem[]> {
+    const results = await this.service.findBomItems(parent.id, args);
 
     if (!results) {
       return [];
@@ -271,17 +271,17 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
+  @graphql.ResolveField(() => [Lot], { name: "lots" })
   @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
+    resource: "Lot",
     action: "read",
     possession: "any",
   })
-  async findPurchaseOrders(
+  async findLots(
     @graphql.Parent() parent: Item,
-    @graphql.Args() args: PurchaseOrderFindManyArgs
-  ): Promise<PurchaseOrder[]> {
-    const results = await this.service.findPurchaseOrders(parent.id, args);
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLots(parent.id, args);
 
     if (!results) {
       return [];

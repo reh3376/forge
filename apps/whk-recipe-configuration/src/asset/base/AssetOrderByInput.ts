@@ -83,17 +83,6 @@ class AssetOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  globalId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   id?: SortOrder;
 
   @ApiProperty({
@@ -161,6 +150,17 @@ class AssetOrderByInput {
     nullable: true,
   })
   updatedBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  globalId?: SortOrder;
 }
 
 export { AssetOrderByInput as AssetOrderByInput };

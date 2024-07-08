@@ -13,62 +13,28 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  ValidateNested,
-  IsOptional,
-  IsDate,
   IsString,
   MaxLength,
+  IsOptional,
+  IsBoolean,
+  IsDate,
   IsNumber,
   Max,
   IsEnum,
+  ValidateNested,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
-import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 
 @ObjectType()
 class TestParameter {
-  @ApiProperty({
-    required: true,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @Field(() => Boolean)
-  active!: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameter,
-  })
-  @ValidateNested()
-  @Type(() => TestParameter)
-  @IsOptional()
-  classId?: TestParameter | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -83,24 +49,22 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
-    type: () => [EquipmentPhase],
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
+  @IsBoolean()
   @IsOptional()
-  equipmentPhases?: Array<EquipmentPhase>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  globalId!: string | null;
+  testPass!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -112,15 +76,6 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
-    type: () => [TestParameter],
-  })
-  @ValidateNested()
-  @Type(() => TestParameter)
-  @IsOptional()
-  instances?: Array<TestParameter>;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -128,16 +83,19 @@ class TestParameter {
   @Field(() => Boolean, {
     nullable: true,
   })
-  isClassDef!: boolean | null;
+  testSetpointBooleanValue!: boolean | null;
 
   @ApiProperty({
     required: false,
-    type: () => ItemReceipt,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemReceipt)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  itemReceipt?: ItemReceipt | null;
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 
   @ApiProperty({
     required: true,
@@ -149,13 +107,12 @@ class TestParameter {
   name!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => [PurchaseOrder],
+    required: true,
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => PurchaseOrder)
-  @IsOptional()
-  purchaseOrder?: Array<PurchaseOrder>;
+  @IsBoolean()
+  @Field(() => Boolean)
+  active!: boolean;
 
   @ApiProperty({
     required: false,
@@ -171,50 +128,15 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Number, {
     nullable: true,
   })
-  testDetails!: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  testedAt!: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamRevision!: string | null;
+  testSetpointValue!: number | null;
 
   @ApiProperty({
     required: true,
@@ -224,61 +146,6 @@ class TestParameter {
   @MaxLength(256)
   @Field(() => String)
   testParamUnits!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testPass!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  testResult!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testSetpointBooleanValue!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointLowerLimit!: number | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumTestParameterTestSetpointType,
-  })
-  @IsEnum(EnumTestParameterTestSetpointType)
-  @IsOptional()
-  @Field(() => EnumTestParameterTestSetpointType, {
-    nullable: true,
-  })
-  testSetpointType?: "Boolean" | "Numerical" | null;
 
   @ApiProperty({
     required: false,
@@ -294,6 +161,18 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testParamRevision!: string | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsNumber()
@@ -302,7 +181,86 @@ class TestParameter {
   @Field(() => Number, {
     nullable: true,
   })
-  testSetpointValue!: number | null;
+  testSetpointLowerLimit!: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  testResult!: JsonValue;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTestParameterTestSetpointType,
+  })
+  @IsEnum(EnumTestParameterTestSetpointType)
+  @IsOptional()
+  @Field(() => EnumTestParameterTestSetpointType, {
+    nullable: true,
+  })
+  testSetpointType?: "Boolean" | "Numerical" | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  updatedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  classId?: TestParameter | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  instances?: Array<TestParameter>;
 
   @ApiProperty({
     required: false,
@@ -318,14 +276,36 @@ class TestParameter {
 
   @ApiProperty({
     required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  updatedAt!: Date | null;
+  testDetails!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrder?: Array<PurchaseOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 
   @ApiProperty({
     required: false,
@@ -337,7 +317,27 @@ class TestParameter {
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: string | null;
+  testedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  testedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceipt,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipt?: ItemReceipt | null;
 }
 
 export { TestParameter as TestParameter };

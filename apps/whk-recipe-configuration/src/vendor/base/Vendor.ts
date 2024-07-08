@@ -12,21 +12,54 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsBoolean,
-  IsOptional,
-  IsDate,
   IsString,
-  MaxLength,
+  IsDate,
   ValidateNested,
+  IsOptional,
+  IsBoolean,
+  MaxLength,
 } from "class-validator";
+import { Type } from "class-transformer";
+import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { Type } from "class-transformer";
-import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Vendor {
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Item],
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  items?: Array<Item>;
+
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -60,20 +93,36 @@ class Vendor {
 
   @ApiProperty({
     required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name!: string | null;
 
   @ApiProperty({
     required: false,
@@ -98,55 +147,6 @@ class Vendor {
     nullable: true,
   })
   globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Item],
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  items?: Array<Item>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name!: string | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy!: string | null;
 }
 
 export { Vendor as Vendor };

@@ -13,68 +13,36 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
   IsString,
   MaxLength,
   IsDate,
-  IsEnum,
+  IsOptional,
   IsInt,
   Max,
+  IsEnum,
+  ValidateNested,
+  IsBoolean,
 } from "class-validator";
 
-import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
-import { Instruction } from "../../instruction/base/Instruction";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { Operation } from "../../operation/base/Operation";
-import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
-import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
+import { Instruction } from "../../instruction/base/Instruction";
 import { TestParameter } from "../../testParameter/base/TestParameter";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 
 @ObjectType()
 class EquipmentPhase {
   @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [BomItem],
-  })
-  @ValidateNested()
-  @Type(() => BomItem)
-  @IsOptional()
-  bomItem?: Array<BomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhase,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  classId?: EquipmentPhase | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  className!: string | null;
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
 
   @ApiProperty({
     required: false,
@@ -88,15 +56,6 @@ class EquipmentPhase {
   createdAt!: Date | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
@@ -106,91 +65,19 @@ class EquipmentPhase {
   @Field(() => String, {
     nullable: true,
   })
-  description!: string | null;
+  schemaVersion!: string | null;
 
   @ApiProperty({
     required: false,
+    type: Number,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsInt()
+  @Max(99)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => Number, {
     nullable: true,
   })
-  editedAt!: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  instances?: Array<EquipmentPhase>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Instruction],
-  })
-  @ValidateNested()
-  @Type(() => Instruction)
-  @IsOptional()
-  instructions?: Array<Instruction>;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  message!: string | null;
+  operationSequenceIndex!: number | null;
 
   @ApiProperty({
     required: true,
@@ -240,37 +127,24 @@ class EquipmentPhase {
   operation?: Operation;
 
   @ApiProperty({
-    required: false,
-    type: Number,
+    required: true,
+    type: String,
   })
-  @IsInt()
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationSequenceIndex!: number | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  path!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [PhaseParameter],
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameter)
-  @IsOptional()
-  phaseParameters?: Array<PhaseParameter>;
+  editedBy!: string | null;
 
   @ApiProperty({
     required: false,
@@ -286,6 +160,17 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  editedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -294,7 +179,101 @@ class EquipmentPhase {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion!: string | null;
+  className!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Instruction],
+  })
+  @ValidateNested()
+  @Type(() => Instruction)
+  @IsOptional()
+  instructions?: Array<Instruction>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  testParameters?: Array<TestParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhase,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  classId?: EquipmentPhase | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  instances?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 
   @ApiProperty({
     required: true,
@@ -326,12 +305,33 @@ class EquipmentPhase {
 
   @ApiProperty({
     required: false,
-    type: () => [TestParameter],
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BomItem],
   })
   @ValidateNested()
-  @Type(() => TestParameter)
+  @Type(() => BomItem)
   @IsOptional()
-  testParameters?: Array<TestParameter>;
+  bomItem?: Array<BomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PhaseParameter],
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  phaseParameters?: Array<PhaseParameter>;
 }
 
 export { EquipmentPhase as EquipmentPhase };

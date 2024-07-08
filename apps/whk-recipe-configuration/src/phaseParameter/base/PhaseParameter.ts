@@ -13,44 +13,32 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
-  IsDate,
   IsString,
-  MaxLength,
-  IsInt,
-  Max,
+  IsDate,
   IsNumber,
+  Max,
+  IsOptional,
+  IsBoolean,
+  MaxLength,
   IsEnum,
+  IsInt,
+  ValidateNested,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 
 @ObjectType()
 class PhaseParameter {
   @ApiProperty({
-    required: false,
-    type: Boolean,
+    required: true,
+    type: String,
   })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameter,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameter)
-  @IsOptional()
-  classId?: PhaseParameter | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -61,148 +49,28 @@ class PhaseParameter {
   createdAt!: Date;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  description!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  equipmentPhases?: Array<EquipmentPhase>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [PhaseParameter],
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameter)
-  @IsOptional()
-  instances?: Array<PhaseParameter>;
-
-  @ApiProperty({
-    required: true,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @Field(() => Boolean)
-  isClassDef!: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isStaticParameter!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeId!: string | null;
-
-  @ApiProperty({
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  revision!: number | null;
+  setpointUpperLimit!: number | null;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(16)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Number, {
     nullable: true,
   })
-  schemaVersion!: string | null;
+  setpointNumericalValue!: number | null;
 
   @ApiProperty({
     required: false,
@@ -216,28 +84,42 @@ class PhaseParameter {
   setpointBooleanValue!: boolean | null;
 
   @ApiProperty({
-    required: false,
-    type: Number,
+    required: true,
+    type: String,
   })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
   })
-  setpointLowerLimit!: number | null;
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  description!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: String,
   })
-  @IsNumber()
-  @Max(99999999999)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => String, {
     nullable: true,
   })
-  setpointNumericalValue!: number | null;
+  itemId!: string | null;
 
   @ApiProperty({
     required: true,
@@ -259,7 +141,121 @@ class PhaseParameter {
   @Field(() => Number, {
     nullable: true,
   })
-  setpointUpperLimit!: number | null;
+  setpointLowerLimit!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(8)
+  @Field(() => String)
+  units!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  editedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @Field(() => Boolean)
+  isClassDef!: boolean;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  classId?: PhaseParameter | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PhaseParameter],
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  instances?: Array<PhaseParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isStaticParameter!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -281,21 +277,25 @@ class PhaseParameter {
     | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(8)
-  @Field(() => String)
-  units!: string;
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: () => [EquipmentPhase],
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
 }
 
 export { PhaseParameter as PhaseParameter };

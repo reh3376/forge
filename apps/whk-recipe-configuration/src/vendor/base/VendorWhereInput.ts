@@ -11,16 +11,39 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { JsonFilter } from "../../util/JsonFilter";
-import { StringFilter } from "../../util/StringFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { JsonFilter } from "../../util/JsonFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class VendorWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemListRelationFilter, {
+    nullable: true,
+  })
+  items?: ItemListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: BooleanNullableFilter,
@@ -74,41 +97,7 @@ class VendorWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  erpId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ItemListRelationFilter)
-  @IsOptional()
-  @Field(() => ItemListRelationFilter, {
-    nullable: true,
-  })
-  items?: ItemListRelationFilter;
+  updatedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -130,7 +119,18 @@ class VendorWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  erpId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
 }
 
 export { VendorWhereInput as VendorWhereInput };

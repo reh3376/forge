@@ -18,78 +18,78 @@ import { BomService } from "../bom.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  id: "exampleId",
+  editedBy: "exampleEditedBy",
+  schemaVersion: "exampleSchemaVersion",
+  className: "exampleClassName",
+  editedAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  createdAt: new Date(),
   bomName: "exampleBomName",
   bomRevision: "exampleBomRevision",
-  bomType: "exampleBomType",
-  className: "exampleClassName",
-  createdAt: new Date(),
-  createdBy: "exampleCreatedBy",
-  editedAt: new Date(),
-  editedBy: "exampleEditedBy",
-  effectiveEndDate: new Date(),
-  effectiveStartDate: new Date(),
-  erpId: "exampleErpId",
   globalId: "exampleGlobalId",
-  id: "exampleId",
-  inactive: "true",
+  bomType: "exampleBomType",
   notes: "exampleNotes",
-  schemaVersion: "exampleSchemaVersion",
+  inactive: "true",
+  effectiveStartDate: new Date(),
+  effectiveEndDate: new Date(),
+  erpId: "exampleErpId",
 };
 const CREATE_RESULT = {
+  id: "exampleId",
+  editedBy: "exampleEditedBy",
+  schemaVersion: "exampleSchemaVersion",
+  className: "exampleClassName",
+  editedAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  createdAt: new Date(),
   bomName: "exampleBomName",
   bomRevision: "exampleBomRevision",
-  bomType: "exampleBomType",
-  className: "exampleClassName",
-  createdAt: new Date(),
-  createdBy: "exampleCreatedBy",
-  editedAt: new Date(),
-  editedBy: "exampleEditedBy",
-  effectiveEndDate: new Date(),
-  effectiveStartDate: new Date(),
-  erpId: "exampleErpId",
   globalId: "exampleGlobalId",
-  id: "exampleId",
-  inactive: "true",
+  bomType: "exampleBomType",
   notes: "exampleNotes",
-  schemaVersion: "exampleSchemaVersion",
+  inactive: "true",
+  effectiveStartDate: new Date(),
+  effectiveEndDate: new Date(),
+  erpId: "exampleErpId",
 };
 const FIND_MANY_RESULT = [
   {
+    id: "exampleId",
+    editedBy: "exampleEditedBy",
+    schemaVersion: "exampleSchemaVersion",
+    className: "exampleClassName",
+    editedAt: new Date(),
+    createdBy: "exampleCreatedBy",
+    createdAt: new Date(),
     bomName: "exampleBomName",
     bomRevision: "exampleBomRevision",
-    bomType: "exampleBomType",
-    className: "exampleClassName",
-    createdAt: new Date(),
-    createdBy: "exampleCreatedBy",
-    editedAt: new Date(),
-    editedBy: "exampleEditedBy",
-    effectiveEndDate: new Date(),
-    effectiveStartDate: new Date(),
-    erpId: "exampleErpId",
     globalId: "exampleGlobalId",
-    id: "exampleId",
-    inactive: "true",
+    bomType: "exampleBomType",
     notes: "exampleNotes",
-    schemaVersion: "exampleSchemaVersion",
+    inactive: "true",
+    effectiveStartDate: new Date(),
+    effectiveEndDate: new Date(),
+    erpId: "exampleErpId",
   },
 ];
 const FIND_ONE_RESULT = {
+  id: "exampleId",
+  editedBy: "exampleEditedBy",
+  schemaVersion: "exampleSchemaVersion",
+  className: "exampleClassName",
+  editedAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  createdAt: new Date(),
   bomName: "exampleBomName",
   bomRevision: "exampleBomRevision",
-  bomType: "exampleBomType",
-  className: "exampleClassName",
-  createdAt: new Date(),
-  createdBy: "exampleCreatedBy",
-  editedAt: new Date(),
-  editedBy: "exampleEditedBy",
-  effectiveEndDate: new Date(),
-  effectiveStartDate: new Date(),
-  erpId: "exampleErpId",
   globalId: "exampleGlobalId",
-  id: "exampleId",
-  inactive: "true",
+  bomType: "exampleBomType",
   notes: "exampleNotes",
-  schemaVersion: "exampleSchemaVersion",
+  inactive: "true",
+  effectiveStartDate: new Date(),
+  effectiveEndDate: new Date(),
+  erpId: "exampleErpId",
 };
 
 const service = {
@@ -174,10 +174,10 @@ describe("Bom", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
-        createdAt: CREATE_RESULT.createdAt.toISOString(),
         editedAt: CREATE_RESULT.editedAt.toISOString(),
-        effectiveEndDate: CREATE_RESULT.effectiveEndDate.toISOString(),
+        createdAt: CREATE_RESULT.createdAt.toISOString(),
         effectiveStartDate: CREATE_RESULT.effectiveStartDate.toISOString(),
+        effectiveEndDate: CREATE_RESULT.effectiveEndDate.toISOString(),
       });
   });
 
@@ -188,11 +188,11 @@ describe("Bom", () => {
       .expect([
         {
           ...FIND_MANY_RESULT[0],
-          createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           editedAt: FIND_MANY_RESULT[0].editedAt.toISOString(),
-          effectiveEndDate: FIND_MANY_RESULT[0].effectiveEndDate.toISOString(),
+          createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           effectiveStartDate:
             FIND_MANY_RESULT[0].effectiveStartDate.toISOString(),
+          effectiveEndDate: FIND_MANY_RESULT[0].effectiveEndDate.toISOString(),
         },
       ]);
   });
@@ -214,10 +214,10 @@ describe("Bom", () => {
       .expect(HttpStatus.OK)
       .expect({
         ...FIND_ONE_RESULT,
-        createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         editedAt: FIND_ONE_RESULT.editedAt.toISOString(),
-        effectiveEndDate: FIND_ONE_RESULT.effectiveEndDate.toISOString(),
+        createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         effectiveStartDate: FIND_ONE_RESULT.effectiveStartDate.toISOString(),
+        effectiveEndDate: FIND_ONE_RESULT.effectiveEndDate.toISOString(),
       });
   });
 
@@ -229,10 +229,10 @@ describe("Bom", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
-        createdAt: CREATE_RESULT.createdAt.toISOString(),
         editedAt: CREATE_RESULT.editedAt.toISOString(),
-        effectiveEndDate: CREATE_RESULT.effectiveEndDate.toISOString(),
+        createdAt: CREATE_RESULT.createdAt.toISOString(),
         effectiveStartDate: CREATE_RESULT.effectiveStartDate.toISOString(),
+        effectiveEndDate: CREATE_RESULT.effectiveEndDate.toISOString(),
       })
       .then(function () {
         agent

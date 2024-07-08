@@ -22,38 +22,38 @@ const CREATE_INPUT = {
   complete: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  erpId: "exampleErpId",
-  globalId: "exampleGlobalId",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
+  transactionGroup: "exampleTransactionGroup",
   id: "exampleId",
   name: "exampleName",
+  totalOrderQuantity: 42,
   purchaseOrderReceiptDate: new Date(),
   purchaseOrderReceived: "true",
   receivedQuantity: 42,
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
-  totalOrderQuantity: 42,
-  transactionGroup: "exampleTransactionGroup",
-  updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  erpId: "exampleErpId",
 };
 const CREATE_RESULT = {
   className: "exampleClassName",
   complete: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  erpId: "exampleErpId",
-  globalId: "exampleGlobalId",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
+  transactionGroup: "exampleTransactionGroup",
   id: "exampleId",
   name: "exampleName",
+  totalOrderQuantity: 42,
   purchaseOrderReceiptDate: new Date(),
   purchaseOrderReceived: "true",
   receivedQuantity: 42,
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
-  totalOrderQuantity: 42,
-  transactionGroup: "exampleTransactionGroup",
-  updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  erpId: "exampleErpId",
 };
 const FIND_MANY_RESULT = [
   {
@@ -61,19 +61,19 @@ const FIND_MANY_RESULT = [
     complete: "true",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
-    erpId: "exampleErpId",
-    globalId: "exampleGlobalId",
+    updatedAt: new Date(),
+    updatedBy: "exampleUpdatedBy",
+    transactionGroup: "exampleTransactionGroup",
     id: "exampleId",
     name: "exampleName",
+    totalOrderQuantity: 42,
     purchaseOrderReceiptDate: new Date(),
     purchaseOrderReceived: "true",
     receivedQuantity: 42,
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
-    totalOrderQuantity: 42,
-    transactionGroup: "exampleTransactionGroup",
-    updatedAt: new Date(),
-    updatedBy: "exampleUpdatedBy",
+    globalId: "exampleGlobalId",
+    erpId: "exampleErpId",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -81,19 +81,19 @@ const FIND_ONE_RESULT = {
   complete: "true",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  erpId: "exampleErpId",
-  globalId: "exampleGlobalId",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
+  transactionGroup: "exampleTransactionGroup",
   id: "exampleId",
   name: "exampleName",
+  totalOrderQuantity: 42,
   purchaseOrderReceiptDate: new Date(),
   purchaseOrderReceived: "true",
   receivedQuantity: 42,
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
-  totalOrderQuantity: 42,
-  transactionGroup: "exampleTransactionGroup",
-  updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  erpId: "exampleErpId",
 };
 
 const service = {
@@ -179,9 +179,9 @@ describe("PurchaseOrder", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         purchaseOrderReceiptDate:
           CREATE_RESULT.purchaseOrderReceiptDate.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -193,9 +193,9 @@ describe("PurchaseOrder", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
+          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
           purchaseOrderReceiptDate:
             FIND_MANY_RESULT[0].purchaseOrderReceiptDate.toISOString(),
-          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
   });
@@ -218,9 +218,9 @@ describe("PurchaseOrder", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
+        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
         purchaseOrderReceiptDate:
           FIND_ONE_RESULT.purchaseOrderReceiptDate.toISOString(),
-        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -233,9 +233,9 @@ describe("PurchaseOrder", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         purchaseOrderReceiptDate:
           CREATE_RESULT.purchaseOrderReceiptDate.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {
         agent

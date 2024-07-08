@@ -52,13 +52,13 @@ export class UnitControllerBase {
     return await this.service.createUnit({
       data: data,
       select: {
-        active: true,
-        createdAt: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        active: true,
         name: true,
         unitType: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
   }
@@ -80,13 +80,13 @@ export class UnitControllerBase {
     return this.service.units({
       ...args,
       select: {
-        active: true,
-        createdAt: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        active: true,
         name: true,
         unitType: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
   }
@@ -109,13 +109,13 @@ export class UnitControllerBase {
     const result = await this.service.unit({
       where: params,
       select: {
-        active: true,
-        createdAt: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        active: true,
         name: true,
         unitType: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
     if (result === null) {
@@ -150,13 +150,13 @@ export class UnitControllerBase {
         where: params,
         data: data,
         select: {
-          active: true,
-          createdAt: true,
-          globalId: true,
           id: true,
+          createdAt: true,
+          updatedAt: true,
+          active: true,
           name: true,
           unitType: true,
-          updatedAt: true,
+          globalId: true,
         },
       });
     } catch (error) {

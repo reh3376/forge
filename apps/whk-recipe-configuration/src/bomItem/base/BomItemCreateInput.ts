@@ -11,47 +11,24 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import {
-  ValidateNested,
-  IsOptional,
-  IsDate,
   IsString,
   MaxLength,
+  IsOptional,
+  ValidateNested,
   IsNumber,
   Max,
+  IsDate,
 } from "class-validator";
-import { Type } from "class-transformer";
-import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 
 @InputType()
 class BomItemCreateInput {
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  bom?: BomWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  consumedAt?: Date | null;
-
   @ApiProperty({
     required: true,
     type: String,
@@ -63,27 +40,15 @@ class BomItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseCreateNestedManyWithoutBomItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomItemsInput;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(100)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: true,
@@ -93,18 +58,6 @@ class BomItemCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => LotWhereUniqueInput)
-  @IsOptional()
-  @Field(() => LotWhereUniqueInput, {
-    nullable: true,
-  })
-  lot?: LotWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -141,15 +94,62 @@ class BomItemCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  bom?: BomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutBomItemsInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutBomItemsInput;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  consumedAt?: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput | null;
 }
 
 export { BomItemCreateInput as BomItemCreateInput };

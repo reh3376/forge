@@ -29,10 +29,10 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { FermentationSettingDatumFindManyArgs } from "../../fermentationSettingDatum/base/FermentationSettingDatumFindManyArgs";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
+import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { OperationService } from "../operation.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -178,6 +178,26 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Operation], { name: "instances" })
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @graphql.Parent() parent: Operation,
+    @graphql.Args() args: OperationFindManyArgs
+  ): Promise<Operation[]> {
+    const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [FermentationChemistry], {
     name: "fermentationChemistries",
   })
@@ -194,28 +214,6 @@ export class OperationResolverBase {
       parent.id,
       args
     );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationDayDatum], {
-    name: "fermentationDayData",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationDayData(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: FermentationDayDatumFindManyArgs
-  ): Promise<FermentationDayDatum[]> {
-    const results = await this.service.findFermentationDayData(parent.id, args);
 
     if (!results) {
       return [];
@@ -250,17 +248,19 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Operation], { name: "instances" })
+  @graphql.ResolveField(() => [FermentationDayDatum], {
+    name: "fermentationDayData",
+  })
   @nestAccessControl.UseRoles({
-    resource: "Operation",
+    resource: "FermentationDayDatum",
     action: "read",
     possession: "any",
   })
-  async findInstances(
+  async findFermentationDayData(
     @graphql.Parent() parent: Operation,
-    @graphql.Args() args: OperationFindManyArgs
-  ): Promise<Operation[]> {
-    const results = await this.service.findInstances(parent.id, args);
+    @graphql.Args() args: FermentationDayDatumFindManyArgs
+  ): Promise<FermentationDayDatum[]> {
+    const results = await this.service.findFermentationDayData(parent.id, args);
 
     if (!results) {
       return [];

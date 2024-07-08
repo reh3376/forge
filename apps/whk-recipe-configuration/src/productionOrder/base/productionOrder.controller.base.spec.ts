@@ -18,70 +18,70 @@ import { ProductionOrderService } from "../productionOrder.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
   className: "exampleClassName",
   complete: "true",
-  createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customerCode: "exampleCustomerCode",
-  endDate: new Date(),
-  globalId: "exampleGlobalId",
-  id: "exampleId",
   inProcess: "true",
+  updatedBy: new Date(),
   scheduled: "true",
   schemaVersion: "exampleSchemaVersion",
   startDate: new Date(),
-  updatedAt: new Date(),
-  updatedBy: new Date(),
+  endDate: new Date(),
+  globalId: "exampleGlobalId",
+  customerCode: "exampleCustomerCode",
 };
 const CREATE_RESULT = {
+  id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
   className: "exampleClassName",
   complete: "true",
-  createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customerCode: "exampleCustomerCode",
-  endDate: new Date(),
-  globalId: "exampleGlobalId",
-  id: "exampleId",
   inProcess: "true",
+  updatedBy: new Date(),
   scheduled: "true",
   schemaVersion: "exampleSchemaVersion",
   startDate: new Date(),
-  updatedAt: new Date(),
-  updatedBy: new Date(),
+  endDate: new Date(),
+  globalId: "exampleGlobalId",
+  customerCode: "exampleCustomerCode",
 };
 const FIND_MANY_RESULT = [
   {
+    id: "exampleId",
+    createdAt: new Date(),
+    updatedAt: new Date(),
     className: "exampleClassName",
     complete: "true",
-    createdAt: new Date(),
     createdBy: "exampleCreatedBy",
-    customerCode: "exampleCustomerCode",
-    endDate: new Date(),
-    globalId: "exampleGlobalId",
-    id: "exampleId",
     inProcess: "true",
+    updatedBy: new Date(),
     scheduled: "true",
     schemaVersion: "exampleSchemaVersion",
     startDate: new Date(),
-    updatedAt: new Date(),
-    updatedBy: new Date(),
+    endDate: new Date(),
+    globalId: "exampleGlobalId",
+    customerCode: "exampleCustomerCode",
   },
 ];
 const FIND_ONE_RESULT = {
+  id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
   className: "exampleClassName",
   complete: "true",
-  createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customerCode: "exampleCustomerCode",
-  endDate: new Date(),
-  globalId: "exampleGlobalId",
-  id: "exampleId",
   inProcess: "true",
+  updatedBy: new Date(),
   scheduled: "true",
   schemaVersion: "exampleSchemaVersion",
   startDate: new Date(),
-  updatedAt: new Date(),
-  updatedBy: new Date(),
+  endDate: new Date(),
+  globalId: "exampleGlobalId",
+  customerCode: "exampleCustomerCode",
 };
 
 const service = {
@@ -167,10 +167,10 @@ describe("ProductionOrder", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        endDate: CREATE_RESULT.endDate.toISOString(),
-        startDate: CREATE_RESULT.startDate.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         updatedBy: CREATE_RESULT.updatedBy.toISOString(),
+        startDate: CREATE_RESULT.startDate.toISOString(),
+        endDate: CREATE_RESULT.endDate.toISOString(),
       });
   });
 
@@ -182,10 +182,10 @@ describe("ProductionOrder", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          endDate: FIND_MANY_RESULT[0].endDate.toISOString(),
-          startDate: FIND_MANY_RESULT[0].startDate.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
           updatedBy: FIND_MANY_RESULT[0].updatedBy.toISOString(),
+          startDate: FIND_MANY_RESULT[0].startDate.toISOString(),
+          endDate: FIND_MANY_RESULT[0].endDate.toISOString(),
         },
       ]);
   });
@@ -208,10 +208,10 @@ describe("ProductionOrder", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        endDate: FIND_ONE_RESULT.endDate.toISOString(),
-        startDate: FIND_ONE_RESULT.startDate.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
         updatedBy: FIND_ONE_RESULT.updatedBy.toISOString(),
+        startDate: FIND_ONE_RESULT.startDate.toISOString(),
+        endDate: FIND_ONE_RESULT.endDate.toISOString(),
       });
   });
 
@@ -224,10 +224,10 @@ describe("ProductionOrder", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        endDate: CREATE_RESULT.endDate.toISOString(),
-        startDate: CREATE_RESULT.startDate.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         updatedBy: CREATE_RESULT.updatedBy.toISOString(),
+        startDate: CREATE_RESULT.startDate.toISOString(),
+        endDate: CREATE_RESULT.endDate.toISOString(),
       })
       .then(function () {
         agent

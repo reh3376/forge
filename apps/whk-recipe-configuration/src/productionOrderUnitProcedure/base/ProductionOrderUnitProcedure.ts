@@ -11,46 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { EnumProductionOrderUnitProcedureAbbreviation } from "./EnumProductionOrderUnitProcedureAbbreviation";
 import {
-  IsEnum,
-  IsOptional,
-  IsDate,
   IsString,
+  IsDate,
   MaxLength,
+  IsEnum,
   ValidateNested,
+  IsOptional,
 } from "class-validator";
+import { Type } from "class-transformer";
+import { EnumProductionOrderUnitProcedureAbbreviation } from "./EnumProductionOrderUnitProcedureAbbreviation";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { Recipe } from "../../recipe/base/Recipe";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { Type } from "class-transformer";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { Recipe } from "../../recipe/base/Recipe";
-import { EnumProductionOrderUnitProcedureStatus } from "./EnumProductionOrderUnitProcedureStatus";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { Item } from "../../item/base/Item";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { EnumProductionOrderUnitProcedureStatus } from "./EnumProductionOrderUnitProcedureStatus";
 
 @ObjectType()
 class ProductionOrderUnitProcedure {
   @ApiProperty({
     required: true,
-    enum: EnumProductionOrderUnitProcedureAbbreviation,
+    type: String,
   })
-  @IsEnum(EnumProductionOrderUnitProcedureAbbreviation)
-  @Field(() => EnumProductionOrderUnitProcedureAbbreviation, {
-    nullable: true,
-  })
-  abbreviation?: "MAS" | "FER" | "DIS" | "DPR" | "MIL" | "GLD";
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  bom!: JsonValue;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -62,32 +50,11 @@ class ProductionOrderUnitProcedure {
 
   @ApiProperty({
     required: true,
-    type: String,
   })
-  @IsString()
-  @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -97,6 +64,16 @@ class ProductionOrderUnitProcedure {
   @MaxLength(1000)
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumProductionOrderUnitProcedureAbbreviation,
+  })
+  @IsEnum(EnumProductionOrderUnitProcedureAbbreviation)
+  @Field(() => EnumProductionOrderUnitProcedureAbbreviation, {
+    nullable: true,
+  })
+  abbreviation?: "MAS" | "FER" | "DIS" | "DPR" | "MIL" | "GLD";
 
   @ApiProperty({
     required: false,
@@ -118,6 +95,55 @@ class ProductionOrderUnitProcedure {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  bom!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  wipItem?: Item | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @Field(() => String)
+  customer!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedure,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProcedure?: UnitProcedure | null;
+
+  @ApiProperty({
+    required: false,
     enum: EnumProductionOrderUnitProcedureStatus,
   })
   @IsEnum(EnumProductionOrderUnitProcedureStatus)
@@ -133,32 +159,6 @@ class ProductionOrderUnitProcedure {
     | "Complete"
     | "Abandoned"
     | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedure,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProcedure?: UnitProcedure | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  wipItem?: Item | null;
 }
 
 export { ProductionOrderUnitProcedure as ProductionOrderUnitProcedure };

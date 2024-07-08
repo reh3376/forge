@@ -15,13 +15,13 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  ValidateNested,
   IsInt,
   Max,
+  ValidateNested,
 } from "class-validator";
-import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
-import { Type } from "class-transformer";
 import { SalesOrderCreateNestedManyWithoutCustomersInput } from "./SalesOrderCreateNestedManyWithoutCustomersInput";
+import { Type } from "class-transformer";
+import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
 
 @InputType()
 class CustomerCreateInput {
@@ -42,18 +42,6 @@ class CustomerCreateInput {
   @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(3)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -92,6 +80,48 @@ class CustomerCreateInput {
   email?: string | null;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @Field(() => Number)
+  revision!: number;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => SalesOrderCreateNestedManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderCreateNestedManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => SalesOrderCreateNestedManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderCreateNestedManyWithoutCustomersInput;
+
+  @ApiProperty({
     required: false,
     type: String,
   })
@@ -104,13 +134,16 @@ class CustomerCreateInput {
   globalId?: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  name!: string;
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -135,39 +168,6 @@ class CustomerCreateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderCreateNestedManyWithoutCustomersInput;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @Field(() => Number)
-  revision!: number;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderCreateNestedManyWithoutCustomersInput,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderCreateNestedManyWithoutCustomersInput)
-  @IsOptional()
-  @Field(() => SalesOrderCreateNestedManyWithoutCustomersInput, {
-    nullable: true,
-  })
-  salesOrders?: SalesOrderCreateNestedManyWithoutCustomersInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
 }
 
 export { CustomerCreateInput as CustomerCreateInput };

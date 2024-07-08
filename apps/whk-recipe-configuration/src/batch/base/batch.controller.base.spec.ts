@@ -18,38 +18,38 @@ import { BatchService } from "../batch.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  batchId: "exampleBatchId",
-  createdAt: new Date(),
   id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  batchId: "exampleBatchId",
   quantity: 42,
   revision: 42,
-  updatedAt: new Date(),
 };
 const CREATE_RESULT = {
-  batchId: "exampleBatchId",
-  createdAt: new Date(),
   id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  batchId: "exampleBatchId",
   quantity: 42,
   revision: 42,
-  updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
-    batchId: "exampleBatchId",
-    createdAt: new Date(),
     id: "exampleId",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    batchId: "exampleBatchId",
     quantity: 42,
     revision: 42,
-    updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
-  batchId: "exampleBatchId",
-  createdAt: new Date(),
   id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  batchId: "exampleBatchId",
   quantity: 42,
   revision: 42,
-  updatedAt: new Date(),
 };
 
 const service = {

@@ -13,89 +13,23 @@ import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsNumber,
-  Max,
-  IsOptional,
-  ValidateNested,
-  IsInt,
   IsString,
   MaxLength,
+  ValidateNested,
+  IsOptional,
+  IsInt,
+  Max,
   IsDate,
+  IsNumber,
 } from "class-validator";
 
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { Type } from "class-transformer";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 
 @InputType()
 class FermentationSettingDatumCreateInput {
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  acid?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(100)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  balling?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(1000)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  dryInches?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Max(100)
-  @Field(() => Number)
-  fermenterNumber!: number;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  loggedBy!: string;
-
   @ApiProperty({
     required: true,
     type: String,
@@ -118,16 +52,21 @@ class FermentationSettingDatumCreateInput {
   operation?: OperationWhereUniqueInput | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Number,
   })
-  @IsNumber()
-  @Max(14)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
+  @IsInt()
+  @Max(100)
+  @Field(() => Number)
+  fermenterNumber!: number;
+
+  @ApiProperty({
+    required: true,
   })
-  pH?: Decimal | null;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  yeastPitchTime!: Date;
 
   @ApiProperty({
     required: true,
@@ -147,12 +86,73 @@ class FermentationSettingDatumCreateInput {
   temperature!: Decimal;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: Number,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  yeastPitchTime!: Date;
+  @IsNumber()
+  @Max(1000)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  dryInches?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  balling?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  acid?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  pH?: Decimal | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  loggedBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
 }
 
 export { FermentationSettingDatumCreateInput as FermentationSettingDatumCreateInput };

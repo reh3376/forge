@@ -57,13 +57,13 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
-        globalId: true,
         id: true,
         isClassDefinition: true,
         schemaVersion: true,
         testDescription: true,
         testName: true,
         testRevision: true,
+        globalId: true,
       },
     });
   }
@@ -90,13 +90,13 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
-        globalId: true,
         id: true,
         isClassDefinition: true,
         schemaVersion: true,
         testDescription: true,
         testName: true,
         testRevision: true,
+        globalId: true,
       },
     });
   }
@@ -124,13 +124,13 @@ export class TestControllerBase {
         createdBy: true,
         editedAt: true,
         editedBy: true,
-        globalId: true,
         id: true,
         isClassDefinition: true,
         schemaVersion: true,
         testDescription: true,
         testName: true,
         testRevision: true,
+        globalId: true,
       },
     });
     if (result === null) {
@@ -170,13 +170,13 @@ export class TestControllerBase {
           createdBy: true,
           editedAt: true,
           editedBy: true,
-          globalId: true,
           id: true,
           isClassDefinition: true,
           schemaVersion: true,
           testDescription: true,
           testName: true,
           testRevision: true,
+          globalId: true,
         },
       });
     } catch (error) {

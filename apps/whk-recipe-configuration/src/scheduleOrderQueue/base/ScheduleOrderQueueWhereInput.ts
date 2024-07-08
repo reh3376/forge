@@ -15,12 +15,23 @@ import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderQueueWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  id?: StringFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -41,18 +52,40 @@ class ScheduleOrderQueueWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
+  updatedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  id?: StringFilter;
+  schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  queueIndex?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -79,17 +112,6 @@ class ScheduleOrderQueueWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  queueIndex?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => ScheduleOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -99,28 +121,6 @@ class ScheduleOrderQueueWhereInput {
     nullable: true,
   })
   scheduleOrder?: ScheduleOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  updatedBy?: StringNullableFilter;
 }
 
 export { ScheduleOrderQueueWhereInput as ScheduleOrderQueueWhereInput };

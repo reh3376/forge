@@ -68,34 +68,34 @@ export class MashDatumControllerBase {
           : undefined,
       },
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        lotId: true,
+        balling: true,
+        pH: true,
+        backSetPH: true,
+        backsetVolume: true,
+        waterVolume: true,
+        cornLbs: true,
+        ryeLbs: true,
+        maltLbs: true,
+        wheatLbs: true,
+        loggedBy: true,
+
         asset: {
           select: {
             id: true,
           },
         },
 
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
+        fermenterNumber: true,
 
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
-        updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
       },
     });
   }
@@ -117,34 +117,34 @@ export class MashDatumControllerBase {
     return this.service.mashData({
       ...args,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        lotId: true,
+        balling: true,
+        pH: true,
+        backSetPH: true,
+        backsetVolume: true,
+        waterVolume: true,
+        cornLbs: true,
+        ryeLbs: true,
+        maltLbs: true,
+        wheatLbs: true,
+        loggedBy: true,
+
         asset: {
           select: {
             id: true,
           },
         },
 
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
+        fermenterNumber: true,
 
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
-        updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
       },
     });
   }
@@ -167,34 +167,34 @@ export class MashDatumControllerBase {
     const result = await this.service.mashDatum({
       where: params,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        lotId: true,
+        balling: true,
+        pH: true,
+        backSetPH: true,
+        backsetVolume: true,
+        waterVolume: true,
+        cornLbs: true,
+        ryeLbs: true,
+        maltLbs: true,
+        wheatLbs: true,
+        loggedBy: true,
+
         asset: {
           select: {
             id: true,
           },
         },
 
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
+        fermenterNumber: true,
 
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
-        updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
       },
     });
     if (result === null) {
@@ -243,34 +243,34 @@ export class MashDatumControllerBase {
             : undefined,
         },
         select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          lotId: true,
+          balling: true,
+          pH: true,
+          backSetPH: true,
+          backsetVolume: true,
+          waterVolume: true,
+          cornLbs: true,
+          ryeLbs: true,
+          maltLbs: true,
+          wheatLbs: true,
+          loggedBy: true,
+
           asset: {
             select: {
               id: true,
             },
           },
 
-          backSetPH: true,
-          backsetVolume: true,
-          balling: true,
-          cornLbs: true,
-          createdAt: true,
+          fermenterNumber: true,
 
           fermentationChemistry: {
             select: {
               id: true,
             },
           },
-
-          fermenterNumber: true,
-          id: true,
-          loggedBy: true,
-          lotId: true,
-          maltLbs: true,
-          pH: true,
-          ryeLbs: true,
-          updatedAt: true,
-          waterVolume: true,
-          wheatLbs: true,
         },
       });
     } catch (error) {

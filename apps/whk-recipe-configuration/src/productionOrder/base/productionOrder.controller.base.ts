@@ -26,6 +26,9 @@ import { ProductionOrder } from "./ProductionOrder";
 import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderWhereUniqueInput } from "./ProductionOrderWhereUniqueInput";
 import { ProductionOrderUpdateInput } from "./ProductionOrderUpdateInput";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
@@ -35,9 +38,6 @@ import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
-import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -71,10 +71,6 @@ export class ProductionOrderControllerBase {
           connect: data.bom,
         },
 
-        customer: {
-          connect: data.customer,
-        },
-
         item: {
           connect: data.item,
         },
@@ -91,8 +87,8 @@ export class ProductionOrderControllerBase {
             }
           : undefined,
 
-        salesOrder: {
-          connect: data.salesOrder,
+        customer: {
+          connect: data.customer,
         },
 
         scheduleOrder: data.scheduleOrder
@@ -100,8 +96,16 @@ export class ProductionOrderControllerBase {
               connect: data.scheduleOrder,
             }
           : undefined,
+
+        salesOrder: {
+          connect: data.salesOrder,
+        },
       },
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
         bom: {
           select: {
             id: true,
@@ -110,20 +114,9 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
-        createdAt: true,
         createdBy: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        customerCode: true,
-        endDate: true,
-        globalId: true,
-        id: true,
         inProcess: true,
+        updatedBy: true,
 
         item: {
           select: {
@@ -143,13 +136,17 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        salesOrder: {
+        customer: {
           select: {
             id: true,
           },
         },
 
         scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        endDate: true,
+        status: true,
 
         scheduleOrder: {
           select: {
@@ -157,11 +154,14 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        schemaVersion: true,
-        startDate: true,
-        status: true,
-        updatedAt: true,
-        updatedBy: true,
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        customerCode: true,
       },
     });
   }
@@ -185,6 +185,10 @@ export class ProductionOrderControllerBase {
     return this.service.productionOrders({
       ...args,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
         bom: {
           select: {
             id: true,
@@ -193,20 +197,9 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
-        createdAt: true,
         createdBy: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        customerCode: true,
-        endDate: true,
-        globalId: true,
-        id: true,
         inProcess: true,
+        updatedBy: true,
 
         item: {
           select: {
@@ -226,13 +219,17 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        salesOrder: {
+        customer: {
           select: {
             id: true,
           },
         },
 
         scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        endDate: true,
+        status: true,
 
         scheduleOrder: {
           select: {
@@ -240,11 +237,14 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        schemaVersion: true,
-        startDate: true,
-        status: true,
-        updatedAt: true,
-        updatedBy: true,
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        customerCode: true,
       },
     });
   }
@@ -267,6 +267,10 @@ export class ProductionOrderControllerBase {
     const result = await this.service.productionOrder({
       where: params,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
         bom: {
           select: {
             id: true,
@@ -275,20 +279,9 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
-        createdAt: true,
         createdBy: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        customerCode: true,
-        endDate: true,
-        globalId: true,
-        id: true,
         inProcess: true,
+        updatedBy: true,
 
         item: {
           select: {
@@ -308,13 +301,17 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        salesOrder: {
+        customer: {
           select: {
             id: true,
           },
         },
 
         scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        endDate: true,
+        status: true,
 
         scheduleOrder: {
           select: {
@@ -322,11 +319,14 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        schemaVersion: true,
-        startDate: true,
-        status: true,
-        updatedAt: true,
-        updatedBy: true,
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        customerCode: true,
       },
     });
     if (result === null) {
@@ -366,10 +366,6 @@ export class ProductionOrderControllerBase {
             connect: data.bom,
           },
 
-          customer: {
-            connect: data.customer,
-          },
-
           item: {
             connect: data.item,
           },
@@ -386,8 +382,8 @@ export class ProductionOrderControllerBase {
               }
             : undefined,
 
-          salesOrder: {
-            connect: data.salesOrder,
+          customer: {
+            connect: data.customer,
           },
 
           scheduleOrder: data.scheduleOrder
@@ -395,8 +391,16 @@ export class ProductionOrderControllerBase {
                 connect: data.scheduleOrder,
               }
             : undefined,
+
+          salesOrder: {
+            connect: data.salesOrder,
+          },
         },
         select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+
           bom: {
             select: {
               id: true,
@@ -405,20 +409,9 @@ export class ProductionOrderControllerBase {
 
           className: true,
           complete: true,
-          createdAt: true,
           createdBy: true,
-
-          customer: {
-            select: {
-              id: true,
-            },
-          },
-
-          customerCode: true,
-          endDate: true,
-          globalId: true,
-          id: true,
           inProcess: true,
+          updatedBy: true,
 
           item: {
             select: {
@@ -438,13 +431,17 @@ export class ProductionOrderControllerBase {
             },
           },
 
-          salesOrder: {
+          customer: {
             select: {
               id: true,
             },
           },
 
           scheduled: true,
+          schemaVersion: true,
+          startDate: true,
+          endDate: true,
+          status: true,
 
           scheduleOrder: {
             select: {
@@ -452,11 +449,14 @@ export class ProductionOrderControllerBase {
             },
           },
 
-          schemaVersion: true,
-          startDate: true,
-          status: true,
-          updatedAt: true,
-          updatedBy: true,
+          salesOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          globalId: true,
+          customerCode: true,
         },
       });
     } catch (error) {
@@ -467,6 +467,140 @@ export class ProductionOrderControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderUnitProcedures")
+  @ApiNestedQuery(ProductionOrderUnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderUnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderUnitProcedures(
+    @common.Req() request: Request,
+    @common.Param() params: ProductionOrderWhereUniqueInput
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const query = plainToClass(
+      ProductionOrderUnitProcedureFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findProductionOrderUnitProcedures(
+      params.id,
+      {
+        ...query,
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          name: true,
+          abbreviation: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          bom: true,
+
+          wipItem: {
+            select: {
+              id: true,
+            },
+          },
+
+          globalId: true,
+          customer: true,
+
+          unitProcedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderUnitProcedures(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        connect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderUnitProcedures(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        set: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderUnitProcedures(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -488,25 +622,11 @@ export class ProductionOrderControllerBase {
     const results = await this.service.findFermentationChemistries(params.id, {
       ...query,
       select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -518,7 +638,7 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -530,7 +650,20 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -623,37 +756,9 @@ export class ProductionOrderControllerBase {
     const results = await this.service.findFermentationDayData(params.id, {
       ...query,
       select: {
-        acid: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        balling: true,
-        createdAt: true,
-        day: true,
-        dryInches: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
         id: true,
-        loggedBy: true,
-        lotId: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        pH: true,
+        createdAt: true,
+        updatedAt: true,
 
         productionOrder: {
           select: {
@@ -661,8 +766,34 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        lotId: true,
+        loggedBy: true,
+        day: true,
         temperature: true,
-        updatedAt: true,
+        balling: true,
+        acid: true,
+        pH: true,
+        dryInches: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistry: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -758,30 +889,8 @@ export class ProductionOrderControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
         id: true,
-        isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotNumber: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
 
         purchaseOrderAcceptedLots: {
           select: {
@@ -789,14 +898,35 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        schemaVersion: true,
+        updatedAt: true,
+        globalId: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        schemaVersion: true,
-        updatedAt: true,
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        isRawMaterial: true,
       },
     });
     if (results === null) {
@@ -863,139 +993,6 @@ export class ProductionOrderControllerBase {
   ): Promise<void> {
     const data = {
       lots: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/productionOrderUnitProcedures")
-  @ApiNestedQuery(ProductionOrderUnitProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderUnitProcedures(
-    @common.Req() request: Request,
-    @common.Param() params: ProductionOrderWhereUniqueInput
-  ): Promise<ProductionOrderUnitProcedure[]> {
-    const query = plainToClass(
-      ProductionOrderUnitProcedureFindManyArgs,
-      request.query
-    );
-    const results = await this.service.findProductionOrderUnitProcedures(
-      params.id,
-      {
-        ...query,
-        select: {
-          abbreviation: true,
-          bom: true,
-          createdAt: true,
-          customer: true,
-          globalId: true,
-          id: true,
-          name: true,
-
-          productionOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
-          status: true,
-
-          unitProcedure: {
-            select: {
-              id: true,
-            },
-          },
-
-          updatedAt: true,
-
-          wipItem: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      }
-    );
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/productionOrderUnitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async connectProductionOrderUnitProcedures(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderUnitProcedures: {
-        connect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/productionOrderUnitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async updateProductionOrderUnitProcedures(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderUnitProcedures: {
-        set: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/productionOrderUnitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectProductionOrderUnitProcedures(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderUnitProcedures: {
         disconnect: body,
       },
     };

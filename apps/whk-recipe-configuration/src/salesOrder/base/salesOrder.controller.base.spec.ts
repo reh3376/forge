@@ -20,9 +20,6 @@ const existingId = "existingId";
 const CREATE_INPUT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customerCode: "exampleCustomerCode",
-  erpId: "exampleErpId",
-  globalId: "exampleGlobalId",
   id: "exampleId",
   orderType: "exampleOrderType",
   quantity: 42,
@@ -30,13 +27,13 @@ const CREATE_INPUT = {
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  customerCode: "exampleCustomerCode",
+  erpId: "exampleErpId",
 };
 const CREATE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customerCode: "exampleCustomerCode",
-  erpId: "exampleErpId",
-  globalId: "exampleGlobalId",
   id: "exampleId",
   orderType: "exampleOrderType",
   quantity: 42,
@@ -44,14 +41,14 @@ const CREATE_RESULT = {
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  customerCode: "exampleCustomerCode",
+  erpId: "exampleErpId",
 };
 const FIND_MANY_RESULT = [
   {
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
-    customerCode: "exampleCustomerCode",
-    erpId: "exampleErpId",
-    globalId: "exampleGlobalId",
     id: "exampleId",
     orderType: "exampleOrderType",
     quantity: 42,
@@ -59,14 +56,14 @@ const FIND_MANY_RESULT = [
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
+    globalId: "exampleGlobalId",
+    customerCode: "exampleCustomerCode",
+    erpId: "exampleErpId",
   },
 ];
 const FIND_ONE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
-  customerCode: "exampleCustomerCode",
-  erpId: "exampleErpId",
-  globalId: "exampleGlobalId",
   id: "exampleId",
   orderType: "exampleOrderType",
   quantity: 42,
@@ -74,6 +71,9 @@ const FIND_ONE_RESULT = {
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  customerCode: "exampleCustomerCode",
+  erpId: "exampleErpId",
 };
 
 const service = {

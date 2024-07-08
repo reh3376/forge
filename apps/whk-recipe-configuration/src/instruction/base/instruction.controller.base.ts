@@ -57,17 +57,17 @@ export class InstructionControllerBase {
     return await this.service.createInstruction({
       data: data,
       select: {
-        active: true,
         createdAt: true,
-        createdBy: true,
-        editedBy: true,
-        filePath: true,
-        globalId: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
+        filePath: true,
+        editedBy: true,
+        active: true,
+        createdBy: true,
+        id: true,
+        schemaVersion: true,
+        revision: true,
+        name: true,
+        globalId: true,
       },
     });
   }
@@ -89,17 +89,17 @@ export class InstructionControllerBase {
     return this.service.instructions({
       ...args,
       select: {
-        active: true,
         createdAt: true,
-        createdBy: true,
-        editedBy: true,
-        filePath: true,
-        globalId: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
+        filePath: true,
+        editedBy: true,
+        active: true,
+        createdBy: true,
+        id: true,
+        schemaVersion: true,
+        revision: true,
+        name: true,
+        globalId: true,
       },
     });
   }
@@ -122,17 +122,17 @@ export class InstructionControllerBase {
     const result = await this.service.instruction({
       where: params,
       select: {
-        active: true,
         createdAt: true,
-        createdBy: true,
-        editedBy: true,
-        filePath: true,
-        globalId: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
         updatedAt: true,
+        filePath: true,
+        editedBy: true,
+        active: true,
+        createdBy: true,
+        id: true,
+        schemaVersion: true,
+        revision: true,
+        name: true,
+        globalId: true,
       },
     });
     if (result === null) {
@@ -167,17 +167,17 @@ export class InstructionControllerBase {
         where: params,
         data: data,
         select: {
-          active: true,
           createdAt: true,
-          createdBy: true,
-          editedBy: true,
-          filePath: true,
-          globalId: true,
-          id: true,
-          name: true,
-          revision: true,
-          schemaVersion: true,
           updatedAt: true,
+          filePath: true,
+          editedBy: true,
+          active: true,
+          createdBy: true,
+          id: true,
+          schemaVersion: true,
+          revision: true,
+          name: true,
+          globalId: true,
         },
       });
     } catch (error) {
@@ -206,24 +206,10 @@ export class InstructionControllerBase {
     const results = await this.service.findEquipmentPhase(params.id, {
       ...query,
       select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
         createdBy: true,
-        description: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        message: true,
+        createdAt: true,
+        schemaVersion: true,
+        operationSequenceIndex: true,
         name: true,
 
         operation: {
@@ -232,11 +218,25 @@ export class InstructionControllerBase {
           },
         },
 
-        operationSequenceIndex: true,
-        path: true,
+        id: true,
+        editedBy: true,
         revision: true,
-        schemaVersion: true,
+        editedAt: true,
+        className: true,
+        description: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        active: true,
+        path: true,
+        globalId: true,
         stepType: true,
+        message: true,
       },
     });
     if (results === null) {

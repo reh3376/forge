@@ -17,21 +17,21 @@ import {
   MaxLength,
   IsOptional,
   IsDate,
-  ValidateNested,
   IsInt,
   Max,
   IsEnum,
+  ValidateNested,
 } from "class-validator";
 
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
+import { EnumAssetType } from "./EnumAssetType";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
-import { EnumAssetType } from "./EnumAssetType";
 
 @ObjectType()
 class Asset {
@@ -81,51 +81,12 @@ class Asset {
   description!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationDayDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
-  @IsOptional()
-  fermentationDayData?: Array<FermentationDayDatum>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [MashDatum],
-  })
-  @ValidateNested()
-  @Type(() => MashDatum)
-  @IsOptional()
-  mashData?: Array<MashDatum>;
 
   @ApiProperty({
     required: true,
@@ -135,15 +96,6 @@ class Asset {
   @MaxLength(256)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [PurchaseOrder],
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrder)
-  @IsOptional()
-  purchaseOrders?: Array<PurchaseOrder>;
 
   @ApiProperty({
     required: false,
@@ -203,6 +155,54 @@ class Asset {
     nullable: true,
   })
   updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrders?: Array<PurchaseOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashDatum],
+  })
+  @ValidateNested()
+  @Type(() => MashDatum)
+  @IsOptional()
+  mashData?: Array<MashDatum>;
 }
 
 export { Asset as Asset };

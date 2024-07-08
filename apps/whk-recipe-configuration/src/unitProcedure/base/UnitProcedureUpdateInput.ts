@@ -16,73 +16,26 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  IsBoolean,
-  ValidateNested,
-  IsEnum,
   IsInt,
   Max,
+  IsEnum,
+  ValidateNested,
+  IsBoolean,
 } from "class-validator";
 
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
-import { Type } from "class-transformer";
-import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
-import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
+import { Type } from "class-transformer";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput";
+import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
+import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { RecipeUpdateManyWithoutUnitProceduresInput } from "./RecipeUpdateManyWithoutUnitProceduresInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput";
 
 @InputType()
 class UnitProcedureUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(3)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  abbreviation?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  boms?: BomWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: UnitProcedureWhereUniqueInput | null;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -100,12 +53,52 @@ class UnitProcedureUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  description?: string | null;
+  updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumUnitProcedureName,
+  })
+  @IsEnum(EnumUnitProcedureName)
+  @IsOptional()
+  @Field(() => EnumUnitProcedureName, {
+    nullable: true,
+  })
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
 
   @ApiProperty({
     required: false,
@@ -117,7 +110,54 @@ class UnitProcedureUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationUpdateManyWithoutUnitProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationUpdateManyWithoutUnitProceduresInput)
+  @IsOptional()
+  @Field(() => OperationUpdateManyWithoutUnitProceduresInput, {
+    nullable: true,
+  })
+  operations?: OperationUpdateManyWithoutUnitProceduresInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: UnitProcedureWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -140,47 +180,31 @@ class UnitProcedureUpdateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
-  isClassDef?: boolean | null;
+  active?: boolean | null;
 
   @ApiProperty({
     required: false,
-    enum: EnumUnitProcedureName,
-  })
-  @IsEnum(EnumUnitProcedureName)
-  @IsOptional()
-  @Field(() => EnumUnitProcedureName, {
-    nullable: true,
-  })
-  name?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Granary01";
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationUpdateManyWithoutUnitProceduresInput,
+    type: () => RecipeUpdateManyWithoutUnitProceduresInput,
   })
   @ValidateNested()
-  @Type(() => OperationUpdateManyWithoutUnitProceduresInput)
+  @Type(() => RecipeUpdateManyWithoutUnitProceduresInput)
   @IsOptional()
-  @Field(() => OperationUpdateManyWithoutUnitProceduresInput, {
+  @Field(() => RecipeUpdateManyWithoutUnitProceduresInput, {
     nullable: true,
   })
-  operations?: OperationUpdateManyWithoutUnitProceduresInput;
+  recipe?: RecipeUpdateManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => BomWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(1000)
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => BomWhereUniqueInput, {
     nullable: true,
   })
-  path?: string | null;
+  boms?: BomWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -196,15 +220,39 @@ class UnitProcedureUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProcedureWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => ProcedureWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  procedure?: ProcedureWhereUniqueInput;
+  path?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -224,63 +272,15 @@ class UnitProcedureUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeUpdateManyWithoutUnitProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeUpdateManyWithoutUnitProceduresInput)
-  @IsOptional()
-  @Field(() => RecipeUpdateManyWithoutUnitProceduresInput, {
-    nullable: true,
-  })
-  recipe?: RecipeUpdateManyWithoutUnitProceduresInput;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderQueueWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderQueueWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
-    nullable: true,
-  })
-  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(3)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
+  abbreviation?: string | null;
 }
 
 export { UnitProcedureUpdateInput as UnitProcedureUpdateInput };

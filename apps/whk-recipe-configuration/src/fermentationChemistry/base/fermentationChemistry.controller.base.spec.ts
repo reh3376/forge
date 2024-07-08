@@ -18,34 +18,34 @@ import { FermentationChemistryService } from "../fermentationChemistry.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  approved: "true",
-  approvedBy: "exampleApprovedBy",
-  createdAt: new Date(),
   id: "exampleId",
+  createdAt: new Date(),
   updatedAt: new Date(),
+  approvedBy: "exampleApprovedBy",
+  approved: "true",
 };
 const CREATE_RESULT = {
-  approved: "true",
-  approvedBy: "exampleApprovedBy",
-  createdAt: new Date(),
   id: "exampleId",
+  createdAt: new Date(),
   updatedAt: new Date(),
+  approvedBy: "exampleApprovedBy",
+  approved: "true",
 };
 const FIND_MANY_RESULT = [
   {
-    approved: "true",
-    approvedBy: "exampleApprovedBy",
-    createdAt: new Date(),
     id: "exampleId",
+    createdAt: new Date(),
     updatedAt: new Date(),
+    approvedBy: "exampleApprovedBy",
+    approved: "true",
   },
 ];
 const FIND_ONE_RESULT = {
-  approved: "true",
-  approvedBy: "exampleApprovedBy",
-  createdAt: new Date(),
   id: "exampleId",
+  createdAt: new Date(),
   updatedAt: new Date(),
+  approvedBy: "exampleApprovedBy",
+  approved: "true",
 };
 
 const service = {
