@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "start": "nest start",
-    "prod-start": "pm2 start dist/main.js --name whk-mes",
-    "start:dev:watch": "nest start --watch",
+    "prod-start": "pm2 start dist/main.js --name whk-mes --node-args=\"-r newrelic\"",
+    "start:dev:watch": "nest start --watch -e 'node -r newrelic'",
     "start:dev:debug": "nest start --debug --watch -e 'node -r newrelic'",
     "build": "nest build",
     "test": "jest",
