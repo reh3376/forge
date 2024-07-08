@@ -358,6 +358,7 @@ model ProductionOrder {
   fermentationDayData           FermentationDayDatum[]
   lots                          Lot[]
   customerCode                  String?
+  units                         String?
 }
 
 model ScheduleOrder {

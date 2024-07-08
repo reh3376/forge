@@ -386,6 +386,7 @@ export class RecipeGroupControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
       },
     });
     if (results === null) {
