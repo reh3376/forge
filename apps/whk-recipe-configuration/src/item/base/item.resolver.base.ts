@@ -41,6 +41,8 @@ import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
 import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -302,6 +304,26 @@ export class ItemResolverBase {
     @graphql.Args() args: SalesOrderFindManyArgs
   ): Promise<SalesOrder[]> {
     const results = await this.service.findSalesOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Recipe], { name: "recipes" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipes(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findRecipes(parent.id, args);
 
     if (!results) {
       return [];

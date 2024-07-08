@@ -22,8 +22,11 @@ import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupW
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class RecipeWhereInput {
@@ -95,28 +98,6 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  customerId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  itemId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -124,7 +105,7 @@ class RecipeWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  itemDescription?: StringNullableFilter;
+  customerCode?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -198,14 +179,15 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: () => CustomerWhereUniqueInput,
   })
-  @Type(() => StringFilter)
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => CustomerWhereUniqueInput, {
     nullable: true,
   })
-  customer?: StringFilter;
+  customer?: CustomerWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -230,6 +212,30 @@ class RecipeWhereInput {
     nullable: true,
   })
   lots?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  parameters?: PhaseParameterWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
 }
 
 export { RecipeWhereInput as RecipeWhereInput };

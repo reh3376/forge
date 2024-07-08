@@ -26,6 +26,7 @@ import { ProductionOrderUnitProcedureListRelationFilter } from "../../production
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
+import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 
 @InputType()
 class ItemWhereInput {
@@ -290,6 +291,18 @@ class ItemWhereInput {
     nullable: true,
   })
   vendor?: VendorWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeListRelationFilter, {
+    nullable: true,
+  })
+  recipes?: RecipeListRelationFilter;
 }
 
 export { ItemWhereInput as ItemWhereInput };

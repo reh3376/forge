@@ -33,6 +33,7 @@ import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure
 import { Lot } from "../../lot/base/Lot";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { Vendor } from "../../vendor/base/Vendor";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Item {
@@ -280,6 +281,15 @@ class Item {
   @Type(() => Vendor)
   @IsOptional()
   vendor?: Vendor | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
 }
 
 export { Item as Item };
