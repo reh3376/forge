@@ -133,7 +133,7 @@ export class SyncService implements OnModuleInit {
         try {
             return this.parseModelRelations(schemaPath, entityName);  // Implement parsing logic as shown previously
         } catch (err) {
-            console.error('Error reading schema file:', err);
+            this.logger.error('Error reading schema file:', err);
         }
     }
 
@@ -260,11 +260,15 @@ export class SyncService implements OnModuleInit {
             // Validate the payload
             const validatedInstance = await this.validatePayload(entity, payload);
 
-            await this.prismaEntityMap[entity].update(
-                {
+            try {
+                await this.prismaEntityMap[entity].update(
+                    {
                     where: { globalId: globalId },
                     data: validatedInstance
                 });
+            } catch (error: unknown) {
+                this.logger.error(`Error updating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
+            }
         } else {
             const payload = {
                 ...payloadData,
@@ -277,7 +281,11 @@ export class SyncService implements OnModuleInit {
             this.logger.debug(`Finally creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
 
             // Create a new entity with the data
-            await this.prismaEntityMap[entity].create({ data: validatedInstance });
+            try {
+                await this.prismaEntityMap[entity].create({ data: validatedInstance });
+            } catch (error: unknown) {
+                this.logger.error(`Error creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
+            }
         }
     }
 
