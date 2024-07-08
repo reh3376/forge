@@ -24,6 +24,7 @@ import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput
 import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 
 @InputType()
 class PhaseParameterWhereInput {
@@ -113,7 +114,7 @@ class PhaseParameterWhereInput {
   @Field(() => EnumPhaseParameterSetpointType, {
     nullable: true,
   })
-  setpointType?: "Boolean" | "Numeric";
+  setpointType?: "Boolean" | "Numeric" | "String";
 
   @ApiProperty({
     required: false,
@@ -289,6 +290,29 @@ class PhaseParameterWhereInput {
     nullable: true,
   })
   equipmentPhases?: EquipmentPhaseListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeListRelationFilter, {
+    nullable: true,
+  })
+  recipes?: RecipeListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  stringValue?: StringNullableFilter;
 }
 
 export { PhaseParameterWhereInput as PhaseParameterWhereInput };

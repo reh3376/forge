@@ -15,6 +15,7 @@ import {
   Prisma,
   PhaseParameter as PrismaPhaseParameter,
   EquipmentPhase as PrismaEquipmentPhase,
+  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class PhaseParameterServiceBase {
@@ -72,6 +73,17 @@ export class PhaseParameterServiceBase {
         where: { id: parentId },
       })
       .equipmentPhases(args);
+  }
+
+  async findRecipes(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.phaseParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipes(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaPhaseParameter | null> {

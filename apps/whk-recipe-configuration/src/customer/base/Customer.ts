@@ -23,6 +23,7 @@ import {
 import { Type } from "class-transformer";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Customer {
@@ -187,6 +188,15 @@ class Customer {
   @Type(() => ProductionOrder)
   @IsOptional()
   productionOrders?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
 }
 
 export { Customer as Customer };

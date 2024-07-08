@@ -26,8 +26,11 @@ import { Type } from "class-transformer";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class RecipeUpdateInput {
@@ -100,31 +103,7 @@ class RecipeUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  customerId?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemId?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemDescription?: string | null;
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -200,15 +179,15 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => CustomerWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(3)
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => CustomerWhereUniqueInput, {
     nullable: true,
   })
-  customer?: string;
+  customer?: CustomerWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -233,6 +212,30 @@ class RecipeUpdateInput {
     nullable: true,
   })
   lots?: LotUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  parameters?: PhaseParameterWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
 }
 
 export { RecipeUpdateInput as RecipeUpdateInput };
