@@ -28,8 +28,10 @@ import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { Customer } from "../../customer/base/Customer";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Lot } from "../../lot/base/Lot";
+import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
 
 @ObjectType()
 class Recipe {
@@ -114,13 +116,16 @@ class Recipe {
   active!: boolean | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(16)
-  @Field(() => String)
-  customerId!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode!: string | null;
 
   @ApiProperty({
     required: true,
@@ -202,12 +207,11 @@ class Recipe {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => Customer,
   })
-  @IsString()
-  @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
+  @ValidateNested()
+  @Type(() => Customer)
+  customer?: Customer;
 
   @ApiProperty({
     required: false,
@@ -226,6 +230,15 @@ class Recipe {
   @Type(() => Lot)
   @IsOptional()
   lots?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  parameters?: PhaseParameter | null;
 }
 
 export { Recipe as Recipe };

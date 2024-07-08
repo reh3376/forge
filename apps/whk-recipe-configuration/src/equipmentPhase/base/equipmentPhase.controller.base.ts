@@ -827,6 +827,7 @@ export class EquipmentPhaseControllerBase {
         isStaticParameter: true,
         staticName: true,
         globalId: true,
+        stringValue: true,
       },
     });
     if (results === null) {

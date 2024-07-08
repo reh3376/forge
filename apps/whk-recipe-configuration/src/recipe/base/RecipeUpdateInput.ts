@@ -26,8 +26,10 @@ import { Type } from "class-transformer";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
 
 @InputType()
 class RecipeUpdateInput {
@@ -100,7 +102,7 @@ class RecipeUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  customerId?: string;
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -200,15 +202,15 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => CustomerWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(3)
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => CustomerWhereUniqueInput, {
     nullable: true,
   })
-  customer?: string;
+  customer?: CustomerWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -233,6 +235,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   lots?: LotUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  parameters?: PhaseParameterWhereUniqueInput | null;
 }
 
 export { RecipeUpdateInput as RecipeUpdateInput };

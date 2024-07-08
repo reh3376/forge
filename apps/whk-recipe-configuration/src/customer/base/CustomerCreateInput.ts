@@ -22,6 +22,7 @@ import {
 import { SalesOrderCreateNestedManyWithoutCustomersInput } from "./SalesOrderCreateNestedManyWithoutCustomersInput";
 import { Type } from "class-transformer";
 import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
+import { RecipeCreateNestedManyWithoutCustomersInput } from "./RecipeCreateNestedManyWithoutCustomersInput";
 
 @InputType()
 class CustomerCreateInput {
@@ -168,6 +169,18 @@ class CustomerCreateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderCreateNestedManyWithoutCustomersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  recipes?: RecipeCreateNestedManyWithoutCustomersInput;
 }
 
 export { CustomerCreateInput as CustomerCreateInput };

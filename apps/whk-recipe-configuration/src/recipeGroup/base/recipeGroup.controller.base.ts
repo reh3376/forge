@@ -212,7 +212,7 @@ export class RecipeGroupControllerBase {
         schemaVersion: true,
         revision: true,
         active: true,
-        customerId: true,
+        customerCode: true,
         itemId: true,
         itemDescription: true,
         Recipe: true,
@@ -224,7 +224,18 @@ export class RecipeGroupControllerBase {
         },
 
         globalId: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameters: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

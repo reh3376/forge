@@ -38,6 +38,7 @@ const CREATE_INPUT = {
   isClassDef: "true",
   isStaticParameter: "true",
   globalId: "exampleGlobalId",
+  stringValue: "exampleStringValue",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -60,6 +61,7 @@ const CREATE_RESULT = {
   isClassDef: "true",
   isStaticParameter: "true",
   globalId: "exampleGlobalId",
+  stringValue: "exampleStringValue",
 };
 const FIND_MANY_RESULT = [
   {
@@ -83,6 +85,7 @@ const FIND_MANY_RESULT = [
     isClassDef: "true",
     isStaticParameter: "true",
     globalId: "exampleGlobalId",
+    stringValue: "exampleStringValue",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -106,6 +109,7 @@ const FIND_ONE_RESULT = {
   isClassDef: "true",
   isStaticParameter: "true",
   globalId: "exampleGlobalId",
+  stringValue: "exampleStringValue",
 };
 
 const service = {
