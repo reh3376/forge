@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumUnitProcedureName, Item, Operation, PrismaClient, Procedure } from "@prisma/client";
+import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, SalesOrder } from "@prisma/client";
 import { Salt, parseSalt } from "../src/auth/password.service";
 import { hash } from "bcrypt";
 
@@ -110,7 +110,7 @@ async function seed() {
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 9; // This should be configurable or fetched from a setting
+  const totalNumberOfCooks = 18; // This should be configurable or fetched from a setting
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -365,21 +365,88 @@ async function seed() {
     return item;
   };
 
-  const item = await getItemByItemNumber('SOME_ITEM_NUMBER');
+  const item = await getItemByItemNumber('WHK-74-18-00-08-ISC-53-06-04-0-0-00-125');
   if (item) {
     console.log(`Found item: ${item.id}, ${item.itemNumber}`);
+  }
+
+  // Find customer with "KWH Venture, LLC" name
+  const CUSTOMER_NAME = "KWH Venture, LLC";
+  const customer = await client.customer.findFirst({
+    where: {
+      name: CUSTOMER_NAME
+    }
+  });
+
+  if (customer) {
+    console.log(`Found customer: ${customer.id}, ${customer.name}`);
+  } else {
+    console.log(`Customer '${CUSTOMER_NAME}' not found`);
   }
 
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
-      Recipe: "Mashing Recipe",
+      Recipe: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125",
     }
   });
 
+  // Create instances of phase parameters
+  const phaseParameters = [
+    { name: 'HighWineProof', setpointValue: 140 },
+    { name: 'LowWineProof', setpointValue: 100 },
+    { name: 'FinalProof', setpointValue: 125 },
+    { name: 'BaseLoss', setpointValue: 0.5 },
+    { name: 'BeerFeedTray', setpointValue: 15 },
+    { name: 'FermentationAge', setpointValue: 72 },
+    { name: 'ControlTemperature', setpointValue: 85 },
+    { name: 'CooksPerFerm', setpointValue: 3 },
+    { name: 'TopOffFrequency', setpointValue: 24 },
+    { name: 'TopOffQuantity', setpointValue: 100 },
+    { name: 'TopOffTemperature', setpointValue: 80 },
+    { name: 'MashpH', setpointValue: 5.2 },
+    { name: 'MashRatio', setpointValue: 3.5 },
+    { name: 'RatioByFerm', setpointValue: 2.8 },
+    { name: 'FermSetTemp', setpointValue: 86 },
+    { name: 'StarterSweetpH', setpointValue: 5.8 },
+    { name: 'TotalGrainWeight', setpointValue: 20000 },
+    { name: 'TotalLiquid', setpointValue: 70000 },
+    { name: 'NumberOfCooks', setpointValue: 18 },
+    { name: 'AssumbedFermABV', setpointValue: 12.5 }
+  ];
+
+  let newParams: PhaseParameter[] = [];
+  for (const param of phaseParameters) {
+    const classParam = await client.phaseParameter.findFirst({
+      where: {
+        name: param.name,
+        isClassDef: true
+      }
+    });
+    if (classParam) {
+      console.log(`Updating existing phase parameter: ${param.name}`);
+      newParams.push(await client.phaseParameter.create({
+        data: {
+          name: classParam.name,
+          staticName: classParam.staticName,
+          setpointNumericalValue: param.setpointValue,
+          units: classParam.units,
+          description: classParam.description,
+          isClassDef: false,
+          classId: { connect: { id: classParam.id } },
+          createdBy: "seed",
+          setpointType: classParam.setpointType,
+        }
+      }));
+    } else {
+      console.log(`Phase parameter ${param.name} already exists, skipping.`);
+    }
+  }
+
+  let recipe: Recipe;
   if (existingRecipe) {
     console.log("Mashing Recipe already exists, updating...");
-    await client.recipe.update({
+    recipe = await client.recipe.update({
       where: { id: existingRecipe.id },
       data: {
         unitProcedures: {
@@ -390,23 +457,177 @@ async function seed() {
     console.log("Mashing Recipe updated successfully");
   } else {
     console.log("Creating new Mashing Recipe...");
-    const newRecipe = await client.recipe.create({
+    recipe = await client.recipe.create({
       data: {
-        Recipe: "Mashing Recipe",
+        Recipe: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125",
         revision: 1,
         createdBy: "seed",
+        // parameters: {
+        //   connect: newParams.map(param => ({ id: param.id }))
+        // },
         unitProcedures: {
           connect: { id: mashingUnitProcedure.id }
         },
         customer: {
-          connect: { id: "clq00000000000000000000000" }
+          connect: { id: customer?.id }
         },
         item: {
           connect: { id: (item as Item).id }
         },
       }
     });
-    console.log("New Mashing Recipe created successfully:", newRecipe.id);
+    console.log("New Mashing Recipe created successfully:", recipe.id);
+  }
+
+  // Create a recipe group and add the recipe to it
+  console.log("Creating recipe group and adding recipe...");
+  let recipeGroup: RecipeGroup;
+  const existingRecipeGroup = await client.recipeGroup.findFirst({
+    where: {
+      recipe: { equals: "74-18-00-08" }
+    }
+  });
+
+  if (existingRecipeGroup) {
+    console.log("Recipe group 'Mashing Recipes' already exists, updating...");
+    recipeGroup = await client.recipeGroup.update({
+      where: { id: existingRecipeGroup.id },
+      data: {
+        recipes: {
+          connect: { id: recipe.id }
+        }
+      }
+    });
+    console.log("Recipe added to existing group successfully");
+  } else {
+    console.log("Creating new recipe group 'Mashing Recipes'...");
+    recipeGroup = await client.recipeGroup.create({
+      data: {
+        recipe: "74-18-00-08",
+        createdBy: "seed",
+        recipes: {
+          connect: { id: recipe.id }
+        }
+      }
+    });
+    console.log("New recipe group created and recipe added successfully:", recipeGroup.id);
+  }
+
+  // Create a sample sales order
+  console.log("Creating sample sales order...");
+  let salesOrder: SalesOrder;
+  const existingSalesOrder = await client.salesOrder.findFirst({
+    where: {
+      customer: { id: customer?.id }
+    }
+  });
+
+  if (existingSalesOrder) {
+    console.log("Sample sales order already exists, skipping creation.");
+    salesOrder = existingSalesOrder;
+  } else {
+    const newSalesOrder = await client.salesOrder.create({
+      data: {
+        item: {
+          connect: { id: (item as Item).id }
+        },
+        customer: {
+          connect: { id: customer?.id }
+        },
+        createdBy: "seed",
+        // orderDate: new Date(),
+        // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+        quantity: 1000, // Adjust as needed
+      }
+    });
+
+    console.log("Sample sales order created successfully:", newSalesOrder.id);
+
+    // Update the salesOrder variable for use in production order creation
+    salesOrder = newSalesOrder;
+  }
+
+  // Create a sample production order
+  console.log("Creating sample production order...");
+
+  const existingProductionOrder = await client.productionOrder.findFirst({
+    where: {
+      recipe: { Recipe: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125" },
+      item: { id: (item as Item).id },
+      bom: { id: bom?.id }
+    }
+  });
+
+  if (existingProductionOrder) {
+    console.log("Sample production order already exists, skipping creation.");
+  } else {
+    const newProductionOrder = await client.productionOrder.create({
+      data: {
+        recipe: {
+          connect: { id: recipe.id }
+        },
+        item: {
+          connect: { id: (item as Item).id }
+        },
+        bom: {
+          connect: { id: bom?.id }
+        },
+        customer: {
+          connect: { id: customer?.id }
+        },
+        salesOrder: {
+          connect: { id: salesOrder?.id }
+        },
+        createdBy: "seed",
+        status: EnumProductionOrderStatus.Initiated,
+        // units: "Barrels",
+        // quantity: 1000, // Adjust as needed
+        // plannedQuantity: 500, // Adjust as needed
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      }
+    });
+
+    // Create a sample schedule order
+    console.log("Creating sample schedule order...");
+    const newScheduleOrder = await client.scheduleOrder.create({
+      data: {
+        productionOrders: {
+          connect: { id: newProductionOrder.id }
+        },
+        status: EnumScheduleOrderStatus.Scheduled,
+        createdBy: "seed",
+        estimatedStart: new Date(),
+        estimatedEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        recipeName: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125",
+        productionOrderAllocation: 1000,
+        recipeGroup: {
+          connect: { id: recipeGroup.id }
+        },
+      }
+    });
+
+    console.log("Sample schedule order created successfully:", newScheduleOrder.id);
+
+    // Create a sample schedule order queue record
+    console.log("Creating sample schedule order queue record...");
+    const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
+      data: {
+        scheduleOrder: {
+          connect: { id: newScheduleOrder.id }
+        },
+        queueIndex: 0,
+        createdBy: "seed",
+        nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
+        nextUnitProcedure: {
+          connect: { id: mashingUnitProcedure.id }
+        }
+      }
+    });
+
+    console.log("Sample schedule order queue record created successfully:", newScheduleOrderQueue.id);
+
+    console.log("Sample production order created successfully:", newProductionOrder.id);
   }
 
   // Close the Prisma client connection
