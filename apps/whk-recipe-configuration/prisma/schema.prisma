@@ -359,6 +359,7 @@ model ProductionOrder {
   lots                          Lot[]
   customerCode                  String?
   units                         String?
+  quantity                      Int?
 }
 
 model ScheduleOrder {

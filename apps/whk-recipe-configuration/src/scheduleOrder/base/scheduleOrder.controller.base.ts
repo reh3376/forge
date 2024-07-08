@@ -396,6 +396,7 @@ export class ScheduleOrderControllerBase {
         globalId: true,
         customerCode: true,
         units: true,
+        quantity: true,
       },
     });
     if (results === null) {

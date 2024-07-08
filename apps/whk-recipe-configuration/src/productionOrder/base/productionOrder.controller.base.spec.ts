@@ -33,6 +33,7 @@ const CREATE_INPUT = {
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
   units: "exampleUnits",
+  quantity: 42,
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -50,6 +51,7 @@ const CREATE_RESULT = {
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
   units: "exampleUnits",
+  quantity: 42,
 };
 const FIND_MANY_RESULT = [
   {
@@ -68,6 +70,7 @@ const FIND_MANY_RESULT = [
     globalId: "exampleGlobalId",
     customerCode: "exampleCustomerCode",
     units: "exampleUnits",
+    quantity: 42,
   },
 ];
 const FIND_ONE_RESULT = {
@@ -86,6 +89,7 @@ const FIND_ONE_RESULT = {
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
   units: "exampleUnits",
+  quantity: 42,
 };
 
 const service = {
