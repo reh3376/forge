@@ -202,10 +202,23 @@ async function seed() {
       continue;
     }
 
+    // Map the provided phase names to the actual enum values
+    const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
+      "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
+      "Hold": EnumEquipmentPhaseName.Hold,
+      "Add Grain": EnumEquipmentPhaseName.GrainAdd
+    };
+
+    // Update the mashingProtocol with the mapped enum values
+    const mappedMashingProtocol = mashingProtocol.map(phase => ({
+      ...phase,
+      action: phaseNameMap[phase.action] || phase.action
+    }));
+
     for (const [phaseIndex, phase] of mashingProtocol.entries()) {
       const existingPhase = await client.equipmentPhase.findFirst({
         where: {
-          name: phase.action as EnumEquipmentPhaseName,
+          name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
           operation: {
             name: EnumOperationName.Cook,
             isClassDefinition: false,
@@ -233,7 +246,7 @@ async function seed() {
           const stepType = phase.action === "Hold" ? phase.holdType : undefined;
           const newPhase = await client.equipmentPhase.create({
             data: {
-              name: phase.action as EnumEquipmentPhaseName,
+              name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
               path: `${mashingUnitProcedure.path}/Cook${cookIndex + 1}/${phase.action}`,
               isClassDefinition: false,
               revision: 0,
@@ -332,6 +345,43 @@ async function seed() {
       }
     }
   }
+
+  // Create or update the Recipe record and link it to the Mashing Unit Procedure
+  const existingRecipe = await client.recipe.findFirst({
+    where: {
+      Recipe: "Mashing Recipe",
+    }
+  });
+
+  if (existingRecipe) {
+    console.log("Mashing Recipe already exists, updating...");
+    await client.recipe.update({
+      where: { id: existingRecipe.id },
+      data: {
+        unitProcedures: {
+          connect: { id: mashingUnitProcedure.id }
+        },
+        bom: bom ? { connect: { id: bom.id } } : undefined
+      }
+    });
+    console.log("Mashing Recipe updated successfully");
+  } else {
+    console.log("Creating new Mashing Recipe...");
+    const newRecipe = await client.recipe.create({
+      data: {
+        Recipe: "Mashing Recipe",
+        revision: 1,
+        description: "Mashing Recipe for Line 1",
+        createdBy: "seed",
+        unitProcedures: {
+          connect: { id: mashingUnitProcedure.id }
+        },
+        bom: bom ? { connect: { id: bom.id } } : undefined
+      }
+    });
+    console.log("New Mashing Recipe created successfully:", newRecipe.id);
+  }
+
   // Close the Prisma client connection
   await client.$disconnect();
 }
