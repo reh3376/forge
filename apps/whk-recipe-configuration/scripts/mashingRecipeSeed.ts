@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumUnitProcedureName, Operation, PrismaClient, Procedure } from "@prisma/client";
+import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumUnitProcedureName, Item, Operation, PrismaClient, Procedure } from "@prisma/client";
 import { Salt, parseSalt } from "../src/auth/password.service";
 import { hash } from "bcrypt";
 
@@ -346,6 +346,30 @@ async function seed() {
     }
   }
 
+  // Get the item with the correct item number
+  const getItemByItemNumber = async (itemNumber: string) => {
+    const item = await client.item.findFirst({
+      where: {
+        itemNumber: {
+          equals: itemNumber,
+          mode: 'insensitive'
+        }
+      }
+    });
+    
+    if (!item) {
+      console.log(`Item with item number ${itemNumber} not found`);
+      return null;
+    }
+    
+    return item;
+  };
+
+  const item = await getItemByItemNumber('SOME_ITEM_NUMBER');
+  if (item) {
+    console.log(`Found item: ${item.id}, ${item.itemNumber}`);
+  }
+
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
@@ -361,7 +385,6 @@ async function seed() {
         unitProcedures: {
           connect: { id: mashingUnitProcedure.id }
         },
-        bom: bom ? { connect: { id: bom.id } } : undefined
       }
     });
     console.log("Mashing Recipe updated successfully");
@@ -371,12 +394,16 @@ async function seed() {
       data: {
         Recipe: "Mashing Recipe",
         revision: 1,
-        description: "Mashing Recipe for Line 1",
         createdBy: "seed",
         unitProcedures: {
           connect: { id: mashingUnitProcedure.id }
         },
-        bom: bom ? { connect: { id: bom.id } } : undefined
+        customer: {
+          connect: { id: "clq00000000000000000000000" }
+        },
+        item: {
+          connect: { id: (item as Item).id }
+        },
       }
     });
     console.log("New Mashing Recipe created successfully:", newRecipe.id);
