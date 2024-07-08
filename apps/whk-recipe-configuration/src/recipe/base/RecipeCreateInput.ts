@@ -26,8 +26,11 @@ import { Type } from "class-transformer";
 import { UnitProcedureCreateNestedManyWithoutRecipesInput } from "./UnitProcedureCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrderCreateNestedManyWithoutRecipesInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class RecipeCreateInput {
@@ -88,34 +91,16 @@ class RecipeCreateInput {
   active?: boolean | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @Field(() => String)
-  customerId!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @Field(() => String)
-  itemId!: string;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  itemDescription?: string | null;
+  customerCode?: string | null;
 
   @ApiProperty({
     required: true,
@@ -188,12 +173,12 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => CustomerWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @Field(() => CustomerWhereUniqueInput)
+  customer!: CustomerWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -221,6 +206,30 @@ class RecipeCreateInput {
     nullable: true,
   })
   lots?: LotCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  parameters?: PhaseParameterWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
 }
 
 export { RecipeCreateInput as RecipeCreateInput };

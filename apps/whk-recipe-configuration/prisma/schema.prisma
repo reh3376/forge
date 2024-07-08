@@ -45,8 +45,8 @@ model PhaseParameter {
   staticName             EnumPhaseParameterStaticName?
   globalId               String?                        @unique @default(cuid())
   equipmentPhases        EquipmentPhase[]
-
-  // @@unique([name, revision, isClassDef, equipmentPhases])
+  recipes                Recipe[]
+  stringValue            String?
 }
 
 model TestParameter {
@@ -154,8 +154,6 @@ model EquipmentPhase {
   message                String?
   bomItem                BomItem[]
   phaseParameters        PhaseParameter[]
-
-  @@unique([name, revision, active, isClassDefinition, stepType])
 }
 
 model Operation {
@@ -217,9 +215,7 @@ model Recipe {
   schemaVersion                 String?                        @default("0001-b")
   revision                      Int?                           @default(0)
   active                        Boolean?                       @default(true)
-  customerId                    String
-  itemId                        String
-  itemDescription               String?
+  customerCode                  String?
   Recipe                        String
   recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                 String?
@@ -227,9 +223,14 @@ model Recipe {
   productionOrders              ProductionOrder[]
   scheduleOrders                ScheduleOrder[]
   globalId                      String?                        @unique @default(cuid())
-  customer                      String
+  customer                      Customer                       @relation(fields: [customerId], references: [id])
+  customerId                    String
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   lots                          Lot[]
+  parameters                    PhaseParameter?                @relation(fields: [parameterId], references: [id])
+  parameterId                   String?
+  item                          Item?                          @relation(fields: [itemId], references: [id])
+  itemId                        String?
 
   @@unique([itemId, customerId])
 }
@@ -305,8 +306,6 @@ model UnitProcedure {
   scheduleOrderQueues           ScheduleOrderQueue?
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   abbreviation                  String?
-
-  @@unique([name, revision, active])
 }
 
 model RecipeGroup {
@@ -421,6 +420,7 @@ model Item {
   salesOrders                   SalesOrder[]
   vendor                        Vendor?                        @relation(fields: [vendorId], references: [id])
   vendorId                      String?
+  recipes                       Recipe[]
 }
 
 model ItemGroup {
@@ -449,6 +449,7 @@ model Customer {
   customerCode     String?
   phone            String?
   productionOrders ProductionOrder[]
+  recipes          Recipe[]
 
   @@unique([revision, name])
 }
@@ -761,6 +762,7 @@ model Vendor {
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
+  String
 }
 
 enum EnumPhaseParameterStaticName {

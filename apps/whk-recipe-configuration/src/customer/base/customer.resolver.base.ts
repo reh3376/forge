@@ -29,6 +29,8 @@ import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindMany
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
 import { CustomerService } from "../customer.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Customer)
@@ -156,6 +158,26 @@ export class CustomerResolverBase {
     @graphql.Args() args: ProductionOrderFindManyArgs
   ): Promise<ProductionOrder[]> {
     const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Recipe], { name: "recipes" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipes(
+    @graphql.Parent() parent: Customer,
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findRecipes(parent.id, args);
 
     if (!results) {
       return [];

@@ -29,6 +29,7 @@ import { Type } from "class-transformer";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class PhaseParameter {
@@ -129,7 +130,7 @@ class PhaseParameter {
   @Field(() => EnumPhaseParameterSetpointType, {
     nullable: true,
   })
-  setpointType?: "Boolean" | "Numeric";
+  setpointType?: "Boolean" | "Numeric" | "String";
 
   @ApiProperty({
     required: false,
@@ -296,6 +297,27 @@ class PhaseParameter {
   @Type(() => EquipmentPhase)
   @IsOptional()
   equipmentPhases?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  stringValue!: string | null;
 }
 
 export { PhaseParameter as PhaseParameter };

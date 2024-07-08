@@ -28,8 +28,11 @@ import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { Customer } from "../../customer/base/Customer";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Lot } from "../../lot/base/Lot";
+import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Recipe {
@@ -114,34 +117,16 @@ class Recipe {
   active!: boolean | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @Field(() => String)
-  customerId!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @Field(() => String)
-  itemId!: string;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  itemDescription!: string | null;
+  customerCode!: string | null;
 
   @ApiProperty({
     required: true,
@@ -202,12 +187,11 @@ class Recipe {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => Customer,
   })
-  @IsString()
-  @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
+  @ValidateNested()
+  @Type(() => Customer)
+  customer?: Customer;
 
   @ApiProperty({
     required: false,
@@ -226,6 +210,24 @@ class Recipe {
   @Type(() => Lot)
   @IsOptional()
   lots?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameter)
+  @IsOptional()
+  parameters?: PhaseParameter | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
 }
 
 export { Recipe as Recipe };

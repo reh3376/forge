@@ -73,6 +73,22 @@ export class RecipeControllerBase {
               connect: data.recipeGroup,
             }
           : undefined,
+
+        customer: {
+          connect: data.customer,
+        },
+
+        parameters: data.parameters
+          ? {
+              connect: data.parameters,
+            }
+          : undefined,
+
+        item: data.item
+          ? {
+              connect: data.item,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -83,9 +99,7 @@ export class RecipeControllerBase {
         schemaVersion: true,
         revision: true,
         active: true,
-        customerId: true,
-        itemId: true,
-        itemDescription: true,
+        customerCode: true,
         Recipe: true,
 
         recipeGroup: {
@@ -95,7 +109,24 @@ export class RecipeControllerBase {
         },
 
         globalId: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -125,9 +156,7 @@ export class RecipeControllerBase {
         schemaVersion: true,
         revision: true,
         active: true,
-        customerId: true,
-        itemId: true,
-        itemDescription: true,
+        customerCode: true,
         Recipe: true,
 
         recipeGroup: {
@@ -137,7 +166,24 @@ export class RecipeControllerBase {
         },
 
         globalId: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -168,9 +214,7 @@ export class RecipeControllerBase {
         schemaVersion: true,
         revision: true,
         active: true,
-        customerId: true,
-        itemId: true,
-        itemDescription: true,
+        customerCode: true,
         Recipe: true,
 
         recipeGroup: {
@@ -180,7 +224,24 @@ export class RecipeControllerBase {
         },
 
         globalId: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -221,6 +282,22 @@ export class RecipeControllerBase {
                 connect: data.recipeGroup,
               }
             : undefined,
+
+          customer: {
+            connect: data.customer,
+          },
+
+          parameters: data.parameters
+            ? {
+                connect: data.parameters,
+              }
+            : undefined,
+
+          item: data.item
+            ? {
+                connect: data.item,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -231,9 +308,7 @@ export class RecipeControllerBase {
           schemaVersion: true,
           revision: true,
           active: true,
-          customerId: true,
-          itemId: true,
-          itemDescription: true,
+          customerCode: true,
           Recipe: true,
 
           recipeGroup: {
@@ -243,7 +318,24 @@ export class RecipeControllerBase {
           },
 
           globalId: true,
-          customer: true,
+
+          customer: {
+            select: {
+              id: true,
+            },
+          },
+
+          parameters: {
+            select: {
+              id: true,
+            },
+          },
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

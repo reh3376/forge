@@ -22,6 +22,7 @@ import {
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Lot as PrismaLot,
   SalesOrder as PrismaSalesOrder,
+  Recipe as PrismaRecipe,
   Vendor as PrismaVendor,
 } from "@prisma/client";
 
@@ -134,6 +135,17 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .salesOrders(args);
+  }
+
+  async findRecipes(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipes(args);
   }
 
   async getVendor(parentId: string): Promise<PrismaVendor | null> {

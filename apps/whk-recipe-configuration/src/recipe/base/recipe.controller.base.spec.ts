@@ -26,12 +26,9 @@ const CREATE_INPUT = {
   schemaVersion: "exampleSchemaVersion",
   revision: 42,
   active: "true",
-  customerId: "exampleCustomerId",
-  itemId: "exampleItemId",
-  itemDescription: "exampleItemDescription",
+  customerCode: "exampleCustomerCode",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
-  customer: "exampleCustomer",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -42,12 +39,9 @@ const CREATE_RESULT = {
   schemaVersion: "exampleSchemaVersion",
   revision: 42,
   active: "true",
-  customerId: "exampleCustomerId",
-  itemId: "exampleItemId",
-  itemDescription: "exampleItemDescription",
+  customerCode: "exampleCustomerCode",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
-  customer: "exampleCustomer",
 };
 const FIND_MANY_RESULT = [
   {
@@ -59,12 +53,9 @@ const FIND_MANY_RESULT = [
     schemaVersion: "exampleSchemaVersion",
     revision: 42,
     active: "true",
-    customerId: "exampleCustomerId",
-    itemId: "exampleItemId",
-    itemDescription: "exampleItemDescription",
+    customerCode: "exampleCustomerCode",
     Recipe: "exampleRecipe",
     globalId: "exampleGlobalId",
-    customer: "exampleCustomer",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -76,12 +67,9 @@ const FIND_ONE_RESULT = {
   schemaVersion: "exampleSchemaVersion",
   revision: 42,
   active: "true",
-  customerId: "exampleCustomerId",
-  itemId: "exampleItemId",
-  itemDescription: "exampleItemDescription",
+  customerCode: "exampleCustomerCode",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
-  customer: "exampleCustomer",
 };
 
 const service = {

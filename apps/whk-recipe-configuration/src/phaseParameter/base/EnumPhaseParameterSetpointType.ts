@@ -14,6 +14,7 @@ import { registerEnumType } from "@nestjs/graphql";
 export enum EnumPhaseParameterSetpointType {
   Boolean = "Boolean",
   Numeric = "Numeric",
+  String = "String",
 }
 
 registerEnumType(EnumPhaseParameterSetpointType, {
