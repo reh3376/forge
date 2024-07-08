@@ -19,9 +19,9 @@ import {
   ScheduleOrder as PrismaScheduleOrder,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Lot as PrismaLot,
+  PhaseParameter as PrismaPhaseParameter,
   RecipeGroup as PrismaRecipeGroup,
   Customer as PrismaCustomer,
-  PhaseParameter as PrismaPhaseParameter,
   Item as PrismaItem,
 } from "@prisma/client";
 
@@ -105,6 +105,17 @@ export class RecipeServiceBase {
       .lots(args);
   }
 
+  async findParameters(
+    parentId: string,
+    args: Prisma.PhaseParameterFindManyArgs
+  ): Promise<PrismaPhaseParameter[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .parameters(args);
+  }
+
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
     return this.prisma.recipe
       .findUnique({
@@ -119,14 +130,6 @@ export class RecipeServiceBase {
         where: { id: parentId },
       })
       .customer();
-  }
-
-  async getParameters(parentId: string): Promise<PrismaPhaseParameter | null> {
-    return this.prisma.recipe
-      .findUnique({
-        where: { id: parentId },
-      })
-      .parameters();
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {

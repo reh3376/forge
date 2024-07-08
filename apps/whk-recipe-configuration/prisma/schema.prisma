@@ -227,8 +227,7 @@ model Recipe {
   customerId                    String
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   lots                          Lot[]
-  parameters                    PhaseParameter?                @relation(fields: [parameterId], references: [id])
-  parameterId                   String?
+  parameters                    PhaseParameter[]
   item                          Item?                          @relation(fields: [itemId], references: [id])
   itemId                        String?
 

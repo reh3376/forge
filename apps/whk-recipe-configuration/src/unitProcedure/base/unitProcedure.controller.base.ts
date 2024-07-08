@@ -710,12 +710,6 @@ export class UnitProcedureControllerBase {
           },
         },
 
-        parameters: {
-          select: {
-            id: true,
-          },
-        },
-
         item: {
           select: {
             id: true,

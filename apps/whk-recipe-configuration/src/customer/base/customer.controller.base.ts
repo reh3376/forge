@@ -519,12 +519,6 @@ export class CustomerControllerBase {
           },
         },
 
-        parameters: {
-          select: {
-            id: true,
-          },
-        },
-
         item: {
           select: {
             id: true,

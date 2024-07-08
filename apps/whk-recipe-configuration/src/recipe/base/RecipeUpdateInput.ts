@@ -29,7 +29,7 @@ import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdat
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
-import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { PhaseParameterUpdateManyWithoutRecipesInput } from "./PhaseParameterUpdateManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
@@ -215,15 +215,15 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => PhaseParameterWhereUniqueInput,
+    type: () => PhaseParameterUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => PhaseParameterWhereUniqueInput)
+  @Type(() => PhaseParameterUpdateManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => PhaseParameterWhereUniqueInput, {
+  @Field(() => PhaseParameterUpdateManyWithoutRecipesInput, {
     nullable: true,
   })
-  parameters?: PhaseParameterWhereUniqueInput | null;
+  parameters?: PhaseParameterUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
