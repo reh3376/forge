@@ -294,6 +294,18 @@ class ProductionOrder {
     nullable: true,
   })
   customerCode!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  units!: string | null;
 }
 
 export { ProductionOrder as ProductionOrder };

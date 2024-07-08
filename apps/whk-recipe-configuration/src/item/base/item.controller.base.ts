@@ -348,6 +348,7 @@ export class ItemControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
       },
     });
     if (results === null) {

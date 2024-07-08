@@ -32,6 +32,7 @@ const CREATE_INPUT = {
   endDate: new Date(),
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
+  units: "exampleUnits",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -48,6 +49,7 @@ const CREATE_RESULT = {
   endDate: new Date(),
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
+  units: "exampleUnits",
 };
 const FIND_MANY_RESULT = [
   {
@@ -65,6 +67,7 @@ const FIND_MANY_RESULT = [
     endDate: new Date(),
     globalId: "exampleGlobalId",
     customerCode: "exampleCustomerCode",
+    units: "exampleUnits",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -82,6 +85,7 @@ const FIND_ONE_RESULT = {
   endDate: new Date(),
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
+  units: "exampleUnits",
 };
 
 const service = {

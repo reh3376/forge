@@ -402,6 +402,7 @@ export class CustomerControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
       },
     });
     if (results === null) {
