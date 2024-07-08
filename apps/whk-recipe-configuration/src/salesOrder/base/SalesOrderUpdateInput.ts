@@ -19,6 +19,7 @@ import {
   MaxLength,
   IsInt,
   Max,
+  IsDate,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -182,6 +183,29 @@ class SalesOrderUpdateInput {
     nullable: true,
   })
   erpId?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  requestedShipDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string;
 }
 
 export { SalesOrderUpdateInput as SalesOrderUpdateInput };

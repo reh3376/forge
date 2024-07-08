@@ -1218,6 +1218,8 @@ export class ItemControllerBase {
         customerCode: true,
         lineItems: true,
         erpId: true,
+        requestedShipDate: true,
+        name: true,
       },
     });
     if (results === null) {

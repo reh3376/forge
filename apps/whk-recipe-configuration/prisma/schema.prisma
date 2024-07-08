@@ -489,23 +489,25 @@ model PurchaseOrder {
 }
 
 model SalesOrder {
-  customer         Customer?        @relation(fields: [customerId], references: [id])
-  customerId       String?
-  createdAt        DateTime         @default(now())
-  createdBy        String
-  id               String           @id @default(cuid())
-  orderType        String?
-  quantity         Int
-  revision         Int              @default(0)
-  schemaVersion    String?          @default("0001-alpha")
-  updatedAt        DateTime         @updatedAt
-  updatedBy        String?
-  productionOrders ProductionOrder?
-  globalId         String           @unique @default(cuid())
-  customerCode     String?
-  item             Item[]
-  lineItems        Json?
-  erpId            String?          @unique
+  customer          Customer?        @relation(fields: [customerId], references: [id])
+  customerId        String?
+  createdAt         DateTime         @default(now())
+  createdBy         String
+  id                String           @id @default(cuid())
+  orderType         String?
+  quantity          Int
+  revision          Int              @default(0)
+  schemaVersion     String?          @default("0001-alpha")
+  updatedAt         DateTime         @updatedAt
+  updatedBy         String?
+  productionOrders  ProductionOrder?
+  globalId          String           @unique @default(cuid())
+  customerCode      String?
+  item              Item[]
+  lineItems         Json?
+  erpId             String?          @unique
+  requestedShipDate DateTime?
+  name              String           @unique
 }
 
 model Test {
