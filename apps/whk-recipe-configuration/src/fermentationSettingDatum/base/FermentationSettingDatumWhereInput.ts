@@ -11,74 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { IntFilter } from "../../util/IntFilter";
-import { StringFilter } from "../../util/StringFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { IntFilter } from "../../util/IntFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { DecimalFilter } from "../../util/DecimalFilter";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 
 @InputType()
 class FermentationSettingDatumWhereInput {
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  acid?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  balling?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  dryInches?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  fermenterNumber?: IntFilter;
-
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -89,17 +33,6 @@ class FermentationSettingDatumWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  loggedBy?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -126,14 +59,25 @@ class FermentationSettingDatumWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: IntFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => IntFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => IntFilter, {
     nullable: true,
   })
-  pH?: DecimalNullableFilter;
+  fermenterNumber?: IntFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  yeastPitchTime?: DateTimeFilter;
 
   @ApiProperty({
     required: false,
@@ -159,14 +103,70 @@ class FermentationSettingDatumWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeFilter,
+    type: DecimalNullableFilter,
   })
-  @Type(() => DateTimeFilter)
+  @Type(() => DecimalNullableFilter)
   @IsOptional()
-  @Field(() => DateTimeFilter, {
+  @Field(() => DecimalNullableFilter, {
     nullable: true,
   })
-  yeastPitchTime?: DateTimeFilter;
+  dryInches?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  balling?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  acid?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  pH?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  loggedBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryWhereUniqueInput;
 }
 
 export { FermentationSettingDatumWhereInput as FermentationSettingDatumWhereInput };

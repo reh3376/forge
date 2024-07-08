@@ -11,19 +11,31 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { DateTimeFilter } from "../../util/DateTimeFilter";
-import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
-import { StringFilter } from "../../util/StringFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
+import { ValidateNested, IsOptional } from "class-validator";
+import { Type } from "class-transformer";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { IntFilter } from "../../util/IntFilter";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { JsonFilter } from "../../util/JsonFilter";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { IntFilter } from "../../util/IntFilter";
 
 @InputType()
 class SalesOrderWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput;
+
   @ApiProperty({
     required: false,
     type: DateTimeFilter,
@@ -48,51 +60,6 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => CustomerWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => CustomerWhereUniqueInput)
-  @IsOptional()
-  @Field(() => CustomerWhereUniqueInput, {
-    nullable: true,
-  })
-  customer?: CustomerWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  customerCode?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  erpId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  globalId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -104,29 +71,6 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ItemListRelationFilter)
-  @IsOptional()
-  @Field(() => ItemListRelationFilter, {
-    nullable: true,
-  })
-  item?: ItemListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  lineItems?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -135,18 +79,6 @@ class SalesOrderWhereInput {
     nullable: true,
   })
   orderType?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -202,6 +134,74 @@ class SalesOrderWhereInput {
     nullable: true,
   })
   updatedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  globalId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  customerCode?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemListRelationFilter, {
+    nullable: true,
+  })
+  item?: ItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  lineItems?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  erpId?: StringNullableFilter;
 }
 
 export { SalesOrderWhereInput as SalesOrderWhereInput };

@@ -11,47 +11,48 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import {
-  IsBoolean,
+  ValidateNested,
   IsOptional,
   IsString,
   MaxLength,
-  ValidateNested,
+  IsBoolean,
 } from "class-validator";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
 import { FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput } from "./FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { MashDatumUpdateManyWithoutFermentationChemistriesInput } from "./MashDatumUpdateManyWithoutFermentationChemistriesInput";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
 
 @InputType()
 class FermentationChemistryUpdateInput {
   @ApiProperty({
     required: false,
-    type: Boolean,
+    type: () => ProductionOrderWhereUniqueInput,
   })
-  @IsBoolean()
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => ProductionOrderWhereUniqueInput, {
     nullable: true,
   })
-  approved?: boolean | null;
+  productionOrder?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => OperationWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(64)
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => OperationWhereUniqueInput, {
     nullable: true,
   })
-  approvedBy?: string | null;
+  operation?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -67,15 +68,15 @@ class FermentationChemistryUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => BatchWhereUniqueInput,
+    type: () => FermentationSettingDatumWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
+  @Type(() => FermentationSettingDatumWhereUniqueInput)
   @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
+  @Field(() => FermentationSettingDatumWhereUniqueInput, {
     nullable: true,
   })
-  batch?: BatchWhereUniqueInput;
+  settingData?: FermentationSettingDatumWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -95,6 +96,29 @@ class FermentationChemistryUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  approvedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  approved?: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: () => LotWhereUniqueInput,
   })
   @ValidateNested()
@@ -107,6 +131,18 @@ class FermentationChemistryUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BatchWhereUniqueInput, {
+    nullable: true,
+  })
+  batch?: BatchWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: () => MashDatumUpdateManyWithoutFermentationChemistriesInput,
   })
   @ValidateNested()
@@ -116,42 +152,6 @@ class FermentationChemistryUpdateInput {
     nullable: true,
   })
   mashData?: MashDatumUpdateManyWithoutFermentationChemistriesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatumWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatumWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationSettingDatumWhereUniqueInput, {
-    nullable: true,
-  })
-  settingData?: FermentationSettingDatumWhereUniqueInput | null;
 }
 
 export { FermentationChemistryUpdateInput as FermentationChemistryUpdateInput };

@@ -15,9 +15,9 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  ValidateNested,
   IsInt,
   Max,
+  ValidateNested,
 } from "class-validator";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -33,6 +33,42 @@ class ScheduleOrderQueueCreateInput {
   @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  queueIndex?: number | null;
 
   @ApiProperty({
     required: false,
@@ -66,18 +102,6 @@ class ScheduleOrderQueueCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  queueIndex?: number | null;
-
-  @ApiProperty({
-    required: false,
     type: () => ScheduleOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -87,30 +111,6 @@ class ScheduleOrderQueueCreateInput {
     nullable: true,
   })
   scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
 }
 
 export { ScheduleOrderQueueCreateInput as ScheduleOrderQueueCreateInput };

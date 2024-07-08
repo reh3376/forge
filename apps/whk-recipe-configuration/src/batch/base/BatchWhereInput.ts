@@ -11,28 +11,28 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { JsonFilter } from "../../util/JsonFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { StringFilter } from "../../util/StringFilter";
+import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { BatchListRelationFilter } from "./BatchListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { JsonFilter } from "../../util/JsonFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
 class BatchWhereInput {
   @ApiProperty({
     required: false,
-    type: JsonFilter,
+    type: StringFilter,
   })
-  @Type(() => JsonFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => JsonFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  batchData?: JsonFilter;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -47,6 +47,18 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BatchWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: BatchWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: () => BatchListRelationFilter,
   })
   @ValidateNested()
@@ -56,6 +68,39 @@ class BatchWhereInput {
     nullable: true,
   })
   children?: BatchListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  quantity?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  batchData?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -82,17 +127,6 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => LotWhereUniqueInput,
   })
   @ValidateNested()
@@ -102,40 +136,6 @@ class BatchWhereInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
-    nullable: true,
-  })
-  parent?: BatchWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  quantity?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  revision?: IntNullableFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };

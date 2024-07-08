@@ -12,21 +12,29 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsDate,
   IsString,
+  IsDate,
   MaxLength,
-  IsOptional,
-  ValidateNested,
   IsInt,
   Max,
+  IsOptional,
+  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class RecipeGroup {
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
   @ApiProperty({
     required: true,
   })
@@ -37,41 +45,11 @@ class RecipeGroup {
 
   @ApiProperty({
     required: true,
-    type: String,
   })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrder],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrders?: Array<ProductionOrder>;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -81,15 +59,6 @@ class RecipeGroup {
   @MaxLength(256)
   @Field(() => String)
   recipe!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Recipe],
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipes?: Array<Recipe>;
 
   @ApiProperty({
     required: false,
@@ -105,15 +74,6 @@ class RecipeGroup {
 
   @ApiProperty({
     required: false,
-    type: () => [ScheduleOrder],
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrder)
-  @IsOptional()
-  scheduleOrders?: Array<ScheduleOrder>;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -126,11 +86,12 @@ class RecipeGroup {
 
   @ApiProperty({
     required: true,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
 
   @ApiProperty({
     required: false,
@@ -143,6 +104,45 @@ class RecipeGroup {
     nullable: true,
   })
   updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ScheduleOrder],
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrders?: Array<ScheduleOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 }
 
 export { RecipeGroup as RecipeGroup };

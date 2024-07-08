@@ -11,21 +11,33 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { ItemCreateNestedManyWithoutVendorsInput } from "./ItemCreateNestedManyWithoutVendorsInput";
 import {
-  IsBoolean,
+  ValidateNested,
   IsOptional,
+  IsBoolean,
   IsString,
   MaxLength,
-  ValidateNested,
 } from "class-validator";
+import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { ItemCreateNestedManyWithoutVendorsInput } from "./ItemCreateNestedManyWithoutVendorsInput";
-import { Type } from "class-transformer";
 
 @InputType()
 class VendorCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => ItemCreateNestedManyWithoutVendorsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemCreateNestedManyWithoutVendorsInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutVendorsInput, {
+    nullable: true,
+  })
+  items?: ItemCreateNestedManyWithoutVendorsInput;
+
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -71,36 +83,12 @@ class VendorCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(100)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  erpId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemCreateNestedManyWithoutVendorsInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemCreateNestedManyWithoutVendorsInput)
-  @IsOptional()
-  @Field(() => ItemCreateNestedManyWithoutVendorsInput, {
-    nullable: true,
-  })
-  items?: ItemCreateNestedManyWithoutVendorsInput;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -119,12 +107,24 @@ class VendorCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  erpId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
 }
 
 export { VendorCreateInput as VendorCreateInput };

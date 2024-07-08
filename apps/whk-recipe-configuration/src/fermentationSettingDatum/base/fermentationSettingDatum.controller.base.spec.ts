@@ -18,66 +18,66 @@ import { FermentationSettingDatumService } from "../fermentationSettingDatum.ser
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  acid: 42.424242424,
-  balling: 42.424242424,
-  createdAt: new Date(),
-  dryInches: 42.424242424,
-  fermenterNumber: 42,
   id: "exampleId",
-  loggedBy: "exampleLoggedBy",
+  createdAt: new Date(),
+  updatedAt: new Date(),
   lotId: "exampleLotId",
-  pH: 42.424242424,
+  fermenterNumber: 42,
+  yeastPitchTime: new Date(),
   setTime: new Date(),
   temperature: 42.424242424,
-  updatedAt: new Date(),
-  yeastPitchTime: new Date(),
+  dryInches: 42.424242424,
+  balling: 42.424242424,
+  acid: 42.424242424,
+  pH: 42.424242424,
+  loggedBy: "exampleLoggedBy",
 };
 const CREATE_RESULT = {
-  acid: 42.424242424,
-  balling: 42.424242424,
-  createdAt: new Date(),
-  dryInches: 42.424242424,
-  fermenterNumber: 42,
   id: "exampleId",
-  loggedBy: "exampleLoggedBy",
+  createdAt: new Date(),
+  updatedAt: new Date(),
   lotId: "exampleLotId",
-  pH: 42.424242424,
+  fermenterNumber: 42,
+  yeastPitchTime: new Date(),
   setTime: new Date(),
   temperature: 42.424242424,
-  updatedAt: new Date(),
-  yeastPitchTime: new Date(),
+  dryInches: 42.424242424,
+  balling: 42.424242424,
+  acid: 42.424242424,
+  pH: 42.424242424,
+  loggedBy: "exampleLoggedBy",
 };
 const FIND_MANY_RESULT = [
   {
-    acid: 42.424242424,
-    balling: 42.424242424,
-    createdAt: new Date(),
-    dryInches: 42.424242424,
-    fermenterNumber: 42,
     id: "exampleId",
-    loggedBy: "exampleLoggedBy",
+    createdAt: new Date(),
+    updatedAt: new Date(),
     lotId: "exampleLotId",
-    pH: 42.424242424,
+    fermenterNumber: 42,
+    yeastPitchTime: new Date(),
     setTime: new Date(),
     temperature: 42.424242424,
-    updatedAt: new Date(),
-    yeastPitchTime: new Date(),
+    dryInches: 42.424242424,
+    balling: 42.424242424,
+    acid: 42.424242424,
+    pH: 42.424242424,
+    loggedBy: "exampleLoggedBy",
   },
 ];
 const FIND_ONE_RESULT = {
-  acid: 42.424242424,
-  balling: 42.424242424,
-  createdAt: new Date(),
-  dryInches: 42.424242424,
-  fermenterNumber: 42,
   id: "exampleId",
-  loggedBy: "exampleLoggedBy",
+  createdAt: new Date(),
+  updatedAt: new Date(),
   lotId: "exampleLotId",
-  pH: 42.424242424,
+  fermenterNumber: 42,
+  yeastPitchTime: new Date(),
   setTime: new Date(),
   temperature: 42.424242424,
-  updatedAt: new Date(),
-  yeastPitchTime: new Date(),
+  dryInches: 42.424242424,
+  balling: 42.424242424,
+  acid: 42.424242424,
+  pH: 42.424242424,
+  loggedBy: "exampleLoggedBy",
 };
 
 const service = {
@@ -163,9 +163,9 @@ describe("FermentationSettingDatum", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        setTime: CREATE_RESULT.setTime.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         yeastPitchTime: CREATE_RESULT.yeastPitchTime.toISOString(),
+        setTime: CREATE_RESULT.setTime.toISOString(),
       });
   });
 
@@ -177,9 +177,9 @@ describe("FermentationSettingDatum", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          setTime: FIND_MANY_RESULT[0].setTime.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
           yeastPitchTime: FIND_MANY_RESULT[0].yeastPitchTime.toISOString(),
+          setTime: FIND_MANY_RESULT[0].setTime.toISOString(),
         },
       ]);
   });
@@ -202,9 +202,9 @@ describe("FermentationSettingDatum", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        setTime: FIND_ONE_RESULT.setTime.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
         yeastPitchTime: FIND_ONE_RESULT.yeastPitchTime.toISOString(),
+        setTime: FIND_ONE_RESULT.setTime.toISOString(),
       });
   });
 
@@ -217,9 +217,9 @@ describe("FermentationSettingDatum", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        setTime: CREATE_RESULT.setTime.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         yeastPitchTime: CREATE_RESULT.yeastPitchTime.toISOString(),
+        setTime: CREATE_RESULT.setTime.toISOString(),
       })
       .then(function () {
         agent

@@ -11,36 +11,24 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  ValidateNested,
   IsInt,
   Max,
 } from "class-validator";
-import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { Type } from "class-transformer";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { ItemUpdateManyWithoutSalesOrdersInput } from "./ItemUpdateManyWithoutSalesOrdersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @InputType()
 class SalesOrderUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  createdBy?: string;
-
   @ApiProperty({
     required: false,
     type: () => CustomerWhereUniqueInput,
@@ -58,58 +46,12 @@ class SalesOrderUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(3)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  customerCode?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(100)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  erpId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemUpdateManyWithoutSalesOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemUpdateManyWithoutSalesOrdersInput)
-  @IsOptional()
-  @Field(() => ItemUpdateManyWithoutSalesOrdersInput, {
-    nullable: true,
-  })
-  item?: ItemUpdateManyWithoutSalesOrdersInput;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  lineItems?: InputJsonValue;
+  createdBy?: string;
 
   @ApiProperty({
     required: false,
@@ -122,18 +64,6 @@ class SalesOrderUpdateInput {
     nullable: true,
   })
   orderType?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -182,6 +112,76 @@ class SalesOrderUpdateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemUpdateManyWithoutSalesOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemUpdateManyWithoutSalesOrdersInput)
+  @IsOptional()
+  @Field(() => ItemUpdateManyWithoutSalesOrdersInput, {
+    nullable: true,
+  })
+  item?: ItemUpdateManyWithoutSalesOrdersInput;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId?: string | null;
 }
 
 export { SalesOrderUpdateInput as SalesOrderUpdateInput };

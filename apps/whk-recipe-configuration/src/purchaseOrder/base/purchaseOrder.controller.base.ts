@@ -26,15 +26,15 @@ import { PurchaseOrder } from "./PurchaseOrder";
 import { PurchaseOrderFindManyArgs } from "./PurchaseOrderFindManyArgs";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
 import { PurchaseOrderUpdateInput } from "./PurchaseOrderUpdateInput";
+import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
@@ -90,11 +90,12 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        erpId: true,
-        globalId: true,
+        updatedAt: true,
+        updatedBy: true,
+        transactionGroup: true,
         id: true,
-        lineItems: true,
         name: true,
+        totalOrderQuantity: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -108,10 +109,9 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        totalOrderQuantity: true,
-        transactionGroup: true,
-        updatedAt: true,
-        updatedBy: true,
+        globalId: true,
+        lineItems: true,
+        erpId: true,
       },
     });
   }
@@ -145,11 +145,12 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        erpId: true,
-        globalId: true,
+        updatedAt: true,
+        updatedBy: true,
+        transactionGroup: true,
         id: true,
-        lineItems: true,
         name: true,
+        totalOrderQuantity: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -163,10 +164,9 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        totalOrderQuantity: true,
-        transactionGroup: true,
-        updatedAt: true,
-        updatedBy: true,
+        globalId: true,
+        lineItems: true,
+        erpId: true,
       },
     });
   }
@@ -199,11 +199,12 @@ export class PurchaseOrderControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        erpId: true,
-        globalId: true,
+        updatedAt: true,
+        updatedBy: true,
+        transactionGroup: true,
         id: true,
-        lineItems: true,
         name: true,
+        totalOrderQuantity: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -217,10 +218,9 @@ export class PurchaseOrderControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        totalOrderQuantity: true,
-        transactionGroup: true,
-        updatedAt: true,
-        updatedBy: true,
+        globalId: true,
+        lineItems: true,
+        erpId: true,
       },
     });
     if (result === null) {
@@ -279,11 +279,12 @@ export class PurchaseOrderControllerBase {
           complete: true,
           createdAt: true,
           createdBy: true,
-          erpId: true,
-          globalId: true,
+          updatedAt: true,
+          updatedBy: true,
+          transactionGroup: true,
           id: true,
-          lineItems: true,
           name: true,
+          totalOrderQuantity: true,
           purchaseOrderReceiptDate: true,
           purchaseOrderReceived: true,
 
@@ -297,10 +298,9 @@ export class PurchaseOrderControllerBase {
           receivedQuantity: true,
           revision: true,
           schemaVersion: true,
-          totalOrderQuantity: true,
-          transactionGroup: true,
-          updatedAt: true,
-          updatedBy: true,
+          globalId: true,
+          lineItems: true,
+          erpId: true,
         },
       });
     } catch (error) {
@@ -311,6 +311,252 @@ export class PurchaseOrderControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lotsRejected")
+  @ApiNestedQuery(PurchaseOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findLotsRejected(
+    @common.Req() request: Request,
+    @common.Param() params: PurchaseOrderWhereUniqueInput
+  ): Promise<PurchaseOrder[]> {
+    const query = plainToClass(PurchaseOrderFindManyArgs, request.query);
+    const results = await this.service.findLotsRejected(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        updatedAt: true,
+        updatedBy: true,
+        transactionGroup: true,
+        id: true,
+        name: true,
+        totalOrderQuantity: true,
+        purchaseOrderReceiptDate: true,
+        purchaseOrderReceived: true,
+
+        purchaseOrderRejectedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        receiptStatus: true,
+        receivedQuantity: true,
+        revision: true,
+        schemaVersion: true,
+        globalId: true,
+        lineItems: true,
+        erpId: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lotsRejected")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectLotsRejected(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotsRejected: {
+        connect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lotsRejected")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateLotsRejected(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotsRejected: {
+        set: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lotsRejected")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLotsRejected(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotsRejected: {
+        disconnect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/itemReceipts")
+  @ApiNestedQuery(ItemReceiptFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "read",
+    possession: "any",
+  })
+  async findItemReceipts(
+    @common.Req() request: Request,
+    @common.Param() params: PurchaseOrderWhereUniqueInput
+  ): Promise<ItemReceipt[]> {
+    const query = plainToClass(ItemReceiptFindManyArgs, request.query);
+    const results = await this.service.findItemReceipts(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        driver: true,
+        id: true,
+
+        purchaseOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        schemaVersion: true,
+        status: true,
+        supplierLot: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+        weighIn: true,
+        weighOut: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        loadId: true,
+        testsPassed: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/itemReceipts")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectItemReceipts(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: ItemReceiptWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      itemReceipts: {
+        connect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/itemReceipts")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateItemReceipts(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: ItemReceiptWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      itemReceipts: {
+        set: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/itemReceipts")
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectItemReceipts(
+    @common.Param() params: PurchaseOrderWhereUniqueInput,
+    @common.Body() body: ItemReceiptWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      itemReceipts: {
+        disconnect: body,
+      },
+    };
+    await this.service.updatePurchaseOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -332,30 +578,8 @@ export class PurchaseOrderControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
         id: true,
-        isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotNumber: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
 
         purchaseOrderAcceptedLots: {
           select: {
@@ -363,14 +587,35 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        schemaVersion: true,
+        updatedAt: true,
+        globalId: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        schemaVersion: true,
-        updatedAt: true,
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        isRawMaterial: true,
       },
     });
     if (results === null) {
@@ -463,22 +708,22 @@ export class PurchaseOrderControllerBase {
     const results = await this.service.findItem(params.id, {
       ...query,
       select: {
-        active: true,
-        createdAt: true,
-        createdBy: true,
-        erpId: true,
-        globalId: true,
         id: true,
-        itemClass: true,
-        itemDescription: true,
-        itemGroup: true,
-        itemName: true,
-        itemNumber: true,
-        itemRevision: true,
-        itemType: true,
-        schemaVersion: true,
+        createdAt: true,
         updatedAt: true,
+        active: true,
+        createdBy: true,
         updatedBy: true,
+        itemType: true,
+        itemDescription: true,
+        itemName: true,
+        itemRevision: true,
+        itemNumber: true,
+        schemaVersion: true,
+        itemClass: true,
+        itemGroup: true,
+        globalId: true,
+        erpId: true,
 
         vendor: {
           select: {
@@ -562,252 +807,6 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/itemReceipts")
-  @ApiNestedQuery(ItemReceiptFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ItemReceipt",
-    action: "read",
-    possession: "any",
-  })
-  async findItemReceipts(
-    @common.Req() request: Request,
-    @common.Param() params: PurchaseOrderWhereUniqueInput
-  ): Promise<ItemReceipt[]> {
-    const query = plainToClass(ItemReceiptFindManyArgs, request.query);
-    const results = await this.service.findItemReceipts(params.id, {
-      ...query,
-      select: {
-        createdAt: true,
-        createdBy: true,
-        driver: true,
-        globalId: true,
-        id: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        loadId: true,
-
-        purchaseOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        quantity: true,
-        schemaVersion: true,
-        status: true,
-        supplierLot: true,
-        testsPassed: true,
-        units: true,
-        updatedAt: true,
-        updatedBy: true,
-        weighIn: true,
-        weighOut: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "update",
-    possession: "any",
-  })
-  async connectItemReceipts(
-    @common.Param() params: PurchaseOrderWhereUniqueInput,
-    @common.Body() body: ItemReceiptWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      itemReceipts: {
-        connect: body,
-      },
-    };
-    await this.service.updatePurchaseOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "update",
-    possession: "any",
-  })
-  async updateItemReceipts(
-    @common.Param() params: PurchaseOrderWhereUniqueInput,
-    @common.Body() body: ItemReceiptWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      itemReceipts: {
-        set: body,
-      },
-    };
-    await this.service.updatePurchaseOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectItemReceipts(
-    @common.Param() params: PurchaseOrderWhereUniqueInput,
-    @common.Body() body: ItemReceiptWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      itemReceipts: {
-        disconnect: body,
-      },
-    };
-    await this.service.updatePurchaseOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/lotsRejected")
-  @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findLotsRejected(
-    @common.Req() request: Request,
-    @common.Param() params: PurchaseOrderWhereUniqueInput
-  ): Promise<PurchaseOrder[]> {
-    const query = plainToClass(PurchaseOrderFindManyArgs, request.query);
-    const results = await this.service.findLotsRejected(params.id, {
-      ...query,
-      select: {
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        complete: true,
-        createdAt: true,
-        createdBy: true,
-        erpId: true,
-        globalId: true,
-        id: true,
-        lineItems: true,
-        name: true,
-        purchaseOrderReceiptDate: true,
-        purchaseOrderReceived: true,
-
-        purchaseOrderRejectedLots: {
-          select: {
-            id: true,
-          },
-        },
-
-        receiptStatus: true,
-        receivedQuantity: true,
-        revision: true,
-        schemaVersion: true,
-        totalOrderQuantity: true,
-        transactionGroup: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/lotsRejected")
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "update",
-    possession: "any",
-  })
-  async connectLotsRejected(
-    @common.Param() params: PurchaseOrderWhereUniqueInput,
-    @common.Body() body: PurchaseOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      lotsRejected: {
-        connect: body,
-      },
-    };
-    await this.service.updatePurchaseOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/lotsRejected")
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "update",
-    possession: "any",
-  })
-  async updateLotsRejected(
-    @common.Param() params: PurchaseOrderWhereUniqueInput,
-    @common.Body() body: PurchaseOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      lotsRejected: {
-        set: body,
-      },
-    };
-    await this.service.updatePurchaseOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/lotsRejected")
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectLotsRejected(
-    @common.Param() params: PurchaseOrderWhereUniqueInput,
-    @common.Body() body: PurchaseOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      lotsRejected: {
-        disconnect: body,
-      },
-    };
-    await this.service.updatePurchaseOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/qualityTests")
   @ApiNestedQuery(TestParameterFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -823,7 +822,25 @@ export class PurchaseOrderControllerBase {
     const results = await this.service.findQualityTests(params.id, {
       ...query,
       select: {
+        description: true,
+        testPass: true,
+        createdAt: true,
+        id: true,
+        testSetpointBooleanValue: true,
+        updatedBy: true,
+        name: true,
         active: true,
+        schemaVersion: true,
+        testSetpointValue: true,
+        testParamUnits: true,
+        testSetpointUpperLimit: true,
+        testParamRevision: true,
+        testSetpointLowerLimit: true,
+        testResult: true,
+        createdBy: true,
+        testSetpointType: true,
+        updatedAt: true,
+        isClassDef: true,
 
         classId: {
           select: {
@@ -831,36 +848,17 @@ export class PurchaseOrderControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
+        tooltip: true,
+        testDetails: true,
         globalId: true,
-        id: true,
-        isClassDef: true,
+        testedBy: true,
+        testedAt: true,
 
         itemReceipt: {
           select: {
             id: true,
           },
         },
-
-        name: true,
-        schemaVersion: true,
-        testDetails: true,
-        testedAt: true,
-        testedBy: true,
-        testParamRevision: true,
-        testParamUnits: true,
-        testPass: true,
-        testResult: true,
-        testSetpointBooleanValue: true,
-        testSetpointLowerLimit: true,
-        testSetpointType: true,
-        testSetpointUpperLimit: true,
-        testSetpointValue: true,
-        tooltip: true,
-        updatedAt: true,
-        updatedBy: true,
       },
     });
     if (results === null) {

@@ -28,7 +28,40 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  bomsId?: SortOrder;
+  id?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  createdAt?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  updatedAt?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  bomId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -61,17 +94,6 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  createdAt?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   createdBy?: SortOrder;
 
   @ApiProperty({
@@ -83,62 +105,18 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  customerId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  customerCode?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  endDate?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  globalId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  id?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   inProcess?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  updatedBy?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -182,7 +160,7 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  salesOrderId?: SortOrder;
+  customerId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -194,17 +172,6 @@ class ProductionOrderOrderByInput {
     nullable: true,
   })
   scheduled?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  scheduleOrderId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -237,6 +204,17 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  endDate?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   status?: SortOrder;
 
   @ApiProperty({
@@ -248,7 +226,7 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
+  scheduleOrderId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -259,7 +237,29 @@ class ProductionOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedBy?: SortOrder;
+  salesOrderId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  globalId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  customerCode?: SortOrder;
 }
 
 export { ProductionOrderOrderByInput as ProductionOrderOrderByInput };

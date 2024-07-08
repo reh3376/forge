@@ -83,17 +83,6 @@ class TestOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  globalId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   id?: SortOrder;
 
   @ApiProperty({
@@ -150,6 +139,17 @@ class TestOrderByInput {
     nullable: true,
   })
   testRevision?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  globalId?: SortOrder;
 }
 
 export { TestOrderByInput as TestOrderByInput };

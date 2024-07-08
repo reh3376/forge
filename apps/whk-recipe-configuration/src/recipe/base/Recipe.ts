@@ -13,26 +13,95 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  IsDate,
   IsString,
+  IsDate,
   MaxLength,
-  ValidateNested,
+  IsOptional,
   IsInt,
   Max,
+  IsBoolean,
+  ValidateNested,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Lot } from "../../lot/base/Lot";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { Lot } from "../../lot/base/Lot";
 
 @ObjectType()
 class Recipe {
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -46,70 +115,12 @@ class Recipe {
 
   @ApiProperty({
     required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
-
-  @ApiProperty({
-    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(16)
   @Field(() => String)
   customerId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemDescription!: string | null;
 
   @ApiProperty({
     required: true,
@@ -122,30 +133,15 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: () => [Lot],
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Lot)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  lots?: Array<Lot>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrder],
+  @Field(() => String, {
+    nullable: true,
   })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrders?: Array<ProductionOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrderUnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedure)
-  @IsOptional()
-  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
+  itemDescription!: string | null;
 
   @ApiProperty({
     required: true,
@@ -167,15 +163,21 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: () => [UnitProcedure],
   })
-  @IsInt()
-  @Max(99999999999)
+  @ValidateNested()
+  @Type(() => UnitProcedure)
   @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
+  unitProcedures?: Array<UnitProcedure>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
   })
-  revision!: number | null;
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
     required: false,
@@ -196,36 +198,34 @@ class Recipe {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [UnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProcedures?: Array<UnitProcedure>;
+  globalId!: string | null;
 
   @ApiProperty({
     required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
+  @MaxLength(3)
+  @Field(() => String)
+  customer!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderUnitProcedure],
   })
-  updatedBy!: string | null;
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedure)
+  @IsOptional()
+  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 }
 
 export { Recipe as Recipe };

@@ -25,12 +25,12 @@ import { PurchaseOrderFindManyArgs } from "./PurchaseOrderFindManyArgs";
 import { PurchaseOrderFindUniqueArgs } from "./PurchaseOrderFindUniqueArgs";
 import { CreatePurchaseOrderArgs } from "./CreatePurchaseOrderArgs";
 import { UpdatePurchaseOrderArgs } from "./UpdatePurchaseOrderArgs";
+import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
-import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Asset } from "../../asset/base/Asset";
@@ -158,6 +158,46 @@ export class PurchaseOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [PurchaseOrder], { name: "lotsRejected" })
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findLotsRejected(
+    @graphql.Parent() parent: PurchaseOrder,
+    @graphql.Args() args: PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    const results = await this.service.findLotsRejected(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ItemReceipt], { name: "itemReceipts" })
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "read",
+    possession: "any",
+  })
+  async findItemReceipts(
+    @graphql.Parent() parent: PurchaseOrder,
+    @graphql.Args() args: ItemReceiptFindManyArgs
+  ): Promise<ItemReceipt[]> {
+    const results = await this.service.findItemReceipts(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Lot], { name: "acceptedLots" })
   @nestAccessControl.UseRoles({
     resource: "Lot",
@@ -189,46 +229,6 @@ export class PurchaseOrderResolverBase {
     @graphql.Args() args: ItemFindManyArgs
   ): Promise<Item[]> {
     const results = await this.service.findItem(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ItemReceipt], { name: "itemReceipts" })
-  @nestAccessControl.UseRoles({
-    resource: "ItemReceipt",
-    action: "read",
-    possession: "any",
-  })
-  async findItemReceipts(
-    @graphql.Parent() parent: PurchaseOrder,
-    @graphql.Args() args: ItemReceiptFindManyArgs
-  ): Promise<ItemReceipt[]> {
-    const results = await this.service.findItemReceipts(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [PurchaseOrder], { name: "lotsRejected" })
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findLotsRejected(
-    @graphql.Parent() parent: PurchaseOrder,
-    @graphql.Args() args: PurchaseOrderFindManyArgs
-  ): Promise<PurchaseOrder[]> {
-    const results = await this.service.findLotsRejected(parent.id, args);
 
     if (!results) {
       return [];

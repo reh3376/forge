@@ -16,8 +16,8 @@ import {
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   ProductionOrder as PrismaProductionOrder,
   Recipe as PrismaRecipe,
-  UnitProcedure as PrismaUnitProcedure,
   Item as PrismaItem,
+  UnitProcedure as PrismaUnitProcedure,
 } from "@prisma/client";
 
 export class ProductionOrderUnitProcedureServiceBase {
@@ -73,6 +73,14 @@ export class ProductionOrderUnitProcedureServiceBase {
       .recipe();
   }
 
+  async getWipItem(parentId: string): Promise<PrismaItem | null> {
+    return this.prisma.productionOrderUnitProcedure
+      .findUnique({
+        where: { id: parentId },
+      })
+      .wipItem();
+  }
+
   async getUnitProcedure(
     parentId: string
   ): Promise<PrismaUnitProcedure | null> {
@@ -81,13 +89,5 @@ export class ProductionOrderUnitProcedureServiceBase {
         where: { id: parentId },
       })
       .unitProcedure();
-  }
-
-  async getWipItem(parentId: string): Promise<PrismaItem | null> {
-    return this.prisma.productionOrderUnitProcedure
-      .findUnique({
-        where: { id: parentId },
-      })
-      .wipItem();
   }
 }

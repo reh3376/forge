@@ -25,10 +25,10 @@ import { FermentationDayDatumFindManyArgs } from "./FermentationDayDatumFindMany
 import { FermentationDayDatumFindUniqueArgs } from "./FermentationDayDatumFindUniqueArgs";
 import { CreateFermentationDayDatumArgs } from "./CreateFermentationDayDatumArgs";
 import { UpdateFermentationDayDatumArgs } from "./UpdateFermentationDayDatumArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { Operation } from "../../operation/base/Operation";
 import { Asset } from "../../asset/base/Asset";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { Operation } from "../../operation/base/Operation";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationDayDatumService } from "../fermentationDayDatum.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => FermentationDayDatum)
@@ -98,6 +98,14 @@ export class FermentationDayDatumResolverBase {
       data: {
         ...args.data,
 
+        productionOrder: {
+          connect: args.data.productionOrder,
+        },
+
+        operation: {
+          connect: args.data.operation,
+        },
+
         asset: args.data.asset
           ? {
               connect: args.data.asset,
@@ -109,14 +117,6 @@ export class FermentationDayDatumResolverBase {
               connect: args.data.fermentationChemistry,
             }
           : undefined,
-
-        operation: {
-          connect: args.data.operation,
-        },
-
-        productionOrder: {
-          connect: args.data.productionOrder,
-        },
       },
     });
   }
@@ -137,6 +137,14 @@ export class FermentationDayDatumResolverBase {
         data: {
           ...args.data,
 
+          productionOrder: {
+            connect: args.data.productionOrder,
+          },
+
+          operation: {
+            connect: args.data.operation,
+          },
+
           asset: args.data.asset
             ? {
                 connect: args.data.asset,
@@ -148,14 +156,6 @@ export class FermentationDayDatumResolverBase {
                 connect: args.data.fermentationChemistry,
               }
             : undefined,
-
-          operation: {
-            connect: args.data.operation,
-          },
-
-          productionOrder: {
-            connect: args.data.productionOrder,
-          },
         },
       });
     } catch (error) {
@@ -166,6 +166,48 @@ export class FermentationDayDatumResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrder, {
+    nullable: true,
+    name: "productionOrder",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrder(
+    @graphql.Parent() parent: FermentationDayDatum
+  ): Promise<ProductionOrder | null> {
+    const result = await this.service.getProductionOrder(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Operation, {
+    nullable: true,
+    name: "operation",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "read",
+    possession: "any",
+  })
+  async getOperation(
+    @graphql.Parent() parent: FermentationDayDatum
+  ): Promise<Operation | null> {
+    const result = await this.service.getOperation(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -203,48 +245,6 @@ export class FermentationDayDatumResolverBase {
     @graphql.Parent() parent: FermentationDayDatum
   ): Promise<FermentationChemistry | null> {
     const result = await this.service.getFermentationChemistry(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Operation, {
-    nullable: true,
-    name: "operation",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "read",
-    possession: "any",
-  })
-  async getOperation(
-    @graphql.Parent() parent: FermentationDayDatum
-  ): Promise<Operation | null> {
-    const result = await this.service.getOperation(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ProductionOrder, {
-    nullable: true,
-    name: "productionOrder",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async getProductionOrder(
-    @graphql.Parent() parent: FermentationDayDatum
-  ): Promise<ProductionOrder | null> {
-    const result = await this.service.getProductionOrder(parent.id);
 
     if (!result) {
       return null;

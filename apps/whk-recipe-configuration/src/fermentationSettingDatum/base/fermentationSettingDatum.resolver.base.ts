@@ -25,8 +25,8 @@ import { FermentationSettingDatumFindManyArgs } from "./FermentationSettingDatum
 import { FermentationSettingDatumFindUniqueArgs } from "./FermentationSettingDatumFindUniqueArgs";
 import { CreateFermentationSettingDatumArgs } from "./CreateFermentationSettingDatumArgs";
 import { UpdateFermentationSettingDatumArgs } from "./UpdateFermentationSettingDatumArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Operation } from "../../operation/base/Operation";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationSettingDatumService } from "../fermentationSettingDatum.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => FermentationSettingDatum)
@@ -96,15 +96,15 @@ export class FermentationSettingDatumResolverBase {
       data: {
         ...args.data,
 
-        fermentationChemistries: args.data.fermentationChemistries
-          ? {
-              connect: args.data.fermentationChemistries,
-            }
-          : undefined,
-
         operation: args.data.operation
           ? {
               connect: args.data.operation,
+            }
+          : undefined,
+
+        fermentationChemistries: args.data.fermentationChemistries
+          ? {
+              connect: args.data.fermentationChemistries,
             }
           : undefined,
       },
@@ -127,15 +127,15 @@ export class FermentationSettingDatumResolverBase {
         data: {
           ...args.data,
 
-          fermentationChemistries: args.data.fermentationChemistries
-            ? {
-                connect: args.data.fermentationChemistries,
-              }
-            : undefined,
-
           operation: args.data.operation
             ? {
                 connect: args.data.operation,
+              }
+            : undefined,
+
+          fermentationChemistries: args.data.fermentationChemistries
+            ? {
+                connect: args.data.fermentationChemistries,
               }
             : undefined,
         },
@@ -148,27 +148,6 @@ export class FermentationSettingDatumResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => FermentationChemistry, {
-    nullable: true,
-    name: "fermentationChemistries",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async getFermentationChemistries(
-    @graphql.Parent() parent: FermentationSettingDatum
-  ): Promise<FermentationChemistry | null> {
-    const result = await this.service.getFermentationChemistries(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -185,6 +164,27 @@ export class FermentationSettingDatumResolverBase {
     @graphql.Parent() parent: FermentationSettingDatum
   ): Promise<Operation | null> {
     const result = await this.service.getOperation(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => FermentationChemistry, {
+    nullable: true,
+    name: "fermentationChemistries",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationChemistry",
+    action: "read",
+    possession: "any",
+  })
+  async getFermentationChemistries(
+    @graphql.Parent() parent: FermentationSettingDatum
+  ): Promise<FermentationChemistry | null> {
+    const result = await this.service.getFermentationChemistries(parent.id);
 
     if (!result) {
       return null;

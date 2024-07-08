@@ -13,65 +13,30 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
   IsString,
   MaxLength,
-  IsDate,
+  IsOptional,
+  IsBoolean,
   IsNumber,
   Max,
   IsEnum,
+  ValidateNested,
+  IsDate,
 } from "class-validator";
 
-import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
-import { Type } from "class-transformer";
-import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
-import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
-import { PurchaseOrderUpdateManyWithoutTestParametersInput } from "./PurchaseOrderUpdateManyWithoutTestParametersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
+import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
+import { Type } from "class-transformer";
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
+import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
+import { PurchaseOrderUpdateManyWithoutTestParametersInput } from "./PurchaseOrderUpdateManyWithoutTestParametersInput";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 
 @InputType()
 class TestParameterUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestParameterWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestParameterWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  createdBy?: string;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -86,39 +51,14 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseUpdateManyWithoutTestParametersInput,
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseUpdateManyWithoutTestParametersInput)
+  @IsBoolean()
   @IsOptional()
-  @Field(() => EquipmentPhaseUpdateManyWithoutTestParametersInput, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterUpdateManyWithoutTestParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterUpdateManyWithoutTestParametersInput)
-  @IsOptional()
-  @Field(() => TestParameterUpdateManyWithoutTestParametersInput, {
-    nullable: true,
-  })
-  instances?: TestParameterUpdateManyWithoutTestParametersInput;
+  testPass?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -129,19 +69,19 @@ class TestParameterUpdateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
-  isClassDef?: boolean | null;
+  testSetpointBooleanValue?: boolean | null;
 
   @ApiProperty({
     required: false,
-    type: () => ItemReceiptWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  itemReceipt?: ItemReceiptWhereUniqueInput | null;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -157,15 +97,14 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => PurchaseOrderUpdateManyWithoutTestParametersInput,
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => PurchaseOrderUpdateManyWithoutTestParametersInput)
+  @IsBoolean()
   @IsOptional()
-  @Field(() => PurchaseOrderUpdateManyWithoutTestParametersInput, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  purchaseOrder?: PurchaseOrderUpdateManyWithoutTestParametersInput;
+  active?: boolean;
 
   @ApiProperty({
     required: false,
@@ -178,132 +117,6 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testDetails?: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  testedAt?: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamRevision?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamUnits?: string;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testPass?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  testResult?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testSetpointBooleanValue?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointLowerLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumTestParameterTestSetpointType,
-  })
-  @IsEnum(EnumTestParameterTestSetpointType)
-  @IsOptional()
-  @Field(() => EnumTestParameterTestSetpointType, {
-    nullable: true,
-  })
-  testSetpointType?: "Boolean" | "Numerical" | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointUpperLimit?: number | null;
 
   @ApiProperty({
     required: false,
@@ -322,6 +135,134 @@ class TestParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testParamUnits?: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointUpperLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testParamRevision?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointLowerLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  testResult?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTestParameterTestSetpointType,
+  })
+  @IsEnum(EnumTestParameterTestSetpointType)
+  @IsOptional()
+  @Field(() => EnumTestParameterTestSetpointType, {
+    nullable: true,
+  })
+  testSetpointType?: "Boolean" | "Numerical" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TestParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: TestParameterWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => TestParameterUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  instances?: TestParameterUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
   @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
@@ -334,12 +275,71 @@ class TestParameterUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testDetails?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  purchaseOrder?: PurchaseOrderUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
   @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  testedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  testedAt?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceiptWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemReceiptWhereUniqueInput, {
+    nullable: true,
+  })
+  itemReceipt?: ItemReceiptWhereUniqueInput | null;
 }
 
 export { TestParameterUpdateInput as TestParameterUpdateInput };

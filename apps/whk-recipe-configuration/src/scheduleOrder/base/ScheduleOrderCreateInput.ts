@@ -11,53 +11,54 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
 
 import {
-  IsDate,
+  ValidateNested,
   IsOptional,
+  IsEnum,
   IsString,
   MaxLength,
-  IsNumber,
-  Max,
   IsInt,
-  ValidateNested,
-  IsEnum,
+  Max,
+  IsDate,
+  IsNumber,
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { Decimal } from "decimal.js";
-import { ProductionOrderCreateNestedManyWithoutScheduleOrdersInput } from "./ProductionOrderCreateNestedManyWithoutScheduleOrdersInput";
-import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput } from "./ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
 
 @InputType()
 class ScheduleOrderCreateInput {
   @ApiProperty({
-    required: false,
+    required: true,
+    type: () => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput,
   })
-  @IsDate()
-  @Type(() => Date)
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput, {
     nullable: true,
   })
-  actualEnd?: Date | null;
+  productionOrders?: ProductionOrderCreateNestedManyWithoutScheduleOrdersInput;
 
   @ApiProperty({
     required: false,
+    enum: EnumScheduleOrderStatus,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsEnum(EnumScheduleOrderStatus)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => EnumScheduleOrderStatus, {
     nullable: true,
   })
-  actualStart?: Date | null;
+  status?: "Created" | "Scheduled" | "InProgress" | "Complete" | null;
 
   @ApiProperty({
     required: false,
@@ -73,6 +74,151 @@ class ScheduleOrderCreateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => RecipeGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroupWhereUniqueInput)
+  @Field(() => RecipeGroupWhereUniqueInput)
+  recipeGroup!: RecipeGroupWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrderRecipe?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @Field(() => String)
+  recipeName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalProofGallons?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedTotalProductionTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedMashingTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedFermentationTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedDistillationTime?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedProcessing?: number | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsJSONValue()
+  @Field(() => GraphQLJSON)
+  productionOrderAllocation!: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalBarrels?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
   })
   @IsJSONValue()
   @IsOptional()
@@ -80,6 +226,50 @@ class ScheduleOrderCreateInput {
     nullable: true,
   })
   customers?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedStart?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedEnd?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualStart?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  actualEnd?: Date | null;
 
   @ApiProperty({
     required: false,
@@ -107,137 +297,6 @@ class ScheduleOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  estimatedDistillationTime?: number | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  estimatedEnd?: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  estimatedFermentationTime?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  estimatedMashingTime?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  estimatedProcessing?: number | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  estimatedStart?: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  estimatedTotalProductionTime?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsJSONValue()
-  @Field(() => GraphQLJSON)
-  productionOrderAllocation!: InputJsonValue;
-
-  @ApiProperty({
-    required: true,
-    type: () => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput)
-  @IsOptional()
-  @Field(() => ProductionOrderCreateNestedManyWithoutScheduleOrdersInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderCreateNestedManyWithoutScheduleOrdersInput;
-
-  @ApiProperty({
-    required: true,
-    type: () => RecipeGroupWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeGroupWhereUniqueInput)
-  @Field(() => RecipeGroupWhereUniqueInput)
-  recipeGroup!: RecipeGroupWhereUniqueInput;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @Field(() => String)
-  recipeName!: string;
-
-  @ApiProperty({
-    required: false,
     type: () => ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput,
   })
   @ValidateNested()
@@ -247,65 +306,6 @@ class ScheduleOrderCreateInput {
     nullable: true,
   })
   scheduleOrderQueues?: ScheduleOrderQueueCreateNestedManyWithoutScheduleOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  scheduleOrderRecipe?: RecipeWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumScheduleOrderStatus,
-  })
-  @IsEnum(EnumScheduleOrderStatus)
-  @IsOptional()
-  @Field(() => EnumScheduleOrderStatus, {
-    nullable: true,
-  })
-  status?: "Created" | "Scheduled" | "InProgress" | "Complete" | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalBarrels?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalProofGallons?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
 }
 
 export { ScheduleOrderCreateInput as ScheduleOrderCreateInput };

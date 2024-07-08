@@ -21,47 +21,47 @@ const CREATE_INPUT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   externalId: "exampleExternalId",
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  isRawMaterial: "true",
   lotNumber: "exampleLotNumber",
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
+  globalId: "exampleGlobalId",
+  isRawMaterial: "true",
 };
 const CREATE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   externalId: "exampleExternalId",
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  isRawMaterial: "true",
   lotNumber: "exampleLotNumber",
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
+  globalId: "exampleGlobalId",
+  isRawMaterial: "true",
 };
 const FIND_MANY_RESULT = [
   {
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     externalId: "exampleExternalId",
-    globalId: "exampleGlobalId",
     id: "exampleId",
-    isRawMaterial: "true",
     lotNumber: "exampleLotNumber",
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
+    globalId: "exampleGlobalId",
+    isRawMaterial: "true",
   },
 ];
 const FIND_ONE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   externalId: "exampleExternalId",
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  isRawMaterial: "true",
   lotNumber: "exampleLotNumber",
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
+  globalId: "exampleGlobalId",
+  isRawMaterial: "true",
 };
 
 const service = {

@@ -14,11 +14,11 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Recipe as PrismaRecipe,
-  Lot as PrismaLot,
-  ProductionOrder as PrismaProductionOrder,
-  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
-  ScheduleOrder as PrismaScheduleOrder,
   UnitProcedure as PrismaUnitProcedure,
+  ProductionOrder as PrismaProductionOrder,
+  ScheduleOrder as PrismaScheduleOrder,
+  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
+  Lot as PrismaLot,
   RecipeGroup as PrismaRecipeGroup,
 } from "@prisma/client";
 
@@ -47,15 +47,15 @@ export class RecipeServiceBase {
     return this.prisma.recipe.delete(args);
   }
 
-  async findLots(
+  async findUnitProcedures(
     parentId: string,
-    args: Prisma.LotFindManyArgs
-  ): Promise<PrismaLot[]> {
+    args: Prisma.UnitProcedureFindManyArgs
+  ): Promise<PrismaUnitProcedure[]> {
     return this.prisma.recipe
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .lots(args);
+      .unitProcedures(args);
   }
 
   async findProductionOrders(
@@ -69,17 +69,6 @@ export class RecipeServiceBase {
       .productionOrders(args);
   }
 
-  async findProductionOrderUnitProcedures(
-    parentId: string,
-    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<PrismaProductionOrderUnitProcedure[]> {
-    return this.prisma.recipe
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderUnitProcedures(args);
-  }
-
   async findScheduleOrders(
     parentId: string,
     args: Prisma.ScheduleOrderFindManyArgs
@@ -91,15 +80,26 @@ export class RecipeServiceBase {
       .scheduleOrders(args);
   }
 
-  async findUnitProcedures(
+  async findProductionOrderUnitProcedures(
     parentId: string,
-    args: Prisma.UnitProcedureFindManyArgs
-  ): Promise<PrismaUnitProcedure[]> {
+    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<PrismaProductionOrderUnitProcedure[]> {
     return this.prisma.recipe
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .unitProcedures(args);
+      .productionOrderUnitProcedures(args);
+  }
+
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
   }
 
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
