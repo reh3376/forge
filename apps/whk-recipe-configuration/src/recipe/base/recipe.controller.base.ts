@@ -83,6 +83,12 @@ export class RecipeControllerBase {
               connect: data.parameters,
             }
           : undefined,
+
+        item: data.item
+          ? {
+              connect: data.item,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -94,8 +100,6 @@ export class RecipeControllerBase {
         revision: true,
         active: true,
         customerCode: true,
-        itemId: true,
-        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -113,6 +117,12 @@ export class RecipeControllerBase {
         },
 
         parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
           select: {
             id: true,
           },
@@ -147,8 +157,6 @@ export class RecipeControllerBase {
         revision: true,
         active: true,
         customerCode: true,
-        itemId: true,
-        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -166,6 +174,12 @@ export class RecipeControllerBase {
         },
 
         parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
           select: {
             id: true,
           },
@@ -201,8 +215,6 @@ export class RecipeControllerBase {
         revision: true,
         active: true,
         customerCode: true,
-        itemId: true,
-        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -220,6 +232,12 @@ export class RecipeControllerBase {
         },
 
         parameters: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
           select: {
             id: true,
           },
@@ -274,6 +292,12 @@ export class RecipeControllerBase {
                 connect: data.parameters,
               }
             : undefined,
+
+          item: data.item
+            ? {
+                connect: data.item,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -285,8 +309,6 @@ export class RecipeControllerBase {
           revision: true,
           active: true,
           customerCode: true,
-          itemId: true,
-          itemDescription: true,
           Recipe: true,
 
           recipeGroup: {
@@ -304,6 +326,12 @@ export class RecipeControllerBase {
           },
 
           parameters: {
+            select: {
+              id: true,
+            },
+          },
+
+          item: {
             select: {
               id: true,
             },

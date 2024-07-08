@@ -27,8 +27,6 @@ const CREATE_INPUT = {
   revision: 42,
   active: "true",
   customerCode: "exampleCustomerCode",
-  itemId: "exampleItemId",
-  itemDescription: "exampleItemDescription",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
 };
@@ -42,8 +40,6 @@ const CREATE_RESULT = {
   revision: 42,
   active: "true",
   customerCode: "exampleCustomerCode",
-  itemId: "exampleItemId",
-  itemDescription: "exampleItemDescription",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
 };
@@ -58,8 +54,6 @@ const FIND_MANY_RESULT = [
     revision: 42,
     active: "true",
     customerCode: "exampleCustomerCode",
-    itemId: "exampleItemId",
-    itemDescription: "exampleItemDescription",
     Recipe: "exampleRecipe",
     globalId: "exampleGlobalId",
   },
@@ -74,8 +68,6 @@ const FIND_ONE_RESULT = {
   revision: 42,
   active: "true",
   customerCode: "exampleCustomerCode",
-  itemId: "exampleItemId",
-  itemDescription: "exampleItemDescription",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
 };

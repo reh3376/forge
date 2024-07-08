@@ -38,6 +38,7 @@ import { Lot } from "../../lot/base/Lot";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { Customer } from "../../customer/base/Customer";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { Item } from "../../item/base/Item";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Recipe)
@@ -118,6 +119,12 @@ export class RecipeResolverBase {
               connect: args.data.parameters,
             }
           : undefined,
+
+        item: args.data.item
+          ? {
+              connect: args.data.item,
+            }
+          : undefined,
       },
     });
   }
@@ -151,6 +158,12 @@ export class RecipeResolverBase {
           parameters: args.data.parameters
             ? {
                 connect: args.data.parameters,
+              }
+            : undefined,
+
+          item: args.data.item
+            ? {
+                connect: args.data.item,
               }
             : undefined,
         },
@@ -326,6 +339,25 @@ export class RecipeResolverBase {
     @graphql.Parent() parent: Recipe
   ): Promise<PhaseParameter | null> {
     const result = await this.service.getParameters(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Item, {
+    nullable: true,
+    name: "item",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async getItem(@graphql.Parent() parent: Recipe): Promise<Item | null> {
+    const result = await this.service.getItem(parent.id);
 
     if (!result) {
       return null;

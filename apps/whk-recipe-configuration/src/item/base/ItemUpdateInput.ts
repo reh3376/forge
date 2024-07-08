@@ -30,6 +30,7 @@ import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./Produ
 import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
 import { SalesOrderUpdateManyWithoutItemsInput } from "./SalesOrderUpdateManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
+import { RecipeUpdateManyWithoutItemsInput } from "./RecipeUpdateManyWithoutItemsInput";
 
 @InputType()
 class ItemUpdateInput {
@@ -295,6 +296,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   vendor?: VendorWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeUpdateManyWithoutItemsInput;
 }
 
 export { ItemUpdateInput as ItemUpdateInput };

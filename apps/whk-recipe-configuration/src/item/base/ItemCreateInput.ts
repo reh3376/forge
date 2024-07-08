@@ -30,6 +30,7 @@ import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from ".
 import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
 import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
+import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedManyWithoutItemsInput";
 
 @InputType()
 class ItemCreateInput {
@@ -280,6 +281,18 @@ class ItemCreateInput {
     nullable: true,
   })
   vendor?: VendorWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeCreateNestedManyWithoutItemsInput;
 }
 
 export { ItemCreateInput as ItemCreateInput };
