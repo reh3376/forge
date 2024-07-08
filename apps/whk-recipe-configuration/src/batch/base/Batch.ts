@@ -11,34 +11,48 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsJSONValue } from "../../validators";
 import {
-  IsOptional,
   IsString,
+  IsDate,
   MaxLength,
   ValidateNested,
-  IsDate,
+  IsOptional,
   IsInt,
   Min,
   Max,
 } from "class-validator";
+import { Type } from "class-transformer";
+import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { Type } from "class-transformer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
 
 @ObjectType()
 class Batch {
   @ApiProperty({
-    required: false,
+    required: true,
+    type: String,
   })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
   })
-  batchData!: JsonValue;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -51,6 +65,15 @@ class Batch {
 
   @ApiProperty({
     required: false,
+    type: () => Batch,
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  parent?: Batch | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [Batch],
   })
   @ValidateNested()
@@ -59,12 +82,39 @@ class Batch {
   children?: Array<Batch>;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: Number,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity!: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  batchData!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
 
   @ApiProperty({
     required: false,
@@ -86,14 +136,6 @@ class Batch {
   fermentationChemistries?: Array<FermentationChemistry>;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
     required: false,
     type: () => Lot,
   })
@@ -101,48 +143,6 @@ class Batch {
   @Type(() => Lot)
   @IsOptional()
   lot?: Lot | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Batch,
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  parent?: Batch | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  quantity!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
 }
 
 export { Batch as Batch };

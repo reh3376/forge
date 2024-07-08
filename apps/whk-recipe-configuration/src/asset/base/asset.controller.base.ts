@@ -26,6 +26,9 @@ import { Asset } from "./Asset";
 import { AssetFindManyArgs } from "./AssetFindManyArgs";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { AssetUpdateInput } from "./AssetUpdateInput";
+import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
@@ -35,9 +38,6 @@ import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum
 import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUniqueInput";
-import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
-import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -69,7 +69,6 @@ export class AssetControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        globalId: true,
         id: true,
         name: true,
         revision: true,
@@ -77,6 +76,7 @@ export class AssetControllerBase {
         type: true,
         updatedAt: true,
         updatedBy: true,
+        globalId: true,
       },
     });
   }
@@ -103,7 +103,6 @@ export class AssetControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        globalId: true,
         id: true,
         name: true,
         revision: true,
@@ -111,6 +110,7 @@ export class AssetControllerBase {
         type: true,
         updatedAt: true,
         updatedBy: true,
+        globalId: true,
       },
     });
   }
@@ -138,7 +138,6 @@ export class AssetControllerBase {
         createdAt: true,
         createdBy: true,
         description: true,
-        globalId: true,
         id: true,
         name: true,
         revision: true,
@@ -146,6 +145,7 @@ export class AssetControllerBase {
         type: true,
         updatedAt: true,
         updatedBy: true,
+        globalId: true,
       },
     });
     if (result === null) {
@@ -185,7 +185,6 @@ export class AssetControllerBase {
           createdAt: true,
           createdBy: true,
           description: true,
-          globalId: true,
           id: true,
           name: true,
           revision: true,
@@ -193,6 +192,7 @@ export class AssetControllerBase {
           type: true,
           updatedAt: true,
           updatedBy: true,
+          globalId: true,
         },
       });
     } catch (error) {
@@ -203,6 +203,130 @@ export class AssetControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/purchaseOrders")
+  @ApiNestedQuery(PurchaseOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrders(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<PurchaseOrder[]> {
+    const query = plainToClass(PurchaseOrderFindManyArgs, request.query);
+    const results = await this.service.findPurchaseOrders(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        updatedAt: true,
+        updatedBy: true,
+        transactionGroup: true,
+        id: true,
+        name: true,
+        totalOrderQuantity: true,
+        purchaseOrderReceiptDate: true,
+        purchaseOrderReceived: true,
+
+        purchaseOrderRejectedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        receiptStatus: true,
+        receivedQuantity: true,
+        revision: true,
+        schemaVersion: true,
+        globalId: true,
+        lineItems: true,
+        erpId: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/purchaseOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectPurchaseOrders(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/purchaseOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updatePurchaseOrders(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/purchaseOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectPurchaseOrders(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -224,25 +348,11 @@ export class AssetControllerBase {
     const results = await this.service.findFermentationChemistries(params.id, {
       ...query,
       select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -254,7 +364,7 @@ export class AssetControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -266,7 +376,20 @@ export class AssetControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -359,37 +482,9 @@ export class AssetControllerBase {
     const results = await this.service.findFermentationDayData(params.id, {
       ...query,
       select: {
-        acid: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        balling: true,
-        createdAt: true,
-        day: true,
-        dryInches: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
         id: true,
-        loggedBy: true,
-        lotId: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        pH: true,
+        createdAt: true,
+        updatedAt: true,
 
         productionOrder: {
           select: {
@@ -397,8 +492,34 @@ export class AssetControllerBase {
           },
         },
 
+        lotId: true,
+        loggedBy: true,
+        day: true,
         temperature: true,
-        updatedAt: true,
+        balling: true,
+        acid: true,
+        pH: true,
+        dryInches: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistry: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -491,34 +612,34 @@ export class AssetControllerBase {
     const results = await this.service.findMashData(params.id, {
       ...query,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        lotId: true,
+        balling: true,
+        pH: true,
+        backSetPH: true,
+        backsetVolume: true,
+        waterVolume: true,
+        cornLbs: true,
+        ryeLbs: true,
+        maltLbs: true,
+        wheatLbs: true,
+        loggedBy: true,
+
         asset: {
           select: {
             id: true,
           },
         },
 
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
+        fermenterNumber: true,
 
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
-        updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
       },
     });
     if (results === null) {
@@ -585,130 +706,6 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       mashData: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateAsset({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/purchaseOrders")
-  @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findPurchaseOrders(
-    @common.Req() request: Request,
-    @common.Param() params: AssetWhereUniqueInput
-  ): Promise<PurchaseOrder[]> {
-    const query = plainToClass(PurchaseOrderFindManyArgs, request.query);
-    const results = await this.service.findPurchaseOrders(params.id, {
-      ...query,
-      select: {
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        complete: true,
-        createdAt: true,
-        createdBy: true,
-        erpId: true,
-        globalId: true,
-        id: true,
-        lineItems: true,
-        name: true,
-        purchaseOrderReceiptDate: true,
-        purchaseOrderReceived: true,
-
-        purchaseOrderRejectedLots: {
-          select: {
-            id: true,
-          },
-        },
-
-        receiptStatus: true,
-        receivedQuantity: true,
-        revision: true,
-        schemaVersion: true,
-        totalOrderQuantity: true,
-        transactionGroup: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Asset",
-    action: "update",
-    possession: "any",
-  })
-  async connectPurchaseOrders(
-    @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: PurchaseOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      purchaseOrders: {
-        connect: body,
-      },
-    };
-    await this.service.updateAsset({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Asset",
-    action: "update",
-    possession: "any",
-  })
-  async updatePurchaseOrders(
-    @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: PurchaseOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      purchaseOrders: {
-        set: body,
-      },
-    };
-    await this.service.updateAsset({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Asset",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectPurchaseOrders(
-    @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: PurchaseOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      purchaseOrders: {
         disconnect: body,
       },
     };

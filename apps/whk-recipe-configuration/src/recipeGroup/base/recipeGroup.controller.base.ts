@@ -26,12 +26,12 @@ import { RecipeGroup } from "./RecipeGroup";
 import { RecipeGroupFindManyArgs } from "./RecipeGroupFindManyArgs";
 import { RecipeGroupWhereUniqueInput } from "./RecipeGroupWhereUniqueInput";
 import { RecipeGroupUpdateInput } from "./RecipeGroupUpdateInput";
-import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
@@ -63,15 +63,15 @@ export class RecipeGroupControllerBase {
     return await this.service.createRecipeGroup({
       data: data,
       select: {
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
         recipe: true,
         revision: true,
         schemaVersion: true,
-        updatedAt: true,
+        createdBy: true,
         updatedBy: true,
+        globalId: true,
       },
     });
   }
@@ -93,15 +93,15 @@ export class RecipeGroupControllerBase {
     return this.service.recipeGroups({
       ...args,
       select: {
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
         recipe: true,
         revision: true,
         schemaVersion: true,
-        updatedAt: true,
+        createdBy: true,
         updatedBy: true,
+        globalId: true,
       },
     });
   }
@@ -124,15 +124,15 @@ export class RecipeGroupControllerBase {
     const result = await this.service.recipeGroup({
       where: params,
       select: {
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
         recipe: true,
         revision: true,
         schemaVersion: true,
-        updatedAt: true,
+        createdBy: true,
         updatedBy: true,
+        globalId: true,
       },
     });
     if (result === null) {
@@ -167,15 +167,15 @@ export class RecipeGroupControllerBase {
         where: params,
         data: data,
         select: {
-          createdAt: true,
-          createdBy: true,
-          globalId: true,
           id: true,
+          createdAt: true,
+          updatedAt: true,
           recipe: true,
           revision: true,
           schemaVersion: true,
-          updatedAt: true,
+          createdBy: true,
           updatedBy: true,
+          globalId: true,
         },
       });
     } catch (error) {
@@ -186,158 +186,6 @@ export class RecipeGroupControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/productionOrders")
-  @ApiNestedQuery(ProductionOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrders(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeGroupWhereUniqueInput
-  ): Promise<ProductionOrder[]> {
-    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
-    const results = await this.service.findProductionOrders(params.id, {
-      ...query,
-      select: {
-        boms: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        complete: true,
-        createdAt: true,
-        createdBy: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        customerCode: true,
-        endDate: true,
-        globalId: true,
-        id: true,
-        inProcess: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        scheduled: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        schemaVersion: true,
-        startDate: true,
-        status: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "update",
-    possession: "any",
-  })
-  async connectProductionOrders(
-    @common.Param() params: RecipeGroupWhereUniqueInput,
-    @common.Body() body: ProductionOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrders: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "update",
-    possession: "any",
-  })
-  async updateProductionOrders(
-    @common.Param() params: RecipeGroupWhereUniqueInput,
-    @common.Body() body: ProductionOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrders: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectProductionOrders(
-    @common.Param() params: RecipeGroupWhereUniqueInput,
-    @common.Body() body: ProductionOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrders: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -356,15 +204,17 @@ export class RecipeGroupControllerBase {
     const results = await this.service.findRecipes(params.id, {
       ...query,
       select: {
-        active: true,
-        createdAt: true,
-        createdBy: true,
-        customer: true,
-        customerId: true,
-        globalId: true,
         id: true,
-        itemDescription: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
+        schemaVersion: true,
+        revision: true,
+        active: true,
+        customerId: true,
         itemId: true,
+        itemDescription: true,
         Recipe: true,
 
         recipeGroup: {
@@ -373,10 +223,8 @@ export class RecipeGroupControllerBase {
           },
         },
 
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
+        globalId: true,
+        customer: true,
       },
     });
     if (results === null) {
@@ -454,6 +302,158 @@ export class RecipeGroupControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrders")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeGroupWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrders(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        complete: true,
+        createdBy: true,
+        inProcess: true,
+        updatedBy: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        endDate: true,
+        status: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        customerCode: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrders")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrders(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/scheduleOrders")
   @ApiNestedQuery(ScheduleOrderFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -469,23 +469,12 @@ export class RecipeGroupControllerBase {
     const results = await this.service.findScheduleOrders(params.id, {
       ...query,
       select: {
-        actualEnd: true,
-        actualStart: true,
-        createdAt: true,
-        createdBy: true,
-        customers: true,
-        duration: true,
-        durationUnits: true,
-        estimatedDistillationTime: true,
-        estimatedEnd: true,
-        estimatedFermentationTime: true,
-        estimatedMashingTime: true,
-        estimatedProcessing: true,
-        estimatedStart: true,
-        estimatedTotalProductionTime: true,
-        globalId: true,
         id: true,
-        productionOrderAllocation: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+        createdBy: true,
+        updatedBy: true,
 
         recipeGroup: {
           select: {
@@ -493,19 +482,29 @@ export class RecipeGroupControllerBase {
           },
         },
 
-        recipeName: true,
-
         scheduleOrderRecipe: {
           select: {
             id: true,
           },
         },
 
-        status: true,
-        totalBarrels: true,
+        recipeName: true,
         totalProofGallons: true,
-        updatedAt: true,
-        updatedBy: true,
+        estimatedTotalProductionTime: true,
+        estimatedMashingTime: true,
+        estimatedFermentationTime: true,
+        estimatedDistillationTime: true,
+        estimatedProcessing: true,
+        productionOrderAllocation: true,
+        totalBarrels: true,
+        globalId: true,
+        customers: true,
+        estimatedStart: true,
+        estimatedEnd: true,
+        actualStart: true,
+        actualEnd: true,
+        duration: true,
+        durationUnits: true,
       },
     });
     if (results === null) {

@@ -11,43 +11,31 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Bom } from "../../bom/base/Bom";
 import {
-  ValidateNested,
-  IsOptional,
-  IsDate,
   IsString,
+  IsDate,
   MaxLength,
+  IsOptional,
+  ValidateNested,
   IsNumber,
   Max,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Item } from "../../item/base/Item";
-import { Lot } from "../../lot/base/Lot";
 import { Decimal } from "decimal.js";
+import { Bom } from "../../bom/base/Bom";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { Lot } from "../../lot/base/Lot";
 
 @ObjectType()
 class BomItem {
   @ApiProperty({
-    required: false,
-    type: () => Bom,
+    required: true,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Bom)
-  @IsOptional()
-  bom?: Bom | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  consumedAt!: Date | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -56,6 +44,14 @@ class BomItem {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -68,32 +64,15 @@ class BomItem {
 
   @ApiProperty({
     required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  equipmentPhases?: Array<EquipmentPhase>;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(100)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  updatedBy!: string | null;
 
   @ApiProperty({
     required: true,
@@ -102,15 +81,6 @@ class BomItem {
   @ValidateNested()
   @Type(() => Item)
   item?: Item;
-
-  @ApiProperty({
-    required: false,
-    type: () => Lot,
-  })
-  @ValidateNested()
-  @Type(() => Lot)
-  @IsOptional()
-  lot?: Lot | null;
 
   @ApiProperty({
     required: true,
@@ -146,24 +116,54 @@ class BomItem {
   units!: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: () => Bom,
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  bom?: Bom | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: false,
   })
   @IsDate()
   @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  consumedAt!: Date | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: string | null;
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Lot,
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lot?: Lot | null;
 }
 
 export { BomItem as BomItem };

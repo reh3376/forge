@@ -56,30 +56,23 @@ export class BatchControllerBase {
       data: {
         ...data,
 
-        lot: data.lot
-          ? {
-              connect: data.lot,
-            }
-          : undefined,
-
         parent: data.parent
           ? {
               connect: data.parent,
             }
           : undefined,
+
+        lot: data.lot
+          ? {
+              connect: data.lot,
+            }
+          : undefined,
       },
       select: {
-        batchData: true,
-        batchId: true,
-        createdAt: true,
-        customers: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
 
         parent: {
           select: {
@@ -88,8 +81,15 @@ export class BatchControllerBase {
         },
 
         quantity: true,
+        batchData: true,
         revision: true,
-        updatedAt: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -111,17 +111,10 @@ export class BatchControllerBase {
     return this.service.batches({
       ...args,
       select: {
-        batchData: true,
-        batchId: true,
-        createdAt: true,
-        customers: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
 
         parent: {
           select: {
@@ -130,8 +123,15 @@ export class BatchControllerBase {
         },
 
         quantity: true,
+        batchData: true,
         revision: true,
-        updatedAt: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -154,17 +154,10 @@ export class BatchControllerBase {
     const result = await this.service.batch({
       where: params,
       select: {
-        batchData: true,
-        batchId: true,
-        createdAt: true,
-        customers: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
 
         parent: {
           select: {
@@ -173,8 +166,15 @@ export class BatchControllerBase {
         },
 
         quantity: true,
+        batchData: true,
         revision: true,
-        updatedAt: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -210,30 +210,23 @@ export class BatchControllerBase {
         data: {
           ...data,
 
-          lot: data.lot
-            ? {
-                connect: data.lot,
-              }
-            : undefined,
-
           parent: data.parent
             ? {
                 connect: data.parent,
               }
             : undefined,
+
+          lot: data.lot
+            ? {
+                connect: data.lot,
+              }
+            : undefined,
         },
         select: {
-          batchData: true,
-          batchId: true,
-          createdAt: true,
-          customers: true,
           id: true,
-
-          lot: {
-            select: {
-              id: true,
-            },
-          },
+          createdAt: true,
+          updatedAt: true,
+          batchId: true,
 
           parent: {
             select: {
@@ -242,8 +235,15 @@ export class BatchControllerBase {
           },
 
           quantity: true,
+          batchData: true,
           revision: true,
-          updatedAt: true,
+          customers: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -272,17 +272,10 @@ export class BatchControllerBase {
     const results = await this.service.findChildren(params.id, {
       ...query,
       select: {
-        batchData: true,
-        batchId: true,
-        createdAt: true,
-        customers: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
 
         parent: {
           select: {
@@ -291,8 +284,15 @@ export class BatchControllerBase {
         },
 
         quantity: true,
+        batchData: true,
         revision: true,
-        updatedAt: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -388,25 +388,11 @@ export class BatchControllerBase {
     const results = await this.service.findFermentationChemistries(params.id, {
       ...query,
       select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -418,7 +404,7 @@ export class BatchControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -430,7 +416,20 @@ export class BatchControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

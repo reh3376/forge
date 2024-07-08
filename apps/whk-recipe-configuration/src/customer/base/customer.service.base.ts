@@ -14,8 +14,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Customer as PrismaCustomer,
-  ProductionOrder as PrismaProductionOrder,
   SalesOrder as PrismaSalesOrder,
+  ProductionOrder as PrismaProductionOrder,
 } from "@prisma/client";
 
 export class CustomerServiceBase {
@@ -51,17 +51,6 @@ export class CustomerServiceBase {
     return this.prisma.customer.delete(args);
   }
 
-  async findProductionOrders(
-    parentId: string,
-    args: Prisma.ProductionOrderFindManyArgs
-  ): Promise<PrismaProductionOrder[]> {
-    return this.prisma.customer
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrders(args);
-  }
-
   async findSalesOrders(
     parentId: string,
     args: Prisma.SalesOrderFindManyArgs
@@ -71,5 +60,16 @@ export class CustomerServiceBase {
         where: { id: parentId },
       })
       .salesOrders(args);
+  }
+
+  async findProductionOrders(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<PrismaProductionOrder[]> {
+    return this.prisma.customer
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrders(args);
   }
 }

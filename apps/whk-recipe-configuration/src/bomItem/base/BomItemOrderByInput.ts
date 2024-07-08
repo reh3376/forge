@@ -28,18 +28,7 @@ class BomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  bomId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  consumedAt?: SortOrder;
+  id?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -61,6 +50,17 @@ class BomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  updatedAt?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   createdBy?: SortOrder;
 
   @ApiProperty({
@@ -72,18 +72,7 @@ class BomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  globalId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  id?: SortOrder;
+  updatedBy?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -95,17 +84,6 @@ class BomItemOrderByInput {
     nullable: true,
   })
   itemId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  lotId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -149,7 +127,7 @@ class BomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
+  bomId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -160,7 +138,29 @@ class BomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedBy?: SortOrder;
+  consumedAt?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  globalId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  lotId?: SortOrder;
 }
 
 export { BomItemOrderByInput as BomItemOrderByInput };

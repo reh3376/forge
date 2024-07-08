@@ -55,17 +55,17 @@ export class VendorControllerBase {
     return await this.service.createVendor({
       data: data,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
         active: true,
         additionalDetails: true,
         contactInformation: true,
-        createdAt: true,
         createdBy: true,
+        updatedBy: true,
+        name: true,
         erpId: true,
         globalId: true,
-        id: true,
-        name: true,
-        updatedAt: true,
-        updatedBy: true,
       },
     });
   }
@@ -87,17 +87,17 @@ export class VendorControllerBase {
     return this.service.vendors({
       ...args,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
         active: true,
         additionalDetails: true,
         contactInformation: true,
-        createdAt: true,
         createdBy: true,
+        updatedBy: true,
+        name: true,
         erpId: true,
         globalId: true,
-        id: true,
-        name: true,
-        updatedAt: true,
-        updatedBy: true,
       },
     });
   }
@@ -120,17 +120,17 @@ export class VendorControllerBase {
     const result = await this.service.vendor({
       where: params,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
         active: true,
         additionalDetails: true,
         contactInformation: true,
-        createdAt: true,
         createdBy: true,
+        updatedBy: true,
+        name: true,
         erpId: true,
         globalId: true,
-        id: true,
-        name: true,
-        updatedAt: true,
-        updatedBy: true,
       },
     });
     if (result === null) {
@@ -165,17 +165,17 @@ export class VendorControllerBase {
         where: params,
         data: data,
         select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
           active: true,
           additionalDetails: true,
           contactInformation: true,
-          createdAt: true,
           createdBy: true,
+          updatedBy: true,
+          name: true,
           erpId: true,
           globalId: true,
-          id: true,
-          name: true,
-          updatedAt: true,
-          updatedBy: true,
         },
       });
     } catch (error) {
@@ -204,22 +204,22 @@ export class VendorControllerBase {
     const results = await this.service.findItems(params.id, {
       ...query,
       select: {
-        active: true,
-        createdAt: true,
-        createdBy: true,
-        erpId: true,
-        globalId: true,
         id: true,
-        itemClass: true,
-        itemDescription: true,
-        itemGroup: true,
-        itemName: true,
-        itemNumber: true,
-        itemRevision: true,
-        itemType: true,
-        schemaVersion: true,
+        createdAt: true,
         updatedAt: true,
+        active: true,
+        createdBy: true,
         updatedBy: true,
+        itemType: true,
+        itemDescription: true,
+        itemName: true,
+        itemRevision: true,
+        itemNumber: true,
+        schemaVersion: true,
+        itemClass: true,
+        itemGroup: true,
+        globalId: true,
+        erpId: true,
 
         vendor: {
           select: {

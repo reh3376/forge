@@ -11,42 +11,30 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
-import { ValidateNested, IsOptional } from "class-validator";
-import { Type } from "class-transformer";
-import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { Type } from "class-transformer";
+import { IsOptional, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { DecimalFilter } from "../../util/DecimalFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 
 @InputType()
 class BomItemWhereInput {
   @ApiProperty({
     required: false,
-    type: () => BomWhereUniqueInput,
+    type: StringFilter,
   })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  bom?: BomWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeNullableFilter,
-  })
-  @Type(() => DateTimeNullableFilter)
-  @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
-    nullable: true,
-  })
-  consumedAt?: DateTimeNullableFilter;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -61,18 +49,6 @@ class BomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => EquipmentPhaseListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseListRelationFilter)
-  @IsOptional()
-  @Field(() => EquipmentPhaseListRelationFilter, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -80,18 +56,7 @@ class BomItemWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
+  updatedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -104,18 +69,6 @@ class BomItemWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => LotWhereUniqueInput)
-  @IsOptional()
-  @Field(() => LotWhereUniqueInput, {
-    nullable: true,
-  })
-  lot?: LotWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -152,6 +105,41 @@ class BomItemWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  bom?: BomWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  consumedAt?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -159,7 +147,19 @@ class BomItemWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput;
 }
 
 export { BomItemWhereInput as BomItemWhereInput };

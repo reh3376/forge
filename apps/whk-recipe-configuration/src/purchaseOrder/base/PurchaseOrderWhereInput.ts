@@ -11,37 +11,25 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
-import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
-import { JsonFilter } from "../../util/JsonFilter";
-import { PurchaseOrderListRelationFilter } from "./PurchaseOrderListRelationFilter";
-import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
-import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
+import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
+import { PurchaseOrderListRelationFilter } from "./PurchaseOrderListRelationFilter";
+import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
+import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
+import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
 class PurchaseOrderWhereInput {
-  @ApiProperty({
-    required: false,
-    type: () => LotListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => LotListRelationFilter)
-  @IsOptional()
-  @Field(() => LotListRelationFilter, {
-    nullable: true,
-  })
-  acceptedLots?: LotListRelationFilter;
-
   @ApiProperty({
     required: false,
     type: () => AssetWhereUniqueInput,
@@ -100,25 +88,36 @@ class PurchaseOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: DateTimeNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => DateTimeNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => DateTimeNullableFilter, {
     nullable: true,
   })
-  erpId?: StringFilter;
+  updatedAt?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringFilter;
+  updatedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  transactionGroup?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -133,53 +132,6 @@ class PurchaseOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ItemListRelationFilter)
-  @IsOptional()
-  @Field(() => ItemListRelationFilter, {
-    nullable: true,
-  })
-  item?: ItemListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptListRelationFilter)
-  @IsOptional()
-  @Field(() => ItemReceiptListRelationFilter, {
-    nullable: true,
-  })
-  itemReceipts?: ItemReceiptListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  lineItems?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderListRelationFilter)
-  @IsOptional()
-  @Field(() => PurchaseOrderListRelationFilter, {
-    nullable: true,
-  })
-  lotsRejected?: PurchaseOrderListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -188,6 +140,17 @@ class PurchaseOrderWhereInput {
     nullable: true,
   })
   name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  totalOrderQuantity?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -222,18 +185,6 @@ class PurchaseOrderWhereInput {
     nullable: true,
   })
   purchaseOrderRejectedLots?: PurchaseOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => TestParameterListRelationFilter, {
-    nullable: true,
-  })
-  qualityTests?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -287,47 +238,96 @@ class PurchaseOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: () => PurchaseOrderListRelationFilter,
   })
-  @Type(() => IntNullableFilter)
+  @ValidateNested()
+  @Type(() => PurchaseOrderListRelationFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => PurchaseOrderListRelationFilter, {
     nullable: true,
   })
-  totalOrderQuantity?: IntNullableFilter;
+  lotsRejected?: PurchaseOrderListRelationFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: () => ItemReceiptListRelationFilter,
   })
-  @Type(() => StringNullableFilter)
+  @ValidateNested()
+  @Type(() => ItemReceiptListRelationFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => ItemReceiptListRelationFilter, {
     nullable: true,
   })
-  transactionGroup?: StringNullableFilter;
+  itemReceipts?: ItemReceiptListRelationFilter;
 
   @ApiProperty({
     required: false,
-    type: DateTimeNullableFilter,
+    type: () => LotListRelationFilter,
   })
-  @Type(() => DateTimeNullableFilter)
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
   @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
+  @Field(() => LotListRelationFilter, {
     nullable: true,
   })
-  updatedAt?: DateTimeNullableFilter;
+  acceptedLots?: LotListRelationFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: () => ItemListRelationFilter,
   })
-  @Type(() => StringNullableFilter)
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => ItemListRelationFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  item?: ItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => TestParameterListRelationFilter, {
+    nullable: true,
+  })
+  qualityTests?: TestParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  globalId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  lineItems?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  erpId?: StringFilter;
 }
 
 export { PurchaseOrderWhereInput as PurchaseOrderWhereInput };

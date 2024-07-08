@@ -28,18 +28,7 @@ class FermentationSettingDatumOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  acid?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  balling?: SortOrder;
+  id?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -61,51 +50,7 @@ class FermentationSettingDatumOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  dryInches?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  fermentationChemistriesId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  fermenterNumber?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  id?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  loggedBy?: SortOrder;
+  updatedAt?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +83,18 @@ class FermentationSettingDatumOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  pH?: SortOrder;
+  fermenterNumber?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  yeastPitchTime?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -171,7 +127,7 @@ class FermentationSettingDatumOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
+  dryInches?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -182,7 +138,51 @@ class FermentationSettingDatumOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  yeastPitchTime?: SortOrder;
+  balling?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  acid?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  pH?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  loggedBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  fermentationChemistriesId?: SortOrder;
 }
 
 export { FermentationSettingDatumOrderByInput as FermentationSettingDatumOrderByInput };

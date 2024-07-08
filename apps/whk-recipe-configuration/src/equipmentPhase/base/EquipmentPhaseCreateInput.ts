@@ -13,76 +13,29 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
   IsString,
   MaxLength,
-  IsEnum,
+  IsOptional,
   IsInt,
   Max,
+  IsEnum,
+  ValidateNested,
+  IsBoolean,
 } from "class-validator";
 
-import { BomItemCreateNestedManyWithoutEquipmentPhasesInput } from "./BomItemCreateNestedManyWithoutEquipmentPhasesInput";
-import { Type } from "class-transformer";
-import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
-import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput";
-import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
-import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
+import { Type } from "class-transformer";
+import { InstructionCreateNestedManyWithoutEquipmentPhasesInput } from "./InstructionCreateNestedManyWithoutEquipmentPhasesInput";
 import { TestParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./TestParameterCreateNestedManyWithoutEquipmentPhasesInput";
+import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
+import { EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
+import { BomItemCreateNestedManyWithoutEquipmentPhasesInput } from "./BomItemCreateNestedManyWithoutEquipmentPhasesInput";
+import { PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput } from "./PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput";
 
 @InputType()
 class EquipmentPhaseCreateInput {
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomItemCreateNestedManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => BomItemCreateNestedManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => BomItemCreateNestedManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  bomItem?: BomItemCreateNestedManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseWhereUniqueInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: EquipmentPhaseWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  className?: string | null;
-
   @ApiProperty({
     required: true,
     type: String,
@@ -102,78 +55,19 @@ class EquipmentPhaseCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  description?: string | null;
+  schemaVersion?: string | null;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(64)
+  @IsInt()
+  @Max(99)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Number, {
     nullable: true,
   })
-  editedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  instances?: EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => InstructionCreateNestedManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => InstructionCreateNestedManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => InstructionCreateNestedManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  instructions?: InstructionCreateNestedManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  message?: string | null;
+  operationSequenceIndex?: number | null;
 
   @ApiProperty({
     required: true,
@@ -223,39 +117,15 @@ class EquipmentPhaseCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationSequenceIndex?: number | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  path?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
+  editedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -279,7 +149,113 @@ class EquipmentPhaseCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
+  className?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => InstructionCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => InstructionCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => InstructionCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  instructions?: InstructionCreateNestedManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => TestParameterCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  testParameters?: TestParameterCreateNestedManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: EquipmentPhaseWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  instances?: EquipmentPhaseCreateNestedManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
 
   @ApiProperty({
     required: true,
@@ -309,15 +285,39 @@ class EquipmentPhaseCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => TestParameterCreateNestedManyWithoutEquipmentPhasesInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => TestParameterCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => TestParameterCreateNestedManyWithoutEquipmentPhasesInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  testParameters?: TestParameterCreateNestedManyWithoutEquipmentPhasesInput;
+  message?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => BomItemCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemCreateNestedManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  phaseParameters?: PhaseParameterCreateNestedManyWithoutEquipmentPhasesInput;
 }
 
 export { EquipmentPhaseCreateInput as EquipmentPhaseCreateInput };

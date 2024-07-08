@@ -28,18 +28,7 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  batchData?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  batchId?: SortOrder;
+  id?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -61,7 +50,7 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  customers?: SortOrder;
+  updatedAt?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -72,18 +61,7 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  id?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  lotId?: SortOrder;
+  batchId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -116,6 +94,17 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  batchData?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   revision?: SortOrder;
 
   @ApiProperty({
@@ -127,7 +116,18 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
+  customers?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  lotId?: SortOrder;
 }
 
 export { BatchOrderByInput as BatchOrderByInput };

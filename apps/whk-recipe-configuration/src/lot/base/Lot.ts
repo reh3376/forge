@@ -11,43 +11,25 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Batch } from "../../batch/base/Batch";
 import {
-  ValidateNested,
-  IsOptional,
   IsDate,
   IsString,
   MaxLength,
+  IsOptional,
+  ValidateNested,
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { BomItem } from "../../bomItem/base/BomItem";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { Item } from "../../item/base/Item";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
+import { Item } from "../../item/base/Item";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { Batch } from "../../batch/base/Batch";
+import { BomItem } from "../../bomItem/base/BomItem";
 
 @ObjectType()
 class Lot {
-  @ApiProperty({
-    required: true,
-    type: () => [Batch],
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  batches?: Array<Batch>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [BomItem],
-  })
-  @ValidateNested()
-  @Type(() => BomItem)
-  @IsOptional()
-  bomItems?: Array<BomItem>;
-
   @ApiProperty({
     required: true,
   })
@@ -81,53 +63,12 @@ class Lot {
   externalId!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: () => FermentationChemistry,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: FermentationChemistry | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isRawMaterial!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  item?: Item | null;
 
   @ApiProperty({
     required: true,
@@ -140,30 +81,12 @@ class Lot {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrder,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrder?: ProductionOrder | null;
-
-  @ApiProperty({
-    required: false,
     type: () => PurchaseOrder,
   })
   @ValidateNested()
   @Type(() => PurchaseOrder)
   @IsOptional()
   purchaseOrderAcceptedLots?: PurchaseOrder | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Recipe,
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipe?: Recipe | null;
 
   @ApiProperty({
     required: false,
@@ -184,6 +107,83 @@ class Lot {
   @Type(() => Date)
   @Field(() => Date)
   updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Recipe,
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipe?: Recipe | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrder,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrder?: ProductionOrder | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistry,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: FermentationChemistry | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isRawMaterial!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BomItem],
+  })
+  @ValidateNested()
+  @Type(() => BomItem)
+  @IsOptional()
+  bomItems?: Array<BomItem>;
 }
 
 export { Lot as Lot };

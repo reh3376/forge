@@ -18,38 +18,38 @@ import { ProductionOrderUnitProcedureService } from "../productionOrderUnitProce
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  createdAt: new Date(),
-  customer: "exampleCustomer",
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  name: "exampleName",
+  createdAt: new Date(),
   updatedAt: new Date(),
+  name: "exampleName",
+  globalId: "exampleGlobalId",
+  customer: "exampleCustomer",
 };
 const CREATE_RESULT = {
-  createdAt: new Date(),
-  customer: "exampleCustomer",
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  name: "exampleName",
+  createdAt: new Date(),
   updatedAt: new Date(),
+  name: "exampleName",
+  globalId: "exampleGlobalId",
+  customer: "exampleCustomer",
 };
 const FIND_MANY_RESULT = [
   {
-    createdAt: new Date(),
-    customer: "exampleCustomer",
-    globalId: "exampleGlobalId",
     id: "exampleId",
-    name: "exampleName",
+    createdAt: new Date(),
     updatedAt: new Date(),
+    name: "exampleName",
+    globalId: "exampleGlobalId",
+    customer: "exampleCustomer",
   },
 ];
 const FIND_ONE_RESULT = {
-  createdAt: new Date(),
-  customer: "exampleCustomer",
-  globalId: "exampleGlobalId",
   id: "exampleId",
-  name: "exampleName",
+  createdAt: new Date(),
   updatedAt: new Date(),
+  name: "exampleName",
+  globalId: "exampleGlobalId",
+  customer: "exampleCustomer",
 };
 
 const service = {

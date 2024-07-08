@@ -27,8 +27,8 @@ import { CreateItemReceiptArgs } from "./CreateItemReceiptArgs";
 import { UpdateItemReceiptArgs } from "./UpdateItemReceiptArgs";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
-import { Item } from "../../item/base/Item";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { Item } from "../../item/base/Item";
 import { ItemReceiptService } from "../itemReceipt.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ItemReceipt)
@@ -98,15 +98,15 @@ export class ItemReceiptResolverBase {
       data: {
         ...args.data,
 
-        item: {
-          connect: args.data.item,
-        },
-
         purchaseOrder: args.data.purchaseOrder
           ? {
               connect: args.data.purchaseOrder,
             }
           : undefined,
+
+        item: {
+          connect: args.data.item,
+        },
       },
     });
   }
@@ -127,15 +127,15 @@ export class ItemReceiptResolverBase {
         data: {
           ...args.data,
 
-          item: {
-            connect: args.data.item,
-          },
-
           purchaseOrder: args.data.purchaseOrder
             ? {
                 connect: args.data.purchaseOrder,
               }
             : undefined,
+
+          item: {
+            connect: args.data.item,
+          },
         },
       });
     } catch (error) {
@@ -169,25 +169,6 @@ export class ItemReceiptResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Item, {
-    nullable: true,
-    name: "item",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async getItem(@graphql.Parent() parent: ItemReceipt): Promise<Item | null> {
-    const result = await this.service.getItem(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => PurchaseOrder, {
     nullable: true,
     name: "purchaseOrder",
@@ -201,6 +182,25 @@ export class ItemReceiptResolverBase {
     @graphql.Parent() parent: ItemReceipt
   ): Promise<PurchaseOrder | null> {
     const result = await this.service.getPurchaseOrder(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Item, {
+    nullable: true,
+    name: "item",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async getItem(@graphql.Parent() parent: ItemReceipt): Promise<Item | null> {
+    const result = await this.service.getItem(parent.id);
 
     if (!result) {
       return null;

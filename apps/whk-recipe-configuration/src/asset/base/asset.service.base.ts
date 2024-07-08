@@ -14,10 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Asset as PrismaAsset,
+  PurchaseOrder as PrismaPurchaseOrder,
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   MashDatum as PrismaMashDatum,
-  PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -41,6 +41,17 @@ export class AssetServiceBase {
   }
   async deleteAsset(args: Prisma.AssetDeleteArgs): Promise<PrismaAsset> {
     return this.prisma.asset.delete(args);
+  }
+
+  async findPurchaseOrders(
+    parentId: string,
+    args: Prisma.PurchaseOrderFindManyArgs
+  ): Promise<PrismaPurchaseOrder[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .purchaseOrders(args);
   }
 
   async findFermentationChemistries(
@@ -74,16 +85,5 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .mashData(args);
-  }
-
-  async findPurchaseOrders(
-    parentId: string,
-    args: Prisma.PurchaseOrderFindManyArgs
-  ): Promise<PrismaPurchaseOrder[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .purchaseOrders(args);
   }
 }

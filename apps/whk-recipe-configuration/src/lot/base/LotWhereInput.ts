@@ -11,46 +11,22 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
-import { ValidateNested, IsOptional } from "class-validator";
-import { Type } from "class-transformer";
-import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { Type } from "class-transformer";
+import { IsOptional, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
+import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 
 @InputType()
 class LotWhereInput {
-  @ApiProperty({
-    required: false,
-    type: () => BatchListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => BatchListRelationFilter)
-  @IsOptional()
-  @Field(() => BatchListRelationFilter, {
-    nullable: true,
-  })
-  batches?: BatchListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomItemListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => BomItemListRelationFilter)
-  @IsOptional()
-  @Field(() => BomItemListRelationFilter, {
-    nullable: true,
-  })
-  bomItems?: BomItemListRelationFilter;
-
   @ApiProperty({
     required: false,
     type: DateTimeFilter,
@@ -86,29 +62,6 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -117,29 +70,6 @@ class LotWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isRawMaterial?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -154,18 +84,6 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: () => PurchaseOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -175,18 +93,6 @@ class LotWhereInput {
     nullable: true,
   })
   purchaseOrderAcceptedLots?: PurchaseOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -209,6 +115,100 @@ class LotWhereInput {
     nullable: true,
   })
   updatedAt?: DateTimeFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  recipe?: RecipeWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isRawMaterial?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchListRelationFilter, {
+    nullable: true,
+  })
+  batches?: BatchListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => BomItemListRelationFilter, {
+    nullable: true,
+  })
+  bomItems?: BomItemListRelationFilter;
 }
 
 export { LotWhereInput as LotWhereInput };

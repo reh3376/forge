@@ -12,35 +12,91 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsBoolean,
-  IsOptional,
   IsString,
-  MaxLength,
-  ValidateNested,
   IsDate,
+  ValidateNested,
+  IsOptional,
+  MaxLength,
+  IsBoolean,
 } from "class-validator";
-import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
-import { Batch } from "../../batch/base/Batch";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { Operation } from "../../operation/base/Operation";
+import { Asset } from "../../asset/base/Asset";
+import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Lot } from "../../lot/base/Lot";
+import { Batch } from "../../batch/base/Batch";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { Operation } from "../../operation/base/Operation";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 
 @ObjectType()
 class FermentationChemistry {
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
     required: false,
-    type: Boolean,
+    type: () => ProductionOrder,
   })
-  @IsBoolean()
+  @ValidateNested()
+  @Type(() => ProductionOrder)
   @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
+  productionOrder?: ProductionOrder | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => Operation,
   })
-  approved!: boolean | null;
+  @ValidateNested()
+  @Type(() => Operation)
+  operation?: Operation;
+
+  @ApiProperty({
+    required: true,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  asset?: Asset;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationSettingDatum,
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatum)
+  @IsOptional()
+  settingData?: FermentationSettingDatum | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  dailyData?: Array<FermentationDayDatum>;
 
   @ApiProperty({
     required: false,
@@ -55,45 +111,15 @@ class FermentationChemistry {
   approvedBy!: string | null;
 
   @ApiProperty({
-    required: true,
-    type: () => Asset,
-  })
-  @ValidateNested()
-  @Type(() => Asset)
-  asset?: Asset;
-
-  @ApiProperty({
-    required: true,
-    type: () => Batch,
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  batch?: Batch;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
     required: false,
-    type: () => [FermentationDayDatum],
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
+  @IsBoolean()
   @IsOptional()
-  dailyData?: Array<FermentationDayDatum>;
-
-  @ApiProperty({
-    required: true,
-    type: String,
+  @Field(() => Boolean, {
+    nullable: true,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  approved!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -105,6 +131,14 @@ class FermentationChemistry {
   lot?: Lot | null;
 
   @ApiProperty({
+    required: true,
+    type: () => Batch,
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  batch?: Batch;
+
+  @ApiProperty({
     required: false,
     type: () => [MashDatum],
   })
@@ -112,40 +146,6 @@ class FermentationChemistry {
   @Type(() => MashDatum)
   @IsOptional()
   mashData?: Array<MashDatum>;
-
-  @ApiProperty({
-    required: true,
-    type: () => Operation,
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  operation?: Operation;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrder,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrder?: ProductionOrder | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatum,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatum)
-  @IsOptional()
-  settingData?: FermentationSettingDatum | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
 }
 
 export { FermentationChemistry as FermentationChemistry };

@@ -11,80 +11,22 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
-import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
-import { StringFilter } from "../../util/StringFilter";
-import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
+import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
 
 @InputType()
 class FermentationChemistryWhereInput {
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  approved?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  approvedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  asset?: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
-    nullable: true,
-  })
-  batch?: BatchWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationDayDatumListRelationFilter, {
-    nullable: true,
-  })
-  dailyData?: FermentationDayDatumListRelationFilter;
-
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -95,42 +37,6 @@ class FermentationChemistryWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => LotWhereUniqueInput)
-  @IsOptional()
-  @Field(() => LotWhereUniqueInput, {
-    nullable: true,
-  })
-  lot?: LotWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashData?: MashDatumListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -146,6 +52,30 @@ class FermentationChemistryWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  operation?: OperationWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: () => FermentationSettingDatumWhereUniqueInput,
   })
   @ValidateNested()
@@ -155,6 +85,76 @@ class FermentationChemistryWhereInput {
     nullable: true,
   })
   settingData?: FermentationSettingDatumWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationDayDatumListRelationFilter, {
+    nullable: true,
+  })
+  dailyData?: FermentationDayDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  approvedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  approved?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lot?: LotWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BatchWhereUniqueInput, {
+    nullable: true,
+  })
+  batch?: BatchWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => MashDatumListRelationFilter, {
+    nullable: true,
+  })
+  mashData?: MashDatumListRelationFilter;
 }
 
 export { FermentationChemistryWhereInput as FermentationChemistryWhereInput };

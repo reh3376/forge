@@ -14,10 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   EquipmentPhase as PrismaEquipmentPhase,
-  BomItem as PrismaBomItem,
   Instruction as PrismaInstruction,
-  PhaseParameter as PrismaPhaseParameter,
   TestParameter as PrismaTestParameter,
+  BomItem as PrismaBomItem,
+  PhaseParameter as PrismaPhaseParameter,
   Operation as PrismaOperation,
 } from "@prisma/client";
 
@@ -56,28 +56,6 @@ export class EquipmentPhaseServiceBase {
     return this.prisma.equipmentPhase.delete(args);
   }
 
-  async findBomItem(
-    parentId: string,
-    args: Prisma.BomItemFindManyArgs
-  ): Promise<PrismaBomItem[]> {
-    return this.prisma.equipmentPhase
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .bomItem(args);
-  }
-
-  async findInstances(
-    parentId: string,
-    args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<PrismaEquipmentPhase[]> {
-    return this.prisma.equipmentPhase
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .instances(args);
-  }
-
   async findInstructions(
     parentId: string,
     args: Prisma.InstructionFindManyArgs
@@ -87,17 +65,6 @@ export class EquipmentPhaseServiceBase {
         where: { id: parentId },
       })
       .instructions(args);
-  }
-
-  async findPhaseParameters(
-    parentId: string,
-    args: Prisma.PhaseParameterFindManyArgs
-  ): Promise<PrismaPhaseParameter[]> {
-    return this.prisma.equipmentPhase
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .phaseParameters(args);
   }
 
   async findTestParameters(
@@ -111,12 +78,37 @@ export class EquipmentPhaseServiceBase {
       .testParameters(args);
   }
 
-  async getClassId(parentId: string): Promise<PrismaEquipmentPhase | null> {
+  async findInstances(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<PrismaEquipmentPhase[]> {
     return this.prisma.equipmentPhase
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .classId();
+      .instances(args);
+  }
+
+  async findBomItem(
+    parentId: string,
+    args: Prisma.BomItemFindManyArgs
+  ): Promise<PrismaBomItem[]> {
+    return this.prisma.equipmentPhase
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .bomItem(args);
+  }
+
+  async findPhaseParameters(
+    parentId: string,
+    args: Prisma.PhaseParameterFindManyArgs
+  ): Promise<PrismaPhaseParameter[]> {
+    return this.prisma.equipmentPhase
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .phaseParameters(args);
   }
 
   async getOperation(parentId: string): Promise<PrismaOperation | null> {
@@ -125,5 +117,13 @@ export class EquipmentPhaseServiceBase {
         where: { id: parentId },
       })
       .operation();
+  }
+
+  async getClassId(parentId: string): Promise<PrismaEquipmentPhase | null> {
+    return this.prisma.equipmentPhase
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
   }
 }

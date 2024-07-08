@@ -59,9 +59,15 @@ export class LotControllerBase {
       data: {
         ...data,
 
-        fermentationChemistries: data.fermentationChemistries
+        purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
           ? {
-              connect: data.fermentationChemistries,
+              connect: data.purchaseOrderAcceptedLots,
+            }
+          : undefined,
+
+        recipe: data.recipe
+          ? {
+              connect: data.recipe,
             }
           : undefined,
 
@@ -77,15 +83,9 @@ export class LotControllerBase {
             }
           : undefined,
 
-        purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
+        fermentationChemistries: data.fermentationChemistries
           ? {
-              connect: data.purchaseOrderAcceptedLots,
-            }
-          : undefined,
-
-        recipe: data.recipe
-          ? {
-              connect: data.recipe,
+              connect: data.fermentationChemistries,
             }
           : undefined,
       },
@@ -93,30 +93,8 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
         id: true,
-        isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotNumber: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
 
         purchaseOrderAcceptedLots: {
           select: {
@@ -124,14 +102,35 @@ export class LotControllerBase {
           },
         },
 
+        schemaVersion: true,
+        updatedAt: true,
+        globalId: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        schemaVersion: true,
-        updatedAt: true,
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        isRawMaterial: true,
       },
     });
   }
@@ -156,30 +155,8 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
         id: true,
-        isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotNumber: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
 
         purchaseOrderAcceptedLots: {
           select: {
@@ -187,14 +164,35 @@ export class LotControllerBase {
           },
         },
 
+        schemaVersion: true,
+        updatedAt: true,
+        globalId: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        schemaVersion: true,
-        updatedAt: true,
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        isRawMaterial: true,
       },
     });
   }
@@ -218,30 +216,8 @@ export class LotControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
         id: true,
-        isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotNumber: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
 
         purchaseOrderAcceptedLots: {
           select: {
@@ -249,14 +225,35 @@ export class LotControllerBase {
           },
         },
 
+        schemaVersion: true,
+        updatedAt: true,
+        globalId: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        schemaVersion: true,
-        updatedAt: true,
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        isRawMaterial: true,
       },
     });
     if (result === null) {
@@ -292,9 +289,15 @@ export class LotControllerBase {
         data: {
           ...data,
 
-          fermentationChemistries: data.fermentationChemistries
+          purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
             ? {
-                connect: data.fermentationChemistries,
+                connect: data.purchaseOrderAcceptedLots,
+              }
+            : undefined,
+
+          recipe: data.recipe
+            ? {
+                connect: data.recipe,
               }
             : undefined,
 
@@ -310,15 +313,9 @@ export class LotControllerBase {
               }
             : undefined,
 
-          purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
+          fermentationChemistries: data.fermentationChemistries
             ? {
-                connect: data.purchaseOrderAcceptedLots,
-              }
-            : undefined,
-
-          recipe: data.recipe
-            ? {
-                connect: data.recipe,
+                connect: data.fermentationChemistries,
               }
             : undefined,
         },
@@ -326,30 +323,8 @@ export class LotControllerBase {
           createdAt: true,
           createdBy: true,
           externalId: true,
-
-          fermentationChemistries: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
           id: true,
-          isRawMaterial: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
           lotNumber: true,
-
-          productionOrder: {
-            select: {
-              id: true,
-            },
-          },
 
           purchaseOrderAcceptedLots: {
             select: {
@@ -357,14 +332,35 @@ export class LotControllerBase {
             },
           },
 
+          schemaVersion: true,
+          updatedAt: true,
+          globalId: true,
+
           recipe: {
             select: {
               id: true,
             },
           },
 
-          schemaVersion: true,
-          updatedAt: true,
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          fermentationChemistries: {
+            select: {
+              id: true,
+            },
+          },
+
+          isRawMaterial: true,
         },
       });
     } catch (error) {
@@ -393,17 +389,10 @@ export class LotControllerBase {
     const results = await this.service.findBatches(params.id, {
       ...query,
       select: {
-        batchData: true,
-        batchId: true,
-        createdAt: true,
-        customers: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
 
         parent: {
           select: {
@@ -412,8 +401,15 @@ export class LotControllerBase {
         },
 
         quantity: true,
+        batchData: true,
         revision: true,
-        updatedAt: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -506,25 +502,13 @@ export class LotControllerBase {
     const results = await this.service.findBomItems(params.id, {
       ...query,
       select: {
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        consumedAt: true,
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
 
         item: {
-          select: {
-            id: true,
-          },
-        },
-
-        lot: {
           select: {
             id: true,
           },
@@ -533,8 +517,21 @@ export class LotControllerBase {
         quantity: true,
         quantityActual: true,
         units: true,
-        updatedAt: true,
-        updatedBy: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        globalId: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

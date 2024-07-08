@@ -13,29 +13,62 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsBoolean,
-  IsOptional,
-  ValidateNested,
-  IsDate,
   IsString,
+  IsDate,
+  ValidateNested,
+  IsOptional,
+  IsBoolean,
   MaxLength,
   IsInt,
   Max,
 } from "class-validator";
 
-import { BomItem } from "../../bomItem/base/BomItem";
 import { Type } from "class-transformer";
-import { Bom } from "../../bom/base/Bom";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
-import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { Bom } from "../../bom/base/Bom";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { BomItem } from "../../bomItem/base/BomItem";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { Lot } from "../../lot/base/Lot";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
 class Item {
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
+
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -48,32 +81,6 @@ class Item {
   active!: boolean | null;
 
   @ApiProperty({
-    required: false,
-    type: () => [BomItem],
-  })
-  @ValidateNested()
-  @Type(() => BomItem)
-  @IsOptional()
-  bomItems?: Array<BomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Bom],
-  })
-  @ValidateNested()
-  @Type(() => Bom)
-  @IsOptional()
-  bomsWipItem?: Array<Bom>;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -83,45 +90,25 @@ class Item {
   createdBy!: string;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  erpId!: string;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId!: string | null;
+  updatedBy!: string | null;
 
   @ApiProperty({
     required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemClass!: string | null;
+  @Field(() => String)
+  itemType!: string;
 
   @ApiProperty({
     required: false,
@@ -136,18 +123,6 @@ class Item {
   itemDescription!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemGroup!: string | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -155,24 +130,6 @@ class Item {
   @MaxLength(1000)
   @Field(() => String)
   itemName!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  itemNumber!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ItemReceipt],
-  })
-  @ValidateNested()
-  @Type(() => ItemReceipt)
-  @IsOptional()
-  itemReceipts?: Array<ItemReceipt>;
 
   @ApiProperty({
     required: false,
@@ -191,54 +148,9 @@ class Item {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(1000)
   @Field(() => String)
-  itemType!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Lot],
-  })
-  @ValidateNested()
-  @Type(() => Lot)
-  @IsOptional()
-  lots?: Array<Lot>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrder],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrders?: Array<ProductionOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrderUnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedure)
-  @IsOptional()
-  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [PurchaseOrder],
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrder)
-  @IsOptional()
-  purchaseOrders?: Array<PurchaseOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [SalesOrder],
-  })
-  @ValidateNested()
-  @Type(() => SalesOrder)
-  @IsOptional()
-  salesOrders?: Array<SalesOrder>;
+  itemNumber!: string;
 
   @ApiProperty({
     required: false,
@@ -253,24 +165,112 @@ class Item {
   schemaVersion!: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemClass!: string | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: string | null;
+  itemGroup!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Bom],
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  bomsWipItem?: Array<Bom>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrders?: Array<PurchaseOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ItemReceipt],
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipts?: Array<ItemReceipt>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BomItem],
+  })
+  @ValidateNested()
+  @Type(() => BomItem)
+  @IsOptional()
+  bomItems?: Array<BomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderUnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedure)
+  @IsOptional()
+  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  erpId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [SalesOrder],
+  })
+  @ValidateNested()
+  @Type(() => SalesOrder)
+  @IsOptional()
+  salesOrders?: Array<SalesOrder>;
 
   @ApiProperty({
     required: false,

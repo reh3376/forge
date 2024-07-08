@@ -15,8 +15,8 @@ import {
   Prisma,
   BomItem as PrismaBomItem,
   EquipmentPhase as PrismaEquipmentPhase,
-  Bom as PrismaBom,
   Item as PrismaItem,
+  Bom as PrismaBom,
   Lot as PrismaLot,
 } from "@prisma/client";
 
@@ -56,20 +56,20 @@ export class BomItemServiceBase {
       .equipmentPhases(args);
   }
 
-  async getBom(parentId: string): Promise<PrismaBom | null> {
-    return this.prisma.bomItem
-      .findUnique({
-        where: { id: parentId },
-      })
-      .bom();
-  }
-
   async getItem(parentId: string): Promise<PrismaItem | null> {
     return this.prisma.bomItem
       .findUnique({
         where: { id: parentId },
       })
       .item();
+  }
+
+  async getBom(parentId: string): Promise<PrismaBom | null> {
+    return this.prisma.bomItem
+      .findUnique({
+        where: { id: parentId },
+      })
+      .bom();
   }
 
   async getLot(parentId: string): Promise<PrismaLot | null> {

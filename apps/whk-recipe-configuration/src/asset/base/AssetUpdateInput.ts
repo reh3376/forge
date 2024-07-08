@@ -15,20 +15,20 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  ValidateNested,
   IsInt,
   Max,
   IsEnum,
+  ValidateNested,
 } from "class-validator";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
+import { EnumAssetType } from "./EnumAssetType";
+import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
 import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
 import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
-import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
-import { EnumAssetType } from "./EnumAssetType";
 
 @InputType()
 class AssetUpdateInput {
@@ -80,54 +80,6 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationChemistryUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationDayDatumUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashDatumUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  mashData?: MashDatumUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -137,18 +89,6 @@ class AssetUpdateInput {
     nullable: true,
   })
   name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
@@ -204,6 +144,66 @@ class AssetUpdateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumUpdateManyWithoutAssetsInput;
 }
 
 export { AssetUpdateInput as AssetUpdateInput };
