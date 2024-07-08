@@ -30,6 +30,7 @@ import { Type } from "class-transformer";
 import { PhaseParameterCreateNestedManyWithoutPhaseParametersInput } from "./PhaseParameterCreateNestedManyWithoutPhaseParametersInput";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 import { EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput";
+import { RecipeCreateNestedManyWithoutPhaseParametersInput } from "./RecipeCreateNestedManyWithoutPhaseParametersInput";
 
 @InputType()
 class PhaseParameterCreateInput {
@@ -104,7 +105,7 @@ class PhaseParameterCreateInput {
   })
   @IsEnum(EnumPhaseParameterSetpointType)
   @Field(() => EnumPhaseParameterSetpointType)
-  setpointType!: "Boolean" | "Numeric";
+  setpointType!: "Boolean" | "Numeric" | "String";
 
   @ApiProperty({
     required: false,
@@ -280,6 +281,30 @@ class PhaseParameterCreateInput {
     nullable: true,
   })
   equipmentPhases?: EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutPhaseParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutPhaseParametersInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutPhaseParametersInput, {
+    nullable: true,
+  })
+  recipes?: RecipeCreateNestedManyWithoutPhaseParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  stringValue?: string | null;
 }
 
 export { PhaseParameterCreateInput as PhaseParameterCreateInput };

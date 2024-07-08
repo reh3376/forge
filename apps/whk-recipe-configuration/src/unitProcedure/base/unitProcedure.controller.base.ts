@@ -693,7 +693,7 @@ export class UnitProcedureControllerBase {
         schemaVersion: true,
         revision: true,
         active: true,
-        customerId: true,
+        customerCode: true,
         itemId: true,
         itemDescription: true,
         Recipe: true,
@@ -705,7 +705,18 @@ export class UnitProcedureControllerBase {
         },
 
         globalId: true,
-        customer: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameters: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

@@ -16,6 +16,7 @@ import {
   Customer as PrismaCustomer,
   SalesOrder as PrismaSalesOrder,
   ProductionOrder as PrismaProductionOrder,
+  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class CustomerServiceBase {
@@ -71,5 +72,16 @@ export class CustomerServiceBase {
         where: { id: parentId },
       })
       .productionOrders(args);
+  }
+
+  async findRecipes(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.customer
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipes(args);
   }
 }

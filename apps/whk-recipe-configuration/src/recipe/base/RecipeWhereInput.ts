@@ -22,8 +22,10 @@ import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupW
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
 
 @InputType()
 class RecipeWhereInput {
@@ -95,14 +97,14 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  customerId?: StringFilter;
+  customerCode?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -198,14 +200,15 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: () => CustomerWhereUniqueInput,
   })
-  @Type(() => StringFilter)
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => CustomerWhereUniqueInput, {
     nullable: true,
   })
-  customer?: StringFilter;
+  customer?: CustomerWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -230,6 +233,18 @@ class RecipeWhereInput {
     nullable: true,
   })
   lots?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  parameters?: PhaseParameterWhereUniqueInput;
 }
 
 export { RecipeWhereInput as RecipeWhereInput };

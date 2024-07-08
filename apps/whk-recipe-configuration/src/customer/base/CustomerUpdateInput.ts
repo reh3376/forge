@@ -22,6 +22,7 @@ import {
 import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
 import { Type } from "class-transformer";
 import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
+import { RecipeUpdateManyWithoutCustomersInput } from "./RecipeUpdateManyWithoutCustomersInput";
 
 @InputType()
 class CustomerUpdateInput {
@@ -180,6 +181,18 @@ class CustomerUpdateInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderUpdateManyWithoutCustomersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  recipes?: RecipeUpdateManyWithoutCustomersInput;
 }
 
 export { CustomerUpdateInput as CustomerUpdateInput };
