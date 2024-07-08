@@ -11,41 +11,51 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
-import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
+import { Type } from "class-transformer";
+import { IsOptional, IsEnum, ValidateNested } from "class-validator";
 import { EnumProcedureName } from "./EnumProcedureName";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
+import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
+import { ProcedureListRelationFilter } from "./ProcedureListRelationFilter";
 
 @InputType()
 class ProcedureWhereInput {
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => BooleanNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => BooleanNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  active?: BooleanNullableFilter;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: () => ProcedureWhereUniqueInput,
+    enum: EnumProcedureName,
   })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
+  @IsEnum(EnumProcedureName)
   @IsOptional()
-  @Field(() => ProcedureWhereUniqueInput, {
+  @Field(() => EnumProcedureName, {
     nullable: true,
   })
-  classId?: ProcedureWhereUniqueInput;
+  name?: "Line1";
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -67,7 +77,7 @@ class ProcedureWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  description?: StringNullableFilter;
+  updatedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -78,52 +88,7 @@ class ProcedureWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureListRelationFilter)
-  @IsOptional()
-  @Field(() => ProcedureListRelationFilter, {
-    nullable: true,
-  })
-  instances?: ProcedureListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isClassDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumProcedureName,
-  })
-  @IsEnum(EnumProcedureName)
-  @IsOptional()
-  @Field(() => EnumProcedureName, {
-    nullable: true,
-  })
-  name?: "Line1";
+  schemaVersion?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -138,14 +103,14 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: BooleanNullableFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => BooleanNullableFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => BooleanNullableFilter, {
     nullable: true,
   })
-  schemaVersion?: StringNullableFilter;
+  active?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -161,6 +126,41 @@ class ProcedureWhereInput {
 
   @ApiProperty({
     required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureListRelationFilter)
+  @IsOptional()
+  @Field(() => ProcedureListRelationFilter, {
+    nullable: true,
+  })
+  instances?: ProcedureListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -168,7 +168,7 @@ class ProcedureWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  globalId?: StringNullableFilter;
 }
 
 export { ProcedureWhereInput as ProcedureWhereInput };

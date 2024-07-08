@@ -12,10 +12,10 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  IsString,
+  IsDate,
   IsBoolean,
   IsOptional,
-  IsDate,
-  IsString,
   MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -23,15 +23,12 @@ import { Type } from "class-transformer";
 @ObjectType()
 class Unit {
   @ApiProperty({
-    required: false,
-    type: Boolean,
+    required: true,
+    type: String,
   })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active!: boolean | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -42,24 +39,23 @@ class Unit {
   createdAt!: Date;
 
   @ApiProperty({
-    required: false,
-    type: String,
+    required: true,
   })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: Boolean,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -86,12 +82,16 @@ class Unit {
   unitType!: string | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 }
 
 export { Unit as Unit };

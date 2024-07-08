@@ -16,9 +16,9 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
+import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 
 @InputType()
 class CustomerWhereInput {
@@ -64,17 +64,6 @@ class CustomerWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  customerCode?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
   description?: StringNullableFilter;
 
   @ApiProperty({
@@ -101,17 +90,6 @@ class CustomerWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -131,6 +109,73 @@ class CustomerWhereInput {
     nullable: true,
   })
   name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntFilter,
+  })
+  @Type(() => IntFilter)
+  @IsOptional()
+  @Field(() => IntFilter, {
+    nullable: true,
+  })
+  revision?: IntFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  updatedAt?: DateTimeFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => SalesOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => SalesOrderListRelationFilter, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  customerCode?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -154,51 +199,6 @@ class CustomerWhereInput {
     nullable: true,
   })
   productionOrders?: ProductionOrderListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  revision?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderListRelationFilter)
-  @IsOptional()
-  @Field(() => SalesOrderListRelationFilter, {
-    nullable: true,
-  })
-  salesOrders?: SalesOrderListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeFilter,
-  })
-  @Type(() => DateTimeFilter)
-  @IsOptional()
-  @Field(() => DateTimeFilter, {
-    nullable: true,
-  })
-  updatedAt?: DateTimeFilter;
 }
 
 export { CustomerWhereInput as CustomerWhereInput };

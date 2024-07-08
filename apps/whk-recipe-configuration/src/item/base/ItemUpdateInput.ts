@@ -11,28 +11,40 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 import {
-  IsBoolean,
-  IsOptional,
   ValidateNested,
+  IsOptional,
+  IsBoolean,
   IsString,
   MaxLength,
   IsInt,
   Max,
 } from "class-validator";
-import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
-import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
-import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
-import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
+import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
+import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
+import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutItemsInput";
+import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
 import { SalesOrderUpdateManyWithoutItemsInput } from "./SalesOrderUpdateManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class ItemUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderUpdateManyWithoutItemsInput;
+
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -43,30 +55,6 @@ class ItemUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomItemUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => BomItemUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => BomItemUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  bomItems?: BomItemUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => BomUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => BomUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  bomsWipItem?: BomUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -85,24 +73,12 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  erpId?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -114,7 +90,7 @@ class ItemUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  itemClass?: string | null;
+  itemType?: string;
 
   @ApiProperty({
     required: false,
@@ -133,48 +109,12 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemGroup?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   itemName?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemNumber?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ItemReceiptUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  itemReceipts?: ItemReceiptUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -193,72 +133,12 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  itemType?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => LotUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => LotUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  lots?: LotUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => SalesOrderUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  salesOrders?: SalesOrderUpdateManyWithoutItemsInput;
+  itemNumber?: string;
 
   @ApiProperty({
     required: false,
@@ -277,12 +157,132 @@ class ItemUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  itemClass?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemGroup?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BomUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  bomsWipItem?: BomUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceiptUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ItemReceiptUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BomItemUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  bomItems?: BomItemUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  lots?: LotUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => SalesOrderUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => SalesOrderUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

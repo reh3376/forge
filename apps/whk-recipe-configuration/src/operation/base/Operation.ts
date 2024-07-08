@@ -13,68 +13,41 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
+  IsInt,
+  Max,
+  IsOptional,
+  IsDate,
+  IsEnum,
   IsString,
   MaxLength,
   IsBoolean,
-  IsOptional,
   ValidateNested,
-  IsDate,
-  IsEnum,
-  IsInt,
-  Max,
 } from "class-validator";
 
+import { Type } from "class-transformer";
+import { EnumOperationName } from "./EnumOperationName";
+import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { Type } from "class-transformer";
-import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
-import { EnumOperationName } from "./EnumOperationName";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 
 @ObjectType()
 class Operation {
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(4)
-  @Field(() => String)
-  abbreviation!: string;
-
-  @ApiProperty({
     required: false,
-    type: Boolean,
+    type: Number,
   })
-  @IsBoolean()
+  @IsInt()
+  @Max(9999)
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => Number, {
     nullable: true,
   })
-  active!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  auxiliaryPhases!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => Operation,
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  @IsOptional()
-  classId?: Operation | null;
+  revision!: number | null;
 
   @ApiProperty({
     required: false,
@@ -86,124 +59,6 @@ class Operation {
     nullable: true,
   })
   createdAt!: Date | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  description!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [EquipmentPhase],
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhase)
-  @IsOptional()
-  equipmentPhases?: Array<EquipmentPhase>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationDayDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
-  @IsOptional()
-  fermentationDayData?: Array<FermentationDayDatum>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationSettingDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatum)
-  @IsOptional()
-  fermentationSettingData?: Array<FermentationSettingDatum>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Operation],
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  @IsOptional()
-  instances?: Array<Operation>;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lotId!: string | null;
 
   @ApiProperty({
     required: true,
@@ -228,12 +83,30 @@ class Operation {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  path!: string | null;
+  editedBy!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  description!: string;
 
   @ApiProperty({
     required: true,
@@ -243,18 +116,6 @@ class Operation {
   @Max(999)
   @Field(() => Number)
   procedureSequenceIndex!: number;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
 
   @ApiProperty({
     required: false,
@@ -270,12 +131,14 @@ class Operation {
 
   @ApiProperty({
     required: false,
-    type: () => UnitProcedure,
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
+  @IsBoolean()
   @IsOptional()
-  unitProcedure?: UnitProcedure | null;
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -287,6 +150,143 @@ class Operation {
     nullable: true,
   })
   updatedAt!: Date | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EquipmentPhase],
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhase)
+  @IsOptional()
+  equipmentPhases?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Operation,
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  classId?: Operation | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Operation],
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  instances?: Array<Operation>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(4)
+  @Field(() => String)
+  abbreviation!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedure,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProcedure?: UnitProcedure | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  auxiliaryPhases!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationSettingDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatum)
+  @IsOptional()
+  fermentationSettingData?: Array<FermentationSettingDatum>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationDayDatum],
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatum)
+  @IsOptional()
+  fermentationDayData?: Array<FermentationDayDatum>;
 }
 
 export { Operation as Operation };

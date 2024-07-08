@@ -11,16 +11,38 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
 
 @InputType()
 class InstructionWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  filePath?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  editedBy?: StringNullableFilter;
+
   @ApiProperty({
     required: false,
     type: BooleanNullableFilter,
@@ -45,17 +67,6 @@ class InstructionWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  editedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => EquipmentPhaseListRelationFilter,
   })
   @ValidateNested()
@@ -65,28 +76,6 @@ class InstructionWhereInput {
     nullable: true,
   })
   equipmentPhase?: EquipmentPhaseListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  filePath?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -108,7 +97,7 @@ class InstructionWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  name?: StringNullableFilter;
+  schemaVersion?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -130,7 +119,18 @@ class InstructionWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  schemaVersion?: StringNullableFilter;
+  name?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
 }
 
 export { InstructionWhereInput as InstructionWhereInput };

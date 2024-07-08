@@ -15,10 +15,10 @@ import {
   Prisma,
   UnitProcedure as PrismaUnitProcedure,
   Operation as PrismaOperation,
-  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Recipe as PrismaRecipe,
-  Bom as PrismaBom,
+  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Procedure as PrismaProcedure,
+  Bom as PrismaBom,
   ScheduleOrderQueue as PrismaScheduleOrderQueue,
 } from "@prisma/client";
 
@@ -57,17 +57,6 @@ export class UnitProcedureServiceBase {
     return this.prisma.unitProcedure.delete(args);
   }
 
-  async findInstances(
-    parentId: string,
-    args: Prisma.UnitProcedureFindManyArgs
-  ): Promise<PrismaUnitProcedure[]> {
-    return this.prisma.unitProcedure
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .instances(args);
-  }
-
   async findOperations(
     parentId: string,
     args: Prisma.OperationFindManyArgs
@@ -79,15 +68,15 @@ export class UnitProcedureServiceBase {
       .operations(args);
   }
 
-  async findProductionOrderUnitProcedures(
+  async findInstances(
     parentId: string,
-    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<PrismaProductionOrderUnitProcedure[]> {
+    args: Prisma.UnitProcedureFindManyArgs
+  ): Promise<PrismaUnitProcedure[]> {
     return this.prisma.unitProcedure
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .productionOrderUnitProcedures(args);
+      .instances(args);
   }
 
   async findRecipe(
@@ -101,12 +90,23 @@ export class UnitProcedureServiceBase {
       .recipe(args);
   }
 
-  async getBoms(parentId: string): Promise<PrismaBom | null> {
+  async findProductionOrderUnitProcedures(
+    parentId: string,
+    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<PrismaProductionOrderUnitProcedure[]> {
+    return this.prisma.unitProcedure
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrderUnitProcedures(args);
+  }
+
+  async getProcedure(parentId: string): Promise<PrismaProcedure | null> {
     return this.prisma.unitProcedure
       .findUnique({
         where: { id: parentId },
       })
-      .boms();
+      .procedure();
   }
 
   async getClassId(parentId: string): Promise<PrismaUnitProcedure | null> {
@@ -117,20 +117,20 @@ export class UnitProcedureServiceBase {
       .classId();
   }
 
+  async getBoms(parentId: string): Promise<PrismaBom | null> {
+    return this.prisma.unitProcedure
+      .findUnique({
+        where: { id: parentId },
+      })
+      .boms();
+  }
+
   async getPrimaryBom(parentId: string): Promise<PrismaBom | null> {
     return this.prisma.unitProcedure
       .findUnique({
         where: { id: parentId },
       })
       .primaryBom();
-  }
-
-  async getProcedure(parentId: string): Promise<PrismaProcedure | null> {
-    return this.prisma.unitProcedure
-      .findUnique({
-        where: { id: parentId },
-      })
-      .procedure();
   }
 
   async getScheduleOrderQueues(

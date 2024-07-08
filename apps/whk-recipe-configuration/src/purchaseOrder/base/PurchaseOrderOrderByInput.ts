@@ -83,7 +83,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  erpId?: SortOrder;
+  updatedAt?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -94,7 +94,18 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  globalId?: SortOrder;
+  updatedBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  transactionGroup?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -116,7 +127,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  lineItems?: SortOrder;
+  name?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -127,7 +138,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  name?: SortOrder;
+  totalOrderQuantity?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -215,7 +226,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  totalOrderQuantity?: SortOrder;
+  globalId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -226,7 +237,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  transactionGroup?: SortOrder;
+  lineItems?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -237,18 +248,7 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  updatedBy?: SortOrder;
+  erpId?: SortOrder;
 }
 
 export { PurchaseOrderOrderByInput as PurchaseOrderOrderByInput };

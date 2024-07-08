@@ -52,17 +52,6 @@ export class PhaseParameterServiceBase {
     return this.prisma.phaseParameter.delete(args);
   }
 
-  async findEquipmentPhases(
-    parentId: string,
-    args: Prisma.EquipmentPhaseFindManyArgs
-  ): Promise<PrismaEquipmentPhase[]> {
-    return this.prisma.phaseParameter
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .equipmentPhases(args);
-  }
-
   async findInstances(
     parentId: string,
     args: Prisma.PhaseParameterFindManyArgs
@@ -72,6 +61,17 @@ export class PhaseParameterServiceBase {
         where: { id: parentId },
       })
       .instances(args);
+  }
+
+  async findEquipmentPhases(
+    parentId: string,
+    args: Prisma.EquipmentPhaseFindManyArgs
+  ): Promise<PrismaEquipmentPhase[]> {
+    return this.prisma.phaseParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .equipmentPhases(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaPhaseParameter | null> {

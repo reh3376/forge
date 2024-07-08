@@ -58,15 +58,15 @@ export class BomItemControllerBase {
       data: {
         ...data,
 
+        item: {
+          connect: data.item,
+        },
+
         bom: data.bom
           ? {
               connect: data.bom,
             }
           : undefined,
-
-        item: {
-          connect: data.item,
-        },
 
         lot: data.lot
           ? {
@@ -75,25 +75,13 @@ export class BomItemControllerBase {
           : undefined,
       },
       select: {
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        consumedAt: true,
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
 
         item: {
-          select: {
-            id: true,
-          },
-        },
-
-        lot: {
           select: {
             id: true,
           },
@@ -102,8 +90,21 @@ export class BomItemControllerBase {
         quantity: true,
         quantityActual: true,
         units: true,
-        updatedAt: true,
-        updatedBy: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        globalId: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -125,25 +126,13 @@ export class BomItemControllerBase {
     return this.service.bomItems({
       ...args,
       select: {
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        consumedAt: true,
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
 
         item: {
-          select: {
-            id: true,
-          },
-        },
-
-        lot: {
           select: {
             id: true,
           },
@@ -152,8 +141,21 @@ export class BomItemControllerBase {
         quantity: true,
         quantityActual: true,
         units: true,
-        updatedAt: true,
-        updatedBy: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        globalId: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -176,25 +178,13 @@ export class BomItemControllerBase {
     const result = await this.service.bomItem({
       where: params,
       select: {
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        consumedAt: true,
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
 
         item: {
-          select: {
-            id: true,
-          },
-        },
-
-        lot: {
           select: {
             id: true,
           },
@@ -203,8 +193,21 @@ export class BomItemControllerBase {
         quantity: true,
         quantityActual: true,
         units: true,
-        updatedAt: true,
-        updatedBy: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        globalId: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -240,15 +243,15 @@ export class BomItemControllerBase {
         data: {
           ...data,
 
+          item: {
+            connect: data.item,
+          },
+
           bom: data.bom
             ? {
                 connect: data.bom,
               }
             : undefined,
-
-          item: {
-            connect: data.item,
-          },
 
           lot: data.lot
             ? {
@@ -257,25 +260,13 @@ export class BomItemControllerBase {
             : undefined,
         },
         select: {
-          bom: {
-            select: {
-              id: true,
-            },
-          },
-
-          consumedAt: true,
-          createdAt: true,
-          createdBy: true,
-          globalId: true,
           id: true,
+          createdAt: true,
+          updatedAt: true,
+          createdBy: true,
+          updatedBy: true,
 
           item: {
-            select: {
-              id: true,
-            },
-          },
-
-          lot: {
             select: {
               id: true,
             },
@@ -284,8 +275,21 @@ export class BomItemControllerBase {
           quantity: true,
           quantityActual: true,
           units: true,
-          updatedAt: true,
-          updatedBy: true,
+
+          bom: {
+            select: {
+              id: true,
+            },
+          },
+
+          consumedAt: true,
+          globalId: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -314,24 +318,10 @@ export class BomItemControllerBase {
     const results = await this.service.findEquipmentPhases(params.id, {
       ...query,
       select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
         createdBy: true,
-        description: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        message: true,
+        createdAt: true,
+        schemaVersion: true,
+        operationSequenceIndex: true,
         name: true,
 
         operation: {
@@ -340,11 +330,25 @@ export class BomItemControllerBase {
           },
         },
 
-        operationSequenceIndex: true,
-        path: true,
+        id: true,
+        editedBy: true,
         revision: true,
-        schemaVersion: true,
+        editedAt: true,
+        className: true,
+        description: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        active: true,
+        path: true,
+        globalId: true,
         stepType: true,
+        message: true,
       },
     });
     if (results === null) {

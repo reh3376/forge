@@ -11,36 +11,80 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
 import {
-  IsBoolean,
+  IsEnum,
+  IsInt,
+  Max,
+  IsOptional,
+  IsNumber,
   IsString,
   MaxLength,
-  IsOptional,
-  ValidateNested,
+  IsBoolean,
   IsDate,
-  IsEnum,
-  IsNumber,
-  Max,
-  IsInt,
+  ValidateNested,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
-import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 
 @ObjectType()
 class RecipeParameter {
   @ApiProperty({
     required: true,
-    type: Boolean,
+    enum: EnumRecipeParameterRecipeSetpointType,
   })
-  @IsBoolean()
-  @Field(() => Boolean)
-  active!: boolean;
+  @IsEnum(EnumRecipeParameterRecipeSetpointType)
+  @Field(() => EnumRecipeParameterRecipeSetpointType, {
+    nullable: true,
+  })
+  recipeSetpointType?: "Boolean" | "Numeric";
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  recipeSetpointUpperLimit!: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  recipeParamName!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  className!: string;
 
   @ApiProperty({
     required: false,
@@ -55,30 +99,12 @@ class RecipeParameter {
   batch!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: () => RecipeParameter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameter)
-  @IsOptional()
-  classId?: RecipeParameter | null;
-
-  @ApiProperty({
     required: true,
-    type: String,
+    type: Boolean,
   })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  className!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
+  @IsBoolean()
+  @Field(() => Boolean)
+  active!: boolean;
 
   @ApiProperty({
     required: true,
@@ -88,6 +114,18 @@ class RecipeParameter {
   @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  recipeSetpointLowerLimit!: number | null;
 
   @ApiProperty({
     required: false,
@@ -101,56 +139,12 @@ class RecipeParameter {
   editedAt!: Date | null;
 
   @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  itemId!: string;
 
   @ApiProperty({
     required: false,
@@ -166,21 +160,53 @@ class RecipeParameter {
 
   @ApiProperty({
     required: false,
-    type: () => [RecipeParameter],
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => RecipeParameter)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  recipeParameters?: Array<RecipeParameter>;
+  @Field(() => String, {
+    nullable: true,
+  })
+  editedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  sequencerParameters!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  recipeSetpointBooleanValue!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
 
   @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(1000)
   @Field(() => String)
-  recipeParamName!: string;
+  itemId!: string;
 
   @ApiProperty({
     required: false,
@@ -205,63 +231,6 @@ class RecipeParameter {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  recipeSetpointBooleanValue!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  recipeSetpointLowerLimit!: number | null;
-
-  @ApiProperty({
-    required: true,
-    enum: EnumRecipeParameterRecipeSetpointType,
-  })
-  @IsEnum(EnumRecipeParameterRecipeSetpointType)
-  @Field(() => EnumRecipeParameterRecipeSetpointType, {
-    nullable: true,
-  })
-  recipeSetpointType?: "Boolean" | "Numeric";
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  recipeSetpointUpperLimit!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -274,13 +243,44 @@ class RecipeParameter {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
   })
-  @IsJSONValue()
+  @IsBoolean()
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  sequencerParameters!: JsonValue;
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  classId?: RecipeParameter | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeParameter],
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  recipeParameters?: Array<RecipeParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 }
 
 export { RecipeParameter as RecipeParameter };
