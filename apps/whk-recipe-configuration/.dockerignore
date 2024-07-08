@@ -6,3 +6,7 @@ node_modules
 .env
 .gitignore
 .prettierignore
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
