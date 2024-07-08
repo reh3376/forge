@@ -27,8 +27,8 @@ import { CreateBomItemArgs } from "./CreateBomItemArgs";
 import { UpdateBomItemArgs } from "./UpdateBomItemArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
+import { Bom } from "../../bom/base/Bom";
 import { Lot } from "../../lot/base/Lot";
 import { BomItemService } from "../bomItem.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -99,15 +99,15 @@ export class BomItemResolverBase {
       data: {
         ...args.data,
 
+        item: {
+          connect: args.data.item,
+        },
+
         bom: args.data.bom
           ? {
               connect: args.data.bom,
             }
           : undefined,
-
-        item: {
-          connect: args.data.item,
-        },
 
         lot: args.data.lot
           ? {
@@ -134,15 +134,15 @@ export class BomItemResolverBase {
         data: {
           ...args.data,
 
+          item: {
+            connect: args.data.item,
+          },
+
           bom: args.data.bom
             ? {
                 connect: args.data.bom,
               }
             : undefined,
-
-          item: {
-            connect: args.data.item,
-          },
 
           lot: args.data.lot
             ? {
@@ -182,25 +182,6 @@ export class BomItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Bom, {
-    nullable: true,
-    name: "bom",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Bom",
-    action: "read",
-    possession: "any",
-  })
-  async getBom(@graphql.Parent() parent: BomItem): Promise<Bom | null> {
-    const result = await this.service.getBom(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Item, {
     nullable: true,
     name: "item",
@@ -212,6 +193,25 @@ export class BomItemResolverBase {
   })
   async getItem(@graphql.Parent() parent: BomItem): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Bom, {
+    nullable: true,
+    name: "bom",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "read",
+    possession: "any",
+  })
+  async getBom(@graphql.Parent() parent: BomItem): Promise<Bom | null> {
+    const result = await this.service.getBom(parent.id);
 
     if (!result) {
       return null;

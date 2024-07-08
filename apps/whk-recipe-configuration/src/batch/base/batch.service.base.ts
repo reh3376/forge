@@ -63,19 +63,19 @@ export class BatchServiceBase {
       .fermentationChemistries(args);
   }
 
-  async getLot(parentId: string): Promise<PrismaLot | null> {
-    return this.prisma.batch
-      .findUnique({
-        where: { id: parentId },
-      })
-      .lot();
-  }
-
   async getParent(parentId: string): Promise<PrismaBatch | null> {
     return this.prisma.batch
       .findUnique({
         where: { id: parentId },
       })
       .parent();
+  }
+
+  async getLot(parentId: string): Promise<PrismaLot | null> {
+    return this.prisma.batch
+      .findUnique({
+        where: { id: parentId },
+      })
+      .lot();
   }
 }

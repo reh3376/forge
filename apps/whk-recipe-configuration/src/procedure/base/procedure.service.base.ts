@@ -51,17 +51,6 @@ export class ProcedureServiceBase {
     return this.prisma.procedure.delete(args);
   }
 
-  async findInstances(
-    parentId: string,
-    args: Prisma.ProcedureFindManyArgs
-  ): Promise<PrismaProcedure[]> {
-    return this.prisma.procedure
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .instances(args);
-  }
-
   async findUnitProcedures(
     parentId: string,
     args: Prisma.UnitProcedureFindManyArgs
@@ -71,6 +60,17 @@ export class ProcedureServiceBase {
         where: { id: parentId },
       })
       .unitProcedures(args);
+  }
+
+  async findInstances(
+    parentId: string,
+    args: Prisma.ProcedureFindManyArgs
+  ): Promise<PrismaProcedure[]> {
+    return this.prisma.procedure
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .instances(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaProcedure | null> {

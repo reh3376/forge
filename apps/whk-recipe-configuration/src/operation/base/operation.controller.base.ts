@@ -32,12 +32,12 @@ import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/Equipm
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
 import { FermentationSettingDatumFindManyArgs } from "../../fermentationSettingDatum/base/FermentationSettingDatumFindManyArgs";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
+import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
+import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
+import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -80,9 +80,18 @@ export class OperationControllerBase {
           : undefined,
       },
       select: {
-        abbreviation: true,
+        revision: true,
+        createdAt: true,
+        name: true,
+        editedBy: true,
+        createdBy: true,
+        description: true,
+        procedureSequenceIndex: true,
+        schemaVersion: true,
         active: true,
-        auxiliaryPhases: true,
+        updatedAt: true,
+        id: true,
+        isClassDefinition: true,
 
         classId: {
           select: {
@@ -90,19 +99,8 @@ export class OperationControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        lotId: true,
-        name: true,
         path: true,
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
+        abbreviation: true,
 
         unitProcedure: {
           select: {
@@ -110,7 +108,9 @@ export class OperationControllerBase {
           },
         },
 
-        updatedAt: true,
+        globalId: true,
+        auxiliaryPhases: true,
+        lotId: true,
       },
     });
   }
@@ -132,9 +132,18 @@ export class OperationControllerBase {
     return this.service.operations({
       ...args,
       select: {
-        abbreviation: true,
+        revision: true,
+        createdAt: true,
+        name: true,
+        editedBy: true,
+        createdBy: true,
+        description: true,
+        procedureSequenceIndex: true,
+        schemaVersion: true,
         active: true,
-        auxiliaryPhases: true,
+        updatedAt: true,
+        id: true,
+        isClassDefinition: true,
 
         classId: {
           select: {
@@ -142,19 +151,8 @@ export class OperationControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        lotId: true,
-        name: true,
         path: true,
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
+        abbreviation: true,
 
         unitProcedure: {
           select: {
@@ -162,7 +160,9 @@ export class OperationControllerBase {
           },
         },
 
-        updatedAt: true,
+        globalId: true,
+        auxiliaryPhases: true,
+        lotId: true,
       },
     });
   }
@@ -185,9 +185,18 @@ export class OperationControllerBase {
     const result = await this.service.operation({
       where: params,
       select: {
-        abbreviation: true,
+        revision: true,
+        createdAt: true,
+        name: true,
+        editedBy: true,
+        createdBy: true,
+        description: true,
+        procedureSequenceIndex: true,
+        schemaVersion: true,
         active: true,
-        auxiliaryPhases: true,
+        updatedAt: true,
+        id: true,
+        isClassDefinition: true,
 
         classId: {
           select: {
@@ -195,19 +204,8 @@ export class OperationControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        lotId: true,
-        name: true,
         path: true,
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
+        abbreviation: true,
 
         unitProcedure: {
           select: {
@@ -215,7 +213,9 @@ export class OperationControllerBase {
           },
         },
 
-        updatedAt: true,
+        globalId: true,
+        auxiliaryPhases: true,
+        lotId: true,
       },
     });
     if (result === null) {
@@ -264,9 +264,18 @@ export class OperationControllerBase {
             : undefined,
         },
         select: {
-          abbreviation: true,
+          revision: true,
+          createdAt: true,
+          name: true,
+          editedBy: true,
+          createdBy: true,
+          description: true,
+          procedureSequenceIndex: true,
+          schemaVersion: true,
           active: true,
-          auxiliaryPhases: true,
+          updatedAt: true,
+          id: true,
+          isClassDefinition: true,
 
           classId: {
             select: {
@@ -274,19 +283,8 @@ export class OperationControllerBase {
             },
           },
 
-          createdAt: true,
-          createdBy: true,
-          description: true,
-          editedBy: true,
-          globalId: true,
-          id: true,
-          isClassDefinition: true,
-          lotId: true,
-          name: true,
           path: true,
-          procedureSequenceIndex: true,
-          revision: true,
-          schemaVersion: true,
+          abbreviation: true,
 
           unitProcedure: {
             select: {
@@ -294,7 +292,9 @@ export class OperationControllerBase {
             },
           },
 
-          updatedAt: true,
+          globalId: true,
+          auxiliaryPhases: true,
+          lotId: true,
         },
       });
     } catch (error) {
@@ -323,24 +323,10 @@ export class OperationControllerBase {
     const results = await this.service.findEquipmentPhases(params.id, {
       ...query,
       select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
         createdBy: true,
-        description: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        message: true,
+        createdAt: true,
+        schemaVersion: true,
+        operationSequenceIndex: true,
         name: true,
 
         operation: {
@@ -349,11 +335,25 @@ export class OperationControllerBase {
           },
         },
 
-        operationSequenceIndex: true,
-        path: true,
+        id: true,
+        editedBy: true,
         revision: true,
-        schemaVersion: true,
+        editedAt: true,
+        className: true,
+        description: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        active: true,
+        path: true,
+        globalId: true,
         stepType: true,
+        message: true,
       },
     });
     if (results === null) {
@@ -431,6 +431,129 @@ export class OperationControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/instances")
+  @ApiNestedQuery(OperationFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @common.Req() request: Request,
+    @common.Param() params: OperationWhereUniqueInput
+  ): Promise<Operation[]> {
+    const query = plainToClass(OperationFindManyArgs, request.query);
+    const results = await this.service.findInstances(params.id, {
+      ...query,
+      select: {
+        revision: true,
+        createdAt: true,
+        name: true,
+        editedBy: true,
+        createdBy: true,
+        description: true,
+        procedureSequenceIndex: true,
+        schemaVersion: true,
+        active: true,
+        updatedAt: true,
+        id: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        path: true,
+        abbreviation: true,
+
+        unitProcedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        auxiliaryPhases: true,
+        lotId: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async connectInstances(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: OperationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        connect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async updateInstances(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: OperationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        set: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInstances(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: OperationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationChemistries")
   @ApiNestedQuery(FermentationChemistryFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -449,25 +572,11 @@ export class OperationControllerBase {
     const results = await this.service.findFermentationChemistries(params.id, {
       ...query,
       select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -479,7 +588,7 @@ export class OperationControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -491,7 +600,20 @@ export class OperationControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -569,138 +691,6 @@ export class OperationControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/fermentationDayData")
-  @ApiNestedQuery(FermentationDayDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationDayData(
-    @common.Req() request: Request,
-    @common.Param() params: OperationWhereUniqueInput
-  ): Promise<FermentationDayDatum[]> {
-    const query = plainToClass(FermentationDayDatumFindManyArgs, request.query);
-    const results = await this.service.findFermentationDayData(params.id, {
-      ...query,
-      select: {
-        acid: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        balling: true,
-        createdAt: true,
-        day: true,
-        dryInches: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        pH: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        temperature: true,
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/fermentationDayData")
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "update",
-    possession: "any",
-  })
-  async connectFermentationDayData(
-    @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationDayData: {
-        connect: body,
-      },
-    };
-    await this.service.updateOperation({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/fermentationDayData")
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "update",
-    possession: "any",
-  })
-  async updateFermentationDayData(
-    @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationDayData: {
-        set: body,
-      },
-    };
-    await this.service.updateOperation({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/fermentationDayData")
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectFermentationDayData(
-    @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationDayData: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateOperation({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationSettingData")
   @ApiNestedQuery(FermentationSettingDatumFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -719,20 +709,9 @@ export class OperationControllerBase {
     const results = await this.service.findFermentationSettingData(params.id, {
       ...query,
       select: {
-        acid: true,
-        balling: true,
-        createdAt: true,
-        dryInches: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
         id: true,
-        loggedBy: true,
+        createdAt: true,
+        updatedAt: true,
         lotId: true,
 
         operation: {
@@ -741,11 +720,21 @@ export class OperationControllerBase {
           },
         },
 
-        pH: true,
+        fermenterNumber: true,
+        yeastPitchTime: true,
         setTime: true,
         temperature: true,
-        updatedAt: true,
-        yeastPitchTime: true,
+        dryInches: true,
+        balling: true,
+        acid: true,
+        pH: true,
+        loggedBy: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -823,52 +812,59 @@ export class OperationControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/instances")
-  @ApiNestedQuery(OperationFindManyArgs)
+  @common.Get("/:id/fermentationDayData")
+  @ApiNestedQuery(FermentationDayDatumFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Operation",
+    resource: "FermentationDayDatum",
     action: "read",
     possession: "any",
   })
-  async findInstances(
+  async findFermentationDayData(
     @common.Req() request: Request,
     @common.Param() params: OperationWhereUniqueInput
-  ): Promise<Operation[]> {
-    const query = plainToClass(OperationFindManyArgs, request.query);
-    const results = await this.service.findInstances(params.id, {
+  ): Promise<FermentationDayDatum[]> {
+    const query = plainToClass(FermentationDayDatumFindManyArgs, request.query);
+    const results = await this.service.findFermentationDayData(params.id, {
       ...query,
       select: {
-        abbreviation: true,
-        active: true,
-        auxiliaryPhases: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
         id: true,
-        isClassDefinition: true,
-        lotId: true,
-        name: true,
-        path: true,
-        procedureSequenceIndex: true,
-        revision: true,
-        schemaVersion: true,
+        createdAt: true,
+        updatedAt: true,
 
-        unitProcedure: {
+        productionOrder: {
           select: {
             id: true,
           },
         },
 
-        updatedAt: true,
+        lotId: true,
+        loggedBy: true,
+        day: true,
+        temperature: true,
+        balling: true,
+        acid: true,
+        pH: true,
+        dryInches: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistry: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -879,18 +875,18 @@ export class OperationControllerBase {
     return results;
   }
 
-  @common.Post("/:id/instances")
+  @common.Post("/:id/fermentationDayData")
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
   })
-  async connectInstances(
+  async connectFermentationDayData(
     @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: OperationWhereUniqueInput[]
+    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      instances: {
+      fermentationDayData: {
         connect: body,
       },
     };
@@ -901,18 +897,18 @@ export class OperationControllerBase {
     });
   }
 
-  @common.Patch("/:id/instances")
+  @common.Patch("/:id/fermentationDayData")
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
   })
-  async updateInstances(
+  async updateFermentationDayData(
     @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: OperationWhereUniqueInput[]
+    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      instances: {
+      fermentationDayData: {
         set: body,
       },
     };
@@ -923,18 +919,18 @@ export class OperationControllerBase {
     });
   }
 
-  @common.Delete("/:id/instances")
+  @common.Delete("/:id/fermentationDayData")
   @nestAccessControl.UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
   })
-  async disconnectInstances(
+  async disconnectFermentationDayData(
     @common.Param() params: OperationWhereUniqueInput,
-    @common.Body() body: OperationWhereUniqueInput[]
+    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      instances: {
+      fermentationDayData: {
         disconnect: body,
       },
     };

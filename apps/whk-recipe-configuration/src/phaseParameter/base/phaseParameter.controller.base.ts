@@ -65,7 +65,25 @@ export class PhaseParameterControllerBase {
           : undefined,
       },
       select: {
+        id: true,
+        createdAt: true,
+        setpointUpperLimit: true,
+        setpointNumericalValue: true,
+        setpointBooleanValue: true,
+        name: true,
+        description: true,
+        updatedAt: true,
+        itemId: true,
+        setpointType: true,
+        setpointLowerLimit: true,
+        schemaVersion: true,
+        createdBy: true,
+        units: true,
+        recipeId: true,
+        editedBy: true,
+        revision: true,
         active: true,
+        isClassDef: true,
 
         classId: {
           select: {
@@ -73,27 +91,9 @@ export class PhaseParameterControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDef: true,
         isStaticParameter: true,
-        itemId: true,
-        name: true,
-        recipeId: true,
-        revision: true,
-        schemaVersion: true,
-        setpointBooleanValue: true,
-        setpointLowerLimit: true,
-        setpointNumericalValue: true,
-        setpointType: true,
-        setpointUpperLimit: true,
         staticName: true,
-        units: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
   }
@@ -117,7 +117,25 @@ export class PhaseParameterControllerBase {
     return this.service.phaseParameters({
       ...args,
       select: {
+        id: true,
+        createdAt: true,
+        setpointUpperLimit: true,
+        setpointNumericalValue: true,
+        setpointBooleanValue: true,
+        name: true,
+        description: true,
+        updatedAt: true,
+        itemId: true,
+        setpointType: true,
+        setpointLowerLimit: true,
+        schemaVersion: true,
+        createdBy: true,
+        units: true,
+        recipeId: true,
+        editedBy: true,
+        revision: true,
         active: true,
+        isClassDef: true,
 
         classId: {
           select: {
@@ -125,27 +143,9 @@ export class PhaseParameterControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDef: true,
         isStaticParameter: true,
-        itemId: true,
-        name: true,
-        recipeId: true,
-        revision: true,
-        schemaVersion: true,
-        setpointBooleanValue: true,
-        setpointLowerLimit: true,
-        setpointNumericalValue: true,
-        setpointType: true,
-        setpointUpperLimit: true,
         staticName: true,
-        units: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
   }
@@ -168,7 +168,25 @@ export class PhaseParameterControllerBase {
     const result = await this.service.phaseParameter({
       where: params,
       select: {
+        id: true,
+        createdAt: true,
+        setpointUpperLimit: true,
+        setpointNumericalValue: true,
+        setpointBooleanValue: true,
+        name: true,
+        description: true,
+        updatedAt: true,
+        itemId: true,
+        setpointType: true,
+        setpointLowerLimit: true,
+        schemaVersion: true,
+        createdBy: true,
+        units: true,
+        recipeId: true,
+        editedBy: true,
+        revision: true,
         active: true,
+        isClassDef: true,
 
         classId: {
           select: {
@@ -176,27 +194,9 @@ export class PhaseParameterControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDef: true,
         isStaticParameter: true,
-        itemId: true,
-        name: true,
-        recipeId: true,
-        revision: true,
-        schemaVersion: true,
-        setpointBooleanValue: true,
-        setpointLowerLimit: true,
-        setpointNumericalValue: true,
-        setpointType: true,
-        setpointUpperLimit: true,
         staticName: true,
-        units: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
     if (result === null) {
@@ -239,7 +239,25 @@ export class PhaseParameterControllerBase {
             : undefined,
         },
         select: {
+          id: true,
+          createdAt: true,
+          setpointUpperLimit: true,
+          setpointNumericalValue: true,
+          setpointBooleanValue: true,
+          name: true,
+          description: true,
+          updatedAt: true,
+          itemId: true,
+          setpointType: true,
+          setpointLowerLimit: true,
+          schemaVersion: true,
+          createdBy: true,
+          units: true,
+          recipeId: true,
+          editedBy: true,
+          revision: true,
           active: true,
+          isClassDef: true,
 
           classId: {
             select: {
@@ -247,27 +265,9 @@ export class PhaseParameterControllerBase {
             },
           },
 
-          createdAt: true,
-          createdBy: true,
-          description: true,
-          editedBy: true,
-          globalId: true,
-          id: true,
-          isClassDef: true,
           isStaticParameter: true,
-          itemId: true,
-          name: true,
-          recipeId: true,
-          revision: true,
-          schemaVersion: true,
-          setpointBooleanValue: true,
-          setpointLowerLimit: true,
-          setpointNumericalValue: true,
-          setpointType: true,
-          setpointUpperLimit: true,
           staticName: true,
-          units: true,
-          updatedAt: true,
+          globalId: true,
         },
       });
     } catch (error) {
@@ -278,129 +278,6 @@ export class PhaseParameterControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/equipmentPhases")
-  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "EquipmentPhase",
-    action: "read",
-    possession: "any",
-  })
-  async findEquipmentPhases(
-    @common.Req() request: Request,
-    @common.Param() params: PhaseParameterWhereUniqueInput
-  ): Promise<EquipmentPhase[]> {
-    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
-    const results = await this.service.findEquipmentPhases(params.id, {
-      ...query,
-      select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedAt: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        message: true,
-        name: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationSequenceIndex: true,
-        path: true,
-        revision: true,
-        schemaVersion: true,
-        stepType: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
-    action: "update",
-    possession: "any",
-  })
-  async connectEquipmentPhases(
-    @common.Param() params: PhaseParameterWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      equipmentPhases: {
-        connect: body,
-      },
-    };
-    await this.service.updatePhaseParameter({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
-    action: "update",
-    possession: "any",
-  })
-  async updateEquipmentPhases(
-    @common.Param() params: PhaseParameterWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      equipmentPhases: {
-        set: body,
-      },
-    };
-    await this.service.updatePhaseParameter({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectEquipmentPhases(
-    @common.Param() params: PhaseParameterWhereUniqueInput,
-    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      equipmentPhases: {
-        disconnect: body,
-      },
-    };
-    await this.service.updatePhaseParameter({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -419,7 +296,25 @@ export class PhaseParameterControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
+        id: true,
+        createdAt: true,
+        setpointUpperLimit: true,
+        setpointNumericalValue: true,
+        setpointBooleanValue: true,
+        name: true,
+        description: true,
+        updatedAt: true,
+        itemId: true,
+        setpointType: true,
+        setpointLowerLimit: true,
+        schemaVersion: true,
+        createdBy: true,
+        units: true,
+        recipeId: true,
+        editedBy: true,
+        revision: true,
         active: true,
+        isClassDef: true,
 
         classId: {
           select: {
@@ -427,27 +322,9 @@ export class PhaseParameterControllerBase {
           },
         },
 
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        editedBy: true,
-        globalId: true,
-        id: true,
-        isClassDef: true,
         isStaticParameter: true,
-        itemId: true,
-        name: true,
-        recipeId: true,
-        revision: true,
-        schemaVersion: true,
-        setpointBooleanValue: true,
-        setpointLowerLimit: true,
-        setpointNumericalValue: true,
-        setpointType: true,
-        setpointUpperLimit: true,
         staticName: true,
-        units: true,
-        updatedAt: true,
+        globalId: true,
       },
     });
     if (results === null) {
@@ -514,6 +391,129 @@ export class PhaseParameterControllerBase {
   ): Promise<void> {
     const data = {
       instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updatePhaseParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/equipmentPhases")
+  @ApiNestedQuery(EquipmentPhaseFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "EquipmentPhase",
+    action: "read",
+    possession: "any",
+  })
+  async findEquipmentPhases(
+    @common.Req() request: Request,
+    @common.Param() params: PhaseParameterWhereUniqueInput
+  ): Promise<EquipmentPhase[]> {
+    const query = plainToClass(EquipmentPhaseFindManyArgs, request.query);
+    const results = await this.service.findEquipmentPhases(params.id, {
+      ...query,
+      select: {
+        createdBy: true,
+        createdAt: true,
+        schemaVersion: true,
+        operationSequenceIndex: true,
+        name: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        id: true,
+        editedBy: true,
+        revision: true,
+        editedAt: true,
+        className: true,
+        description: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        active: true,
+        path: true,
+        globalId: true,
+        stepType: true,
+        message: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectEquipmentPhases(
+    @common.Param() params: PhaseParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        connect: body,
+      },
+    };
+    await this.service.updatePhaseParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateEquipmentPhases(
+    @common.Param() params: PhaseParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
+        set: body,
+      },
+    };
+    await this.service.updatePhaseParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/equipmentPhases")
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectEquipmentPhases(
+    @common.Param() params: PhaseParameterWhereUniqueInput,
+    @common.Body() body: EquipmentPhaseWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      equipmentPhases: {
         disconnect: body,
       },
     };

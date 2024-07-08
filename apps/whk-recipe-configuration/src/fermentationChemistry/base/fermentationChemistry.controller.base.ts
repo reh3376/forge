@@ -61,17 +61,9 @@ export class FermentationChemistryControllerBase {
       data: {
         ...data,
 
-        asset: {
-          connect: data.asset,
-        },
-
-        batch: {
-          connect: data.batch,
-        },
-
-        lot: data.lot
+        productionOrder: data.productionOrder
           ? {
-              connect: data.lot,
+              connect: data.productionOrder,
             }
           : undefined,
 
@@ -79,38 +71,32 @@ export class FermentationChemistryControllerBase {
           connect: data.operation,
         },
 
-        productionOrder: data.productionOrder
-          ? {
-              connect: data.productionOrder,
-            }
-          : undefined,
+        asset: {
+          connect: data.asset,
+        },
 
         settingData: data.settingData
           ? {
               connect: data.settingData,
             }
           : undefined,
-      },
-      select: {
-        approved: true,
-        approvedBy: true,
 
-        asset: {
-          select: {
-            id: true,
-          },
-        },
+        lot: data.lot
+          ? {
+              connect: data.lot,
+            }
+          : undefined,
 
         batch: {
-          select: {
-            id: true,
-          },
+          connect: data.batch,
         },
-
-        createdAt: true,
+      },
+      select: {
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -122,7 +108,7 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -134,7 +120,20 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -158,25 +157,11 @@ export class FermentationChemistryControllerBase {
     return this.service.fermentationChemistries({
       ...args,
       select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -188,7 +173,7 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -200,7 +185,20 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -223,25 +221,11 @@ export class FermentationChemistryControllerBase {
     const result = await this.service.fermentationChemistry({
       where: params,
       select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
         id: true,
+        createdAt: true,
+        updatedAt: true,
 
-        lot: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -253,7 +237,7 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        productionOrder: {
+        asset: {
           select: {
             id: true,
           },
@@ -265,7 +249,20 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        updatedAt: true,
+        approvedBy: true,
+        approved: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -301,17 +298,9 @@ export class FermentationChemistryControllerBase {
         data: {
           ...data,
 
-          asset: {
-            connect: data.asset,
-          },
-
-          batch: {
-            connect: data.batch,
-          },
-
-          lot: data.lot
+          productionOrder: data.productionOrder
             ? {
-                connect: data.lot,
+                connect: data.productionOrder,
               }
             : undefined,
 
@@ -319,38 +308,32 @@ export class FermentationChemistryControllerBase {
             connect: data.operation,
           },
 
-          productionOrder: data.productionOrder
-            ? {
-                connect: data.productionOrder,
-              }
-            : undefined,
+          asset: {
+            connect: data.asset,
+          },
 
           settingData: data.settingData
             ? {
                 connect: data.settingData,
               }
             : undefined,
-        },
-        select: {
-          approved: true,
-          approvedBy: true,
 
-          asset: {
-            select: {
-              id: true,
-            },
-          },
+          lot: data.lot
+            ? {
+                connect: data.lot,
+              }
+            : undefined,
 
           batch: {
-            select: {
-              id: true,
-            },
+            connect: data.batch,
           },
-
-          createdAt: true,
+        },
+        select: {
           id: true,
+          createdAt: true,
+          updatedAt: true,
 
-          lot: {
+          productionOrder: {
             select: {
               id: true,
             },
@@ -362,7 +345,7 @@ export class FermentationChemistryControllerBase {
             },
           },
 
-          productionOrder: {
+          asset: {
             select: {
               id: true,
             },
@@ -374,7 +357,20 @@ export class FermentationChemistryControllerBase {
             },
           },
 
-          updatedAt: true,
+          approvedBy: true,
+          approved: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
+          batch: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -403,37 +399,9 @@ export class FermentationChemistryControllerBase {
     const results = await this.service.findDailyData(params.id, {
       ...query,
       select: {
-        acid: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        balling: true,
-        createdAt: true,
-        day: true,
-        dryInches: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
         id: true,
-        loggedBy: true,
-        lotId: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        pH: true,
+        createdAt: true,
+        updatedAt: true,
 
         productionOrder: {
           select: {
@@ -441,8 +409,34 @@ export class FermentationChemistryControllerBase {
           },
         },
 
+        lotId: true,
+        loggedBy: true,
+        day: true,
         temperature: true,
-        updatedAt: true,
+        balling: true,
+        acid: true,
+        pH: true,
+        dryInches: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistry: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -535,34 +529,34 @@ export class FermentationChemistryControllerBase {
     const results = await this.service.findMashData(params.id, {
       ...query,
       select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        lotId: true,
+        balling: true,
+        pH: true,
+        backSetPH: true,
+        backsetVolume: true,
+        waterVolume: true,
+        cornLbs: true,
+        ryeLbs: true,
+        maltLbs: true,
+        wheatLbs: true,
+        loggedBy: true,
+
         asset: {
           select: {
             id: true,
           },
         },
 
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
+        fermenterNumber: true,
 
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
-        updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
       },
     });
     if (results === null) {

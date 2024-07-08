@@ -16,11 +16,11 @@ import {
   Lot as PrismaLot,
   Batch as PrismaBatch,
   BomItem as PrismaBomItem,
-  FermentationChemistry as PrismaFermentationChemistry,
-  Item as PrismaItem,
-  ProductionOrder as PrismaProductionOrder,
   PurchaseOrder as PrismaPurchaseOrder,
   Recipe as PrismaRecipe,
+  Item as PrismaItem,
+  ProductionOrder as PrismaProductionOrder,
+  FermentationChemistry as PrismaFermentationChemistry,
 } from "@prisma/client";
 
 export class LotServiceBase {
@@ -68,14 +68,22 @@ export class LotServiceBase {
       .bomItems(args);
   }
 
-  async getFermentationChemistries(
+  async getPurchaseOrderAcceptedLots(
     parentId: string
-  ): Promise<PrismaFermentationChemistry | null> {
+  ): Promise<PrismaPurchaseOrder | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
       })
-      .fermentationChemistries();
+      .purchaseOrderAcceptedLots();
+  }
+
+  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .recipe();
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {
@@ -96,21 +104,13 @@ export class LotServiceBase {
       .productionOrder();
   }
 
-  async getPurchaseOrderAcceptedLots(
+  async getFermentationChemistries(
     parentId: string
-  ): Promise<PrismaPurchaseOrder | null> {
+  ): Promise<PrismaFermentationChemistry | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
       })
-      .purchaseOrderAcceptedLots();
-  }
-
-  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
-    return this.prisma.lot
-      .findUnique({
-        where: { id: parentId },
-      })
-      .recipe();
+      .fermentationChemistries();
   }
 }

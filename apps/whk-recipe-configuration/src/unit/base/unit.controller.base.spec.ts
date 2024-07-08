@@ -18,42 +18,42 @@ import { UnitService } from "../unit.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  active: "true",
-  createdAt: new Date(),
-  globalId: "exampleGlobalId",
   id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  active: "true",
   name: "exampleName",
   unitType: "exampleUnitType",
-  updatedAt: new Date(),
+  globalId: "exampleGlobalId",
 };
 const CREATE_RESULT = {
-  active: "true",
-  createdAt: new Date(),
-  globalId: "exampleGlobalId",
   id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  active: "true",
   name: "exampleName",
   unitType: "exampleUnitType",
-  updatedAt: new Date(),
+  globalId: "exampleGlobalId",
 };
 const FIND_MANY_RESULT = [
   {
-    active: "true",
-    createdAt: new Date(),
-    globalId: "exampleGlobalId",
     id: "exampleId",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    active: "true",
     name: "exampleName",
     unitType: "exampleUnitType",
-    updatedAt: new Date(),
+    globalId: "exampleGlobalId",
   },
 ];
 const FIND_ONE_RESULT = {
-  active: "true",
-  createdAt: new Date(),
-  globalId: "exampleGlobalId",
   id: "exampleId",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  active: "true",
   name: "exampleName",
   unitType: "exampleUnitType",
-  updatedAt: new Date(),
+  globalId: "exampleGlobalId",
 };
 
 const service = {

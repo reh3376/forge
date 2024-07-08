@@ -18,50 +18,50 @@ import { VendorService } from "../vendor.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  active: "true",
+  id: "exampleId",
   createdAt: new Date(),
+  updatedAt: new Date(),
+  active: "true",
   createdBy: "exampleCreatedBy",
+  updatedBy: "exampleUpdatedBy",
+  name: "exampleName",
   erpId: "exampleErpId",
   globalId: "exampleGlobalId",
-  id: "exampleId",
-  name: "exampleName",
-  updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
-  active: "true",
+  id: "exampleId",
   createdAt: new Date(),
+  updatedAt: new Date(),
+  active: "true",
   createdBy: "exampleCreatedBy",
+  updatedBy: "exampleUpdatedBy",
+  name: "exampleName",
   erpId: "exampleErpId",
   globalId: "exampleGlobalId",
-  id: "exampleId",
-  name: "exampleName",
-  updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
-    active: "true",
+    id: "exampleId",
     createdAt: new Date(),
+    updatedAt: new Date(),
+    active: "true",
     createdBy: "exampleCreatedBy",
+    updatedBy: "exampleUpdatedBy",
+    name: "exampleName",
     erpId: "exampleErpId",
     globalId: "exampleGlobalId",
-    id: "exampleId",
-    name: "exampleName",
-    updatedAt: new Date(),
-    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
-  active: "true",
+  id: "exampleId",
   createdAt: new Date(),
+  updatedAt: new Date(),
+  active: "true",
   createdBy: "exampleCreatedBy",
+  updatedBy: "exampleUpdatedBy",
+  name: "exampleName",
   erpId: "exampleErpId",
   globalId: "exampleGlobalId",
-  id: "exampleId",
-  name: "exampleName",
-  updatedAt: new Date(),
-  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {

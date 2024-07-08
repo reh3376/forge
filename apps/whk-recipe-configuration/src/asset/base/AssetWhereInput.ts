@@ -13,16 +13,16 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { IsOptional, IsEnum, ValidateNested } from "class-validator";
 import { JsonFilter } from "../../util/JsonFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
-import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
-import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
-import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumAssetType } from "./EnumAssetType";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
+import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
+import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
+import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
 
 @InputType()
 class AssetWhereInput {
@@ -83,41 +83,6 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationChemistryListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationChemistryListRelationFilter, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationDayDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -129,18 +94,6 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashData?: MashDatumListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -149,18 +102,6 @@ class AssetWhereInput {
     nullable: true,
   })
   name?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderListRelationFilter)
-  @IsOptional()
-  @Field(() => PurchaseOrderListRelationFilter, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -224,6 +165,65 @@ class AssetWhereInput {
     nullable: true,
   })
   updatedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => PurchaseOrderListRelationFilter, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationChemistryListRelationFilter, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationDayDatumListRelationFilter, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => MashDatumListRelationFilter, {
+    nullable: true,
+  })
+  mashData?: MashDatumListRelationFilter;
 }
 
 export { AssetWhereInput as AssetWhereInput };

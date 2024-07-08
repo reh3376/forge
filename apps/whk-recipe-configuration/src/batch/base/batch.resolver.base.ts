@@ -93,15 +93,15 @@ export class BatchResolverBase {
       data: {
         ...args.data,
 
-        lot: args.data.lot
-          ? {
-              connect: args.data.lot,
-            }
-          : undefined,
-
         parent: args.data.parent
           ? {
               connect: args.data.parent,
+            }
+          : undefined,
+
+        lot: args.data.lot
+          ? {
+              connect: args.data.lot,
             }
           : undefined,
       },
@@ -124,15 +124,15 @@ export class BatchResolverBase {
         data: {
           ...args.data,
 
-          lot: args.data.lot
-            ? {
-                connect: args.data.lot,
-              }
-            : undefined,
-
           parent: args.data.parent
             ? {
                 connect: args.data.parent,
+              }
+            : undefined,
+
+          lot: args.data.lot
+            ? {
+                connect: args.data.lot,
               }
             : undefined,
         },
@@ -193,25 +193,6 @@ export class BatchResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Lot, {
-    nullable: true,
-    name: "lot",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Lot",
-    action: "read",
-    possession: "any",
-  })
-  async getLot(@graphql.Parent() parent: Batch): Promise<Lot | null> {
-    const result = await this.service.getLot(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Batch, {
     nullable: true,
     name: "parent",
@@ -223,6 +204,25 @@ export class BatchResolverBase {
   })
   async getParent(@graphql.Parent() parent: Batch): Promise<Batch | null> {
     const result = await this.service.getParent(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Lot, {
+    nullable: true,
+    name: "lot",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async getLot(@graphql.Parent() parent: Batch): Promise<Lot | null> {
+    const result = await this.service.getLot(parent.id);
 
     if (!result) {
       return null;

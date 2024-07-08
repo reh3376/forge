@@ -11,22 +11,55 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
-import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
-import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
-import { BooleanFilter } from "../../util/BooleanFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { Type } from "class-transformer";
+import { IsOptional, IsEnum, ValidateNested } from "class-validator";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EnumPhaseParameterSetpointType } from "./EnumPhaseParameterSetpointType";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { BooleanFilter } from "../../util/BooleanFilter";
+import { PhaseParameterWhereUniqueInput } from "./PhaseParameterWhereUniqueInput";
+import { PhaseParameterListRelationFilter } from "./PhaseParameterListRelationFilter";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 
 @InputType()
 class PhaseParameterWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  setpointUpperLimit?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  setpointNumericalValue?: FloatNullableFilter;
+
   @ApiProperty({
     required: false,
     type: BooleanNullableFilter,
@@ -36,19 +69,7 @@ class PhaseParameterWhereInput {
   @Field(() => BooleanNullableFilter, {
     nullable: true,
   })
-  active?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterWhereUniqueInput)
-  @IsOptional()
-  @Field(() => PhaseParameterWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: PhaseParameterWhereUniqueInput;
+  setpointBooleanValue?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -59,7 +80,7 @@ class PhaseParameterWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  createdBy?: StringFilter;
+  name?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -81,163 +102,7 @@ class PhaseParameterWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  editedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseListRelationFilter)
-  @IsOptional()
-  @Field(() => EquipmentPhaseListRelationFilter, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => PhaseParameterListRelationFilter, {
-    nullable: true,
-  })
-  instances?: PhaseParameterListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanFilter,
-  })
-  @Type(() => BooleanFilter)
-  @IsOptional()
-  @Field(() => BooleanFilter, {
-    nullable: true,
-  })
-  isClassDef?: BooleanFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isStaticParameter?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
   itemId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  name?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  recipeId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  revision?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  setpointBooleanValue?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: FloatNullableFilter,
-  })
-  @Type(() => FloatNullableFilter)
-  @IsOptional()
-  @Field(() => FloatNullableFilter, {
-    nullable: true,
-  })
-  setpointLowerLimit?: FloatNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: FloatNullableFilter,
-  })
-  @Type(() => FloatNullableFilter)
-  @IsOptional()
-  @Field(() => FloatNullableFilter, {
-    nullable: true,
-  })
-  setpointNumericalValue?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -259,7 +124,130 @@ class PhaseParameterWhereInput {
   @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  setpointUpperLimit?: FloatNullableFilter;
+  setpointLowerLimit?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  units?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  recipeId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  editedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanFilter,
+  })
+  @Type(() => BooleanFilter)
+  @IsOptional()
+  @Field(() => BooleanFilter, {
+    nullable: true,
+  })
+  isClassDef?: BooleanFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PhaseParameterWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: PhaseParameterWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => PhaseParameterListRelationFilter, {
+    nullable: true,
+  })
+  instances?: PhaseParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isStaticParameter?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -281,14 +269,26 @@ class PhaseParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  units?: StringFilter;
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
 }
 
 export { PhaseParameterWhereInput as PhaseParameterWhereInput };

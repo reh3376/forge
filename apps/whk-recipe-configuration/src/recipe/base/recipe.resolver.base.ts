@@ -25,16 +25,16 @@ import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeFindUniqueArgs } from "./RecipeFindUniqueArgs";
 import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
-import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
-import { Lot } from "../../lot/base/Lot";
-import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
-import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -144,17 +144,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Lot], { name: "lots" })
+  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
   @nestAccessControl.UseRoles({
-    resource: "Lot",
+    resource: "UnitProcedure",
     action: "read",
     possession: "any",
   })
-  async findLots(
+  async findUnitProcedures(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: LotFindManyArgs
-  ): Promise<Lot[]> {
-    const results = await this.service.findLots(parent.id, args);
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProcedures(parent.id, args);
 
     if (!results) {
       return [];
@@ -175,6 +175,26 @@ export class RecipeResolverBase {
     @graphql.Args() args: ProductionOrderFindManyArgs
   ): Promise<ProductionOrder[]> {
     const results = await this.service.findProductionOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrders(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: ScheduleOrderFindManyArgs
+  ): Promise<ScheduleOrder[]> {
+    const results = await this.service.findScheduleOrders(parent.id, args);
 
     if (!results) {
       return [];
@@ -209,37 +229,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
+  @graphql.ResolveField(() => [Lot], { name: "lots" })
   @nestAccessControl.UseRoles({
-    resource: "ScheduleOrder",
+    resource: "Lot",
     action: "read",
     possession: "any",
   })
-  async findScheduleOrders(
+  async findLots(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: ScheduleOrderFindManyArgs
-  ): Promise<ScheduleOrder[]> {
-    const results = await this.service.findScheduleOrders(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
-  @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findUnitProcedures(
-    @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: UnitProcedureFindManyArgs
-  ): Promise<UnitProcedure[]> {
-    const results = await this.service.findUnitProcedures(parent.id, args);
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLots(parent.id, args);
 
     if (!results) {
       return [];

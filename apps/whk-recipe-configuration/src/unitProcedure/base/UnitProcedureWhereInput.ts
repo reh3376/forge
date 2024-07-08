@@ -11,58 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
-import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
+import { Type } from "class-transformer";
+import { IsOptional, IsEnum, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationListRelationFilter } from "../../operation/base/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
+import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 
 @InputType()
 class UnitProcedureWhereInput {
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => BooleanNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => BooleanNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  active?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  boms?: BomWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: UnitProcedureWhereUniqueInput;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -84,7 +60,7 @@ class UnitProcedureWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  description?: StringNullableFilter;
+  updatedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -95,18 +71,92 @@ class UnitProcedureWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
+  schemaVersion?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  id?: StringFilter;
+  revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumUnitProcedureName,
+  })
+  @IsEnum(EnumUnitProcedureName)
+  @IsOptional()
+  @Field(() => EnumUnitProcedureName, {
+    nullable: true,
+  })
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => OperationListRelationFilter)
+  @IsOptional()
+  @Field(() => OperationListRelationFilter, {
+    nullable: true,
+  })
+  operations?: OperationListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  procedure?: ProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDef?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: UnitProcedureWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -129,82 +179,7 @@ class UnitProcedureWhereInput {
   @Field(() => BooleanNullableFilter, {
     nullable: true,
   })
-  isClassDef?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumUnitProcedureName,
-  })
-  @IsEnum(EnumUnitProcedureName)
-  @IsOptional()
-  @Field(() => EnumUnitProcedureName, {
-    nullable: true,
-  })
-  name?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Granary01";
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => OperationListRelationFilter)
-  @IsOptional()
-  @Field(() => OperationListRelationFilter, {
-    nullable: true,
-  })
-  operations?: OperationListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  path?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  primaryBom?: BomWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  procedure?: ProcedureWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
+  active?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -220,14 +195,49 @@ class UnitProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: () => BomWhereUniqueInput,
   })
-  @Type(() => IntNullableFilter)
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => BomWhereUniqueInput, {
     nullable: true,
   })
-  revision?: IntNullableFilter;
+  boms?: BomWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  primaryBom?: BomWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  path?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -243,14 +253,15 @@ class UnitProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: () => ProductionOrderUnitProcedureListRelationFilter,
   })
-  @Type(() => StringNullableFilter)
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
     nullable: true,
   })
-  schemaVersion?: StringNullableFilter;
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -261,7 +272,7 @@ class UnitProcedureWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  abbreviation?: StringNullableFilter;
 }
 
 export { UnitProcedureWhereInput as UnitProcedureWhereInput };

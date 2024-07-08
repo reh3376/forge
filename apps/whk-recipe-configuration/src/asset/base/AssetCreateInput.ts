@@ -15,20 +15,20 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  ValidateNested,
   IsInt,
   Max,
   IsEnum,
+  ValidateNested,
 } from "class-validator";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./FermentationChemistryCreateNestedManyWithoutAssetsInput";
+import { EnumAssetType } from "./EnumAssetType";
+import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./FermentationChemistryCreateNestedManyWithoutAssetsInput";
 import { FermentationDayDatumCreateNestedManyWithoutAssetsInput } from "./FermentationDayDatumCreateNestedManyWithoutAssetsInput";
 import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
-import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
-import { EnumAssetType } from "./EnumAssetType";
 
 @InputType()
 class AssetCreateInput {
@@ -70,54 +70,6 @@ class AssetCreateInput {
   description!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashDatumCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => MashDatumCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -125,18 +77,6 @@ class AssetCreateInput {
   @MaxLength(256)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
@@ -186,6 +126,66 @@ class AssetCreateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
 }
 
 export { AssetCreateInput as AssetCreateInput };
