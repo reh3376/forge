@@ -8,10 +8,10 @@ CREATE TYPE "EnumPhaseParameterStaticName" AS ENUM ('Temperature', 'Time', 'Quan
 CREATE TYPE "EnumTestParameterTestSetpointType" AS ENUM ('Boolean', 'Numerical');
 
 -- CreateEnum
-CREATE TYPE "EnumRecipeParameterRecipeParamUnits" AS ENUM ('Lbs', 'Gal', 'Percentage', 'PassFail', 'Seconds', 'Minutes', 'DateTime', 'Feet', 'Bushels');
+CREATE TYPE "EnumRecipeParameterRecipeSetpointType" AS ENUM ('Boolean', 'Numeric');
 
 -- CreateEnum
-CREATE TYPE "EnumRecipeParameterRecipeSetpointType" AS ENUM ('Boolean', 'Numeric');
+CREATE TYPE "EnumRecipeParameterRecipeParamUnits" AS ENUM ('Lbs', 'Gal', 'Percentage', 'PassFail', 'Seconds', 'Minutes', 'DateTime', 'Feet', 'Bushels');
 
 -- CreateEnum
 CREATE TYPE "EnumEquipmentPhaseName" AS ENUM ('Steam', 'Hold', 'BacksetAdd', 'WaterAdd', 'AdditiveAdd', 'CornAdd', 'MaltAdd', 'RyeAdd', 'WheatAdd', 'Drop', 'PhCapture', 'Cooldown', 'Rinse', 'HotFlush', 'Cip', 'Fill', 'Run', 'FermenterSteam', 'CoolerSteam', 'DropTubSteam', 'DropLineSteam', 'DropToMashCooler', 'StillStartup', 'StillShutdown', 'Cut', 'Gauge', 'GrainAdd', 'LiquidAdd', 'Prompt');
@@ -54,369 +54,370 @@ CREATE TYPE "EnumFermentationDayDatumDay" AS ENUM ('First', 'Second', 'Third', '
 
 -- CreateTable
 CREATE TABLE "User" (
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "firstName" TEXT,
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "firstName" TEXT,
     "lastName" TEXT,
+    "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "roles" JSONB NOT NULL,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "username" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PhaseParameter" (
-    "active" BOOLEAN DEFAULT false,
-    "classIdId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "editedBy" TEXT,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
-    "isClassDef" BOOLEAN NOT NULL DEFAULT false,
-    "isStaticParameter" BOOLEAN DEFAULT false,
-    "itemId" TEXT,
-    "name" TEXT NOT NULL,
-    "recipeId" TEXT,
-    "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-alpha',
-    "setpointBooleanValue" BOOLEAN,
-    "setpointLowerLimit" DOUBLE PRECISION,
-    "setpointNumericalValue" DOUBLE PRECISION,
-    "setpointType" "EnumPhaseParameterSetpointType" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "setpointUpperLimit" DOUBLE PRECISION,
-    "staticName" "EnumPhaseParameterStaticName",
-    "units" TEXT NOT NULL,
+    "setpointNumericalValue" DOUBLE PRECISION,
+    "setpointBooleanValue" BOOLEAN,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "itemId" TEXT,
+    "setpointType" "EnumPhaseParameterSetpointType" NOT NULL,
+    "setpointLowerLimit" DOUBLE PRECISION,
+    "schemaVersion" TEXT DEFAULT '0001-alpha',
+    "createdBy" TEXT NOT NULL,
+    "units" TEXT NOT NULL,
+    "recipeId" TEXT,
+    "editedBy" TEXT,
+    "revision" INTEGER DEFAULT 0,
+    "active" BOOLEAN DEFAULT false,
+    "isClassDef" BOOLEAN NOT NULL DEFAULT false,
+    "classIdId" TEXT,
+    "isStaticParameter" BOOLEAN DEFAULT false,
+    "staticName" "EnumPhaseParameterStaticName",
+    "globalId" TEXT,
 
     CONSTRAINT "PhaseParameter_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "TestParameter" (
-    "active" BOOLEAN NOT NULL DEFAULT true,
-    "classIdId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
     "description" TEXT,
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "isClassDef" BOOLEAN DEFAULT false,
-    "itemReceiptId" TEXT,
-    "name" TEXT NOT NULL,
-    "schemaVersion" TEXT,
-    "testDetails" TEXT,
-    "testedAt" TIMESTAMP(3),
-    "testedBy" TEXT,
-    "testParamRevision" TEXT,
-    "testParamUnits" TEXT NOT NULL,
     "testPass" BOOLEAN,
-    "testResult" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" TEXT NOT NULL,
     "testSetpointBooleanValue" BOOLEAN DEFAULT true,
-    "testSetpointLowerLimit" DOUBLE PRECISION,
-    "testSetpointType" "EnumTestParameterTestSetpointType",
-    "testSetpointUpperLimit" DOUBLE PRECISION,
-    "testSetpointValue" DOUBLE PRECISION,
-    "tooltip" TEXT,
-    "updatedAt" TIMESTAMP(3),
     "updatedBy" TEXT,
+    "name" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "schemaVersion" TEXT,
+    "testSetpointValue" DOUBLE PRECISION,
+    "testParamUnits" TEXT NOT NULL,
+    "testSetpointUpperLimit" DOUBLE PRECISION,
+    "testParamRevision" TEXT,
+    "testSetpointLowerLimit" DOUBLE PRECISION,
+    "testResult" JSONB,
+    "createdBy" TEXT NOT NULL,
+    "testSetpointType" "EnumTestParameterTestSetpointType",
+    "updatedAt" TIMESTAMP(3),
+    "isClassDef" BOOLEAN DEFAULT false,
+    "classIdId" TEXT,
+    "tooltip" TEXT,
+    "testDetails" TEXT,
+    "globalId" TEXT,
+    "testedBy" TEXT,
+    "testedAt" TIMESTAMP(3),
+    "itemReceiptId" TEXT,
 
     CONSTRAINT "TestParameter_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "RecipeParameter" (
-    "active" BOOLEAN NOT NULL DEFAULT true,
-    "batch" TEXT,
-    "classIdId" TEXT,
-    "className" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "editedAt" TIMESTAMP(3),
-    "editedBy" TEXT,
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "isClassDefinition" BOOLEAN DEFAULT false,
-    "itemId" TEXT NOT NULL,
-    "recipeParamDescription" TEXT,
-    "recipeParamName" TEXT NOT NULL,
-    "recipeParamUnits" "EnumRecipeParameterRecipeParamUnits",
-    "recipeSetpointBooleanValue" BOOLEAN DEFAULT true,
-    "recipeSetpointLowerLimit" DOUBLE PRECISION,
     "recipeSetpointType" "EnumRecipeParameterRecipeSetpointType" NOT NULL,
-    "recipeSetpointUpperLimit" DOUBLE PRECISION,
     "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-alpha',
+    "recipeSetpointUpperLimit" DOUBLE PRECISION,
+    "recipeParamName" TEXT NOT NULL,
+    "className" TEXT NOT NULL,
+    "batch" TEXT,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdBy" TEXT NOT NULL,
+    "recipeSetpointLowerLimit" DOUBLE PRECISION,
+    "editedAt" TIMESTAMP(3),
+    "id" TEXT NOT NULL,
+    "recipeParamDescription" TEXT,
+    "editedBy" TEXT,
     "sequencerParameters" JSONB,
+    "recipeSetpointBooleanValue" BOOLEAN DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "itemId" TEXT NOT NULL,
+    "recipeParamUnits" "EnumRecipeParameterRecipeParamUnits",
+    "schemaVersion" TEXT DEFAULT '0001-alpha',
+    "isClassDefinition" BOOLEAN DEFAULT false,
+    "classIdId" TEXT,
+    "globalId" TEXT,
 
     CONSTRAINT "RecipeParameter_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Instruction" (
-    "active" BOOLEAN DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "editedBy" TEXT,
-    "filePath" TEXT NOT NULL,
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "name" TEXT,
-    "revision" INTEGER NOT NULL DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-alpha',
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "filePath" TEXT NOT NULL,
+    "editedBy" TEXT,
+    "active" BOOLEAN DEFAULT false,
+    "createdBy" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
+    "schemaVersion" TEXT DEFAULT '0001-alpha',
+    "revision" INTEGER NOT NULL DEFAULT 0,
+    "name" TEXT,
+    "globalId" TEXT,
 
     CONSTRAINT "Instruction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "EquipmentPhase" (
-    "active" BOOLEAN DEFAULT true,
-    "classIdId" TEXT,
-    "className" TEXT,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
-    "description" TEXT,
-    "editedAt" TIMESTAMP(3),
-    "editedBy" TEXT,
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "isClassDefinition" BOOLEAN DEFAULT false,
-    "message" TEXT,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "schemaVersion" TEXT DEFAULT '0001-b',
+    "operationSequenceIndex" INTEGER,
     "name" "EnumEquipmentPhaseName" NOT NULL,
     "operationId" TEXT NOT NULL,
-    "operationSequenceIndex" INTEGER,
-    "path" TEXT,
+    "id" TEXT NOT NULL,
+    "editedBy" TEXT,
     "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-b',
+    "editedAt" TIMESTAMP(3),
+    "className" TEXT,
+    "description" TEXT,
+    "isClassDefinition" BOOLEAN DEFAULT false,
+    "classIdId" TEXT,
+    "active" BOOLEAN DEFAULT true,
+    "path" TEXT,
+    "globalId" TEXT,
     "stepType" "EnumEquipmentPhaseStepType" NOT NULL DEFAULT 'NotRequired',
+    "message" TEXT,
 
     CONSTRAINT "EquipmentPhase_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Operation" (
-    "abbreviation" TEXT NOT NULL,
-    "active" BOOLEAN DEFAULT true,
-    "auxiliaryPhases" JSONB,
-    "classIdId" TEXT,
+    "revision" INTEGER DEFAULT 0,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "name" "EnumOperationName" NOT NULL,
+    "editedBy" TEXT,
     "createdBy" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "editedBy" TEXT,
-    "globalId" TEXT,
+    "procedureSequenceIndex" INTEGER NOT NULL DEFAULT 0,
+    "schemaVersion" TEXT DEFAULT '0001-b',
+    "active" BOOLEAN DEFAULT true,
+    "updatedAt" TIMESTAMP(3),
     "id" TEXT NOT NULL,
     "isClassDefinition" BOOLEAN DEFAULT false,
-    "lotId" TEXT,
-    "name" "EnumOperationName" NOT NULL,
+    "classIdId" TEXT,
     "path" TEXT,
-    "procedureSequenceIndex" INTEGER NOT NULL DEFAULT 0,
-    "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-b',
+    "abbreviation" TEXT NOT NULL,
     "unitProcedureId" TEXT,
-    "updatedAt" TIMESTAMP(3),
+    "globalId" TEXT,
+    "auxiliaryPhases" JSONB,
+    "lotId" TEXT,
 
     CONSTRAINT "Operation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Procedure" (
-    "active" BOOLEAN DEFAULT true,
-    "classIdId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "description" TEXT,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
-    "isClassDefinition" BOOLEAN,
-    "name" "EnumProcedureName",
-    "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-b',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" "EnumProcedureName",
+    "description" TEXT,
+    "createdBy" TEXT NOT NULL,
     "updatedBy" TEXT,
+    "schemaVersion" TEXT DEFAULT '0001-b',
+    "revision" INTEGER DEFAULT 0,
+    "active" BOOLEAN DEFAULT true,
+    "isClassDefinition" BOOLEAN,
+    "classIdId" TEXT,
+    "globalId" TEXT,
 
     CONSTRAINT "Procedure_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Recipe" (
-    "active" BOOLEAN DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "customer" TEXT NOT NULL,
-    "customerId" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
-    "itemDescription" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "updatedBy" TEXT,
+    "schemaVersion" TEXT DEFAULT '0001-b',
+    "revision" INTEGER DEFAULT 0,
+    "active" BOOLEAN DEFAULT true,
+    "customerId" TEXT NOT NULL,
     "itemId" TEXT NOT NULL,
+    "itemDescription" TEXT,
     "Recipe" TEXT NOT NULL,
     "recipeGroupId" TEXT,
-    "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-b',
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
+    "globalId" TEXT,
+    "customer" TEXT NOT NULL,
 
     CONSTRAINT "Recipe_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Bom" (
+    "id" TEXT NOT NULL,
+    "editedBy" TEXT,
+    "itemId" TEXT NOT NULL,
+    "schemaVersion" TEXT DEFAULT '0001-alpha',
+    "className" TEXT,
+    "editedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "bomName" TEXT NOT NULL,
     "bomRevision" TEXT NOT NULL,
-    "bomType" TEXT,
-    "className" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "editedAt" TIMESTAMP(3) NOT NULL,
-    "editedBy" TEXT,
-    "effectiveEndDate" TIMESTAMP(3),
-    "effectiveStartDate" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "erpId" TEXT,
     "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "inactive" BOOLEAN DEFAULT false,
-    "itemId" TEXT NOT NULL,
+    "bomType" TEXT,
     "notes" TEXT,
-    "schemaVersion" TEXT DEFAULT '0001-alpha',
+    "inactive" BOOLEAN DEFAULT false,
+    "effectiveStartDate" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "effectiveEndDate" TIMESTAMP(3),
+    "erpId" TEXT,
 
     CONSTRAINT "Bom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ScheduleOrderQueue" (
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "updatedBy" TEXT,
+    "schemaVersion" TEXT DEFAULT '0001-b',
+    "queueIndex" INTEGER,
+    "globalId" TEXT,
     "nextUnitProcedureId" TEXT NOT NULL,
     "nextUnitProcedureName" TEXT NOT NULL,
-    "queueIndex" INTEGER,
     "scheduleOrderId" TEXT,
-    "schemaVersion" TEXT DEFAULT '0001-b',
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
 
     CONSTRAINT "ScheduleOrderQueue_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "UnitProcedure" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "updatedBy" TEXT,
+    "schemaVersion" TEXT DEFAULT '0001-b',
+    "revision" INTEGER DEFAULT 0,
+    "name" "EnumUnitProcedureName" NOT NULL,
+    "description" TEXT,
+    "procedureId" TEXT NOT NULL,
+    "isClassDef" BOOLEAN DEFAULT false,
+    "classIdId" TEXT,
     "active" BOOLEAN DEFAULT true,
     "bomsId" TEXT,
-    "classIdId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "description" TEXT,
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "isClassDef" BOOLEAN DEFAULT false,
-    "name" "EnumUnitProcedureName" NOT NULL,
-    "path" TEXT,
     "primaryBomId" TEXT,
-    "procedureId" TEXT NOT NULL,
-    "revision" INTEGER DEFAULT 0,
-    "schemaVersion" TEXT DEFAULT '0001-b',
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
+    "path" TEXT,
+    "globalId" TEXT,
+    "abbreviation" TEXT,
 
     CONSTRAINT "UnitProcedure_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "RecipeGroup" (
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "recipe" TEXT NOT NULL,
     "revision" INTEGER DEFAULT 0,
     "schemaVersion" TEXT DEFAULT '0001-alpha',
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
     "updatedBy" TEXT,
+    "globalId" TEXT,
 
     CONSTRAINT "RecipeGroup_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ProductionOrder" (
-    "bomsId" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "bomId" TEXT NOT NULL,
     "className" TEXT,
     "complete" BOOLEAN DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
-    "customerId" TEXT NOT NULL,
-    "customerCode" TEXT,
-    "endDate" TIMESTAMP(3),
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
     "inProcess" BOOLEAN DEFAULT false,
+    "updatedBy" TIMESTAMP(3),
     "fgItemId" TEXT NOT NULL,
     "recipeId" TEXT,
     "recipeGroupId" TEXT,
-    "salesOrderId" TEXT NOT NULL,
+    "customerId" TEXT NOT NULL,
     "scheduled" BOOLEAN DEFAULT false,
-    "scheduleOrderId" TEXT,
     "schemaVersion" TEXT DEFAULT '0001-alpha',
     "startDate" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "endDate" TIMESTAMP(3),
     "status" "EnumProductionOrderStatus" DEFAULT 'Initiated',
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TIMESTAMP(3),
+    "scheduleOrderId" TEXT,
+    "salesOrderId" TEXT NOT NULL,
+    "globalId" TEXT,
+    "customerCode" TEXT,
 
     CONSTRAINT "ProductionOrder_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ScheduleOrder" (
-    "actualEnd" TIMESTAMP(3),
-    "actualStart" TIMESTAMP(3),
+    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "status" "EnumScheduleOrderStatus" DEFAULT 'Created',
     "createdBy" TEXT,
+    "updatedBy" TEXT,
+    "recipeGroupId" TEXT NOT NULL,
+    "scheduleOrderRecipeId" TEXT,
+    "recipeName" TEXT NOT NULL,
+    "totalProofGallons" INTEGER,
+    "estimatedTotalProductionTime" INTEGER,
+    "estimatedMashingTime" INTEGER,
+    "estimatedFermentationTime" INTEGER,
+    "estimatedDistillationTime" INTEGER,
+    "estimatedProcessing" INTEGER,
+    "productionOrderAllocation" JSONB NOT NULL,
+    "totalBarrels" INTEGER,
+    "globalId" TEXT,
     "customers" JSONB,
+    "estimatedStart" TIMESTAMP(3),
+    "estimatedEnd" TIMESTAMP(3),
+    "actualStart" TIMESTAMP(3),
+    "actualEnd" TIMESTAMP(3),
     "duration" DECIMAL(65,30),
     "durationUnits" TEXT DEFAULT 'Hours',
-    "estimatedDistillationTime" INTEGER,
-    "estimatedEnd" TIMESTAMP(3),
-    "estimatedFermentationTime" INTEGER,
-    "estimatedMashingTime" INTEGER,
-    "estimatedProcessing" INTEGER,
-    "estimatedStart" TIMESTAMP(3),
-    "estimatedTotalProductionTime" INTEGER,
-    "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "productionOrderAllocation" JSONB NOT NULL,
-    "recipeGroupId" TEXT NOT NULL,
-    "recipeName" TEXT NOT NULL,
-    "scheduleOrderRecipeId" TEXT,
-    "status" "EnumScheduleOrderStatus" DEFAULT 'Created',
-    "totalBarrels" INTEGER,
-    "totalProofGallons" INTEGER,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
 
     CONSTRAINT "ScheduleOrder_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Item" (
-    "active" BOOLEAN DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "erpId" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
-    "itemClass" TEXT,
-    "itemDescription" TEXT,
-    "itemGroup" TEXT,
-    "itemName" TEXT NOT NULL,
-    "itemNumber" TEXT NOT NULL,
-    "itemRevision" INTEGER DEFAULT 0,
-    "itemType" TEXT NOT NULL,
-    "schemaVersion" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "active" BOOLEAN DEFAULT true,
+    "createdBy" TEXT NOT NULL,
     "updatedBy" TEXT,
+    "itemType" TEXT NOT NULL,
+    "itemDescription" TEXT,
+    "itemName" TEXT NOT NULL,
+    "itemRevision" INTEGER DEFAULT 0,
+    "itemNumber" TEXT NOT NULL,
+    "schemaVersion" TEXT,
+    "itemClass" TEXT,
+    "itemGroup" TEXT,
+    "globalId" TEXT,
+    "erpId" TEXT NOT NULL,
     "vendorId" TEXT,
 
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
@@ -424,12 +425,12 @@ CREATE TABLE "Item" (
 
 -- CreateTable
 CREATE TABLE "ItemGroup" (
+    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT NOT NULL,
     "description" TEXT,
     "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ItemGroup_pkey" PRIMARY KEY ("id")
 );
@@ -439,17 +440,17 @@ CREATE TABLE "Customer" (
     "address" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
-    "customerCode" TEXT,
     "description" TEXT,
     "editedBy" TEXT,
     "email" TEXT,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "phone" TEXT,
     "revision" INTEGER NOT NULL DEFAULT 0,
     "schemaVersion" TEXT DEFAULT '0001-alpha',
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "globalId" TEXT,
+    "customerCode" TEXT,
+    "phone" TEXT,
 
     CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
@@ -461,11 +462,12 @@ CREATE TABLE "PurchaseOrder" (
     "complete" BOOLEAN DEFAULT false,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
-    "erpId" TEXT NOT NULL,
-    "globalId" TEXT NOT NULL,
+    "updatedAt" TIMESTAMP(3),
+    "updatedBy" TEXT,
+    "transactionGroup" TEXT,
     "id" TEXT NOT NULL,
-    "lineItems" JSONB,
     "name" TEXT NOT NULL,
+    "totalOrderQuantity" INTEGER,
     "purchaseOrderReceiptDate" TIMESTAMP(3),
     "purchaseOrderReceived" BOOLEAN DEFAULT false,
     "purchaseOrderRejectedLotsId" TEXT,
@@ -473,30 +475,29 @@ CREATE TABLE "PurchaseOrder" (
     "receivedQuantity" INTEGER,
     "revision" INTEGER DEFAULT 0,
     "schemaVersion" TEXT,
-    "totalOrderQuantity" INTEGER,
-    "transactionGroup" TEXT,
-    "updatedAt" TIMESTAMP(3),
-    "updatedBy" TEXT,
+    "globalId" TEXT NOT NULL,
+    "lineItems" JSONB,
+    "erpId" TEXT NOT NULL,
 
     CONSTRAINT "PurchaseOrder_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "SalesOrder" (
+    "customerId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
-    "customerId" TEXT,
-    "customerCode" TEXT,
-    "erpId" TEXT,
-    "globalId" TEXT NOT NULL,
     "id" TEXT NOT NULL,
-    "lineItems" JSONB,
     "orderType" TEXT,
     "quantity" INTEGER NOT NULL,
     "revision" INTEGER NOT NULL DEFAULT 0,
     "schemaVersion" TEXT DEFAULT '0001-alpha',
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "updatedBy" TEXT,
+    "globalId" TEXT NOT NULL,
+    "customerCode" TEXT,
+    "lineItems" JSONB,
+    "erpId" TEXT,
 
     CONSTRAINT "SalesOrder_pkey" PRIMARY KEY ("id")
 );
@@ -508,13 +509,13 @@ CREATE TABLE "Test" (
     "createdBy" TEXT NOT NULL,
     "editedAt" TIMESTAMP(3),
     "editedBy" TEXT,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
     "isClassDefinition" BOOLEAN DEFAULT false,
     "schemaVersion" TEXT,
     "testDescription" TEXT,
     "testName" TEXT NOT NULL,
     "testRevision" INTEGER DEFAULT 0,
+    "globalId" TEXT,
 
     CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
 );
@@ -526,7 +527,6 @@ CREATE TABLE "Asset" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "revision" INTEGER DEFAULT 0,
@@ -534,6 +534,7 @@ CREATE TABLE "Asset" (
     "type" "EnumAssetType" NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "updatedBy" TEXT,
+    "globalId" TEXT,
 
     CONSTRAINT "Asset_pkey" PRIMARY KEY ("id")
 );
@@ -543,21 +544,21 @@ CREATE TABLE "ItemReceipt" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
     "driver" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
-    "itemId" TEXT NOT NULL,
-    "loadId" SERIAL,
     "purchaseOrderId" TEXT,
     "quantity" DECIMAL(65,30) NOT NULL,
     "schemaVersion" TEXT DEFAULT '0001-b',
     "status" "EnumItemReceiptStatus" DEFAULT 'InProgress',
     "supplierLot" TEXT,
-    "testsPassed" BOOLEAN DEFAULT false,
     "units" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "updatedBy" TEXT,
     "weighIn" DECIMAL(65,30),
     "weighOut" DECIMAL(65,30),
+    "itemId" TEXT NOT NULL,
+    "globalId" TEXT,
+    "loadId" SERIAL,
+    "testsPassed" BOOLEAN DEFAULT false,
 
     CONSTRAINT "ItemReceipt_pkey" PRIMARY KEY ("id")
 );
@@ -567,182 +568,182 @@ CREATE TABLE "Lot" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT,
     "externalId" TEXT,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
-    "isRawMaterial" BOOLEAN DEFAULT false,
-    "itemId" TEXT,
     "lotNumber" TEXT NOT NULL,
-    "productionOrderId" TEXT,
     "purchaseOrderAcceptedLotsId" TEXT,
-    "recipeId" TEXT,
     "schemaVersion" TEXT DEFAULT '0001-b',
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "globalId" TEXT,
+    "recipeId" TEXT,
+    "itemId" TEXT,
+    "productionOrderId" TEXT,
+    "isRawMaterial" BOOLEAN DEFAULT false,
 
     CONSTRAINT "Lot_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "BomItem" (
-    "bomId" TEXT,
-    "consumedAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "updatedBy" TEXT,
     "itemId" TEXT NOT NULL,
-    "lotId" TEXT,
     "quantity" DECIMAL(65,30) NOT NULL,
     "quantityActual" DECIMAL(65,30),
     "units" TEXT,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
+    "bomId" TEXT,
+    "consumedAt" TIMESTAMP(3),
+    "globalId" TEXT,
+    "lotId" TEXT,
 
     CONSTRAINT "BomItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Unit" (
-    "active" BOOLEAN DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "active" BOOLEAN DEFAULT true,
     "name" TEXT,
     "unitType" TEXT,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "globalId" TEXT,
 
     CONSTRAINT "Unit_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ProductionOrderUnitProcedure" (
-    "abbreviation" "EnumProductionOrderUnitProcedureAbbreviation" NOT NULL,
-    "bom" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "customer" TEXT NOT NULL,
-    "globalId" TEXT,
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
+    "abbreviation" "EnumProductionOrderUnitProcedureAbbreviation" NOT NULL,
     "productionOrderId" TEXT,
     "recipeId" TEXT,
-    "status" "EnumProductionOrderUnitProcedureStatus",
-    "unitProcedureId" TEXT,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "bom" JSONB,
     "itemId" TEXT,
+    "globalId" TEXT,
+    "customer" TEXT NOT NULL,
+    "unitProcedureId" TEXT,
+    "status" "EnumProductionOrderUnitProcedureStatus",
 
     CONSTRAINT "ProductionOrderUnitProcedure_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "FermentationChemistry" (
-    "approved" BOOLEAN DEFAULT false,
-    "approvedBy" TEXT,
-    "assetId" TEXT NOT NULL,
-    "batchId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "id" TEXT NOT NULL,
-    "lotId" TEXT,
-    "operationId" TEXT NOT NULL,
-    "productionOrderId" TEXT,
-    "settingDataId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "productionOrderId" TEXT,
+    "operationId" TEXT NOT NULL,
+    "assetId" TEXT NOT NULL,
+    "settingDataId" TEXT,
+    "approvedBy" TEXT,
+    "approved" BOOLEAN DEFAULT false,
+    "lotId" TEXT,
+    "batchId" TEXT NOT NULL,
 
     CONSTRAINT "FermentationChemistry_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "MashDatum" (
-    "assetId" TEXT,
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "lotId" TEXT NOT NULL,
+    "balling" DECIMAL(65,30) NOT NULL,
+    "pH" DECIMAL(65,30) NOT NULL,
     "backSetPH" DECIMAL(65,30) NOT NULL,
     "backsetVolume" DECIMAL(65,30),
-    "balling" DECIMAL(65,30) NOT NULL,
-    "cornLbs" DECIMAL(65,30),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "fermentationChemistryId" TEXT,
-    "fermenterNumber" INTEGER NOT NULL,
-    "id" TEXT NOT NULL,
-    "loggedBy" TEXT NOT NULL,
-    "lotId" TEXT NOT NULL,
-    "maltLbs" DECIMAL(65,30),
-    "pH" DECIMAL(65,30) NOT NULL,
-    "ryeLbs" DECIMAL(65,30),
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "waterVolume" DECIMAL(65,30) NOT NULL,
+    "cornLbs" DECIMAL(65,30),
+    "ryeLbs" DECIMAL(65,30),
+    "maltLbs" DECIMAL(65,30),
     "wheatLbs" DECIMAL(65,30),
+    "loggedBy" TEXT NOT NULL,
+    "assetId" TEXT,
+    "fermenterNumber" INTEGER NOT NULL,
+    "fermentationChemistryId" TEXT,
 
     CONSTRAINT "MashDatum_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "FermentationSettingDatum" (
-    "acid" DECIMAL(65,30),
-    "balling" DECIMAL(65,30),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "dryInches" DECIMAL(65,30),
-    "fermenterNumber" INTEGER NOT NULL,
     "id" TEXT NOT NULL,
-    "loggedBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "lotId" TEXT NOT NULL,
     "operationId" TEXT,
-    "pH" DECIMAL(65,30),
+    "fermenterNumber" INTEGER NOT NULL,
+    "yeastPitchTime" TIMESTAMP(3) NOT NULL,
     "setTime" TIMESTAMP(3) NOT NULL,
     "temperature" DECIMAL(65,30) NOT NULL,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "yeastPitchTime" TIMESTAMP(3) NOT NULL,
+    "dryInches" DECIMAL(65,30),
+    "balling" DECIMAL(65,30),
+    "acid" DECIMAL(65,30),
+    "pH" DECIMAL(65,30),
+    "loggedBy" TEXT NOT NULL,
 
     CONSTRAINT "FermentationSettingDatum_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "FermentationDayDatum" (
-    "acid" DECIMAL(65,30) NOT NULL,
-    "assetId" TEXT,
-    "balling" DECIMAL(65,30) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "day" "EnumFermentationDayDatumDay" DEFAULT 'First',
-    "dryInches" DECIMAL(65,30),
-    "fermentationChemistryId" TEXT,
-    "fermenterNumber" INTEGER NOT NULL,
     "id" TEXT NOT NULL,
-    "loggedBy" TEXT NOT NULL,
-    "lotId" TEXT NOT NULL,
-    "operationId" TEXT NOT NULL,
-    "pH" DECIMAL(65,30) NOT NULL,
-    "productionOrderId" TEXT NOT NULL,
-    "temperature" DECIMAL(65,30) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "productionOrderId" TEXT NOT NULL,
+    "lotId" TEXT NOT NULL,
+    "loggedBy" TEXT NOT NULL,
+    "day" "EnumFermentationDayDatumDay" DEFAULT 'First',
+    "temperature" DECIMAL(65,30) NOT NULL,
+    "balling" DECIMAL(65,30) NOT NULL,
+    "acid" DECIMAL(65,30) NOT NULL,
+    "pH" DECIMAL(65,30) NOT NULL,
+    "dryInches" DECIMAL(65,30),
+    "operationId" TEXT NOT NULL,
+    "fermenterNumber" INTEGER NOT NULL,
+    "assetId" TEXT,
+    "fermentationChemistryId" TEXT,
 
     CONSTRAINT "FermentationDayDatum_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Batch" (
-    "batchData" JSONB,
-    "batchId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "customers" JSONB,
     "id" TEXT NOT NULL,
-    "lotId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "batchId" TEXT NOT NULL,
     "parentId" TEXT,
     "quantity" INTEGER,
+    "batchData" JSONB,
     "revision" INTEGER DEFAULT 0,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "customers" JSONB,
+    "lotId" TEXT,
 
     CONSTRAINT "Batch_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Vendor" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "active" BOOLEAN DEFAULT true,
     "additionalDetails" JSONB,
     "contactInformation" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
+    "updatedBy" TEXT,
+    "name" TEXT,
     "erpId" TEXT,
     "globalId" TEXT,
-    "id" TEXT NOT NULL,
-    "name" TEXT,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
 
     CONSTRAINT "Vendor_pkey" PRIMARY KEY ("id")
 );
@@ -754,13 +755,13 @@ CREATE TABLE "_EquipmentPhaseToInstruction" (
 );
 
 -- CreateTable
-CREATE TABLE "_EquipmentPhaseToPhaseParameter" (
+CREATE TABLE "_EquipmentPhaseToTestParameter" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "_EquipmentPhaseToTestParameter" (
+CREATE TABLE "_EquipmentPhaseToPhaseParameter" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
@@ -802,9 +803,6 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE UNIQUE INDEX "PhaseParameter_globalId_key" ON "PhaseParameter"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PhaseParameter_name_revision_isClassDef_key" ON "PhaseParameter"("name", "revision", "isClassDef");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Instruction_globalId_key" ON "Instruction"("globalId");
 
 -- CreateIndex
@@ -814,7 +812,7 @@ CREATE UNIQUE INDEX "Instruction_name_revision_key" ON "Instruction"("name", "re
 CREATE UNIQUE INDEX "EquipmentPhase_globalId_key" ON "EquipmentPhase"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "EquipmentPhase_name_revision_active_isClassDefinition_key" ON "EquipmentPhase"("name", "revision", "active", "isClassDefinition");
+CREATE UNIQUE INDEX "EquipmentPhase_name_revision_active_isClassDefinition_stepT_key" ON "EquipmentPhase"("name", "revision", "active", "isClassDefinition", "stepType");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Operation_lotId_key" ON "Operation"("lotId");
@@ -832,10 +830,10 @@ CREATE UNIQUE INDEX "Recipe_globalId_key" ON "Recipe"("globalId");
 CREATE UNIQUE INDEX "Recipe_itemId_customerId_key" ON "Recipe"("itemId", "customerId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Bom_erpId_key" ON "Bom"("erpId");
+CREATE UNIQUE INDEX "Bom_globalId_key" ON "Bom"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Bom_globalId_key" ON "Bom"("globalId");
+CREATE UNIQUE INDEX "Bom_erpId_key" ON "Bom"("erpId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ScheduleOrderQueue_globalId_key" ON "ScheduleOrderQueue"("globalId");
@@ -865,10 +863,10 @@ CREATE UNIQUE INDEX "ProductionOrder_salesOrderId_key" ON "ProductionOrder"("sal
 CREATE UNIQUE INDEX "ScheduleOrder_globalId_key" ON "ScheduleOrder"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Item_erpId_key" ON "Item"("erpId");
+CREATE UNIQUE INDEX "Item_globalId_key" ON "Item"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Item_globalId_key" ON "Item"("globalId");
+CREATE UNIQUE INDEX "Item_erpId_key" ON "Item"("erpId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ItemGroup_globalId_key" ON "ItemGroup"("globalId");
@@ -880,19 +878,19 @@ CREATE UNIQUE INDEX "Customer_globalId_key" ON "Customer"("globalId");
 CREATE UNIQUE INDEX "Customer_revision_name_key" ON "Customer"("revision", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PurchaseOrder_erpId_key" ON "PurchaseOrder"("erpId");
+CREATE UNIQUE INDEX "PurchaseOrder_globalId_key" ON "PurchaseOrder"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PurchaseOrder_globalId_key" ON "PurchaseOrder"("globalId");
+CREATE UNIQUE INDEX "PurchaseOrder_erpId_key" ON "PurchaseOrder"("erpId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PurchaseOrder_name_revision_key" ON "PurchaseOrder"("name", "revision");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SalesOrder_erpId_key" ON "SalesOrder"("erpId");
+CREATE UNIQUE INDEX "SalesOrder_globalId_key" ON "SalesOrder"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SalesOrder_globalId_key" ON "SalesOrder"("globalId");
+CREATE UNIQUE INDEX "SalesOrder_erpId_key" ON "SalesOrder"("erpId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Test_globalId_key" ON "Test"("globalId");
@@ -913,19 +911,19 @@ CREATE UNIQUE INDEX "ItemReceipt_globalId_key" ON "ItemReceipt"("globalId");
 CREATE UNIQUE INDEX "Lot_externalId_key" ON "Lot"("externalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Lot_globalId_key" ON "Lot"("globalId");
+CREATE UNIQUE INDEX "Lot_lotNumber_key" ON "Lot"("lotNumber");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Lot_lotNumber_key" ON "Lot"("lotNumber");
+CREATE UNIQUE INDEX "Lot_globalId_key" ON "Lot"("globalId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "BomItem_globalId_key" ON "BomItem"("globalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FermentationChemistry_lotId_key" ON "FermentationChemistry"("lotId");
+CREATE UNIQUE INDEX "FermentationChemistry_settingDataId_key" ON "FermentationChemistry"("settingDataId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FermentationChemistry_settingDataId_key" ON "FermentationChemistry"("settingDataId");
+CREATE UNIQUE INDEX "FermentationChemistry_lotId_key" ON "FermentationChemistry"("lotId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Batch_batchId_key" ON "Batch"("batchId");
@@ -943,16 +941,16 @@ CREATE UNIQUE INDEX "_EquipmentPhaseToInstruction_AB_unique" ON "_EquipmentPhase
 CREATE INDEX "_EquipmentPhaseToInstruction_B_index" ON "_EquipmentPhaseToInstruction"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_EquipmentPhaseToPhaseParameter_AB_unique" ON "_EquipmentPhaseToPhaseParameter"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_EquipmentPhaseToPhaseParameter_B_index" ON "_EquipmentPhaseToPhaseParameter"("B");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_EquipmentPhaseToTestParameter_AB_unique" ON "_EquipmentPhaseToTestParameter"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_EquipmentPhaseToTestParameter_B_index" ON "_EquipmentPhaseToTestParameter"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_EquipmentPhaseToPhaseParameter_AB_unique" ON "_EquipmentPhaseToPhaseParameter"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_EquipmentPhaseToPhaseParameter_B_index" ON "_EquipmentPhaseToPhaseParameter"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_RecipeToUnitProcedure_AB_unique" ON "_RecipeToUnitProcedure"("A", "B");
@@ -997,10 +995,10 @@ ALTER TABLE "TestParameter" ADD CONSTRAINT "TestParameter_itemReceiptId_fkey" FO
 ALTER TABLE "RecipeParameter" ADD CONSTRAINT "RecipeParameter_classIdId_fkey" FOREIGN KEY ("classIdId") REFERENCES "RecipeParameter"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EquipmentPhase" ADD CONSTRAINT "EquipmentPhase_classIdId_fkey" FOREIGN KEY ("classIdId") REFERENCES "EquipmentPhase"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "EquipmentPhase" ADD CONSTRAINT "EquipmentPhase_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EquipmentPhase" ADD CONSTRAINT "EquipmentPhase_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "EquipmentPhase" ADD CONSTRAINT "EquipmentPhase_classIdId_fkey" FOREIGN KEY ("classIdId") REFERENCES "EquipmentPhase"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Operation" ADD CONSTRAINT "Operation_classIdId_fkey" FOREIGN KEY ("classIdId") REFERENCES "Operation"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1024,22 +1022,19 @@ ALTER TABLE "ScheduleOrderQueue" ADD CONSTRAINT "ScheduleOrderQueue_nextUnitProc
 ALTER TABLE "ScheduleOrderQueue" ADD CONSTRAINT "ScheduleOrderQueue_scheduleOrderId_fkey" FOREIGN KEY ("scheduleOrderId") REFERENCES "ScheduleOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UnitProcedure" ADD CONSTRAINT "UnitProcedure_bomsId_fkey" FOREIGN KEY ("bomsId") REFERENCES "Bom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "UnitProcedure" ADD CONSTRAINT "UnitProcedure_procedureId_fkey" FOREIGN KEY ("procedureId") REFERENCES "Procedure"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UnitProcedure" ADD CONSTRAINT "UnitProcedure_classIdId_fkey" FOREIGN KEY ("classIdId") REFERENCES "UnitProcedure"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "UnitProcedure" ADD CONSTRAINT "UnitProcedure_bomsId_fkey" FOREIGN KEY ("bomsId") REFERENCES "Bom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "UnitProcedure" ADD CONSTRAINT "UnitProcedure_primaryBomId_fkey" FOREIGN KEY ("primaryBomId") REFERENCES "Bom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UnitProcedure" ADD CONSTRAINT "UnitProcedure_procedureId_fkey" FOREIGN KEY ("procedureId") REFERENCES "Procedure"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_bomsId_fkey" FOREIGN KEY ("bomsId") REFERENCES "Bom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_bomId_fkey" FOREIGN KEY ("bomId") REFERENCES "Bom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_fgItemId_fkey" FOREIGN KEY ("fgItemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1051,10 +1046,13 @@ ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_recipeId_fkey" FOR
 ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_recipeGroupId_fkey" FOREIGN KEY ("recipeGroupId") REFERENCES "RecipeGroup"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_salesOrderId_fkey" FOREIGN KEY ("salesOrderId") REFERENCES "SalesOrder"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_scheduleOrderId_fkey" FOREIGN KEY ("scheduleOrderId") REFERENCES "ScheduleOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductionOrder" ADD CONSTRAINT "ProductionOrder_salesOrderId_fkey" FOREIGN KEY ("salesOrderId") REFERENCES "SalesOrder"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScheduleOrder" ADD CONSTRAINT "ScheduleOrder_recipeGroupId_fkey" FOREIGN KEY ("recipeGroupId") REFERENCES "RecipeGroup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1075,16 +1073,10 @@ ALTER TABLE "PurchaseOrder" ADD CONSTRAINT "PurchaseOrder_purchaseOrderRejectedL
 ALTER TABLE "SalesOrder" ADD CONSTRAINT "SalesOrder_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ItemReceipt" ADD CONSTRAINT "ItemReceipt_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "ItemReceipt" ADD CONSTRAINT "ItemReceipt_purchaseOrderId_fkey" FOREIGN KEY ("purchaseOrderId") REFERENCES "PurchaseOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Lot" ADD CONSTRAINT "Lot_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Lot" ADD CONSTRAINT "Lot_productionOrderId_fkey" FOREIGN KEY ("productionOrderId") REFERENCES "ProductionOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ItemReceipt" ADD CONSTRAINT "ItemReceipt_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Lot" ADD CONSTRAINT "Lot_purchaseOrderAcceptedLotsId_fkey" FOREIGN KEY ("purchaseOrderAcceptedLotsId") REFERENCES "PurchaseOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1093,10 +1085,16 @@ ALTER TABLE "Lot" ADD CONSTRAINT "Lot_purchaseOrderAcceptedLotsId_fkey" FOREIGN 
 ALTER TABLE "Lot" ADD CONSTRAINT "Lot_recipeId_fkey" FOREIGN KEY ("recipeId") REFERENCES "Recipe"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "BomItem" ADD CONSTRAINT "BomItem_bomId_fkey" FOREIGN KEY ("bomId") REFERENCES "Bom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Lot" ADD CONSTRAINT "Lot_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Lot" ADD CONSTRAINT "Lot_productionOrderId_fkey" FOREIGN KEY ("productionOrderId") REFERENCES "ProductionOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BomItem" ADD CONSTRAINT "BomItem_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BomItem" ADD CONSTRAINT "BomItem_bomId_fkey" FOREIGN KEY ("bomId") REFERENCES "Bom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BomItem" ADD CONSTRAINT "BomItem_lotId_fkey" FOREIGN KEY ("lotId") REFERENCES "Lot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1108,28 +1106,28 @@ ALTER TABLE "ProductionOrderUnitProcedure" ADD CONSTRAINT "ProductionOrderUnitPr
 ALTER TABLE "ProductionOrderUnitProcedure" ADD CONSTRAINT "ProductionOrderUnitProcedure_recipeId_fkey" FOREIGN KEY ("recipeId") REFERENCES "Recipe"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProductionOrderUnitProcedure" ADD CONSTRAINT "ProductionOrderUnitProcedure_unitProcedureId_fkey" FOREIGN KEY ("unitProcedureId") REFERENCES "UnitProcedure"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "ProductionOrderUnitProcedure" ADD CONSTRAINT "ProductionOrderUnitProcedure_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_batchId_fkey" FOREIGN KEY ("batchId") REFERENCES "Batch"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_lotId_fkey" FOREIGN KEY ("lotId") REFERENCES "Lot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ProductionOrderUnitProcedure" ADD CONSTRAINT "ProductionOrderUnitProcedure_unitProcedureId_fkey" FOREIGN KEY ("unitProcedureId") REFERENCES "UnitProcedure"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_productionOrderId_fkey" FOREIGN KEY ("productionOrderId") REFERENCES "ProductionOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_settingDataId_fkey" FOREIGN KEY ("settingDataId") REFERENCES "FermentationSettingDatum"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_lotId_fkey" FOREIGN KEY ("lotId") REFERENCES "Lot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FermentationChemistry" ADD CONSTRAINT "FermentationChemistry_batchId_fkey" FOREIGN KEY ("batchId") REFERENCES "Batch"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MashDatum" ADD CONSTRAINT "MashDatum_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1141,22 +1139,22 @@ ALTER TABLE "MashDatum" ADD CONSTRAINT "MashDatum_fermentationChemistryId_fkey" 
 ALTER TABLE "FermentationSettingDatum" ADD CONSTRAINT "FermentationSettingDatum_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "FermentationDayDatum" ADD CONSTRAINT "FermentationDayDatum_productionOrderId_fkey" FOREIGN KEY ("productionOrderId") REFERENCES "ProductionOrder"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FermentationDayDatum" ADD CONSTRAINT "FermentationDayDatum_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "FermentationDayDatum" ADD CONSTRAINT "FermentationDayDatum_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FermentationDayDatum" ADD CONSTRAINT "FermentationDayDatum_fermentationChemistryId_fkey" FOREIGN KEY ("fermentationChemistryId") REFERENCES "FermentationChemistry"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FermentationDayDatum" ADD CONSTRAINT "FermentationDayDatum_operationId_fkey" FOREIGN KEY ("operationId") REFERENCES "Operation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "FermentationDayDatum" ADD CONSTRAINT "FermentationDayDatum_productionOrderId_fkey" FOREIGN KEY ("productionOrderId") REFERENCES "ProductionOrder"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Batch" ADD CONSTRAINT "Batch_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Batch"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Batch" ADD CONSTRAINT "Batch_lotId_fkey" FOREIGN KEY ("lotId") REFERENCES "Lot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Batch" ADD CONSTRAINT "Batch_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Batch"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_EquipmentPhaseToInstruction" ADD CONSTRAINT "_EquipmentPhaseToInstruction_A_fkey" FOREIGN KEY ("A") REFERENCES "EquipmentPhase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1165,16 +1163,16 @@ ALTER TABLE "_EquipmentPhaseToInstruction" ADD CONSTRAINT "_EquipmentPhaseToInst
 ALTER TABLE "_EquipmentPhaseToInstruction" ADD CONSTRAINT "_EquipmentPhaseToInstruction_B_fkey" FOREIGN KEY ("B") REFERENCES "Instruction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_EquipmentPhaseToPhaseParameter" ADD CONSTRAINT "_EquipmentPhaseToPhaseParameter_A_fkey" FOREIGN KEY ("A") REFERENCES "EquipmentPhase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_EquipmentPhaseToPhaseParameter" ADD CONSTRAINT "_EquipmentPhaseToPhaseParameter_B_fkey" FOREIGN KEY ("B") REFERENCES "PhaseParameter"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "_EquipmentPhaseToTestParameter" ADD CONSTRAINT "_EquipmentPhaseToTestParameter_A_fkey" FOREIGN KEY ("A") REFERENCES "EquipmentPhase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_EquipmentPhaseToTestParameter" ADD CONSTRAINT "_EquipmentPhaseToTestParameter_B_fkey" FOREIGN KEY ("B") REFERENCES "TestParameter"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_EquipmentPhaseToPhaseParameter" ADD CONSTRAINT "_EquipmentPhaseToPhaseParameter_A_fkey" FOREIGN KEY ("A") REFERENCES "EquipmentPhase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_EquipmentPhaseToPhaseParameter" ADD CONSTRAINT "_EquipmentPhaseToPhaseParameter_B_fkey" FOREIGN KEY ("B") REFERENCES "PhaseParameter"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_RecipeToUnitProcedure" ADD CONSTRAINT "_RecipeToUnitProcedure_A_fkey" FOREIGN KEY ("A") REFERENCES "Recipe"("id") ON DELETE CASCADE ON UPDATE CASCADE;
