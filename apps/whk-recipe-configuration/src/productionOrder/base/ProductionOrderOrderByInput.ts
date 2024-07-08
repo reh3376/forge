@@ -271,6 +271,17 @@ class ProductionOrderOrderByInput {
     nullable: true,
   })
   units?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  quantity?: SortOrder;
 }
 
 export { ProductionOrderOrderByInput as ProductionOrderOrderByInput };

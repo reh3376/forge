@@ -29,6 +29,7 @@ import { ProductionOrderUnitProcedureListRelationFilter } from "../../production
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
 class ProductionOrderWhereInput {
@@ -317,6 +318,17 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   units?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  quantity?: IntNullableFilter;
 }
 
 export { ProductionOrderWhereInput as ProductionOrderWhereInput };

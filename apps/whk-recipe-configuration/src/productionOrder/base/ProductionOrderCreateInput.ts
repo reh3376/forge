@@ -12,6 +12,7 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+
 import {
   ValidateNested,
   IsString,
@@ -20,7 +21,11 @@ import {
   IsBoolean,
   IsDate,
   IsEnum,
+  IsInt,
+  Min,
+  Max,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -323,6 +328,19 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   units?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity?: number | null;
 }
 
 export { ProductionOrderCreateInput as ProductionOrderCreateInput };
