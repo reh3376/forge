@@ -143,6 +143,16 @@ class Batch {
   @Type(() => Lot)
   @IsOptional()
   lot?: Lot | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  parameterData!: JsonValue;
 }
 
 export { Batch as Batch };

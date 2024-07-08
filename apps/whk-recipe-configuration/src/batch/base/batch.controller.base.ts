@@ -90,6 +90,8 @@ export class BatchControllerBase {
             id: true,
           },
         },
+
+        parameterData: true,
       },
     });
   }
@@ -132,6 +134,8 @@ export class BatchControllerBase {
             id: true,
           },
         },
+
+        parameterData: true,
       },
     });
   }
@@ -175,6 +179,8 @@ export class BatchControllerBase {
             id: true,
           },
         },
+
+        parameterData: true,
       },
     });
     if (result === null) {
@@ -244,6 +250,8 @@ export class BatchControllerBase {
               id: true,
             },
           },
+
+          parameterData: true,
         },
       });
     } catch (error) {
@@ -293,6 +301,8 @@ export class BatchControllerBase {
             id: true,
           },
         },
+
+        parameterData: true,
       },
     });
     if (results === null) {
