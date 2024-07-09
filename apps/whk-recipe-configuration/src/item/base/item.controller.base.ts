@@ -348,6 +348,8 @@ export class ItemControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
+        quantity: true,
       },
     });
     if (results === null) {
@@ -1216,6 +1218,8 @@ export class ItemControllerBase {
         customerCode: true,
         lineItems: true,
         erpId: true,
+        requestedShipDate: true,
+        name: true,
       },
     });
     if (results === null) {
@@ -1328,12 +1332,6 @@ export class ItemControllerBase {
         globalId: true,
 
         customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameters: {
           select: {
             id: true,
           },

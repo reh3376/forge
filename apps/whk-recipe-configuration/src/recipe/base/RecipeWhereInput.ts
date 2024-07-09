@@ -25,7 +25,7 @@ import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/Schedu
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
-import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { PhaseParameterListRelationFilter } from "../../phaseParameter/base/PhaseParameterListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
@@ -215,15 +215,15 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => PhaseParameterWhereUniqueInput,
+    type: () => PhaseParameterListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => PhaseParameterWhereUniqueInput)
+  @Type(() => PhaseParameterListRelationFilter)
   @IsOptional()
-  @Field(() => PhaseParameterWhereUniqueInput, {
+  @Field(() => PhaseParameterListRelationFilter, {
     nullable: true,
   })
-  parameters?: PhaseParameterWhereUniqueInput;
+  parameters?: PhaseParameterListRelationFilter;
 
   @ApiProperty({
     required: false,
