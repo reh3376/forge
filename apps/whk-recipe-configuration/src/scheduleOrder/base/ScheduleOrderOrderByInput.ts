@@ -293,6 +293,17 @@ class ScheduleOrderOrderByInput {
     nullable: true,
   })
   durationUnits?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  scheduleOrderQueueId?: SortOrder;
 }
 
 export { ScheduleOrderOrderByInput as ScheduleOrderOrderByInput };

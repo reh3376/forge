@@ -103,16 +103,13 @@ class ScheduleOrderQueueCreateInput {
   nextUnitProcedureName!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: () => ScheduleOrderWhereUniqueInput,
   })
   @ValidateNested()
   @Type(() => ScheduleOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
+  @Field(() => ScheduleOrderWhereUniqueInput)
+  scheduleOrder!: ScheduleOrderWhereUniqueInput | null;
 }
 
 export { ScheduleOrderQueueCreateInput as ScheduleOrderQueueCreateInput };

@@ -661,6 +661,12 @@ export class RecipeControllerBase {
         actualEnd: true,
         duration: true,
         durationUnits: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

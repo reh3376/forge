@@ -33,7 +33,7 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { Decimal } from "decimal.js";
-import { ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput } from "./ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderUpdateInput {
@@ -306,15 +306,15 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput)
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
   @IsOptional()
-  @Field(() => ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput, {
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
     nullable: true,
   })
-  scheduleOrderQueues?: ScheduleOrderQueueUpdateManyWithoutScheduleOrdersInput;
+  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
 }
 
 export { ScheduleOrderUpdateInput as ScheduleOrderUpdateInput };
