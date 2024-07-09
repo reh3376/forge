@@ -18,13 +18,10 @@ import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
 import { ScheduleOrderQueueCountArgs } from "./ScheduleOrderQueueCountArgs";
 import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs";
 import { ScheduleOrderQueueFindUniqueArgs } from "./ScheduleOrderQueueFindUniqueArgs";
-import { CreateScheduleOrderQueueArgs } from "./CreateScheduleOrderQueueArgs";
-import { UpdateScheduleOrderQueueArgs } from "./UpdateScheduleOrderQueueArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
@@ -79,71 +76,6 @@ export class ScheduleOrderQueueResolverBase {
       return null;
     }
     return result;
-  }
-
-  @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => ScheduleOrderQueue)
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "create",
-    possession: "any",
-  })
-  async createScheduleOrderQueue(
-    @graphql.Args() args: CreateScheduleOrderQueueArgs
-  ): Promise<ScheduleOrderQueue> {
-    return await this.service.createScheduleOrderQueue({
-      ...args,
-      data: {
-        ...args.data,
-
-        nextUnitProcedure: {
-          connect: args.data.nextUnitProcedure,
-        },
-
-        scheduleOrder: args.data.scheduleOrder
-          ? {
-              connect: args.data.scheduleOrder,
-            }
-          : undefined,
-      },
-    });
-  }
-
-  @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => ScheduleOrderQueue)
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "update",
-    possession: "any",
-  })
-  async updateScheduleOrderQueue(
-    @graphql.Args() args: UpdateScheduleOrderQueueArgs
-  ): Promise<ScheduleOrderQueue | null> {
-    try {
-      return await this.service.updateScheduleOrderQueue({
-        ...args,
-        data: {
-          ...args.data,
-
-          nextUnitProcedure: {
-            connect: args.data.nextUnitProcedure,
-          },
-
-          scheduleOrder: args.data.scheduleOrder
-            ? {
-                connect: args.data.scheduleOrder,
-              }
-            : undefined,
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

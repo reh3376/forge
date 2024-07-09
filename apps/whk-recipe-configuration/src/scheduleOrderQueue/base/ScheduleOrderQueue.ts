@@ -127,12 +127,11 @@ class ScheduleOrderQueue {
   nextUnitProcedureName!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: () => ScheduleOrder,
   })
   @ValidateNested()
   @Type(() => ScheduleOrder)
-  @IsOptional()
   scheduleOrder?: ScheduleOrder | null;
 }
 
