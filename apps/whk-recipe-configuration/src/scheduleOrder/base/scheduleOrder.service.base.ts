@@ -15,9 +15,9 @@ import {
   Prisma,
   ScheduleOrder as PrismaScheduleOrder,
   ProductionOrder as PrismaProductionOrder,
-  ScheduleOrderQueue as PrismaScheduleOrderQueue,
   RecipeGroup as PrismaRecipeGroup,
   Recipe as PrismaRecipe,
+  ScheduleOrderQueue as PrismaScheduleOrderQueue,
 } from "@prisma/client";
 
 export class ScheduleOrderServiceBase {
@@ -66,17 +66,6 @@ export class ScheduleOrderServiceBase {
       .productionOrders(args);
   }
 
-  async findScheduleOrderQueues(
-    parentId: string,
-    args: Prisma.ScheduleOrderQueueFindManyArgs
-  ): Promise<PrismaScheduleOrderQueue[]> {
-    return this.prisma.scheduleOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .scheduleOrderQueues(args);
-  }
-
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
     return this.prisma.scheduleOrder
       .findUnique({
@@ -91,5 +80,15 @@ export class ScheduleOrderServiceBase {
         where: { id: parentId },
       })
       .scheduleOrderRecipe();
+  }
+
+  async getScheduleOrderQueues(
+    parentId: string
+  ): Promise<PrismaScheduleOrderQueue | null> {
+    return this.prisma.scheduleOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .scheduleOrderQueues();
   }
 }

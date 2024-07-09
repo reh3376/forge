@@ -17,6 +17,7 @@ import {
   MaxLength,
   IsOptional,
   IsInt,
+  Min,
   Max,
   ValidateNested,
 } from "class-validator";
@@ -88,7 +89,8 @@ class ScheduleOrderQueue {
     type: Number,
   })
   @IsInt()
-  @Max(99999999999)
+  @Min(-99)
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -125,12 +127,11 @@ class ScheduleOrderQueue {
   nextUnitProcedureName!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: () => ScheduleOrder,
   })
   @ValidateNested()
   @Type(() => ScheduleOrder)
-  @IsOptional()
   scheduleOrder?: ScheduleOrder | null;
 }
 

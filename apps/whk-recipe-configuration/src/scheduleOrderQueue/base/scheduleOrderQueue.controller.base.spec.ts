@@ -65,10 +65,8 @@ const FIND_ONE_RESULT = {
 };
 
 const service = {
-  createScheduleOrderQueue() {
-    return CREATE_RESULT;
-  },
   scheduleOrderQueues: () => FIND_MANY_RESULT,
+
   scheduleOrderQueue: ({ where }: { where: { id: string } }) => {
     switch (where.id) {
       case existingId:
@@ -139,18 +137,6 @@ describe("ScheduleOrderQueue", () => {
     await app.init();
   });
 
-  test("POST /scheduleOrderQueues", async () => {
-    await request(app.getHttpServer())
-      .post("/scheduleOrderQueues")
-      .send(CREATE_INPUT)
-      .expect(HttpStatus.CREATED)
-      .expect({
-        ...CREATE_RESULT,
-        createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-      });
-  });
-
   test("GET /scheduleOrderQueues", async () => {
     await request(app.getHttpServer())
       .get("/scheduleOrderQueues")
@@ -183,28 +169,6 @@ describe("ScheduleOrderQueue", () => {
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
-      });
-  });
-
-  test("POST /scheduleOrderQueues existing resource", async () => {
-    const agent = request(app.getHttpServer());
-    await agent
-      .post("/scheduleOrderQueues")
-      .send(CREATE_INPUT)
-      .expect(HttpStatus.CREATED)
-      .expect({
-        ...CREATE_RESULT,
-        createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-      })
-      .then(function () {
-        agent
-          .post("/scheduleOrderQueues")
-          .send(CREATE_INPUT)
-          .expect(HttpStatus.CONFLICT)
-          .expect({
-            statusCode: HttpStatus.CONFLICT,
-          });
       });
   });
 
