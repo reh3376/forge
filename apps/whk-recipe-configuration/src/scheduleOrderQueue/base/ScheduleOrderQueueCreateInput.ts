@@ -16,6 +16,7 @@ import {
   MaxLength,
   IsOptional,
   IsInt,
+  Min,
   Max,
   ValidateNested,
 } from "class-validator";
@@ -63,7 +64,8 @@ class ScheduleOrderQueueCreateInput {
     type: Number,
   })
   @IsInt()
-  @Max(99999999999)
+  @Min(-99)
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
