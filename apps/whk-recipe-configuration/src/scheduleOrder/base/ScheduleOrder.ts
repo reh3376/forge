@@ -314,12 +314,12 @@ class ScheduleOrder {
 
   @ApiProperty({
     required: false,
-    type: () => [ScheduleOrderQueue],
+    type: () => ScheduleOrderQueue,
   })
   @ValidateNested()
   @Type(() => ScheduleOrderQueue)
   @IsOptional()
-  scheduleOrderQueues?: Array<ScheduleOrderQueue>;
+  scheduleOrderQueues?: ScheduleOrderQueue | null;
 }
 
 export { ScheduleOrder as ScheduleOrder };

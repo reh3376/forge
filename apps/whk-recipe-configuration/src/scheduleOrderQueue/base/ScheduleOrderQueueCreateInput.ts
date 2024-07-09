@@ -16,6 +16,7 @@ import {
   MaxLength,
   IsOptional,
   IsInt,
+  Min,
   Max,
   ValidateNested,
 } from "class-validator";
@@ -63,7 +64,8 @@ class ScheduleOrderQueueCreateInput {
     type: Number,
   })
   @IsInt()
-  @Max(99999999999)
+  @Min(-99)
+  @Max(99)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -101,16 +103,13 @@ class ScheduleOrderQueueCreateInput {
   nextUnitProcedureName!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: () => ScheduleOrderWhereUniqueInput,
   })
   @ValidateNested()
   @Type(() => ScheduleOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
+  @Field(() => ScheduleOrderWhereUniqueInput)
+  scheduleOrder!: ScheduleOrderWhereUniqueInput | null;
 }
 
 export { ScheduleOrderQueueCreateInput as ScheduleOrderQueueCreateInput };
