@@ -266,13 +266,12 @@ model ScheduleOrderQueue {
   createdBy             String
   updatedBy             String?
   schemaVersion         String?        @default("0001-b")
-  queueIndex            Int?
+  queueIndex            Int?           @unique
   globalId              String?        @unique @default(cuid())
   nextUnitProcedure     UnitProcedure  @relation(fields: [nextUnitProcedureId], references: [id])
   nextUnitProcedureId   String         @unique
   nextUnitProcedureName String
-  scheduleOrder         ScheduleOrder? @relation(fields: [scheduleOrderId], references: [id])
-  scheduleOrderId       String?
+  scheduleOrder         ScheduleOrder?
 
   @@unique([queueIndex, nextUnitProcedureId])
 }
@@ -391,7 +390,8 @@ model ScheduleOrder {
   actualEnd                    DateTime?
   duration                     Decimal?
   durationUnits                String?                  @default("Hours")
-  scheduleOrderQueues          ScheduleOrderQueue[]
+  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  scheduleOrderQueueId         String?                  @unique
 }
 
 model Item {

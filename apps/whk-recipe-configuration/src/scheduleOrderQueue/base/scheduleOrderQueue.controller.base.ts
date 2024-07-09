@@ -19,13 +19,10 @@ import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import * as nestAccessControl from "nest-access-control";
 import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { ScheduleOrderQueueCreateInput } from "./ScheduleOrderQueueCreateInput";
-import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
 import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
 import { ScheduleOrderQueueWhereUniqueInput } from "./ScheduleOrderQueueWhereUniqueInput";
-import { ScheduleOrderQueueUpdateInput } from "./ScheduleOrderQueueUpdateInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -34,63 +31,6 @@ export class ScheduleOrderQueueControllerBase {
     protected readonly service: ScheduleOrderQueueService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.Post()
-  @swagger.ApiCreatedResponse({ type: ScheduleOrderQueue })
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: ScheduleOrderQueueCreateInput,
-  })
-  async createScheduleOrderQueue(
-    @common.Body() data: ScheduleOrderQueueCreateInput
-  ): Promise<ScheduleOrderQueue> {
-    return await this.service.createScheduleOrderQueue({
-      data: {
-        ...data,
-
-        nextUnitProcedure: {
-          connect: data.nextUnitProcedure,
-        },
-
-        scheduleOrder: data.scheduleOrder
-          ? {
-              connect: data.scheduleOrder,
-            }
-          : undefined,
-      },
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        queueIndex: true,
-        globalId: true,
-
-        nextUnitProcedure: {
-          select: {
-            id: true,
-          },
-        },
-
-        nextUnitProcedureName: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-  }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
@@ -185,75 +125,5 @@ export class ScheduleOrderQueueControllerBase {
       );
     }
     return result;
-  }
-
-  @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.Patch("/:id")
-  @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: ScheduleOrderQueueUpdateInput,
-  })
-  async updateScheduleOrderQueue(
-    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
-    @common.Body() data: ScheduleOrderQueueUpdateInput
-  ): Promise<ScheduleOrderQueue | null> {
-    try {
-      return await this.service.updateScheduleOrderQueue({
-        where: params,
-        data: {
-          ...data,
-
-          nextUnitProcedure: {
-            connect: data.nextUnitProcedure,
-          },
-
-          scheduleOrder: data.scheduleOrder
-            ? {
-                connect: data.scheduleOrder,
-              }
-            : undefined,
-        },
-        select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          schemaVersion: true,
-          queueIndex: true,
-          globalId: true,
-
-          nextUnitProcedure: {
-            select: {
-              id: true,
-            },
-          },
-
-          nextUnitProcedureName: true,
-
-          scheduleOrder: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
-    }
   }
 }

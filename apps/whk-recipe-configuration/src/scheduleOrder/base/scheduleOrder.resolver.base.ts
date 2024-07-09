@@ -27,10 +27,9 @@ import { CreateScheduleOrderArgs } from "./CreateScheduleOrderArgs";
 import { UpdateScheduleOrderArgs } from "./UpdateScheduleOrderArgs";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { Recipe } from "../../recipe/base/Recipe";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { ScheduleOrderService } from "../scheduleOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ScheduleOrder)
@@ -109,6 +108,12 @@ export class ScheduleOrderResolverBase {
               connect: args.data.scheduleOrderRecipe,
             }
           : undefined,
+
+        scheduleOrderQueues: args.data.scheduleOrderQueues
+          ? {
+              connect: args.data.scheduleOrderQueues,
+            }
+          : undefined,
       },
     });
   }
@@ -138,6 +143,12 @@ export class ScheduleOrderResolverBase {
                 connect: args.data.scheduleOrderRecipe,
               }
             : undefined,
+
+          scheduleOrderQueues: args.data.scheduleOrderQueues
+            ? {
+                connect: args.data.scheduleOrderQueues,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -162,28 +173,6 @@ export class ScheduleOrderResolverBase {
     @graphql.Args() args: ProductionOrderFindManyArgs
   ): Promise<ProductionOrder[]> {
     const results = await this.service.findProductionOrders(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ScheduleOrderQueue], {
-    name: "scheduleOrderQueues",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "read",
-    possession: "any",
-  })
-  async findScheduleOrderQueues(
-    @graphql.Parent() parent: ScheduleOrder,
-    @graphql.Args() args: ScheduleOrderQueueFindManyArgs
-  ): Promise<ScheduleOrderQueue[]> {
-    const results = await this.service.findScheduleOrderQueues(parent.id, args);
 
     if (!results) {
       return [];
@@ -227,6 +216,27 @@ export class ScheduleOrderResolverBase {
     @graphql.Parent() parent: ScheduleOrder
   ): Promise<Recipe | null> {
     const result = await this.service.getScheduleOrderRecipe(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ScheduleOrderQueue, {
+    nullable: true,
+    name: "scheduleOrderQueues",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async getScheduleOrderQueues(
+    @graphql.Parent() parent: ScheduleOrder
+  ): Promise<ScheduleOrderQueue | null> {
+    const result = await this.service.getScheduleOrderQueues(parent.id);
 
     if (!result) {
       return null;

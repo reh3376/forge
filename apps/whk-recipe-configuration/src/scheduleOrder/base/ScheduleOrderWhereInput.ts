@@ -23,7 +23,7 @@ import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderWhereInput {
@@ -285,15 +285,15 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueueListRelationFilter,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueueListRelationFilter)
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
   @IsOptional()
-  @Field(() => ScheduleOrderQueueListRelationFilter, {
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
     nullable: true,
   })
-  scheduleOrderQueues?: ScheduleOrderQueueListRelationFilter;
+  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput;
 }
 
 export { ScheduleOrderWhereInput as ScheduleOrderWhereInput };
