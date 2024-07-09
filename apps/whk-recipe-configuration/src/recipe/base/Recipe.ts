@@ -213,12 +213,12 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: () => PhaseParameter,
+    type: () => [PhaseParameter],
   })
   @ValidateNested()
   @Type(() => PhaseParameter)
   @IsOptional()
-  parameters?: PhaseParameter | null;
+  parameters?: Array<PhaseParameter>;
 
   @ApiProperty({
     required: false,

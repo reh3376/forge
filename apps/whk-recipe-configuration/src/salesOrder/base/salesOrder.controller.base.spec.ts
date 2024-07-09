@@ -30,6 +30,8 @@ const CREATE_INPUT = {
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
   erpId: "exampleErpId",
+  requestedShipDate: new Date(),
+  name: "exampleName",
 };
 const CREATE_RESULT = {
   createdAt: new Date(),
@@ -44,6 +46,8 @@ const CREATE_RESULT = {
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
   erpId: "exampleErpId",
+  requestedShipDate: new Date(),
+  name: "exampleName",
 };
 const FIND_MANY_RESULT = [
   {
@@ -59,6 +63,8 @@ const FIND_MANY_RESULT = [
     globalId: "exampleGlobalId",
     customerCode: "exampleCustomerCode",
     erpId: "exampleErpId",
+    requestedShipDate: new Date(),
+    name: "exampleName",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -74,6 +80,8 @@ const FIND_ONE_RESULT = {
   globalId: "exampleGlobalId",
   customerCode: "exampleCustomerCode",
   erpId: "exampleErpId",
+  requestedShipDate: new Date(),
+  name: "exampleName",
 };
 
 const service = {
@@ -160,6 +168,7 @@ describe("SalesOrder", () => {
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
+        requestedShipDate: CREATE_RESULT.requestedShipDate.toISOString(),
       });
   });
 
@@ -172,6 +181,8 @@ describe("SalesOrder", () => {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
+          requestedShipDate:
+            FIND_MANY_RESULT[0].requestedShipDate.toISOString(),
         },
       ]);
   });
@@ -195,6 +206,7 @@ describe("SalesOrder", () => {
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
+        requestedShipDate: FIND_ONE_RESULT.requestedShipDate.toISOString(),
       });
   });
 
@@ -208,6 +220,7 @@ describe("SalesOrder", () => {
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
+        requestedShipDate: CREATE_RESULT.requestedShipDate.toISOString(),
       })
       .then(function () {
         agent

@@ -97,6 +97,8 @@ export class SalesOrderControllerBase {
         customerCode: true,
         lineItems: true,
         erpId: true,
+        requestedShipDate: true,
+        name: true,
       },
     });
   }
@@ -144,6 +146,8 @@ export class SalesOrderControllerBase {
         customerCode: true,
         lineItems: true,
         erpId: true,
+        requestedShipDate: true,
+        name: true,
       },
     });
   }
@@ -192,6 +196,8 @@ export class SalesOrderControllerBase {
         customerCode: true,
         lineItems: true,
         erpId: true,
+        requestedShipDate: true,
+        name: true,
       },
     });
     if (result === null) {
@@ -266,6 +272,8 @@ export class SalesOrderControllerBase {
           customerCode: true,
           lineItems: true,
           erpId: true,
+          requestedShipDate: true,
+          name: true,
         },
       });
     } catch (error) {

@@ -21,6 +21,7 @@ import { IntFilter } from "../../util/IntFilter";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { JsonFilter } from "../../util/JsonFilter";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
 @InputType()
 class SalesOrderWhereInput {
@@ -202,6 +203,28 @@ class SalesOrderWhereInput {
     nullable: true,
   })
   erpId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  requestedShipDate?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  name?: StringFilter;
 }
 
 export { SalesOrderWhereInput as SalesOrderWhereInput };

@@ -573,12 +573,6 @@ export class PhaseParameterControllerBase {
           },
         },
 
-        parameters: {
-          select: {
-            id: true,
-          },
-        },
-
         item: {
           select: {
             id: true,

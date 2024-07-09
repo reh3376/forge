@@ -136,6 +136,17 @@ class BatchWhereInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  parameterData?: JsonFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };

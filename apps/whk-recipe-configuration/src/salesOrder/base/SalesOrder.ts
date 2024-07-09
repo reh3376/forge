@@ -186,6 +186,26 @@ class SalesOrder {
     nullable: true,
   })
   erpId!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  requestedShipDate!: Date | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  name!: string;
 }
 
 export { SalesOrder as SalesOrder };
