@@ -132,6 +132,16 @@ class BatchCreateInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  parameterData?: InputJsonValue;
 }
 
 export { BatchCreateInput as BatchCreateInput };

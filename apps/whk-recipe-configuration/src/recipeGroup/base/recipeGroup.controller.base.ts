@@ -229,12 +229,6 @@ export class RecipeGroupControllerBase {
           },
         },
 
-        parameters: {
-          select: {
-            id: true,
-          },
-        },
-
         item: {
           select: {
             id: true,
@@ -392,6 +386,8 @@ export class RecipeGroupControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
+        quantity: true,
       },
     });
     if (results === null) {

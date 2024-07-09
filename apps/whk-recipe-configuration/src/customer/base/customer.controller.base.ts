@@ -250,6 +250,8 @@ export class CustomerControllerBase {
         customerCode: true,
         lineItems: true,
         erpId: true,
+        requestedShipDate: true,
+        name: true,
       },
     });
     if (results === null) {
@@ -402,6 +404,8 @@ export class CustomerControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
+        quantity: true,
       },
     });
     if (results === null) {
@@ -514,12 +518,6 @@ export class CustomerControllerBase {
         globalId: true,
 
         customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameters: {
           select: {
             id: true,
           },

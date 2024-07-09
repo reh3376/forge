@@ -410,6 +410,8 @@ export class LotControllerBase {
             id: true,
           },
         },
+
+        parameterData: true,
       },
     });
     if (results === null) {

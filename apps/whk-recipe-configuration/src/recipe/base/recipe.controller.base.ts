@@ -41,6 +41,9 @@ import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOr
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
+import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -78,12 +81,6 @@ export class RecipeControllerBase {
           connect: data.customer,
         },
 
-        parameters: data.parameters
-          ? {
-              connect: data.parameters,
-            }
-          : undefined,
-
         item: data.item
           ? {
               connect: data.item,
@@ -111,12 +108,6 @@ export class RecipeControllerBase {
         globalId: true,
 
         customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameters: {
           select: {
             id: true,
           },
@@ -168,12 +159,6 @@ export class RecipeControllerBase {
         globalId: true,
 
         customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameters: {
           select: {
             id: true,
           },
@@ -231,12 +216,6 @@ export class RecipeControllerBase {
           },
         },
 
-        parameters: {
-          select: {
-            id: true,
-          },
-        },
-
         item: {
           select: {
             id: true,
@@ -287,12 +266,6 @@ export class RecipeControllerBase {
             connect: data.customer,
           },
 
-          parameters: data.parameters
-            ? {
-                connect: data.parameters,
-              }
-            : undefined,
-
           item: data.item
             ? {
                 connect: data.item,
@@ -320,12 +293,6 @@ export class RecipeControllerBase {
           globalId: true,
 
           customer: {
-            select: {
-              id: true,
-            },
-          },
-
-          parameters: {
             select: {
               id: true,
             },
@@ -564,6 +531,8 @@ export class RecipeControllerBase {
 
         globalId: true,
         customerCode: true,
+        units: true,
+        quantity: true,
       },
     });
     if (results === null) {
@@ -1025,6 +994,128 @@ export class RecipeControllerBase {
   ): Promise<void> {
     const data = {
       lots: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/parameters")
+  @ApiNestedQuery(PhaseParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "PhaseParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findParameters(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<PhaseParameter[]> {
+    const query = plainToClass(PhaseParameterFindManyArgs, request.query);
+    const results = await this.service.findParameters(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        setpointUpperLimit: true,
+        setpointNumericalValue: true,
+        setpointBooleanValue: true,
+        name: true,
+        description: true,
+        updatedAt: true,
+        itemId: true,
+        setpointType: true,
+        setpointLowerLimit: true,
+        schemaVersion: true,
+        createdBy: true,
+        units: true,
+        recipeId: true,
+        editedBy: true,
+        revision: true,
+        active: true,
+        isClassDef: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isStaticParameter: true,
+        staticName: true,
+        globalId: true,
+        stringValue: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/parameters")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectParameters(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: PhaseParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      parameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/parameters")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateParameters(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: PhaseParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      parameters: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/parameters")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectParameters(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: PhaseParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      parameters: {
         disconnect: body,
       },
     };

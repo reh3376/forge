@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   IsDate,
@@ -19,7 +20,11 @@ import {
   IsOptional,
   IsBoolean,
   IsEnum,
+  IsInt,
+  Min,
+  Max,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { Bom } from "../../bom/base/Bom";
 import { Item } from "../../item/base/Item";
@@ -294,6 +299,31 @@ class ProductionOrder {
     nullable: true,
   })
   customerCode!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  units!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity!: number | null;
 }
 
 export { ProductionOrder as ProductionOrder };
