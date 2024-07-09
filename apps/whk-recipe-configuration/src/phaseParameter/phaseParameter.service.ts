@@ -163,7 +163,9 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
           for (const equipmentPhaseInput of args.data.equipmentPhases.connect) {
               // args.data.equipmentPhases.connect.forEach((equipmentPhaseInput: EquipmentPhaseWhereUniqueInput) => {
               const equipmentPhaseId = equipmentPhaseInput.id as string;
-              await this.validateEquipmentPhase(equipmentPhaseId, name);
+              if (name) {
+                await this.validateEquipmentPhase(equipmentPhaseId, name);
+              }
           }
           phaseParameterData = await super.updatePhaseParameter(args);
 
