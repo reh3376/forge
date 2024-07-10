@@ -37,18 +37,12 @@ export class RabbitMQController {
     // try {
       const eventType: string = message.data.event_type;
       if (eventType === 'create') {
-          await this.syncService.upsertEntity(message.data.recordName, message);
+          await this.syncService.upsertEntity(message.data.recordName, message, 'create');
           return;
       } else if (eventType === 'update') {
-          await this.syncService.upsertEntity(message.data.recordName, message);
-          return;
-      } else if (eventType === 'delete') {
-          await this.syncService.deleteEntity(message.data.recordName, message);
+          await this.syncService.upsertEntity(message.data.recordName, message, 'update');
           return;
       }
-    // } catch (error) {
-    //   this.logger.error(`Error handling event: ${error}`);
-    // }
   }
 
   @EventPattern("wh.whk01.distillery01.asset")
