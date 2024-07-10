@@ -22,40 +22,40 @@ const CREATE_INPUT = {
   recipeSetpointUpperLimit: 42.42,
   recipeParamName: "exampleRecipeParamName",
   className: "exampleClassName",
-  batch: "exampleBatch",
   active: "true",
   createdBy: "exampleCreatedBy",
   recipeSetpointLowerLimit: 42.42,
-  editedAt: new Date(),
+  updatedAt: new Date(),
   id: "exampleId",
   recipeParamDescription: "exampleRecipeParamDescription",
-  editedBy: "exampleEditedBy",
+  updatedBy: "exampleUpdatedBy",
   recipeSetpointBooleanValue: "true",
   createdAt: new Date(),
-  itemId: "exampleItemId",
+  recipeParamUnits: "exampleRecipeParamUnits",
   schemaVersion: "exampleSchemaVersion",
   isClassDefinition: "true",
   globalId: "exampleGlobalId",
+  recipeNumericalSetpoint: 42.424242424,
 };
 const CREATE_RESULT = {
   revision: 42,
   recipeSetpointUpperLimit: 42.42,
   recipeParamName: "exampleRecipeParamName",
   className: "exampleClassName",
-  batch: "exampleBatch",
   active: "true",
   createdBy: "exampleCreatedBy",
   recipeSetpointLowerLimit: 42.42,
-  editedAt: new Date(),
+  updatedAt: new Date(),
   id: "exampleId",
   recipeParamDescription: "exampleRecipeParamDescription",
-  editedBy: "exampleEditedBy",
+  updatedBy: "exampleUpdatedBy",
   recipeSetpointBooleanValue: "true",
   createdAt: new Date(),
-  itemId: "exampleItemId",
+  recipeParamUnits: "exampleRecipeParamUnits",
   schemaVersion: "exampleSchemaVersion",
   isClassDefinition: "true",
   globalId: "exampleGlobalId",
+  recipeNumericalSetpoint: 42.424242424,
 };
 const FIND_MANY_RESULT = [
   {
@@ -63,20 +63,20 @@ const FIND_MANY_RESULT = [
     recipeSetpointUpperLimit: 42.42,
     recipeParamName: "exampleRecipeParamName",
     className: "exampleClassName",
-    batch: "exampleBatch",
     active: "true",
     createdBy: "exampleCreatedBy",
     recipeSetpointLowerLimit: 42.42,
-    editedAt: new Date(),
+    updatedAt: new Date(),
     id: "exampleId",
     recipeParamDescription: "exampleRecipeParamDescription",
-    editedBy: "exampleEditedBy",
+    updatedBy: "exampleUpdatedBy",
     recipeSetpointBooleanValue: "true",
     createdAt: new Date(),
-    itemId: "exampleItemId",
+    recipeParamUnits: "exampleRecipeParamUnits",
     schemaVersion: "exampleSchemaVersion",
     isClassDefinition: "true",
     globalId: "exampleGlobalId",
+    recipeNumericalSetpoint: 42.424242424,
   },
 ];
 const FIND_ONE_RESULT = {
@@ -84,20 +84,20 @@ const FIND_ONE_RESULT = {
   recipeSetpointUpperLimit: 42.42,
   recipeParamName: "exampleRecipeParamName",
   className: "exampleClassName",
-  batch: "exampleBatch",
   active: "true",
   createdBy: "exampleCreatedBy",
   recipeSetpointLowerLimit: 42.42,
-  editedAt: new Date(),
+  updatedAt: new Date(),
   id: "exampleId",
   recipeParamDescription: "exampleRecipeParamDescription",
-  editedBy: "exampleEditedBy",
+  updatedBy: "exampleUpdatedBy",
   recipeSetpointBooleanValue: "true",
   createdAt: new Date(),
-  itemId: "exampleItemId",
+  recipeParamUnits: "exampleRecipeParamUnits",
   schemaVersion: "exampleSchemaVersion",
   isClassDefinition: "true",
   globalId: "exampleGlobalId",
+  recipeNumericalSetpoint: 42.424242424,
 };
 
 const service = {
@@ -182,7 +182,7 @@ describe("RecipeParameter", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
-        editedAt: CREATE_RESULT.editedAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
       });
   });
@@ -194,7 +194,7 @@ describe("RecipeParameter", () => {
       .expect([
         {
           ...FIND_MANY_RESULT[0],
-          editedAt: FIND_MANY_RESULT[0].editedAt.toISOString(),
+          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
         },
       ]);
@@ -217,7 +217,7 @@ describe("RecipeParameter", () => {
       .expect(HttpStatus.OK)
       .expect({
         ...FIND_ONE_RESULT,
-        editedAt: FIND_ONE_RESULT.editedAt.toISOString(),
+        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
       });
   });
@@ -230,7 +230,7 @@ describe("RecipeParameter", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
-        editedAt: CREATE_RESULT.editedAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
       })
       .then(function () {

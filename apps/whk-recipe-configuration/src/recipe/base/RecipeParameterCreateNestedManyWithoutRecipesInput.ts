@@ -10,19 +10,19 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class PhaseParameterCreateNestedManyWithoutRecipesInput {
-  @Field(() => [PhaseParameterWhereUniqueInput], {
+class RecipeParameterCreateNestedManyWithoutRecipesInput {
+  @Field(() => [RecipeParameterWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [PhaseParameterWhereUniqueInput],
+    type: () => [RecipeParameterWhereUniqueInput],
   })
-  connect?: Array<PhaseParameterWhereUniqueInput>;
+  connect?: Array<RecipeParameterWhereUniqueInput>;
 }
 
-export { PhaseParameterCreateNestedManyWithoutRecipesInput as PhaseParameterCreateNestedManyWithoutRecipesInput };
+export { RecipeParameterCreateNestedManyWithoutRecipesInput as RecipeParameterCreateNestedManyWithoutRecipesInput };

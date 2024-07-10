@@ -25,6 +25,8 @@ import { RecipeParameterFindManyArgs } from "./RecipeParameterFindManyArgs";
 import { RecipeParameterFindUniqueArgs } from "./RecipeParameterFindUniqueArgs";
 import { CreateRecipeParameterArgs } from "./CreateRecipeParameterArgs";
 import { UpdateRecipeParameterArgs } from "./UpdateRecipeParameterArgs";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeParameterService } from "../recipeParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeParameter)
@@ -137,17 +139,37 @@ export class RecipeParameterResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeParameter], { name: "recipeParameters" })
+  @graphql.ResolveField(() => [RecipeParameter], { name: "instances" })
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "any",
   })
-  async findRecipeParameters(
+  async findInstances(
     @graphql.Parent() parent: RecipeParameter,
     @graphql.Args() args: RecipeParameterFindManyArgs
   ): Promise<RecipeParameter[]> {
-    const results = await this.service.findRecipeParameters(parent.id, args);
+    const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Recipe], { name: "recipe" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipe(
+    @graphql.Parent() parent: RecipeParameter,
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findRecipe(parent.id, args);
 
     if (!results) {
       return [];

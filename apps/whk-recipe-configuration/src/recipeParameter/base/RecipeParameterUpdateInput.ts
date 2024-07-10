@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field } from "@nestjs/graphql";
+import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
@@ -25,13 +25,11 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
-import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { RecipeParameterUpdateManyWithoutRecipeParametersInput } from "./RecipeParameterUpdateManyWithoutRecipeParametersInput";
+import { Decimal } from "decimal.js";
+import { RecipeUpdateManyWithoutRecipeParametersInput } from "./RecipeUpdateManyWithoutRecipeParametersInput";
 
 @InputType()
 class RecipeParameterUpdateInput {
@@ -44,7 +42,7 @@ class RecipeParameterUpdateInput {
   @Field(() => EnumRecipeParameterRecipeSetpointType, {
     nullable: true,
   })
-  recipeSetpointType?: "Boolean" | "Numeric";
+  recipeSetpointType?: "Boolean" | "Numeric" | "Text";
 
   @ApiProperty({
     required: false,
@@ -93,18 +91,6 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   className?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  batch?: string | null;
 
   @ApiProperty({
     required: false,
@@ -163,17 +149,7 @@ class RecipeParameterUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  editedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  sequencerParameters?: InputJsonValue;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -191,33 +167,12 @@ class RecipeParameterUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  itemId?: string;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumRecipeParameterRecipeParamUnits,
-  })
-  @IsEnum(EnumRecipeParameterRecipeParamUnits)
-  @IsOptional()
-  @Field(() => EnumRecipeParameterRecipeParamUnits, {
-    nullable: true,
-  })
-  recipeParamUnits?:
-    | "Lbs"
-    | "Gal"
-    | "Percentage"
-    | "PassFail"
-    | "Seconds"
-    | "Minutes"
-    | "DateTime"
-    | "Feet"
-    | "Bushels"
-    | null;
+  recipeParamUnits?: string | null;
 
   @ApiProperty({
     required: false,
@@ -264,7 +219,7 @@ class RecipeParameterUpdateInput {
   @Field(() => RecipeParameterUpdateManyWithoutRecipeParametersInput, {
     nullable: true,
   })
-  recipeParameters?: RecipeParameterUpdateManyWithoutRecipeParametersInput;
+  instances?: RecipeParameterUpdateManyWithoutRecipeParametersInput;
 
   @ApiProperty({
     required: false,
@@ -277,6 +232,30 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  recipeNumericalSetpoint?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutRecipeParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutRecipeParametersInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutRecipeParametersInput, {
+    nullable: true,
+  })
+  recipe?: RecipeUpdateManyWithoutRecipeParametersInput;
 }
 
 export { RecipeParameterUpdateInput as RecipeParameterUpdateInput };

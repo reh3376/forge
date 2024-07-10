@@ -29,6 +29,7 @@ import { Type } from "class-transformer";
 import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./FermentationChemistryCreateNestedManyWithoutAssetsInput";
 import { FermentationDayDatumCreateNestedManyWithoutAssetsInput } from "./FermentationDayDatumCreateNestedManyWithoutAssetsInput";
 import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
+import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedManyWithoutAssetsInput";
 
 @InputType()
 class AssetCreateInput {
@@ -186,6 +187,18 @@ class AssetCreateInput {
     nullable: true,
   })
   mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutAssetsInput;
 }
 
 export { AssetCreateInput as AssetCreateInput };

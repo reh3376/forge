@@ -67,6 +67,12 @@ export class BatchControllerBase {
               connect: data.lot,
             }
           : undefined,
+
+        asset: data.asset
+          ? {
+              connect: data.asset,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -92,6 +98,16 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
+        batchInitData: true,
       },
     });
   }
@@ -136,6 +152,16 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
+        batchInitData: true,
       },
     });
   }
@@ -181,6 +207,16 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
+        batchInitData: true,
       },
     });
     if (result === null) {
@@ -227,6 +263,12 @@ export class BatchControllerBase {
                 connect: data.lot,
               }
             : undefined,
+
+          asset: data.asset
+            ? {
+                connect: data.asset,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -252,6 +294,16 @@ export class BatchControllerBase {
           },
 
           parameterData: true,
+
+          asset: {
+            select: {
+              id: true,
+            },
+          },
+
+          assetPath: true,
+          recipeId: true,
+          batchInitData: true,
         },
       });
     } catch (error) {
@@ -303,6 +355,16 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
+        batchInitData: true,
       },
     });
     if (results === null) {

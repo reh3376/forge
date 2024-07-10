@@ -18,6 +18,7 @@ import {
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   MashDatum as PrismaMashDatum,
+  Batch as PrismaBatch,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -85,5 +86,16 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .mashData(args);
+  }
+
+  async findBatches(
+    parentId: string,
+    args: Prisma.BatchFindManyArgs
+  ): Promise<PrismaBatch[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batches(args);
   }
 }

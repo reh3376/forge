@@ -31,7 +31,7 @@ import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { Customer } from "../../customer/base/Customer";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Lot } from "../../lot/base/Lot";
-import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { Item } from "../../item/base/Item";
 
 @ObjectType()
@@ -213,12 +213,12 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: () => [PhaseParameter],
+    type: () => [RecipeParameter],
   })
   @ValidateNested()
-  @Type(() => PhaseParameter)
+  @Type(() => RecipeParameter)
   @IsOptional()
-  parameters?: Array<PhaseParameter>;
+  parameters?: Array<RecipeParameter>;
 
   @ApiProperty({
     required: false,
