@@ -187,6 +187,16 @@ class Batch {
     nullable: true,
   })
   recipeId!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  batchInitData!: JsonValue;
 }
 
 export { Batch as Batch };

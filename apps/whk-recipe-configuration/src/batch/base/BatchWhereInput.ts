@@ -183,6 +183,17 @@ class BatchWhereInput {
     nullable: true,
   })
   recipeId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  batchInitData?: JsonFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };
