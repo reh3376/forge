@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field } from "@nestjs/graphql";
+import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
@@ -25,13 +25,11 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
-import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
 import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { RecipeParameterCreateNestedManyWithoutRecipeParametersInput } from "./RecipeParameterCreateNestedManyWithoutRecipeParametersInput";
+import { Decimal } from "decimal.js";
+import { RecipeCreateNestedManyWithoutRecipeParametersInput } from "./RecipeCreateNestedManyWithoutRecipeParametersInput";
 
 @InputType()
 class RecipeParameterCreateInput {
@@ -41,7 +39,7 @@ class RecipeParameterCreateInput {
   })
   @IsEnum(EnumRecipeParameterRecipeSetpointType)
   @Field(() => EnumRecipeParameterRecipeSetpointType)
-  recipeSetpointType!: "Boolean" | "Numeric";
+  recipeSetpointType!: "Boolean" | "Numeric" | "Text";
 
   @ApiProperty({
     required: false,
@@ -84,18 +82,6 @@ class RecipeParameterCreateInput {
   @MaxLength(256)
   @Field(() => String)
   className!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  batch?: string | null;
 
   @ApiProperty({
     required: true,
@@ -148,17 +134,7 @@ class RecipeParameterCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  editedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  sequencerParameters?: InputJsonValue;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -172,34 +148,16 @@ class RecipeParameterCreateInput {
   recipeSetpointBooleanValue?: boolean | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  itemId!: string;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumRecipeParameterRecipeParamUnits,
-  })
-  @IsEnum(EnumRecipeParameterRecipeParamUnits)
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => EnumRecipeParameterRecipeParamUnits, {
+  @Field(() => String, {
     nullable: true,
   })
-  recipeParamUnits?:
-    | "Lbs"
-    | "Gal"
-    | "Percentage"
-    | "PassFail"
-    | "Seconds"
-    | "Minutes"
-    | "DateTime"
-    | "Feet"
-    | "Bushels"
-    | null;
+  recipeParamUnits?: string | null;
 
   @ApiProperty({
     required: false,
@@ -246,7 +204,7 @@ class RecipeParameterCreateInput {
   @Field(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput, {
     nullable: true,
   })
-  recipeParameters?: RecipeParameterCreateNestedManyWithoutRecipeParametersInput;
+  instances?: RecipeParameterCreateNestedManyWithoutRecipeParametersInput;
 
   @ApiProperty({
     required: false,
@@ -259,6 +217,30 @@ class RecipeParameterCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  recipeNumericalSetpoint?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutRecipeParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutRecipeParametersInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutRecipeParametersInput, {
+    nullable: true,
+  })
+  recipe?: RecipeCreateNestedManyWithoutRecipeParametersInput;
 }
 
 export { RecipeParameterCreateInput as RecipeParameterCreateInput };

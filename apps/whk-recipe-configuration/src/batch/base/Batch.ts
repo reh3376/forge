@@ -27,6 +27,7 @@ import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
+import { Asset } from "../../asset/base/Asset";
 
 @ObjectType()
 class Batch {
@@ -153,6 +154,49 @@ class Batch {
     nullable: true,
   })
   parameterData!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  asset?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  assetPath!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeId!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  batchInitData!: JsonValue;
 }
 
 export { Batch as Batch };

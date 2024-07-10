@@ -10,37 +10,37 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class PhaseParameterUpdateManyWithoutRecipesInput {
-  @Field(() => [PhaseParameterWhereUniqueInput], {
+class RecipeUpdateManyWithoutRecipeParametersInput {
+  @Field(() => [RecipeWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [PhaseParameterWhereUniqueInput],
+    type: () => [RecipeWhereUniqueInput],
   })
-  connect?: Array<PhaseParameterWhereUniqueInput>;
+  connect?: Array<RecipeWhereUniqueInput>;
 
-  @Field(() => [PhaseParameterWhereUniqueInput], {
+  @Field(() => [RecipeWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [PhaseParameterWhereUniqueInput],
+    type: () => [RecipeWhereUniqueInput],
   })
-  disconnect?: Array<PhaseParameterWhereUniqueInput>;
+  disconnect?: Array<RecipeWhereUniqueInput>;
 
-  @Field(() => [PhaseParameterWhereUniqueInput], {
+  @Field(() => [RecipeWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [PhaseParameterWhereUniqueInput],
+    type: () => [RecipeWhereUniqueInput],
   })
-  set?: Array<PhaseParameterWhereUniqueInput>;
+  set?: Array<RecipeWhereUniqueInput>;
 }
 
-export { PhaseParameterUpdateManyWithoutRecipesInput as PhaseParameterUpdateManyWithoutRecipesInput };
+export { RecipeUpdateManyWithoutRecipeParametersInput as RecipeUpdateManyWithoutRecipeParametersInput };

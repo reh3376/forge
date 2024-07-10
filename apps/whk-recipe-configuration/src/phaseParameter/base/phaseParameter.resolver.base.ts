@@ -27,8 +27,6 @@ import { CreatePhaseParameterArgs } from "./CreatePhaseParameterArgs";
 import { UpdatePhaseParameterArgs } from "./UpdatePhaseParameterArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
-import { Recipe } from "../../recipe/base/Recipe";
 import { PhaseParameterService } from "../phaseParameter.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => PhaseParameter)
@@ -172,26 +170,6 @@ export class PhaseParameterResolverBase {
     @graphql.Args() args: EquipmentPhaseFindManyArgs
   ): Promise<EquipmentPhase[]> {
     const results = await this.service.findEquipmentPhases(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Recipe], { name: "recipes" })
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipes(
-    @graphql.Parent() parent: PhaseParameter,
-    @graphql.Args() args: RecipeFindManyArgs
-  ): Promise<Recipe[]> {
-    const results = await this.service.findRecipes(parent.id, args);
 
     if (!results) {
       return [];

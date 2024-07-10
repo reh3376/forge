@@ -16,6 +16,7 @@ import {
   Batch as PrismaBatch,
   FermentationChemistry as PrismaFermentationChemistry,
   Lot as PrismaLot,
+  Asset as PrismaAsset,
 } from "@prisma/client";
 
 export class BatchServiceBase {
@@ -77,5 +78,13 @@ export class BatchServiceBase {
         where: { id: parentId },
       })
       .lot();
+  }
+
+  async getAsset(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.batch
+      .findUnique({
+        where: { id: parentId },
+      })
+      .asset();
   }
 }
