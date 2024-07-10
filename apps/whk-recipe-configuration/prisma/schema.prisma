@@ -749,6 +749,7 @@ model Batch {
   assetId                 String?
   assetPath               String?
   recipeId                String?
+  batchInitData           Json?
 }
 
 model Vendor {

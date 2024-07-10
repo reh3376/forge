@@ -767,6 +767,7 @@ export class AssetControllerBase {
 
         assetPath: true,
         recipeId: true,
+        batchInitData: true,
       },
     });
     if (results === null) {

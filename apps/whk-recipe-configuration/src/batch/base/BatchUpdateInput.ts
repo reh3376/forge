@@ -182,6 +182,16 @@ class BatchUpdateInput {
     nullable: true,
   })
   recipeId?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  batchInitData?: InputJsonValue;
 }
 
 export { BatchUpdateInput as BatchUpdateInput };

@@ -421,6 +421,7 @@ export class LotControllerBase {
 
         assetPath: true,
         recipeId: true,
+        batchInitData: true,
       },
     });
     if (results === null) {
