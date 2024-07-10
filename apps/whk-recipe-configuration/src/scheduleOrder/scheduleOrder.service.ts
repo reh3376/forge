@@ -48,4 +48,5 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
         this.logger.log(`Deleted ScheduleOrder: ${scheduleOrder.id} & pushed to topic`);
         return scheduleOrder;
     }
+
 }
