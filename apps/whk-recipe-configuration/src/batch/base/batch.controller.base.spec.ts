@@ -24,6 +24,8 @@ const CREATE_INPUT = {
   batchId: "exampleBatchId",
   quantity: 42,
   revision: 42,
+  assetPath: "exampleAssetPath",
+  recipeId: "exampleRecipeId",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -32,6 +34,8 @@ const CREATE_RESULT = {
   batchId: "exampleBatchId",
   quantity: 42,
   revision: 42,
+  assetPath: "exampleAssetPath",
+  recipeId: "exampleRecipeId",
 };
 const FIND_MANY_RESULT = [
   {
@@ -41,6 +45,8 @@ const FIND_MANY_RESULT = [
     batchId: "exampleBatchId",
     quantity: 42,
     revision: 42,
+    assetPath: "exampleAssetPath",
+    recipeId: "exampleRecipeId",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -50,6 +56,8 @@ const FIND_ONE_RESULT = {
   batchId: "exampleBatchId",
   quantity: 42,
   revision: 42,
+  assetPath: "exampleAssetPath",
+  recipeId: "exampleRecipeId",
 };
 
 const service = {

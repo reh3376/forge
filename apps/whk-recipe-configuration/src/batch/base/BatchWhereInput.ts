@@ -20,6 +20,8 @@ import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class BatchWhereInput {
@@ -147,6 +149,40 @@ class BatchWhereInput {
     nullable: true,
   })
   parameterData?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  assetPath?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  recipeId?: StringNullableFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };

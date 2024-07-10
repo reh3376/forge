@@ -23,6 +23,7 @@ import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/Purcha
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 
 @InputType()
 class AssetWhereInput {
@@ -224,6 +225,18 @@ class AssetWhereInput {
     nullable: true,
   })
   mashData?: MashDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchListRelationFilter, {
+    nullable: true,
+  })
+  batches?: BatchListRelationFilter;
 }
 
 export { AssetWhereInput as AssetWhereInput };

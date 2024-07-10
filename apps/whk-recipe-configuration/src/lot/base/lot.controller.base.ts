@@ -412,6 +412,15 @@ export class LotControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
       },
     });
     if (results === null) {
