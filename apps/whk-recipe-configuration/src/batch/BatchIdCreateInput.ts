@@ -2,6 +2,8 @@ import { ArgsType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsOptional } from "class-validator";
+import GraphQLJSON from "graphql-type-json";
+import { InputJsonValue } from "src/types";
 import { IsJSONValue } from "src/validators";
 
 @ArgsType()
@@ -14,26 +16,25 @@ class BatchIdCreateInput {
     @Type(() => String)
     operation!: string;
 
-    @Field(() => String)
     @ApiProperty({
         required: false,
-        type: () => String,
-        description: 'JSON string containing batch data'
     })
-    @Type(() => String)
-    @IsOptional()
-    batchData?: string;
-
-    @Field(() => String)
     @IsJSONValue()
+    @IsOptional()
+    @Field(() => GraphQLJSON, {
+        nullable: true,
+    })
+    batchData?: InputJsonValue;
+
     @ApiProperty({
         required: false,
-        type: () => String,
-        description: 'JSON string containing param data'
     })
-    @Type(() => String)
+    @IsJSONValue()
     @IsOptional()
-    parameterData?: string;
+    @Field(() => GraphQLJSON, {
+        nullable: true,
+    })
+    parameterData?: InputJsonValue;
 
     @Field(() => String)
     @ApiProperty({
