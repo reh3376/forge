@@ -51,11 +51,13 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
     jsonb_build_object(
             'rate', "li"."rate",
             'itemName', "li"."itemName",
-            'quantity', "li"."quantity"
+            'quantity', "li"."quantity",
+            'description', "li"."description"
     ),
     li.quantity as "lineItemQuantity",
     li."itemName" as "lineItemItemName",
     li.rate as "lineItemRate",
+    li.description as "lineItemDescription",
     i.id as itemId,
     i."itemNumber" as itemNumber,
     i."itemClass",
@@ -64,7 +66,8 @@ FROM "PurchaseOrder" po
 CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" (
     "itemName" text,
     "rate" text,
-    "quantity" text
+    "quantity" text,
+    "description" text
   )
 LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
 LEFT JOIN "Vendor" v on i."vendorId" = v.id;
@@ -97,19 +100,24 @@ LEFT JOIN "Vendor" v on i."vendorId" = v.id;
     jsonb_build_object(
             'rate', "li"."rate",
             'itemName', "li"."itemName",
-            'quantity', "li"."quantity"
+            'quantity', "li"."quantity",
+            'description', "li"."description"
     ),
     li.quantity as "lineItemQuantity",
     li."itemName" as "lineItemItemName",
     li.rate as "lineItemRate",
+    li.description as "lineItemDescription",
     i.id as itemId,
     i."itemNumber" as itemNumber,
     i."itemClass",
     v."name" as "vendorName"
 FROM "PurchaseOrder" po
-CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" ("itemName" text,
-                                                                    "rate" text,
-    "quantity" text)
+CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" (
+    "itemName" text,
+    "rate" text,
+    "quantity" text,
+    "description" text
+  )
 LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
 LEFT JOIN "Vendor" v on i."vendorId" = v.id;
 WHERE po.id = '${params.id}'
