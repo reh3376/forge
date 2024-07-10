@@ -222,7 +222,7 @@ export class SyncService implements OnModuleInit {
     }
 
 
-    async upsertEntity(entityName: string, data: any): Promise<void> {
+    async upsertEntity(entityName: string, data: any, type: string = 'create'): Promise<void> {
         // Convert the entityName to lowercase to match the Prisma model name
         this.logger.debug(`Upserting ${entityName} with data: ${JSON.stringify(data)}`);
         const entity = entityName.toLowerCase();
@@ -251,7 +251,7 @@ export class SyncService implements OnModuleInit {
 
         // If the entity exists, update it with the new data.
         // If the entity does not exist, create a new one with the data
-        if (existingEntity && existingEntity.length > 0) {
+        if (type === 'update' && existingEntity && existingEntity.length > 0) {
             const payload = {
                 ...payloadData,
             };
@@ -269,7 +269,7 @@ export class SyncService implements OnModuleInit {
             } catch (error: unknown) {
                 this.logger.error(`Error updating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
             }
-        } else {
+        } else if (type === 'create' && (!existingEntity || existingEntity.length === 0)) {
             const payload = {
                 ...payloadData,
             };
