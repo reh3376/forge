@@ -28,6 +28,7 @@ import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { FermentationChemistryCreateNestedManyWithoutBatchesInput } from "./FermentationChemistryCreateNestedManyWithoutBatchesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
 class BatchCreateInput {
@@ -142,6 +143,42 @@ class BatchCreateInput {
     nullable: true,
   })
   parameterData?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  assetPath?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeId?: string | null;
 }
 
 export { BatchCreateInput as BatchCreateInput };

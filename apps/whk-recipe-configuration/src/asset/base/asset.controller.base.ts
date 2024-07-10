@@ -38,6 +38,9 @@ import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum
 import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUniqueInput";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -706,6 +709,130 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       mashData: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batches")
+  @ApiNestedQuery(BatchFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Batch[]> {
+    const query = plainToClass(BatchFindManyArgs, request.query);
+    const results = await this.service.findBatches(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        batchData: true,
+        revision: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatches(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatches(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatches(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
         disconnect: body,
       },
     };

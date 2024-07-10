@@ -67,6 +67,12 @@ export class BatchControllerBase {
               connect: data.lot,
             }
           : undefined,
+
+        asset: data.asset
+          ? {
+              connect: data.asset,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -92,6 +98,15 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
       },
     });
   }
@@ -136,6 +151,15 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
       },
     });
   }
@@ -181,6 +205,15 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
       },
     });
     if (result === null) {
@@ -227,6 +260,12 @@ export class BatchControllerBase {
                 connect: data.lot,
               }
             : undefined,
+
+          asset: data.asset
+            ? {
+                connect: data.asset,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -252,6 +291,15 @@ export class BatchControllerBase {
           },
 
           parameterData: true,
+
+          asset: {
+            select: {
+              id: true,
+            },
+          },
+
+          assetPath: true,
+          recipeId: true,
         },
       });
     } catch (error) {
@@ -303,6 +351,15 @@ export class BatchControllerBase {
         },
 
         parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        recipeId: true,
       },
     });
     if (results === null) {

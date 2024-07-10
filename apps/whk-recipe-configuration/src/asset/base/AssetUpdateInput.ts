@@ -29,6 +29,7 @@ import { Type } from "class-transformer";
 import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
 import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
 import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
+import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAssetsInput";
 
 @InputType()
 class AssetUpdateInput {
@@ -204,6 +205,18 @@ class AssetUpdateInput {
     nullable: true,
   })
   mashData?: MashDatumUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => BatchUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  batches?: BatchUpdateManyWithoutAssetsInput;
 }
 
 export { AssetUpdateInput as AssetUpdateInput };

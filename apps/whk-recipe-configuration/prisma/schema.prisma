@@ -541,6 +541,7 @@ model Asset {
   fermentationChemistries FermentationChemistry[]
   fermentationDayData     FermentationDayDatum[]
   mashData                MashDatum[]
+  batches                 Batch[]
 
   @@unique([name, revision])
 }
@@ -744,6 +745,10 @@ model Batch {
   lot                     Lot?                    @relation(fields: [lotId], references: [id])
   lotId                   String?
   parameterData           Json?
+  asset                   Asset?                  @relation(fields: [assetId], references: [id])
+  assetId                 String?
+  assetPath               String?
+  recipeId                String?
 }
 
 model Vendor {
