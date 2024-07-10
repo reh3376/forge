@@ -41,9 +41,9 @@ import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOr
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
-import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
-import { PhaseParameterWhereUniqueInput } from "../../phaseParameter/base/PhaseParameterWhereUniqueInput";
+import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
+import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
+import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -1012,39 +1012,37 @@ export class RecipeControllerBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/parameters")
-  @ApiNestedQuery(PhaseParameterFindManyArgs)
+  @ApiNestedQuery(RecipeParameterFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
+    resource: "RecipeParameter",
     action: "read",
     possession: "any",
   })
   async findParameters(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<PhaseParameter[]> {
-    const query = plainToClass(PhaseParameterFindManyArgs, request.query);
+  ): Promise<RecipeParameter[]> {
+    const query = plainToClass(RecipeParameterFindManyArgs, request.query);
     const results = await this.service.findParameters(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        setpointUpperLimit: true,
-        setpointNumericalValue: true,
-        setpointBooleanValue: true,
-        name: true,
-        description: true,
-        updatedAt: true,
-        itemId: true,
-        setpointType: true,
-        setpointLowerLimit: true,
-        schemaVersion: true,
-        createdBy: true,
-        units: true,
-        recipeId: true,
-        editedBy: true,
+        recipeSetpointType: true,
         revision: true,
+        recipeSetpointUpperLimit: true,
+        recipeParamName: true,
+        className: true,
         active: true,
-        isClassDef: true,
+        createdBy: true,
+        recipeSetpointLowerLimit: true,
+        updatedAt: true,
+        id: true,
+        recipeParamDescription: true,
+        updatedBy: true,
+        recipeSetpointBooleanValue: true,
+        createdAt: true,
+        recipeParamUnits: true,
+        schemaVersion: true,
+        isClassDefinition: true,
 
         classId: {
           select: {
@@ -1052,10 +1050,8 @@ export class RecipeControllerBase {
           },
         },
 
-        isStaticParameter: true,
-        staticName: true,
         globalId: true,
-        stringValue: true,
+        recipeNumericalSetpoint: true,
       },
     });
     if (results === null) {
@@ -1074,7 +1070,7 @@ export class RecipeControllerBase {
   })
   async connectParameters(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: PhaseParameterWhereUniqueInput[]
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       parameters: {
@@ -1096,7 +1092,7 @@ export class RecipeControllerBase {
   })
   async updateParameters(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: PhaseParameterWhereUniqueInput[]
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       parameters: {
@@ -1118,7 +1114,7 @@ export class RecipeControllerBase {
   })
   async disconnectParameters(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: PhaseParameterWhereUniqueInput[]
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
       parameters: {

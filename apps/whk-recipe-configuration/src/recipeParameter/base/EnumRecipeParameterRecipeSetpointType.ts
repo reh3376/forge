@@ -14,6 +14,7 @@ import { registerEnumType } from "@nestjs/graphql";
 export enum EnumRecipeParameterRecipeSetpointType {
   Boolean = "Boolean",
   Numeric = "Numeric",
+  Text = "Text",
 }
 
 registerEnumType(EnumRecipeParameterRecipeSetpointType, {

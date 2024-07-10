@@ -13,6 +13,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   RecipeParameter as PrismaRecipeParameter,
+  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class RecipeParameterServiceBase {
@@ -50,7 +51,7 @@ export class RecipeParameterServiceBase {
     return this.prisma.recipeParameter.delete(args);
   }
 
-  async findRecipeParameters(
+  async findInstances(
     parentId: string,
     args: Prisma.RecipeParameterFindManyArgs
   ): Promise<PrismaRecipeParameter[]> {
@@ -58,7 +59,18 @@ export class RecipeParameterServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .recipeParameters(args);
+      .instances(args);
+  }
+
+  async findRecipe(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.recipeParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipe(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaRecipeParameter | null> {

@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field } from "@nestjs/graphql";
+import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
@@ -27,10 +27,8 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { JsonValue } from "type-fest";
-import { EnumRecipeParameterRecipeParamUnits } from "./EnumRecipeParameterRecipeParamUnits";
+import { Decimal } from "decimal.js";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class RecipeParameter {
@@ -42,7 +40,7 @@ class RecipeParameter {
   @Field(() => EnumRecipeParameterRecipeSetpointType, {
     nullable: true,
   })
-  recipeSetpointType?: "Boolean" | "Numeric";
+  recipeSetpointType?: "Boolean" | "Numeric" | "Text";
 
   @ApiProperty({
     required: false,
@@ -87,18 +85,6 @@ class RecipeParameter {
   className!: string;
 
   @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  batch!: string | null;
-
-  @ApiProperty({
     required: true,
     type: Boolean,
   })
@@ -136,7 +122,7 @@ class RecipeParameter {
   @Field(() => Date, {
     nullable: true,
   })
-  editedAt!: Date | null;
+  updatedAt!: Date | null;
 
   @ApiProperty({
     required: true,
@@ -168,17 +154,7 @@ class RecipeParameter {
   @Field(() => String, {
     nullable: true,
   })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  sequencerParameters!: JsonValue;
+  updatedBy!: string | null;
 
   @ApiProperty({
     required: false,
@@ -200,34 +176,16 @@ class RecipeParameter {
   createdAt!: Date;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  itemId!: string;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumRecipeParameterRecipeParamUnits,
-  })
-  @IsEnum(EnumRecipeParameterRecipeParamUnits)
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => EnumRecipeParameterRecipeParamUnits, {
+  @Field(() => String, {
     nullable: true,
   })
-  recipeParamUnits?:
-    | "Lbs"
-    | "Gal"
-    | "Percentage"
-    | "PassFail"
-    | "Seconds"
-    | "Minutes"
-    | "DateTime"
-    | "Feet"
-    | "Bushels"
-    | null;
+  recipeParamUnits!: string | null;
 
   @ApiProperty({
     required: false,
@@ -268,7 +226,7 @@ class RecipeParameter {
   @ValidateNested()
   @Type(() => RecipeParameter)
   @IsOptional()
-  recipeParameters?: Array<RecipeParameter>;
+  instances?: Array<RecipeParameter>;
 
   @ApiProperty({
     required: false,
@@ -281,6 +239,27 @@ class RecipeParameter {
     nullable: true,
   })
   globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  recipeNumericalSetpoint!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipe?: Array<Recipe>;
 }
 
 export { RecipeParameter as RecipeParameter };

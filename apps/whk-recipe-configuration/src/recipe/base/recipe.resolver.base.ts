@@ -35,8 +35,8 @@ import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderU
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
-import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
-import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
+import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
@@ -273,16 +273,16 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [PhaseParameter], { name: "parameters" })
+  @graphql.ResolveField(() => [RecipeParameter], { name: "parameters" })
   @nestAccessControl.UseRoles({
-    resource: "PhaseParameter",
+    resource: "RecipeParameter",
     action: "read",
     possession: "any",
   })
   async findParameters(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: PhaseParameterFindManyArgs
-  ): Promise<PhaseParameter[]> {
+    @graphql.Args() args: RecipeParameterFindManyArgs
+  ): Promise<RecipeParameter[]> {
     const results = await this.service.findParameters(parent.id, args);
 
     if (!results) {
