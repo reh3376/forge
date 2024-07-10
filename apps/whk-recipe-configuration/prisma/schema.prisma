@@ -45,7 +45,6 @@ model PhaseParameter {
   staticName             EnumPhaseParameterStaticName?
   globalId               String?                        @unique @default(cuid())
   equipmentPhases        EquipmentPhase[]
-  recipes                Recipe[]
   stringValue            String?
 }
 
@@ -89,25 +88,24 @@ model RecipeParameter {
   recipeSetpointUpperLimit   Float?
   recipeParamName            String
   className                  String
-  batch                      String?
   active                     Boolean                               @default(true)
   createdBy                  String
   recipeSetpointLowerLimit   Float?
-  editedAt                   DateTime?                             @updatedAt
+  updatedAt                  DateTime?                             @updatedAt
   id                         String                                @id @default(cuid())
   recipeParamDescription     String?
-  editedBy                   String?
-  sequencerParameters        Json?
+  updatedBy                  String?
   recipeSetpointBooleanValue Boolean?                              @default(true)
   createdAt                  DateTime                              @default(now())
-  itemId                     String
-  recipeParamUnits           EnumRecipeParameterRecipeParamUnits?
+  recipeParamUnits           String?
   schemaVersion              String?                               @default("0001-alpha")
   isClassDefinition          Boolean?                              @default(false)
-  classId                    RecipeParameter?                      @relation(name: "recipeParameters", fields: [classIdId], references: [id])
+  classId                    RecipeParameter?                      @relation(name: "RecipeParameterClassIdRecipeParameterInstances", fields: [classIdId], references: [id])
   classIdId                  String?
-  recipeParameters           RecipeParameter[]                     @relation(name: "recipeParameters")
+  instances                  RecipeParameter[]                     @relation(name: "RecipeParameterClassIdRecipeParameterInstances")
   globalId                   String?                               @default(cuid())
+  recipeNumericalSetpoint    Decimal?
+  recipe                     Recipe[]
 }
 
 model Instruction {
@@ -227,7 +225,7 @@ model Recipe {
   customerId                    String
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   lots                          Lot[]
-  parameters                    PhaseParameter[]
+  parameters                    RecipeParameter[]
   item                          Item?                          @relation(fields: [itemId], references: [id])
   itemId                        String?
 
@@ -787,18 +785,7 @@ enum EnumTestParameterTestSetpointType {
 enum EnumRecipeParameterRecipeSetpointType {
   Boolean
   Numeric
-}
-
-enum EnumRecipeParameterRecipeParamUnits {
-  Lbs
-  Gal
-  Percentage
-  PassFail
-  Seconds
-  Minutes
-  DateTime
-  Feet
-  Bushels
+  Text
 }
 
 enum EnumEquipmentPhaseName {

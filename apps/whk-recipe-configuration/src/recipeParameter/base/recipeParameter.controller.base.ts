@@ -26,6 +26,9 @@ import { RecipeParameter } from "./RecipeParameter";
 import { RecipeParameterFindManyArgs } from "./RecipeParameterFindManyArgs";
 import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { RecipeParameterUpdateInput } from "./RecipeParameterUpdateInput";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -67,18 +70,15 @@ export class RecipeParameterControllerBase {
         recipeSetpointUpperLimit: true,
         recipeParamName: true,
         className: true,
-        batch: true,
         active: true,
         createdBy: true,
         recipeSetpointLowerLimit: true,
-        editedAt: true,
+        updatedAt: true,
         id: true,
         recipeParamDescription: true,
-        editedBy: true,
-        sequencerParameters: true,
+        updatedBy: true,
         recipeSetpointBooleanValue: true,
         createdAt: true,
-        itemId: true,
         recipeParamUnits: true,
         schemaVersion: true,
         isClassDefinition: true,
@@ -90,6 +90,7 @@ export class RecipeParameterControllerBase {
         },
 
         globalId: true,
+        recipeNumericalSetpoint: true,
       },
     });
   }
@@ -118,18 +119,15 @@ export class RecipeParameterControllerBase {
         recipeSetpointUpperLimit: true,
         recipeParamName: true,
         className: true,
-        batch: true,
         active: true,
         createdBy: true,
         recipeSetpointLowerLimit: true,
-        editedAt: true,
+        updatedAt: true,
         id: true,
         recipeParamDescription: true,
-        editedBy: true,
-        sequencerParameters: true,
+        updatedBy: true,
         recipeSetpointBooleanValue: true,
         createdAt: true,
-        itemId: true,
         recipeParamUnits: true,
         schemaVersion: true,
         isClassDefinition: true,
@@ -141,6 +139,7 @@ export class RecipeParameterControllerBase {
         },
 
         globalId: true,
+        recipeNumericalSetpoint: true,
       },
     });
   }
@@ -168,18 +167,15 @@ export class RecipeParameterControllerBase {
         recipeSetpointUpperLimit: true,
         recipeParamName: true,
         className: true,
-        batch: true,
         active: true,
         createdBy: true,
         recipeSetpointLowerLimit: true,
-        editedAt: true,
+        updatedAt: true,
         id: true,
         recipeParamDescription: true,
-        editedBy: true,
-        sequencerParameters: true,
+        updatedBy: true,
         recipeSetpointBooleanValue: true,
         createdAt: true,
-        itemId: true,
         recipeParamUnits: true,
         schemaVersion: true,
         isClassDefinition: true,
@@ -191,6 +187,7 @@ export class RecipeParameterControllerBase {
         },
 
         globalId: true,
+        recipeNumericalSetpoint: true,
       },
     });
     if (result === null) {
@@ -238,18 +235,15 @@ export class RecipeParameterControllerBase {
           recipeSetpointUpperLimit: true,
           recipeParamName: true,
           className: true,
-          batch: true,
           active: true,
           createdBy: true,
           recipeSetpointLowerLimit: true,
-          editedAt: true,
+          updatedAt: true,
           id: true,
           recipeParamDescription: true,
-          editedBy: true,
-          sequencerParameters: true,
+          updatedBy: true,
           recipeSetpointBooleanValue: true,
           createdAt: true,
-          itemId: true,
           recipeParamUnits: true,
           schemaVersion: true,
           isClassDefinition: true,
@@ -261,6 +255,7 @@ export class RecipeParameterControllerBase {
           },
 
           globalId: true,
+          recipeNumericalSetpoint: true,
         },
       });
     } catch (error) {
@@ -274,19 +269,19 @@ export class RecipeParameterControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipeParameters")
+  @common.Get("/:id/instances")
   @ApiNestedQuery(RecipeParameterFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "any",
   })
-  async findRecipeParameters(
+  async findInstances(
     @common.Req() request: Request,
     @common.Param() params: RecipeParameterWhereUniqueInput
   ): Promise<RecipeParameter[]> {
     const query = plainToClass(RecipeParameterFindManyArgs, request.query);
-    const results = await this.service.findRecipeParameters(params.id, {
+    const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
         recipeSetpointType: true,
@@ -294,18 +289,15 @@ export class RecipeParameterControllerBase {
         recipeSetpointUpperLimit: true,
         recipeParamName: true,
         className: true,
-        batch: true,
         active: true,
         createdBy: true,
         recipeSetpointLowerLimit: true,
-        editedAt: true,
+        updatedAt: true,
         id: true,
         recipeParamDescription: true,
-        editedBy: true,
-        sequencerParameters: true,
+        updatedBy: true,
         recipeSetpointBooleanValue: true,
         createdAt: true,
-        itemId: true,
         recipeParamUnits: true,
         schemaVersion: true,
         isClassDefinition: true,
@@ -317,6 +309,7 @@ export class RecipeParameterControllerBase {
         },
 
         globalId: true,
+        recipeNumericalSetpoint: true,
       },
     });
     if (results === null) {
@@ -327,18 +320,18 @@ export class RecipeParameterControllerBase {
     return results;
   }
 
-  @common.Post("/:id/recipeParameters")
+  @common.Post("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
   })
-  async connectRecipeParameters(
+  async connectInstances(
     @common.Param() params: RecipeParameterWhereUniqueInput,
     @common.Body() body: RecipeParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeParameters: {
+      instances: {
         connect: body,
       },
     };
@@ -349,18 +342,18 @@ export class RecipeParameterControllerBase {
     });
   }
 
-  @common.Patch("/:id/recipeParameters")
+  @common.Patch("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
   })
-  async updateRecipeParameters(
+  async updateInstances(
     @common.Param() params: RecipeParameterWhereUniqueInput,
     @common.Body() body: RecipeParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeParameters: {
+      instances: {
         set: body,
       },
     };
@@ -371,18 +364,140 @@ export class RecipeParameterControllerBase {
     });
   }
 
-  @common.Delete("/:id/recipeParameters")
+  @common.Delete("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
   })
-  async disconnectRecipeParameters(
+  async disconnectInstances(
     @common.Param() params: RecipeParameterWhereUniqueInput,
     @common.Body() body: RecipeParameterWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeParameters: {
+      instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipe")
+  @ApiNestedQuery(RecipeFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipe(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeParameterWhereUniqueInput
+  ): Promise<Recipe[]> {
+    const query = plainToClass(RecipeFindManyArgs, request.query);
+    const results = await this.service.findRecipe(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
+        schemaVersion: true,
+        revision: true,
+        active: true,
+        customerCode: true,
+        Recipe: true,
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipe")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipe(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipe: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipe")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipe(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipe: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeParameter({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipe")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipe(
+    @common.Param() params: RecipeParameterWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipe: {
         disconnect: body,
       },
     };

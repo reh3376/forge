@@ -14,7 +14,7 @@ import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class RecipeCreateNestedManyWithoutPhaseParametersInput {
+class RecipeUpdateManyWithoutRecipeParametersInput {
   @Field(() => [RecipeWhereUniqueInput], {
     nullable: true,
   })
@@ -23,6 +23,24 @@ class RecipeCreateNestedManyWithoutPhaseParametersInput {
     type: () => [RecipeWhereUniqueInput],
   })
   connect?: Array<RecipeWhereUniqueInput>;
+
+  @Field(() => [RecipeWhereUniqueInput], {
+    nullable: true,
+  })
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeWhereUniqueInput],
+  })
+  disconnect?: Array<RecipeWhereUniqueInput>;
+
+  @Field(() => [RecipeWhereUniqueInput], {
+    nullable: true,
+  })
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeWhereUniqueInput],
+  })
+  set?: Array<RecipeWhereUniqueInput>;
 }
 
-export { RecipeCreateNestedManyWithoutPhaseParametersInput as RecipeCreateNestedManyWithoutPhaseParametersInput };
+export { RecipeUpdateManyWithoutRecipeParametersInput as RecipeUpdateManyWithoutRecipeParametersInput };

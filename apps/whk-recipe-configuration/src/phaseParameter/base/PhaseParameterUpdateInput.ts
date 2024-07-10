@@ -30,7 +30,6 @@ import { Type } from "class-transformer";
 import { PhaseParameterUpdateManyWithoutPhaseParametersInput } from "./PhaseParameterUpdateManyWithoutPhaseParametersInput";
 import { EnumPhaseParameterStaticName } from "./EnumPhaseParameterStaticName";
 import { EquipmentPhaseUpdateManyWithoutPhaseParametersInput } from "./EquipmentPhaseUpdateManyWithoutPhaseParametersInput";
-import { RecipeUpdateManyWithoutPhaseParametersInput } from "./RecipeUpdateManyWithoutPhaseParametersInput";
 
 @InputType()
 class PhaseParameterUpdateInput {
@@ -299,18 +298,6 @@ class PhaseParameterUpdateInput {
     nullable: true,
   })
   equipmentPhases?: EquipmentPhaseUpdateManyWithoutPhaseParametersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeUpdateManyWithoutPhaseParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeUpdateManyWithoutPhaseParametersInput)
-  @IsOptional()
-  @Field(() => RecipeUpdateManyWithoutPhaseParametersInput, {
-    nullable: true,
-  })
-  recipes?: RecipeUpdateManyWithoutPhaseParametersInput;
 
   @ApiProperty({
     required: false,
