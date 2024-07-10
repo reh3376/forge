@@ -33,6 +33,8 @@ import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/bas
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
 import { AssetService } from "../asset.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Asset)
@@ -203,6 +205,26 @@ export class AssetResolverBase {
     @graphql.Args() args: MashDatumFindManyArgs
   ): Promise<MashDatum[]> {
     const results = await this.service.findMashData(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Batch], { name: "batches" })
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: BatchFindManyArgs
+  ): Promise<Batch[]> {
+    const results = await this.service.findBatches(parent.id, args);
 
     if (!results) {
       return [];

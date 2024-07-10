@@ -32,6 +32,7 @@ import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
+import { Batch } from "../../batch/base/Batch";
 
 @ObjectType()
 class Asset {
@@ -203,6 +204,15 @@ class Asset {
   @Type(() => MashDatum)
   @IsOptional()
   mashData?: Array<MashDatum>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
 }
 
 export { Asset as Asset };

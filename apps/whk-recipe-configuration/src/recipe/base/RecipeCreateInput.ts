@@ -29,7 +29,7 @@ import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrde
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
-import { PhaseParameterCreateNestedManyWithoutRecipesInput } from "./PhaseParameterCreateNestedManyWithoutRecipesInput";
+import { RecipeParameterCreateNestedManyWithoutRecipesInput } from "./RecipeParameterCreateNestedManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
@@ -209,15 +209,15 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => PhaseParameterCreateNestedManyWithoutRecipesInput,
+    type: () => RecipeParameterCreateNestedManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => PhaseParameterCreateNestedManyWithoutRecipesInput)
+  @Type(() => RecipeParameterCreateNestedManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => PhaseParameterCreateNestedManyWithoutRecipesInput, {
+  @Field(() => RecipeParameterCreateNestedManyWithoutRecipesInput, {
     nullable: true,
   })
-  parameters?: PhaseParameterCreateNestedManyWithoutRecipesInput;
+  parameters?: RecipeParameterCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
