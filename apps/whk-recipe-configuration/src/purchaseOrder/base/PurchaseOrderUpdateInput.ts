@@ -36,6 +36,7 @@ import { TestParameterUpdateManyWithoutPurchaseOrdersInput } from "./TestParamet
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class PurchaseOrderUpdateInput {
@@ -315,6 +316,18 @@ class PurchaseOrderUpdateInput {
     nullable: true,
   })
   erpId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput | null;
 }
 
 export { PurchaseOrderUpdateInput as PurchaseOrderUpdateInput };

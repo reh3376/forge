@@ -27,6 +27,7 @@ import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { JsonFilter } from "../../util/JsonFilter";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class PurchaseOrderWhereInput {
@@ -328,6 +329,18 @@ class PurchaseOrderWhereInput {
     nullable: true,
   })
   erpId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput;
 }
 
 export { PurchaseOrderWhereInput as PurchaseOrderWhereInput };

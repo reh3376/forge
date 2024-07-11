@@ -9,9 +9,10 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
+import { Unit } from "../../unit/base/Unit";
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum EnumAssetType {
+export enum EnumAssetAssetType {
   Ent = "ENT",
   Site = "SITE",
   Area = "AREA",
@@ -20,8 +21,10 @@ export enum EnumAssetType {
   Equipmod = "EQUIPMOD",
   Equipphase = "EQUIPPHASE",
   Controlmod = "CONTROLMOD",
+  Unit = "UNIT",
+  Device = "DEVICE",
 }
 
-registerEnumType(EnumAssetType, {
-  name: "EnumAssetType",
+registerEnumType(EnumAssetAssetType, {
+  name: "EnumAssetAssetType",
 });

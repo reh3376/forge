@@ -116,7 +116,7 @@ class AssetOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  type?: SortOrder;
+  assetType?: SortOrder;
 
   @ApiProperty({
     required: false,

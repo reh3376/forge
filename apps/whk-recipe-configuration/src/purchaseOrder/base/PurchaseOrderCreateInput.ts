@@ -36,6 +36,7 @@ import { TestParameterCreateNestedManyWithoutPurchaseOrdersInput } from "./TestP
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class PurchaseOrderCreateInput {
@@ -303,6 +304,18 @@ class PurchaseOrderCreateInput {
   @MaxLength(100)
   @Field(() => String)
   erpId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput | null;
 }
 
 export { PurchaseOrderCreateInput as PurchaseOrderCreateInput };

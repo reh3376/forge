@@ -24,6 +24,7 @@ import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 
 @ObjectType()
 class Vendor {
@@ -147,6 +148,15 @@ class Vendor {
     nullable: true,
   })
   globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrders?: Array<PurchaseOrder>;
 }
 
 export { Vendor as Vendor };

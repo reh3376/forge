@@ -19,6 +19,7 @@ import {
   Item as PrismaItem,
   TestParameter as PrismaTestParameter,
   Asset as PrismaAsset,
+  Vendor as PrismaVendor,
 } from "@prisma/client";
 
 export class PurchaseOrderServiceBase {
@@ -127,5 +128,13 @@ export class PurchaseOrderServiceBase {
         where: { id: parentId },
       })
       .purchaseOrderRejectedLots();
+  }
+
+  async getVendor(parentId: string): Promise<PrismaVendor | null> {
+    return this.prisma.purchaseOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .vendor();
   }
 }
