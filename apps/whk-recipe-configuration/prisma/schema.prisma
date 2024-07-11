@@ -389,7 +389,7 @@ model ScheduleOrder {
   duration                     Decimal?
   durationUnits                String?                  @default("Hours")
   scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
-  scheduleOrderQueueId         String?
+  scheduleOrderQueueId         String?                  @unique
 }
 
 model Item {
