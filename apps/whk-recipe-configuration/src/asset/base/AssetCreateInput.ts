@@ -14,15 +14,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  IsOptional,
   IsInt,
   Max,
+  IsOptional,
   IsEnum,
   ValidateNested,
 } from "class-validator";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
 import { EnumAssetType } from "./EnumAssetType";
 import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
 import { Type } from "class-transformer";
@@ -33,6 +30,7 @@ import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedMany
 import { InventoryCreateNestedManyWithoutAssetsInput } from "./InventoryCreateNestedManyWithoutAssetsInput";
 import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCreateNestedManyWithoutAssetsInput";
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
+import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 
 @InputType()
 class AssetCreateInput {
@@ -44,16 +42,6 @@ class AssetCreateInput {
   @MaxLength(256)
   @Field(() => String)
   assetPath!: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  children?: InputJsonValue;
 
   @ApiProperty({
     required: true,
@@ -250,6 +238,30 @@ class AssetCreateInput {
     nullable: true,
   })
   inventoryTransfersTo?: InventoryTransferCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  children?: AssetWhereUniqueInput | null;
 }
 
 export { AssetCreateInput as AssetCreateInput };

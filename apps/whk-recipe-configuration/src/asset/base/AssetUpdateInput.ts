@@ -20,9 +20,6 @@ import {
   IsEnum,
   ValidateNested,
 } from "class-validator";
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
 import { EnumAssetType } from "./EnumAssetType";
 import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
@@ -33,6 +30,7 @@ import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAsset
 import { InventoryUpdateManyWithoutAssetsInput } from "./InventoryUpdateManyWithoutAssetsInput";
 import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateManyWithoutAssetsInput";
 import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
+import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 
 @InputType()
 class AssetUpdateInput {
@@ -47,16 +45,6 @@ class AssetUpdateInput {
     nullable: true,
   })
   assetPath?: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  children?: InputJsonValue;
 
   @ApiProperty({
     required: false,
@@ -268,6 +256,30 @@ class AssetUpdateInput {
     nullable: true,
   })
   inventoryTransfersTo?: InventoryTransferUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  children?: AssetWhereUniqueInput | null;
 }
 
 export { AssetUpdateInput as AssetUpdateInput };
