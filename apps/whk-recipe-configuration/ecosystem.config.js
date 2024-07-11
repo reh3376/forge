@@ -3,19 +3,15 @@ module.exports = {
     {
       name: 'whk-mes-backend',
       script: 'dist/main.js',
-      instances: '2', // Or specify the number of instances you want
+      args: '-r newrelic', // Add the -r newrelic option here
+      instances: 2, // Specify the number of instances directly
       exec_mode: 'cluster', // Use cluster mode for load balancing
-      watch: true, // Enable watch to restart on file changes
       env: {
         NODE_ENV: 'development',
       },
       env_production: {
         NODE_ENV: 'production',
       },
-      max_memory_restart: '500M', // Restart if it exceeds 500MB
-      max_cpu: 50, // Restart if CPU usage exceeds 50%
-      // max_memory_restart: '500M', // Restart if it exceeds 500MB
-      // max_cpu: 50, // Restart if CPU usage exceeds 50%
     },
   ],
 
