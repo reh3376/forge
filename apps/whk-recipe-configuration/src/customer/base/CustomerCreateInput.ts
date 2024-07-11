@@ -23,6 +23,7 @@ import { SalesOrderCreateNestedManyWithoutCustomersInput } from "./SalesOrderCre
 import { Type } from "class-transformer";
 import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
 import { RecipeCreateNestedManyWithoutCustomersInput } from "./RecipeCreateNestedManyWithoutCustomersInput";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 
 @InputType()
 class CustomerCreateInput {
@@ -181,6 +182,18 @@ class CustomerCreateInput {
     nullable: true,
   })
   recipes?: RecipeCreateNestedManyWithoutCustomersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogWhereUniqueInput)
+  @IsOptional()
+  @Field(() => InventoryLogWhereUniqueInput, {
+    nullable: true,
+  })
+  inventoryLog?: InventoryLogWhereUniqueInput | null;
 }
 
 export { CustomerCreateInput as CustomerCreateInput };

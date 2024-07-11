@@ -27,6 +27,9 @@ import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
+import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
+import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
+import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 
 @InputType()
 class ItemWhereInput {
@@ -303,6 +306,42 @@ class ItemWhereInput {
     nullable: true,
   })
   recipes?: RecipeListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryListRelationFilter, {
+    nullable: true,
+  })
+  inventories?: InventoryListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryLogListRelationFilter, {
+    nullable: true,
+  })
+  inventoryLogs?: InventoryLogListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryTransferListRelationFilter, {
+    nullable: true,
+  })
+  inventoryTransfers?: InventoryTransferListRelationFilter;
 }
 
 export { ItemWhereInput as ItemWhereInput };

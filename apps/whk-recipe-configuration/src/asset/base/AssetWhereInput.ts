@@ -24,6 +24,9 @@ import { FermentationChemistryListRelationFilter } from "../../fermentationChemi
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
+import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
+import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
+import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 
 @InputType()
 class AssetWhereInput {
@@ -237,6 +240,54 @@ class AssetWhereInput {
     nullable: true,
   })
   batches?: BatchListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryListRelationFilter, {
+    nullable: true,
+  })
+  inventories?: InventoryListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryLogListRelationFilter, {
+    nullable: true,
+  })
+  inventoryLogs?: InventoryLogListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryTransferListRelationFilter, {
+    nullable: true,
+  })
+  inventoryTransfersFrom?: InventoryTransferListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryTransferListRelationFilter, {
+    nullable: true,
+  })
+  inventoryTransfersTo?: InventoryTransferListRelationFilter;
 }
 
 export { AssetWhereInput as AssetWhereInput };

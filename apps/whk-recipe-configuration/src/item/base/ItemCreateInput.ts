@@ -31,6 +31,9 @@ import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWitho
 import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedManyWithoutItemsInput";
+import { InventoryCreateNestedManyWithoutItemsInput } from "./InventoryCreateNestedManyWithoutItemsInput";
+import { InventoryLogCreateNestedManyWithoutItemsInput } from "./InventoryLogCreateNestedManyWithoutItemsInput";
+import { InventoryTransferCreateNestedManyWithoutItemsInput } from "./InventoryTransferCreateNestedManyWithoutItemsInput";
 
 @InputType()
 class ItemCreateInput {
@@ -293,6 +296,42 @@ class ItemCreateInput {
     nullable: true,
   })
   recipes?: RecipeCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => InventoryCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  inventories?: InventoryCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => InventoryLogCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  inventoryLogs?: InventoryLogCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  inventoryTransfers?: InventoryTransferCreateNestedManyWithoutItemsInput;
 }
 
 export { ItemCreateInput as ItemCreateInput };
