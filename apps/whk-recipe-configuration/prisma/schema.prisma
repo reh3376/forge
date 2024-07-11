@@ -63,7 +63,7 @@ model TestParameter {
   testSetpointUpperLimit   Float?
   testParamRevision        String?
   testSetpointLowerLimit   Float?
-  testResult               Json?
+  testResult               Decimal?
   createdBy                String
   testSetpointType         EnumTestParameterTestSetpointType?
   updatedAt                DateTime?                          @updatedAt
