@@ -35,6 +35,12 @@ import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArg
 import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
+import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
+import { Inventory } from "../../inventory/base/Inventory";
+import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFindManyArgs";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
+import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { AssetService } from "../asset.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Asset)
@@ -225,6 +231,96 @@ export class AssetResolverBase {
     @graphql.Args() args: BatchFindManyArgs
   ): Promise<Batch[]> {
     const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Inventory], { name: "inventories" })
+  @nestAccessControl.UseRoles({
+    resource: "Inventory",
+    action: "read",
+    possession: "any",
+  })
+  async findInventories(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: InventoryFindManyArgs
+  ): Promise<Inventory[]> {
+    const results = await this.service.findInventories(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [InventoryLog], { name: "inventoryLogs" })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryLog",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryLogs(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: InventoryLogFindManyArgs
+  ): Promise<InventoryLog[]> {
+    const results = await this.service.findInventoryLogs(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [InventoryTransfer], {
+    name: "inventoryTransfersFrom",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryTransfer",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryTransfersFrom(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: InventoryTransferFindManyArgs
+  ): Promise<InventoryTransfer[]> {
+    const results = await this.service.findInventoryTransfersFrom(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [InventoryTransfer], {
+    name: "inventoryTransfersTo",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryTransfer",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryTransfersTo(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: InventoryTransferFindManyArgs
+  ): Promise<InventoryTransfer[]> {
+    const results = await this.service.findInventoryTransfersTo(
+      parent.id,
+      args
+    );
 
     if (!results) {
       return [];

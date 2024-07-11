@@ -41,6 +41,15 @@ import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUn
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
+import { Inventory } from "../../inventory/base/Inventory";
+import { InventoryWhereUniqueInput } from "../../inventory/base/InventoryWhereUniqueInput";
+import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFindManyArgs";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
+import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
+import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
+import { InventoryTransferWhereUniqueInput } from "../../inventoryTransfer/base/InventoryTransferWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -834,6 +843,488 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       batches: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/inventories")
+  @ApiNestedQuery(InventoryFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Inventory",
+    action: "read",
+    possession: "any",
+  })
+  async findInventories(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Inventory[]> {
+    const query = plainToClass(InventoryFindManyArgs, request.query);
+    const results = await this.service.findInventories(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
+        schemaVersion: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        correctionNote: true,
+        correctedBy: true,
+        lotNumber: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        notes: true,
+        units: true,
+        globalId: true,
+        customers: true,
+        proof: true,
+        fifoIndex: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/inventories")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectInventories(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventories: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/inventories")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateInventories(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventories: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/inventories")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInventories(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventories: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/inventoryLogs")
+  @ApiNestedQuery(InventoryLogFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "InventoryLog",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryLogs(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<InventoryLog[]> {
+    const query = plainToClass(InventoryLogFindManyArgs, request.query);
+    const results = await this.service.findInventoryLogs(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        dateTime: true,
+        date: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        loggedBy: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        revisedBy: true,
+        rawMeasurementValue: true,
+        rawMeasurementUnits: true,
+        units: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/inventoryLogs")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectInventoryLogs(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryLogWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryLogs: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/inventoryLogs")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateInventoryLogs(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryLogWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryLogs: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/inventoryLogs")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInventoryLogs(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryLogWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryLogs: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/inventoryTransfersFrom")
+  @ApiNestedQuery(InventoryTransferFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "InventoryTransfer",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryTransfersFrom(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<InventoryTransfer[]> {
+    const query = plainToClass(InventoryTransferFindManyArgs, request.query);
+    const results = await this.service.findInventoryTransfersFrom(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
+        fromLocation: {
+          select: {
+            id: true,
+          },
+        },
+
+        notes: true,
+        department: true,
+        createdBy: true,
+        updatedBy: true,
+        quantity: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/inventoryTransfersFrom")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectInventoryTransfersFrom(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryTransferWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryTransfersFrom: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/inventoryTransfersFrom")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateInventoryTransfersFrom(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryTransferWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryTransfersFrom: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/inventoryTransfersFrom")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInventoryTransfersFrom(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryTransferWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryTransfersFrom: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/inventoryTransfersTo")
+  @ApiNestedQuery(InventoryTransferFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "InventoryTransfer",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryTransfersTo(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<InventoryTransfer[]> {
+    const query = plainToClass(InventoryTransferFindManyArgs, request.query);
+    const results = await this.service.findInventoryTransfersTo(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
+        fromLocation: {
+          select: {
+            id: true,
+          },
+        },
+
+        notes: true,
+        department: true,
+        createdBy: true,
+        updatedBy: true,
+        quantity: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/inventoryTransfersTo")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectInventoryTransfersTo(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryTransferWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryTransfersTo: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/inventoryTransfersTo")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateInventoryTransfersTo(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryTransferWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryTransfersTo: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/inventoryTransfersTo")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInventoryTransfersTo(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: InventoryTransferWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventoryTransfersTo: {
         disconnect: body,
       },
     };

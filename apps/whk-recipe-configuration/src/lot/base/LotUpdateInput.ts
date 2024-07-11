@@ -26,6 +26,7 @@ import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/Prod
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { BatchUpdateManyWithoutLotsInput } from "./BatchUpdateManyWithoutLotsInput";
 import { BomItemUpdateManyWithoutLotsInput } from "./BomItemUpdateManyWithoutLotsInput";
+import { InventoryTransferUpdateManyWithoutLotsInput } from "./InventoryTransferUpdateManyWithoutLotsInput";
 
 @InputType()
 class LotUpdateInput {
@@ -183,6 +184,18 @@ class LotUpdateInput {
     nullable: true,
   })
   bomItems?: BomItemUpdateManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferUpdateManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferUpdateManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferUpdateManyWithoutLotsInput, {
+    nullable: true,
+  })
+  inventoryTransfers?: InventoryTransferUpdateManyWithoutLotsInput;
 }
 
 export { LotUpdateInput as LotUpdateInput };

@@ -31,6 +31,7 @@ import { ProductionOrderFindManyArgs } from "../../productionOrder/base/Producti
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { CustomerService } from "../customer.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Customer)
@@ -97,7 +98,15 @@ export class CustomerResolverBase {
   ): Promise<Customer> {
     return await this.service.createCustomer({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        inventoryLog: args.data.inventoryLog
+          ? {
+              connect: args.data.inventoryLog,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -114,7 +123,15 @@ export class CustomerResolverBase {
     try {
       return await this.service.updateCustomer({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          inventoryLog: args.data.inventoryLog
+            ? {
+                connect: args.data.inventoryLog,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -184,5 +201,26 @@ export class CustomerResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => InventoryLog, {
+    nullable: true,
+    name: "inventoryLog",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryLog",
+    action: "read",
+    possession: "any",
+  })
+  async getInventoryLog(
+    @graphql.Parent() parent: Customer
+  ): Promise<InventoryLog | null> {
+    const result = await this.service.getInventoryLog(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

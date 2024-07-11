@@ -19,6 +19,9 @@ import {
   FermentationDayDatum as PrismaFermentationDayDatum,
   MashDatum as PrismaMashDatum,
   Batch as PrismaBatch,
+  Inventory as PrismaInventory,
+  InventoryLog as PrismaInventoryLog,
+  InventoryTransfer as PrismaInventoryTransfer,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -97,5 +100,49 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .batches(args);
+  }
+
+  async findInventories(
+    parentId: string,
+    args: Prisma.InventoryFindManyArgs
+  ): Promise<PrismaInventory[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .inventories(args);
+  }
+
+  async findInventoryLogs(
+    parentId: string,
+    args: Prisma.InventoryLogFindManyArgs
+  ): Promise<PrismaInventoryLog[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .inventoryLogs(args);
+  }
+
+  async findInventoryTransfersFrom(
+    parentId: string,
+    args: Prisma.InventoryTransferFindManyArgs
+  ): Promise<PrismaInventoryTransfer[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .inventoryTransfersFrom(args);
+  }
+
+  async findInventoryTransfersTo(
+    parentId: string,
+    args: Prisma.InventoryTransferFindManyArgs
+  ): Promise<PrismaInventoryTransfer[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .inventoryTransfersTo(args);
   }
 }
