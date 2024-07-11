@@ -61,7 +61,15 @@ export class CustomerControllerBase {
     @common.Body() data: CustomerCreateInput
   ): Promise<Customer> {
     return await this.service.createCustomer({
-      data: data,
+      data: {
+        ...data,
+
+        inventoryLog: data.inventoryLog
+          ? {
+              connect: data.inventoryLog,
+            }
+          : undefined,
+      },
       select: {
         address: true,
         createdAt: true,
@@ -77,6 +85,12 @@ export class CustomerControllerBase {
         globalId: true,
         customerCode: true,
         phone: true,
+
+        inventoryLog: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -112,6 +126,12 @@ export class CustomerControllerBase {
         globalId: true,
         customerCode: true,
         phone: true,
+
+        inventoryLog: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -148,6 +168,12 @@ export class CustomerControllerBase {
         globalId: true,
         customerCode: true,
         phone: true,
+
+        inventoryLog: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -180,7 +206,15 @@ export class CustomerControllerBase {
     try {
       return await this.service.updateCustomer({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          inventoryLog: data.inventoryLog
+            ? {
+                connect: data.inventoryLog,
+              }
+            : undefined,
+        },
         select: {
           address: true,
           createdAt: true,
@@ -196,6 +230,12 @@ export class CustomerControllerBase {
           globalId: true,
           customerCode: true,
           phone: true,
+
+          inventoryLog: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

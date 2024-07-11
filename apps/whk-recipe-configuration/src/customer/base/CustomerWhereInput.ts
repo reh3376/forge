@@ -20,6 +20,7 @@ import { IntFilter } from "../../util/IntFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 
 @InputType()
 class CustomerWhereInput {
@@ -212,6 +213,18 @@ class CustomerWhereInput {
     nullable: true,
   })
   recipes?: RecipeListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogWhereUniqueInput)
+  @IsOptional()
+  @Field(() => InventoryLogWhereUniqueInput, {
+    nullable: true,
+  })
+  inventoryLog?: InventoryLogWhereUniqueInput;
 }
 
 export { CustomerWhereInput as CustomerWhereInput };

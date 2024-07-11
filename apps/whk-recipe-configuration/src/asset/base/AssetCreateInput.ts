@@ -30,6 +30,9 @@ import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./Ferme
 import { FermentationDayDatumCreateNestedManyWithoutAssetsInput } from "./FermentationDayDatumCreateNestedManyWithoutAssetsInput";
 import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
 import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedManyWithoutAssetsInput";
+import { InventoryCreateNestedManyWithoutAssetsInput } from "./InventoryCreateNestedManyWithoutAssetsInput";
+import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCreateNestedManyWithoutAssetsInput";
+import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
 
 @InputType()
 class AssetCreateInput {
@@ -199,6 +202,54 @@ class AssetCreateInput {
     nullable: true,
   })
   batches?: BatchCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventories?: InventoryCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryLogCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventoryLogs?: InventoryLogCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventoryTransfersFrom?: InventoryTransferCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventoryTransfersTo?: InventoryTransferCreateNestedManyWithoutAssetsInput;
 }
 
 export { AssetCreateInput as AssetCreateInput };

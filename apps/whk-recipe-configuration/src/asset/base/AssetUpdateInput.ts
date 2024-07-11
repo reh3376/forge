@@ -30,6 +30,9 @@ import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./Fermentatio
 import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
 import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
 import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAssetsInput";
+import { InventoryUpdateManyWithoutAssetsInput } from "./InventoryUpdateManyWithoutAssetsInput";
+import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateManyWithoutAssetsInput";
+import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
 
 @InputType()
 class AssetUpdateInput {
@@ -217,6 +220,54 @@ class AssetUpdateInput {
     nullable: true,
   })
   batches?: BatchUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventories?: InventoryUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryLogUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventoryLogs?: InventoryLogUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventoryTransfersFrom?: InventoryTransferUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  inventoryTransfersTo?: InventoryTransferUpdateManyWithoutAssetsInput;
 }
 
 export { AssetUpdateInput as AssetUpdateInput };

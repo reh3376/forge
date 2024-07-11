@@ -17,6 +17,7 @@ import {
   SalesOrder as PrismaSalesOrder,
   ProductionOrder as PrismaProductionOrder,
   Recipe as PrismaRecipe,
+  InventoryLog as PrismaInventoryLog,
 } from "@prisma/client";
 
 export class CustomerServiceBase {
@@ -83,5 +84,13 @@ export class CustomerServiceBase {
         where: { id: parentId },
       })
       .recipes(args);
+  }
+
+  async getInventoryLog(parentId: string): Promise<PrismaInventoryLog | null> {
+    return this.prisma.customer
+      .findUnique({
+        where: { id: parentId },
+      })
+      .inventoryLog();
   }
 }

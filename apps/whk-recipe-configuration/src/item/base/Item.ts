@@ -34,6 +34,9 @@ import { Lot } from "../../lot/base/Lot";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { Vendor } from "../../vendor/base/Vendor";
 import { Recipe } from "../../recipe/base/Recipe";
+import { Inventory } from "../../inventory/base/Inventory";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 
 @ObjectType()
 class Item {
@@ -290,6 +293,33 @@ class Item {
   @Type(() => Recipe)
   @IsOptional()
   recipes?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Inventory],
+  })
+  @ValidateNested()
+  @Type(() => Inventory)
+  @IsOptional()
+  inventories?: Array<Inventory>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [InventoryLog],
+  })
+  @ValidateNested()
+  @Type(() => InventoryLog)
+  @IsOptional()
+  inventoryLogs?: Array<InventoryLog>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [InventoryTransfer],
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransfer)
+  @IsOptional()
+  inventoryTransfers?: Array<InventoryTransfer>;
 }
 
 export { Item as Item };

@@ -16,6 +16,7 @@ import {
   Lot as PrismaLot,
   Batch as PrismaBatch,
   BomItem as PrismaBomItem,
+  InventoryTransfer as PrismaInventoryTransfer,
   PurchaseOrder as PrismaPurchaseOrder,
   Recipe as PrismaRecipe,
   Item as PrismaItem,
@@ -66,6 +67,17 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .bomItems(args);
+  }
+
+  async findInventoryTransfers(
+    parentId: string,
+    args: Prisma.InventoryTransferFindManyArgs
+  ): Promise<PrismaInventoryTransfer[]> {
+    return this.prisma.lot
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .inventoryTransfers(args);
   }
 
   async getPurchaseOrderAcceptedLots(
