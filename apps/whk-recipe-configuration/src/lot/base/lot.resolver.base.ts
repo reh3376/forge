@@ -29,6 +29,8 @@ import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
+import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
+import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { Item } from "../../item/base/Item";
@@ -217,6 +219,28 @@ export class LotResolverBase {
     @graphql.Args() args: BomItemFindManyArgs
   ): Promise<BomItem[]> {
     const results = await this.service.findBomItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [InventoryTransfer], {
+    name: "inventoryTransfers",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryTransfer",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryTransfers(
+    @graphql.Parent() parent: Lot,
+    @graphql.Args() args: InventoryTransferFindManyArgs
+  ): Promise<InventoryTransfer[]> {
+    const results = await this.service.findInventoryTransfers(parent.id, args);
 
     if (!results) {
       return [];
