@@ -387,7 +387,7 @@ export class InventoryTransferControllerBase {
         name: true,
         revision: true,
         schemaVersion: true,
-        type: true,
+        assetType: true,
         updatedAt: true,
         updatedBy: true,
         globalId: true,
