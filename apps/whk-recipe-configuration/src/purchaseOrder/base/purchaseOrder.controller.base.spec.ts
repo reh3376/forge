@@ -14,6 +14,8 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { PurchaseOrderController } from "../purchaseOrder.controller";
 import { PurchaseOrderService } from "../purchaseOrder.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { LoggerModule } from "../../logger/logger.module";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -153,6 +155,7 @@ describe("PurchaseOrder", () => {
           provide: PurchaseOrderService,
           useValue: service,
         },
+        PrismaService,
       ],
       controllers: [PurchaseOrderController],
       imports: [ACLModule],

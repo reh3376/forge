@@ -6,9 +6,9 @@ import * as errors from "../errors";
 import { ScheduleOrderQueueService } from "./scheduleOrderQueue.service";
 import { ScheduleOrderQueueControllerBase } from "./base/scheduleOrderQueue.controller.base";
 import { ScheduleOrderQueueCreateInput } from "./base/ScheduleOrderQueueCreateInput";
-import { AclValidateRequestInterceptor } from "src/interceptors/aclValidateRequest.interceptor";
+import { AclValidateRequestInterceptor } from "../interceptors/aclValidateRequest.interceptor";
 import { ScheduleOrderQueue } from "./base/ScheduleOrderQueue";
-import { isRecordNotFoundError } from "src/prisma.util";
+import { isRecordNotFoundError } from "../prisma.util";
 import { ScheduleOrderQueueWhereUniqueInput } from "./base/ScheduleOrderQueueWhereUniqueInput";
 import { ScheduleOrderQueueUpdateInput } from "./base/ScheduleOrderQueueUpdateInput";
 
