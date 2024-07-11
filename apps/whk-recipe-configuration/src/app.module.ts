@@ -51,6 +51,7 @@ import { VendorModule } from "./vendor/vendor.module";
 import { InventoryModule } from "./inventory/inventory.module";
 import { InventoryLogModule } from "./inventoryLog/inventoryLog.module";
 import { InventoryTransferModule } from "./inventoryTransfer/inventoryTransfer.module";
+import { UnitLookupModule } from "./unitLookup/unitLookup.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -111,6 +112,7 @@ import {SyncModule} from "./sync/sync.module";
     InventoryModule,
     InventoryLogModule,
     InventoryTransferModule,
+    UnitLookupModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
