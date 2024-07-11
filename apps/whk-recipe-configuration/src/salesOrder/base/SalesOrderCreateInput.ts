@@ -184,13 +184,16 @@ class SalesOrderCreateInput {
   requestedShipDate?: Date | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @Field(() => String)
-  name!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
 }
 
 export { SalesOrderCreateInput as SalesOrderCreateInput };

@@ -217,14 +217,14 @@ class SalesOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  name?: StringFilter;
+  name?: StringNullableFilter;
 }
 
 export { SalesOrderWhereInput as SalesOrderWhereInput };
