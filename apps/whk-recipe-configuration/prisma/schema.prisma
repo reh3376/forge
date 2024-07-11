@@ -530,7 +530,6 @@ model Test {
 
 model Asset {
   assetPath               String                  @unique
-  children                Json?
   createdAt               DateTime                @default(now())
   createdBy               String
   description             String
@@ -551,6 +550,9 @@ model Asset {
   inventoryLogs           InventoryLog[]
   inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
+  parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
+  parentId                String?                 @unique
+  children                Asset?                  @relation(name: "AssetChildrenAssetParent")
 
   @@unique([name, revision])
 }
@@ -744,9 +746,9 @@ model Batch {
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt
   batchId                 String                  @unique
-  parent                  Batch?                  @relation(name: "parent", fields: [parentId], references: [id])
+  parent                  Batch?                  @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
   parentId                String?
-  children                Batch[]                 @relation(name: "parent")
+  children                Batch[]                 @relation(name: "BatchChildrenBatchParent")
   quantity                Int?
   batchData               Json?
   revision                Int?                    @default(0)

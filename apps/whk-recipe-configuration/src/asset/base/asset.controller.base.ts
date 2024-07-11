@@ -74,10 +74,23 @@ export class AssetControllerBase {
   })
   async createAsset(@common.Body() data: AssetCreateInput): Promise<Asset> {
     return await this.service.createAsset({
-      data: data,
+      data: {
+        ...data,
+
+        parent: data.parent
+          ? {
+              connect: data.parent,
+            }
+          : undefined,
+
+        children: data.children
+          ? {
+              connect: data.children,
+            }
+          : undefined,
+      },
       select: {
         assetPath: true,
-        children: true,
         createdAt: true,
         createdBy: true,
         description: true,
@@ -89,6 +102,18 @@ export class AssetControllerBase {
         updatedAt: true,
         updatedBy: true,
         globalId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        children: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -111,7 +136,6 @@ export class AssetControllerBase {
       ...args,
       select: {
         assetPath: true,
-        children: true,
         createdAt: true,
         createdBy: true,
         description: true,
@@ -123,6 +147,18 @@ export class AssetControllerBase {
         updatedAt: true,
         updatedBy: true,
         globalId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        children: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -146,7 +182,6 @@ export class AssetControllerBase {
       where: params,
       select: {
         assetPath: true,
-        children: true,
         createdAt: true,
         createdBy: true,
         description: true,
@@ -158,6 +193,18 @@ export class AssetControllerBase {
         updatedAt: true,
         updatedBy: true,
         globalId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        children: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -190,10 +237,23 @@ export class AssetControllerBase {
     try {
       return await this.service.updateAsset({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          parent: data.parent
+            ? {
+                connect: data.parent,
+              }
+            : undefined,
+
+          children: data.children
+            ? {
+                connect: data.children,
+              }
+            : undefined,
+        },
         select: {
           assetPath: true,
-          children: true,
           createdAt: true,
           createdBy: true,
           description: true,
@@ -205,6 +265,18 @@ export class AssetControllerBase {
           updatedAt: true,
           updatedBy: true,
           globalId: true,
+
+          parent: {
+            select: {
+              id: true,
+            },
+          },
+
+          children: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

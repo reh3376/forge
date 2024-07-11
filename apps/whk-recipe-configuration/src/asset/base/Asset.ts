@@ -15,17 +15,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  IsOptional,
   IsDate,
   IsInt,
   Max,
+  IsOptional,
   IsEnum,
   ValidateNested,
 } from "class-validator";
 
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
 import { EnumAssetType } from "./EnumAssetType";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
@@ -47,16 +44,6 @@ class Asset {
   @MaxLength(256)
   @Field(() => String)
   assetPath!: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  children!: JsonValue;
 
   @ApiProperty({
     required: true,
@@ -252,6 +239,24 @@ class Asset {
   @Type(() => InventoryTransfer)
   @IsOptional()
   inventoryTransfersTo?: Array<InventoryTransfer>;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  parent?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  children?: Asset | null;
 }
 
 export { Asset as Asset };

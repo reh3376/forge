@@ -14,7 +14,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, IsEnum, ValidateNested } from "class-validator";
-import { JsonFilter } from "../../util/JsonFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumAssetType } from "./EnumAssetType";
@@ -27,6 +26,7 @@ import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilte
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
+import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 
 @InputType()
 class AssetWhereInput {
@@ -40,17 +40,6 @@ class AssetWhereInput {
     nullable: true,
   })
   assetPath?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  children?: JsonFilter;
 
   @ApiProperty({
     required: false,
@@ -288,6 +277,30 @@ class AssetWhereInput {
     nullable: true,
   })
   inventoryTransfersTo?: InventoryTransferListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  children?: AssetWhereUniqueInput;
 }
 
 export { AssetWhereInput as AssetWhereInput };
