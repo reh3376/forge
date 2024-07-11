@@ -3,9 +3,9 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsOptional } from "class-validator";
 import GraphQLJSON from "graphql-type-json";
-import { AssetWhereUniqueInput } from "src/asset/base/AssetWhereUniqueInput";
-import { InputJsonValue } from "src/types";
-import { IsJSONValue } from "src/validators";
+import { AssetWhereUniqueInput } from "../asset/base/AssetWhereUniqueInput";
+import { InputJsonValue } from "../types";
+import { IsJSONValue } from "../validators";
 
 @ArgsType()
 class BatchIdCreateInput {

@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { BatchServiceBase } from "./base/batch.service.base";
-import { RabbitMQProducerService } from "src/rabbitmq/rabbitmq.producer.service";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { WhMessageBrokerTopics } from "src/rabbitmq/topics";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Batch, Prisma } from "@prisma/client";
 import { BatchIdCreateInput } from "./BatchIdCreateInput";
 import { BatchCreateInput } from "./base/BatchCreateInput";

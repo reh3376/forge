@@ -4,9 +4,10 @@ import { PurchaseOrderModuleBase } from "./base/purchaseOrder.module.base";
 import { PurchaseOrderService } from "./purchaseOrder.service";
 import { PurchaseOrderController } from "./purchaseOrder.controller";
 import { PurchaseOrderResolver } from "./purchaseOrder.resolver";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Module({
-  imports: [PurchaseOrderModuleBase, forwardRef(() => AuthModule)],
+  imports: [PurchaseOrderModuleBase, forwardRef(() => AuthModule), PrismaService],
   controllers: [PurchaseOrderController],
   providers: [PurchaseOrderService, PurchaseOrderResolver],
   exports: [PurchaseOrderService],
