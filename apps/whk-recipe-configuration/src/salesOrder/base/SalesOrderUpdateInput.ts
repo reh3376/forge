@@ -205,7 +205,7 @@ class SalesOrderUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  name?: string;
+  name?: string | null;
 }
 
 export { SalesOrderUpdateInput as SalesOrderUpdateInput };
