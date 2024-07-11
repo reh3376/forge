@@ -18,6 +18,7 @@ import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 
 @InputType()
 class VendorWhereInput {
@@ -131,6 +132,18 @@ class VendorWhereInput {
     nullable: true,
   })
   globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => PurchaseOrderListRelationFilter, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderListRelationFilter;
 }
 
 export { VendorWhereInput as VendorWhereInput };

@@ -29,6 +29,9 @@ import { VendorUpdateInput } from "./VendorUpdateInput";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -292,6 +295,136 @@ export class VendorControllerBase {
   ): Promise<void> {
     const data = {
       items: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateVendor({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/purchaseOrders")
+  @ApiNestedQuery(PurchaseOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrders(
+    @common.Req() request: Request,
+    @common.Param() params: VendorWhereUniqueInput
+  ): Promise<PurchaseOrder[]> {
+    const query = plainToClass(PurchaseOrderFindManyArgs, request.query);
+    const results = await this.service.findPurchaseOrders(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
+        complete: true,
+        createdAt: true,
+        createdBy: true,
+        updatedAt: true,
+        updatedBy: true,
+        transactionGroup: true,
+        id: true,
+        name: true,
+        totalOrderQuantity: true,
+        purchaseOrderReceiptDate: true,
+        purchaseOrderReceived: true,
+
+        purchaseOrderRejectedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        receiptStatus: true,
+        receivedQuantity: true,
+        revision: true,
+        schemaVersion: true,
+        globalId: true,
+        lineItems: true,
+        erpId: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/purchaseOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Vendor",
+    action: "update",
+    possession: "any",
+  })
+  async connectPurchaseOrders(
+    @common.Param() params: VendorWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateVendor({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/purchaseOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Vendor",
+    action: "update",
+    possession: "any",
+  })
+  async updatePurchaseOrders(
+    @common.Param() params: VendorWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateVendor({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/purchaseOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Vendor",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectPurchaseOrders(
+    @common.Param() params: VendorWhereUniqueInput,
+    @common.Body() body: PurchaseOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      purchaseOrders: {
         disconnect: body,
       },
     };

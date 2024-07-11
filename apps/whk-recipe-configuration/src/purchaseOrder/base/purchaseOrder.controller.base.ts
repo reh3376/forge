@@ -78,6 +78,12 @@ export class PurchaseOrderControllerBase {
               connect: data.purchaseOrderRejectedLots,
             }
           : undefined,
+
+        vendor: data.vendor
+          ? {
+              connect: data.vendor,
+            }
+          : undefined,
       },
       select: {
         asset: {
@@ -112,6 +118,12 @@ export class PurchaseOrderControllerBase {
         globalId: true,
         lineItems: true,
         erpId: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -167,6 +179,12 @@ export class PurchaseOrderControllerBase {
         globalId: true,
         lineItems: true,
         erpId: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -221,6 +239,12 @@ export class PurchaseOrderControllerBase {
         globalId: true,
         lineItems: true,
         erpId: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -267,6 +291,12 @@ export class PurchaseOrderControllerBase {
                 connect: data.purchaseOrderRejectedLots,
               }
             : undefined,
+
+          vendor: data.vendor
+            ? {
+                connect: data.vendor,
+              }
+            : undefined,
         },
         select: {
           asset: {
@@ -301,6 +331,12 @@ export class PurchaseOrderControllerBase {
           globalId: true,
           lineItems: true,
           erpId: true,
+
+          vendor: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -361,6 +397,12 @@ export class PurchaseOrderControllerBase {
         globalId: true,
         lineItems: true,
         erpId: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
