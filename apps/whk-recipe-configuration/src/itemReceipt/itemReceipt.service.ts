@@ -54,18 +54,12 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           }
         });
       }
-
-
-      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
-        event_type: 'create',
-        data: itemReceipt,
-        recordName: 'ItemReceipt',
-      });
-      this.logger.log(`Created ItemReceipt: ${itemReceipt.id} & pushed to topic`)
       return itemReceipt;
     }
 
     async updateItemReceipt<T extends Prisma.ItemReceiptUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ItemReceiptUpdateArgs>): Promise<import(".prisma/client").ItemReceipt> {
+      
+      
       const itemReceipt = await super.updateItemReceipt(args);
 
       // use the id from the update to get the record in the form we want for the message publishing
@@ -74,15 +68,29 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           include: {
             purchaseOrder: true,
             item: true,
-          }
+          }  
       });
-
-      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
-        event_type: 'update',
-        data: itemReceiptPayload,
-        recordName: 'ItemReceipt',
-      });
-      this.logger.log(`Updated ItemReceipt: ${itemReceipt.id} & pushed to topic`)
+      // Check if quantity is in the args and over 10k
+      if (args.data.quantity && typeof args.data.quantity === 'number' && args.data.quantity > 10000) {
+        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt, {
+          event_type: 'large_quantity_update',
+          // data: {
+            // id: itemReceipt.id,
+            // quantity: args.data.quantity,
+            // item: itemReceiptPayload?.item,
+            // purchaseOrder: itemReceiptPayload?.purchaseOrder
+          // },
+          data: {
+            ...itemReceiptPayload,
+          },
+          id: itemReceipt.id,
+          quantity: args.data.quantity,
+          item: itemReceiptPayload?.item,
+          purchaseOrder: itemReceiptPayload?.purchaseOrder,
+          recordName: 'ItemReceipt',
+        });
+        this.logger.log(`Emitted large quantity update for ItemReceipt: ${itemReceipt.id}`);
+      }
 
       return itemReceipt;
     }
