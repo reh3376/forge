@@ -103,7 +103,21 @@ export class AssetResolverBase {
   async createAsset(@graphql.Args() args: CreateAssetArgs): Promise<Asset> {
     return await this.service.createAsset({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        parent: args.data.parent
+          ? {
+              connect: args.data.parent,
+            }
+          : undefined,
+
+        children: args.data.children
+          ? {
+              connect: args.data.children,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -120,7 +134,21 @@ export class AssetResolverBase {
     try {
       return await this.service.updateAsset({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          parent: args.data.parent
+            ? {
+                connect: args.data.parent,
+              }
+            : undefined,
+
+          children: args.data.children
+            ? {
+                connect: args.data.children,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -327,5 +355,43 @@ export class AssetResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "parent",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getParent(@graphql.Parent() parent: Asset): Promise<Asset | null> {
+    const result = await this.service.getParent(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "children",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getChildren(@graphql.Parent() parent: Asset): Promise<Asset | null> {
+    const result = await this.service.getChildren(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }
