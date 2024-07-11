@@ -17,14 +17,7 @@ import * as nestAccessControl from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Unit } from "./Unit";
-import { UnitCountArgs } from "./UnitCountArgs";
-import { UnitFindManyArgs } from "./UnitFindManyArgs";
-import { UnitFindUniqueArgs } from "./UnitFindUniqueArgs";
-import { CreateUnitArgs } from "./CreateUnitArgs";
-import { UpdateUnitArgs } from "./UpdateUnitArgs";
 import { UnitService } from "../unit.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Unit)
@@ -33,82 +26,4 @@ export class UnitResolverBase {
     protected readonly service: UnitService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
-
-  @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "read",
-    possession: "any",
-  })
-  async _unitsMeta(
-    @graphql.Args() args: UnitCountArgs
-  ): Promise<MetaQueryPayload> {
-    const result = await this.service.count(args);
-    return {
-      count: result,
-    };
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.Query(() => [Unit])
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "read",
-    possession: "any",
-  })
-  async units(@graphql.Args() args: UnitFindManyArgs): Promise<Unit[]> {
-    return this.service.units(args);
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.Query(() => Unit, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "read",
-    possession: "own",
-  })
-  async unit(@graphql.Args() args: UnitFindUniqueArgs): Promise<Unit | null> {
-    const result = await this.service.unit(args);
-    if (result === null) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => Unit)
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "create",
-    possession: "any",
-  })
-  async createUnit(@graphql.Args() args: CreateUnitArgs): Promise<Unit> {
-    return await this.service.createUnit({
-      ...args,
-      data: args.data,
-    });
-  }
-
-  @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => Unit)
-  @nestAccessControl.UseRoles({
-    resource: "Unit",
-    action: "update",
-    possession: "any",
-  })
-  async updateUnit(@graphql.Args() args: UpdateUnitArgs): Promise<Unit | null> {
-    try {
-      return await this.service.updateUnit({
-        ...args,
-        data: args.data,
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
-    }
-  }
 }
