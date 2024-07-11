@@ -23,6 +23,7 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { PurchaseOrderCreateNestedManyWithoutVendorsInput } from "./PurchaseOrderCreateNestedManyWithoutVendorsInput";
 
 @InputType()
 class VendorCreateInput {
@@ -125,6 +126,18 @@ class VendorCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderCreateNestedManyWithoutVendorsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderCreateNestedManyWithoutVendorsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderCreateNestedManyWithoutVendorsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutVendorsInput;
 }
 
 export { VendorCreateInput as VendorCreateInput };

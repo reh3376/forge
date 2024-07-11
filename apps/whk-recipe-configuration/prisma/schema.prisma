@@ -487,6 +487,8 @@ model PurchaseOrder {
   globalId                    String                          @unique @default(cuid())
   lineItems                   Json?
   erpId                       String                          @unique
+  vendor                      Vendor?                         @relation(fields: [vendorId], references: [id])
+  vendorId                    String?
 
   @@unique([name, revision])
 }
@@ -537,7 +539,7 @@ model Asset {
   name                    String
   revision                Int?                    @default(0)
   schemaVersion           String                  @default("0001-alpha")
-  type                    EnumAssetType
+  assetType               EnumAssetAssetType
   updatedAt               DateTime                @updatedAt
   updatedBy               String?
   purchaseOrders          PurchaseOrder[]
@@ -765,18 +767,19 @@ model Batch {
 }
 
 model Vendor {
-  id                 String   @id @default(cuid())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                 String          @id @default(cuid())
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
   items              Item[]
-  active             Boolean? @default(true)
+  active             Boolean?        @default(true)
   additionalDetails  Json?
   contactInformation Json?
   createdBy          String
   updatedBy          String?
   name               String?
-  erpId              String?  @unique
-  globalId           String?  @unique @default(cuid())
+  erpId              String?         @unique
+  globalId           String?         @unique @default(cuid())
+  purchaseOrders     PurchaseOrder[]
 }
 
 model Inventory {
@@ -970,7 +973,7 @@ enum EnumPurchaseOrderReceiptStatus {
   ReceivedTested
 }
 
-enum EnumAssetType {
+enum EnumAssetAssetType {
   ENT
   SITE
   AREA
@@ -979,6 +982,8 @@ enum EnumAssetType {
   EQUIPMOD
   EQUIPPHASE
   CONTROLMOD
+  UNIT
+  DEVICE
 }
 
 enum EnumItemReceiptStatus {

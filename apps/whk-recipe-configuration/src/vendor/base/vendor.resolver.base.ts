@@ -27,6 +27,8 @@ import { CreateVendorArgs } from "./CreateVendorArgs";
 import { UpdateVendorArgs } from "./UpdateVendorArgs";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
+import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { VendorService } from "../vendor.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Vendor)
@@ -130,6 +132,26 @@ export class VendorResolverBase {
     @graphql.Args() args: ItemFindManyArgs
   ): Promise<Item[]> {
     const results = await this.service.findItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrders(
+    @graphql.Parent() parent: Vendor,
+    @graphql.Args() args: PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    const results = await this.service.findPurchaseOrders(parent.id, args);
 
     if (!results) {
       return [];

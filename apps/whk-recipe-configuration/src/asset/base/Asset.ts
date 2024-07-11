@@ -24,7 +24,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { EnumAssetType } from "./EnumAssetType";
+import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
@@ -111,13 +111,13 @@ class Asset {
 
   @ApiProperty({
     required: true,
-    enum: EnumAssetType,
+    enum: EnumAssetAssetType,
   })
-  @IsEnum(EnumAssetType)
-  @Field(() => EnumAssetType, {
+  @IsEnum(EnumAssetAssetType)
+  @Field(() => EnumAssetAssetType, {
     nullable: true,
   })
-  type?:
+  assetType?:
     | "ENT"
     | "SITE"
     | "AREA"
@@ -125,7 +125,9 @@ class Asset {
     | "CELL"
     | "EQUIPMOD"
     | "EQUIPPHASE"
-    | "CONTROLMOD";
+    | "CONTROLMOD"
+    | "UNIT"
+    | "DEVICE";
 
   @ApiProperty({
     required: true,

@@ -598,6 +598,12 @@ export class ItemControllerBase {
         globalId: true,
         lineItems: true,
         erpId: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
