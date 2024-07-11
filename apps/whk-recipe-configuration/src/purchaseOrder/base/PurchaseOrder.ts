@@ -34,6 +34,7 @@ import { TestParameter } from "../../testParameter/base/TestParameter";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
 class PurchaseOrder {
@@ -310,6 +311,15 @@ class PurchaseOrder {
   @MaxLength(100)
   @Field(() => String)
   erpId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Vendor,
+  })
+  @ValidateNested()
+  @Type(() => Vendor)
+  @IsOptional()
+  vendor?: Vendor | null;
 }
 
 export { PurchaseOrder as PurchaseOrder };
