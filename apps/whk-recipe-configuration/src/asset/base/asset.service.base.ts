@@ -145,4 +145,20 @@ export class AssetServiceBase {
       })
       .inventoryTransfersTo(args);
   }
+
+  async getParent(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.asset
+      .findUnique({
+        where: { id: parentId },
+      })
+      .parent();
+  }
+
+  async getChildren(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.asset
+      .findUnique({
+        where: { id: parentId },
+      })
+      .children();
+  }
 }
