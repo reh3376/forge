@@ -420,6 +420,9 @@ model Item {
   vendor                        Vendor?                        @relation(fields: [vendorId], references: [id])
   vendorId                      String?
   recipes                       Recipe[]
+  inventories                   Inventory[]
+  inventoryLogs                 InventoryLog[]
+  inventoryTransfers            InventoryTransfer[]
 }
 
 model ItemGroup {
@@ -449,6 +452,8 @@ model Customer {
   phone            String?
   productionOrders ProductionOrder[]
   recipes          Recipe[]
+  inventoryLog     InventoryLog?     @relation(fields: [inventoryLogId], references: [id])
+  inventoryLogId   String?
 
   @@unique([revision, name])
 }
@@ -542,6 +547,10 @@ model Asset {
   fermentationDayData     FermentationDayDatum[]
   mashData                MashDatum[]
   batches                 Batch[]
+  inventories             Inventory[]
+  inventoryLogs           InventoryLog[]
+  inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
+  inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
 
   @@unique([name, revision])
 }
@@ -591,6 +600,7 @@ model Lot {
   isRawMaterial               Boolean?               @default(false)
   batches                     Batch[]
   bomItems                    BomItem[]
+  inventoryTransfers          InventoryTransfer[]
 }
 
 model BomItem {
@@ -765,6 +775,70 @@ model Vendor {
   name               String?
   erpId              String?  @unique
   globalId           String?  @unique @default(cuid())
+}
+
+model Inventory {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdBy      String
+  updatedBy      String?
+  schemaVersion  String?
+  asset          Asset    @relation(fields: [assetId], references: [id])
+  assetId        String
+  revision       Int?     @default(0)
+  correctionNote String?
+  correctedBy    String?
+  lotNumber      String?
+  item           Item     @relation(fields: [itemId], references: [id])
+  itemId         String
+  notes          String?
+  units          String?
+  globalId       String?  @unique @default(cuid())
+  customers      Json?
+  proof          Decimal?
+  fifoIndex      Int?     @default(0)
+
+  @@unique([assetId, fifoIndex])
+}
+
+model InventoryLog {
+  id                  String     @id @default(cuid())
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  dateTime            DateTime
+  date                DateTime
+  asset               Asset      @relation(fields: [assetId], references: [id])
+  assetId             String
+  quantity            Decimal?
+  loggedBy            String
+  item                Item       @relation(fields: [itemId], references: [id])
+  itemId              String
+  revision            Int?       @default(0)
+  revisedBy           String?
+  customers           Customer[]
+  rawMeasurementValue String?
+  rawMeasurementUnits String?
+  units               String
+}
+
+model InventoryTransfer {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  fromLocation Asset?   @relation(name: "fromLocation", fields: [fromAssetId], references: [id])
+  fromAssetId  String?
+  toLocation   Asset[]  @relation(name: "inventoryTransfersTo")
+  notes        String?
+  department   String?
+  createdBy    String?
+  updatedBy    String?
+  quantity     Int?
+  item         Item?    @relation(fields: [itemId], references: [id])
+  itemId       String?
+  lot          Lot?     @relation(fields: [lotId], references: [id])
+  lotId        String?
+  globalId     String?  @unique @default(cuid())
 }
 
 enum EnumPhaseParameterSetpointType {

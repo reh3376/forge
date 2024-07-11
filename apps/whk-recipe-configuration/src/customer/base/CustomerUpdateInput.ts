@@ -23,6 +23,7 @@ import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateMan
 import { Type } from "class-transformer";
 import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
 import { RecipeUpdateManyWithoutCustomersInput } from "./RecipeUpdateManyWithoutCustomersInput";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 
 @InputType()
 class CustomerUpdateInput {
@@ -193,6 +194,18 @@ class CustomerUpdateInput {
     nullable: true,
   })
   recipes?: RecipeUpdateManyWithoutCustomersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogWhereUniqueInput)
+  @IsOptional()
+  @Field(() => InventoryLogWhereUniqueInput, {
+    nullable: true,
+  })
+  inventoryLog?: InventoryLogWhereUniqueInput | null;
 }
 
 export { CustomerUpdateInput as CustomerUpdateInput };

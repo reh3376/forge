@@ -33,6 +33,9 @@ import { FermentationChemistry } from "../../fermentationChemistry/base/Fermenta
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { Batch } from "../../batch/base/Batch";
+import { Inventory } from "../../inventory/base/Inventory";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 
 @ObjectType()
 class Asset {
@@ -213,6 +216,42 @@ class Asset {
   @Type(() => Batch)
   @IsOptional()
   batches?: Array<Batch>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Inventory],
+  })
+  @ValidateNested()
+  @Type(() => Inventory)
+  @IsOptional()
+  inventories?: Array<Inventory>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [InventoryLog],
+  })
+  @ValidateNested()
+  @Type(() => InventoryLog)
+  @IsOptional()
+  inventoryLogs?: Array<InventoryLog>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [InventoryTransfer],
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransfer)
+  @IsOptional()
+  inventoryTransfersFrom?: Array<InventoryTransfer>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [InventoryTransfer],
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransfer)
+  @IsOptional()
+  inventoryTransfersTo?: Array<InventoryTransfer>;
 }
 
 export { Asset as Asset };

@@ -48,6 +48,9 @@ import { FermentationSettingDatumModule } from "./fermentationSettingDatum/ferme
 import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
 import { BatchModule } from "./batch/batch.module";
 import { VendorModule } from "./vendor/vendor.module";
+import { InventoryModule } from "./inventory/inventory.module";
+import { InventoryLogModule } from "./inventoryLog/inventoryLog.module";
+import { InventoryTransferModule } from "./inventoryTransfer/inventoryTransfer.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -104,6 +107,9 @@ import { AuthModule } from "./auth/auth.module";
     FermentationDayDatumModule,
     BatchModule,
     VendorModule,
+    InventoryModule,
+    InventoryLogModule,
+    InventoryTransferModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

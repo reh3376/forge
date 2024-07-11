@@ -24,6 +24,7 @@ import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemist
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
+import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 
 @InputType()
 class LotWhereInput {
@@ -209,6 +210,18 @@ class LotWhereInput {
     nullable: true,
   })
   bomItems?: BomItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryTransferListRelationFilter, {
+    nullable: true,
+  })
+  inventoryTransfers?: InventoryTransferListRelationFilter;
 }
 
 export { LotWhereInput as LotWhereInput };

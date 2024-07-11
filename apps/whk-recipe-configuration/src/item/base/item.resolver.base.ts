@@ -43,6 +43,12 @@ import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindMany
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
+import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
+import { Inventory } from "../../inventory/base/Inventory";
+import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFindManyArgs";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
+import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -324,6 +330,68 @@ export class ItemResolverBase {
     @graphql.Args() args: RecipeFindManyArgs
   ): Promise<Recipe[]> {
     const results = await this.service.findRecipes(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Inventory], { name: "inventories" })
+  @nestAccessControl.UseRoles({
+    resource: "Inventory",
+    action: "read",
+    possession: "any",
+  })
+  async findInventories(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: InventoryFindManyArgs
+  ): Promise<Inventory[]> {
+    const results = await this.service.findInventories(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [InventoryLog], { name: "inventoryLogs" })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryLog",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryLogs(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: InventoryLogFindManyArgs
+  ): Promise<InventoryLog[]> {
+    const results = await this.service.findInventoryLogs(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [InventoryTransfer], {
+    name: "inventoryTransfers",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "InventoryTransfer",
+    action: "read",
+    possession: "any",
+  })
+  async findInventoryTransfers(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: InventoryTransferFindManyArgs
+  ): Promise<InventoryTransfer[]> {
+    const results = await this.service.findInventoryTransfers(parent.id, args);
 
     if (!results) {
       return [];

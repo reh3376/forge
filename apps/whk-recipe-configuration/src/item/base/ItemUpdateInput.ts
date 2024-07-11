@@ -31,6 +31,9 @@ import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput
 import { SalesOrderUpdateManyWithoutItemsInput } from "./SalesOrderUpdateManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 import { RecipeUpdateManyWithoutItemsInput } from "./RecipeUpdateManyWithoutItemsInput";
+import { InventoryUpdateManyWithoutItemsInput } from "./InventoryUpdateManyWithoutItemsInput";
+import { InventoryLogUpdateManyWithoutItemsInput } from "./InventoryLogUpdateManyWithoutItemsInput";
+import { InventoryTransferUpdateManyWithoutItemsInput } from "./InventoryTransferUpdateManyWithoutItemsInput";
 
 @InputType()
 class ItemUpdateInput {
@@ -308,6 +311,42 @@ class ItemUpdateInput {
     nullable: true,
   })
   recipes?: RecipeUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => InventoryUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  inventories?: InventoryUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => InventoryLogUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  inventoryLogs?: InventoryLogUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  inventoryTransfers?: InventoryTransferUpdateManyWithoutItemsInput;
 }
 
 export { ItemUpdateInput as ItemUpdateInput };
