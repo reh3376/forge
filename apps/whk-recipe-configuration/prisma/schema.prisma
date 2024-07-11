@@ -846,6 +846,19 @@ model InventoryTransfer {
   globalId     String?  @unique @default(cuid())
 }
 
+model UnitLookup {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  conversion Decimal?
+  fromUnit   String?
+  toUnit     String?
+  name       String?  @unique
+  classField String?
+
+  @@unique([toUnit, fromUnit])
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
