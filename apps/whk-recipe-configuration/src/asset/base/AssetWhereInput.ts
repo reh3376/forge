@@ -16,7 +16,7 @@ import { Type } from "class-transformer";
 import { IsOptional, IsEnum, ValidateNested } from "class-validator";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { EnumAssetType } from "./EnumAssetType";
+import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
@@ -120,14 +120,14 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumAssetType,
+    enum: EnumAssetAssetType,
   })
-  @IsEnum(EnumAssetType)
+  @IsEnum(EnumAssetAssetType)
   @IsOptional()
-  @Field(() => EnumAssetType, {
+  @Field(() => EnumAssetAssetType, {
     nullable: true,
   })
-  type?:
+  assetType?:
     | "ENT"
     | "SITE"
     | "AREA"
@@ -135,7 +135,9 @@ class AssetWhereInput {
     | "CELL"
     | "EQUIPMOD"
     | "EQUIPPHASE"
-    | "CONTROLMOD";
+    | "CONTROLMOD"
+    | "UNIT"
+    | "DEVICE";
 
   @ApiProperty({
     required: false,

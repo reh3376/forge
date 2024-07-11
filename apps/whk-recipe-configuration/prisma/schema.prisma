@@ -537,7 +537,7 @@ model Asset {
   name                    String
   revision                Int?                    @default(0)
   schemaVersion           String                  @default("0001-alpha")
-  type                    EnumAssetType
+  assetType               EnumAssetAssetType
   updatedAt               DateTime                @updatedAt
   updatedBy               String?
   purchaseOrders          PurchaseOrder[]
@@ -970,7 +970,7 @@ enum EnumPurchaseOrderReceiptStatus {
   ReceivedTested
 }
 
-enum EnumAssetType {
+enum EnumAssetAssetType {
   ENT
   SITE
   AREA
@@ -979,6 +979,8 @@ enum EnumAssetType {
   EQUIPMOD
   EQUIPPHASE
   CONTROLMOD
+  UNIT
+  DEVICE
 }
 
 enum EnumItemReceiptStatus {
