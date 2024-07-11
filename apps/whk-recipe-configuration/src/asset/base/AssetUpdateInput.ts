@@ -20,7 +20,7 @@ import {
   IsEnum,
   ValidateNested,
 } from "class-validator";
-import { EnumAssetType } from "./EnumAssetType";
+import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
 import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
@@ -108,14 +108,14 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumAssetType,
+    enum: EnumAssetAssetType,
   })
-  @IsEnum(EnumAssetType)
+  @IsEnum(EnumAssetAssetType)
   @IsOptional()
-  @Field(() => EnumAssetType, {
+  @Field(() => EnumAssetAssetType, {
     nullable: true,
   })
-  type?:
+  assetType?:
     | "ENT"
     | "SITE"
     | "AREA"
@@ -123,7 +123,9 @@ class AssetUpdateInput {
     | "CELL"
     | "EQUIPMOD"
     | "EQUIPPHASE"
-    | "CONTROLMOD";
+    | "CONTROLMOD"
+    | "UNIT"
+    | "DEVICE";
 
   @ApiProperty({
     required: false,

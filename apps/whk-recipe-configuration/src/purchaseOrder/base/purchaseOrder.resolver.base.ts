@@ -34,6 +34,7 @@ import { Item } from "../../item/base/Item";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Asset } from "../../asset/base/Asset";
+import { Vendor } from "../../vendor/base/Vendor";
 import { PurchaseOrderService } from "../purchaseOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => PurchaseOrder)
@@ -114,6 +115,12 @@ export class PurchaseOrderResolverBase {
               connect: args.data.purchaseOrderRejectedLots,
             }
           : undefined,
+
+        vendor: args.data.vendor
+          ? {
+              connect: args.data.vendor,
+            }
+          : undefined,
       },
     });
   }
@@ -143,6 +150,12 @@ export class PurchaseOrderResolverBase {
           purchaseOrderRejectedLots: args.data.purchaseOrderRejectedLots
             ? {
                 connect: args.data.purchaseOrderRejectedLots,
+              }
+            : undefined,
+
+          vendor: args.data.vendor
+            ? {
+                connect: args.data.vendor,
               }
             : undefined,
         },
@@ -292,6 +305,27 @@ export class PurchaseOrderResolverBase {
     @graphql.Parent() parent: PurchaseOrder
   ): Promise<PurchaseOrder | null> {
     const result = await this.service.getPurchaseOrderRejectedLots(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Vendor, {
+    nullable: true,
+    name: "vendor",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Vendor",
+    action: "read",
+    possession: "any",
+  })
+  async getVendor(
+    @graphql.Parent() parent: PurchaseOrder
+  ): Promise<Vendor | null> {
+    const result = await this.service.getVendor(parent.id);
 
     if (!result) {
       return null;
