@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field } from "@nestjs/graphql";
+import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -24,9 +24,7 @@ import {
   IsDate,
 } from "class-validator";
 
-import { IsJSONValue } from "../../validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
+import { Decimal } from "decimal.js";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
 import { Type } from "class-transformer";
@@ -180,13 +178,15 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
   })
-  @IsJSONValue()
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => Float, {
     nullable: true,
   })
-  testResult?: InputJsonValue;
+  testResult?: Decimal | null;
 
   @ApiProperty({
     required: false,

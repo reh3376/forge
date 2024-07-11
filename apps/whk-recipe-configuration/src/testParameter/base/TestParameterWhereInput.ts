@@ -18,7 +18,7 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { BooleanFilter } from "../../util/BooleanFilter";
-import { JsonFilter } from "../../util/JsonFilter";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
@@ -152,14 +152,14 @@ class TestParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: JsonFilter,
+    type: DecimalNullableFilter,
   })
-  @Type(() => JsonFilter)
+  @Type(() => DecimalNullableFilter)
   @IsOptional()
-  @Field(() => JsonFilter, {
+  @Field(() => DecimalNullableFilter, {
     nullable: true,
   })
-  testResult?: JsonFilter;
+  testResult?: DecimalNullableFilter;
 
   @ApiProperty({
     required: false,
