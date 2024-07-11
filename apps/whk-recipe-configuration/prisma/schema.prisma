@@ -505,7 +505,7 @@ model SalesOrder {
   lineItems         Json?
   erpId             String?          @unique
   requestedShipDate DateTime?
-  name              String           @unique
+  name              String?          @unique
 }
 
 model Test {
