@@ -4,6 +4,7 @@ import * as nestAccessControl from "nest-access-control";
 import { BatchService } from "./batch.service";
 import { BatchControllerBase } from "./base/batch.controller.base";
 import { BatchIdCreateInput } from "./BatchIdCreateInput";
+import { Batch } from "@prisma/client";
 
 @swagger.ApiTags("batches")
 @common.Controller("batches")
@@ -25,8 +26,7 @@ export class BatchController extends BatchControllerBase {
   })
   async getBatchId(
     @common.Body() batchIdCreateInput: BatchIdCreateInput
-  ): Promise<{ batchId: string }> {
-    const batch = await this.service.GetBatchId(batchIdCreateInput);
-    return { batchId: batch.batchId };
+  ): Promise<Batch> {
+    return await this.service.GetBatchId(batchIdCreateInput);
   }
 }
