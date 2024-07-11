@@ -380,7 +380,6 @@ export class InventoryTransferControllerBase {
       ...query,
       select: {
         assetPath: true,
-        children: true,
         createdAt: true,
         createdBy: true,
         description: true,
@@ -392,6 +391,18 @@ export class InventoryTransferControllerBase {
         updatedAt: true,
         updatedBy: true,
         globalId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        children: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
