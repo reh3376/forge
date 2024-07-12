@@ -273,6 +273,17 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   recipe?: RecipeListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
 }
 
 export { RecipeParameterWhereInput as RecipeParameterWhereInput };
