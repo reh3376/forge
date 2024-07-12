@@ -260,6 +260,18 @@ class RecipeParameter {
   @Type(() => Recipe)
   @IsOptional()
   recipe?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description!: string | null;
 }
 
 export { RecipeParameter as RecipeParameter };

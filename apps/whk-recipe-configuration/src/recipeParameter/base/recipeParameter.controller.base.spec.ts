@@ -36,6 +36,7 @@ const CREATE_INPUT = {
   isClassDefinition: "true",
   globalId: "exampleGlobalId",
   recipeNumericalSetpoint: 42.424242424,
+  description: "exampleDescription",
 };
 const CREATE_RESULT = {
   revision: 42,
@@ -56,6 +57,7 @@ const CREATE_RESULT = {
   isClassDefinition: "true",
   globalId: "exampleGlobalId",
   recipeNumericalSetpoint: 42.424242424,
+  description: "exampleDescription",
 };
 const FIND_MANY_RESULT = [
   {
@@ -77,6 +79,7 @@ const FIND_MANY_RESULT = [
     isClassDefinition: "true",
     globalId: "exampleGlobalId",
     recipeNumericalSetpoint: 42.424242424,
+    description: "exampleDescription",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -98,6 +101,7 @@ const FIND_ONE_RESULT = {
   isClassDefinition: "true",
   globalId: "exampleGlobalId",
   recipeNumericalSetpoint: 42.424242424,
+  description: "exampleDescription",
 };
 
 const service = {
