@@ -91,6 +91,7 @@ export class RecipeParameterControllerBase {
 
         globalId: true,
         recipeNumericalSetpoint: true,
+        description: true,
       },
     });
   }
@@ -140,6 +141,7 @@ export class RecipeParameterControllerBase {
 
         globalId: true,
         recipeNumericalSetpoint: true,
+        description: true,
       },
     });
   }
@@ -188,6 +190,7 @@ export class RecipeParameterControllerBase {
 
         globalId: true,
         recipeNumericalSetpoint: true,
+        description: true,
       },
     });
     if (result === null) {
@@ -256,6 +259,7 @@ export class RecipeParameterControllerBase {
 
           globalId: true,
           recipeNumericalSetpoint: true,
+          description: true,
         },
       });
     } catch (error) {
@@ -310,6 +314,7 @@ export class RecipeParameterControllerBase {
 
         globalId: true,
         recipeNumericalSetpoint: true,
+        description: true,
       },
     });
     if (results === null) {

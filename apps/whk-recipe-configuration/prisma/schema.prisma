@@ -106,6 +106,7 @@ model RecipeParameter {
   globalId                   String?                               @default(cuid())
   recipeNumericalSetpoint    Decimal?
   recipe                     Recipe[]
+  description                String?
 }
 
 model Instruction {

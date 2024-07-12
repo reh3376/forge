@@ -1052,6 +1052,7 @@ export class RecipeControllerBase {
 
         globalId: true,
         recipeNumericalSetpoint: true,
+        description: true,
       },
     });
     if (results === null) {
