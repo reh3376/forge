@@ -19,6 +19,13 @@ import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import * as nestAccessControl from "nest-access-control";
 import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { UnitLookupService } from "../unitLookup.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { UnitLookupCreateInput } from "./UnitLookupCreateInput";
+import { UnitLookup } from "./UnitLookup";
+import { UnitLookupFindManyArgs } from "./UnitLookupFindManyArgs";
+import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
+import { UnitLookupUpdateInput } from "./UnitLookupUpdateInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -27,4 +34,346 @@ export class UnitLookupControllerBase {
     protected readonly service: UnitLookupService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Post()
+  @swagger.ApiCreatedResponse({ type: UnitLookup })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: UnitLookupCreateInput,
+  })
+  async createUnitLookup(
+    @common.Body() data: UnitLookupCreateInput
+  ): Promise<UnitLookup> {
+    return await this.service.createUnitLookup({
+      data: {
+        ...data,
+
+        baseRecord: data.baseRecord
+          ? {
+              connect: data.baseRecord,
+            }
+          : undefined,
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        conversionRate: true,
+        name: true,
+        typeName: true,
+        abbreviation: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        baseUnit: true,
+
+        baseRecord: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get()
+  @swagger.ApiOkResponse({ type: [UnitLookup] })
+  @ApiNestedQuery(UnitLookupFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async unitLookups(@common.Req() request: Request): Promise<UnitLookup[]> {
+    const args = plainToClass(UnitLookupFindManyArgs, request.query);
+    return this.service.unitLookups({
+      ...args,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        conversionRate: true,
+        name: true,
+        typeName: true,
+        abbreviation: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        baseUnit: true,
+
+        baseRecord: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id")
+  @swagger.ApiOkResponse({ type: UnitLookup })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async unitLookup(
+    @common.Param() params: UnitLookupWhereUniqueInput
+  ): Promise<UnitLookup | null> {
+    const result = await this.service.unitLookup({
+      where: params,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        conversionRate: true,
+        name: true,
+        typeName: true,
+        abbreviation: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        baseUnit: true,
+
+        baseRecord: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (result === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Patch("/:id")
+  @swagger.ApiOkResponse({ type: UnitLookup })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: UnitLookupUpdateInput,
+  })
+  async updateUnitLookup(
+    @common.Param() params: UnitLookupWhereUniqueInput,
+    @common.Body() data: UnitLookupUpdateInput
+  ): Promise<UnitLookup | null> {
+    try {
+      return await this.service.updateUnitLookup({
+        where: params,
+        data: {
+          ...data,
+
+          baseRecord: data.baseRecord
+            ? {
+                connect: data.baseRecord,
+              }
+            : undefined,
+        },
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          conversionRate: true,
+          name: true,
+          typeName: true,
+          abbreviation: true,
+          pluralAbbreviation: true,
+          pluralName: true,
+          baseUnit: true,
+
+          baseRecord: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.Delete("/:id")
+  @swagger.ApiOkResponse({ type: UnitLookup })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async deleteUnitLookup(
+    @common.Param() params: UnitLookupWhereUniqueInput
+  ): Promise<UnitLookup | null> {
+    try {
+      return await this.service.deleteUnitLookup({
+        where: params,
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          conversionRate: true,
+          name: true,
+          typeName: true,
+          abbreviation: true,
+          pluralAbbreviation: true,
+          pluralName: true,
+          baseUnit: true,
+
+          baseRecord: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/unitLookupRecords")
+  @ApiNestedQuery(UnitLookupFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitLookupRecords(
+    @common.Req() request: Request,
+    @common.Param() params: UnitLookupWhereUniqueInput
+  ): Promise<UnitLookup[]> {
+    const query = plainToClass(UnitLookupFindManyArgs, request.query);
+    const results = await this.service.findUnitLookupRecords(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        conversionRate: true,
+        name: true,
+        typeName: true,
+        abbreviation: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        baseUnit: true,
+
+        baseRecord: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/unitLookupRecords")
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "update",
+    possession: "any",
+  })
+  async connectUnitLookupRecords(
+    @common.Param() params: UnitLookupWhereUniqueInput,
+    @common.Body() body: UnitLookupWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitLookupRecords: {
+        connect: body,
+      },
+    };
+    await this.service.updateUnitLookup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/unitLookupRecords")
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitLookupRecords(
+    @common.Param() params: UnitLookupWhereUniqueInput,
+    @common.Body() body: UnitLookupWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitLookupRecords: {
+        set: body,
+      },
+    };
+    await this.service.updateUnitLookup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/unitLookupRecords")
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectUnitLookupRecords(
+    @common.Param() params: UnitLookupWhereUniqueInput,
+    @common.Body() body: UnitLookupWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitLookupRecords: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUnitLookup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
 }
