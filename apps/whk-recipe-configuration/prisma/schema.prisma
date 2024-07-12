@@ -847,16 +847,19 @@ model InventoryTransfer {
 }
 
 model UnitLookup {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  conversion Decimal?
-  fromUnit   String?
-  toUnit     String?
-  name       String?  @unique
-  classField String?
-
-  @@unique([toUnit, fromUnit])
+  id                 String       @id @default(cuid())
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  conversionRate     Decimal?
+  name               String       @unique
+  typeName           String
+  abbreviation       String       @unique
+  pluralAbbreviation String       @unique
+  pluralName         String       @unique
+  baseUnit           Boolean?     @default(false)
+  baseRecord         UnitLookup?  @relation(name: "baseRecord", fields: [baseRecordId], references: [id])
+  baseRecordId       String?
+  unitLookupRecords  UnitLookup[] @relation(name: "baseRecord")
 }
 
 enum EnumPhaseParameterSetpointType {
