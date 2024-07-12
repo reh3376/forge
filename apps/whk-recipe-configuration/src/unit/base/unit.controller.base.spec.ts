@@ -56,7 +56,20 @@ const FIND_ONE_RESULT = {
   globalId: "exampleGlobalId",
 };
 
-const service = {};
+const service = {
+  createUnit() {
+    return CREATE_RESULT;
+  },
+  units: () => FIND_MANY_RESULT,
+  unit: ({ where }: { where: { id: string } }) => {
+    switch (where.id) {
+      case existingId:
+        return FIND_ONE_RESULT;
+      case nonExistingId:
+        return null;
+    }
+  },
+};
 
 const basicAuthGuard = {
   canActivate: (context: ExecutionContext) => {
@@ -116,6 +129,75 @@ describe("Unit", () => {
 
     app = moduleRef.createNestApplication();
     await app.init();
+  });
+
+  test("POST /units", async () => {
+    await request(app.getHttpServer())
+      .post("/units")
+      .send(CREATE_INPUT)
+      .expect(HttpStatus.CREATED)
+      .expect({
+        ...CREATE_RESULT,
+        createdAt: CREATE_RESULT.createdAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
+      });
+  });
+
+  test("GET /units", async () => {
+    await request(app.getHttpServer())
+      .get("/units")
+      .expect(HttpStatus.OK)
+      .expect([
+        {
+          ...FIND_MANY_RESULT[0],
+          createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
+          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
+        },
+      ]);
+  });
+
+  test("GET /units/:id non existing", async () => {
+    await request(app.getHttpServer())
+      .get(`${"/units"}/${nonExistingId}`)
+      .expect(HttpStatus.NOT_FOUND)
+      .expect({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No resource was found for {"${"id"}":"${nonExistingId}"}`,
+        error: "Not Found",
+      });
+  });
+
+  test("GET /units/:id existing", async () => {
+    await request(app.getHttpServer())
+      .get(`${"/units"}/${existingId}`)
+      .expect(HttpStatus.OK)
+      .expect({
+        ...FIND_ONE_RESULT,
+        createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
+        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
+      });
+  });
+
+  test("POST /units existing resource", async () => {
+    const agent = request(app.getHttpServer());
+    await agent
+      .post("/units")
+      .send(CREATE_INPUT)
+      .expect(HttpStatus.CREATED)
+      .expect({
+        ...CREATE_RESULT,
+        createdAt: CREATE_RESULT.createdAt.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
+      })
+      .then(function () {
+        agent
+          .post("/units")
+          .send(CREATE_INPUT)
+          .expect(HttpStatus.CONFLICT)
+          .expect({
+            statusCode: HttpStatus.CONFLICT,
+          });
+      });
   });
 
   afterAll(async () => {

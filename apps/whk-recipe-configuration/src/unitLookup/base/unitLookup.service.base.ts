@@ -47,6 +47,17 @@ export class UnitLookupServiceBase {
     return this.prisma.unitLookup.delete(args);
   }
 
+  async findUnitLookupRecords(
+    parentId: string,
+    args: Prisma.UnitLookupFindManyArgs
+  ): Promise<PrismaUnitLookup[]> {
+    return this.prisma.unitLookup
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .unitLookupRecords(args);
+  }
+
   async getBaseRecord(parentId: string): Promise<PrismaUnitLookup | null> {
     return this.prisma.unitLookup
       .findUnique({
