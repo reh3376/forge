@@ -238,6 +238,17 @@ class RecipeParameterOrderByInput {
     nullable: true,
   })
   recipeNumericalSetpoint?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  description?: SortOrder;
 }
 
 export { RecipeParameterOrderByInput as RecipeParameterOrderByInput };
