@@ -17,13 +17,14 @@ async function seed() {
       // id: "clygzlkz2000308l94m140qt3",
       name: "WH",
       description: "Whiskey House",
-      type: "ENT",
+      type: EnumAssetType.ENT,
       revision: 1,
       createdAt: new Date("2024-07-11T03:07:00.000Z"),
       createdBy: "pmannion@whiskeyhouse.com",
       updatedAt: new Date("2024-07-11T03:08:00.000Z"),
       updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH"
+      assetPath: "WH",
+      status: EnumAssetStatus.ACTIVE
     },
     {
       // id: "clx60pmnc005p10wyhcqz2g48",
