@@ -13,9 +13,11 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested } from "class-validator";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
+import { UnitLookupListRelationFilter } from "./UnitLookupListRelationFilter";
 
 @InputType()
 class UnitLookupWhereInput {
@@ -39,51 +41,97 @@ class UnitLookupWhereInput {
   @Field(() => DecimalNullableFilter, {
     nullable: true,
   })
-  conversion?: DecimalNullableFilter;
+  conversionRate?: DecimalNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  fromUnit?: StringNullableFilter;
+  name?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  toUnit?: StringNullableFilter;
+  typeName?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  name?: StringNullableFilter;
+  abbreviation?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  classField?: StringNullableFilter;
+  pluralAbbreviation?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  pluralName?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  baseUnit?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitLookupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitLookupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitLookupWhereUniqueInput, {
+    nullable: true,
+  })
+  baseRecord?: UnitLookupWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitLookupListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnitLookupListRelationFilter)
+  @IsOptional()
+  @Field(() => UnitLookupListRelationFilter, {
+    nullable: true,
+  })
+  unitLookupRecords?: UnitLookupListRelationFilter;
 }
 
 export { UnitLookupWhereInput as UnitLookupWhereInput };
