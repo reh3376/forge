@@ -17,8 +17,13 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  IsBoolean,
+  ValidateNested,
 } from "class-validator";
 import { Decimal } from "decimal.js";
+import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
+import { Type } from "class-transformer";
+import { UnitLookupUpdateManyWithoutUnitLookupsInput } from "./UnitLookupUpdateManyWithoutUnitLookupsInput";
 
 @InputType()
 class UnitLookupUpdateInput {
@@ -32,7 +37,7 @@ class UnitLookupUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  conversion?: Decimal | null;
+  conversionRate?: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -44,7 +49,7 @@ class UnitLookupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  fromUnit?: string | null;
+  name?: string;
 
   @ApiProperty({
     required: false,
@@ -56,7 +61,7 @@ class UnitLookupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  toUnit?: string | null;
+  typeName?: string;
 
   @ApiProperty({
     required: false,
@@ -68,7 +73,7 @@ class UnitLookupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  name?: string | null;
+  abbreviation?: string;
 
   @ApiProperty({
     required: false,
@@ -80,7 +85,54 @@ class UnitLookupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  classField?: string | null;
+  pluralAbbreviation?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  pluralName?: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  baseUnit?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitLookupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitLookupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitLookupWhereUniqueInput, {
+    nullable: true,
+  })
+  baseRecord?: UnitLookupWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitLookupUpdateManyWithoutUnitLookupsInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitLookupUpdateManyWithoutUnitLookupsInput)
+  @IsOptional()
+  @Field(() => UnitLookupUpdateManyWithoutUnitLookupsInput, {
+    nullable: true,
+  })
+  unitLookupRecords?: UnitLookupUpdateManyWithoutUnitLookupsInput;
 }
 
 export { UnitLookupUpdateInput as UnitLookupUpdateInput };

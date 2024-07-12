@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   IsDate,
@@ -18,7 +19,10 @@ import {
   Max,
   IsOptional,
   MaxLength,
+  IsBoolean,
+  ValidateNested,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 
@@ -58,55 +62,81 @@ class UnitLookup {
   @Field(() => Float, {
     nullable: true,
   })
-  conversion!: Decimal | null;
+  conversionRate!: Decimal | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  fromUnit!: string | null;
+  @Field(() => String)
+  name!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  toUnit!: string | null;
+  @Field(() => String)
+  typeName!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name!: string | null;
+  @Field(() => String)
+  abbreviation!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
+  @Field(() => String)
+  pluralAbbreviation!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  pluralName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  classField!: string | null;
+  baseUnit!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitLookup,
+  })
+  @ValidateNested()
+  @Type(() => UnitLookup)
+  @IsOptional()
+  baseRecord?: UnitLookup | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitLookup],
+  })
+  @ValidateNested()
+  @Type(() => UnitLookup)
+  @IsOptional()
+  unitLookupRecords?: Array<UnitLookup>;
 }
 
 export { UnitLookup as UnitLookup };

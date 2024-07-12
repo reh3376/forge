@@ -17,6 +17,7 @@ import * as nestAccessControl from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { UnitLookup } from "./UnitLookup";
 import { UnitLookupService } from "../unitLookup.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -26,4 +27,25 @@ export class UnitLookupResolverBase {
     protected readonly service: UnitLookupService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => UnitLookup, {
+    nullable: true,
+    name: "baseRecord",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "any",
+  })
+  async getBaseRecord(
+    @graphql.Parent() parent: UnitLookup
+  ): Promise<UnitLookup | null> {
+    const result = await this.service.getBaseRecord(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
 }
