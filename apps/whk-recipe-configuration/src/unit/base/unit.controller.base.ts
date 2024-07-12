@@ -19,6 +19,13 @@ import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import * as nestAccessControl from "nest-access-control";
 import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { UnitService } from "../unit.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { UnitCreateInput } from "./UnitCreateInput";
+import { Unit } from "./Unit";
+import { UnitFindManyArgs } from "./UnitFindManyArgs";
+import { UnitWhereUniqueInput } from "./UnitWhereUniqueInput";
+import { UnitUpdateInput } from "./UnitUpdateInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -27,4 +34,138 @@ export class UnitControllerBase {
     protected readonly service: UnitService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Post()
+  @swagger.ApiCreatedResponse({ type: Unit })
+  @nestAccessControl.UseRoles({
+    resource: "Unit",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: UnitCreateInput,
+  })
+  async createUnit(@common.Body() data: UnitCreateInput): Promise<Unit> {
+    return await this.service.createUnit({
+      data: data,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        active: true,
+        name: true,
+        unitType: true,
+        globalId: true,
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get()
+  @swagger.ApiOkResponse({ type: [Unit] })
+  @ApiNestedQuery(UnitFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Unit",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async units(@common.Req() request: Request): Promise<Unit[]> {
+    const args = plainToClass(UnitFindManyArgs, request.query);
+    return this.service.units({
+      ...args,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        active: true,
+        name: true,
+        unitType: true,
+        globalId: true,
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id")
+  @swagger.ApiOkResponse({ type: Unit })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Unit",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async unit(
+    @common.Param() params: UnitWhereUniqueInput
+  ): Promise<Unit | null> {
+    const result = await this.service.unit({
+      where: params,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        active: true,
+        name: true,
+        unitType: true,
+        globalId: true,
+      },
+    });
+    if (result === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Patch("/:id")
+  @swagger.ApiOkResponse({ type: Unit })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Unit",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: UnitUpdateInput,
+  })
+  async updateUnit(
+    @common.Param() params: UnitWhereUniqueInput,
+    @common.Body() data: UnitUpdateInput
+  ): Promise<Unit | null> {
+    try {
+      return await this.service.updateUnit({
+        where: params,
+        data: data,
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          active: true,
+          name: true,
+          unitType: true,
+          globalId: true,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
 }

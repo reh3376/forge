@@ -18,7 +18,14 @@ import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { UnitLookup } from "./UnitLookup";
+import { UnitLookupCountArgs } from "./UnitLookupCountArgs";
+import { UnitLookupFindManyArgs } from "./UnitLookupFindManyArgs";
+import { UnitLookupFindUniqueArgs } from "./UnitLookupFindUniqueArgs";
+import { CreateUnitLookupArgs } from "./CreateUnitLookupArgs";
+import { UpdateUnitLookupArgs } from "./UpdateUnitLookupArgs";
+import { DeleteUnitLookupArgs } from "./DeleteUnitLookupArgs";
 import { UnitLookupService } from "../unitLookup.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => UnitLookup)
@@ -27,6 +34,149 @@ export class UnitLookupResolverBase {
     protected readonly service: UnitLookupService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
+
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "any",
+  })
+  async _unitLookupsMeta(
+    @graphql.Args() args: UnitLookupCountArgs
+  ): Promise<MetaQueryPayload> {
+    const result = await this.service.count(args);
+    return {
+      count: result,
+    };
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.Query(() => [UnitLookup])
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "any",
+  })
+  async unitLookups(
+    @graphql.Args() args: UnitLookupFindManyArgs
+  ): Promise<UnitLookup[]> {
+    return this.service.unitLookups(args);
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.Query(() => UnitLookup, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "own",
+  })
+  async unitLookup(
+    @graphql.Args() args: UnitLookupFindUniqueArgs
+  ): Promise<UnitLookup | null> {
+    const result = await this.service.unitLookup(args);
+    if (result === null) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => UnitLookup)
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "create",
+    possession: "any",
+  })
+  async createUnitLookup(
+    @graphql.Args() args: CreateUnitLookupArgs
+  ): Promise<UnitLookup> {
+    return await this.service.createUnitLookup({
+      ...args,
+      data: {
+        ...args.data,
+
+        baseRecord: args.data.baseRecord
+          ? {
+              connect: args.data.baseRecord,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => UnitLookup)
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitLookup(
+    @graphql.Args() args: UpdateUnitLookupArgs
+  ): Promise<UnitLookup | null> {
+    try {
+      return await this.service.updateUnitLookup({
+        ...args,
+        data: {
+          ...args.data,
+
+          baseRecord: args.data.baseRecord
+            ? {
+                connect: args.data.baseRecord,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => UnitLookup)
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "delete",
+    possession: "any",
+  })
+  async deleteUnitLookup(
+    @graphql.Args() args: DeleteUnitLookupArgs
+  ): Promise<UnitLookup | null> {
+    try {
+      return await this.service.deleteUnitLookup(args);
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnitLookup], { name: "unitLookupRecords" })
+  @nestAccessControl.UseRoles({
+    resource: "UnitLookup",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitLookupRecords(
+    @graphql.Parent() parent: UnitLookup,
+    @graphql.Args() args: UnitLookupFindManyArgs
+  ): Promise<UnitLookup[]> {
+    const results = await this.service.findUnitLookupRecords(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => UnitLookup, {
