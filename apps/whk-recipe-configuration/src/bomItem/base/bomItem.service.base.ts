@@ -56,6 +56,17 @@ export class BomItemServiceBase {
       .equipmentPhases(args);
   }
 
+  async findInstances(
+    parentId: string,
+    args: Prisma.BomItemFindManyArgs
+  ): Promise<PrismaBomItem[]> {
+    return this.prisma.bomItem
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .instances(args);
+  }
+
   async getItem(parentId: string): Promise<PrismaItem | null> {
     return this.prisma.bomItem
       .findUnique({
@@ -78,5 +89,13 @@ export class BomItemServiceBase {
         where: { id: parentId },
       })
       .lot();
+  }
+
+  async getClassIdId(parentId: string): Promise<PrismaBomItem | null> {
+    return this.prisma.bomItem
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classIdId();
   }
 }

@@ -425,6 +425,8 @@ export class LotControllerBase {
         assetPath: true,
         recipeId: true,
         batchInitData: true,
+        operationType: true,
+        operationIndex: true,
       },
     });
     if (results === null) {
@@ -547,6 +549,14 @@ export class LotControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
     if (results === null) {

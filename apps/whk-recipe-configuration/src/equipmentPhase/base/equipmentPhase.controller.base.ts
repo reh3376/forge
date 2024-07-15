@@ -706,6 +706,14 @@ export class EquipmentPhaseControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
     if (results === null) {
