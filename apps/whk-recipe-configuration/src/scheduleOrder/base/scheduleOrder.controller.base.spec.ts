@@ -38,6 +38,7 @@ const CREATE_INPUT = {
   actualEnd: new Date(),
   duration: 42.424242424,
   durationUnits: "exampleDurationUnits",
+  name: "exampleName",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -60,6 +61,7 @@ const CREATE_RESULT = {
   actualEnd: new Date(),
   duration: 42.424242424,
   durationUnits: "exampleDurationUnits",
+  name: "exampleName",
 };
 const FIND_MANY_RESULT = [
   {
@@ -83,6 +85,7 @@ const FIND_MANY_RESULT = [
     actualEnd: new Date(),
     duration: 42.424242424,
     durationUnits: "exampleDurationUnits",
+    name: "exampleName",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -106,6 +109,7 @@ const FIND_ONE_RESULT = {
   actualEnd: new Date(),
   duration: 42.424242424,
   durationUnits: "exampleDurationUnits",
+  name: "exampleName",
 };
 
 const service = {

@@ -341,6 +341,18 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   quantity?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
 }
 
 export { ProductionOrderCreateInput as ProductionOrderCreateInput };

@@ -610,6 +610,7 @@ export class BomControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (results === null) {
@@ -732,6 +733,14 @@ export class BomControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
     if (results === null) {

@@ -388,6 +388,7 @@ export class RecipeGroupControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (results === null) {
@@ -522,6 +523,8 @@ export class RecipeGroupControllerBase {
             id: true,
           },
         },
+
+        name: true,
       },
     });
     if (results === null) {

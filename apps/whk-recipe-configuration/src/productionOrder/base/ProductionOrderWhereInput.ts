@@ -329,6 +329,17 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   quantity?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  name?: StringNullableFilter;
 }
 
 export { ProductionOrderWhereInput as ProductionOrderWhereInput };

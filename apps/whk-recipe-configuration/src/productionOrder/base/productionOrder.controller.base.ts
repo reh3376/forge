@@ -164,6 +164,7 @@ export class ProductionOrderControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
   }
@@ -249,6 +250,7 @@ export class ProductionOrderControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
   }
@@ -333,6 +335,7 @@ export class ProductionOrderControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (result === null) {
@@ -465,6 +468,7 @@ export class ProductionOrderControllerBase {
           customerCode: true,
           units: true,
           quantity: true,
+          name: true,
         },
       });
     } catch (error) {

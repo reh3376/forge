@@ -117,6 +117,8 @@ export class ScheduleOrderControllerBase {
             id: true,
           },
         },
+
+        name: true,
       },
     });
   }
@@ -182,6 +184,8 @@ export class ScheduleOrderControllerBase {
             id: true,
           },
         },
+
+        name: true,
       },
     });
   }
@@ -246,6 +250,8 @@ export class ScheduleOrderControllerBase {
             id: true,
           },
         },
+
+        name: true,
       },
     });
     if (result === null) {
@@ -340,6 +346,8 @@ export class ScheduleOrderControllerBase {
               id: true,
             },
           },
+
+          name: true,
         },
       });
     } catch (error) {
@@ -430,6 +438,7 @@ export class ScheduleOrderControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (results === null) {

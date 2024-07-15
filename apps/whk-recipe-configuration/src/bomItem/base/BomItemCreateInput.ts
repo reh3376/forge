@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   MaxLength,
@@ -19,13 +20,17 @@ import {
   IsNumber,
   Max,
   IsDate,
+  IsBoolean,
 } from "class-validator";
+
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { BomItemWhereUniqueInput } from "./BomItemWhereUniqueInput";
+import { BomItemCreateNestedManyWithoutBomItemsInput } from "./BomItemCreateNestedManyWithoutBomItemsInput";
 
 @InputType()
 class BomItemCreateInput {
@@ -150,6 +155,41 @@ class BomItemCreateInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomItemWhereUniqueInput, {
+    nullable: true,
+  })
+  classIdId?: BomItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemCreateNestedManyWithoutBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemCreateNestedManyWithoutBomItemsInput)
+  @IsOptional()
+  @Field(() => BomItemCreateNestedManyWithoutBomItemsInput, {
+    nullable: true,
+  })
+  instances?: BomItemCreateNestedManyWithoutBomItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
 }
 
 export { BomItemCreateInput as BomItemCreateInput };
