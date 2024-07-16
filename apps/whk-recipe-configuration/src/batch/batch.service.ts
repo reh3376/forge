@@ -132,11 +132,19 @@ export class BatchService extends BatchServiceBase {
       // operation: args.operation,
       batchData: args.batchData,
       parameterData: args.parameterData,
+      asset: args.asset,
+      assetPath: args.assetPath,
     }
     return await this.createBatch({
       data: {
         ...writeBatchData,
-        asset: undefined,
+        ...(args.asset ? {
+          asset: {
+            connect: {
+              id: args.asset.id,
+            }
+          }
+        } : {asset: undefined}),
         parent: undefined,
         lot: undefined,
       },

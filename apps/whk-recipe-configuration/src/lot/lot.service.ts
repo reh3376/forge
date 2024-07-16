@@ -17,7 +17,15 @@ export class LotService extends LotServiceBase {
   }
 
   async createLot<T extends Prisma.LotCreateArgs>(args: Prisma.SelectSubset<T, Prisma.LotCreateArgs>): Promise<import(".prisma/client").Lot> {
-    const lot = await super.createLot(args);
+    const lot = await super.createLot({
+        ...args,
+        include: {
+            ...args.include,
+            productionOrder: true,
+            item: true,
+            recipe: true,
+        }
+    });
     await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
         recordName: 'Lot',
         event_type: 'create',
@@ -29,7 +37,15 @@ export class LotService extends LotServiceBase {
   }
 
     async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
-      const Lot = await super.updateLot(args);
+      const Lot = await super.updateLot({
+        ...args,
+        include: {
+            ...args.include,
+            productionOrder: true,
+            item: true,
+            recipe: true,
+        }
+    });
       await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
         event_type: 'update',
         data: Lot,
@@ -41,13 +57,6 @@ export class LotService extends LotServiceBase {
     }
 
     async deleteLot<T extends Prisma.LotDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.LotDeleteArgs>): Promise<import(".prisma/client").Lot> {
-      const Lot = await super.deleteLot(args);
-      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
-        recordName: 'Lot',
-        event_type: 'delete',
-        data: Lot
-      });
-      this.logger.log(`Deleted Lot: ${Lot.lotNumber} & pushed to topic`);
-      return Lot;
+      throw new Error("Delete operations are not allowed for Lot.");
     }
 }

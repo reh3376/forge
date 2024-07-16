@@ -83,6 +83,9 @@ async function main() {
   };
 
   const document = SwaggerModule.createDocument(app, swaggerDocumentOptions);
+  SwaggerModule.setup('api', app, document);
+  // Write the OpenAPI document to a file
+  fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
 
   /** check if there is Public decorator for each path (action) and its method (findMany / findOne) on each controller */
   Object.values((document as OpenAPIObject).paths).forEach((path: any) => {
