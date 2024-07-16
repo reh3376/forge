@@ -294,6 +294,17 @@ class ScheduleOrderWhereInput {
     nullable: true,
   })
   scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  name?: StringNullableFilter;
 }
 
 export { ScheduleOrderWhereInput as ScheduleOrderWhereInput };
