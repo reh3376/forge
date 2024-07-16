@@ -28,6 +28,7 @@ const CREATE_INPUT = {
   units: "exampleUnits",
   consumedAt: new Date(),
   globalId: "exampleGlobalId",
+  isClassDefinition: "true",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -40,6 +41,7 @@ const CREATE_RESULT = {
   units: "exampleUnits",
   consumedAt: new Date(),
   globalId: "exampleGlobalId",
+  isClassDefinition: "true",
 };
 const FIND_MANY_RESULT = [
   {
@@ -53,6 +55,7 @@ const FIND_MANY_RESULT = [
     units: "exampleUnits",
     consumedAt: new Date(),
     globalId: "exampleGlobalId",
+    isClassDefinition: "true",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -66,6 +69,7 @@ const FIND_ONE_RESULT = {
   units: "exampleUnits",
   consumedAt: new Date(),
   globalId: "exampleGlobalId",
+  isClassDefinition: "true",
 };
 
 const service = {

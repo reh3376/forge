@@ -446,6 +446,7 @@ export class CustomerControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (results === null) {

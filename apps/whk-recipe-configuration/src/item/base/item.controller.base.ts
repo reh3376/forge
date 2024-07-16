@@ -359,6 +359,7 @@ export class ItemControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (results === null) {
@@ -848,6 +849,14 @@ export class ItemControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
     if (results === null) {

@@ -73,6 +73,12 @@ export class BomItemControllerBase {
               connect: data.lot,
             }
           : undefined,
+
+        classIdId: data.classIdId
+          ? {
+              connect: data.classIdId,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -105,6 +111,14 @@ export class BomItemControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
   }
@@ -156,6 +170,14 @@ export class BomItemControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
   }
@@ -208,6 +230,14 @@ export class BomItemControllerBase {
             id: true,
           },
         },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
       },
     });
     if (result === null) {
@@ -258,6 +288,12 @@ export class BomItemControllerBase {
                 connect: data.lot,
               }
             : undefined,
+
+          classIdId: data.classIdId
+            ? {
+                connect: data.classIdId,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -290,6 +326,14 @@ export class BomItemControllerBase {
               id: true,
             },
           },
+
+          classIdId: {
+            select: {
+              id: true,
+            },
+          },
+
+          isClassDefinition: true,
         },
       });
     } catch (error) {
@@ -415,6 +459,136 @@ export class BomItemControllerBase {
   ): Promise<void> {
     const data = {
       equipmentPhases: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBomItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/instances")
+  @ApiNestedQuery(BomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @common.Req() request: Request,
+    @common.Param() params: BomItemWhereUniqueInput
+  ): Promise<BomItem[]> {
+    const query = plainToClass(BomItemFindManyArgs, request.query);
+    const results = await this.service.findInstances(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        quantityActual: true,
+        units: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        consumedAt: true,
+        globalId: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        classIdId: {
+          select: {
+            id: true,
+          },
+        },
+
+        isClassDefinition: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "update",
+    possession: "any",
+  })
+  async connectInstances(
+    @common.Param() params: BomItemWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        connect: body,
+      },
+    };
+    await this.service.updateBomItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "update",
+    possession: "any",
+  })
+  async updateInstances(
+    @common.Param() params: BomItemWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        set: body,
+      },
+    };
+    await this.service.updateBomItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "BomItem",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInstances(
+    @common.Param() params: BomItemWhereUniqueInput,
+    @common.Body() body: BomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
         disconnect: body,
       },
     };

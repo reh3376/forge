@@ -358,6 +358,7 @@ model ProductionOrder {
   customerCode                  String?
   units                         String?
   quantity                      Int?
+  name                          String?                        @unique
 }
 
 model ScheduleOrder {
@@ -390,6 +391,7 @@ model ScheduleOrder {
   duration                     Decimal?
   durationUnits                String?                  @default("Hours")
   scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  name                         String?                  @unique
   scheduleOrderQueueId         String?                  @unique
 }
 
@@ -609,23 +611,27 @@ model Lot {
 }
 
 model BomItem {
-  id              String           @id @default(cuid())
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  createdBy       String
-  updatedBy       String?
-  item            Item             @relation(fields: [itemId], references: [id])
-  itemId          String
-  quantity        Decimal
-  quantityActual  Decimal?
-  units           String?
-  bom             Bom?             @relation(fields: [bomId], references: [id])
-  bomId           String?
-  equipmentPhases EquipmentPhase[]
-  consumedAt      DateTime?
-  globalId        String?          @unique @default(cuid())
-  lot             Lot?             @relation(fields: [lotId], references: [id])
-  lotId           String?
+  id                String           @id @default(cuid())
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  createdBy         String
+  updatedBy         String?
+  item              Item             @relation(fields: [itemId], references: [id])
+  itemId            String
+  quantity          Decimal
+  quantityActual    Decimal?
+  units             String?
+  bom               Bom?             @relation(fields: [bomId], references: [id])
+  bomId             String?
+  equipmentPhases   EquipmentPhase[]
+  consumedAt        DateTime?
+  globalId          String?          @unique @default(cuid())
+  lot               Lot?             @relation(fields: [lotId], references: [id])
+  lotId             String?
+  classIdId         BomItem?         @relation(name: "classIdId", fields: [classId], references: [id])
+  classId           String?
+  instances         BomItem[]        @relation(name: "classIdId")
+  isClassDefinition Boolean?         @default(false)
 }
 
 model Unit {
@@ -765,6 +771,8 @@ model Batch {
   assetPath               String?
   recipeId                String?
   batchInitData           Json?
+  operationType           String?
+  operationIndex          String?
 }
 
 model Vendor {
@@ -861,6 +869,12 @@ model UnitLookup {
   baseRecord         UnitLookup?  @relation(name: "baseRecord", fields: [baseRecordId], references: [id])
   baseRecordId       String?
   unitLookupRecords  UnitLookup[] @relation(name: "baseRecord")
+}
+
+model ProductionOrderBomItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {
