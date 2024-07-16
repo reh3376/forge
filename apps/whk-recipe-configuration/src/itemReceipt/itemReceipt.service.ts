@@ -67,17 +67,25 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
     const itemReceiptPayload = await this.prisma.itemReceipt.findUnique({
       where: { id: itemReceipt.id },
       include: {
-        purchaseOrder: true,
+        purchaseOrder: {
+          include: {
+            vendor: true,
+            item: true,
+            // Include other fields as needed
+          }
+        },
         item: true,
       }
     });
     let quantityInPounds = args.data.quantity;
+    this.logger.debug(`Quantity in the args: ${quantityInPounds}`);
     // Check if quantity is in the args and over 10k
     if (quantityInPounds && typeof quantityInPounds === 'number' && quantityInPounds > 10000) {
       // Convert quantity to pounds based on grain type
+      this.logger.debug(`Purchase order for the itemReceipt: ${itemReceiptPayload?.purchaseOrder}`);
       if (itemReceiptPayload?.purchaseOrder?.transactionGroup?.startsWith('RM-GR-')) {
         const item = itemReceiptPayload?.item;
-
+        this.logger.debug(`Item for the itemReceipt: ${item}`);
         if (item) {
           // Map transaction group to unitLookup record name
           const transactionGroupToUnitMap = {
@@ -116,7 +124,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           ...itemReceiptPayload,
         },
         id: itemReceipt.id,
-        quantity: args.data.quantity,
+        quantity: new Decimal(quantityInPounds),
         item: itemReceiptPayload?.item,
         purchaseOrder: itemReceiptPayload?.purchaseOrder,
         recordName: 'ItemReceipt',

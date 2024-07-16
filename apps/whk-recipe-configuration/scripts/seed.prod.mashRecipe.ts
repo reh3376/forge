@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, SalesOrder } from "@prisma/client";
+import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder } from "@prisma/client";
 import { Salt, parseSalt } from "../src/auth/password.service";
 import { hash } from "bcrypt";
 
@@ -7,33 +7,6 @@ async function seed() {
 
 
   console.info("Seeding database with custom seed for Mashing Recipe...");
-
-  // const phaseParameters = [
-  //   { name: "Quantity", staticName: "Quantity", units: "lbs", description: "Quantity", isClassDef: false,  },
-  //   { name: "Time", staticName: "Time", units: "hours", description: "Time", isClassDef: false },
-  //   { name: "Temperature", staticName: "Temperature", units: "°F", description: "Temperature", isClassDef: false },
-  //   { name: "Level", staticName: "Level", units: "%", description: "Level", isClassDef: false },
-  //   { name: "HighWineProof", units: "Proof", description: "HighWineProof", isClassDef: false, isStaticParameter: false },
-  //   { name: "LowWineProof", units: "Proof", description: "LowWineProof", isClassDef: false, isStaticParameter: false },
-  //   { name: "FinalProof", units: "Proof", description: "FinalProof", isClassDef: false, isStaticParameter: false },
-  //   { name: "BaseLoss", units: "% ABV", description: "BaseLoss", isClassDef: false, isStaticParameter: false },
-  //   { name: "BeerFeedTray", units: "Tray No.", description: "BeerFeedTray", isClassDef: false, isStaticParameter: false },
-  //   { name: "FermentationAge", units: "Hours", description: "FermentationAge", isClassDef: false, isStaticParameter: false },
-  //   { name: "ControlTemperature", units: "°F", description: "ControlTemperature", isClassDef: false, isStaticParameter: false },
-  //   { name: "CooksPerFerm", units: "", description: "CooksPerFerm", isClassDef: false, isStaticParameter: false },
-  //   { name: "TopOffFrequency", units: "Cooks btw Ferms", description: "TopOffFrequency", isClassDef: false, isStaticParameter: false },
-  //   { name: "TopOffQuantity", units: "Gal", description: "TopOffQuantity", isClassDef: false, isStaticParameter: false },
-  //   { name: "TopOffTemperature", units: "°F", description: "TopOffTemperature", isClassDef: false, isStaticParameter: false },
-  //   { name: "MashpH", units: "pH", description: "MashpH", isClassDef: false, isStaticParameter: false },
-  //   { name: "MashRatio", units: "Gal/lbs", description: "MashRatio", isClassDef: false, isStaticParameter: false },
-  //   { name: "RatioByFerm", units: "BGs", description: "RatioByFerm", isClassDef: false, isStaticParameter: false },
-  //   { name: "FermSetTemp", units: "°F", description: "FermSetTemp", isClassDef: false, isStaticParameter: false },
-  //   { name: "StarterSweetpH", units: "pH", description: "StarterSweetpH", isClassDef: false, isStaticParameter: false },
-  //   { name: "TotalGrainWeight", units: "lbs", description: "TotalGrainWeight", isClassDef: false, isStaticParameter: false },
-  //   { name: "TotalLiquid", units: "Gal", description: "TotalLiquid", isClassDef: false, isStaticParameter: false },
-  //   { name: "NumberOfCooks", units: "", description: "NumberOfCooks", isClassDef: false, isStaticParameter: false },
-  //   { name: "AssumbedFermABV", units: "%ABV", description: "AssumbedFermABV", isClassDef: false, isStaticParameter: false },
-  // ];
 
   /*
   1. Seed instance of unit procedures, using the main procedure instance
@@ -78,10 +51,14 @@ async function seed() {
       where: {
         name: classDef.name,
         isClassDef: false
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
 
     if (!existingInstance) {
+    // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -110,7 +87,8 @@ async function seed() {
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 18; // This should be configurable or fetched from a setting
+  const totalNumberOfCooks = 42; // This should be configurable or fetched from a setting
+  const startCook = 31;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -125,6 +103,9 @@ async function seed() {
       name: EnumUnitProcedureName.Mashing01,
       isClassDef: false,
       procedure: { id: mashingRecipeProcedure.id }
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   });
 
@@ -132,8 +113,8 @@ async function seed() {
     console.error("Mashing Unit Procedure instance not found");
     return;
   }
-
-  for (let cookIndex = 0; cookIndex < totalNumberOfCooks; cookIndex++) {
+  let newCookInstances: Operation[] = [];
+  for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
     const existingInstance = await client.operation.findFirst({
       where: {
         name: EnumOperationName.Cook,
@@ -142,12 +123,12 @@ async function seed() {
         procedureSequenceIndex: cookIndex
       }
     });
-
     if (!existingInstance) {
+      // if (true) {
       const cookClassDef = operationClassDefs.find(def => def.name === EnumOperationName.Cook);
 
       if (cookClassDef) {
-        const newInstance = await client.operation.create({
+        newCookInstances[cookIndex] = await client.operation.create({
           data: {
             name: EnumOperationName.Cook,
             path: `${cookClassDef.path}/Cook${cookIndex + 1}`,
@@ -161,7 +142,7 @@ async function seed() {
             abbreviation: 'MAS'
           }
         });
-        console.log(`Created new Operation instance: ${newInstance.name} for Cook ${cookIndex + 1}`);
+        console.log(`Created new Operation instance: ${newCookInstances[cookIndex].name} for Cook ${cookIndex + 1}`);
       } else {
         console.log(`Cook class definition not found, skipping Cook ${cookIndex + 1}`);
       }
@@ -175,25 +156,30 @@ async function seed() {
   const mashingProtocol = [
     { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset" },
     { action: "Hold", holdType: "Heat", temperature: 130 },
-    { action: "Add Grain", grainType: "Premalt" },
+    { action: "Add Additive", additiveType: "Termamyl" },
+    { action: "Add Grain", grainType: "Malt" },
     { action: "Add Grain", grainType: "Corn" },
-    { action: "Hold", holdType: "Cool", temperature: 145 },
-    { action: "Hold", holdType: "Hold", temperature: 200, time: 15 },
+    { action: "Add Additive", additiveType: "Citric" },
+    { action: "Hold", holdType: "Heat", temperature: 200, time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 170 },
     { action: "Add Grain", grainType: "Rye" },
     { action: "Hold", holdType: "Hold", time: 15 },
-    { action: "Hold", holdType: "Heat", temperature: 200 }
+    { action: "Hold", holdType: "Cool", temperature: 145 },
+    { action: "Add Grain", grainType: "Malt" },
+    { action: "Add Additive", additiveType: "Saczyme" },
+    { action: "Hold", holdType: "Hold", time: 10 },
   ];
 
-  for (let cookIndex = 0; cookIndex < totalNumberOfCooks; cookIndex++) {
+  for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
     // const fermIndex = Math.floor(cookIndex / numberOfCooksPerFerm);
 
     const cookOperation = await client.operation.findFirst({
       where: {
-        name: EnumOperationName.Cook,
-        isClassDefinition: false,
-        unitProcedure: { id: mashingUnitProcedure.id },
-        procedureSequenceIndex: cookIndex
+        // name: EnumOperationName.Cook,
+        // isClassDefinition: false,
+        // unitProcedure: { id: mashingUnitProcedure.id },
+        // procedureSequenceIndex: cookIndex
+        id: newCookInstances[cookIndex].id
       }
     });
 
@@ -206,7 +192,8 @@ async function seed() {
     const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
       "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
       "Hold": EnumEquipmentPhaseName.Hold,
-      "Add Grain": EnumEquipmentPhaseName.GrainAdd
+      "Add Grain": EnumEquipmentPhaseName.GrainAdd,
+      "Add Additive": EnumEquipmentPhaseName.AdditiveAdd
     };
 
     // Update the mashingProtocol with the mapped enum values
@@ -220,12 +207,9 @@ async function seed() {
         where: {
           name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
           operation: {
-            name: EnumOperationName.Cook,
-            isClassDefinition: false,
-            unitProcedure: { id: mashingUnitProcedure.id },
-            procedureSequenceIndex: cookIndex
+            id: newCookInstances[cookIndex].id
           },
-          operationSequenceIndex: phaseIndex
+          operationSequenceIndex: phaseIndex,
         },
         include: {
           operation: true
@@ -239,11 +223,13 @@ async function seed() {
             isClassDefinition: false,
             unitProcedure: { id: mashingUnitProcedure.id },
             procedureSequenceIndex: cookIndex
-          }
+          },
+          orderBy: {createdAt: 'desc'}
         });
 
         if (cookOperation) {
-          const stepType = phase.action === "Hold" ? phase.holdType : undefined;
+          
+          const stepType = (phase.action === "Hold") ? phase.holdType : (phase.action === "Add Grain") ? phase.grainType : (phase.action === "Add Liquid") ? phase.liquidType01 : undefined;
           const newPhase = await client.equipmentPhase.create({
             data: {
               name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
@@ -319,13 +305,71 @@ async function seed() {
 
           for (const component of bomComponents) {
             if (
-              (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase())) ||
+              (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
               (phase.action === "Add Liquid" && (
-                (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) ||
-                (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
+                (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
+                // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
               ))
             ) {
+               if (phase.grainType == "Malt") {
+                if (component.quantity.lt(500)) {
+                  await client.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                } else {
+                  console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                }
+              } else if ((phase.grainType == "Malt") ){
+                if (component.quantity.gte(500)) {
+                  await client.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                } else {
+                  console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                }
+              } else {
               await client.equipmentPhase.update({
+                where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked BOM component ${component.item.itemNumber  } to Equipment Phase ${newPhase.name}`);
+                  
+                }
+              } else if (phase.grainType == "Corn") {
+                console.log(`Corn: ${component.item.itemNumber}`);
+                if (component.item.itemNumber === "COR-DLF01-US #2 Yellow Dent GMO") {
+                  await client.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                } 
+            } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
+              console.log(`Add Additive: ${component.item.itemNumber}`);
+              // if (phase.additiveType == "Teramyl") {
+              //   console.log(`Teramyl: ${component.item.itemNumber}`);
+              // } else if (phase.additiveType)
+                await client.equipmentPhase.update({
                 where: { id: newPhase.id },
                 data: {
                   bomItem: {
@@ -333,8 +377,8 @@ async function seed() {
                   },
                 },
               });
-              console.log(`Linked BOM component ${component.item.itemNumber  } to Equipment Phase ${newPhase.name}`);
-            }
+              console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);            }
+
           }
         } else {
           console.log("BOM not found, skipping linking BOM components to Equipment Phases");
@@ -365,13 +409,13 @@ async function seed() {
     return item;
   };
 
-  const item = await getItemByItemNumber('WHK-74-18-00-08-ISC-53-06-04-0-0-00-125');
+  const item = await getItemByItemNumber('WSC-74-18-00-08-ISC-53-06-04-0-0-00-125');
   if (item) {
     console.log(`Found item: ${item.id}, ${item.itemNumber}`);
   }
 
   // Find customer with "KWH Venture, LLC" name
-  const CUSTOMER_NAME = "KWH Venture, LLC";
+  const CUSTOMER_NAME = "Western Spirits Beverage Company, LLC";
   const customer = await client.customer.findFirst({
     where: {
       name: CUSTOMER_NAME
@@ -387,12 +431,12 @@ async function seed() {
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
-      Recipe: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125",
+      Recipe: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125",
     }
   });
 
   // Create instances of phase parameters
-  const phaseParameters = [
+  const recipeParameters = [
     { name: 'HighWineProof', setpointValue: 140 },
     { name: 'LowWineProof', setpointValue: 100 },
     { name: 'FinalProof', setpointValue: 125 },
@@ -415,27 +459,29 @@ async function seed() {
     { name: 'AssumbedFermABV', setpointValue: 12.5 }
   ];
 
-  let newParams: PhaseParameter[] = [];
-  for (const param of phaseParameters) {
-    const classParam = await client.phaseParameter.findFirst({
+  let newParams: RecipeParameter[] = [];
+  for (const param of recipeParameters) {
+    const classParam = await client.recipeParameter.findFirst({
       where: {
-        name: param.name,
-        isClassDef: true
+        recipeParamName: param.name,
+        isClassDefinition: true
       }
     });
     if (classParam) {
-      console.log(`Updating existing phase parameter: ${param.name}`);
-      newParams.push(await client.phaseParameter.create({
+      console.log(`Updating existing recipe parameter: ${param.name}`);
+      newParams.push(await client.recipeParameter.create({
         data: {
-          name: classParam.name,
-          staticName: classParam.staticName,
-          setpointNumericalValue: param.setpointValue,
-          units: classParam.units,
+          className: classParam.className,
+          recipeParamName: param.name,
+          recipeNumericalSetpoint: param.setpointValue,
           description: classParam.description,
-          isClassDef: false,
-          classId: { connect: { id: classParam.id } },
-          createdBy: "seed",
-          setpointType: classParam.setpointType,
+          isClassDefinition: false,
+          recipeSetpointType: classParam.recipeSetpointType,
+          createdBy: "pmannion",
+          // createdBy: "pmannion",
+          // recipeSetpointUpperLimit: classParam.recipeSetpointUpperLimit,
+          // recipeSetpointLowerLimit: classParam.recipeSetpointLowerLimit,
+          // recipeSetpointNumericalValue: param.setpointValue,
         }
       }));
     } else {
@@ -459,9 +505,9 @@ async function seed() {
     console.log("Creating new Mashing Recipe...");
     recipe = await client.recipe.create({
       data: {
-        Recipe: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125",
+        Recipe: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125",
         revision: 1,
-        createdBy: "seed",
+        createdBy: "pmannion",
         // parameters: {
         //   connect: newParams.map(param => ({ id: param.id }))
         // },
@@ -474,6 +520,9 @@ async function seed() {
         item: {
           connect: { id: (item as Item).id }
         },
+        parameters: {
+          connect: newParams.map(param => ({ id: param.id }))
+        }
       }
     });
     console.log("New Mashing Recipe created successfully:", recipe.id);
@@ -504,7 +553,7 @@ async function seed() {
     recipeGroup = await client.recipeGroup.create({
       data: {
         recipe: "74-18-00-08",
-        createdBy: "seed",
+        createdBy: "pmannion",
         recipes: {
           connect: { id: recipe.id }
         }
@@ -534,10 +583,11 @@ async function seed() {
         customer: {
           connect: { id: customer?.id }
         },
-        createdBy: "seed",
+        createdBy: "pmannion",
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        quantity: 1000, // Adjust as needed
+        quantity: 3000, // Adjust as needed
+        // units: "Barrels",
       }
     });
 
@@ -552,7 +602,7 @@ async function seed() {
 
   const existingProductionOrder = await client.productionOrder.findFirst({
     where: {
-      recipe: { Recipe: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125" },
+      recipe: { Recipe: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125" },
       item: { id: (item as Item).id },
       bom: { id: bom?.id }
     }
@@ -578,11 +628,12 @@ async function seed() {
         salesOrder: {
           connect: { id: salesOrder?.id }
         },
-        createdBy: "seed",
+        createdBy: "pmannion",
         status: EnumProductionOrderStatus.Initiated,
-        // units: "Barrels",
-        // quantity: 1000, // Adjust as needed
-        // plannedQuantity: 500, // Adjust as needed
+        customerCode: 'WSC',
+        units: 'Barrels',
+        quantity: 3000,
+        // name: 'WSC-74-18-00-08-ISC-53-06-04-0-0-00-125',// TODO: add name
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }
@@ -596,10 +647,10 @@ async function seed() {
           connect: { id: newProductionOrder.id }
         },
         status: EnumScheduleOrderStatus.Scheduled,
-        createdBy: "seed",
+        createdBy: "pmannion",
         estimatedStart: new Date(),
-        estimatedEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        recipeName: "WHK-74-18-00-08-ISC-53-06-04-0-0-00-125",
+        estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
+        recipeName: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125",
         productionOrderAllocation: 1000,
         recipeGroup: {
           connect: { id: recipeGroup.id }
@@ -616,8 +667,8 @@ async function seed() {
         scheduleOrder: {
           connect: { id: newScheduleOrder.id }
         },
-        queueIndex: 0,
-        createdBy: "seed",
+        queueIndex: 1,
+        createdBy: "pmannion",
         nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
         nextUnitProcedure: {
           connect: { id: mashingUnitProcedure.id }

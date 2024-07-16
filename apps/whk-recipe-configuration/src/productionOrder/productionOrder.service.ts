@@ -17,7 +17,18 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
   }
 
     async createProductionOrder<T extends Prisma.ProductionOrderCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderCreateArgs>): Promise<import(".prisma/client").ProductionOrder> {
-        const productionOrder = await super.createProductionOrder(args);
+        const productionOrder = await super.createProductionOrder({
+            ...args,
+            include: {
+                ...args.include,
+                scheduleOrder: true,
+                item: true,
+                recipe: true,
+                recipeGroup: true,
+                salesOrder: true,
+                bom: true,
+            }
+        });
         await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
         recordName: 'ProductionOrder',
         event_type: 'create',
@@ -28,7 +39,18 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
     }
 
     async updateProductionOrder<T extends Prisma.ProductionOrderUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderUpdateArgs>): Promise<import(".prisma/client").ProductionOrder> {
-        const productionOrder = await super.updateProductionOrder(args);
+        const productionOrder = await super.updateProductionOrder({
+            ...args,
+            include: {
+                ...args.include,
+                scheduleOrder: true,
+                item: true,
+                recipe: true,
+                recipeGroup: true,
+                salesOrder: true,
+                bom: true,
+            }
+        });
         await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
         recordName: 'ProductionOrder',
         event_type: 'update',
@@ -39,13 +61,6 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
     }
 
     async deleteProductionOrder<T extends Prisma.ProductionOrderDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderDeleteArgs>): Promise<import(".prisma/client").ProductionOrder> {
-        const productionOrder = await super.deleteProductionOrder(args);
-        await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
-        recordName: 'ProductionOrder',
-        event_type: 'delete',
-        data: productionOrder
-        });
-        this.logger.log(`Deleted ProductionOrder: ${productionOrder.id} & pushed to topic`);
-        return productionOrder;
+        throw new Error("Delete operations are not allowed for ProductionOrder.");
     }
 }
