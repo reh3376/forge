@@ -533,6 +533,7 @@ export class RecipeControllerBase {
         customerCode: true,
         units: true,
         quantity: true,
+        name: true,
       },
     });
     if (results === null) {
@@ -667,6 +668,8 @@ export class RecipeControllerBase {
             id: true,
           },
         },
+
+        name: true,
       },
     });
     if (results === null) {

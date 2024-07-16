@@ -108,6 +108,8 @@ export class BatchControllerBase {
         assetPath: true,
         recipeId: true,
         batchInitData: true,
+        operationType: true,
+        operationIndex: true,
       },
     });
   }
@@ -162,6 +164,8 @@ export class BatchControllerBase {
         assetPath: true,
         recipeId: true,
         batchInitData: true,
+        operationType: true,
+        operationIndex: true,
       },
     });
   }
@@ -217,6 +221,8 @@ export class BatchControllerBase {
         assetPath: true,
         recipeId: true,
         batchInitData: true,
+        operationType: true,
+        operationIndex: true,
       },
     });
     if (result === null) {
@@ -304,6 +310,8 @@ export class BatchControllerBase {
           assetPath: true,
           recipeId: true,
           batchInitData: true,
+          operationType: true,
+          operationIndex: true,
         },
       });
     } catch (error) {
@@ -365,6 +373,8 @@ export class BatchControllerBase {
         assetPath: true,
         recipeId: true,
         batchInitData: true,
+        operationType: true,
+        operationIndex: true,
       },
     });
     if (results === null) {

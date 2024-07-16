@@ -855,6 +855,8 @@ export class AssetControllerBase {
         assetPath: true,
         recipeId: true,
         batchInitData: true,
+        operationType: true,
+        operationIndex: true,
       },
     });
     if (results === null) {

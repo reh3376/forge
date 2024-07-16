@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   IsDate,
@@ -19,7 +20,9 @@ import {
   ValidateNested,
   IsNumber,
   Max,
+  IsBoolean,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
 import { Decimal } from "decimal.js";
@@ -164,6 +167,35 @@ class BomItem {
   @Type(() => Lot)
   @IsOptional()
   lot?: Lot | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItem,
+  })
+  @ValidateNested()
+  @Type(() => BomItem)
+  @IsOptional()
+  classIdId?: BomItem | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BomItem],
+  })
+  @ValidateNested()
+  @Type(() => BomItem)
+  @IsOptional()
+  instances?: Array<BomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
 }
 
 export { BomItem as BomItem };
