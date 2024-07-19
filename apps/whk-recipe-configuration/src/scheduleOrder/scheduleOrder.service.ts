@@ -18,14 +18,13 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
 
     async createScheduleOrder<T extends Prisma.ScheduleOrderCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderCreateArgs>): Promise<ScheduleOrder> {
         const scheduleOrder = await super.createScheduleOrder({
-            ...args,
             data: {
                 ...args.data,
             },
             include: {
                 ...args.include,
                 recipeGroup: true,
-                scheduleOrderQueue: true,
+                scheduleOrderQueues: true,
                 productionOrders: true,
             }
         });
@@ -40,16 +39,16 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
 
     async updateScheduleOrder<T extends Prisma.ScheduleOrderUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderUpdateArgs>): Promise<ScheduleOrder> {
         const scheduleOrder = await super.updateScheduleOrder({
-            ...args,
             data: {
                 ...args.data,
             },
             include: {
                 ...args.include,
                 recipeGroup: true,
-                scheduleOrderQueue: true,
+                scheduleOrderQueues: true,
                 productionOrders: true,
-            }
+            },
+            where: args.where,
         });
         await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
         recordName: 'ScheduleOrder',
@@ -62,11 +61,11 @@ export class ScheduleOrderService extends ScheduleOrderServiceBase {
 
     async deleteScheduleOrder<T extends Prisma.ScheduleOrderDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderDeleteArgs>): Promise<ScheduleOrder> {
         const scheduleOrder = await super.deleteScheduleOrder({
-            ...args,
+            where: args.where,
             include: {
                 ...args.include,
                 recipeGroup: true,
-                scheduleOrderQueue: true,
+                scheduleOrderQueues: true,
                 productionOrders: true,
             }
         });

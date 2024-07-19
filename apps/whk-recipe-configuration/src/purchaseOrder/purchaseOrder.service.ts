@@ -10,15 +10,17 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
   }
 
   async getPurchaseOrdersWithLineItemsByType(purchaseOrderType: string) {
+    
+    // NOTE - "ItemName" is incorrect in the LineItem JSON from PO. It's really the ItemNumber, hence the join
     const query = Prisma.sql`
-    SELECT
+    SELECT DISTINCT
       po.*,
-      jsonb_build_object(
-              'rate', "li"."rate",
-              'itemName', "li"."itemName",
-              'quantity', "li"."quantity",
-              'description', "li"."description"
-      ),
+--       jsonb_build_object(
+--               'rate', "li"."rate",
+--               'itemName', "li"."itemName",
+--               'quantity', "li"."quantity",
+--               'description', "li"."description"
+--       ),
       li.quantity as "lineItemQuantity",
       li."itemName" as "lineItemItemName",
       li.rate as "lineItemRate",
@@ -36,7 +38,8 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
     )
     LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
     LEFT JOIN "Vendor" v on i."vendorId" = v.id
-    WHERE po."transactionGroup" LIKE ${`%${purchaseOrderType}%`}`;
+     WHERE po."transactionGroup" LIKE ${`%${purchaseOrderType}%`}`;
+    // WHERE i."itemGroup" LIKE ${`%${purchaseOrderType}%`}`;
 
     const purchaseOrders = await this.prisma.$queryRaw<PurchaseOrder[]>(query);
     return purchaseOrders;
@@ -44,31 +47,31 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
 
   async getPurchaseOrderWithLineItemsById(id: string) {
     const query = `
-      SELECT
-        po.*,
-        jsonb_build_object(
-                'rate', "li"."rate",
-                'itemName', "li"."itemName",
-                'quantity', "li"."quantity",
-                'description', "li"."description"
-        ),
-        li.quantity as "lineItemQuantity",
-        li."itemName" as "lineItemItemName",
-        li.rate as "lineItemRate",
-        li.description as "lineItemDescription",
-        i.id as itemId,
-        i."itemNumber" as itemNumber,
-        i."itemClass",
-        v."name" as "vendorName"
-      FROM "PurchaseOrder" po
-      CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" (
-        "itemName" text,
-        "rate" text,
-        "quantity" text,
-        "description" text
-      )
-      LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
-      LEFT JOIN "Vendor" v on i."vendorId" = v.id
+      SELECT DISTINCT
+      po.*,
+--       jsonb_build_object(
+--               'rate', "li"."rate",
+--               'itemName', "li"."itemName",
+--               'quantity', "li"."quantity",
+--               'description', "li"."description"
+--       ),
+      li.quantity as "lineItemQuantity",
+      li."itemName" as "lineItemItemName",
+      li.rate as "lineItemRate",
+      li.description as "lineItemDescription",
+      i.id as itemId,
+      i."itemNumber" as itemNumber,
+      i."itemClass",
+      v."name" as "vendorName"
+    FROM "PurchaseOrder" po
+    CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" (
+      "itemName" text,
+      "rate" text,
+      "quantity" text,
+      "description" text
+    )
+    LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
+    LEFT JOIN "Vendor" v on i."vendorId" = v.id
       WHERE po.id = $1`;
     const purchaseOrder = await this.prisma.$queryRaw<PurchaseOrder>(Prisma.sql([query, id]));
     return purchaseOrder;
