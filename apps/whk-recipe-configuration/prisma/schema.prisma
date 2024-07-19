@@ -107,6 +107,8 @@ model RecipeParameter {
   recipeNumericalSetpoint    Decimal?
   recipe                     Recipe[]
   description                String?
+  operation                  EnumRecipeParameterOperation?
+  operationIndex             String?                               @default(-1)
 }
 
 model Instruction {
@@ -229,6 +231,17 @@ model Recipe {
   parameters                    RecipeParameter[]
   item                          Item?                          @relation(fields: [itemId], references: [id])
   itemId                        String?
+  totalCooks                    Int?
+  cooksPerFerm                  Int?                           @default(3)
+  estimatedAbv                  Decimal?
+  totalFermenters               Int?
+  targetProof                   Decimal?
+  isClassDefinition             Boolean?                       @default(true)
+  classId                       Recipe?                        @relation(name: "RecipeClassIdRecipeInstances", fields: [classId], references: [id])
+  classId                       String?
+  instances                     Recipe[]                       @relation(name: "RecipeClassIdRecipeInstances")
+  recipeBoms                    RecipeBomItem[]
+  batches                       Batch[]
 
   @@unique([itemId, customerId])
 }
@@ -390,9 +403,8 @@ model ScheduleOrder {
   actualEnd                    DateTime?
   duration                     Decimal?
   durationUnits                String?                  @default("Hours")
-  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  scheduleOrderQueues          ScheduleOrderQueue?
   name                         String?                  @unique
-  scheduleOrderQueueId         String?
 }
 
 model Item {
@@ -426,6 +438,7 @@ model Item {
   inventories                   Inventory[]
   inventoryLogs                 InventoryLog[]
   inventoryTransfers            InventoryTransfer[]
+  recipeBoms                    RecipeBomItem[]
 }
 
 model ItemGroup {
@@ -558,6 +571,7 @@ model Asset {
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
   parentId                String?                 @unique
   children                Asset?                  @relation(name: "AssetChildrenAssetParent")
+  itemReceipts            ItemReceipt[]
 
   @@unique([name, revision])
 }
@@ -584,6 +598,8 @@ model ItemReceipt {
   globalId        String?                @unique @default(cuid())
   loadId          Int?                   @default(autoincrement())
   testsPassed     Boolean?               @default(false)
+  toAsset         Asset?                 @relation(fields: [toAssetId], references: [id])
+  toAssetId       String?
 }
 
 model Lot {
@@ -769,10 +785,12 @@ model Batch {
   asset                   Asset?                  @relation(fields: [assetId], references: [id])
   assetId                 String?
   assetPath               String?
+  recipeId                Recipe?                 @relation(fields: [recipeId], references: [id])
   recipeId                String?
   batchInitData           Json?
-  operationType           String?
+  operationType           EnumBatchOperationType?
   operationIndex          String?
+  recipe                  String?
 }
 
 model Vendor {
@@ -877,6 +895,60 @@ model ProductionOrderBomItem {
   updatedAt DateTime @updatedAt
 }
 
+model RecipeBomItem {
+  id                   String                     @id @default(cuid())
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  item                 Item?                      @relation(fields: [itemId], references: [id])
+  itemId               String?
+  recipe               Recipe?                    @relation(fields: [recipeId], references: [id])
+  recipeId             String?
+  createdBy            String
+  updatedBy            DateTime?
+  operation            EnumRecipeBomItemOperation
+  operationIndex       Int                        @default(-1)
+  isClassDefinition    Boolean?                   @default(false)
+  quantity             Int?
+  units                String
+  quantityActual       Decimal?
+  classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classId], references: [id])
+  classId              String?
+  instances            RecipeBomItem[]            @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances")
+  globalId             String?                    @unique @default(cuid())
+  lot                  String?
+  mashingProtocolSteps MashingProtocolStep[]
+}
+
+model MashingProtocol {
+  id        String                @id @default(cuid())
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  steps     MashingProtocolStep[]
+}
+
+model MashingProtocolStep {
+  id                  String                           @id @default(cuid())
+  createdAt           DateTime                         @default(now())
+  updatedAt           DateTime                         @updatedAt
+  mashingProtocol     MashingProtocol?                 @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId   String?
+  index               Int?
+  agitatorEnabled     Boolean?                         @default(false)
+  agitatorSpdSp       Decimal?
+  coolEnabled         Boolean?                         @default(false)
+  coolTempSp          Decimal?
+  heatEnabled         Boolean?                         @default(false)
+  heatTempSp          Decimal?
+  recipeBomItem       RecipeBomItem[]
+  isClassDefinition   Boolean?                         @default(false)
+  stepType            EnumMashingProtocolStepStepType?
+  holdType            EnumMashingProtocolStepHoldType?
+  temperatureSetpoint Decimal?
+  temperatureActual   Decimal?
+  createdBy           String
+  updatedBy           String?
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
@@ -902,6 +974,13 @@ enum EnumRecipeParameterRecipeSetpointType {
   Boolean
   Numeric
   Text
+}
+
+enum EnumRecipeParameterOperation {
+  Mashing01
+  Ferrmentation01
+  Distillation01
+  Processing01
 }
 
 enum EnumEquipmentPhaseName {
@@ -1047,4 +1126,37 @@ enum EnumFermentationDayDatumDay {
   Second
   Third
   Final
+}
+
+enum EnumBatchOperationType {
+  Mashing01
+  Fermentation01
+  Distillation01
+  Processing01
+  Barreling01
+}
+
+enum EnumRecipeBomItemOperation {
+  Mashing01
+  Fermentation01
+  Distillation01
+  Processing01
+}
+
+enum EnumMashingProtocolStepStepType {
+  Hold
+  LiquidAdd
+  Corn
+  Wheat
+  Rye
+  PreMalt
+  Malt
+  Prompt
+  AdditiveAdd
+}
+
+enum EnumMashingProtocolStepHoldType {
+  Heat
+  Cool
+  Hold
 }

@@ -30,6 +30,7 @@ import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFi
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
+import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 
 @InputType()
 class ItemWhereInput {
@@ -342,6 +343,18 @@ class ItemWhereInput {
     nullable: true,
   })
   inventoryTransfers?: InventoryTransferListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeBomItemListRelationFilter, {
+    nullable: true,
+  })
+  recipeBoms?: RecipeBomItemListRelationFilter;
 }
 
 export { ItemWhereInput as ItemWhereInput };

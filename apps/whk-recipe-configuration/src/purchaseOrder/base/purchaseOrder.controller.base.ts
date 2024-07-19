@@ -525,6 +525,12 @@ export class PurchaseOrderControllerBase {
         globalId: true,
         loadId: true,
         testsPassed: true,
+
+        toAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

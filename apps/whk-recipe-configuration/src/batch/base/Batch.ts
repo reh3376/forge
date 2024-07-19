@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   IsDate,
@@ -20,7 +21,9 @@ import {
   IsInt,
   Min,
   Max,
+  IsEnum,
 } from "class-validator";
+
 import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -28,6 +31,8 @@ import { JsonValue } from "type-fest";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
 import { Asset } from "../../asset/base/Asset";
+import { Recipe } from "../../recipe/base/Recipe";
+import { EnumBatchOperationType } from "./EnumBatchOperationType";
 
 @ObjectType()
 class Batch {
@@ -178,15 +183,12 @@ class Batch {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => Recipe,
   })
-  @IsString()
-  @MaxLength(256)
+  @ValidateNested()
+  @Type(() => Recipe)
   @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeId!: string | null;
+  recipeId?: Recipe | null;
 
   @ApiProperty({
     required: false,
@@ -200,15 +202,20 @@ class Batch {
 
   @ApiProperty({
     required: false,
-    type: String,
+    enum: EnumBatchOperationType,
   })
-  @IsString()
-  @MaxLength(256)
+  @IsEnum(EnumBatchOperationType)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => EnumBatchOperationType, {
     nullable: true,
   })
-  operationType!: string | null;
+  operationType?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Barreling01"
+    | null;
 
   @ApiProperty({
     required: false,
@@ -221,6 +228,18 @@ class Batch {
     nullable: true,
   })
   operationIndex!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipe!: string | null;
 }
 
 export { Batch as Batch };

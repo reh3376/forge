@@ -423,10 +423,17 @@ export class LotControllerBase {
         },
 
         assetPath: true,
-        recipeId: true,
+
+        recipeId: {
+          select: {
+            id: true,
+          },
+        },
+
         batchInitData: true,
         operationType: true,
         operationIndex: true,
+        recipe: true,
       },
     });
     if (results === null) {

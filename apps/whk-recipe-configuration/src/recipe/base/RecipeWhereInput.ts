@@ -27,6 +27,11 @@ import { ProductionOrderUnitProcedureListRelationFilter } from "../../production
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { RecipeParameterListRelationFilter } from "../../recipeParameter/base/RecipeParameterListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
+import { RecipeListRelationFilter } from "./RecipeListRelationFilter";
+import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 
 @InputType()
 class RecipeWhereInput {
@@ -236,6 +241,120 @@ class RecipeWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  totalCooks?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  cooksPerFerm?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  estimatedAbv?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  totalFermenters?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  targetProof?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeListRelationFilter, {
+    nullable: true,
+  })
+  instances?: RecipeListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeBomItemListRelationFilter, {
+    nullable: true,
+  })
+  recipeBoms?: RecipeBomItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchListRelationFilter, {
+    nullable: true,
+  })
+  batches?: BatchListRelationFilter;
 }
 
 export { RecipeWhereInput as RecipeWhereInput };

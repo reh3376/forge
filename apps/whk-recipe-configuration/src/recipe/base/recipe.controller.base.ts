@@ -44,6 +44,12 @@ import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -86,6 +92,12 @@ export class RecipeControllerBase {
               connect: data.item,
             }
           : undefined,
+
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -114,6 +126,19 @@ export class RecipeControllerBase {
         },
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
           select: {
             id: true,
           },
@@ -165,6 +190,19 @@ export class RecipeControllerBase {
         },
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
           select: {
             id: true,
           },
@@ -221,6 +259,19 @@ export class RecipeControllerBase {
             id: true,
           },
         },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -271,6 +322,12 @@ export class RecipeControllerBase {
                 connect: data.item,
               }
             : undefined,
+
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -299,6 +356,19 @@ export class RecipeControllerBase {
           },
 
           item: {
+            select: {
+              id: true,
+            },
+          },
+
+          totalCooks: true,
+          cooksPerFerm: true,
+          estimatedAbv: true,
+          totalFermenters: true,
+          targetProof: true,
+          isClassDefinition: true,
+
+          classId: {
             select: {
               id: true,
             },
@@ -1056,6 +1126,8 @@ export class RecipeControllerBase {
         globalId: true,
         recipeNumericalSetpoint: true,
         description: true,
+        operation: true,
+        operationIndex: true,
       },
     });
     if (results === null) {
@@ -1122,6 +1194,400 @@ export class RecipeControllerBase {
   ): Promise<void> {
     const data = {
       parameters: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/instances")
+  @ApiNestedQuery(RecipeFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<Recipe[]> {
+    const query = plainToClass(RecipeFindManyArgs, request.query);
+    const results = await this.service.findInstances(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: true,
+        updatedBy: true,
+        schemaVersion: true,
+        revision: true,
+        active: true,
+        customerCode: true,
+        Recipe: true,
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectInstances(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateInstances(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/instances")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInstances(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBoms")
+  @ApiNestedQuery(RecipeBomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBoms(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<RecipeBomItem[]> {
+    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
+    const results = await this.service.findRecipeBoms(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdBy: true,
+        updatedBy: true,
+        operation: true,
+        operationIndex: true,
+        isClassDefinition: true,
+        quantity: true,
+        units: true,
+        quantityActual: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        lot: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBoms")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBoms(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBoms: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBoms")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBoms(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBoms: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBoms")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBoms(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBoms: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batches")
+  @ApiNestedQuery(BatchFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<Batch[]> {
+    const query = plainToClass(BatchFindManyArgs, request.query);
+    const results = await this.service.findBatches(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        batchId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        batchData: true,
+        revision: true,
+        customers: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        parameterData: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+
+        recipeId: {
+          select: {
+            id: true,
+          },
+        },
+
+        batchInitData: true,
+        operationType: true,
+        operationIndex: true,
+        recipe: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatches(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatches(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatches(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
         disconnect: body,
       },
     };

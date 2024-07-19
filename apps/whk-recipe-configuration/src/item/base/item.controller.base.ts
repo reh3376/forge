@@ -62,6 +62,9 @@ import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryL
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { InventoryTransferWhereUniqueInput } from "../../inventoryTransfer/base/InventoryTransferWhereUniqueInput";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -727,6 +730,12 @@ export class ItemControllerBase {
         globalId: true,
         loadId: true,
         testsPassed: true,
+
+        toAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -1366,6 +1375,19 @@ export class ItemControllerBase {
             id: true,
           },
         },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -1793,6 +1815,131 @@ export class ItemControllerBase {
   ): Promise<void> {
     const data = {
       inventoryTransfers: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBoms")
+  @ApiNestedQuery(RecipeBomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBoms(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<RecipeBomItem[]> {
+    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
+    const results = await this.service.findRecipeBoms(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdBy: true,
+        updatedBy: true,
+        operation: true,
+        operationIndex: true,
+        isClassDefinition: true,
+        quantity: true,
+        units: true,
+        quantityActual: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        lot: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBoms")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBoms(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBoms: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBoms")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBoms(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBoms: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBoms")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBoms(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBoms: {
         disconnect: body,
       },
     };

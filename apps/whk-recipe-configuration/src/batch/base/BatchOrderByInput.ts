@@ -205,6 +205,17 @@ class BatchOrderByInput {
     nullable: true,
   })
   operationIndex?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  recipe?: SortOrder;
 }
 
 export { BatchOrderByInput as BatchOrderByInput };

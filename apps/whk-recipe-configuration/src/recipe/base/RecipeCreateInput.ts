@@ -9,8 +9,9 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field } from "@nestjs/graphql";
+import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   MaxLength,
@@ -19,7 +20,9 @@ import {
   Max,
   IsBoolean,
   ValidateNested,
+  IsNumber,
 } from "class-validator";
+
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -31,6 +34,11 @@ import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from 
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { RecipeParameterCreateNestedManyWithoutRecipesInput } from "./RecipeParameterCreateNestedManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { Decimal } from "decimal.js";
+import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
+import { RecipeCreateNestedManyWithoutRecipesInput } from "./RecipeCreateNestedManyWithoutRecipesInput";
+import { RecipeBomItemCreateNestedManyWithoutRecipesInput } from "./RecipeBomItemCreateNestedManyWithoutRecipesInput";
+import { BatchCreateNestedManyWithoutRecipesInput } from "./BatchCreateNestedManyWithoutRecipesInput";
 
 @InputType()
 class RecipeCreateInput {
@@ -230,6 +238,125 @@ class RecipeCreateInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  cooksPerFerm?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(20)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  estimatedAbv?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  targetProof?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  instances?: RecipeCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  recipeBoms?: RecipeBomItemCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutRecipesInput;
 }
 
 export { RecipeCreateInput as RecipeCreateInput };

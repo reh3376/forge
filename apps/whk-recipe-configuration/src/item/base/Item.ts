@@ -37,6 +37,7 @@ import { Recipe } from "../../recipe/base/Recipe";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
 @ObjectType()
 class Item {
@@ -320,6 +321,15 @@ class Item {
   @Type(() => InventoryTransfer)
   @IsOptional()
   inventoryTransfers?: Array<InventoryTransfer>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomItem],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  recipeBoms?: Array<RecipeBomItem>;
 }
 
 export { Item as Item };

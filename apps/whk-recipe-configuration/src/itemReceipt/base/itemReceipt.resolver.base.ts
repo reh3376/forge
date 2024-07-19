@@ -29,6 +29,7 @@ import { TestParameterFindManyArgs } from "../../testParameter/base/TestParamete
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Item } from "../../item/base/Item";
+import { Asset } from "../../asset/base/Asset";
 import { ItemReceiptService } from "../itemReceipt.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ItemReceipt)
@@ -107,6 +108,12 @@ export class ItemReceiptResolverBase {
         item: {
           connect: args.data.item,
         },
+
+        toAsset: args.data.toAsset
+          ? {
+              connect: args.data.toAsset,
+            }
+          : undefined,
       },
     });
   }
@@ -136,6 +143,12 @@ export class ItemReceiptResolverBase {
           item: {
             connect: args.data.item,
           },
+
+          toAsset: args.data.toAsset
+            ? {
+                connect: args.data.toAsset,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -201,6 +214,27 @@ export class ItemReceiptResolverBase {
   })
   async getItem(@graphql.Parent() parent: ItemReceipt): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "toAsset",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getToAsset(
+    @graphql.Parent() parent: ItemReceipt
+  ): Promise<Asset | null> {
+    const result = await this.service.getToAsset(parent.id);
 
     if (!result) {
       return null;

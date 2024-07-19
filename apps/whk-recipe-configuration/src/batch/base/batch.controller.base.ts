@@ -73,6 +73,12 @@ export class BatchControllerBase {
               connect: data.asset,
             }
           : undefined,
+
+        recipeId: data.recipeId
+          ? {
+              connect: data.recipeId,
+            }
+          : undefined,
       },
       select: {
         id: true,
@@ -106,10 +112,17 @@ export class BatchControllerBase {
         },
 
         assetPath: true,
-        recipeId: true,
+
+        recipeId: {
+          select: {
+            id: true,
+          },
+        },
+
         batchInitData: true,
         operationType: true,
         operationIndex: true,
+        recipe: true,
       },
     });
   }
@@ -162,10 +175,17 @@ export class BatchControllerBase {
         },
 
         assetPath: true,
-        recipeId: true,
+
+        recipeId: {
+          select: {
+            id: true,
+          },
+        },
+
         batchInitData: true,
         operationType: true,
         operationIndex: true,
+        recipe: true,
       },
     });
   }
@@ -219,10 +239,17 @@ export class BatchControllerBase {
         },
 
         assetPath: true,
-        recipeId: true,
+
+        recipeId: {
+          select: {
+            id: true,
+          },
+        },
+
         batchInitData: true,
         operationType: true,
         operationIndex: true,
+        recipe: true,
       },
     });
     if (result === null) {
@@ -275,6 +302,12 @@ export class BatchControllerBase {
                 connect: data.asset,
               }
             : undefined,
+
+          recipeId: data.recipeId
+            ? {
+                connect: data.recipeId,
+              }
+            : undefined,
         },
         select: {
           id: true,
@@ -308,10 +341,17 @@ export class BatchControllerBase {
           },
 
           assetPath: true,
-          recipeId: true,
+
+          recipeId: {
+            select: {
+              id: true,
+            },
+          },
+
           batchInitData: true,
           operationType: true,
           operationIndex: true,
+          recipe: true,
         },
       });
     } catch (error) {
@@ -371,10 +411,17 @@ export class BatchControllerBase {
         },
 
         assetPath: true,
-        recipeId: true,
+
+        recipeId: {
+          select: {
+            id: true,
+          },
+        },
+
         batchInitData: true,
         operationType: true,
         operationIndex: true,
+        recipe: true,
       },
     });
     if (results === null) {

@@ -53,6 +53,9 @@ import { InventoryLogModule } from "./inventoryLog/inventoryLog.module";
 import { InventoryTransferModule } from "./inventoryTransfer/inventoryTransfer.module";
 import { UnitLookupModule } from "./unitLookup/unitLookup.module";
 import { ProductionOrderBomItemModule } from "./productionOrderBomItem/productionOrderBomItem.module";
+import { RecipeBomItemModule } from "./recipeBomItem/recipeBomItem.module";
+import { MashingProtocolModule } from "./mashingProtocol/mashingProtocol.module";
+import { MashingProtocolStepModule } from "./mashingProtocolStep/mashingProtocolStep.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -114,6 +117,9 @@ import { AuthModule } from "./auth/auth.module";
     InventoryTransferModule,
     UnitLookupModule,
     ProductionOrderBomItemModule,
+    RecipeBomItemModule,
+    MashingProtocolModule,
+    MashingProtocolStepModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
