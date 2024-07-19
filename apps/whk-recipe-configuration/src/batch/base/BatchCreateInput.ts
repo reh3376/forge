@@ -19,6 +19,7 @@ import {
   IsInt,
   Min,
   Max,
+  IsEnum,
 } from "class-validator";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -29,6 +30,8 @@ import { InputJsonValue } from "../../types";
 import { FermentationChemistryCreateNestedManyWithoutBatchesInput } from "./FermentationChemistryCreateNestedManyWithoutBatchesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumBatchOperationType } from "./EnumBatchOperationType";
 
 @InputType()
 class BatchCreateInput {
@@ -170,15 +173,15 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => RecipeWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(256)
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  recipeId?: string | null;
+  recipeId?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -192,15 +195,20 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    enum: EnumBatchOperationType,
   })
-  @IsString()
-  @MaxLength(256)
+  @IsEnum(EnumBatchOperationType)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => EnumBatchOperationType, {
     nullable: true,
   })
-  operationType?: string | null;
+  operationType?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Barreling01"
+    | null;
 
   @ApiProperty({
     required: false,
@@ -213,6 +221,18 @@ class BatchCreateInput {
     nullable: true,
   })
   operationIndex?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipe?: string | null;
 }
 
 export { BatchCreateInput as BatchCreateInput };

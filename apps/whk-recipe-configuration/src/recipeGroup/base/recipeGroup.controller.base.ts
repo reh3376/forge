@@ -234,6 +234,19 @@ export class RecipeGroupControllerBase {
             id: true,
           },
         },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

@@ -34,6 +34,7 @@ import { RecipeUpdateManyWithoutItemsInput } from "./RecipeUpdateManyWithoutItem
 import { InventoryUpdateManyWithoutItemsInput } from "./InventoryUpdateManyWithoutItemsInput";
 import { InventoryLogUpdateManyWithoutItemsInput } from "./InventoryLogUpdateManyWithoutItemsInput";
 import { InventoryTransferUpdateManyWithoutItemsInput } from "./InventoryTransferUpdateManyWithoutItemsInput";
+import { RecipeBomItemUpdateManyWithoutItemsInput } from "./RecipeBomItemUpdateManyWithoutItemsInput";
 
 @InputType()
 class ItemUpdateInput {
@@ -347,6 +348,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   inventoryTransfers?: InventoryTransferUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  recipeBoms?: RecipeBomItemUpdateManyWithoutItemsInput;
 }
 
 export { ItemUpdateInput as ItemUpdateInput };

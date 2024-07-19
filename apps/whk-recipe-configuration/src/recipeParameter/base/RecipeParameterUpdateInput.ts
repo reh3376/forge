@@ -30,6 +30,7 @@ import { Type } from "class-transformer";
 import { RecipeParameterUpdateManyWithoutRecipeParametersInput } from "./RecipeParameterUpdateManyWithoutRecipeParametersInput";
 import { Decimal } from "decimal.js";
 import { RecipeUpdateManyWithoutRecipeParametersInput } from "./RecipeUpdateManyWithoutRecipeParametersInput";
+import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 
 @InputType()
 class RecipeParameterUpdateInput {
@@ -268,6 +269,34 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeParameterOperation,
+  })
+  @IsEnum(EnumRecipeParameterOperation)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterOperation, {
+    nullable: true,
+  })
+  operation?:
+    | "Mashing01"
+    | "Ferrmentation01"
+    | "Distillation01"
+    | "Processing01"
+    | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  operationIndex?: string | null;
 }
 
 export { RecipeParameterUpdateInput as RecipeParameterUpdateInput };

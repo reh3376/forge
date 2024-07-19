@@ -33,6 +33,7 @@ import { Batch } from "../../batch/base/Batch";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 
 @ObjectType()
 class Asset {
@@ -259,6 +260,15 @@ class Asset {
   @Type(() => Asset)
   @IsOptional()
   children?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ItemReceipt],
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipts?: Array<ItemReceipt>;
 }
 
 export { Asset as Asset };

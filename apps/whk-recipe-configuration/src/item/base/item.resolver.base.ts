@@ -49,6 +49,8 @@ import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFi
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -392,6 +394,26 @@ export class ItemResolverBase {
     @graphql.Args() args: InventoryTransferFindManyArgs
   ): Promise<InventoryTransfer[]> {
     const results = await this.service.findInventoryTransfers(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBoms" })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBoms(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: RecipeBomItemFindManyArgs
+  ): Promise<RecipeBomItem[]> {
+    const results = await this.service.findRecipeBoms(parent.id, args);
 
     if (!results) {
       return [];

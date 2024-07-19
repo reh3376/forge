@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field } from "@nestjs/graphql";
+import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -21,6 +21,7 @@ import {
   Max,
   IsBoolean,
   ValidateNested,
+  IsNumber,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -33,6 +34,9 @@ import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure
 import { Lot } from "../../lot/base/Lot";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { Item } from "../../item/base/Item";
+import { Decimal } from "decimal.js";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { Batch } from "../../batch/base/Batch";
 
 @ObjectType()
 class Recipe {
@@ -228,6 +232,113 @@ class Recipe {
   @Type(() => Item)
   @IsOptional()
   item?: Item | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalCooks!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  cooksPerFerm!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(20)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  estimatedAbv!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalFermenters!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  targetProof!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Recipe,
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  classId?: Recipe | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  instances?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomItem],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  recipeBoms?: Array<RecipeBomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
 }
 
 export { Recipe as Recipe };

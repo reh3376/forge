@@ -29,6 +29,7 @@ import {
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { Recipe } from "../../recipe/base/Recipe";
+import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 
 @ObjectType()
 class RecipeParameter {
@@ -272,6 +273,34 @@ class RecipeParameter {
     nullable: true,
   })
   description!: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeParameterOperation,
+  })
+  @IsEnum(EnumRecipeParameterOperation)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterOperation, {
+    nullable: true,
+  })
+  operation?:
+    | "Mashing01"
+    | "Ferrmentation01"
+    | "Distillation01"
+    | "Processing01"
+    | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  operationIndex!: string | null;
 }
 
 export { RecipeParameter as RecipeParameter };

@@ -569,6 +569,19 @@ export class CustomerControllerBase {
             id: true,
           },
         },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

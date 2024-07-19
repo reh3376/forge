@@ -92,6 +92,8 @@ export class RecipeParameterControllerBase {
         globalId: true,
         recipeNumericalSetpoint: true,
         description: true,
+        operation: true,
+        operationIndex: true,
       },
     });
   }
@@ -142,6 +144,8 @@ export class RecipeParameterControllerBase {
         globalId: true,
         recipeNumericalSetpoint: true,
         description: true,
+        operation: true,
+        operationIndex: true,
       },
     });
   }
@@ -191,6 +195,8 @@ export class RecipeParameterControllerBase {
         globalId: true,
         recipeNumericalSetpoint: true,
         description: true,
+        operation: true,
+        operationIndex: true,
       },
     });
     if (result === null) {
@@ -260,6 +266,8 @@ export class RecipeParameterControllerBase {
           globalId: true,
           recipeNumericalSetpoint: true,
           description: true,
+          operation: true,
+          operationIndex: true,
         },
       });
     } catch (error) {
@@ -315,6 +323,8 @@ export class RecipeParameterControllerBase {
         globalId: true,
         recipeNumericalSetpoint: true,
         description: true,
+        operation: true,
+        operationIndex: true,
       },
     });
     if (results === null) {
@@ -433,6 +443,19 @@ export class RecipeParameterControllerBase {
         },
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
           select: {
             id: true,
           },

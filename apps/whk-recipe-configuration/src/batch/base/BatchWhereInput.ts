@@ -13,7 +13,7 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { BatchListRelationFilter } from "./BatchListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -22,6 +22,8 @@ import { FermentationChemistryListRelationFilter } from "../../fermentationChemi
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumBatchOperationType } from "./EnumBatchOperationType";
 
 @InputType()
 class BatchWhereInput {
@@ -175,14 +177,15 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: () => RecipeWhereUniqueInput,
   })
-  @Type(() => StringNullableFilter)
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  recipeId?: StringNullableFilter;
+  recipeId?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -197,14 +200,19 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    enum: EnumBatchOperationType,
   })
-  @Type(() => StringNullableFilter)
+  @IsEnum(EnumBatchOperationType)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => EnumBatchOperationType, {
     nullable: true,
   })
-  operationType?: StringNullableFilter;
+  operationType?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Barreling01";
 
   @ApiProperty({
     required: false,
@@ -216,6 +224,17 @@ class BatchWhereInput {
     nullable: true,
   })
   operationIndex?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  recipe?: StringNullableFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };

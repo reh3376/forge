@@ -34,6 +34,7 @@ import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedMan
 import { InventoryCreateNestedManyWithoutItemsInput } from "./InventoryCreateNestedManyWithoutItemsInput";
 import { InventoryLogCreateNestedManyWithoutItemsInput } from "./InventoryLogCreateNestedManyWithoutItemsInput";
 import { InventoryTransferCreateNestedManyWithoutItemsInput } from "./InventoryTransferCreateNestedManyWithoutItemsInput";
+import { RecipeBomItemCreateNestedManyWithoutItemsInput } from "./RecipeBomItemCreateNestedManyWithoutItemsInput";
 
 @InputType()
 class ItemCreateInput {
@@ -332,6 +333,18 @@ class ItemCreateInput {
     nullable: true,
   })
   inventoryTransfers?: InventoryTransferCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  recipeBoms?: RecipeBomItemCreateNestedManyWithoutItemsInput;
 }
 
 export { ItemCreateInput as ItemCreateInput };

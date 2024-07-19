@@ -29,6 +29,7 @@ import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/b
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
 import { Asset } from "../../asset/base/Asset";
+import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Batch)
@@ -111,6 +112,12 @@ export class BatchResolverBase {
               connect: args.data.asset,
             }
           : undefined,
+
+        recipeId: args.data.recipeId
+          ? {
+              connect: args.data.recipeId,
+            }
+          : undefined,
       },
     });
   }
@@ -146,6 +153,12 @@ export class BatchResolverBase {
           asset: args.data.asset
             ? {
                 connect: args.data.asset,
+              }
+            : undefined,
+
+          recipeId: args.data.recipeId
+            ? {
+                connect: args.data.recipeId,
               }
             : undefined,
         },
@@ -255,6 +268,25 @@ export class BatchResolverBase {
   })
   async getAsset(@graphql.Parent() parent: Batch): Promise<Asset | null> {
     const result = await this.service.getAsset(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Recipe, {
+    nullable: true,
+    name: "recipeId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async getRecipeId(@graphql.Parent() parent: Batch): Promise<Recipe | null> {
+    const result = await this.service.getRecipeId(parent.id);
 
     if (!result) {
       return null;
