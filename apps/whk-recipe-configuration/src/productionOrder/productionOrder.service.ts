@@ -18,7 +18,9 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
 
     async createProductionOrder<T extends Prisma.ProductionOrderCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderCreateArgs>): Promise<import(".prisma/client").ProductionOrder> {
         const productionOrder = await super.createProductionOrder({
-            ...args,
+            data: {
+                ...args.data,
+            },
             include: {
                 ...args.include,
                 scheduleOrder: true,
@@ -40,7 +42,9 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
 
     async updateProductionOrder<T extends Prisma.ProductionOrderUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ProductionOrderUpdateArgs>): Promise<import(".prisma/client").ProductionOrder> {
         const productionOrder = await super.updateProductionOrder({
-            ...args,
+            data: {
+                ...args.data,
+            },
             include: {
                 ...args.include,
                 scheduleOrder: true,
@@ -49,7 +53,8 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
                 recipeGroup: true,
                 salesOrder: true,
                 bom: true,
-            }
+            },
+            where: args.where,
         });
         await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
         recordName: 'ProductionOrder',

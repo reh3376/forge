@@ -18,18 +18,15 @@ export class LotService extends LotServiceBase {
 
   async createLot<T extends Prisma.LotCreateArgs>(args: Prisma.SelectSubset<T, Prisma.LotCreateArgs>): Promise<import(".prisma/client").Lot> {
     const lot = await super.createLot({
-        ...args,
+        data: {
+            ...args.data,
+        },
         include: {
             ...args.include,
             productionOrder: true,
             item: true,
             recipe: true,
-        }
-    });
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
-        recordName: 'Lot',
-        event_type: 'create',
-        data: lot
+        },
     });
 
     this.logger.log(`Updated Lot: ${lot.lotNumber} & pushed to topic`);
@@ -38,13 +35,16 @@ export class LotService extends LotServiceBase {
 
     async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
       const Lot = await super.updateLot({
-        ...args,
+        data: {
+            ...args.data,
+        },
         include: {
             ...args.include,
             productionOrder: true,
             item: true,
             recipe: true,
-        }
+        },
+        where: args.where,
     });
       await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
         event_type: 'update',
