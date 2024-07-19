@@ -82,13 +82,14 @@ async function seed() {
     where: {
       bomName: "15",
       bomRevision: 'WSC-74-18-00-08-53-06-3-0-0-100 Rev',
+      
     }
   });
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 42; // This should be configurable or fetched from a setting
-  const startCook = 31;
+  const totalNumberOfCooks = 82; // This should be configurable or fetched from a setting
+  const startCook = 76;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -154,18 +155,19 @@ async function seed() {
   // Create the cook equipment phases for each cook using the mashing protocol
   // Create the cook equipment phases for each cook using the mashing protocol
   const mashingProtocol = [
-    { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset" },
+    { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 130 },
-    { action: "Add Additive", additiveType: "Termamyl" },
-    { action: "Add Grain", grainType: "Malt" },
+    { action: "Add Additive", additiveType: "Citric", qty: 0},
+    { action: "Add Grain", grainType: "Malt", qty: 164 },
     { action: "Add Grain", grainType: "Corn" },
-    { action: "Add Additive", additiveType: "Citric" },
+    { action: "Add Liquid", liquidType01: "Water", qty: 0 },
+    { action: "Add Additive", additiveType: "Termamyl"},
     { action: "Hold", holdType: "Heat", temperature: 200, time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 170 },
     { action: "Add Grain", grainType: "Rye" },
     { action: "Hold", holdType: "Hold", time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 145 },
-    { action: "Add Grain", grainType: "Malt" },
+    { action: "Add Grain", grainType: "Malt" , qty: 1476 },
     { action: "Add Additive", additiveType: "Saczyme" },
     { action: "Hold", holdType: "Hold", time: 10 },
   ];
@@ -292,11 +294,12 @@ async function seed() {
             });
           }
 
-        // Link BOM components to their equipment phases
+        // Link BOM components to their equipment phases - these will be the "class definitions"
         if (bom) {
           const bomComponents = await client.bomItem.findMany({
             where: {
               bom: { id: bom.id },
+              isClassDefinition: true, 
             },
             include: {
               item: true
@@ -311,8 +314,10 @@ async function seed() {
                 // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
               ))
             ) {
-               if (phase.grainType == "Malt") {
-                if (component.quantity.lt(500)) {
+              // Check if the quantity field is present in the phase object
+              if (phase.qty !== undefined) {
+                // Only match if the bomItem quantity equals the phase quantity
+                if (component.quantity.equals(phase.qty)) {
                   await client.equipmentPhase.update({
                     where: { id: newPhase.id },
                     data: {
@@ -321,12 +326,13 @@ async function seed() {
                       },
                     },
                   });
-                  console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
                 } else {
-                  console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                  console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
                 }
-              } else if ((phase.grainType == "Malt") ){
-                if (component.quantity.gte(500)) {
+              } else if (phase.notQty !== undefined) {
+                // Only match if the bomItem quantity does not equal the phase notQty
+                if (!component.quantity.equals(phase.notQty)) {
                   await client.equipmentPhase.update({
                     where: { id: newPhase.id },
                     data: {
@@ -335,10 +341,42 @@ async function seed() {
                       },
                     },
                   });
-                  console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
                 } else {
-                  console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                  console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
                 }
+              
+              // } else {
+              //   // If quantity is not specified in the phase, proceed with the existing logic
+              // if (phase.action == "Add Grain") {
+              //   if (phase.grainType == "Malt") {
+              //   if (component.quantity.lt(500)) {
+              //     await client.equipmentPhase.update({
+              //       where: { id: newPhase.id },
+              //       data: {
+              //         bomItem: {
+              //           connect: { id: component.id },
+              //         },
+              //       },
+              //     });
+              //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+              //   } else {
+              //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+              //   }
+              // } else if ((phase.grainType == "Malt") ){
+              //   if (component.quantity.gte(500)) {
+              //     await client.equipmentPhase.update({
+              //       where: { id: newPhase.id },
+              //       data: {
+              //         bomItem: {
+              //           connect: { id: component.id },
+              //         },
+              //       },
+              //     });
+              //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+              //   } else {
+              //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+              //   }
               } else {
               await client.equipmentPhase.update({
                 where: { id: newPhase.id },
@@ -505,7 +543,7 @@ async function seed() {
     console.log("Creating new Mashing Recipe...");
     recipe = await client.recipe.create({
       data: {
-        Recipe: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125",
+        Recipe: "WSC-74-18-00-08-R001",
         revision: 1,
         createdBy: "pmannion",
         // parameters: {
