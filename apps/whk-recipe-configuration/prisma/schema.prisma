@@ -569,8 +569,8 @@ model Asset {
   inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
-  parentId                String?                 @unique
-  children                Asset?                  @relation(name: "AssetChildrenAssetParent")
+  parentId                String?
+  children                Asset[]                 @relation(name: "AssetChildrenAssetParent")
   itemReceipts            ItemReceipt[]
 
   @@unique([name, revision])

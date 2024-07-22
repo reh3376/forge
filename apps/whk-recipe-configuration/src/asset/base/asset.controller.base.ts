@@ -85,12 +85,6 @@ export class AssetControllerBase {
               connect: data.parent,
             }
           : undefined,
-
-        children: data.children
-          ? {
-              connect: data.children,
-            }
-          : undefined,
       },
       select: {
         assetPath: true,
@@ -107,12 +101,6 @@ export class AssetControllerBase {
         globalId: true,
 
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        children: {
           select: {
             id: true,
           },
@@ -152,12 +140,6 @@ export class AssetControllerBase {
         globalId: true,
 
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        children: {
           select: {
             id: true,
           },
@@ -202,12 +184,6 @@ export class AssetControllerBase {
             id: true,
           },
         },
-
-        children: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (result === null) {
@@ -248,12 +224,6 @@ export class AssetControllerBase {
                 connect: data.parent,
               }
             : undefined,
-
-          children: data.children
-            ? {
-                connect: data.children,
-              }
-            : undefined,
         },
         select: {
           assetPath: true,
@@ -270,12 +240,6 @@ export class AssetControllerBase {
           globalId: true,
 
           parent: {
-            select: {
-              id: true,
-            },
-          },
-
-          children: {
             select: {
               id: true,
             },
@@ -1415,6 +1379,116 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       inventoryTransfersTo: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/children")
+  @ApiNestedQuery(AssetFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async findChildren(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Asset[]> {
+    const query = plainToClass(AssetFindManyArgs, request.query);
+    const results = await this.service.findChildren(params.id, {
+      ...query,
+      select: {
+        assetPath: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        id: true,
+        name: true,
+        revision: true,
+        schemaVersion: true,
+        assetType: true,
+        updatedAt: true,
+        updatedBy: true,
+        globalId: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/children")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectChildren(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: AssetWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      children: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/children")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateChildren(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: AssetWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      children: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/children")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectChildren(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: AssetWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      children: {
         disconnect: body,
       },
     };

@@ -254,12 +254,12 @@ class Asset {
 
   @ApiProperty({
     required: false,
-    type: () => Asset,
+    type: () => [Asset],
   })
   @ValidateNested()
   @Type(() => Asset)
   @IsOptional()
-  children?: Asset | null;
+  children?: Array<Asset>;
 
   @ApiProperty({
     required: false,
