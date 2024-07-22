@@ -147,6 +147,17 @@ export class AssetServiceBase {
       .inventoryTransfersTo(args);
   }
 
+  async findChildren(
+    parentId: string,
+    args: Prisma.AssetFindManyArgs
+  ): Promise<PrismaAsset[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .children(args);
+  }
+
   async findItemReceipts(
     parentId: string,
     args: Prisma.ItemReceiptFindManyArgs
@@ -164,13 +175,5 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .parent();
-  }
-
-  async getChildren(parentId: string): Promise<PrismaAsset | null> {
-    return this.prisma.asset
-      .findUnique({
-        where: { id: parentId },
-      })
-      .children();
   }
 }

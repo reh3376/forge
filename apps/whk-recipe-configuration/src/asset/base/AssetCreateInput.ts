@@ -31,6 +31,7 @@ import { InventoryCreateNestedManyWithoutAssetsInput } from "./InventoryCreateNe
 import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCreateNestedManyWithoutAssetsInput";
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { AssetCreateNestedManyWithoutAssetsInput } from "./AssetCreateNestedManyWithoutAssetsInput";
 import { ItemReceiptCreateNestedManyWithoutAssetsInput } from "./ItemReceiptCreateNestedManyWithoutAssetsInput";
 
 @InputType()
@@ -256,15 +257,15 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
+    type: () => AssetCreateNestedManyWithoutAssetsInput,
   })
   @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
+  @Type(() => AssetCreateNestedManyWithoutAssetsInput)
   @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
+  @Field(() => AssetCreateNestedManyWithoutAssetsInput, {
     nullable: true,
   })
-  children?: AssetWhereUniqueInput | null;
+  children?: AssetCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
