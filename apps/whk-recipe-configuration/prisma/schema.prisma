@@ -372,6 +372,11 @@ model ProductionOrder {
   units                         String?
   quantity                      Int?
   name                          String?                        @unique
+  plannedCooks                  Int?
+  completedCooks                Int?
+  plannedFermenters             Int?
+  completedFermenters           Int?
+  completedQuantity             Decimal?
 }
 
 model ScheduleOrder {
