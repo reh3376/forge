@@ -447,6 +447,11 @@ export class CustomerControllerBase {
         units: true,
         quantity: true,
         name: true,
+        plannedCooks: true,
+        completedCooks: true,
+        plannedFermenters: true,
+        completedFermenters: true,
+        completedQuantity: true,
       },
     });
     if (results === null) {
