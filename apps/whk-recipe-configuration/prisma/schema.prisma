@@ -652,7 +652,7 @@ model BomItem {
   classIdId         BomItem?         @relation(name: "classIdId", fields: [classId], references: [id])
   classId           String?
   instances         BomItem[]        @relation(name: "classIdId")
-  isClassDefinition Boolean?         @default(false)
+  isClassDefinition Boolean?         @default(true)
 }
 
 model Unit {
