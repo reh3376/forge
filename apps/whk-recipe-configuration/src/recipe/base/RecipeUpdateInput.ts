@@ -9,8 +9,9 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field } from "@nestjs/graphql";
+import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   MaxLength,
@@ -19,7 +20,9 @@ import {
   Max,
   IsBoolean,
   ValidateNested,
+  IsNumber,
 } from "class-validator";
+
 import { Recipe } from "./Recipe";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -31,6 +34,11 @@ import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./Pro
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { Decimal } from "decimal.js";
+import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
+import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
+import { RecipeBomItemUpdateManyWithoutRecipesInput } from "./RecipeBomItemUpdateManyWithoutRecipesInput";
+import { BatchUpdateManyWithoutRecipesInput } from "./BatchUpdateManyWithoutRecipesInput";
 
 @InputType()
 class RecipeUpdateInput {
@@ -236,6 +244,125 @@ class RecipeUpdateInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  cooksPerFerm?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(20)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  estimatedAbv?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  targetProof?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  instances?: RecipeUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  recipeBoms?: RecipeBomItemUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => BatchUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  batches?: BatchUpdateManyWithoutRecipesInput;
 }
 
 export { RecipeUpdateInput as RecipeUpdateInput };

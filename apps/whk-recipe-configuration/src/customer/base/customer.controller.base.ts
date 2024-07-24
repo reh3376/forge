@@ -447,6 +447,11 @@ export class CustomerControllerBase {
         units: true,
         quantity: true,
         name: true,
+        plannedCooks: true,
+        completedCooks: true,
+        plannedFermenters: true,
+        completedFermenters: true,
+        completedQuantity: true,
       },
     });
     if (results === null) {
@@ -565,6 +570,19 @@ export class CustomerControllerBase {
         },
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalCooks: true,
+        cooksPerFerm: true,
+        estimatedAbv: true,
+        totalFermenters: true,
+        targetProof: true,
+        isClassDefinition: true,
+
+        classId: {
           select: {
             id: true,
           },

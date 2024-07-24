@@ -525,6 +525,12 @@ export class PurchaseOrderControllerBase {
         globalId: true,
         loadId: true,
         testsPassed: true,
+
+        toAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
@@ -658,6 +664,12 @@ export class PurchaseOrderControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

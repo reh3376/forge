@@ -26,6 +26,7 @@ import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInp
 import { RecipeParameterListRelationFilter } from "./RecipeParameterListRelationFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
+import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 
 @InputType()
 class RecipeParameterWhereInput {
@@ -284,6 +285,32 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   description?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeParameterOperation,
+  })
+  @IsEnum(EnumRecipeParameterOperation)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterOperation, {
+    nullable: true,
+  })
+  operation?:
+    | "Mashing01"
+    | "Ferrmentation01"
+    | "Distillation01"
+    | "Processing01";
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  operationIndex?: IntNullableFilter;
 }
 
 export { RecipeParameterWhereInput as RecipeParameterWhereInput };
