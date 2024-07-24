@@ -74,9 +74,9 @@ export class BatchControllerBase {
             }
           : undefined,
 
-        recipeId: data.recipeId
+        recipe: data.recipe
           ? {
-              connect: data.recipeId,
+              connect: data.recipe,
             }
           : undefined,
       },
@@ -113,7 +113,7 @@ export class BatchControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -122,7 +122,7 @@ export class BatchControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
   }
@@ -176,7 +176,7 @@ export class BatchControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -185,7 +185,7 @@ export class BatchControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
   }
@@ -240,7 +240,7 @@ export class BatchControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -249,7 +249,7 @@ export class BatchControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
     if (result === null) {
@@ -303,9 +303,9 @@ export class BatchControllerBase {
               }
             : undefined,
 
-          recipeId: data.recipeId
+          recipe: data.recipe
             ? {
-                connect: data.recipeId,
+                connect: data.recipe,
               }
             : undefined,
         },
@@ -342,7 +342,7 @@ export class BatchControllerBase {
 
           assetPath: true,
 
-          recipeId: {
+          recipe: {
             select: {
               id: true,
             },
@@ -351,7 +351,7 @@ export class BatchControllerBase {
           batchInitData: true,
           operationType: true,
           operationIndex: true,
-          recipe: true,
+          recipeName: true,
         },
       });
     } catch (error) {
@@ -412,7 +412,7 @@ export class BatchControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -421,7 +421,7 @@ export class BatchControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
     if (results === null) {

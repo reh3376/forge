@@ -793,12 +793,12 @@ model Batch {
   asset                   Asset?                  @relation(fields: [assetId], references: [id])
   assetId                 String?
   assetPath               String?
-  recipeId                Recipe?                 @relation(fields: [recipeId], references: [id])
+  recipe                  Recipe?                 @relation(fields: [recipeId], references: [id])
   recipeId                String?
   batchInitData           Json?
   operationType           EnumBatchOperationType?
   operationIndex          String?
-  recipe                  String?
+  recipeName              String?
 }
 
 model Vendor {

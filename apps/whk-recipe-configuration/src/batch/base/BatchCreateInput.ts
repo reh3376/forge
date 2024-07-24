@@ -181,7 +181,7 @@ class BatchCreateInput {
   @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  recipeId?: RecipeWhereUniqueInput | null;
+  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -232,7 +232,7 @@ class BatchCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  recipe?: string | null;
+  recipeName?: string | null;
 }
 
 export { BatchCreateInput as BatchCreateInput };

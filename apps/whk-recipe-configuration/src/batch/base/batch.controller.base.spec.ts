@@ -26,7 +26,7 @@ const CREATE_INPUT = {
   revision: 42,
   assetPath: "exampleAssetPath",
   operationIndex: "exampleOperationIndex",
-  recipe: "exampleRecipe",
+  recipeName: "exampleRecipeName",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -37,7 +37,7 @@ const CREATE_RESULT = {
   revision: 42,
   assetPath: "exampleAssetPath",
   operationIndex: "exampleOperationIndex",
-  recipe: "exampleRecipe",
+  recipeName: "exampleRecipeName",
 };
 const FIND_MANY_RESULT = [
   {
@@ -49,7 +49,7 @@ const FIND_MANY_RESULT = [
     revision: 42,
     assetPath: "exampleAssetPath",
     operationIndex: "exampleOperationIndex",
-    recipe: "exampleRecipe",
+    recipeName: "exampleRecipeName",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -61,7 +61,7 @@ const FIND_ONE_RESULT = {
   revision: 42,
   assetPath: "exampleAssetPath",
   operationIndex: "exampleOperationIndex",
-  recipe: "exampleRecipe",
+  recipeName: "exampleRecipeName",
 };
 
 const service = {

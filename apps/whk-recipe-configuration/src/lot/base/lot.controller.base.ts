@@ -460,7 +460,7 @@ export class LotControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -469,7 +469,7 @@ export class LotControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
     if (results === null) {

@@ -89,11 +89,11 @@ export class BatchServiceBase {
       .asset();
   }
 
-  async getRecipeId(parentId: string): Promise<PrismaRecipe | null> {
+  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
     return this.prisma.batch
       .findUnique({
         where: { id: parentId },
       })
-      .recipeId();
+      .recipe();
   }
 }

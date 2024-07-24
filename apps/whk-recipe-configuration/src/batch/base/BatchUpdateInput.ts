@@ -184,7 +184,7 @@ class BatchUpdateInput {
   @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  recipeId?: RecipeWhereUniqueInput | null;
+  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -235,7 +235,7 @@ class BatchUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  recipe?: string | null;
+  recipeName?: string | null;
 }
 
 export { BatchUpdateInput as BatchUpdateInput };

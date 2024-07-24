@@ -824,7 +824,7 @@ export class AssetControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -833,7 +833,7 @@ export class AssetControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
     if (results === null) {
