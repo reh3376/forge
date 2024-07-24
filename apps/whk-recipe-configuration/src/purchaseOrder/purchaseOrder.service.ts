@@ -23,8 +23,8 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
 --       ),
       li.quantity as "lineItemQuantity",
       li."itemName" as "lineItemItemName",
-      li.rate as "lineItemRate",
-      li.description as "lineItemDescription",
+--       li.rate as "lineItemRate",
+--      li.description as "lineItemDescription",
       i.id as itemId,
       i."itemNumber" as itemNumber,
       i."itemClass",
@@ -34,11 +34,12 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
       "itemName" text,
       "rate" text,
       "quantity" text,
-      "description" text
+     "description" text
     )
     LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
     LEFT JOIN "Vendor" v on i."vendorId" = v.id
-     WHERE po."transactionGroup" LIKE ${`%${purchaseOrderType}%`}`;
+     WHERE po."transactionGroup" LIKE ${`%${purchaseOrderType}%`}
+    ORDER BY li."itemName"`;
     // WHERE i."itemGroup" LIKE ${`%${purchaseOrderType}%`}`;
 
     const purchaseOrders = await this.prisma.$queryRaw<PurchaseOrder[]>(query);
