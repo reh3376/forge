@@ -215,7 +215,7 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  recipe?: SortOrder;
+  recipeName?: SortOrder;
 }
 
 export { BatchOrderByInput as BatchOrderByInput };

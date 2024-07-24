@@ -188,7 +188,7 @@ class Batch {
   @ValidateNested()
   @Type(() => Recipe)
   @IsOptional()
-  recipeId?: Recipe | null;
+  recipe?: Recipe | null;
 
   @ApiProperty({
     required: false,
@@ -239,7 +239,7 @@ class Batch {
   @Field(() => String, {
     nullable: true,
   })
-  recipe!: string | null;
+  recipeName!: string | null;
 }
 
 export { Batch as Batch };

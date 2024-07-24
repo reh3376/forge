@@ -1523,7 +1523,7 @@ export class RecipeControllerBase {
 
         assetPath: true,
 
-        recipeId: {
+        recipe: {
           select: {
             id: true,
           },
@@ -1532,7 +1532,7 @@ export class RecipeControllerBase {
         batchInitData: true,
         operationType: true,
         operationIndex: true,
-        recipe: true,
+        recipeName: true,
       },
     });
     if (results === null) {

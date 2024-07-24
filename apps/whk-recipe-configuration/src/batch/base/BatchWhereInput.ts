@@ -185,7 +185,7 @@ class BatchWhereInput {
   @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  recipeId?: RecipeWhereUniqueInput;
+  recipe?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -234,7 +234,7 @@ class BatchWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  recipe?: StringNullableFilter;
+  recipeName?: StringNullableFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };

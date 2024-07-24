@@ -113,9 +113,9 @@ export class BatchResolverBase {
             }
           : undefined,
 
-        recipeId: args.data.recipeId
+        recipe: args.data.recipe
           ? {
-              connect: args.data.recipeId,
+              connect: args.data.recipe,
             }
           : undefined,
       },
@@ -156,9 +156,9 @@ export class BatchResolverBase {
               }
             : undefined,
 
-          recipeId: args.data.recipeId
+          recipe: args.data.recipe
             ? {
-                connect: args.data.recipeId,
+                connect: args.data.recipe,
               }
             : undefined,
         },
@@ -278,15 +278,15 @@ export class BatchResolverBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Recipe, {
     nullable: true,
-    name: "recipeId",
+    name: "recipe",
   })
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
   })
-  async getRecipeId(@graphql.Parent() parent: Batch): Promise<Recipe | null> {
-    const result = await this.service.getRecipeId(parent.id);
+  async getRecipe(@graphql.Parent() parent: Batch): Promise<Recipe | null> {
+    const result = await this.service.getRecipe(parent.id);
 
     if (!result) {
       return null;
