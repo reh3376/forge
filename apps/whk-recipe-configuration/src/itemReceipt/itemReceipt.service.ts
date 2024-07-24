@@ -26,35 +26,39 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       }
     });
 
-    const itemReceipt = await super.createItemReceipt({
-      data: args.data,
-      include: {
-        item: true,
-        purchaseOrder: true,
-      }
-    });
-
-    // create the grain test instances 
-    for (const test of grainTests) {
-      await this.prisma.testParameter.create({
-        data: {
-          testParamUnits: test.testParamUnits,
-          name: test.name,
-          description: test.description,
-          createdBy: args.data.createdBy,
-          testSetpointType: test.testSetpointType,
-          testParamRevision: test.testParamRevision,
-          testSetpointBooleanValue: test.testSetpointBooleanValue,
-          testSetpointLowerLimit: test.testSetpointLowerLimit,
-          testSetpointUpperLimit: test.testSetpointUpperLimit,
-          testSetpointValue: test.testSetpointValue,
-          active: true,
-          isClassDef: false,
-          classId: { connect: { id: test.id } },
-          itemReceipt: { connect: { id: itemReceipt.id } },
+    const itemReceipt = await this.prisma.$transaction(async (prisma) => {
+      const createdItemReceipt = await super.createItemReceipt({
+        data: args.data,
+        include: {
+          item: true,
+          purchaseOrder: true,
         }
       });
-    }
+
+      // create the grain test instances 
+      for (const test of grainTests) {
+        await prisma.testParameter.create({
+          data: {
+            testParamUnits: test.testParamUnits,
+            name: test.name,
+            description: test.description,
+            createdBy: args.data.createdBy,
+            testSetpointType: test.testSetpointType,
+            testParamRevision: test.testParamRevision,
+            testSetpointBooleanValue: test.testSetpointBooleanValue,
+            testSetpointLowerLimit: test.testSetpointLowerLimit,
+            testSetpointUpperLimit: test.testSetpointUpperLimit,
+            testSetpointValue: test.testSetpointValue,
+            active: true,
+            isClassDef: false,
+            classId: { connect: { id: test.id } },
+            itemReceipt: { connect: { id: createdItemReceipt.id } },
+          }
+        });
+      }
+      return createdItemReceipt;
+    });
+
     return itemReceipt;
   }
 
@@ -83,38 +87,59 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
     if (quantityInPounds && typeof quantityInPounds === 'number' && quantityInPounds > 10000) {
       // Convert quantity to pounds based on grain type
       this.logger.debug(`Purchase order for the itemReceipt: ${itemReceiptPayload?.purchaseOrder}`);
+
+      /* 
+      PATRICK MANNION - WHISKEY HOUSE OF KENTUCK
+      2024-07-17
+
+      ERP BUDDIES PLACED LOGIC TO DO THIS CONVERSION. LEAVING THIS IN, IN CASE FUTURE NEED ARISES
+      */
+      // if (itemReceiptPayload?.purchaseOrder?.transactionGroup?.startsWith('RM-GR-')) {
+      //   const item = itemReceiptPayload?.item;
+      //   this.logger.debug(`Item for the itemReceipt: ${item}`);
+      //   if (item) {
+      //     // Map transaction group to unitLookup record name
+      //     const transactionGroupToUnitMap = {
+      //       'RM-GR-MLT': 'Barley Bushel',
+      //       'RM-GR-WHT': 'Wheat Bushel',
+      //       'RM-GR-COR': 'Corn Bushel',
+      //       'RM-GR-RYE': 'Rye Bushel'
+      //     };
+
+      //     const transactionGroup = itemReceiptPayload?.purchaseOrder?.transactionGroup;
+      //     if (transactionGroup && transactionGroup in transactionGroupToUnitMap) {
+      //       const unitName = transactionGroupToUnitMap[transactionGroup as keyof typeof transactionGroupToUnitMap];
+            
+      //       // Fetch the unitLookup record based on the mapped name
+      //       const unitLookup = await this.prisma.unitLookup.findUnique({
+      //         where: { name: unitName }
+      //       });
+
+      //       if (unitLookup) {
+      //         quantityInPounds = quantityInPounds / Number(unitLookup.conversionRate);
+      //       } else {
+      //         this.logger.warn(`Unit conversion not found for ${unitName}. Using original quantity.`);
+      //       }
+      //     } else {
+      //       this.logger.warn(`Transaction group ${transactionGroup} not mapped. Using original quantity.`);
+      //     }
+      //   }
+      //   // Update the quantity in the payload
+      //   itemReceiptPayload.quantity = new Decimal(quantityInPounds);
+      // }
+
       if (itemReceiptPayload?.purchaseOrder?.transactionGroup?.startsWith('RM-GR-')) {
         const item = itemReceiptPayload?.item;
         this.logger.debug(`Item for the itemReceipt: ${item}`);
         if (item) {
           // Map transaction group to unitLookup record name
-          const transactionGroupToUnitMap = {
-            'RM-GR-MLT': 'Barley Bushel',
-            'RM-GR-WHT': 'Wheat Bushel',
-            'RM-GR-COR': 'Corn Bushel',
+          const toUnitMap = {
+            'RM-GR-MLT': 'bsc-mlt',
+            'RM-GR-WHT': 'bsc-wht',
+            'RM-GR-COR': 'bsc-cor',
             'RM-GR-RYE': 'Rye Bushel'
           };
-
-          const transactionGroup = itemReceiptPayload?.purchaseOrder?.transactionGroup;
-          if (transactionGroup && transactionGroup in transactionGroupToUnitMap) {
-            const unitName = transactionGroupToUnitMap[transactionGroup as keyof typeof transactionGroupToUnitMap];
-            
-            // Fetch the unitLookup record based on the mapped name
-            const unitLookup = await this.prisma.unitLookup.findUnique({
-              where: { name: unitName }
-            });
-
-            if (unitLookup) {
-              quantityInPounds = quantityInPounds / Number(unitLookup.conversionRate);
-            } else {
-              this.logger.warn(`Unit conversion not found for ${unitName}. Using original quantity.`);
-            }
-          } else {
-            this.logger.warn(`Transaction group ${transactionGroup} not mapped. Using original quantity.`);
-          }
         }
-        // Update the quantity in the payload
-        itemReceiptPayload.quantity = new Decimal(quantityInPounds);
       }
 
 
