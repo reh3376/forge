@@ -664,6 +664,12 @@ export class PurchaseOrderControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

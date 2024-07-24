@@ -959,6 +959,12 @@ export class ProductionOrderControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

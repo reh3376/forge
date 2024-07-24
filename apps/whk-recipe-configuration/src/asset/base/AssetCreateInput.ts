@@ -33,6 +33,7 @@ import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./Inventory
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { AssetCreateNestedManyWithoutAssetsInput } from "./AssetCreateNestedManyWithoutAssetsInput";
 import { ItemReceiptCreateNestedManyWithoutAssetsInput } from "./ItemReceiptCreateNestedManyWithoutAssetsInput";
+import { LotCreateNestedManyWithoutAssetsInput } from "./LotCreateNestedManyWithoutAssetsInput";
 
 @InputType()
 class AssetCreateInput {
@@ -278,6 +279,18 @@ class AssetCreateInput {
     nullable: true,
   })
   itemReceipts?: ItemReceiptCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutAssetsInput;
 }
 
 export { AssetCreateInput as AssetCreateInput };

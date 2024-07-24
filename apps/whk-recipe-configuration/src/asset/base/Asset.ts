@@ -34,6 +34,7 @@ import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { Lot } from "../../lot/base/Lot";
 
 @ObjectType()
 class Asset {
@@ -269,6 +270,15 @@ class Asset {
   @Type(() => ItemReceipt)
   @IsOptional()
   itemReceipts?: Array<ItemReceipt>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lots?: Array<Lot>;
 }
 
 export { Asset as Asset };

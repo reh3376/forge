@@ -577,6 +577,7 @@ model Asset {
   parentId                String?
   children                Asset[]                 @relation(name: "AssetChildrenAssetParent")
   itemReceipts            ItemReceipt[]
+  lots                    Lot[]
 
   @@unique([name, revision])
 }
@@ -629,6 +630,8 @@ model Lot {
   batches                     Batch[]
   bomItems                    BomItem[]
   inventoryTransfers          InventoryTransfer[]
+  fromAsset                   Asset?                 @relation(fields: [fromAssetId], references: [id])
+  fromAssetId                 String?
 }
 
 model BomItem {

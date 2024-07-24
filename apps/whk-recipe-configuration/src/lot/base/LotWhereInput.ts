@@ -25,6 +25,7 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
 class LotWhereInput {
@@ -222,6 +223,18 @@ class LotWhereInput {
     nullable: true,
   })
   inventoryTransfers?: InventoryTransferListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  fromAsset?: AssetWhereUniqueInput;
 }
 
 export { LotWhereInput as LotWhereInput };

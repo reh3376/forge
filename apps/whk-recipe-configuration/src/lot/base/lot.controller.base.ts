@@ -91,6 +91,12 @@ export class LotControllerBase {
               connect: data.fermentationChemistries,
             }
           : undefined,
+
+        fromAsset: data.fromAsset
+          ? {
+              connect: data.fromAsset,
+            }
+          : undefined,
       },
       select: {
         createdAt: true,
@@ -134,6 +140,12 @@ export class LotControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -196,6 +208,12 @@ export class LotControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -257,6 +275,12 @@ export class LotControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -321,6 +345,12 @@ export class LotControllerBase {
                 connect: data.fermentationChemistries,
               }
             : undefined,
+
+          fromAsset: data.fromAsset
+            ? {
+                connect: data.fromAsset,
+              }
+            : undefined,
         },
         select: {
           createdAt: true,
@@ -364,6 +394,12 @@ export class LotControllerBase {
           },
 
           isRawMaterial: true,
+
+          fromAsset: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

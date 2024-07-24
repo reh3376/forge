@@ -23,6 +23,7 @@ import {
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
   ItemReceipt as PrismaItemReceipt,
+  Lot as PrismaLot,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -167,6 +168,17 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .itemReceipts(args);
+  }
+
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
   }
 
   async getParent(parentId: string): Promise<PrismaAsset | null> {
