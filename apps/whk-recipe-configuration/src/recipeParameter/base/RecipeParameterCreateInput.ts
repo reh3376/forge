@@ -30,6 +30,7 @@ import { Type } from "class-transformer";
 import { RecipeParameterCreateNestedManyWithoutRecipeParametersInput } from "./RecipeParameterCreateNestedManyWithoutRecipeParametersInput";
 import { Decimal } from "decimal.js";
 import { RecipeCreateNestedManyWithoutRecipeParametersInput } from "./RecipeCreateNestedManyWithoutRecipeParametersInput";
+import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 
 @InputType()
 class RecipeParameterCreateInput {
@@ -253,6 +254,34 @@ class RecipeParameterCreateInput {
     nullable: true,
   })
   description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeParameterOperation,
+  })
+  @IsEnum(EnumRecipeParameterOperation)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterOperation, {
+    nullable: true,
+  })
+  operation?:
+    | "Mashing01"
+    | "Ferrmentation01"
+    | "Distillation01"
+    | "Processing01"
+    | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  operationIndex?: number | null;
 }
 
 export { RecipeParameterCreateInput as RecipeParameterCreateInput };

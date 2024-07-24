@@ -24,6 +24,7 @@ import { TestParameterListRelationFilter } from "../../testParameter/base/TestPa
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
 class ItemReceiptWhereInput {
@@ -238,6 +239,18 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   testsPassed?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  toAsset?: AssetWhereUniqueInput;
 }
 
 export { ItemReceiptWhereInput as ItemReceiptWhereInput };

@@ -27,6 +27,9 @@ import { InventoryListRelationFilter } from "../../inventory/base/InventoryListR
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { AssetListRelationFilter } from "./AssetListRelationFilter";
+import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
+import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 
 @InputType()
 class AssetWhereInput {
@@ -294,15 +297,39 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
+    type: () => AssetListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
+  @Type(() => AssetListRelationFilter)
   @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
+  @Field(() => AssetListRelationFilter, {
     nullable: true,
   })
-  children?: AssetWhereUniqueInput;
+  children?: AssetListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceiptListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemReceiptListRelationFilter, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
+  @IsOptional()
+  @Field(() => LotListRelationFilter, {
+    nullable: true,
+  })
+  lots?: LotListRelationFilter;
 }
 
 export { AssetWhereInput as AssetWhereInput };

@@ -29,6 +29,12 @@ const CREATE_INPUT = {
   customerCode: "exampleCustomerCode",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
+  totalCooks: 42,
+  cooksPerFerm: 42,
+  estimatedAbv: 42.424242424,
+  totalFermenters: 42,
+  targetProof: 42.424242424,
+  isClassDefinition: "true",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -42,6 +48,12 @@ const CREATE_RESULT = {
   customerCode: "exampleCustomerCode",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
+  totalCooks: 42,
+  cooksPerFerm: 42,
+  estimatedAbv: 42.424242424,
+  totalFermenters: 42,
+  targetProof: 42.424242424,
+  isClassDefinition: "true",
 };
 const FIND_MANY_RESULT = [
   {
@@ -56,6 +68,12 @@ const FIND_MANY_RESULT = [
     customerCode: "exampleCustomerCode",
     Recipe: "exampleRecipe",
     globalId: "exampleGlobalId",
+    totalCooks: 42,
+    cooksPerFerm: 42,
+    estimatedAbv: 42.424242424,
+    totalFermenters: 42,
+    targetProof: 42.424242424,
+    isClassDefinition: "true",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -70,6 +88,12 @@ const FIND_ONE_RESULT = {
   customerCode: "exampleCustomerCode",
   Recipe: "exampleRecipe",
   globalId: "exampleGlobalId",
+  totalCooks: 42,
+  cooksPerFerm: 42,
+  estimatedAbv: 42.424242424,
+  totalFermenters: 42,
+  targetProof: 42.424242424,
+  isClassDefinition: "true",
 };
 
 const service = {

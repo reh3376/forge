@@ -30,6 +30,7 @@ import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameterCreateNestedManyWithoutItemReceiptsInput } from "./TestParameterCreateNestedManyWithoutItemReceiptsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
 class ItemReceiptCreateInput {
@@ -207,6 +208,18 @@ class ItemReceiptCreateInput {
     nullable: true,
   })
   testsPassed?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  toAsset?: AssetWhereUniqueInput | null;
 }
 
 export { ItemReceiptCreateInput as ItemReceiptCreateInput };

@@ -172,6 +172,17 @@ class LotOrderByInput {
     nullable: true,
   })
   isRawMaterial?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  fromAssetId?: SortOrder;
 }
 
 export { LotOrderByInput as LotOrderByInput };

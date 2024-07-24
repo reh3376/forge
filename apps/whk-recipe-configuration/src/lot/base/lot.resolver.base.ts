@@ -36,6 +36,7 @@ import { Recipe } from "../../recipe/base/Recipe";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { Asset } from "../../asset/base/Asset";
 import { LotService } from "../lot.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Lot)
@@ -128,6 +129,12 @@ export class LotResolverBase {
               connect: args.data.fermentationChemistries,
             }
           : undefined,
+
+        fromAsset: args.data.fromAsset
+          ? {
+              connect: args.data.fromAsset,
+            }
+          : undefined,
       },
     });
   }
@@ -173,6 +180,12 @@ export class LotResolverBase {
           fermentationChemistries: args.data.fermentationChemistries
             ? {
                 connect: args.data.fermentationChemistries,
+              }
+            : undefined,
+
+          fromAsset: args.data.fromAsset
+            ? {
+                connect: args.data.fromAsset,
               }
             : undefined,
         },
@@ -343,6 +356,25 @@ export class LotResolverBase {
     @graphql.Parent() parent: Lot
   ): Promise<FermentationChemistry | null> {
     const result = await this.service.getFermentationChemistries(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "fromAsset",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getFromAsset(@graphql.Parent() parent: Lot): Promise<Asset | null> {
+    const result = await this.service.getFromAsset(parent.id);
 
     if (!result) {
       return null;

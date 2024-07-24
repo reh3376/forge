@@ -35,6 +35,11 @@ const CREATE_INPUT = {
   units: "exampleUnits",
   quantity: 42,
   name: "exampleName",
+  plannedCooks: 42,
+  completedCooks: 42,
+  plannedFermenters: 42,
+  completedFermenters: 42,
+  completedQuantity: 42.424242424,
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -54,6 +59,11 @@ const CREATE_RESULT = {
   units: "exampleUnits",
   quantity: 42,
   name: "exampleName",
+  plannedCooks: 42,
+  completedCooks: 42,
+  plannedFermenters: 42,
+  completedFermenters: 42,
+  completedQuantity: 42.424242424,
 };
 const FIND_MANY_RESULT = [
   {
@@ -74,6 +84,11 @@ const FIND_MANY_RESULT = [
     units: "exampleUnits",
     quantity: 42,
     name: "exampleName",
+    plannedCooks: 42,
+    completedCooks: 42,
+    plannedFermenters: 42,
+    completedFermenters: 42,
+    completedQuantity: 42.424242424,
   },
 ];
 const FIND_ONE_RESULT = {
@@ -94,6 +109,11 @@ const FIND_ONE_RESULT = {
   units: "exampleUnits",
   quantity: 42,
   name: "exampleName",
+  plannedCooks: 42,
+  completedCooks: 42,
+  plannedFermenters: 42,
+  completedFermenters: 42,
+  completedQuantity: 42.424242424,
 };
 
 const service = {

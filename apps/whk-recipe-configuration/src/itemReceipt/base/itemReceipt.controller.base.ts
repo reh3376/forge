@@ -67,6 +67,12 @@ export class ItemReceiptControllerBase {
         item: {
           connect: data.item,
         },
+
+        toAsset: data.toAsset
+          ? {
+              connect: data.toAsset,
+            }
+          : undefined,
       },
       select: {
         createdAt: true,
@@ -99,6 +105,12 @@ export class ItemReceiptControllerBase {
         globalId: true,
         loadId: true,
         testsPassed: true,
+
+        toAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -150,6 +162,12 @@ export class ItemReceiptControllerBase {
         globalId: true,
         loadId: true,
         testsPassed: true,
+
+        toAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -202,6 +220,12 @@ export class ItemReceiptControllerBase {
         globalId: true,
         loadId: true,
         testsPassed: true,
+
+        toAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -246,6 +270,12 @@ export class ItemReceiptControllerBase {
           item: {
             connect: data.item,
           },
+
+          toAsset: data.toAsset
+            ? {
+                connect: data.toAsset,
+              }
+            : undefined,
         },
         select: {
           createdAt: true,
@@ -278,6 +308,12 @@ export class ItemReceiptControllerBase {
           globalId: true,
           loadId: true,
           testsPassed: true,
+
+          toAsset: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

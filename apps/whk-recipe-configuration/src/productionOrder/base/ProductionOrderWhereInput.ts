@@ -30,6 +30,7 @@ import { FermentationChemistryListRelationFilter } from "../../fermentationChemi
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 
 @InputType()
 class ProductionOrderWhereInput {
@@ -340,6 +341,61 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   name?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  plannedCooks?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  completedCooks?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  plannedFermenters?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  completedFermenters?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  completedQuantity?: DecimalNullableFilter;
 }
 
 export { ProductionOrderWhereInput as ProductionOrderWhereInput };
