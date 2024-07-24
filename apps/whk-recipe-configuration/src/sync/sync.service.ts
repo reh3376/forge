@@ -252,23 +252,23 @@ export class SyncService implements OnModuleInit {
         // If the entity exists, update it with the new data.
         // If the entity does not exist, create a new one with the data
         if (type === 'update' && existingEntity && existingEntity.length > 0) {
-            const payload = {
-                ...payloadData,
-            };
-            this.logger.debug(`Updating ${entity} with data: ${JSON.stringify(payload)}`);
+            // const payload = {
+            //     ...payloadData,
+            // };
+            // this.logger.debug(`Updating ${entity} with data: ${JSON.stringify(payload)}`);
 
-            // Validate the payload
-            const validatedInstance = await this.validatePayload(entity, payload);
+            // // Validate the payload
+            // const validatedInstance = await this.validatePayload(entity, payload);
 
-            try {
-                await this.prismaEntityMap[entity].update(
-                    {
-                    where: { globalId: globalId },
-                    data: validatedInstance
-                });
-            } catch (error: unknown) {
-                this.logger.error(`Error updating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
-            }
+            // try {
+            //     await this.prismaEntityMap[entity].update(
+            //         {
+            //         where: { globalId: globalId },
+            //         data: validatedInstance
+            //     });
+            // } catch (error: unknown) {
+            //     this.logger.error(`Error updating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
+            // }
         } else if (type === 'create' && (!existingEntity || existingEntity.length === 0)) {
             const payload = {
                 ...payloadData,
