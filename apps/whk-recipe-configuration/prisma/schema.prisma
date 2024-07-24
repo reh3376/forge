@@ -108,7 +108,7 @@ model RecipeParameter {
   recipe                     Recipe[]
   description                String?
   operation                  EnumRecipeParameterOperation?
-  operationIndex             String?                               @default(-1)
+  operationIndex             Int?                                  @default(-1)
 }
 
 model Instruction {
@@ -408,8 +408,9 @@ model ScheduleOrder {
   actualEnd                    DateTime?
   duration                     Decimal?
   durationUnits                String?                  @default("Hours")
-  scheduleOrderQueues          ScheduleOrderQueue?
+  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
   name                         String?                  @unique
+  scheduleOrderQueueId         String?
 }
 
 model Item {

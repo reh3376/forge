@@ -37,7 +37,7 @@ const CREATE_INPUT = {
   globalId: "exampleGlobalId",
   recipeNumericalSetpoint: 42.424242424,
   description: "exampleDescription",
-  operationIndex: "exampleOperationIndex",
+  operationIndex: 42,
 };
 const CREATE_RESULT = {
   revision: 42,
@@ -59,7 +59,7 @@ const CREATE_RESULT = {
   globalId: "exampleGlobalId",
   recipeNumericalSetpoint: 42.424242424,
   description: "exampleDescription",
-  operationIndex: "exampleOperationIndex",
+  operationIndex: 42,
 };
 const FIND_MANY_RESULT = [
   {
@@ -82,7 +82,7 @@ const FIND_MANY_RESULT = [
     globalId: "exampleGlobalId",
     recipeNumericalSetpoint: 42.424242424,
     description: "exampleDescription",
-    operationIndex: "exampleOperationIndex",
+    operationIndex: 42,
   },
 ];
 const FIND_ONE_RESULT = {
@@ -105,7 +105,7 @@ const FIND_ONE_RESULT = {
   globalId: "exampleGlobalId",
   recipeNumericalSetpoint: 42.424242424,
   description: "exampleDescription",
-  operationIndex: "exampleOperationIndex",
+  operationIndex: 42,
 };
 
 const service = {
