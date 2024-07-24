@@ -237,8 +237,8 @@ model Recipe {
   totalFermenters               Int?
   targetProof                   Decimal?
   isClassDefinition             Boolean?                       @default(true)
-  classId                       Recipe?                        @relation(name: "RecipeClassIdRecipeInstances", fields: [classId], references: [id])
-  classId                       String?
+  classId                       Recipe?                        @relation(name: "RecipeClassIdRecipeInstances", fields: [classIdId], references: [id])
+  classIdId                     String?
   instances                     Recipe[]                       @relation(name: "RecipeClassIdRecipeInstances")
   recipeBoms                    RecipeBomItem[]
   batches                       Batch[]
@@ -919,8 +919,8 @@ model RecipeBomItem {
   quantity             Int?
   units                String
   quantityActual       Decimal?
-  classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classId], references: [id])
-  classId              String?
+  classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classIdid], references: [id])
+  classIdid            String?
   instances            RecipeBomItem[]            @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances")
   globalId             String?                    @unique @default(cuid())
   lot                  String?

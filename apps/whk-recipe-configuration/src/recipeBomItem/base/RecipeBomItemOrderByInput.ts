@@ -171,7 +171,7 @@ class RecipeBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  classId?: SortOrder;
+  classIdid?: SortOrder;
 
   @ApiProperty({
     required: false,
