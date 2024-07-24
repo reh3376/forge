@@ -1012,6 +1012,12 @@ export class RecipeControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {

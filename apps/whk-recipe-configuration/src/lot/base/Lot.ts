@@ -28,6 +28,7 @@ import { FermentationChemistry } from "../../fermentationChemistry/base/Fermenta
 import { Batch } from "../../batch/base/Batch";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
+import { Asset } from "../../asset/base/Asset";
 
 @ObjectType()
 class Lot {
@@ -194,6 +195,15 @@ class Lot {
   @Type(() => InventoryTransfer)
   @IsOptional()
   inventoryTransfers?: Array<InventoryTransfer>;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  fromAsset?: Asset | null;
 }
 
 export { Lot as Lot };

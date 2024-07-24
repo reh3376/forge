@@ -22,6 +22,7 @@ import {
   Item as PrismaItem,
   ProductionOrder as PrismaProductionOrder,
   FermentationChemistry as PrismaFermentationChemistry,
+  Asset as PrismaAsset,
 } from "@prisma/client";
 
 export class LotServiceBase {
@@ -124,5 +125,13 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .fermentationChemistries();
+  }
+
+  async getFromAsset(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .fromAsset();
   }
 }

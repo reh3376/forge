@@ -27,6 +27,7 @@ import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemist
 import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
 import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedManyWithoutLotsInput";
 import { InventoryTransferCreateNestedManyWithoutLotsInput } from "./InventoryTransferCreateNestedManyWithoutLotsInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
 class LotCreateInput {
@@ -193,6 +194,18 @@ class LotCreateInput {
     nullable: true,
   })
   inventoryTransfers?: InventoryTransferCreateNestedManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  fromAsset?: AssetWhereUniqueInput | null;
 }
 
 export { LotCreateInput as LotCreateInput };

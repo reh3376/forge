@@ -43,6 +43,8 @@ import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/Inve
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
 import { AssetService } from "../asset.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Asset)
@@ -379,6 +381,26 @@ export class AssetResolverBase {
     @graphql.Args() args: ItemReceiptFindManyArgs
   ): Promise<ItemReceipt[]> {
     const results = await this.service.findItemReceipts(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Lot], { name: "lots" })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLots(parent.id, args);
 
     if (!results) {
       return [];

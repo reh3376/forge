@@ -53,6 +53,9 @@ import { InventoryTransferWhereUniqueInput } from "../../inventoryTransfer/base/
 import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindManyArgs";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -1617,6 +1620,145 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       itemReceipts: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lots")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLots(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLots(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        externalId: true,
+        id: true,
+        lotNumber: true,
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+        globalId: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectLots(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateLots(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lots")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLots(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lots: {
         disconnect: body,
       },
     };

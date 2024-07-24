@@ -33,6 +33,7 @@ import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransf
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { AssetUpdateManyWithoutAssetsInput } from "./AssetUpdateManyWithoutAssetsInput";
 import { ItemReceiptUpdateManyWithoutAssetsInput } from "./ItemReceiptUpdateManyWithoutAssetsInput";
+import { LotUpdateManyWithoutAssetsInput } from "./LotUpdateManyWithoutAssetsInput";
 
 @InputType()
 class AssetUpdateInput {
@@ -296,6 +297,18 @@ class AssetUpdateInput {
     nullable: true,
   })
   itemReceipts?: ItemReceiptUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lots?: LotUpdateManyWithoutAssetsInput;
 }
 
 export { AssetUpdateInput as AssetUpdateInput };

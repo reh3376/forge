@@ -1138,6 +1138,12 @@ export class ItemControllerBase {
         },
 
         isRawMaterial: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (results === null) {
