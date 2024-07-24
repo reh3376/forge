@@ -303,14 +303,14 @@ class RecipeParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  operationIndex?: StringNullableFilter;
+  operationIndex?: IntNullableFilter;
 }
 
 export { RecipeParameterWhereInput as RecipeParameterWhereInput };

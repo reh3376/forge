@@ -273,15 +273,15 @@ class RecipeParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsInt()
+  @Max(9999)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Number, {
     nullable: true,
   })
-  operationIndex?: string | null;
+  operationIndex?: number | null;
 }
 
 export { RecipeParameterCreateInput as RecipeParameterCreateInput };
