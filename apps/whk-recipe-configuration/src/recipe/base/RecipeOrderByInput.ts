@@ -249,7 +249,7 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  classId?: SortOrder;
+  classIdId?: SortOrder;
 }
 
 export { RecipeOrderByInput as RecipeOrderByInput };
