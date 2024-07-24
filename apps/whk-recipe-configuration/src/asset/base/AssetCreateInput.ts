@@ -31,6 +31,9 @@ import { InventoryCreateNestedManyWithoutAssetsInput } from "./InventoryCreateNe
 import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCreateNestedManyWithoutAssetsInput";
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { AssetCreateNestedManyWithoutAssetsInput } from "./AssetCreateNestedManyWithoutAssetsInput";
+import { ItemReceiptCreateNestedManyWithoutAssetsInput } from "./ItemReceiptCreateNestedManyWithoutAssetsInput";
+import { LotCreateNestedManyWithoutAssetsInput } from "./LotCreateNestedManyWithoutAssetsInput";
 
 @InputType()
 class AssetCreateInput {
@@ -255,15 +258,39 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
+    type: () => AssetCreateNestedManyWithoutAssetsInput,
   })
   @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
+  @Type(() => AssetCreateNestedManyWithoutAssetsInput)
   @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
+  @Field(() => AssetCreateNestedManyWithoutAssetsInput, {
     nullable: true,
   })
-  children?: AssetWhereUniqueInput | null;
+  children?: AssetCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceiptCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => ItemReceiptCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutAssetsInput;
 }
 
 export { AssetCreateInput as AssetCreateInput };

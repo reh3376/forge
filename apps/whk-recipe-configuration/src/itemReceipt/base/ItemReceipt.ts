@@ -31,6 +31,7 @@ import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Item } from "../../item/base/Item";
+import { Asset } from "../../asset/base/Asset";
 
 @ObjectType()
 class ItemReceipt {
@@ -225,6 +226,15 @@ class ItemReceipt {
     nullable: true,
   })
   testsPassed!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  toAsset?: Asset | null;
 }
 
 export { ItemReceipt as ItemReceipt };

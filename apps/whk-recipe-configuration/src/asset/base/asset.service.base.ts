@@ -22,6 +22,8 @@ import {
   Inventory as PrismaInventory,
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
+  ItemReceipt as PrismaItemReceipt,
+  Lot as PrismaLot,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -146,19 +148,44 @@ export class AssetServiceBase {
       .inventoryTransfersTo(args);
   }
 
+  async findChildren(
+    parentId: string,
+    args: Prisma.AssetFindManyArgs
+  ): Promise<PrismaAsset[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .children(args);
+  }
+
+  async findItemReceipts(
+    parentId: string,
+    args: Prisma.ItemReceiptFindManyArgs
+  ): Promise<PrismaItemReceipt[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .itemReceipts(args);
+  }
+
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
+  }
+
   async getParent(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.asset
       .findUnique({
         where: { id: parentId },
       })
       .parent();
-  }
-
-  async getChildren(parentId: string): Promise<PrismaAsset | null> {
-    return this.prisma.asset
-      .findUnique({
-        where: { id: parentId },
-      })
-      .children();
   }
 }

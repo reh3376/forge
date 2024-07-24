@@ -20,6 +20,8 @@ import {
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   Lot as PrismaLot,
   RecipeParameter as PrismaRecipeParameter,
+  RecipeBomItem as PrismaRecipeBomItem,
+  Batch as PrismaBatch,
   RecipeGroup as PrismaRecipeGroup,
   Customer as PrismaCustomer,
   Item as PrismaItem,
@@ -116,6 +118,39 @@ export class RecipeServiceBase {
       .parameters(args);
   }
 
+  async findInstances(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .instances(args);
+  }
+
+  async findRecipeBoms(
+    parentId: string,
+    args: Prisma.RecipeBomItemFindManyArgs
+  ): Promise<PrismaRecipeBomItem[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipeBoms(args);
+  }
+
+  async findBatches(
+    parentId: string,
+    args: Prisma.BatchFindManyArgs
+  ): Promise<PrismaBatch[]> {
+    return this.prisma.recipe
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batches(args);
+  }
+
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
     return this.prisma.recipe
       .findUnique({
@@ -138,5 +173,13 @@ export class RecipeServiceBase {
         where: { id: parentId },
       })
       .item();
+  }
+
+  async getClassId(parentId: string): Promise<PrismaRecipe | null> {
+    return this.prisma.recipe
+      .findUnique({
+        where: { id: parentId },
+      })
+      .classId();
   }
 }

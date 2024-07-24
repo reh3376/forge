@@ -397,12 +397,6 @@ export class InventoryTransferControllerBase {
             id: true,
           },
         },
-
-        children: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (results === null) {

@@ -37,6 +37,10 @@ import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
@@ -120,6 +124,12 @@ export class RecipeResolverBase {
               connect: args.data.item,
             }
           : undefined,
+
+        classId: args.data.classId
+          ? {
+              connect: args.data.classId,
+            }
+          : undefined,
       },
     });
   }
@@ -153,6 +163,12 @@ export class RecipeResolverBase {
           item: args.data.item
             ? {
                 connect: args.data.item,
+              }
+            : undefined,
+
+          classId: args.data.classId
+            ? {
+                connect: args.data.classId,
               }
             : undefined,
         },
@@ -293,6 +309,66 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Recipe], { name: "instances" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBoms" })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBoms(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: RecipeBomItemFindManyArgs
+  ): Promise<RecipeBomItem[]> {
+    const results = await this.service.findRecipeBoms(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Batch], { name: "batches" })
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: BatchFindManyArgs
+  ): Promise<Batch[]> {
+    const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => RecipeGroup, {
     nullable: true,
     name: "recipeGroup",
@@ -346,6 +422,25 @@ export class RecipeResolverBase {
   })
   async getItem(@graphql.Parent() parent: Recipe): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Recipe, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(@graphql.Parent() parent: Recipe): Promise<Recipe | null> {
+    const result = await this.service.getClassId(parent.id);
 
     if (!result) {
       return null;

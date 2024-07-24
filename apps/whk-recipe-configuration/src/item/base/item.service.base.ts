@@ -26,6 +26,7 @@ import {
   Inventory as PrismaInventory,
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
+  RecipeBomItem as PrismaRecipeBomItem,
   Vendor as PrismaVendor,
 } from "@prisma/client";
 
@@ -182,6 +183,17 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .inventoryTransfers(args);
+  }
+
+  async findRecipeBoms(
+    parentId: string,
+    args: Prisma.RecipeBomItemFindManyArgs
+  ): Promise<PrismaRecipeBomItem[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipeBoms(args);
   }
 
   async getVendor(parentId: string): Promise<PrismaVendor | null> {
