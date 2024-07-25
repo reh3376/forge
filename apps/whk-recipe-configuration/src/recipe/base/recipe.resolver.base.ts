@@ -329,17 +329,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBoms" })
+  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBomItems" })
   @nestAccessControl.UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
   })
-  async findRecipeBoms(
+  async findRecipeBomItems(
     @graphql.Parent() parent: Recipe,
     @graphql.Args() args: RecipeBomItemFindManyArgs
   ): Promise<RecipeBomItem[]> {
-    const results = await this.service.findRecipeBoms(parent.id, args);
+    const results = await this.service.findRecipeBomItems(parent.id, args);
 
     if (!results) {
       return [];

@@ -20,7 +20,6 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { IntFilter } from "../../util/IntFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 import { RecipeBomItemListRelationFilter } from "./RecipeBomItemListRelationFilter";
@@ -125,14 +124,14 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: DecimalNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => DecimalNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => DecimalNullableFilter, {
     nullable: true,
   })
-  quantity?: IntNullableFilter;
+  quantity?: DecimalNullableFilter;
 
   @ApiProperty({
     required: false,

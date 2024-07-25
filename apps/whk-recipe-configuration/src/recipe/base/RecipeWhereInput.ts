@@ -342,7 +342,7 @@ class RecipeWhereInput {
   @Field(() => RecipeBomItemListRelationFilter, {
     nullable: true,
   })
-  recipeBoms?: RecipeBomItemListRelationFilter;
+  recipeBomItems?: RecipeBomItemListRelationFilter;
 
   @ApiProperty({
     required: false,
