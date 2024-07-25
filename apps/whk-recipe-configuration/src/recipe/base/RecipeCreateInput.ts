@@ -344,7 +344,7 @@ class RecipeCreateInput {
   @Field(() => RecipeBomItemCreateNestedManyWithoutRecipesInput, {
     nullable: true,
   })
-  recipeBoms?: RecipeBomItemCreateNestedManyWithoutRecipesInput;
+  recipeBomItems?: RecipeBomItemCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

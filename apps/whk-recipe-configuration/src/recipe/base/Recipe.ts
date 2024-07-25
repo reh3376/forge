@@ -329,7 +329,7 @@ class Recipe {
   @ValidateNested()
   @Type(() => RecipeBomItem)
   @IsOptional()
-  recipeBoms?: Array<RecipeBomItem>;
+  recipeBomItems?: Array<RecipeBomItem>;
 
   @ApiProperty({
     required: false,

@@ -129,7 +129,7 @@ export class RecipeServiceBase {
       .instances(args);
   }
 
-  async findRecipeBoms(
+  async findRecipeBomItems(
     parentId: string,
     args: Prisma.RecipeBomItemFindManyArgs
   ): Promise<PrismaRecipeBomItem[]> {
@@ -137,7 +137,7 @@ export class RecipeServiceBase {
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .recipeBoms(args);
+      .recipeBomItems(args);
   }
 
   async findBatches(

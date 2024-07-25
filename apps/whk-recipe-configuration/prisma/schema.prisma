@@ -240,7 +240,7 @@ model Recipe {
   classId                       Recipe?                        @relation(name: "RecipeClassIdRecipeInstances", fields: [classIdId], references: [id])
   classIdId                     String?
   instances                     Recipe[]                       @relation(name: "RecipeClassIdRecipeInstances")
-  recipeBoms                    RecipeBomItem[]
+  recipeBomItems                RecipeBomItem[]
   batches                       Batch[]
 
   @@unique([itemId, customerId])
@@ -918,7 +918,7 @@ model RecipeBomItem {
   operation            EnumRecipeBomItemOperation
   operationIndex       Int                        @default(-1)
   isClassDefinition    Boolean?                   @default(false)
-  quantity             Int?
+  quantity             Decimal?
   units                String
   quantityActual       Decimal?
   classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classIdid], references: [id])

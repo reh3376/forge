@@ -127,14 +127,13 @@ class RecipeBomItemUpdateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Float, {
     nullable: true,
   })
-  quantity?: number | null;
+  quantity?: Decimal | null;
 
   @ApiProperty({
     required: false,

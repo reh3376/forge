@@ -350,7 +350,7 @@ class RecipeUpdateInput {
   @Field(() => RecipeBomItemUpdateManyWithoutRecipesInput, {
     nullable: true,
   })
-  recipeBoms?: RecipeBomItemUpdateManyWithoutRecipesInput;
+  recipeBomItems?: RecipeBomItemUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
