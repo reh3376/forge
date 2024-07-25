@@ -1554,6 +1554,8 @@ export class AssetControllerBase {
             id: true,
           },
         },
+
+        lots: true,
       },
     });
     if (results === null) {

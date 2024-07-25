@@ -31,6 +31,9 @@ import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameterCreateNestedManyWithoutItemReceiptsInput } from "./TestParameterCreateNestedManyWithoutItemReceiptsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 
 @InputType()
 class ItemReceiptCreateInput {
@@ -220,6 +223,16 @@ class ItemReceiptCreateInput {
     nullable: true,
   })
   toAsset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lots?: InputJsonValue;
 }
 
 export { ItemReceiptCreateInput as ItemReceiptCreateInput };

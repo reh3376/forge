@@ -741,6 +741,8 @@ export class ItemControllerBase {
             id: true,
           },
         },
+
+        lots: true,
       },
     });
     if (results === null) {

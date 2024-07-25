@@ -531,6 +531,8 @@ export class PurchaseOrderControllerBase {
             id: true,
           },
         },
+
+        lots: true,
       },
     });
     if (results === null) {

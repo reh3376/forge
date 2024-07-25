@@ -227,6 +227,17 @@ class ItemReceiptOrderByInput {
     nullable: true,
   })
   toAssetId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  lots?: SortOrder;
 }
 
 export { ItemReceiptOrderByInput as ItemReceiptOrderByInput };

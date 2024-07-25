@@ -111,6 +111,8 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        lots: true,
       },
     });
   }
@@ -168,6 +170,8 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        lots: true,
       },
     });
   }
@@ -226,6 +230,8 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        lots: true,
       },
     });
     if (result === null) {
@@ -314,6 +320,8 @@ export class ItemReceiptControllerBase {
               id: true,
             },
           },
+
+          lots: true,
         },
       });
     } catch (error) {
