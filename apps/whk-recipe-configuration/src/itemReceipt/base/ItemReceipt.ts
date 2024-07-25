@@ -32,6 +32,9 @@ import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { JsonValue } from "type-fest";
 
 @ObjectType()
 class ItemReceipt {
@@ -235,6 +238,16 @@ class ItemReceipt {
   @Type(() => Asset)
   @IsOptional()
   toAsset?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lots!: JsonValue;
 }
 
 export { ItemReceipt as ItemReceipt };

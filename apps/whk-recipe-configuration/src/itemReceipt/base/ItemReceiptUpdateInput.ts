@@ -31,6 +31,9 @@ import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameterUpdateManyWithoutItemReceiptsInput } from "./TestParameterUpdateManyWithoutItemReceiptsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
 
 @InputType()
 class ItemReceiptUpdateInput {
@@ -235,6 +238,16 @@ class ItemReceiptUpdateInput {
     nullable: true,
   })
   toAsset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lots?: InputJsonValue;
 }
 
 export { ItemReceiptUpdateInput as ItemReceiptUpdateInput };

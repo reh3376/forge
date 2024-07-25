@@ -607,6 +607,7 @@ model ItemReceipt {
   testsPassed     Boolean?               @default(false)
   toAsset         Asset?                 @relation(fields: [toAssetId], references: [id])
   toAssetId       String?
+  lots            Json?
 }
 
 model Lot {

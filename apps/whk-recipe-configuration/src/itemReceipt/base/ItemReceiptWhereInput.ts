@@ -25,6 +25,7 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
 class ItemReceiptWhereInput {
@@ -251,6 +252,17 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   toAsset?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  lots?: JsonFilter;
 }
 
 export { ItemReceiptWhereInput as ItemReceiptWhereInput };
