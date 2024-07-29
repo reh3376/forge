@@ -26,12 +26,12 @@ import { RecipeGroup } from "./RecipeGroup";
 import { RecipeGroupFindManyArgs } from "./RecipeGroupFindManyArgs";
 import { RecipeGroupWhereUniqueInput } from "./RecipeGroupWhereUniqueInput";
 import { RecipeGroupUpdateInput } from "./RecipeGroupUpdateInput";
-import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
-import { Recipe } from "../../recipe/base/Recipe";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
@@ -63,15 +63,15 @@ export class RecipeGroupControllerBase {
     return await this.service.createRecipeGroup({
       data: data,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
         recipe: true,
         revision: true,
         schemaVersion: true,
-        createdBy: true,
+        updatedAt: true,
         updatedBy: true,
-        globalId: true,
       },
     });
   }
@@ -93,15 +93,15 @@ export class RecipeGroupControllerBase {
     return this.service.recipeGroups({
       ...args,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
         recipe: true,
         revision: true,
         schemaVersion: true,
-        createdBy: true,
+        updatedAt: true,
         updatedBy: true,
-        globalId: true,
       },
     });
   }
@@ -124,15 +124,15 @@ export class RecipeGroupControllerBase {
     const result = await this.service.recipeGroup({
       where: params,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
         recipe: true,
         revision: true,
         schemaVersion: true,
-        createdBy: true,
+        updatedAt: true,
         updatedBy: true,
-        globalId: true,
       },
     });
     if (result === null) {
@@ -167,15 +167,15 @@ export class RecipeGroupControllerBase {
         where: params,
         data: data,
         select: {
-          id: true,
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          globalId: true,
+          id: true,
           recipe: true,
           revision: true,
           schemaVersion: true,
-          createdBy: true,
+          updatedAt: true,
           updatedBy: true,
-          globalId: true,
         },
       });
     } catch (error) {
@@ -186,141 +186,6 @@ export class RecipeGroupControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipes")
-  @ApiNestedQuery(RecipeFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipes(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeGroupWhereUniqueInput
-  ): Promise<Recipe[]> {
-    const query = plainToClass(RecipeFindManyArgs, request.query);
-    const results = await this.service.findRecipes(params.id, {
-      ...query,
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
-        Recipe: true,
-
-        recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/recipes")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "update",
-    possession: "any",
-  })
-  async connectRecipes(
-    @common.Param() params: RecipeGroupWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipes: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/recipes")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "update",
-    possession: "any",
-  })
-  async updateRecipes(
-    @common.Param() params: RecipeGroupWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipes: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/recipes")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectRecipes(
-    @common.Param() params: RecipeGroupWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipes: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeGroup({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -339,10 +204,6 @@ export class RecipeGroupControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-
         bom: {
           select: {
             id: true,
@@ -351,15 +212,34 @@ export class RecipeGroupControllerBase {
 
         className: true,
         complete: true,
+        completedCooks: true,
+        completedFermenters: true,
+        completedQuantity: true,
+        createdAt: true,
         createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        endDate: true,
+        globalId: true,
+        id: true,
         inProcess: true,
-        updatedBy: true,
 
         item: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        plannedCooks: true,
+        plannedFermenters: true,
+        quantity: true,
 
         recipe: {
           select: {
@@ -373,7 +253,13 @@ export class RecipeGroupControllerBase {
           },
         },
 
-        customer: {
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduleOrder: {
           select: {
             id: true,
           },
@@ -382,31 +268,10 @@ export class RecipeGroupControllerBase {
         scheduled: true,
         schemaVersion: true,
         startDate: true,
-        endDate: true,
         status: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customerCode: true,
         units: true,
-        quantity: true,
-        name: true,
-        plannedCooks: true,
-        completedCooks: true,
-        plannedFermenters: true,
-        completedFermenters: true,
-        completedQuantity: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -484,6 +349,142 @@ export class RecipeGroupControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipes")
+  @ApiNestedQuery(RecipeFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipes(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeGroupWhereUniqueInput
+  ): Promise<Recipe[]> {
+    const query = plainToClass(RecipeFindManyArgs, request.query);
+    const results = await this.service.findRecipes(params.id, {
+      ...query,
+      select: {
+        Recipe: true,
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipes(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipes(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeGroup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipes(
+    @common.Param() params: RecipeGroupWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/scheduleOrders")
   @ApiNestedQuery(ScheduleOrderFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -499,14 +500,34 @@ export class RecipeGroupControllerBase {
     const results = await this.service.findScheduleOrders(params.id, {
       ...query,
       select: {
-        id: true,
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
-        updatedAt: true,
-        status: true,
         createdBy: true,
-        updatedBy: true,
+        customers: true,
+        duration: true,
+        durationUnits: true,
+        estimatedDistillationTime: true,
+        estimatedEnd: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedStart: true,
+        estimatedTotalProductionTime: true,
+        globalId: true,
+        id: true,
+        name: true,
+        productionOrderAllocation: true,
 
         recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleOrderQueues: {
           select: {
             id: true,
           },
@@ -518,31 +539,11 @@ export class RecipeGroupControllerBase {
           },
         },
 
-        recipeName: true,
-        totalProofGallons: true,
-        estimatedTotalProductionTime: true,
-        estimatedMashingTime: true,
-        estimatedFermentationTime: true,
-        estimatedDistillationTime: true,
-        estimatedProcessing: true,
-        productionOrderAllocation: true,
+        status: true,
         totalBarrels: true,
-        globalId: true,
-        customers: true,
-        estimatedStart: true,
-        estimatedEnd: true,
-        actualStart: true,
-        actualEnd: true,
-        duration: true,
-        durationUnits: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
-        name: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

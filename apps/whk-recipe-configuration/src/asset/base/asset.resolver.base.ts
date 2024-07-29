@@ -25,16 +25,12 @@ import { AssetFindManyArgs } from "./AssetFindManyArgs";
 import { AssetFindUniqueArgs } from "./AssetFindUniqueArgs";
 import { CreateAssetArgs } from "./CreateAssetArgs";
 import { UpdateAssetArgs } from "./UpdateAssetArgs";
-import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
-import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
 import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFindManyArgs";
@@ -45,6 +41,10 @@ import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindM
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
+import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
+import { MashDatum } from "../../mashDatum/base/MashDatum";
+import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { AssetService } from "../asset.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Asset)
@@ -153,17 +153,37 @@ export class AssetResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
+  @graphql.ResolveField(() => [Batch], { name: "batches" })
   @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
+    resource: "Batch",
     action: "read",
     possession: "any",
   })
-  async findPurchaseOrders(
+  async findBatches(
     @graphql.Parent() parent: Asset,
-    @graphql.Args() args: PurchaseOrderFindManyArgs
-  ): Promise<PurchaseOrder[]> {
-    const results = await this.service.findPurchaseOrders(parent.id, args);
+    @graphql.Args() args: BatchFindManyArgs
+  ): Promise<Batch[]> {
+    const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Asset], { name: "children" })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async findChildren(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: AssetFindManyArgs
+  ): Promise<Asset[]> {
+    const results = await this.service.findChildren(parent.id, args);
 
     if (!results) {
       return [];
@@ -211,46 +231,6 @@ export class AssetResolverBase {
     @graphql.Args() args: FermentationDayDatumFindManyArgs
   ): Promise<FermentationDayDatum[]> {
     const results = await this.service.findFermentationDayData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
-  @nestAccessControl.UseRoles({
-    resource: "MashDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashData(
-    @graphql.Parent() parent: Asset,
-    @graphql.Args() args: MashDatumFindManyArgs
-  ): Promise<MashDatum[]> {
-    const results = await this.service.findMashData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @nestAccessControl.UseRoles({
-    resource: "Batch",
-    action: "read",
-    possession: "any",
-  })
-  async findBatches(
-    @graphql.Parent() parent: Asset,
-    @graphql.Args() args: BatchFindManyArgs
-  ): Promise<Batch[]> {
-    const results = await this.service.findBatches(parent.id, args);
 
     if (!results) {
       return [];
@@ -350,26 +330,6 @@ export class AssetResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Asset], { name: "children" })
-  @nestAccessControl.UseRoles({
-    resource: "Asset",
-    action: "read",
-    possession: "any",
-  })
-  async findChildren(
-    @graphql.Parent() parent: Asset,
-    @graphql.Args() args: AssetFindManyArgs
-  ): Promise<Asset[]> {
-    const results = await this.service.findChildren(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ItemReceipt], { name: "itemReceipts" })
   @nestAccessControl.UseRoles({
     resource: "ItemReceipt",
@@ -401,6 +361,46 @@ export class AssetResolverBase {
     @graphql.Args() args: LotFindManyArgs
   ): Promise<Lot[]> {
     const results = await this.service.findLots(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
+  @nestAccessControl.UseRoles({
+    resource: "MashDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findMashData(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: MashDatumFindManyArgs
+  ): Promise<MashDatum[]> {
+    const results = await this.service.findMashData(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "PurchaseOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findPurchaseOrders(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: PurchaseOrderFindManyArgs
+  ): Promise<PurchaseOrder[]> {
+    const results = await this.service.findPurchaseOrders(parent.id, args);
 
     if (!results) {
       return [];

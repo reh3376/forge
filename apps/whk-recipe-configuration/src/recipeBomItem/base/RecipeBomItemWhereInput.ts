@@ -11,23 +11,57 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
+import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { RecipeBomItemListRelationFilter } from "./RecipeBomItemListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { IntFilter } from "../../util/IntFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
-import { RecipeBomItemListRelationFilter } from "./RecipeBomItemListRelationFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
 @InputType()
 class RecipeBomItemWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeBomItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -38,6 +72,29 @@ class RecipeBomItemWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeBomItemListRelationFilter, {
+    nullable: true,
+  })
+  instances?: RecipeBomItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -53,37 +110,26 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeWhereUniqueInput,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  lot?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolStepListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
+  @Type(() => MashingProtocolStepListRelationFilter)
   @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
+  @Field(() => MashingProtocolStepListRelationFilter, {
     nullable: true,
   })
-  recipe?: RecipeWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  createdBy?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeNullableFilter,
-  })
-  @Type(() => DateTimeNullableFilter)
-  @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
-    nullable: true,
-  })
-  updatedBy?: DateTimeNullableFilter;
+  mashingProtocolSteps?: MashingProtocolStepListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -113,17 +159,6 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isClassDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: DecimalNullableFilter,
   })
   @Type(() => DecimalNullableFilter)
@@ -132,17 +167,6 @@ class RecipeBomItemWhereInput {
     nullable: true,
   })
   quantity?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  units?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -157,61 +181,37 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemWhereUniqueInput,
+    type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemWhereUniqueInput)
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomItemWhereUniqueInput, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  classId?: RecipeBomItemWhereUniqueInput;
+  recipe?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemListRelationFilter,
+    type: StringFilter,
   })
-  @ValidateNested()
-  @Type(() => RecipeBomItemListRelationFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => RecipeBomItemListRelationFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  instances?: RecipeBomItemListRelationFilter;
+  units?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: DateTimeNullableFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => DateTimeNullableFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => DateTimeNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  lot?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingProtocolStepListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashingProtocolStepListRelationFilter)
-  @IsOptional()
-  @Field(() => MashingProtocolStepListRelationFilter, {
-    nullable: true,
-  })
-  mashingProtocolSteps?: MashingProtocolStepListRelationFilter;
+  updatedBy?: DateTimeNullableFilter;
 }
 
 export { RecipeBomItemWhereInput as RecipeBomItemWhereInput };

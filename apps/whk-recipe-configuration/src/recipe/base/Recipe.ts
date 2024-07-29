@@ -14,29 +14,29 @@ import { ApiProperty } from "@nestjs/swagger";
 
 import {
   IsString,
-  IsDate,
   MaxLength,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  IsBoolean,
-  ValidateNested,
+  IsDate,
   IsNumber,
 } from "class-validator";
 
+import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
-import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { Customer } from "../../customer/base/Customer";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { Decimal } from "decimal.js";
+import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
-import { Item } from "../../item/base/Item";
-import { Decimal } from "decimal.js";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
-import { Batch } from "../../batch/base/Batch";
+import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
 class Recipe {
@@ -45,69 +45,9 @@ class Recipe {
     type: String,
   })
   @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
+  @Field(() => String)
+  Recipe!: string;
 
   @ApiProperty({
     required: false,
@@ -122,6 +62,61 @@ class Recipe {
 
   @ApiProperty({
     required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
+
+  @ApiProperty({
+    required: false,
+    type: () => Recipe,
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  classId?: Recipe | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  cooksPerFerm!: number | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => Customer,
+  })
+  @ValidateNested()
+  @Type(() => Customer)
+  customer?: Customer;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -133,49 +128,16 @@ class Recipe {
   customerCode!: string | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  Recipe!: string;
-
-  @ApiProperty({
     required: false,
-    type: () => RecipeGroup,
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => RecipeGroup)
+  @IsNumber()
+  @Max(20)
   @IsOptional()
-  recipeGroup?: RecipeGroup | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [UnitProcedure],
+  @Field(() => Float, {
+    nullable: true,
   })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProcedures?: Array<UnitProcedure>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrder],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrders?: Array<ProductionOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ScheduleOrder],
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrder)
-  @IsOptional()
-  scheduleOrders?: Array<ScheduleOrder>;
+  estimatedAbv!: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -191,20 +153,40 @@ class Recipe {
 
   @ApiProperty({
     required: true,
-    type: () => Customer,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Customer)
-  customer?: Customer;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: false,
-    type: () => [ProductionOrderUnitProcedure],
+    type: () => [Recipe],
   })
   @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedure)
+  @Type(() => Recipe)
   @IsOptional()
-  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
+  instances?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
 
   @ApiProperty({
     required: false,
@@ -226,12 +208,84 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: () => Item,
+    type: () => [ProductionOrderUnitProcedure],
   })
   @ValidateNested()
-  @Type(() => Item)
+  @Type(() => ProductionOrderUnitProcedure)
   @IsOptional()
-  item?: Item | null;
+  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrders?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomItem],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  recipeBomItems?: Array<RecipeBomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroup,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroup)
+  @IsOptional()
+  recipeGroup?: RecipeGroup | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ScheduleOrder],
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrders?: Array<ScheduleOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  targetProof!: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -255,90 +309,36 @@ class Recipe {
   @Field(() => Number, {
     nullable: true,
   })
-  cooksPerFerm!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(20)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  estimatedAbv!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
   totalFermenters!: number | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: () => [UnitProcedure],
   })
-  @IsNumber()
-  @Max(99999999999)
+  @ValidateNested()
+  @Type(() => UnitProcedure)
   @IsOptional()
-  @Field(() => Float, {
+  unitProcedures?: Array<UnitProcedure>;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
     nullable: true,
   })
-  targetProof!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Recipe,
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  classId?: Recipe | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Recipe],
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  instances?: Array<Recipe>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [RecipeBomItem],
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItem)
-  @IsOptional()
-  recipeBomItems?: Array<RecipeBomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Batch],
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  batches?: Array<Batch>;
+  updatedBy!: string | null;
 }
 
 export { Recipe as Recipe };

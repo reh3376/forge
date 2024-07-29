@@ -13,15 +13,15 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsString,
-  IsDate,
-  IsEnum,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
+  IsDate,
+  IsString,
   MaxLength,
+  IsEnum,
   IsInt,
   Max,
-  IsBoolean,
-  ValidateNested,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -31,12 +31,24 @@ import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 @ObjectType()
 class Procedure {
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: Boolean,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Procedure,
+  })
+  @ValidateNested()
+  @Type(() => Procedure)
+  @IsOptional()
+  classId?: Procedure | null;
 
   @ApiProperty({
     required: true,
@@ -45,37 +57,6 @@ class Procedure {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumProcedureName,
-  })
-  @IsEnum(EnumProcedureName)
-  @IsOptional()
-  @Field(() => EnumProcedureName, {
-    nullable: true,
-  })
-  name?: "Line1" | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  description!: string | null;
 
   @ApiProperty({
     required: true,
@@ -91,24 +72,63 @@ class Procedure {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: string | null;
+  description!: string | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion!: string | null;
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Procedure],
+  })
+  @ValidateNested()
+  @Type(() => Procedure)
+  @IsOptional()
+  instances?: Array<Procedure>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumProcedureName,
+  })
+  @IsEnum(EnumProcedureName)
+  @IsOptional()
+  @Field(() => EnumProcedureName, {
+    nullable: true,
+  })
+  name?: "Line1" | null;
 
   @ApiProperty({
     required: false,
@@ -124,14 +144,15 @@ class Procedure {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
+    type: String,
   })
-  @IsBoolean()
+  @IsString()
+  @MaxLength(16)
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => String, {
     nullable: true,
   })
-  active!: boolean | null;
+  schemaVersion!: string | null;
 
   @ApiProperty({
     required: false,
@@ -143,45 +164,24 @@ class Procedure {
   unitProcedures?: Array<UnitProcedure>;
 
   @ApiProperty({
-    required: false,
-    type: Boolean,
+    required: true,
   })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Procedure,
-  })
-  @ValidateNested()
-  @Type(() => Procedure)
-  @IsOptional()
-  classId?: Procedure | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Procedure],
-  })
-  @ValidateNested()
-  @Type(() => Procedure)
-  @IsOptional()
-  instances?: Array<Procedure>;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId!: string | null;
+  updatedBy!: string | null;
 }
 
 export { Procedure as Procedure };

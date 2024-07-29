@@ -11,79 +11,29 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
 import {
+  IsBoolean,
+  ValidateNested,
+  IsOptional,
+  IsString,
+  MaxLength,
   IsEnum,
   IsInt,
   Max,
-  IsOptional,
   IsNumber,
-  IsString,
-  MaxLength,
-  IsBoolean,
-  ValidateNested,
 } from "class-validator";
 
 import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { RecipeParameterCreateNestedManyWithoutRecipeParametersInput } from "./RecipeParameterCreateNestedManyWithoutRecipeParametersInput";
-import { Decimal } from "decimal.js";
-import { RecipeCreateNestedManyWithoutRecipeParametersInput } from "./RecipeCreateNestedManyWithoutRecipeParametersInput";
 import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
+import { RecipeCreateNestedManyWithoutRecipeParametersInput } from "./RecipeCreateNestedManyWithoutRecipeParametersInput";
+import { Decimal } from "decimal.js";
+import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
 @InputType()
 class RecipeParameterCreateInput {
-  @ApiProperty({
-    required: true,
-    enum: EnumRecipeParameterRecipeSetpointType,
-  })
-  @IsEnum(EnumRecipeParameterRecipeSetpointType)
-  @Field(() => EnumRecipeParameterRecipeSetpointType)
-  recipeSetpointType!: "Boolean" | "Numeric" | "Text";
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  recipeSetpointUpperLimit?: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  recipeParamName!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  className!: string;
-
   @ApiProperty({
     required: true,
     type: Boolean,
@@ -91,97 +41,6 @@ class RecipeParameterCreateInput {
   @IsBoolean()
   @Field(() => Boolean)
   active!: boolean;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  recipeSetpointLowerLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeParamDescription?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  recipeSetpointBooleanValue?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeParamUnits?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -196,16 +55,34 @@ class RecipeParameterCreateInput {
   classId?: RecipeParameterWhereUniqueInput | null;
 
   @ApiProperty({
-    required: false,
-    type: () => RecipeParameterCreateNestedManyWithoutRecipeParametersInput,
+    required: true,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput)
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  className!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  instances?: RecipeParameterCreateNestedManyWithoutRecipeParametersInput;
+  description?: string | null;
 
   @ApiProperty({
     required: false,
@@ -221,39 +98,26 @@ class RecipeParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  recipeNumericalSetpoint?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeCreateNestedManyWithoutRecipeParametersInput,
+    type: () => RecipeParameterCreateNestedManyWithoutRecipeParametersInput,
   })
   @ValidateNested()
-  @Type(() => RecipeCreateNestedManyWithoutRecipeParametersInput)
+  @Type(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput)
   @IsOptional()
-  @Field(() => RecipeCreateNestedManyWithoutRecipeParametersInput, {
+  @Field(() => RecipeParameterCreateNestedManyWithoutRecipeParametersInput, {
     nullable: true,
   })
-  recipe?: RecipeCreateNestedManyWithoutRecipeParametersInput;
+  instances?: RecipeParameterCreateNestedManyWithoutRecipeParametersInput;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Boolean,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsBoolean()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  description?: string | null;
+  isClassDefinition?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -282,6 +146,142 @@ class RecipeParameterCreateInput {
     nullable: true,
   })
   operationIndex?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutRecipeParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutRecipeParametersInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutRecipeParametersInput, {
+    nullable: true,
+  })
+  recipe?: RecipeCreateNestedManyWithoutRecipeParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  recipeNumericalSetpoint?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeParamDescription?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  recipeParamName!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeParamUnits?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  recipeSetpointBooleanValue?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  recipeSetpointLowerLimit?: number | null;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumRecipeParameterRecipeSetpointType,
+  })
+  @IsEnum(EnumRecipeParameterRecipeSetpointType)
+  @Field(() => EnumRecipeParameterRecipeSetpointType)
+  recipeSetpointType!: "Boolean" | "Numeric" | "Text";
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  recipeSetpointUpperLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { RecipeParameterCreateInput as RecipeParameterCreateInput };

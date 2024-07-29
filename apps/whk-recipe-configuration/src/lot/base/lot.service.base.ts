@@ -17,12 +17,12 @@ import {
   Batch as PrismaBatch,
   BomItem as PrismaBomItem,
   InventoryTransfer as PrismaInventoryTransfer,
-  PurchaseOrder as PrismaPurchaseOrder,
-  Recipe as PrismaRecipe,
-  Item as PrismaItem,
-  ProductionOrder as PrismaProductionOrder,
   FermentationChemistry as PrismaFermentationChemistry,
   Asset as PrismaAsset,
+  Item as PrismaItem,
+  ProductionOrder as PrismaProductionOrder,
+  PurchaseOrder as PrismaPurchaseOrder,
+  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class LotServiceBase {
@@ -81,22 +81,22 @@ export class LotServiceBase {
       .inventoryTransfers(args);
   }
 
-  async getPurchaseOrderAcceptedLots(
+  async getFermentationChemistries(
     parentId: string
-  ): Promise<PrismaPurchaseOrder | null> {
+  ): Promise<PrismaFermentationChemistry | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
       })
-      .purchaseOrderAcceptedLots();
+      .fermentationChemistries();
   }
 
-  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
+  async getFromAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
       })
-      .recipe();
+      .fromAsset();
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {
@@ -117,21 +117,21 @@ export class LotServiceBase {
       .productionOrder();
   }
 
-  async getFermentationChemistries(
+  async getPurchaseOrderAcceptedLots(
     parentId: string
-  ): Promise<PrismaFermentationChemistry | null> {
+  ): Promise<PrismaPurchaseOrder | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
       })
-      .fermentationChemistries();
+      .purchaseOrderAcceptedLots();
   }
 
-  async getFromAsset(parentId: string): Promise<PrismaAsset | null> {
+  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
     return this.prisma.lot
       .findUnique({
         where: { id: parentId },
       })
-      .fromAsset();
+      .recipe();
   }
 }

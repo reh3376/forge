@@ -14,13 +14,13 @@ import { ApiProperty } from "@nestjs/swagger";
 
 import {
   IsString,
-  IsDate,
+  MaxLength,
+  ValidateNested,
+  IsOptional,
+  IsBoolean,
   IsNumber,
   Max,
-  IsOptional,
-  MaxLength,
-  IsBoolean,
-  ValidateNested,
+  IsDate,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -33,24 +33,29 @@ class UnitLookup {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
   @Field(() => String)
-  id!: string;
+  abbreviation!: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: () => UnitLookup,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
+  @ValidateNested()
+  @Type(() => UnitLookup)
+  @IsOptional()
+  baseRecord?: UnitLookup | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: Boolean,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  baseUnit!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -66,30 +71,28 @@ class UnitLookup {
 
   @ApiProperty({
     required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  typeName!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  abbreviation!: string;
 
   @ApiProperty({
     required: true,
@@ -110,24 +113,13 @@ class UnitLookup {
   pluralName!: string;
 
   @ApiProperty({
-    required: false,
-    type: Boolean,
+    required: true,
+    type: String,
   })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  baseUnit!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitLookup,
-  })
-  @ValidateNested()
-  @Type(() => UnitLookup)
-  @IsOptional()
-  baseRecord?: UnitLookup | null;
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  typeName!: string;
 
   @ApiProperty({
     required: false,
@@ -137,6 +129,14 @@ class UnitLookup {
   @Type(() => UnitLookup)
   @IsOptional()
   unitLookupRecords?: Array<UnitLookup>;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 }
 
 export { UnitLookup as UnitLookup };

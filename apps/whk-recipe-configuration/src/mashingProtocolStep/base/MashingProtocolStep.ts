@@ -13,72 +13,27 @@ import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsString,
-  IsDate,
-  ValidateNested,
-  IsOptional,
-  IsInt,
-  Max,
   IsBoolean,
+  IsOptional,
   IsNumber,
-  IsEnum,
+  Max,
+  IsDate,
+  IsString,
   MaxLength,
+  IsEnum,
+  IsInt,
+  ValidateNested,
 } from "class-validator";
 
-import { Type } from "class-transformer";
-import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { Decimal } from "decimal.js";
+import { Type } from "class-transformer";
+import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
+import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
-import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 
 @ObjectType()
 class MashingProtocolStep {
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingProtocol,
-  })
-  @ValidateNested()
-  @Type(() => MashingProtocol)
-  @IsOptional()
-  mashingProtocol?: MashingProtocol | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(40)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  index!: number | null;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -126,6 +81,23 @@ class MashingProtocolStep {
   coolTempSp!: Decimal | null;
 
   @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
     required: false,
     type: Boolean,
   })
@@ -150,12 +122,34 @@ class MashingProtocolStep {
 
   @ApiProperty({
     required: false,
-    type: () => [RecipeBomItem],
+    enum: EnumMashingProtocolStepHoldType,
   })
-  @ValidateNested()
-  @Type(() => RecipeBomItem)
+  @IsEnum(EnumMashingProtocolStepHoldType)
   @IsOptional()
-  recipeBomItem?: Array<RecipeBomItem>;
+  @Field(() => EnumMashingProtocolStepHoldType, {
+    nullable: true,
+  })
+  holdType?: "Heat" | "Cool" | "Hold" | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(40)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  index!: number | null;
 
   @ApiProperty({
     required: false,
@@ -167,6 +161,24 @@ class MashingProtocolStep {
     nullable: true,
   })
   isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocol,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  mashingProtocol?: MashingProtocol | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomItem],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  recipeBomItem?: Array<RecipeBomItem>;
 
   @ApiProperty({
     required: false,
@@ -191,14 +203,15 @@ class MashingProtocolStep {
 
   @ApiProperty({
     required: false,
-    enum: EnumMashingProtocolStepHoldType,
+    type: Number,
   })
-  @IsEnum(EnumMashingProtocolStepHoldType)
+  @IsNumber()
+  @Max(250)
   @IsOptional()
-  @Field(() => EnumMashingProtocolStepHoldType, {
+  @Field(() => Float, {
     nullable: true,
   })
-  holdType?: "Heat" | "Cool" | "Hold" | null;
+  temperatureActual!: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -213,25 +226,12 @@ class MashingProtocolStep {
   temperatureSetpoint!: Decimal | null;
 
   @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(250)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  temperatureActual!: Decimal | null;
-
-  @ApiProperty({
     required: true,
-    type: String,
   })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  createdBy!: string;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: false,

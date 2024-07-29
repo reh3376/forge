@@ -27,8 +27,8 @@ import { CreateBatchArgs } from "./CreateBatchArgs";
 import { UpdateBatchArgs } from "./UpdateBatchArgs";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { Lot } from "../../lot/base/Lot";
 import { Asset } from "../../asset/base/Asset";
+import { Lot } from "../../lot/base/Lot";
 import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -95,9 +95,9 @@ export class BatchResolverBase {
       data: {
         ...args.data,
 
-        parent: args.data.parent
+        asset: args.data.asset
           ? {
-              connect: args.data.parent,
+              connect: args.data.asset,
             }
           : undefined,
 
@@ -107,9 +107,9 @@ export class BatchResolverBase {
             }
           : undefined,
 
-        asset: args.data.asset
+        parent: args.data.parent
           ? {
-              connect: args.data.asset,
+              connect: args.data.parent,
             }
           : undefined,
 
@@ -138,9 +138,9 @@ export class BatchResolverBase {
         data: {
           ...args.data,
 
-          parent: args.data.parent
+          asset: args.data.asset
             ? {
-                connect: args.data.parent,
+                connect: args.data.asset,
               }
             : undefined,
 
@@ -150,9 +150,9 @@ export class BatchResolverBase {
               }
             : undefined,
 
-          asset: args.data.asset
+          parent: args.data.parent
             ? {
-                connect: args.data.asset,
+                connect: args.data.parent,
               }
             : undefined,
 
@@ -219,17 +219,17 @@ export class BatchResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Batch, {
+  @graphql.ResolveField(() => Asset, {
     nullable: true,
-    name: "parent",
+    name: "asset",
   })
   @nestAccessControl.UseRoles({
-    resource: "Batch",
+    resource: "Asset",
     action: "read",
     possession: "any",
   })
-  async getParent(@graphql.Parent() parent: Batch): Promise<Batch | null> {
-    const result = await this.service.getParent(parent.id);
+  async getAsset(@graphql.Parent() parent: Batch): Promise<Asset | null> {
+    const result = await this.service.getAsset(parent.id);
 
     if (!result) {
       return null;
@@ -257,17 +257,17 @@ export class BatchResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Asset, {
+  @graphql.ResolveField(() => Batch, {
     nullable: true,
-    name: "asset",
+    name: "parent",
   })
   @nestAccessControl.UseRoles({
-    resource: "Asset",
+    resource: "Batch",
     action: "read",
     possession: "any",
   })
-  async getAsset(@graphql.Parent() parent: Batch): Promise<Asset | null> {
-    const result = await this.service.getAsset(parent.id);
+  async getParent(@graphql.Parent() parent: Batch): Promise<Batch | null> {
+    const result = await this.service.getParent(parent.id);
 
     if (!result) {
       return null;

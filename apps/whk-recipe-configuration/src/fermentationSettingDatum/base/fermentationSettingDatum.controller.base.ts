@@ -55,22 +55,33 @@ export class FermentationSettingDatumControllerBase {
       data: {
         ...data,
 
-        operation: data.operation
-          ? {
-              connect: data.operation,
-            }
-          : undefined,
-
         fermentationChemistries: data.fermentationChemistries
           ? {
               connect: data.fermentationChemistries,
             }
           : undefined,
+
+        operation: data.operation
+          ? {
+              connect: data.operation,
+            }
+          : undefined,
       },
       select: {
-        id: true,
+        acid: true,
+        balling: true,
         createdAt: true,
-        updatedAt: true,
+        dryInches: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
         lotId: true,
 
         operation: {
@@ -79,21 +90,11 @@ export class FermentationSettingDatumControllerBase {
           },
         },
 
-        fermenterNumber: true,
-        yeastPitchTime: true,
+        pH: true,
         setTime: true,
         temperature: true,
-        dryInches: true,
-        balling: true,
-        acid: true,
-        pH: true,
-        loggedBy: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
+        updatedAt: true,
+        yeastPitchTime: true,
       },
     });
   }
@@ -120,9 +121,20 @@ export class FermentationSettingDatumControllerBase {
     return this.service.fermentationSettingData({
       ...args,
       select: {
-        id: true,
+        acid: true,
+        balling: true,
         createdAt: true,
-        updatedAt: true,
+        dryInches: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
         lotId: true,
 
         operation: {
@@ -131,21 +143,11 @@ export class FermentationSettingDatumControllerBase {
           },
         },
 
-        fermenterNumber: true,
-        yeastPitchTime: true,
+        pH: true,
         setTime: true,
         temperature: true,
-        dryInches: true,
-        balling: true,
-        acid: true,
-        pH: true,
-        loggedBy: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
+        updatedAt: true,
+        yeastPitchTime: true,
       },
     });
   }
@@ -168,9 +170,20 @@ export class FermentationSettingDatumControllerBase {
     const result = await this.service.fermentationSettingDatum({
       where: params,
       select: {
-        id: true,
+        acid: true,
+        balling: true,
         createdAt: true,
-        updatedAt: true,
+        dryInches: true,
+
+        fermentationChemistries: {
+          select: {
+            id: true,
+          },
+        },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
         lotId: true,
 
         operation: {
@@ -179,21 +192,11 @@ export class FermentationSettingDatumControllerBase {
           },
         },
 
-        fermenterNumber: true,
-        yeastPitchTime: true,
+        pH: true,
         setTime: true,
         temperature: true,
-        dryInches: true,
-        balling: true,
-        acid: true,
-        pH: true,
-        loggedBy: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
+        updatedAt: true,
+        yeastPitchTime: true,
       },
     });
     if (result === null) {
@@ -229,22 +232,33 @@ export class FermentationSettingDatumControllerBase {
         data: {
           ...data,
 
-          operation: data.operation
-            ? {
-                connect: data.operation,
-              }
-            : undefined,
-
           fermentationChemistries: data.fermentationChemistries
             ? {
                 connect: data.fermentationChemistries,
               }
             : undefined,
+
+          operation: data.operation
+            ? {
+                connect: data.operation,
+              }
+            : undefined,
         },
         select: {
-          id: true,
+          acid: true,
+          balling: true,
           createdAt: true,
-          updatedAt: true,
+          dryInches: true,
+
+          fermentationChemistries: {
+            select: {
+              id: true,
+            },
+          },
+
+          fermenterNumber: true,
+          id: true,
+          loggedBy: true,
           lotId: true,
 
           operation: {
@@ -253,21 +267,11 @@ export class FermentationSettingDatumControllerBase {
             },
           },
 
-          fermenterNumber: true,
-          yeastPitchTime: true,
+          pH: true,
           setTime: true,
           temperature: true,
-          dryInches: true,
-          balling: true,
-          acid: true,
-          pH: true,
-          loggedBy: true,
-
-          fermentationChemistries: {
-            select: {
-              id: true,
-            },
-          },
+          updatedAt: true,
+          yeastPitchTime: true,
         },
       });
     } catch (error) {

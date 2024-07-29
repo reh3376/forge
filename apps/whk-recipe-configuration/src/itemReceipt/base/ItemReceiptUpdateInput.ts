@@ -17,23 +17,23 @@ import {
   MaxLength,
   IsOptional,
   ValidateNested,
-  IsNumber,
-  Max,
-  IsEnum,
   IsInt,
+  Max,
+  IsNumber,
+  IsEnum,
   IsBoolean,
 } from "class-validator";
 
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
-import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
-import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { TestParameterUpdateManyWithoutItemReceiptsInput } from "./TestParameterUpdateManyWithoutItemReceiptsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { Decimal } from "decimal.js";
+import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
+import { TestParameterUpdateManyWithoutItemReceiptsInput } from "./TestParameterUpdateManyWithoutItemReceiptsInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
 class ItemReceiptUpdateInput {
@@ -60,6 +60,52 @@ class ItemReceiptUpdateInput {
     nullable: true,
   })
   driver?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  loadId?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lots?: InputJsonValue;
 
   @ApiProperty({
     required: false,
@@ -122,6 +168,41 @@ class ItemReceiptUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterUpdateManyWithoutItemReceiptsInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutItemReceiptsInput)
+  @IsOptional()
+  @Field(() => TestParameterUpdateManyWithoutItemReceiptsInput, {
+    nullable: true,
+  })
+  tests?: TestParameterUpdateManyWithoutItemReceiptsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testsPassed?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  toAsset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -167,87 +248,6 @@ class ItemReceiptUpdateInput {
     nullable: true,
   })
   weighOut?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterUpdateManyWithoutItemReceiptsInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterUpdateManyWithoutItemReceiptsInput)
-  @IsOptional()
-  @Field(() => TestParameterUpdateManyWithoutItemReceiptsInput, {
-    nullable: true,
-  })
-  tests?: TestParameterUpdateManyWithoutItemReceiptsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  loadId?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testsPassed?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  toAsset?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  lots?: InputJsonValue;
 }
 
 export { ItemReceiptUpdateInput as ItemReceiptUpdateInput };

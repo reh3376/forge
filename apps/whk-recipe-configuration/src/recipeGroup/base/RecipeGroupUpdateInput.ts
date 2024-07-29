@@ -15,17 +15,53 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  ValidateNested,
 } from "class-validator";
-import { RecipeUpdateManyWithoutRecipeGroupsInput } from "./RecipeUpdateManyWithoutRecipeGroupsInput";
-import { Type } from "class-transformer";
 import { ProductionOrderUpdateManyWithoutRecipeGroupsInput } from "./ProductionOrderUpdateManyWithoutRecipeGroupsInput";
+import { Type } from "class-transformer";
+import { RecipeUpdateManyWithoutRecipeGroupsInput } from "./RecipeUpdateManyWithoutRecipeGroupsInput";
 import { ScheduleOrderUpdateManyWithoutRecipeGroupsInput } from "./ScheduleOrderUpdateManyWithoutRecipeGroupsInput";
 
 @InputType()
 class RecipeGroupUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUpdateManyWithoutRecipeGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUpdateManyWithoutRecipeGroupsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUpdateManyWithoutRecipeGroupsInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderUpdateManyWithoutRecipeGroupsInput;
+
   @ApiProperty({
     required: false,
     type: String,
@@ -40,6 +76,18 @@ class RecipeGroupUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => RecipeUpdateManyWithoutRecipeGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutRecipeGroupsInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutRecipeGroupsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeUpdateManyWithoutRecipeGroupsInput;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
   @IsInt()
@@ -49,6 +97,18 @@ class RecipeGroupUpdateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderUpdateManyWithoutRecipeGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderUpdateManyWithoutRecipeGroupsInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderUpdateManyWithoutRecipeGroupsInput, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderUpdateManyWithoutRecipeGroupsInput;
 
   @ApiProperty({
     required: false,
@@ -72,67 +132,7 @@ class RecipeGroupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  createdBy?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
   updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeUpdateManyWithoutRecipeGroupsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeUpdateManyWithoutRecipeGroupsInput)
-  @IsOptional()
-  @Field(() => RecipeUpdateManyWithoutRecipeGroupsInput, {
-    nullable: true,
-  })
-  recipes?: RecipeUpdateManyWithoutRecipeGroupsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUpdateManyWithoutRecipeGroupsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUpdateManyWithoutRecipeGroupsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUpdateManyWithoutRecipeGroupsInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderUpdateManyWithoutRecipeGroupsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderUpdateManyWithoutRecipeGroupsInput,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderUpdateManyWithoutRecipeGroupsInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderUpdateManyWithoutRecipeGroupsInput, {
-    nullable: true,
-  })
-  scheduleOrders?: ScheduleOrderUpdateManyWithoutRecipeGroupsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
 }
 
 export { RecipeGroupUpdateInput as RecipeGroupUpdateInput };

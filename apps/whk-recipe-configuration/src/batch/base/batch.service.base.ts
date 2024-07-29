@@ -15,8 +15,8 @@ import {
   Prisma,
   Batch as PrismaBatch,
   FermentationChemistry as PrismaFermentationChemistry,
-  Lot as PrismaLot,
   Asset as PrismaAsset,
+  Lot as PrismaLot,
   Recipe as PrismaRecipe,
 } from "@prisma/client";
 
@@ -65,12 +65,12 @@ export class BatchServiceBase {
       .fermentationChemistries(args);
   }
 
-  async getParent(parentId: string): Promise<PrismaBatch | null> {
+  async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.batch
       .findUnique({
         where: { id: parentId },
       })
-      .parent();
+      .asset();
   }
 
   async getLot(parentId: string): Promise<PrismaLot | null> {
@@ -81,12 +81,12 @@ export class BatchServiceBase {
       .lot();
   }
 
-  async getAsset(parentId: string): Promise<PrismaAsset | null> {
+  async getParent(parentId: string): Promise<PrismaBatch | null> {
     return this.prisma.batch
       .findUnique({
         where: { id: parentId },
       })
-      .asset();
+      .parent();
   }
 
   async getRecipe(parentId: string): Promise<PrismaRecipe | null> {

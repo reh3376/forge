@@ -13,11 +13,11 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
+  IsBoolean,
+  IsOptional,
   IsDate,
   IsString,
   MaxLength,
-  IsOptional,
-  IsBoolean,
   ValidateNested,
   IsInt,
   Max,
@@ -29,6 +29,17 @@ import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 @ObjectType()
 class Instruction {
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
+  @ApiProperty({
     required: true,
   })
   @IsDate()
@@ -38,20 +49,12 @@ class Instruction {
 
   @ApiProperty({
     required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @Field(() => String)
-  filePath!: string;
+  createdBy!: string;
 
   @ApiProperty({
     required: false,
@@ -67,32 +70,33 @@ class Instruction {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active!: boolean | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
     type: () => [EquipmentPhase],
   })
   @ValidateNested()
   @Type(() => EquipmentPhase)
   @IsOptional()
   equipmentPhase?: Array<EquipmentPhase>;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  filePath!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 
   @ApiProperty({
     required: true,
@@ -107,12 +111,12 @@ class Instruction {
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion!: string | null;
+  name!: string | null;
 
   @ApiProperty({
     required: true,
@@ -128,24 +132,20 @@ class Instruction {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  name!: string | null;
+  schemaVersion!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: String,
+    required: true,
   })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 }
 
 export { Instruction as Instruction };

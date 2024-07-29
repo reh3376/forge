@@ -11,75 +11,53 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import {
-  IsString,
-  MaxLength,
   ValidateNested,
   IsOptional,
+  IsString,
+  MaxLength,
+  IsEnum,
   IsInt,
   Min,
   Max,
-  IsEnum,
 } from "class-validator";
-import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { Type } from "class-transformer";
-import { BatchCreateNestedManyWithoutBatchesInput } from "./BatchCreateNestedManyWithoutBatchesInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { BatchCreateNestedManyWithoutBatchesInput } from "./BatchCreateNestedManyWithoutBatchesInput";
 import { FermentationChemistryCreateNestedManyWithoutBatchesInput } from "./FermentationChemistryCreateNestedManyWithoutBatchesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
+import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class BatchCreateInput {
   @ApiProperty({
-    required: true,
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  batchId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  parent?: BatchWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchCreateNestedManyWithoutBatchesInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchCreateNestedManyWithoutBatchesInput)
-  @IsOptional()
-  @Field(() => BatchCreateNestedManyWithoutBatchesInput, {
-    nullable: true,
-  })
-  children?: BatchCreateNestedManyWithoutBatchesInput;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  quantity?: number | null;
+  assetPath?: string | null;
 
   @ApiProperty({
     required: false,
@@ -92,16 +70,35 @@ class BatchCreateInput {
   batchData?: InputJsonValue;
 
   @ApiProperty({
-    required: false,
-    type: Number,
+    required: true,
+    type: String,
   })
-  @IsInt()
-  @Max(9999)
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  batchId!: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  revision?: number | null;
+  batchInitData?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchCreateNestedManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  children?: BatchCreateNestedManyWithoutBatchesInput;
 
   @ApiProperty({
     required: false,
@@ -139,28 +136,6 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  parameterData?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  asset?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -169,29 +144,7 @@ class BatchCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  assetPath?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  batchInitData?: InputJsonValue;
+  operationIndex?: string | null;
 
   @ApiProperty({
     required: false,
@@ -212,15 +165,50 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsJSONValue()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  operationIndex?: string | null;
+  parameterData?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BatchWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: BatchWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -233,6 +221,18 @@ class BatchCreateInput {
     nullable: true,
   })
   recipeName?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
 }
 
 export { BatchCreateInput as BatchCreateInput };

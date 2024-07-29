@@ -15,25 +15,25 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  IsInt,
-  Max,
   IsEnum,
   ValidateNested,
+  IsInt,
+  Max,
 } from "class-validator";
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
-import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
+import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { AssetUpdateManyWithoutAssetsInput } from "./AssetUpdateManyWithoutAssetsInput";
 import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
 import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
-import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
-import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAssetsInput";
 import { InventoryUpdateManyWithoutAssetsInput } from "./InventoryUpdateManyWithoutAssetsInput";
 import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateManyWithoutAssetsInput";
 import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
-import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
-import { AssetUpdateManyWithoutAssetsInput } from "./AssetUpdateManyWithoutAssetsInput";
 import { ItemReceiptUpdateManyWithoutAssetsInput } from "./ItemReceiptUpdateManyWithoutAssetsInput";
 import { LotUpdateManyWithoutAssetsInput } from "./LotUpdateManyWithoutAssetsInput";
+import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
+import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 
 @InputType()
 class AssetUpdateInput {
@@ -48,6 +48,51 @@ class AssetUpdateInput {
     nullable: true,
   })
   assetPath?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumAssetAssetType,
+  })
+  @IsEnum(EnumAssetAssetType)
+  @IsOptional()
+  @Field(() => EnumAssetAssetType, {
+    nullable: true,
+  })
+  assetType?:
+    | "ENT"
+    | "SITE"
+    | "AREA"
+    | "LINE"
+    | "CELL"
+    | "EQUIPMOD"
+    | "EQUIPPHASE"
+    | "CONTROLMOD"
+    | "UNIT"
+    | "DEVICE";
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => BatchUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  batches?: BatchUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => AssetUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  children?: AssetUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
@@ -75,99 +120,6 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumAssetAssetType,
-  })
-  @IsEnum(EnumAssetAssetType)
-  @IsOptional()
-  @Field(() => EnumAssetAssetType, {
-    nullable: true,
-  })
-  assetType?:
-    | "ENT"
-    | "SITE"
-    | "AREA"
-    | "LINE"
-    | "CELL"
-    | "EQUIPMOD"
-    | "EQUIPPHASE"
-    | "CONTROLMOD"
-    | "UNIT"
-    | "DEVICE";
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: () => FermentationChemistryUpdateManyWithoutAssetsInput,
   })
   @ValidateNested()
@@ -192,27 +144,15 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumUpdateManyWithoutAssetsInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  mashData?: MashDatumUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => BatchUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  batches?: BatchUpdateManyWithoutAssetsInput;
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -264,30 +204,6 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  parent?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => AssetUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  children?: AssetUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
     type: () => ItemReceiptUpdateManyWithoutAssetsInput,
   })
   @ValidateNested()
@@ -309,6 +225,90 @@ class AssetUpdateInput {
     nullable: true,
   })
   lots?: LotUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { AssetUpdateInput as AssetUpdateInput };

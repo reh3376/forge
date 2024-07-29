@@ -8,507 +8,507 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   firstName String?
+  id        String   @id @default(cuid())
   lastName  String?
-  username  String   @unique
   password  String
   roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
 }
 
 model PhaseParameter {
-  id                     String                         @id @default(cuid())
-  createdAt              DateTime                       @default(now())
-  setpointUpperLimit     Float?
-  setpointNumericalValue Float?
-  setpointBooleanValue   Boolean?
-  name                   String
-  description            String
-  updatedAt              DateTime                       @updatedAt
-  itemId                 String?
-  setpointType           EnumPhaseParameterSetpointType
-  setpointLowerLimit     Float?
-  schemaVersion          String?                        @default("0001-alpha")
-  createdBy              String
-  units                  String
-  recipeId               String?
-  editedBy               String?
-  revision               Int?                           @default(0)
   active                 Boolean?                       @default(false)
-  isClassDef             Boolean                        @default(false)
   classId                PhaseParameter?                @relation(name: "PhaseParameterClassIdPhaseParameterInstances", fields: [classIdId], references: [id])
   classIdId              String?
-  instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
-  isStaticParameter      Boolean?                       @default(false)
-  staticName             EnumPhaseParameterStaticName?
-  globalId               String?                        @unique @default(cuid())
+  createdAt              DateTime                       @default(now())
+  createdBy              String
+  description            String
+  editedBy               String?
   equipmentPhases        EquipmentPhase[]
+  globalId               String?                        @unique @default(cuid())
+  id                     String                         @id @default(cuid())
+  instances              PhaseParameter[]               @relation(name: "PhaseParameterClassIdPhaseParameterInstances")
+  isClassDef             Boolean                        @default(false)
+  isStaticParameter      Boolean?                       @default(false)
+  itemId                 String?
+  name                   String
+  recipeId               String?
+  revision               Int?                           @default(0)
+  schemaVersion          String?                        @default("0001-alpha")
+  setpointBooleanValue   Boolean?
+  setpointLowerLimit     Float?
+  setpointNumericalValue Float?
+  setpointType           EnumPhaseParameterSetpointType
+  setpointUpperLimit     Float?
+  staticName             EnumPhaseParameterStaticName?
   stringValue            String?
+  units                  String
+  updatedAt              DateTime                       @updatedAt
 }
 
 model TestParameter {
-  description              String?
-  testPass                 Boolean?
-  createdAt                DateTime                           @default(now())
-  id                       String                             @id @default(cuid())
-  testSetpointBooleanValue Boolean?                           @default(true)
-  updatedBy                String?
-  name                     String
   active                   Boolean                            @default(true)
-  schemaVersion            String?
-  testSetpointValue        Float?
-  testParamUnits           String
-  testSetpointUpperLimit   Float?
-  testParamRevision        String?
-  testSetpointLowerLimit   Float?
-  testResult               Decimal?
-  createdBy                String
-  testSetpointType         EnumTestParameterTestSetpointType?
-  updatedAt                DateTime?                          @updatedAt
-  equipmentPhases          EquipmentPhase[]
-  isClassDef               Boolean?                           @default(false)
   classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterInstances", fields: [classIdId], references: [id])
   classIdId                String?
-  instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
-  tooltip                  String?
-  testDetails              String?
-  purchaseOrder            PurchaseOrder[]
+  createdAt                DateTime                           @default(now())
+  createdBy                String
+  description              String?
+  equipmentPhases          EquipmentPhase[]
   globalId                 String?                            @default(cuid())
-  testedBy                 String?
-  testedAt                 DateTime?
+  id                       String                             @id @default(cuid())
+  instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
+  isClassDef               Boolean?                           @default(false)
   itemReceipt              ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
   itemReceiptId            String?
+  name                     String
+  purchaseOrder            PurchaseOrder[]
+  schemaVersion            String?
+  testDetails              String?
+  testParamRevision        String?
+  testParamUnits           String
+  testPass                 Boolean?
+  testResult               Decimal?
+  testSetpointBooleanValue Boolean?                           @default(true)
+  testSetpointLowerLimit   Float?
+  testSetpointType         EnumTestParameterTestSetpointType?
+  testSetpointUpperLimit   Float?
+  testSetpointValue        Float?
+  testedAt                 DateTime?
+  testedBy                 String?
+  tooltip                  String?
+  updatedAt                DateTime?                          @updatedAt
+  updatedBy                String?
 }
 
 model RecipeParameter {
-  recipeSetpointType         EnumRecipeParameterRecipeSetpointType
-  revision                   Int?                                  @default(0)
-  recipeSetpointUpperLimit   Float?
-  recipeParamName            String
-  className                  String
   active                     Boolean                               @default(true)
-  createdBy                  String
-  recipeSetpointLowerLimit   Float?
-  updatedAt                  DateTime?                             @updatedAt
-  id                         String                                @id @default(cuid())
-  recipeParamDescription     String?
-  updatedBy                  String?
-  recipeSetpointBooleanValue Boolean?                              @default(true)
-  createdAt                  DateTime                              @default(now())
-  recipeParamUnits           String?
-  schemaVersion              String?                               @default("0001-alpha")
-  isClassDefinition          Boolean?                              @default(false)
   classId                    RecipeParameter?                      @relation(name: "RecipeParameterClassIdRecipeParameterInstances", fields: [classIdId], references: [id])
   classIdId                  String?
-  instances                  RecipeParameter[]                     @relation(name: "RecipeParameterClassIdRecipeParameterInstances")
-  globalId                   String?                               @default(cuid())
-  recipeNumericalSetpoint    Decimal?
-  recipe                     Recipe[]
+  className                  String
+  createdAt                  DateTime                              @default(now())
+  createdBy                  String
   description                String?
+  globalId                   String?                               @default(cuid())
+  id                         String                                @id @default(cuid())
+  instances                  RecipeParameter[]                     @relation(name: "RecipeParameterClassIdRecipeParameterInstances")
+  isClassDefinition          Boolean?                              @default(false)
   operation                  EnumRecipeParameterOperation?
   operationIndex             Int?                                  @default(-1)
+  recipe                     Recipe[]
+  recipeNumericalSetpoint    Decimal?
+  recipeParamDescription     String?
+  recipeParamName            String
+  recipeParamUnits           String?
+  recipeSetpointBooleanValue Boolean?                              @default(true)
+  recipeSetpointLowerLimit   Float?
+  recipeSetpointType         EnumRecipeParameterRecipeSetpointType
+  recipeSetpointUpperLimit   Float?
+  revision                   Int?                                  @default(0)
+  schemaVersion              String?                               @default("0001-alpha")
+  updatedAt                  DateTime?                             @updatedAt
+  updatedBy                  String?
 }
 
 model Instruction {
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  filePath       String
-  editedBy       String?
   active         Boolean?         @default(false)
+  createdAt      DateTime         @default(now())
   createdBy      String
+  editedBy       String?
   equipmentPhase EquipmentPhase[]
-  id             String           @id @default(cuid())
-  schemaVersion  String?          @default("0001-alpha")
-  revision       Int              @default(0)
-  name           String?
+  filePath       String
   globalId       String?          @unique @default(cuid())
+  id             String           @id @default(cuid())
+  name           String?
+  revision       Int              @default(0)
+  schemaVersion  String?          @default("0001-alpha")
+  updatedAt      DateTime         @updatedAt
 
   @@unique([name, revision])
 }
 
 model EquipmentPhase {
-  createdBy              String
+  active                 Boolean?                   @default(true)
+  bomItem                BomItem[]
+  classId                EquipmentPhase?            @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
+  classIdId              String?
+  className              String?
   createdAt              DateTime?                  @default(now())
-  schemaVersion          String?                    @default("0001-b")
-  operationSequenceIndex Int?
+  createdBy              String
+  description            String?
+  editedAt               DateTime?                  @updatedAt
+  editedBy               String?
+  globalId               String?                    @unique @default(cuid())
+  id                     String                     @id @default(cuid())
+  instances              EquipmentPhase[]           @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances")
+  instructions           Instruction[]
+  isClassDefinition      Boolean?                   @default(false)
+  message                String?
   name                   EnumEquipmentPhaseName
   operation              Operation                  @relation(fields: [operationId], references: [id])
   operationId            String
-  id                     String                     @id @default(cuid())
-  editedBy               String?
-  revision               Int?                       @default(0)
-  editedAt               DateTime?                  @updatedAt
-  className              String?
-  description            String?
-  instructions           Instruction[]
-  testParameters         TestParameter[]
-  isClassDefinition      Boolean?                   @default(false)
-  classId                EquipmentPhase?            @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances", fields: [classIdId], references: [id])
-  classIdId              String?
-  instances              EquipmentPhase[]           @relation(name: "EquipmentPhaseClassIdEquipmentPhaseInstances")
-  active                 Boolean?                   @default(true)
+  operationSequenceIndex Int?
   path                   String?
-  globalId               String?                    @unique @default(cuid())
-  stepType               EnumEquipmentPhaseStepType @default(NotRequired)
-  message                String?
-  bomItem                BomItem[]
   phaseParameters        PhaseParameter[]
+  revision               Int?                       @default(0)
+  schemaVersion          String?                    @default("0001-b")
+  stepType               EnumEquipmentPhaseStepType @default(NotRequired)
+  testParameters         TestParameter[]
 }
 
 model Operation {
-  revision                Int?                       @default(0)
-  createdAt               DateTime?                  @default(now())
-  name                    EnumOperationName
-  editedBy                String?
-  createdBy               String
-  description             String
-  procedureSequenceIndex  Int                        @default(0)
-  schemaVersion           String?                    @default("0001-b")
+  abbreviation            String
   active                  Boolean?                   @default(true)
-  updatedAt               DateTime?                  @updatedAt
-  id                      String                     @id @default(cuid())
-  equipmentPhases         EquipmentPhase[]
-  isClassDefinition       Boolean?                   @default(false)
+  auxiliaryPhases         Json?
   classId                 Operation?                 @relation(name: "OperationClassIdOperationInstances", fields: [classIdId], references: [id])
   classIdId               String?
+  createdAt               DateTime?                  @default(now())
+  createdBy               String
+  description             String
+  editedBy                String?
+  equipmentPhases         EquipmentPhase[]
+  fermentationChemistries FermentationChemistry[]
+  fermentationDayData     FermentationDayDatum[]
+  fermentationSettingData FermentationSettingDatum[]
+  globalId                String?                    @default(cuid())
+  id                      String                     @id @default(cuid())
   instances               Operation[]                @relation(name: "OperationClassIdOperationInstances")
+  isClassDefinition       Boolean?                   @default(false)
+  lotId                   String?                    @unique
+  name                    EnumOperationName
   path                    String?
-  abbreviation            String
+  procedureSequenceIndex  Int                        @default(0)
+  revision                Int?                       @default(0)
+  schemaVersion           String?                    @default("0001-b")
   unitProcedure           UnitProcedure?             @relation(fields: [unitProcedureId], references: [id])
   unitProcedureId         String?
-  globalId                String?                    @default(cuid())
-  auxiliaryPhases         Json?
-  lotId                   String?                    @unique
-  fermentationChemistries FermentationChemistry[]
-  fermentationSettingData FermentationSettingDatum[]
-  fermentationDayData     FermentationDayDatum[]
+  updatedAt               DateTime?                  @updatedAt
 }
 
 model Procedure {
-  id                String             @id @default(cuid())
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  name              EnumProcedureName?
-  description       String?
-  createdBy         String
-  updatedBy         String?
-  schemaVersion     String?            @default("0001-b")
-  revision          Int?               @default(0)
   active            Boolean?           @default(true)
-  unitProcedures    UnitProcedure[]
-  isClassDefinition Boolean?
   classId           Procedure?         @relation(name: "ProcedureClassIdProcedureInstances", fields: [classIdId], references: [id])
   classIdId         String?
-  instances         Procedure[]        @relation(name: "ProcedureClassIdProcedureInstances")
+  createdAt         DateTime           @default(now())
+  createdBy         String
+  description       String?
   globalId          String?            @unique @default(cuid())
+  id                String             @id @default(cuid())
+  instances         Procedure[]        @relation(name: "ProcedureClassIdProcedureInstances")
+  isClassDefinition Boolean?
+  name              EnumProcedureName?
+  revision          Int?               @default(0)
+  schemaVersion     String?            @default("0001-b")
+  unitProcedures    UnitProcedure[]
+  updatedAt         DateTime           @updatedAt
+  updatedBy         String?
 
   @@unique([name, revision, active, isClassDefinition])
 }
 
 model Recipe {
-  id                            String                         @id @default(cuid())
-  createdAt                     DateTime                       @default(now())
-  updatedAt                     DateTime                       @updatedAt
-  createdBy                     String
-  updatedBy                     String?
-  schemaVersion                 String?                        @default("0001-b")
-  revision                      Int?                           @default(0)
-  active                        Boolean?                       @default(true)
-  customerCode                  String?
   Recipe                        String
-  recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId                 String?
-  unitProcedures                UnitProcedure[]
-  productionOrders              ProductionOrder[]
-  scheduleOrders                ScheduleOrder[]
-  globalId                      String?                        @unique @default(cuid())
-  customer                      Customer                       @relation(fields: [customerId], references: [id])
-  customerId                    String
-  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
-  lots                          Lot[]
-  parameters                    RecipeParameter[]
-  item                          Item?                          @relation(fields: [itemId], references: [id])
-  itemId                        String?
-  totalCooks                    Int?
-  cooksPerFerm                  Int?                           @default(3)
-  estimatedAbv                  Decimal?
-  totalFermenters               Int?
-  targetProof                   Decimal?
-  isClassDefinition             Boolean?                       @default(true)
+  active                        Boolean?                       @default(true)
+  batches                       Batch[]
   classId                       Recipe?                        @relation(name: "RecipeClassIdRecipeInstances", fields: [classIdId], references: [id])
   classIdId                     String?
+  cooksPerFerm                  Int?                           @default(3)
+  createdAt                     DateTime                       @default(now())
+  createdBy                     String
+  customer                      Customer                       @relation(fields: [customerId], references: [id])
+  customerId                    String
+  customerCode                  String?
+  estimatedAbv                  Decimal?
+  globalId                      String?                        @unique @default(cuid())
+  id                            String                         @id @default(cuid())
   instances                     Recipe[]                       @relation(name: "RecipeClassIdRecipeInstances")
+  isClassDefinition             Boolean?                       @default(true)
+  item                          Item?                          @relation(fields: [itemId], references: [id])
+  itemId                        String?
+  lots                          Lot[]
+  parameters                    RecipeParameter[]
+  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
+  productionOrders              ProductionOrder[]
   recipeBomItems                RecipeBomItem[]
-  batches                       Batch[]
+  recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                 String?
+  revision                      Int?                           @default(0)
+  scheduleOrders                ScheduleOrder[]
+  schemaVersion                 String?                        @default("0001-b")
+  targetProof                   Decimal?
+  totalCooks                    Int?
+  totalFermenters               Int?
+  unitProcedures                UnitProcedure[]
+  updatedAt                     DateTime                       @updatedAt
+  updatedBy                     String?
 
   @@unique([itemId, customerId])
 }
 
 model Bom {
-  id                    String            @id @default(cuid())
-  editedBy              String?
-  item                  Item              @relation(fields: [itemId], references: [id])
-  itemId                String
-  schemaVersion         String?           @default("0001-alpha")
-  className             String?
-  editedAt              DateTime          @updatedAt
-  createdBy             String
-  createdAt             DateTime          @default(now())
+  bomItem               BomItem[]
   bomName               String
   bomRevision           String
+  bomType               String?
+  className             String?
+  createdAt             DateTime          @default(now())
+  createdBy             String
+  editedAt              DateTime          @updatedAt
+  editedBy              String?
+  effectiveEndDate      DateTime?
+  effectiveStartDate    DateTime?         @default(now())
+  erpId                 String?           @unique
+  globalId              String?           @unique @default(cuid())
+  id                    String            @id @default(cuid())
+  inactive              Boolean?          @default(false)
+  item                  Item              @relation(fields: [itemId], references: [id])
+  itemId                String
+  notes                 String?
+  productionOrder       ProductionOrder[]
+  schemaVersion         String?           @default("0001-alpha")
   unitProcedure         UnitProcedure[]   @relation(name: "BomsOnUnitProcedure")
   unitProceduresPrimary UnitProcedure[]   @relation(name: "primaryBom")
-  productionOrder       ProductionOrder[]
-  bomItem               BomItem[]
-  globalId              String?           @unique @default(cuid())
-  bomType               String?
-  notes                 String?
-  inactive              Boolean?          @default(false)
-  effectiveStartDate    DateTime?         @default(now())
-  effectiveEndDate      DateTime?
-  erpId                 String?           @unique
 }
 
 model ScheduleOrderQueue {
-  id                    String         @id @default(cuid())
   createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
   createdBy             String
-  updatedBy             String?
-  schemaVersion         String?        @default("0001-b")
-  queueIndex            Int?           @unique
   globalId              String?        @unique @default(cuid())
+  id                    String         @id @default(cuid())
   nextUnitProcedure     UnitProcedure  @relation(fields: [nextUnitProcedureId], references: [id])
   nextUnitProcedureId   String         @unique
   nextUnitProcedureName String
+  queueIndex            Int?           @unique
   scheduleOrder         ScheduleOrder?
+  schemaVersion         String?        @default("0001-b")
+  updatedAt             DateTime       @updatedAt
+  updatedBy             String?
 
   @@unique([queueIndex, nextUnitProcedureId])
 }
 
 model UnitProcedure {
-  id                            String                         @id @default(cuid())
-  createdAt                     DateTime                       @default(now())
-  updatedAt                     DateTime                       @updatedAt
-  createdBy                     String
-  updatedBy                     String?
-  schemaVersion                 String?                        @default("0001-b")
-  revision                      Int?                           @default(0)
-  name                          EnumUnitProcedureName
-  description                   String?
-  operations                    Operation[]
-  procedure                     Procedure                      @relation(fields: [procedureId], references: [id])
-  procedureId                   String
-  isClassDef                    Boolean?                       @default(false)
-  classId                       UnitProcedure?                 @relation(name: "UnitProcedureClassIdUnitProcedureInstances", fields: [classIdId], references: [id])
-  classIdId                     String?
-  instances                     UnitProcedure[]                @relation(name: "UnitProcedureClassIdUnitProcedureInstances")
+  abbreviation                  String?
   active                        Boolean?                       @default(true)
-  recipe                        Recipe[]
   boms                          Bom?                           @relation(name: "BomsOnUnitProcedure", fields: [bomsId], references: [id])
   bomsId                        String?
+  classId                       UnitProcedure?                 @relation(name: "UnitProcedureClassIdUnitProcedureInstances", fields: [classIdId], references: [id])
+  classIdId                     String?
+  createdAt                     DateTime                       @default(now())
+  createdBy                     String
+  description                   String?
+  globalId                      String?                        @unique @default(cuid())
+  id                            String                         @id @default(cuid())
+  instances                     UnitProcedure[]                @relation(name: "UnitProcedureClassIdUnitProcedureInstances")
+  isClassDef                    Boolean?                       @default(false)
+  name                          EnumUnitProcedureName
+  operations                    Operation[]
+  path                          String?
   primaryBom                    Bom?                           @relation(name: "primaryBom", fields: [primaryBomId], references: [id])
   primaryBomId                  String?
-  path                          String?
-  globalId                      String?                        @unique @default(cuid())
-  scheduleOrderQueues           ScheduleOrderQueue?
+  procedure                     Procedure                      @relation(fields: [procedureId], references: [id])
+  procedureId                   String
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
-  abbreviation                  String?
+  recipe                        Recipe[]
+  revision                      Int?                           @default(0)
+  scheduleOrderQueues           ScheduleOrderQueue?
+  schemaVersion                 String?                        @default("0001-b")
+  updatedAt                     DateTime                       @updatedAt
+  updatedBy                     String?
 }
 
 model RecipeGroup {
-  id               String            @id @default(cuid())
   createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  recipe           String
-  revision         Int?              @default(0)
-  schemaVersion    String?           @default("0001-alpha")
   createdBy        String
-  updatedBy        String?
-  recipes          Recipe[]
-  productionOrders ProductionOrder[]
-  scheduleOrders   ScheduleOrder[]
   globalId         String?           @unique @default(cuid())
+  id               String            @id @default(cuid())
+  productionOrders ProductionOrder[]
+  recipe           String
+  recipes          Recipe[]
+  revision         Int?              @default(0)
+  scheduleOrders   ScheduleOrder[]
+  schemaVersion    String?           @default("0001-alpha")
+  updatedAt        DateTime          @updatedAt
+  updatedBy        String?
 
   @@unique([recipe, revision])
 }
 
 model ProductionOrder {
-  id                            String                         @id @default(cuid())
-  createdAt                     DateTime                       @default(now())
-  updatedAt                     DateTime                       @updatedAt
   bom                           Bom                            @relation(fields: [bomId], references: [id])
   bomId                         String
   className                     String?
   complete                      Boolean?                       @default(false)
+  completedCooks                Int?
+  completedFermenters           Int?
+  completedQuantity             Decimal?
+  createdAt                     DateTime                       @default(now())
   createdBy                     String
+  customer                      Customer                       @relation(fields: [customerId], references: [id])
+  customerId                    String
+  customerCode                  String?
+  endDate                       DateTime?
+  fermentationChemistries       FermentationChemistry[]
+  fermentationDayData           FermentationDayDatum[]
+  globalId                      String?                        @default(cuid())
+  id                            String                         @id @default(cuid())
   inProcess                     Boolean?                       @default(false)
-  updatedBy                     DateTime?
   item                          Item                           @relation(fields: [fgItemId], references: [id])
   fgItemId                      String
+  lots                          Lot[]
+  name                          String?                        @unique
+  plannedCooks                  Int?
+  plannedFermenters             Int?
+  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
+  quantity                      Int?
   recipe                        Recipe?                        @relation(fields: [recipeId], references: [id])
   recipeId                      String?
   recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                 String?
-  customer                      Customer                       @relation(fields: [customerId], references: [id])
-  customerId                    String
+  salesOrder                    SalesOrder                     @relation(fields: [salesOrderId], references: [id])
+  salesOrderId                  String                         @unique
+  scheduleOrder                 ScheduleOrder?                 @relation(fields: [scheduleOrderId], references: [id])
+  scheduleOrderId               String?
   scheduled                     Boolean?                       @default(false)
   schemaVersion                 String?                        @default("0001-alpha")
   startDate                     DateTime?                      @default(now())
-  endDate                       DateTime?
   status                        EnumProductionOrderStatus?     @default(Initiated)
-  scheduleOrder                 ScheduleOrder?                 @relation(fields: [scheduleOrderId], references: [id])
-  scheduleOrderId               String?
-  salesOrder                    SalesOrder                     @relation(fields: [salesOrderId], references: [id])
-  salesOrderId                  String                         @unique
-  globalId                      String?                        @default(cuid())
-  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
-  fermentationChemistries       FermentationChemistry[]
-  fermentationDayData           FermentationDayDatum[]
-  lots                          Lot[]
-  customerCode                  String?
   units                         String?
-  quantity                      Int?
-  name                          String?                        @unique
-  plannedCooks                  Int?
-  completedCooks                Int?
-  plannedFermenters             Int?
-  completedFermenters           Int?
-  completedQuantity             Decimal?
+  updatedAt                     DateTime                       @updatedAt
+  updatedBy                     DateTime?
 }
 
 model ScheduleOrder {
-  id                           String                   @id @default(cuid())
-  createdAt                    DateTime                 @default(now())
-  updatedAt                    DateTime                 @updatedAt
-  productionOrders             ProductionOrder[]
-  status                       EnumScheduleOrderStatus? @default(Created)
-  createdBy                    String?
-  updatedBy                    String?
-  recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId                String
-  scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
-  scheduleOrderRecipeId        String?
-  recipeName                   String
-  totalProofGallons            Int?
-  estimatedTotalProductionTime Int?
-  estimatedMashingTime         Int?
-  estimatedFermentationTime    Int?
-  estimatedDistillationTime    Int?
-  estimatedProcessing          Int?
-  productionOrderAllocation    Json
-  totalBarrels                 Int?
-  globalId                     String?                  @unique @default(cuid())
-  customers                    Json?
-  estimatedStart               DateTime?
-  estimatedEnd                 DateTime?
-  actualStart                  DateTime?
   actualEnd                    DateTime?
+  actualStart                  DateTime?
+  createdAt                    DateTime                 @default(now())
+  createdBy                    String?
+  customers                    Json?
   duration                     Decimal?
   durationUnits                String?                  @default("Hours")
-  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  estimatedDistillationTime    Int?
+  estimatedEnd                 DateTime?
+  estimatedFermentationTime    Int?
+  estimatedMashingTime         Int?
+  estimatedProcessing          Int?
+  estimatedStart               DateTime?
+  estimatedTotalProductionTime Int?
+  globalId                     String?                  @unique @default(cuid())
+  id                           String                   @id @default(cuid())
   name                         String?                  @unique
+  productionOrderAllocation    Json
+  productionOrders             ProductionOrder[]
+  recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                String
+  recipeName                   String
+  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
+  scheduleOrderRecipeId        String?
+  status                       EnumScheduleOrderStatus? @default(Created)
+  totalBarrels                 Int?
+  totalProofGallons            Int?
+  updatedAt                    DateTime                 @updatedAt
+  updatedBy                    String?
   scheduleOrderQueueId         String?
 }
 
 model Item {
-  id                            String                         @id @default(cuid())
-  createdAt                     DateTime                       @default(now())
-  updatedAt                     DateTime                       @updatedAt
-  productionOrders              ProductionOrder[]
   active                        Boolean?                       @default(true)
-  createdBy                     String
-  updatedBy                     String?
-  itemType                      String
-  itemDescription               String?
-  itemName                      String
-  itemRevision                  Int?                           @default(0)
-  itemNumber                    String
-  schemaVersion                 String?
-  itemClass                     String?
-  itemGroup                     String?
-  bomsWipItem                   Bom[]
-  purchaseOrders                PurchaseOrder[]
-  itemReceipts                  ItemReceipt[]
-  globalId                      String?                        @unique @default(cuid())
   bomItems                      BomItem[]
-  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
-  lots                          Lot[]
+  bomsWipItem                   Bom[]
+  createdAt                     DateTime                       @default(now())
+  createdBy                     String
   erpId                         String                         @unique
-  salesOrders                   SalesOrder[]
-  vendor                        Vendor?                        @relation(fields: [vendorId], references: [id])
-  vendorId                      String?
-  recipes                       Recipe[]
+  globalId                      String?                        @unique @default(cuid())
+  id                            String                         @id @default(cuid())
   inventories                   Inventory[]
   inventoryLogs                 InventoryLog[]
   inventoryTransfers            InventoryTransfer[]
+  itemClass                     String?
+  itemDescription               String?
+  itemGroup                     String?
+  itemName                      String
+  itemNumber                    String
+  itemReceipts                  ItemReceipt[]
+  itemRevision                  Int?                           @default(0)
+  itemType                      String
+  lots                          Lot[]
+  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
+  productionOrders              ProductionOrder[]
+  purchaseOrders                PurchaseOrder[]
   recipeBoms                    RecipeBomItem[]
+  recipes                       Recipe[]
+  salesOrders                   SalesOrder[]
+  schemaVersion                 String?
+  updatedAt                     DateTime                       @updatedAt
+  updatedBy                     String?
+  vendor                        Vendor?                        @relation(fields: [vendorId], references: [id])
+  vendorId                      String?
 }
 
 model ItemGroup {
-  id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  name        String
   description String?
   globalId    String?  @unique @default(cuid())
+  id          String   @id @default(cuid())
+  name        String
+  updatedAt   DateTime @updatedAt
 }
 
 model Customer {
   address          String
   createdAt        DateTime          @default(now())
   createdBy        String
+  customerCode     String?
   description      String?
   editedBy         String?
   email            String?
-  id               String            @id @default(cuid())
-  name             String
-  revision         Int               @default(0)
-  schemaVersion    String?           @default("0001-alpha")
-  updatedAt        DateTime          @updatedAt
-  salesOrders      SalesOrder[]
   globalId         String?           @unique @default(cuid())
-  customerCode     String?
+  id               String            @id @default(cuid())
+  inventoryLog     InventoryLog?     @relation(fields: [inventoryLogId], references: [id])
+  inventoryLogId   String?
+  name             String
   phone            String?
   productionOrders ProductionOrder[]
   recipes          Recipe[]
-  inventoryLog     InventoryLog?     @relation(fields: [inventoryLogId], references: [id])
-  inventoryLogId   String?
+  revision         Int               @default(0)
+  salesOrders      SalesOrder[]
+  schemaVersion    String?           @default("0001-alpha")
+  updatedAt        DateTime          @updatedAt
 
   @@unique([revision, name])
 }
 
 model PurchaseOrder {
+  acceptedLots                Lot[]
   asset                       Asset?                          @relation(fields: [assetId], references: [id])
   assetId                     String?
   className                   String?
   complete                    Boolean?                        @default(false)
   createdAt                   DateTime?                       @default(now())
   createdBy                   String
-  updatedAt                   DateTime?                       @updatedAt
-  updatedBy                   String?
-  transactionGroup            String?
+  erpId                       String                          @unique
+  globalId                    String                          @unique @default(cuid())
   id                          String                          @id @default(cuid())
+  item                        Item[]
+  itemReceipts                ItemReceipt[]
+  lineItems                   Json?
+  lotsRejected                PurchaseOrder[]                 @relation(name: "lotsRejected")
   name                        String
-  totalOrderQuantity          Int?
   purchaseOrderReceiptDate    DateTime?
   purchaseOrderReceived       Boolean?                        @default(false)
   purchaseOrderRejectedLots   PurchaseOrder?                  @relation(name: "lotsRejected", fields: [purchaseOrderRejectedLotsId], references: [id])
   purchaseOrderRejectedLotsId String?
+  qualityTests                TestParameter[]
   receiptStatus               EnumPurchaseOrderReceiptStatus? @default(InitializedNotReceived)
   receivedQuantity            Int?
   revision                    Int?                            @default(0)
   schemaVersion               String?
-  lotsRejected                PurchaseOrder[]                 @relation(name: "lotsRejected")
-  itemReceipts                ItemReceipt[]
-  acceptedLots                Lot[]
-  item                        Item[]
-  qualityTests                TestParameter[]
-  globalId                    String                          @unique @default(cuid())
-  lineItems                   Json?
-  erpId                       String                          @unique
+  totalOrderQuantity          Int?
+  transactionGroup            String?
+  updatedAt                   DateTime?                       @updatedAt
+  updatedBy                   String?
   vendor                      Vendor?                         @relation(fields: [vendorId], references: [id])
   vendorId                    String?
 
@@ -516,25 +516,25 @@ model PurchaseOrder {
 }
 
 model SalesOrder {
-  customer          Customer?        @relation(fields: [customerId], references: [id])
-  customerId        String?
   createdAt         DateTime         @default(now())
   createdBy         String
+  customer          Customer?        @relation(fields: [customerId], references: [id])
+  customerId        String?
+  customerCode      String?
+  erpId             String?          @unique
+  globalId          String           @unique @default(cuid())
   id                String           @id @default(cuid())
+  item              Item[]
+  lineItems         Json?
+  name              String?          @unique
   orderType         String?
+  productionOrders  ProductionOrder?
   quantity          Int
+  requestedShipDate DateTime?
   revision          Int              @default(0)
   schemaVersion     String?          @default("0001-alpha")
   updatedAt         DateTime         @updatedAt
   updatedBy         String?
-  productionOrders  ProductionOrder?
-  globalId          String           @unique @default(cuid())
-  customerCode      String?
-  item              Item[]
-  lineItems         Json?
-  erpId             String?          @unique
-  requestedShipDate DateTime?
-  name              String?          @unique
 }
 
 model Test {
@@ -543,42 +543,42 @@ model Test {
   createdBy         String
   editedAt          DateTime? @updatedAt
   editedBy          String?
+  globalId          String?   @unique @default(cuid())
   id                String    @id @default(cuid())
   isClassDefinition Boolean?  @default(false)
   schemaVersion     String?
   testDescription   String?
   testName          String
   testRevision      Int?      @default(0)
-  globalId          String?   @unique @default(cuid())
 }
 
 model Asset {
   assetPath               String                  @unique
+  assetType               EnumAssetAssetType
+  batches                 Batch[]
+  children                Asset[]                 @relation(name: "AssetChildrenAssetParent")
   createdAt               DateTime                @default(now())
   createdBy               String
   description             String
-  id                      String                  @id @default(cuid())
-  name                    String
-  revision                Int?                    @default(0)
-  schemaVersion           String                  @default("0001-alpha")
-  assetType               EnumAssetAssetType
-  updatedAt               DateTime                @updatedAt
-  updatedBy               String?
-  purchaseOrders          PurchaseOrder[]
-  globalId                String?                 @unique @default(cuid())
   fermentationChemistries FermentationChemistry[]
   fermentationDayData     FermentationDayDatum[]
-  mashData                MashDatum[]
-  batches                 Batch[]
+  globalId                String?                 @unique @default(cuid())
+  id                      String                  @id @default(cuid())
   inventories             Inventory[]
   inventoryLogs           InventoryLog[]
   inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
-  parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
-  parentId                String?
-  children                Asset[]                 @relation(name: "AssetChildrenAssetParent")
   itemReceipts            ItemReceipt[]
   lots                    Lot[]
+  mashData                MashDatum[]
+  name                    String
+  parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
+  parentId                String?
+  purchaseOrders          PurchaseOrder[]
+  revision                Int?                    @default(0)
+  schemaVersion           String                  @default("0001-alpha")
+  updatedAt               DateTime                @updatedAt
+  updatedBy               String?
 
   @@unique([name, revision])
 }
@@ -587,375 +587,375 @@ model ItemReceipt {
   createdAt       DateTime               @default(now())
   createdBy       String
   driver          String
+  globalId        String?                @unique @default(cuid())
   id              String                 @id @default(cuid())
+  item            Item                   @relation(fields: [itemId], references: [id])
+  itemId          String
+  loadId          Int?                   @default(autoincrement())
+  lots            Json?
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
   quantity        Decimal
   schemaVersion   String?                @default("0001-b")
   status          EnumItemReceiptStatus? @default(InProgress)
   supplierLot     String?
+  tests           TestParameter[]
+  testsPassed     Boolean?               @default(false)
+  toAsset         Asset?                 @relation(fields: [toAssetId], references: [id])
+  toAssetId       String?
   units           String
   updatedAt       DateTime               @updatedAt
   updatedBy       String?
   weighIn         Decimal?
   weighOut        Decimal?
-  tests           TestParameter[]
-  item            Item                   @relation(fields: [itemId], references: [id])
-  itemId          String
-  globalId        String?                @unique @default(cuid())
-  loadId          Int?                   @default(autoincrement())
-  testsPassed     Boolean?               @default(false)
-  toAsset         Asset?                 @relation(fields: [toAssetId], references: [id])
-  toAssetId       String?
-  lots            Json?
 }
 
 model Lot {
+  batches                     Batch[]
+  bomItems                    BomItem[]
   createdAt                   DateTime               @default(now())
   createdBy                   String?
   externalId                  String?                @unique
-  id                          String                 @id @default(cuid())
-  lotNumber                   String                 @unique
-  purchaseOrderAcceptedLots   PurchaseOrder?         @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
-  purchaseOrderAcceptedLotsId String?
-  schemaVersion               String?                @default("0001-b")
-  updatedAt                   DateTime               @updatedAt
-  globalId                    String?                @unique @default(cuid())
-  recipe                      Recipe?                @relation(fields: [recipeId], references: [id])
-  recipeId                    String?
-  item                        Item?                  @relation(fields: [itemId], references: [id])
-  itemId                      String?
-  productionOrder             ProductionOrder?       @relation(fields: [productionOrderId], references: [id])
-  productionOrderId           String?
   fermentationChemistries     FermentationChemistry?
-  isRawMaterial               Boolean?               @default(false)
-  batches                     Batch[]
-  bomItems                    BomItem[]
-  inventoryTransfers          InventoryTransfer[]
   fromAsset                   Asset?                 @relation(fields: [fromAssetId], references: [id])
   fromAssetId                 String?
+  globalId                    String?                @unique @default(cuid())
+  id                          String                 @id @default(cuid())
+  inventoryTransfers          InventoryTransfer[]
+  isRawMaterial               Boolean?               @default(false)
+  item                        Item?                  @relation(fields: [itemId], references: [id])
+  itemId                      String?
+  lotNumber                   String                 @unique
+  productionOrder             ProductionOrder?       @relation(fields: [productionOrderId], references: [id])
+  productionOrderId           String?
+  purchaseOrderAcceptedLots   PurchaseOrder?         @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
+  purchaseOrderAcceptedLotsId String?
+  recipe                      Recipe?                @relation(fields: [recipeId], references: [id])
+  recipeId                    String?
+  schemaVersion               String?                @default("0001-b")
+  updatedAt                   DateTime               @updatedAt
 }
 
 model BomItem {
-  id                String           @id @default(cuid())
+  bom               Bom?             @relation(fields: [bomId], references: [id])
+  bomId             String?
+  classIdId         BomItem?         @relation(name: "classIdId", fields: [classId], references: [id])
+  classId           String?
+  consumedAt        DateTime?
   createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
   createdBy         String
-  updatedBy         String?
+  equipmentPhases   EquipmentPhase[]
+  globalId          String?          @unique @default(cuid())
+  id                String           @id @default(cuid())
+  instances         BomItem[]        @relation(name: "classIdId")
+  isClassDefinition Boolean?         @default(true)
   item              Item             @relation(fields: [itemId], references: [id])
   itemId            String
+  lot               Lot?             @relation(fields: [lotId], references: [id])
+  lotId             String?
   quantity          Decimal
   quantityActual    Decimal?
   units             String?
-  bom               Bom?             @relation(fields: [bomId], references: [id])
-  bomId             String?
-  equipmentPhases   EquipmentPhase[]
-  consumedAt        DateTime?
-  globalId          String?          @unique @default(cuid())
-  lot               Lot?             @relation(fields: [lotId], references: [id])
-  lotId             String?
-  classIdId         BomItem?         @relation(name: "classIdId", fields: [classId], references: [id])
-  classId           String?
-  instances         BomItem[]        @relation(name: "classIdId")
-  isClassDefinition Boolean?         @default(true)
+  updatedAt         DateTime         @updatedAt
+  updatedBy         String?
 }
 
 model Unit {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   active    Boolean? @default(true)
+  createdAt DateTime @default(now())
+  globalId  String?  @default(cuid())
+  id        String   @id @default(cuid())
   name      String?
   unitType  String?
-  globalId  String?  @default(cuid())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductionOrderUnitProcedure {
-  id                String                                       @id @default(cuid())
-  createdAt         DateTime                                     @default(now())
-  updatedAt         DateTime                                     @updatedAt
-  name              String
   abbreviation      EnumProductionOrderUnitProcedureAbbreviation
+  bom               Json?
+  createdAt         DateTime                                     @default(now())
+  customer          String
+  globalId          String?                                      @default(cuid())
+  id                String                                       @id @default(cuid())
+  name              String
   productionOrder   ProductionOrder?                             @relation(fields: [productionOrderId], references: [id])
   productionOrderId String?
   recipe            Recipe?                                      @relation(fields: [recipeId], references: [id])
   recipeId          String?
-  bom               Json?
-  wipItem           Item?                                        @relation(fields: [itemId], references: [id])
-  itemId            String?
-  globalId          String?                                      @default(cuid())
-  customer          String
+  status            EnumProductionOrderUnitProcedureStatus?
   unitProcedure     UnitProcedure?                               @relation(fields: [unitProcedureId], references: [id])
   unitProcedureId   String?
-  status            EnumProductionOrderUnitProcedureStatus?
+  updatedAt         DateTime                                     @updatedAt
+  wipItem           Item?                                        @relation(fields: [itemId], references: [id])
+  itemId            String?
 }
 
 model FermentationChemistry {
-  id                String                    @id @default(cuid())
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
-  productionOrderId String?
-  operation         Operation                 @relation(fields: [operationId], references: [id])
-  operationId       String
+  approved          Boolean?                  @default(false)
+  approvedBy        String?
   asset             Asset                     @relation(fields: [assetId], references: [id])
   assetId           String
-  settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
-  settingDataId     String?                   @unique
-  dailyData         FermentationDayDatum[]
-  approvedBy        String?
-  approved          Boolean?                  @default(false)
-  lot               Lot?                      @relation(fields: [lotId], references: [id])
-  lotId             String?                   @unique
   batch             Batch                     @relation(fields: [batchId], references: [id])
   batchId           String
+  createdAt         DateTime                  @default(now())
+  dailyData         FermentationDayDatum[]
+  id                String                    @id @default(cuid())
+  lot               Lot?                      @relation(fields: [lotId], references: [id])
+  lotId             String?                   @unique
   mashData          MashDatum[]
+  operation         Operation                 @relation(fields: [operationId], references: [id])
+  operationId       String
+  productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
+  productionOrderId String?
+  settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
+  settingDataId     String?                   @unique
+  updatedAt         DateTime                  @updatedAt
 }
 
 model MashDatum {
-  id                      String                 @id @default(cuid())
-  createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
-  lotId                   String
-  balling                 Decimal
-  pH                      Decimal
-  backSetPH               Decimal
-  backsetVolume           Decimal?
-  waterVolume             Decimal
-  cornLbs                 Decimal?
-  ryeLbs                  Decimal?
-  maltLbs                 Decimal?
-  wheatLbs                Decimal?
-  loggedBy                String
   asset                   Asset?                 @relation(fields: [assetId], references: [id])
   assetId                 String?
-  fermenterNumber         Int
+  backSetPH               Decimal
+  backsetVolume           Decimal?
+  balling                 Decimal
+  cornLbs                 Decimal?
+  createdAt               DateTime               @default(now())
   fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
   fermentationChemistryId String?
+  fermenterNumber         Int
+  id                      String                 @id @default(cuid())
+  loggedBy                String
+  lotId                   String
+  maltLbs                 Decimal?
+  pH                      Decimal
+  ryeLbs                  Decimal?
+  updatedAt               DateTime               @updatedAt
+  waterVolume             Decimal
+  wheatLbs                Decimal?
 }
 
 model FermentationSettingDatum {
-  id                      String                 @id @default(cuid())
+  acid                    Decimal?
+  balling                 Decimal?
   createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
+  dryInches               Decimal?
+  fermentationChemistries FermentationChemistry?
+  fermenterNumber         Int
+  id                      String                 @id @default(cuid())
+  loggedBy                String
   lotId                   String
   operation               Operation?             @relation(fields: [operationId], references: [id])
   operationId             String?
-  fermenterNumber         Int
-  yeastPitchTime          DateTime
+  pH                      Decimal?
   setTime                 DateTime
   temperature             Decimal
-  dryInches               Decimal?
-  balling                 Decimal?
-  acid                    Decimal?
-  pH                      Decimal?
-  loggedBy                String
-  fermentationChemistries FermentationChemistry?
+  updatedAt               DateTime               @updatedAt
+  yeastPitchTime          DateTime
 }
 
 model FermentationDayDatum {
-  id                      String                       @id @default(cuid())
-  createdAt               DateTime                     @default(now())
-  updatedAt               DateTime                     @updatedAt
-  productionOrder         ProductionOrder              @relation(fields: [productionOrderId], references: [id])
-  productionOrderId       String
-  lotId                   String
-  loggedBy                String
-  day                     EnumFermentationDayDatumDay? @default(First)
-  temperature             Decimal
-  balling                 Decimal
   acid                    Decimal
-  pH                      Decimal
-  dryInches               Decimal?
-  operation               Operation                    @relation(fields: [operationId], references: [id])
-  operationId             String
-  fermenterNumber         Int
   asset                   Asset?                       @relation(fields: [assetId], references: [id])
   assetId                 String?
+  balling                 Decimal
+  createdAt               DateTime                     @default(now())
+  day                     EnumFermentationDayDatumDay? @default(First)
+  dryInches               Decimal?
   fermentationChemistry   FermentationChemistry?       @relation(fields: [fermentationChemistryId], references: [id])
   fermentationChemistryId String?
+  fermenterNumber         Int
+  id                      String                       @id @default(cuid())
+  loggedBy                String
+  lotId                   String
+  operation               Operation                    @relation(fields: [operationId], references: [id])
+  operationId             String
+  pH                      Decimal
+  productionOrder         ProductionOrder              @relation(fields: [productionOrderId], references: [id])
+  productionOrderId       String
+  temperature             Decimal
+  updatedAt               DateTime                     @updatedAt
 }
 
 model Batch {
-  id                      String                  @id @default(cuid())
-  createdAt               DateTime                @default(now())
-  updatedAt               DateTime                @updatedAt
-  batchId                 String                  @unique
-  parent                  Batch?                  @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
-  parentId                String?
-  children                Batch[]                 @relation(name: "BatchChildrenBatchParent")
-  quantity                Int?
-  batchData               Json?
-  revision                Int?                    @default(0)
-  customers               Json?
-  fermentationChemistries FermentationChemistry[]
-  lot                     Lot?                    @relation(fields: [lotId], references: [id])
-  lotId                   String?
-  parameterData           Json?
   asset                   Asset?                  @relation(fields: [assetId], references: [id])
   assetId                 String?
   assetPath               String?
+  batchData               Json?
+  batchId                 String                  @unique
+  batchInitData           Json?
+  children                Batch[]                 @relation(name: "BatchChildrenBatchParent")
+  createdAt               DateTime                @default(now())
+  customers               Json?
+  fermentationChemistries FermentationChemistry[]
+  id                      String                  @id @default(cuid())
+  lot                     Lot?                    @relation(fields: [lotId], references: [id])
+  lotId                   String?
+  operationIndex          String?
+  operationType           EnumBatchOperationType?
+  parameterData           Json?
+  parent                  Batch?                  @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
+  parentId                String?
+  quantity                Int?
   recipe                  Recipe?                 @relation(fields: [recipeId], references: [id])
   recipeId                String?
-  batchInitData           Json?
-  operationType           EnumBatchOperationType?
-  operationIndex          String?
   recipeName              String?
+  revision                Int?                    @default(0)
+  updatedAt               DateTime                @updatedAt
 }
 
 model Vendor {
-  id                 String          @id @default(cuid())
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-  items              Item[]
   active             Boolean?        @default(true)
   additionalDetails  Json?
   contactInformation Json?
+  createdAt          DateTime        @default(now())
   createdBy          String
-  updatedBy          String?
-  name               String?
   erpId              String?         @unique
   globalId           String?         @unique @default(cuid())
+  id                 String          @id @default(cuid())
+  items              Item[]
+  name               String?
   purchaseOrders     PurchaseOrder[]
+  updatedAt          DateTime        @updatedAt
+  updatedBy          String?
 }
 
 model Inventory {
-  id             String   @id @default(cuid())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  createdBy      String
-  updatedBy      String?
-  schemaVersion  String?
   asset          Asset    @relation(fields: [assetId], references: [id])
   assetId        String
-  revision       Int?     @default(0)
-  correctionNote String?
   correctedBy    String?
-  lotNumber      String?
+  correctionNote String?
+  createdAt      DateTime @default(now())
+  createdBy      String
+  customers      Json?
+  fifoIndex      Int?     @default(0)
+  globalId       String?  @unique @default(cuid())
+  id             String   @id @default(cuid())
   item           Item     @relation(fields: [itemId], references: [id])
   itemId         String
+  lotNumber      String?
   notes          String?
-  units          String?
-  globalId       String?  @unique @default(cuid())
-  customers      Json?
   proof          Decimal?
-  fifoIndex      Int?     @default(0)
+  revision       Int?     @default(0)
+  schemaVersion  String?
+  units          String?
+  updatedAt      DateTime @updatedAt
+  updatedBy      String?
 
   @@unique([assetId, fifoIndex])
 }
 
 model InventoryLog {
-  id                  String     @id @default(cuid())
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
-  dateTime            DateTime
-  date                DateTime
   asset               Asset      @relation(fields: [assetId], references: [id])
   assetId             String
-  quantity            Decimal?
-  loggedBy            String
+  createdAt           DateTime   @default(now())
+  customers           Customer[]
+  date                DateTime
+  dateTime            DateTime
+  id                  String     @id @default(cuid())
   item                Item       @relation(fields: [itemId], references: [id])
   itemId              String
-  revision            Int?       @default(0)
-  revisedBy           String?
-  customers           Customer[]
-  rawMeasurementValue String?
+  loggedBy            String
+  quantity            Decimal?
   rawMeasurementUnits String?
+  rawMeasurementValue String?
+  revisedBy           String?
+  revision            Int?       @default(0)
   units               String
+  updatedAt           DateTime   @updatedAt
 }
 
 model InventoryTransfer {
-  id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdBy    String?
+  department   String?
   fromLocation Asset?   @relation(name: "fromLocation", fields: [fromAssetId], references: [id])
   fromAssetId  String?
-  toLocation   Asset[]  @relation(name: "inventoryTransfersTo")
-  notes        String?
-  department   String?
-  createdBy    String?
-  updatedBy    String?
-  quantity     Int?
+  globalId     String?  @unique @default(cuid())
+  id           String   @id @default(cuid())
   item         Item?    @relation(fields: [itemId], references: [id])
   itemId       String?
   lot          Lot?     @relation(fields: [lotId], references: [id])
   lotId        String?
-  globalId     String?  @unique @default(cuid())
+  notes        String?
+  quantity     Int?
+  toLocation   Asset[]  @relation(name: "inventoryTransfersTo")
+  updatedAt    DateTime @updatedAt
+  updatedBy    String?
 }
 
 model UnitLookup {
-  id                 String       @id @default(cuid())
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  conversionRate     Decimal?
-  name               String       @unique
-  typeName           String
   abbreviation       String       @unique
-  pluralAbbreviation String       @unique
-  pluralName         String       @unique
-  baseUnit           Boolean?     @default(false)
   baseRecord         UnitLookup?  @relation(name: "baseRecord", fields: [baseRecordId], references: [id])
   baseRecordId       String?
+  baseUnit           Boolean?     @default(false)
+  conversionRate     Decimal?
+  createdAt          DateTime     @default(now())
+  id                 String       @id @default(cuid())
+  name               String       @unique
+  pluralAbbreviation String       @unique
+  pluralName         String       @unique
+  typeName           String
   unitLookupRecords  UnitLookup[] @relation(name: "baseRecord")
+  updatedAt          DateTime     @updatedAt
 }
 
 model ProductionOrderBomItem {
-  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
 }
 
 model RecipeBomItem {
-  id                   String                     @id @default(cuid())
-  createdAt            DateTime                   @default(now())
-  updatedAt            DateTime                   @updatedAt
-  item                 Item?                      @relation(fields: [itemId], references: [id])
-  itemId               String?
-  recipe               Recipe?                    @relation(fields: [recipeId], references: [id])
-  recipeId             String?
-  createdBy            String
-  updatedBy            DateTime?
-  operation            EnumRecipeBomItemOperation
-  operationIndex       Int                        @default(-1)
-  isClassDefinition    Boolean?                   @default(false)
-  quantity             Decimal?
-  units                String
-  quantityActual       Decimal?
   classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classIdid], references: [id])
   classIdid            String?
-  instances            RecipeBomItem[]            @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances")
+  createdAt            DateTime                   @default(now())
+  createdBy            String
   globalId             String?                    @unique @default(cuid())
+  id                   String                     @id @default(cuid())
+  instances            RecipeBomItem[]            @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances")
+  isClassDefinition    Boolean?                   @default(false)
+  item                 Item?                      @relation(fields: [itemId], references: [id])
+  itemId               String?
   lot                  String?
   mashingProtocolSteps MashingProtocolStep[]
+  operation            EnumRecipeBomItemOperation
+  operationIndex       Int                        @default(-1)
+  quantity             Decimal?
+  quantityActual       Decimal?
+  recipe               Recipe?                    @relation(fields: [recipeId], references: [id])
+  recipeId             String?
+  units                String
+  updatedAt            DateTime                   @updatedAt
+  updatedBy            DateTime?
 }
 
 model MashingProtocol {
-  id        String                @id @default(cuid())
   createdAt DateTime              @default(now())
-  updatedAt DateTime              @updatedAt
+  id        String                @id @default(cuid())
   steps     MashingProtocolStep[]
+  updatedAt DateTime              @updatedAt
 }
 
 model MashingProtocolStep {
-  id                  String                           @id @default(cuid())
-  createdAt           DateTime                         @default(now())
-  updatedAt           DateTime                         @updatedAt
-  mashingProtocol     MashingProtocol?                 @relation(fields: [mashingProtocolId], references: [id])
-  mashingProtocolId   String?
-  index               Int?
   agitatorEnabled     Boolean?                         @default(false)
   agitatorSpdSp       Decimal?
   coolEnabled         Boolean?                         @default(false)
   coolTempSp          Decimal?
+  createdAt           DateTime                         @default(now())
+  createdBy           String
   heatEnabled         Boolean?                         @default(false)
   heatTempSp          Decimal?
-  recipeBomItem       RecipeBomItem[]
-  isClassDefinition   Boolean?                         @default(false)
-  stepType            EnumMashingProtocolStepStepType?
   holdType            EnumMashingProtocolStepHoldType?
-  temperatureSetpoint Decimal?
+  id                  String                           @id @default(cuid())
+  index               Int?
+  isClassDefinition   Boolean?                         @default(false)
+  mashingProtocol     MashingProtocol?                 @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId   String?
+  recipeBomItem       RecipeBomItem[]
+  stepType            EnumMashingProtocolStepStepType?
   temperatureActual   Decimal?
-  createdBy           String
+  temperatureSetpoint Decimal?
+  updatedAt           DateTime                         @updatedAt
   updatedBy           String?
 }
 
@@ -980,17 +980,17 @@ enum EnumTestParameterTestSetpointType {
   Numerical
 }
 
-enum EnumRecipeParameterRecipeSetpointType {
-  Boolean
-  Numeric
-  Text
-}
-
 enum EnumRecipeParameterOperation {
   Mashing01
   Ferrmentation01
   Distillation01
   Processing01
+}
+
+enum EnumRecipeParameterRecipeSetpointType {
+  Boolean
+  Numeric
+  Text
 }
 
 enum EnumEquipmentPhaseName {
@@ -1153,6 +1153,12 @@ enum EnumRecipeBomItemOperation {
   Processing01
 }
 
+enum EnumMashingProtocolStepHoldType {
+  Heat
+  Cool
+  Hold
+}
+
 enum EnumMashingProtocolStepStepType {
   Hold
   LiquidAdd
@@ -1163,10 +1169,4 @@ enum EnumMashingProtocolStepStepType {
   Malt
   Prompt
   AdditiveAdd
-}
-
-enum EnumMashingProtocolStepHoldType {
-  Heat
-  Cool
-  Hold
 }

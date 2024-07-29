@@ -14,34 +14,67 @@ import { ApiProperty } from "@nestjs/swagger";
 
 import {
   IsString,
-  IsDate,
   MaxLength,
   IsOptional,
+  IsBoolean,
+  ValidateNested,
+  IsDate,
+  IsEnum,
   IsInt,
   Max,
-  IsEnum,
-  ValidateNested,
-  IsBoolean,
 } from "class-validator";
 
+import { Bom } from "../../bom/base/Bom";
 import { Type } from "class-transformer";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { Operation } from "../../operation/base/Operation";
 import { Procedure } from "../../procedure/base/Procedure";
-import { Recipe } from "../../recipe/base/Recipe";
-import { Bom } from "../../bom/base/Bom";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { Recipe } from "../../recipe/base/Recipe";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 
 @ObjectType()
 class UnitProcedure {
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @Field(() => String)
-  id!: string;
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  abbreviation!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Bom,
+  })
+  @ValidateNested()
+  @Type(() => Bom)
+  @IsOptional()
+  boms?: Bom | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedure,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  classId?: UnitProcedure | null;
 
   @ApiProperty({
     required: true,
@@ -50,14 +83,6 @@ class UnitProcedure {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -73,51 +98,12 @@ class UnitProcedure {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
-    required: true,
-    enum: EnumUnitProcedureName,
-  })
-  @IsEnum(EnumUnitProcedureName)
-  @Field(() => EnumUnitProcedureName, {
-    nullable: true,
-  })
-  name?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Granary01";
+  description!: string | null;
 
   @ApiProperty({
     required: false,
@@ -129,44 +115,15 @@ class UnitProcedure {
   @Field(() => String, {
     nullable: true,
   })
-  description!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Operation],
-  })
-  @ValidateNested()
-  @Type(() => Operation)
-  @IsOptional()
-  operations?: Array<Operation>;
+  globalId!: string | null;
 
   @ApiProperty({
     required: true,
-    type: () => Procedure,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Procedure)
-  procedure?: Procedure;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDef!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedure,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  classId?: UnitProcedure | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: false,
@@ -186,34 +143,31 @@ class UnitProcedure {
   @Field(() => Boolean, {
     nullable: true,
   })
-  active!: boolean | null;
+  isClassDef!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumUnitProcedureName,
+  })
+  @IsEnum(EnumUnitProcedureName)
+  @Field(() => EnumUnitProcedureName, {
+    nullable: true,
+  })
+  name?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
 
   @ApiProperty({
     required: false,
-    type: () => [Recipe],
+    type: () => [Operation],
   })
   @ValidateNested()
-  @Type(() => Recipe)
+  @Type(() => Operation)
   @IsOptional()
-  recipe?: Array<Recipe>;
-
-  @ApiProperty({
-    required: false,
-    type: () => Bom,
-  })
-  @ValidateNested()
-  @Type(() => Bom)
-  @IsOptional()
-  boms?: Bom | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Bom,
-  })
-  @ValidateNested()
-  @Type(() => Bom)
-  @IsOptional()
-  primaryBom?: Bom | null;
+  operations?: Array<Operation>;
 
   @ApiProperty({
     required: false,
@@ -229,24 +183,20 @@ class UnitProcedure {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderQueue,
+    type: () => Bom,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueue)
+  @Type(() => Bom)
   @IsOptional()
-  scheduleOrderQueues?: ScheduleOrderQueue | null;
+  primaryBom?: Bom | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => Procedure,
+  })
+  @ValidateNested()
+  @Type(() => Procedure)
+  procedure?: Procedure;
 
   @ApiProperty({
     required: false,
@@ -259,15 +209,65 @@ class UnitProcedure {
 
   @ApiProperty({
     required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipe?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueue,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueue)
+  @IsOptional()
+  scheduleOrderQueues?: ScheduleOrderQueue | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(3)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  abbreviation!: string | null;
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { UnitProcedure as UnitProcedure };

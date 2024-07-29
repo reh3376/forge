@@ -54,8 +54,8 @@ export class ProductionOrderBomItemControllerBase {
     return await this.service.createProductionOrderBomItem({
       data: data,
       select: {
-        id: true,
         createdAt: true,
+        id: true,
         updatedAt: true,
       },
     });
@@ -83,8 +83,8 @@ export class ProductionOrderBomItemControllerBase {
     return this.service.productionOrderBomItems({
       ...args,
       select: {
-        id: true,
         createdAt: true,
+        id: true,
         updatedAt: true,
       },
     });
@@ -108,8 +108,8 @@ export class ProductionOrderBomItemControllerBase {
     const result = await this.service.productionOrderBomItem({
       where: params,
       select: {
-        id: true,
         createdAt: true,
+        id: true,
         updatedAt: true,
       },
     });
@@ -145,8 +145,8 @@ export class ProductionOrderBomItemControllerBase {
         where: params,
         data: data,
         select: {
-          id: true,
           createdAt: true,
+          id: true,
           updatedAt: true,
         },
       });
@@ -178,8 +178,8 @@ export class ProductionOrderBomItemControllerBase {
       return await this.service.deleteProductionOrderBomItem({
         where: params,
         select: {
-          id: true,
           createdAt: true,
+          id: true,
           updatedAt: true,
         },
       });

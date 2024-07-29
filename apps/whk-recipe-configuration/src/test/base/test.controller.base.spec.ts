@@ -23,13 +23,13 @@ const CREATE_INPUT = {
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   isClassDefinition: "true",
   schemaVersion: "exampleSchemaVersion",
   testDescription: "exampleTestDescription",
   testName: "exampleTestName",
   testRevision: 42,
-  globalId: "exampleGlobalId",
 };
 const CREATE_RESULT = {
   active: "true",
@@ -37,13 +37,13 @@ const CREATE_RESULT = {
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   isClassDefinition: "true",
   schemaVersion: "exampleSchemaVersion",
   testDescription: "exampleTestDescription",
   testName: "exampleTestName",
   testRevision: 42,
-  globalId: "exampleGlobalId",
 };
 const FIND_MANY_RESULT = [
   {
@@ -52,13 +52,13 @@ const FIND_MANY_RESULT = [
     createdBy: "exampleCreatedBy",
     editedAt: new Date(),
     editedBy: "exampleEditedBy",
+    globalId: "exampleGlobalId",
     id: "exampleId",
     isClassDefinition: "true",
     schemaVersion: "exampleSchemaVersion",
     testDescription: "exampleTestDescription",
     testName: "exampleTestName",
     testRevision: 42,
-    globalId: "exampleGlobalId",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -67,13 +67,13 @@ const FIND_ONE_RESULT = {
   createdBy: "exampleCreatedBy",
   editedAt: new Date(),
   editedBy: "exampleEditedBy",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   isClassDefinition: "true",
   schemaVersion: "exampleSchemaVersion",
   testDescription: "exampleTestDescription",
   testName: "exampleTestName",
   testRevision: 42,
-  globalId: "exampleGlobalId",
 };
 
 const service = {

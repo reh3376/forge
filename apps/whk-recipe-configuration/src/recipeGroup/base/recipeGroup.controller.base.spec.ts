@@ -18,50 +18,50 @@ import { RecipeGroupService } from "../recipeGroup.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  globalId: "exampleGlobalId",
+  id: "exampleId",
   recipe: "exampleRecipe",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
-  createdBy: "exampleCreatedBy",
+  updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
 };
 const CREATE_RESULT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  globalId: "exampleGlobalId",
+  id: "exampleId",
   recipe: "exampleRecipe",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
-  createdBy: "exampleCreatedBy",
+  updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
 };
 const FIND_MANY_RESULT = [
   {
-    id: "exampleId",
     createdAt: new Date(),
-    updatedAt: new Date(),
+    createdBy: "exampleCreatedBy",
+    globalId: "exampleGlobalId",
+    id: "exampleId",
     recipe: "exampleRecipe",
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
-    createdBy: "exampleCreatedBy",
+    updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
-    globalId: "exampleGlobalId",
   },
 ];
 const FIND_ONE_RESULT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
+  createdBy: "exampleCreatedBy",
+  globalId: "exampleGlobalId",
+  id: "exampleId",
   recipe: "exampleRecipe",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
-  createdBy: "exampleCreatedBy",
+  updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
 };
 
 const service = {

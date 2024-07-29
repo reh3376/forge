@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { LotUpdateManyWithoutPurchaseOrdersInput } from "./LotUpdateManyWithoutPurchaseOrdersInput";
 
 import {
   ValidateNested,
@@ -19,27 +19,39 @@ import {
   IsString,
   MaxLength,
   IsBoolean,
-  IsInt,
-  Max,
   IsDate,
   IsEnum,
+  IsInt,
+  Max,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
-import { PurchaseOrderUpdateManyWithoutPurchaseOrdersInput } from "./PurchaseOrderUpdateManyWithoutPurchaseOrdersInput";
-import { ItemReceiptUpdateManyWithoutPurchaseOrdersInput } from "./ItemReceiptUpdateManyWithoutPurchaseOrdersInput";
-import { LotUpdateManyWithoutPurchaseOrdersInput } from "./LotUpdateManyWithoutPurchaseOrdersInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { ItemUpdateManyWithoutPurchaseOrdersInput } from "./ItemUpdateManyWithoutPurchaseOrdersInput";
-import { TestParameterUpdateManyWithoutPurchaseOrdersInput } from "./TestParameterUpdateManyWithoutPurchaseOrdersInput";
+import { ItemReceiptUpdateManyWithoutPurchaseOrdersInput } from "./ItemReceiptUpdateManyWithoutPurchaseOrdersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { PurchaseOrderUpdateManyWithoutPurchaseOrdersInput } from "./PurchaseOrderUpdateManyWithoutPurchaseOrdersInput";
+import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
+import { TestParameterUpdateManyWithoutPurchaseOrdersInput } from "./TestParameterUpdateManyWithoutPurchaseOrdersInput";
+import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class PurchaseOrderUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutPurchaseOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  acceptedLots?: LotUpdateManyWithoutPurchaseOrdersInput;
+
   @ApiProperty({
     required: false,
     type: () => AssetWhereUniqueInput,
@@ -92,24 +104,70 @@ class PurchaseOrderUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  erpId?: string;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  transactionGroup?: string | null;
+  globalId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemUpdateManyWithoutPurchaseOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemUpdateManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => ItemUpdateManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  item?: ItemUpdateManyWithoutPurchaseOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceiptUpdateManyWithoutPurchaseOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptUpdateManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => ItemReceiptUpdateManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptUpdateManyWithoutPurchaseOrdersInput;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderUpdateManyWithoutPurchaseOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderUpdateManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderUpdateManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  lotsRejected?: PurchaseOrderUpdateManyWithoutPurchaseOrdersInput;
 
   @ApiProperty({
     required: false,
@@ -122,18 +180,6 @@ class PurchaseOrderUpdateInput {
     nullable: true,
   })
   name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalOrderQuantity?: number | null;
 
   @ApiProperty({
     required: false,
@@ -168,6 +214,18 @@ class PurchaseOrderUpdateInput {
     nullable: true,
   })
   purchaseOrderRejectedLots?: PurchaseOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterUpdateManyWithoutPurchaseOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutPurchaseOrdersInput)
+  @IsOptional()
+  @Field(() => TestParameterUpdateManyWithoutPurchaseOrdersInput, {
+    nullable: true,
+  })
+  qualityTests?: TestParameterUpdateManyWithoutPurchaseOrdersInput;
 
   @ApiProperty({
     required: false,
@@ -225,97 +283,39 @@ class PurchaseOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => PurchaseOrderUpdateManyWithoutPurchaseOrdersInput,
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => PurchaseOrderUpdateManyWithoutPurchaseOrdersInput)
+  @IsInt()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => PurchaseOrderUpdateManyWithoutPurchaseOrdersInput, {
+  @Field(() => Number, {
     nullable: true,
   })
-  lotsRejected?: PurchaseOrderUpdateManyWithoutPurchaseOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptUpdateManyWithoutPurchaseOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptUpdateManyWithoutPurchaseOrdersInput)
-  @IsOptional()
-  @Field(() => ItemReceiptUpdateManyWithoutPurchaseOrdersInput, {
-    nullable: true,
-  })
-  itemReceipts?: ItemReceiptUpdateManyWithoutPurchaseOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotUpdateManyWithoutPurchaseOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => LotUpdateManyWithoutPurchaseOrdersInput)
-  @IsOptional()
-  @Field(() => LotUpdateManyWithoutPurchaseOrdersInput, {
-    nullable: true,
-  })
-  acceptedLots?: LotUpdateManyWithoutPurchaseOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemUpdateManyWithoutPurchaseOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemUpdateManyWithoutPurchaseOrdersInput)
-  @IsOptional()
-  @Field(() => ItemUpdateManyWithoutPurchaseOrdersInput, {
-    nullable: true,
-  })
-  item?: ItemUpdateManyWithoutPurchaseOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterUpdateManyWithoutPurchaseOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterUpdateManyWithoutPurchaseOrdersInput)
-  @IsOptional()
-  @Field(() => TestParameterUpdateManyWithoutPurchaseOrdersInput, {
-    nullable: true,
-  })
-  qualityTests?: TestParameterUpdateManyWithoutPurchaseOrdersInput;
+  totalOrderQuantity?: number | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  lineItems?: InputJsonValue;
+  transactionGroup?: string | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(100)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  erpId?: string;
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,

@@ -12,10 +12,10 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  IsBoolean,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  IsBoolean,
   ValidateNested,
   IsInt,
   Max,
@@ -25,30 +25,6 @@ import { Type } from "class-transformer";
 
 @InputType()
 class InstructionUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  filePath?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy?: string | null;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -74,6 +50,18 @@ class InstructionUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => EquipmentPhaseUpdateManyWithoutInstructionsInput,
   })
   @ValidateNested()
@@ -89,12 +77,36 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
+  filePath?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
 
   @ApiProperty({
     required: false,
@@ -113,24 +125,12 @@ class InstructionUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
+  schemaVersion?: string | null;
 }
 
 export { InstructionUpdateInput as InstructionUpdateInput };

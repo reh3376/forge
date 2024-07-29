@@ -31,12 +31,12 @@ import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
-import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
-import { Recipe } from "../../recipe/base/Recipe";
-import { Item } from "../../item/base/Item";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Asset } from "../../asset/base/Asset";
+import { Item } from "../../item/base/Item";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { Recipe } from "../../recipe/base/Recipe";
 import { LotService } from "../lot.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Lot)
@@ -100,15 +100,15 @@ export class LotResolverBase {
       data: {
         ...args.data,
 
-        purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
+        fermentationChemistries: args.data.fermentationChemistries
           ? {
-              connect: args.data.purchaseOrderAcceptedLots,
+              connect: args.data.fermentationChemistries,
             }
           : undefined,
 
-        recipe: args.data.recipe
+        fromAsset: args.data.fromAsset
           ? {
-              connect: args.data.recipe,
+              connect: args.data.fromAsset,
             }
           : undefined,
 
@@ -124,15 +124,15 @@ export class LotResolverBase {
             }
           : undefined,
 
-        fermentationChemistries: args.data.fermentationChemistries
+        purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
           ? {
-              connect: args.data.fermentationChemistries,
+              connect: args.data.purchaseOrderAcceptedLots,
             }
           : undefined,
 
-        fromAsset: args.data.fromAsset
+        recipe: args.data.recipe
           ? {
-              connect: args.data.fromAsset,
+              connect: args.data.recipe,
             }
           : undefined,
       },
@@ -153,15 +153,15 @@ export class LotResolverBase {
         data: {
           ...args.data,
 
-          purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
+          fermentationChemistries: args.data.fermentationChemistries
             ? {
-                connect: args.data.purchaseOrderAcceptedLots,
+                connect: args.data.fermentationChemistries,
               }
             : undefined,
 
-          recipe: args.data.recipe
+          fromAsset: args.data.fromAsset
             ? {
-                connect: args.data.recipe,
+                connect: args.data.fromAsset,
               }
             : undefined,
 
@@ -177,15 +177,15 @@ export class LotResolverBase {
               }
             : undefined,
 
-          fermentationChemistries: args.data.fermentationChemistries
+          purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
             ? {
-                connect: args.data.fermentationChemistries,
+                connect: args.data.purchaseOrderAcceptedLots,
               }
             : undefined,
 
-          fromAsset: args.data.fromAsset
+          recipe: args.data.recipe
             ? {
-                connect: args.data.fromAsset,
+                connect: args.data.recipe,
               }
             : undefined,
         },
@@ -263,19 +263,19 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => PurchaseOrder, {
+  @graphql.ResolveField(() => FermentationChemistry, {
     nullable: true,
-    name: "purchaseOrderAcceptedLots",
+    name: "fermentationChemistries",
   })
   @nestAccessControl.UseRoles({
-    resource: "PurchaseOrder",
+    resource: "FermentationChemistry",
     action: "read",
     possession: "any",
   })
-  async getPurchaseOrderAcceptedLots(
+  async getFermentationChemistries(
     @graphql.Parent() parent: Lot
-  ): Promise<PurchaseOrder | null> {
-    const result = await this.service.getPurchaseOrderAcceptedLots(parent.id);
+  ): Promise<FermentationChemistry | null> {
+    const result = await this.service.getFermentationChemistries(parent.id);
 
     if (!result) {
       return null;
@@ -284,17 +284,17 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Recipe, {
+  @graphql.ResolveField(() => Asset, {
     nullable: true,
-    name: "recipe",
+    name: "fromAsset",
   })
   @nestAccessControl.UseRoles({
-    resource: "Recipe",
+    resource: "Asset",
     action: "read",
     possession: "any",
   })
-  async getRecipe(@graphql.Parent() parent: Lot): Promise<Recipe | null> {
-    const result = await this.service.getRecipe(parent.id);
+  async getFromAsset(@graphql.Parent() parent: Lot): Promise<Asset | null> {
+    const result = await this.service.getFromAsset(parent.id);
 
     if (!result) {
       return null;
@@ -343,19 +343,19 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => FermentationChemistry, {
+  @graphql.ResolveField(() => PurchaseOrder, {
     nullable: true,
-    name: "fermentationChemistries",
+    name: "purchaseOrderAcceptedLots",
   })
   @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
+    resource: "PurchaseOrder",
     action: "read",
     possession: "any",
   })
-  async getFermentationChemistries(
+  async getPurchaseOrderAcceptedLots(
     @graphql.Parent() parent: Lot
-  ): Promise<FermentationChemistry | null> {
-    const result = await this.service.getFermentationChemistries(parent.id);
+  ): Promise<PurchaseOrder | null> {
+    const result = await this.service.getPurchaseOrderAcceptedLots(parent.id);
 
     if (!result) {
       return null;
@@ -364,17 +364,17 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Asset, {
+  @graphql.ResolveField(() => Recipe, {
     nullable: true,
-    name: "fromAsset",
+    name: "recipe",
   })
   @nestAccessControl.UseRoles({
-    resource: "Asset",
+    resource: "Recipe",
     action: "read",
     possession: "any",
   })
-  async getFromAsset(@graphql.Parent() parent: Lot): Promise<Asset | null> {
-    const result = await this.service.getFromAsset(parent.id);
+  async getRecipe(@graphql.Parent() parent: Lot): Promise<Recipe | null> {
+    const result = await this.service.getRecipe(parent.id);
 
     if (!result) {
       return null;

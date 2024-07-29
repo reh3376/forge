@@ -16,103 +16,32 @@ import {
   IsString,
   MaxLength,
   IsOptional,
-  IsInt,
-  Max,
   IsBoolean,
   ValidateNested,
+  IsInt,
+  Max,
   IsNumber,
 } from "class-validator";
 
 import { Recipe } from "./Recipe";
-import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { BatchUpdateManyWithoutRecipesInput } from "./BatchUpdateManyWithoutRecipesInput";
 import { Type } from "class-transformer";
-import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
-import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
-import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
+import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
+import { Decimal } from "decimal.js";
+import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { Decimal } from "decimal.js";
-import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
-import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
+import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
+import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { RecipeBomItemUpdateManyWithoutRecipesInput } from "./RecipeBomItemUpdateManyWithoutRecipesInput";
-import { BatchUpdateManyWithoutRecipesInput } from "./BatchUpdateManyWithoutRecipesInput";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
+import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 
 @InputType()
 class RecipeUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  createdBy?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  customerCode?: string | null;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -127,63 +56,62 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeGroupWhereUniqueInput,
+    type: Boolean,
   })
-  @ValidateNested()
-  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsBoolean()
   @IsOptional()
-  @Field(() => RecipeGroupWhereUniqueInput, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  recipeGroup?: RecipeGroupWhereUniqueInput | null;
+  active?: boolean | null;
 
   @ApiProperty({
     required: false,
-    type: () => UnitProcedureUpdateManyWithoutRecipesInput,
+    type: () => BatchUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => UnitProcedureUpdateManyWithoutRecipesInput)
+  @Type(() => BatchUpdateManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => UnitProcedureUpdateManyWithoutRecipesInput, {
+  @Field(() => BatchUpdateManyWithoutRecipesInput, {
     nullable: true,
   })
-  unitProcedures?: UnitProcedureUpdateManyWithoutRecipesInput;
+  batches?: BatchUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderUpdateManyWithoutRecipesInput,
+    type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderUpdateManyWithoutRecipesInput)
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => ProductionOrderUpdateManyWithoutRecipesInput, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  productionOrders?: ProductionOrderUpdateManyWithoutRecipesInput;
+  classId?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderUpdateManyWithoutRecipesInput,
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => ScheduleOrderUpdateManyWithoutRecipesInput)
+  @IsInt()
+  @Max(99)
   @IsOptional()
-  @Field(() => ScheduleOrderUpdateManyWithoutRecipesInput, {
+  @Field(() => Number, {
     nullable: true,
   })
-  scheduleOrders?: ScheduleOrderUpdateManyWithoutRecipesInput;
+  cooksPerFerm?: number | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  createdBy?: string;
 
   @ApiProperty({
     required: false,
@@ -199,15 +127,74 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput)
+  @IsString()
+  @MaxLength(16)
   @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput;
+  customerCode?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(20)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  estimatedAbv?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  instances?: RecipeUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -235,15 +222,99 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput | null;
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  recipeBomItems?: RecipeBomItemUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  recipeGroup?: RecipeGroupWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  targetProof?: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -267,102 +338,31 @@ class RecipeUpdateInput {
   @Field(() => Number, {
     nullable: true,
   })
-  cooksPerFerm?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(20)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  estimatedAbv?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
   totalFermenters?: number | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  targetProof?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
+    type: () => UnitProcedureUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
+  @Type(() => UnitProcedureUpdateManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
+  @Field(() => UnitProcedureUpdateManyWithoutRecipesInput, {
     nullable: true,
   })
-  classId?: RecipeWhereUniqueInput | null;
+  unitProcedures?: UnitProcedureUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
-    type: () => RecipeUpdateManyWithoutRecipesInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => RecipeUpdateManyWithoutRecipesInput)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  @Field(() => RecipeUpdateManyWithoutRecipesInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  instances?: RecipeUpdateManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemUpdateManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemUpdateManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => RecipeBomItemUpdateManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  recipeBomItems?: RecipeBomItemUpdateManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchUpdateManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchUpdateManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => BatchUpdateManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  batches?: BatchUpdateManyWithoutRecipesInput;
+  updatedBy?: string | null;
 }
 
 export { RecipeUpdateInput as RecipeUpdateInput };

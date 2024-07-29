@@ -65,23 +65,7 @@ export class RecipeParameterControllerBase {
           : undefined,
       },
       select: {
-        recipeSetpointType: true,
-        revision: true,
-        recipeSetpointUpperLimit: true,
-        recipeParamName: true,
-        className: true,
         active: true,
-        createdBy: true,
-        recipeSetpointLowerLimit: true,
-        updatedAt: true,
-        id: true,
-        recipeParamDescription: true,
-        updatedBy: true,
-        recipeSetpointBooleanValue: true,
-        createdAt: true,
-        recipeParamUnits: true,
-        schemaVersion: true,
-        isClassDefinition: true,
 
         classId: {
           select: {
@@ -89,11 +73,27 @@ export class RecipeParameterControllerBase {
           },
         },
 
-        globalId: true,
-        recipeNumericalSetpoint: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
         description: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
         operation: true,
         operationIndex: true,
+        recipeNumericalSetpoint: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -117,23 +117,7 @@ export class RecipeParameterControllerBase {
     return this.service.recipeParameters({
       ...args,
       select: {
-        recipeSetpointType: true,
-        revision: true,
-        recipeSetpointUpperLimit: true,
-        recipeParamName: true,
-        className: true,
         active: true,
-        createdBy: true,
-        recipeSetpointLowerLimit: true,
-        updatedAt: true,
-        id: true,
-        recipeParamDescription: true,
-        updatedBy: true,
-        recipeSetpointBooleanValue: true,
-        createdAt: true,
-        recipeParamUnits: true,
-        schemaVersion: true,
-        isClassDefinition: true,
 
         classId: {
           select: {
@@ -141,11 +125,27 @@ export class RecipeParameterControllerBase {
           },
         },
 
-        globalId: true,
-        recipeNumericalSetpoint: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
         description: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
         operation: true,
         operationIndex: true,
+        recipeNumericalSetpoint: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -168,23 +168,7 @@ export class RecipeParameterControllerBase {
     const result = await this.service.recipeParameter({
       where: params,
       select: {
-        recipeSetpointType: true,
-        revision: true,
-        recipeSetpointUpperLimit: true,
-        recipeParamName: true,
-        className: true,
         active: true,
-        createdBy: true,
-        recipeSetpointLowerLimit: true,
-        updatedAt: true,
-        id: true,
-        recipeParamDescription: true,
-        updatedBy: true,
-        recipeSetpointBooleanValue: true,
-        createdAt: true,
-        recipeParamUnits: true,
-        schemaVersion: true,
-        isClassDefinition: true,
 
         classId: {
           select: {
@@ -192,11 +176,27 @@ export class RecipeParameterControllerBase {
           },
         },
 
-        globalId: true,
-        recipeNumericalSetpoint: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
         description: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
         operation: true,
         operationIndex: true,
+        recipeNumericalSetpoint: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -239,23 +239,7 @@ export class RecipeParameterControllerBase {
             : undefined,
         },
         select: {
-          recipeSetpointType: true,
-          revision: true,
-          recipeSetpointUpperLimit: true,
-          recipeParamName: true,
-          className: true,
           active: true,
-          createdBy: true,
-          recipeSetpointLowerLimit: true,
-          updatedAt: true,
-          id: true,
-          recipeParamDescription: true,
-          updatedBy: true,
-          recipeSetpointBooleanValue: true,
-          createdAt: true,
-          recipeParamUnits: true,
-          schemaVersion: true,
-          isClassDefinition: true,
 
           classId: {
             select: {
@@ -263,11 +247,27 @@ export class RecipeParameterControllerBase {
             },
           },
 
-          globalId: true,
-          recipeNumericalSetpoint: true,
+          className: true,
+          createdAt: true,
+          createdBy: true,
           description: true,
+          globalId: true,
+          id: true,
+          isClassDefinition: true,
           operation: true,
           operationIndex: true,
+          recipeNumericalSetpoint: true,
+          recipeParamDescription: true,
+          recipeParamName: true,
+          recipeParamUnits: true,
+          recipeSetpointBooleanValue: true,
+          recipeSetpointLowerLimit: true,
+          recipeSetpointType: true,
+          recipeSetpointUpperLimit: true,
+          revision: true,
+          schemaVersion: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -296,23 +296,7 @@ export class RecipeParameterControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
-        recipeSetpointType: true,
-        revision: true,
-        recipeSetpointUpperLimit: true,
-        recipeParamName: true,
-        className: true,
         active: true,
-        createdBy: true,
-        recipeSetpointLowerLimit: true,
-        updatedAt: true,
-        id: true,
-        recipeParamDescription: true,
-        updatedBy: true,
-        recipeSetpointBooleanValue: true,
-        createdAt: true,
-        recipeParamUnits: true,
-        schemaVersion: true,
-        isClassDefinition: true,
 
         classId: {
           select: {
@@ -320,11 +304,27 @@ export class RecipeParameterControllerBase {
           },
         },
 
-        globalId: true,
-        recipeNumericalSetpoint: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
         description: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
         operation: true,
         operationIndex: true,
+        recipeNumericalSetpoint: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -417,24 +417,18 @@ export class RecipeParameterControllerBase {
     const results = await this.service.findRecipe(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
         Recipe: true,
+        active: true,
 
-        recipeGroup: {
+        classId: {
           select: {
             id: true,
           },
         },
 
-        globalId: true,
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -442,24 +436,31 @@ export class RecipeParameterControllerBase {
           },
         },
 
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
         item: {
           select: {
             id: true,
           },
         },
 
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
-
-        classId: {
+        recipeGroup: {
           select: {
             id: true,
           },
         },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
