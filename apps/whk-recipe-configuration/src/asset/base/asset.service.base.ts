@@ -14,16 +14,16 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Asset as PrismaAsset,
-  PurchaseOrder as PrismaPurchaseOrder,
+  Batch as PrismaBatch,
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
-  MashDatum as PrismaMashDatum,
-  Batch as PrismaBatch,
   Inventory as PrismaInventory,
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
   ItemReceipt as PrismaItemReceipt,
   Lot as PrismaLot,
+  MashDatum as PrismaMashDatum,
+  PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -49,15 +49,26 @@ export class AssetServiceBase {
     return this.prisma.asset.delete(args);
   }
 
-  async findPurchaseOrders(
+  async findBatches(
     parentId: string,
-    args: Prisma.PurchaseOrderFindManyArgs
-  ): Promise<PrismaPurchaseOrder[]> {
+    args: Prisma.BatchFindManyArgs
+  ): Promise<PrismaBatch[]> {
     return this.prisma.asset
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .purchaseOrders(args);
+      .batches(args);
+  }
+
+  async findChildren(
+    parentId: string,
+    args: Prisma.AssetFindManyArgs
+  ): Promise<PrismaAsset[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .children(args);
   }
 
   async findFermentationChemistries(
@@ -80,28 +91,6 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .fermentationDayData(args);
-  }
-
-  async findMashData(
-    parentId: string,
-    args: Prisma.MashDatumFindManyArgs
-  ): Promise<PrismaMashDatum[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .mashData(args);
-  }
-
-  async findBatches(
-    parentId: string,
-    args: Prisma.BatchFindManyArgs
-  ): Promise<PrismaBatch[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .batches(args);
   }
 
   async findInventories(
@@ -148,17 +137,6 @@ export class AssetServiceBase {
       .inventoryTransfersTo(args);
   }
 
-  async findChildren(
-    parentId: string,
-    args: Prisma.AssetFindManyArgs
-  ): Promise<PrismaAsset[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .children(args);
-  }
-
   async findItemReceipts(
     parentId: string,
     args: Prisma.ItemReceiptFindManyArgs
@@ -179,6 +157,28 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .lots(args);
+  }
+
+  async findMashData(
+    parentId: string,
+    args: Prisma.MashDatumFindManyArgs
+  ): Promise<PrismaMashDatum[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .mashData(args);
+  }
+
+  async findPurchaseOrders(
+    parentId: string,
+    args: Prisma.PurchaseOrderFindManyArgs
+  ): Promise<PrismaPurchaseOrder[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .purchaseOrders(args);
   }
 
   async getParent(parentId: string): Promise<PrismaAsset | null> {

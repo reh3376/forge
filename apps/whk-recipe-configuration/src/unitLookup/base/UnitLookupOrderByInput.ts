@@ -28,7 +28,7 @@ class UnitLookupOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  id?: SortOrder;
+  abbreviation?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -39,7 +39,7 @@ class UnitLookupOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  createdAt?: SortOrder;
+  baseRecordId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -50,7 +50,7 @@ class UnitLookupOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
+  baseUnit?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -72,29 +72,29 @@ class UnitLookupOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  createdAt?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  id?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   name?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  typeName?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  abbreviation?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -127,7 +127,7 @@ class UnitLookupOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  baseUnit?: SortOrder;
+  typeName?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +138,7 @@ class UnitLookupOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  baseRecordId?: SortOrder;
+  updatedAt?: SortOrder;
 }
 
 export { UnitLookupOrderByInput as UnitLookupOrderByInput };

@@ -12,14 +12,14 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsString,
   IsDate,
+  IsString,
   MaxLength,
   IsOptional,
+  ValidateNested,
   IsInt,
   Min,
   Max,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
@@ -29,27 +29,11 @@ import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 class ScheduleOrderQueue {
   @ApiProperty({
     required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
   })
   @IsDate()
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
@@ -65,49 +49,20 @@ class ScheduleOrderQueue {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-99)
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  queueIndex!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   globalId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -127,12 +82,57 @@ class ScheduleOrderQueue {
   nextUnitProcedureName!: string;
 
   @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-99)
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  queueIndex!: number | null;
+
+  @ApiProperty({
     required: true,
     type: () => ScheduleOrder,
   })
   @ValidateNested()
   @Type(() => ScheduleOrder)
   scheduleOrder?: ScheduleOrder | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { ScheduleOrderQueue as ScheduleOrderQueue };

@@ -15,15 +15,15 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  ValidateNested,
 } from "class-validator";
-import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
 import { RecipeUpdateManyWithoutCustomersInput } from "./RecipeUpdateManyWithoutCustomersInput";
-import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
+import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
 
 @InputType()
 class CustomerUpdateInput {
@@ -50,6 +50,18 @@ class CustomerUpdateInput {
     nullable: true,
   })
   createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode?: string | null;
 
   @ApiProperty({
     required: false,
@@ -92,54 +104,6 @@ class CustomerUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderUpdateManyWithoutCustomersInput,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderUpdateManyWithoutCustomersInput)
-  @IsOptional()
-  @Field(() => SalesOrderUpdateManyWithoutCustomersInput, {
-    nullable: true,
-  })
-  salesOrders?: SalesOrderUpdateManyWithoutCustomersInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
@@ -149,15 +113,27 @@ class CustomerUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => InventoryLogWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogWhereUniqueInput)
+  @IsOptional()
+  @Field(() => InventoryLogWhereUniqueInput, {
+    nullable: true,
+  })
+  inventoryLog?: InventoryLogWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(3)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  customerCode?: string | null;
+  name?: string;
 
   @ApiProperty({
     required: false,
@@ -197,15 +173,39 @@ class CustomerUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => InventoryLogWhereUniqueInput,
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => InventoryLogWhereUniqueInput)
+  @IsInt()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => InventoryLogWhereUniqueInput, {
+  @Field(() => Number, {
     nullable: true,
   })
-  inventoryLog?: InventoryLogWhereUniqueInput | null;
+  revision?: number;
+
+  @ApiProperty({
+    required: false,
+    type: () => SalesOrderUpdateManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderUpdateManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => SalesOrderUpdateManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderUpdateManyWithoutCustomersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
 }
 
 export { CustomerUpdateInput as CustomerUpdateInput };

@@ -11,34 +11,47 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 import {
-  IsDate,
   ValidateNested,
+  IsOptional,
+  IsDate,
+  IsString,
+  MaxLength,
   IsNumber,
   Min,
   Max,
-  IsOptional,
-  IsString,
-  MaxLength,
   IsInt,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { Decimal } from "decimal.js";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { CustomerCreateNestedManyWithoutInventoryLogsInput } from "./CustomerCreateNestedManyWithoutInventoryLogsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { Decimal } from "decimal.js";
 
 @InputType()
 class InventoryLogCreateInput {
   @ApiProperty({
     required: true,
+    type: () => AssetWhereUniqueInput,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  dateTime!: Date;
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @Field(() => AssetWhereUniqueInput)
+  asset!: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CustomerCreateNestedManyWithoutInventoryLogsInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerCreateNestedManyWithoutInventoryLogsInput)
+  @IsOptional()
+  @Field(() => CustomerCreateNestedManyWithoutInventoryLogsInput, {
+    nullable: true,
+  })
+  customers?: CustomerCreateNestedManyWithoutInventoryLogsInput;
 
   @ApiProperty({
     required: true,
@@ -50,12 +63,29 @@ class InventoryLogCreateInput {
 
   @ApiProperty({
     required: true,
-    type: () => AssetWhereUniqueInput,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  dateTime!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: () => ItemWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @Field(() => AssetWhereUniqueInput)
-  asset!: AssetWhereUniqueInput;
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  loggedBy!: string;
 
   @ApiProperty({
     required: false,
@@ -71,36 +101,6 @@ class InventoryLogCreateInput {
   quantity?: Decimal | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  loggedBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @Field(() => ItemWhereUniqueInput)
-  item!: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
@@ -110,19 +110,7 @@ class InventoryLogCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  revisedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => CustomerCreateNestedManyWithoutInventoryLogsInput,
-  })
-  @ValidateNested()
-  @Type(() => CustomerCreateNestedManyWithoutInventoryLogsInput)
-  @IsOptional()
-  @Field(() => CustomerCreateNestedManyWithoutInventoryLogsInput, {
-    nullable: true,
-  })
-  customers?: CustomerCreateNestedManyWithoutInventoryLogsInput;
+  rawMeasurementUnits?: string | null;
 
   @ApiProperty({
     required: false,
@@ -146,7 +134,19 @@ class InventoryLogCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  rawMeasurementUnits?: string | null;
+  revisedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
 
   @ApiProperty({
     required: true,

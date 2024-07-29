@@ -56,9 +56,9 @@ export class BatchControllerBase {
       data: {
         ...data,
 
-        parent: data.parent
+        asset: data.asset
           ? {
-              connect: data.parent,
+              connect: data.asset,
             }
           : undefined,
 
@@ -68,9 +68,9 @@ export class BatchControllerBase {
             }
           : undefined,
 
-        asset: data.asset
+        parent: data.parent
           ? {
-              connect: data.asset,
+              connect: data.parent,
             }
           : undefined,
 
@@ -81,10 +81,29 @@ export class BatchControllerBase {
           : undefined,
       },
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        batchData: true,
         batchId: true,
+        batchInitData: true,
+        createdAt: true,
+        customers: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationIndex: true,
+        operationType: true,
+        parameterData: true,
 
         parent: {
           select: {
@@ -93,25 +112,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-        batchData: true,
-        revision: true,
-        customers: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameterData: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        assetPath: true,
 
         recipe: {
           select: {
@@ -119,10 +119,9 @@ export class BatchControllerBase {
           },
         },
 
-        batchInitData: true,
-        operationType: true,
-        operationIndex: true,
         recipeName: true,
+        revision: true,
+        updatedAt: true,
       },
     });
   }
@@ -144,10 +143,29 @@ export class BatchControllerBase {
     return this.service.batches({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        batchData: true,
         batchId: true,
+        batchInitData: true,
+        createdAt: true,
+        customers: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationIndex: true,
+        operationType: true,
+        parameterData: true,
 
         parent: {
           select: {
@@ -156,25 +174,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-        batchData: true,
-        revision: true,
-        customers: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameterData: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        assetPath: true,
 
         recipe: {
           select: {
@@ -182,10 +181,9 @@ export class BatchControllerBase {
           },
         },
 
-        batchInitData: true,
-        operationType: true,
-        operationIndex: true,
         recipeName: true,
+        revision: true,
+        updatedAt: true,
       },
     });
   }
@@ -208,10 +206,29 @@ export class BatchControllerBase {
     const result = await this.service.batch({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        batchData: true,
         batchId: true,
+        batchInitData: true,
+        createdAt: true,
+        customers: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationIndex: true,
+        operationType: true,
+        parameterData: true,
 
         parent: {
           select: {
@@ -220,25 +237,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-        batchData: true,
-        revision: true,
-        customers: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameterData: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        assetPath: true,
 
         recipe: {
           select: {
@@ -246,10 +244,9 @@ export class BatchControllerBase {
           },
         },
 
-        batchInitData: true,
-        operationType: true,
-        operationIndex: true,
         recipeName: true,
+        revision: true,
+        updatedAt: true,
       },
     });
     if (result === null) {
@@ -285,9 +282,9 @@ export class BatchControllerBase {
         data: {
           ...data,
 
-          parent: data.parent
+          asset: data.asset
             ? {
-                connect: data.parent,
+                connect: data.asset,
               }
             : undefined,
 
@@ -297,9 +294,9 @@ export class BatchControllerBase {
               }
             : undefined,
 
-          asset: data.asset
+          parent: data.parent
             ? {
-                connect: data.asset,
+                connect: data.parent,
               }
             : undefined,
 
@@ -310,10 +307,29 @@ export class BatchControllerBase {
             : undefined,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
+          asset: {
+            select: {
+              id: true,
+            },
+          },
+
+          assetPath: true,
+          batchData: true,
           batchId: true,
+          batchInitData: true,
+          createdAt: true,
+          customers: true,
+          id: true,
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
+          operationIndex: true,
+          operationType: true,
+          parameterData: true,
 
           parent: {
             select: {
@@ -322,25 +338,6 @@ export class BatchControllerBase {
           },
 
           quantity: true,
-          batchData: true,
-          revision: true,
-          customers: true,
-
-          lot: {
-            select: {
-              id: true,
-            },
-          },
-
-          parameterData: true,
-
-          asset: {
-            select: {
-              id: true,
-            },
-          },
-
-          assetPath: true,
 
           recipe: {
             select: {
@@ -348,10 +345,9 @@ export class BatchControllerBase {
             },
           },
 
-          batchInitData: true,
-          operationType: true,
-          operationIndex: true,
           recipeName: true,
+          revision: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
@@ -380,10 +376,29 @@ export class BatchControllerBase {
     const results = await this.service.findChildren(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        batchData: true,
         batchId: true,
+        batchInitData: true,
+        createdAt: true,
+        customers: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationIndex: true,
+        operationType: true,
+        parameterData: true,
 
         parent: {
           select: {
@@ -392,25 +407,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-        batchData: true,
-        revision: true,
-        customers: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        parameterData: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        assetPath: true,
 
         recipe: {
           select: {
@@ -418,10 +414,9 @@ export class BatchControllerBase {
           },
         },
 
-        batchInitData: true,
-        operationType: true,
-        operationIndex: true,
         recipeName: true,
+        revision: true,
+        updatedAt: true,
       },
     });
     if (results === null) {
@@ -517,11 +512,25 @@ export class BatchControllerBase {
     const results = await this.service.findFermentationChemistries(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
+        approved: true,
+        approvedBy: true,
 
-        productionOrder: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        id: true,
+
+        lot: {
           select: {
             id: true,
           },
@@ -533,7 +542,7 @@ export class BatchControllerBase {
           },
         },
 
-        asset: {
+        productionOrder: {
           select: {
             id: true,
           },
@@ -545,20 +554,7 @@ export class BatchControllerBase {
           },
         },
 
-        approvedBy: true,
-        approved: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
+        updatedAt: true,
       },
     });
     if (results === null) {

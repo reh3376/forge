@@ -15,30 +15,30 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  IsBoolean,
-  ValidateNested,
   IsNumber,
 } from "class-validator";
 
 import { Recipe } from "./Recipe";
-import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { BatchCreateNestedManyWithoutRecipesInput } from "./BatchCreateNestedManyWithoutRecipesInput";
 import { Type } from "class-transformer";
-import { UnitProcedureCreateNestedManyWithoutRecipesInput } from "./UnitProcedureCreateNestedManyWithoutRecipesInput";
-import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
-import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrderCreateNestedManyWithoutRecipesInput";
+import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
+import { Decimal } from "decimal.js";
+import { RecipeCreateNestedManyWithoutRecipesInput } from "./RecipeCreateNestedManyWithoutRecipesInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { RecipeParameterCreateNestedManyWithoutRecipesInput } from "./RecipeParameterCreateNestedManyWithoutRecipesInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { Decimal } from "decimal.js";
-import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
-import { RecipeCreateNestedManyWithoutRecipesInput } from "./RecipeCreateNestedManyWithoutRecipesInput";
+import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
+import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { RecipeBomItemCreateNestedManyWithoutRecipesInput } from "./RecipeBomItemCreateNestedManyWithoutRecipesInput";
-import { BatchCreateNestedManyWithoutRecipesInput } from "./BatchCreateNestedManyWithoutRecipesInput";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrderCreateNestedManyWithoutRecipesInput";
+import { UnitProcedureCreateNestedManyWithoutRecipesInput } from "./UnitProcedureCreateNestedManyWithoutRecipesInput";
 
 @InputType()
 class RecipeCreateInput {
@@ -47,45 +47,9 @@ class RecipeCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
+  @Field(() => String)
+  Recipe!: string;
 
   @ApiProperty({
     required: false,
@@ -100,6 +64,60 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => BatchCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  cooksPerFerm?: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @Field(() => CustomerWhereUniqueInput)
+  customer!: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -111,61 +129,16 @@ class RecipeCreateInput {
   customerCode?: string | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  Recipe!: string;
-
-  @ApiProperty({
     required: false,
-    type: () => RecipeGroupWhereUniqueInput,
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsNumber()
+  @Max(20)
   @IsOptional()
-  @Field(() => RecipeGroupWhereUniqueInput, {
+  @Field(() => Float, {
     nullable: true,
   })
-  recipeGroup?: RecipeGroupWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => UnitProcedureCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  unitProcedures?: UnitProcedureCreateNestedManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => ProductionOrderCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderCreateNestedManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  scheduleOrders?: ScheduleOrderCreateNestedManyWithoutRecipesInput;
+  estimatedAbv?: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -180,28 +153,39 @@ class RecipeCreateInput {
   globalId?: string | null;
 
   @ApiProperty({
-    required: true,
-    type: () => CustomerWhereUniqueInput,
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => CustomerWhereUniqueInput)
-  @Field(() => CustomerWhereUniqueInput)
-  customer!: CustomerWhereUniqueInput;
+  @Type(() => RecipeCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  instances?: RecipeCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput)
+  @Type(() => ItemWhereUniqueInput)
   @IsOptional()
-  @Field(
-    () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput;
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -229,15 +213,102 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(
+    () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutRecipesInput, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput | null;
+  productionOrders?: ProductionOrderCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  recipeBomItems?: RecipeBomItemCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeGroupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeGroupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeGroupWhereUniqueInput, {
+    nullable: true,
+  })
+  recipeGroup?: RecipeGroupWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderCreateNestedManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  scheduleOrders?: ScheduleOrderCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  targetProof?: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -261,102 +332,31 @@ class RecipeCreateInput {
   @Field(() => Number, {
     nullable: true,
   })
-  cooksPerFerm?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(20)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  estimatedAbv?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
   totalFermenters?: number | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  targetProof?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
+    type: () => UnitProcedureCreateNestedManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
+  @Type(() => UnitProcedureCreateNestedManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
+  @Field(() => UnitProcedureCreateNestedManyWithoutRecipesInput, {
     nullable: true,
   })
-  classId?: RecipeWhereUniqueInput | null;
+  unitProcedures?: UnitProcedureCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
-    type: () => RecipeCreateNestedManyWithoutRecipesInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => RecipeCreateNestedManyWithoutRecipesInput)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  @Field(() => RecipeCreateNestedManyWithoutRecipesInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  instances?: RecipeCreateNestedManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  recipeBomItems?: RecipeBomItemCreateNestedManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => BatchCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  batches?: BatchCreateNestedManyWithoutRecipesInput;
+  updatedBy?: string | null;
 }
 
 export { RecipeCreateInput as RecipeCreateInput };

@@ -55,14 +55,6 @@ export class FermentationDayDatumControllerBase {
       data: {
         ...data,
 
-        productionOrder: {
-          connect: data.productionOrder,
-        },
-
-        operation: {
-          connect: data.operation,
-        },
-
         asset: data.asset
           ? {
               connect: data.asset,
@@ -74,34 +66,17 @@ export class FermentationDayDatumControllerBase {
               connect: data.fermentationChemistry,
             }
           : undefined,
-      },
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        lotId: true,
-        loggedBy: true,
-        day: true,
-        temperature: true,
-        balling: true,
-        acid: true,
-        pH: true,
-        dryInches: true,
 
         operation: {
-          select: {
-            id: true,
-          },
+          connect: data.operation,
         },
 
-        fermenterNumber: true,
+        productionOrder: {
+          connect: data.productionOrder,
+        },
+      },
+      select: {
+        acid: true,
 
         asset: {
           select: {
@@ -109,11 +84,38 @@ export class FermentationDayDatumControllerBase {
           },
         },
 
+        balling: true,
+        createdAt: true,
+        day: true,
+        dryInches: true,
+
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
+        lotId: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        pH: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        temperature: true,
+        updatedAt: true,
       },
     });
   }
@@ -137,32 +139,7 @@ export class FermentationDayDatumControllerBase {
     return this.service.fermentationDayData({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        lotId: true,
-        loggedBy: true,
-        day: true,
-        temperature: true,
-        balling: true,
         acid: true,
-        pH: true,
-        dryInches: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
 
         asset: {
           select: {
@@ -170,11 +147,38 @@ export class FermentationDayDatumControllerBase {
           },
         },
 
+        balling: true,
+        createdAt: true,
+        day: true,
+        dryInches: true,
+
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
+        lotId: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        pH: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        temperature: true,
+        updatedAt: true,
       },
     });
   }
@@ -197,32 +201,7 @@ export class FermentationDayDatumControllerBase {
     const result = await this.service.fermentationDayDatum({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        lotId: true,
-        loggedBy: true,
-        day: true,
-        temperature: true,
-        balling: true,
         acid: true,
-        pH: true,
-        dryInches: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
 
         asset: {
           select: {
@@ -230,11 +209,38 @@ export class FermentationDayDatumControllerBase {
           },
         },
 
+        balling: true,
+        createdAt: true,
+        day: true,
+        dryInches: true,
+
         fermentationChemistry: {
           select: {
             id: true,
           },
         },
+
+        fermenterNumber: true,
+        id: true,
+        loggedBy: true,
+        lotId: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        pH: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        temperature: true,
+        updatedAt: true,
       },
     });
     if (result === null) {
@@ -270,14 +276,6 @@ export class FermentationDayDatumControllerBase {
         data: {
           ...data,
 
-          productionOrder: {
-            connect: data.productionOrder,
-          },
-
-          operation: {
-            connect: data.operation,
-          },
-
           asset: data.asset
             ? {
                 connect: data.asset,
@@ -289,34 +287,17 @@ export class FermentationDayDatumControllerBase {
                 connect: data.fermentationChemistry,
               }
             : undefined,
-        },
-        select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-
-          productionOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          lotId: true,
-          loggedBy: true,
-          day: true,
-          temperature: true,
-          balling: true,
-          acid: true,
-          pH: true,
-          dryInches: true,
 
           operation: {
-            select: {
-              id: true,
-            },
+            connect: data.operation,
           },
 
-          fermenterNumber: true,
+          productionOrder: {
+            connect: data.productionOrder,
+          },
+        },
+        select: {
+          acid: true,
 
           asset: {
             select: {
@@ -324,11 +305,38 @@ export class FermentationDayDatumControllerBase {
             },
           },
 
+          balling: true,
+          createdAt: true,
+          day: true,
+          dryInches: true,
+
           fermentationChemistry: {
             select: {
               id: true,
             },
           },
+
+          fermenterNumber: true,
+          id: true,
+          loggedBy: true,
+          lotId: true,
+
+          operation: {
+            select: {
+              id: true,
+            },
+          },
+
+          pH: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          temperature: true,
+          updatedAt: true,
         },
       });
     } catch (error) {

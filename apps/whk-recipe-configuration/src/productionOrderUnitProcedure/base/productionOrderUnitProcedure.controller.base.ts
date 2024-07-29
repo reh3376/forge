@@ -67,24 +67,26 @@ export class ProductionOrderUnitProcedureControllerBase {
             }
           : undefined,
 
-        wipItem: data.wipItem
-          ? {
-              connect: data.wipItem,
-            }
-          : undefined,
-
         unitProcedure: data.unitProcedure
           ? {
               connect: data.unitProcedure,
             }
           : undefined,
+
+        wipItem: data.wipItem
+          ? {
+              connect: data.wipItem,
+            }
+          : undefined,
       },
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        name: true,
         abbreviation: true,
+        bom: true,
+        createdAt: true,
+        customer: true,
+        globalId: true,
+        id: true,
+        name: true,
 
         productionOrder: {
           select: {
@@ -98,16 +100,7 @@ export class ProductionOrderUnitProcedureControllerBase {
           },
         },
 
-        bom: true,
-
-        wipItem: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customer: true,
+        status: true,
 
         unitProcedure: {
           select: {
@@ -115,7 +108,13 @@ export class ProductionOrderUnitProcedureControllerBase {
           },
         },
 
-        status: true,
+        updatedAt: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -142,11 +141,13 @@ export class ProductionOrderUnitProcedureControllerBase {
     return this.service.productionOrderUnitProcedures({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        name: true,
         abbreviation: true,
+        bom: true,
+        createdAt: true,
+        customer: true,
+        globalId: true,
+        id: true,
+        name: true,
 
         productionOrder: {
           select: {
@@ -160,16 +161,7 @@ export class ProductionOrderUnitProcedureControllerBase {
           },
         },
 
-        bom: true,
-
-        wipItem: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customer: true,
+        status: true,
 
         unitProcedure: {
           select: {
@@ -177,7 +169,13 @@ export class ProductionOrderUnitProcedureControllerBase {
           },
         },
 
-        status: true,
+        updatedAt: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -200,11 +198,13 @@ export class ProductionOrderUnitProcedureControllerBase {
     const result = await this.service.productionOrderUnitProcedure({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        name: true,
         abbreviation: true,
+        bom: true,
+        createdAt: true,
+        customer: true,
+        globalId: true,
+        id: true,
+        name: true,
 
         productionOrder: {
           select: {
@@ -218,16 +218,7 @@ export class ProductionOrderUnitProcedureControllerBase {
           },
         },
 
-        bom: true,
-
-        wipItem: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customer: true,
+        status: true,
 
         unitProcedure: {
           select: {
@@ -235,7 +226,13 @@ export class ProductionOrderUnitProcedureControllerBase {
           },
         },
 
-        status: true,
+        updatedAt: true,
+
+        wipItem: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -283,24 +280,26 @@ export class ProductionOrderUnitProcedureControllerBase {
               }
             : undefined,
 
-          wipItem: data.wipItem
-            ? {
-                connect: data.wipItem,
-              }
-            : undefined,
-
           unitProcedure: data.unitProcedure
             ? {
                 connect: data.unitProcedure,
               }
             : undefined,
+
+          wipItem: data.wipItem
+            ? {
+                connect: data.wipItem,
+              }
+            : undefined,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          name: true,
           abbreviation: true,
+          bom: true,
+          createdAt: true,
+          customer: true,
+          globalId: true,
+          id: true,
+          name: true,
 
           productionOrder: {
             select: {
@@ -314,16 +313,7 @@ export class ProductionOrderUnitProcedureControllerBase {
             },
           },
 
-          bom: true,
-
-          wipItem: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
-          customer: true,
+          status: true,
 
           unitProcedure: {
             select: {
@@ -331,7 +321,13 @@ export class ProductionOrderUnitProcedureControllerBase {
             },
           },
 
-          status: true,
+          updatedAt: true,
+
+          wipItem: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

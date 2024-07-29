@@ -49,13 +49,13 @@ export class UserControllerBase {
     return this.service.users({
       ...args,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
         firstName: true,
+        id: true,
         lastName: true,
-        username: true,
         roles: true,
+        updatedAt: true,
+        username: true,
       },
     });
   }
@@ -78,13 +78,13 @@ export class UserControllerBase {
     const result = await this.service.user({
       where: params,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
         firstName: true,
+        id: true,
         lastName: true,
-        username: true,
         roles: true,
+        updatedAt: true,
+        username: true,
       },
     });
     if (result === null) {

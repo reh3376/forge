@@ -13,30 +13,46 @@ import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsString,
-  IsDate,
-  MaxLength,
-  ValidateNested,
-  IsOptional,
-  IsInt,
-  Max,
   IsNumber,
+  Max,
+  IsOptional,
+  IsDate,
+  ValidateNested,
+  IsInt,
+  IsString,
+  MaxLength,
 } from "class-validator";
 
-import { Type } from "class-transformer";
-import { Operation } from "../../operation/base/Operation";
 import { Decimal } from "decimal.js";
+import { Type } from "class-transformer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { Operation } from "../../operation/base/Operation";
 
 @ObjectType()
 class FermentationSettingDatum {
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: Number,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  acid!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  balling!: Decimal | null;
 
   @ApiProperty({
     required: true,
@@ -47,12 +63,51 @@ class FermentationSettingDatum {
   createdAt!: Date;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: Number,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsNumber()
+  @Max(1000)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  dryInches!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistry,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: FermentationChemistry | null;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Max(100)
+  @Field(() => Number)
+  fermenterNumber!: number;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  loggedBy!: string;
 
   @ApiProperty({
     required: true,
@@ -73,21 +128,16 @@ class FermentationSettingDatum {
   operation?: Operation | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: Number,
   })
-  @IsInt()
-  @Max(100)
-  @Field(() => Number)
-  fermenterNumber!: number;
-
-  @ApiProperty({
-    required: true,
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  yeastPitchTime!: Date;
+  pH!: Decimal | null;
 
   @ApiProperty({
     required: true,
@@ -107,70 +157,20 @@ class FermentationSettingDatum {
   temperature!: Decimal;
 
   @ApiProperty({
-    required: false,
-    type: Number,
+    required: true,
   })
-  @IsNumber()
-  @Max(1000)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  dryInches!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(100)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  balling!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  acid!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH!: Decimal | null;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: true,
-    type: String,
   })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  loggedBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistry,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: FermentationChemistry | null;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  yeastPitchTime!: Date;
 }
 
 export { FermentationSettingDatum as FermentationSettingDatum };

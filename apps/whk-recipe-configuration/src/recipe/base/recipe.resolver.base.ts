@@ -25,25 +25,25 @@ import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeFindUniqueArgs } from "./RecipeFindUniqueArgs";
 import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
-import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
-import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
+import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Recipe)
@@ -109,9 +109,9 @@ export class RecipeResolverBase {
       data: {
         ...args.data,
 
-        recipeGroup: args.data.recipeGroup
+        classId: args.data.classId
           ? {
-              connect: args.data.recipeGroup,
+              connect: args.data.classId,
             }
           : undefined,
 
@@ -125,9 +125,9 @@ export class RecipeResolverBase {
             }
           : undefined,
 
-        classId: args.data.classId
+        recipeGroup: args.data.recipeGroup
           ? {
-              connect: args.data.classId,
+              connect: args.data.recipeGroup,
             }
           : undefined,
       },
@@ -150,9 +150,9 @@ export class RecipeResolverBase {
         data: {
           ...args.data,
 
-          recipeGroup: args.data.recipeGroup
+          classId: args.data.classId
             ? {
-                connect: args.data.recipeGroup,
+                connect: args.data.classId,
               }
             : undefined,
 
@@ -166,9 +166,9 @@ export class RecipeResolverBase {
               }
             : undefined,
 
-          classId: args.data.classId
+          recipeGroup: args.data.recipeGroup
             ? {
-                connect: args.data.classId,
+                connect: args.data.recipeGroup,
               }
             : undefined,
         },
@@ -184,17 +184,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
+  @graphql.ResolveField(() => [Batch], { name: "batches" })
   @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
+    resource: "Batch",
     action: "read",
     possession: "any",
   })
-  async findUnitProcedures(
+  async findBatches(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: UnitProcedureFindManyArgs
-  ): Promise<UnitProcedure[]> {
-    const results = await this.service.findUnitProcedures(parent.id, args);
+    @graphql.Args() args: BatchFindManyArgs
+  ): Promise<Batch[]> {
+    const results = await this.service.findBatches(parent.id, args);
 
     if (!results) {
       return [];
@@ -204,62 +204,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
+  @graphql.ResolveField(() => [Recipe], { name: "instances" })
   @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
+    resource: "Recipe",
     action: "read",
     possession: "any",
   })
-  async findProductionOrders(
+  async findInstances(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: ProductionOrderFindManyArgs
-  ): Promise<ProductionOrder[]> {
-    const results = await this.service.findProductionOrders(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findScheduleOrders(
-    @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: ScheduleOrderFindManyArgs
-  ): Promise<ScheduleOrder[]> {
-    const results = await this.service.findScheduleOrders(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
-    name: "productionOrderUnitProcedures",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderUnitProcedures(
-    @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<ProductionOrderUnitProcedure[]> {
-    const results = await this.service.findProductionOrderUnitProcedures(
-      parent.id,
-      args
-    );
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findInstances(parent.id, args);
 
     if (!results) {
       return [];
@@ -309,17 +264,42 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Recipe], { name: "instances" })
+  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
+    name: "productionOrderUnitProcedures",
+  })
   @nestAccessControl.UseRoles({
-    resource: "Recipe",
+    resource: "ProductionOrderUnitProcedure",
     action: "read",
     possession: "any",
   })
-  async findInstances(
+  async findProductionOrderUnitProcedures(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: RecipeFindManyArgs
-  ): Promise<Recipe[]> {
-    const results = await this.service.findInstances(parent.id, args);
+    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const results = await this.service.findProductionOrderUnitProcedures(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    const results = await this.service.findProductionOrders(parent.id, args);
 
     if (!results) {
       return [];
@@ -349,17 +329,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Batch], { name: "batches" })
+  @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
   @nestAccessControl.UseRoles({
-    resource: "Batch",
+    resource: "ScheduleOrder",
     action: "read",
     possession: "any",
   })
-  async findBatches(
+  async findScheduleOrders(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: BatchFindManyArgs
-  ): Promise<Batch[]> {
-    const results = await this.service.findBatches(parent.id, args);
+    @graphql.Args() args: ScheduleOrderFindManyArgs
+  ): Promise<ScheduleOrder[]> {
+    const results = await this.service.findScheduleOrders(parent.id, args);
 
     if (!results) {
       return [];
@@ -369,19 +349,37 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => RecipeGroup, {
-    nullable: true,
-    name: "recipeGroup",
-  })
+  @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
   @nestAccessControl.UseRoles({
-    resource: "RecipeGroup",
+    resource: "UnitProcedure",
     action: "read",
     possession: "any",
   })
-  async getRecipeGroup(
-    @graphql.Parent() parent: Recipe
-  ): Promise<RecipeGroup | null> {
-    const result = await this.service.getRecipeGroup(parent.id);
+  async findUnitProcedures(
+    @graphql.Parent() parent: Recipe,
+    @graphql.Args() args: UnitProcedureFindManyArgs
+  ): Promise<UnitProcedure[]> {
+    const results = await this.service.findUnitProcedures(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Recipe, {
+    nullable: true,
+    name: "classId",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async getClassId(@graphql.Parent() parent: Recipe): Promise<Recipe | null> {
+    const result = await this.service.getClassId(parent.id);
 
     if (!result) {
       return null;
@@ -430,17 +428,19 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Recipe, {
+  @graphql.ResolveField(() => RecipeGroup, {
     nullable: true,
-    name: "classId",
+    name: "recipeGroup",
   })
   @nestAccessControl.UseRoles({
-    resource: "Recipe",
+    resource: "RecipeGroup",
     action: "read",
     possession: "any",
   })
-  async getClassId(@graphql.Parent() parent: Recipe): Promise<Recipe | null> {
-    const result = await this.service.getClassId(parent.id);
+  async getRecipeGroup(
+    @graphql.Parent() parent: Recipe
+  ): Promise<RecipeGroup | null> {
+    const result = await this.service.getRecipeGroup(parent.id);
 
     if (!result) {
       return null;

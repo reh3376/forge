@@ -16,8 +16,8 @@ import {
   Operation as PrismaOperation,
   EquipmentPhase as PrismaEquipmentPhase,
   FermentationChemistry as PrismaFermentationChemistry,
-  FermentationSettingDatum as PrismaFermentationSettingDatum,
   FermentationDayDatum as PrismaFermentationDayDatum,
+  FermentationSettingDatum as PrismaFermentationSettingDatum,
   UnitProcedure as PrismaUnitProcedure,
 } from "@prisma/client";
 
@@ -67,17 +67,6 @@ export class OperationServiceBase {
       .equipmentPhases(args);
   }
 
-  async findInstances(
-    parentId: string,
-    args: Prisma.OperationFindManyArgs
-  ): Promise<PrismaOperation[]> {
-    return this.prisma.operation
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .instances(args);
-  }
-
   async findFermentationChemistries(
     parentId: string,
     args: Prisma.FermentationChemistryFindManyArgs
@@ -87,6 +76,17 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .fermentationChemistries(args);
+  }
+
+  async findFermentationDayData(
+    parentId: string,
+    args: Prisma.FermentationDayDatumFindManyArgs
+  ): Promise<PrismaFermentationDayDatum[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .fermentationDayData(args);
   }
 
   async findFermentationSettingData(
@@ -100,15 +100,15 @@ export class OperationServiceBase {
       .fermentationSettingData(args);
   }
 
-  async findFermentationDayData(
+  async findInstances(
     parentId: string,
-    args: Prisma.FermentationDayDatumFindManyArgs
-  ): Promise<PrismaFermentationDayDatum[]> {
+    args: Prisma.OperationFindManyArgs
+  ): Promise<PrismaOperation[]> {
     return this.prisma.operation
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .fermentationDayData(args);
+      .instances(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaOperation | null> {

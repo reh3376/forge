@@ -18,50 +18,50 @@ import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
   createdBy: "exampleCreatedBy",
-  updatedBy: "exampleUpdatedBy",
-  schemaVersion: "exampleSchemaVersion",
-  queueIndex: 42,
   globalId: "exampleGlobalId",
+  id: "exampleId",
   nextUnitProcedureName: "exampleNextUnitProcedureName",
+  queueIndex: 42,
+  schemaVersion: "exampleSchemaVersion",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
   createdBy: "exampleCreatedBy",
-  updatedBy: "exampleUpdatedBy",
-  schemaVersion: "exampleSchemaVersion",
-  queueIndex: 42,
   globalId: "exampleGlobalId",
+  id: "exampleId",
   nextUnitProcedureName: "exampleNextUnitProcedureName",
+  queueIndex: 42,
+  schemaVersion: "exampleSchemaVersion",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
-    id: "exampleId",
     createdAt: new Date(),
-    updatedAt: new Date(),
     createdBy: "exampleCreatedBy",
-    updatedBy: "exampleUpdatedBy",
-    schemaVersion: "exampleSchemaVersion",
-    queueIndex: 42,
     globalId: "exampleGlobalId",
+    id: "exampleId",
     nextUnitProcedureName: "exampleNextUnitProcedureName",
+    queueIndex: 42,
+    schemaVersion: "exampleSchemaVersion",
+    updatedAt: new Date(),
+    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
   createdBy: "exampleCreatedBy",
-  updatedBy: "exampleUpdatedBy",
-  schemaVersion: "exampleSchemaVersion",
-  queueIndex: 42,
   globalId: "exampleGlobalId",
+  id: "exampleId",
   nextUnitProcedureName: "exampleNextUnitProcedureName",
+  queueIndex: 42,
+  schemaVersion: "exampleSchemaVersion",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {

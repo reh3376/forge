@@ -64,23 +64,20 @@ export class InventoryControllerBase {
         },
       },
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-
         asset: {
           select: {
             id: true,
           },
         },
 
-        revision: true,
-        correctionNote: true,
         correctedBy: true,
-        lotNumber: true,
+        correctionNote: true,
+        createdAt: true,
+        createdBy: true,
+        customers: true,
+        fifoIndex: true,
+        globalId: true,
+        id: true,
 
         item: {
           select: {
@@ -88,12 +85,14 @@ export class InventoryControllerBase {
           },
         },
 
+        lotNumber: true,
         notes: true,
-        units: true,
-        globalId: true,
-        customers: true,
         proof: true,
-        fifoIndex: true,
+        revision: true,
+        schemaVersion: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -115,23 +114,20 @@ export class InventoryControllerBase {
     return this.service.inventories({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-
         asset: {
           select: {
             id: true,
           },
         },
 
-        revision: true,
-        correctionNote: true,
         correctedBy: true,
-        lotNumber: true,
+        correctionNote: true,
+        createdAt: true,
+        createdBy: true,
+        customers: true,
+        fifoIndex: true,
+        globalId: true,
+        id: true,
 
         item: {
           select: {
@@ -139,12 +135,14 @@ export class InventoryControllerBase {
           },
         },
 
+        lotNumber: true,
         notes: true,
-        units: true,
-        globalId: true,
-        customers: true,
         proof: true,
-        fifoIndex: true,
+        revision: true,
+        schemaVersion: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -167,23 +165,20 @@ export class InventoryControllerBase {
     const result = await this.service.inventory({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-
         asset: {
           select: {
             id: true,
           },
         },
 
-        revision: true,
-        correctionNote: true,
         correctedBy: true,
-        lotNumber: true,
+        correctionNote: true,
+        createdAt: true,
+        createdBy: true,
+        customers: true,
+        fifoIndex: true,
+        globalId: true,
+        id: true,
 
         item: {
           select: {
@@ -191,12 +186,14 @@ export class InventoryControllerBase {
           },
         },
 
+        lotNumber: true,
         notes: true,
-        units: true,
-        globalId: true,
-        customers: true,
         proof: true,
-        fifoIndex: true,
+        revision: true,
+        schemaVersion: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -241,23 +238,20 @@ export class InventoryControllerBase {
           },
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          schemaVersion: true,
-
           asset: {
             select: {
               id: true,
             },
           },
 
-          revision: true,
-          correctionNote: true,
           correctedBy: true,
-          lotNumber: true,
+          correctionNote: true,
+          createdAt: true,
+          createdBy: true,
+          customers: true,
+          fifoIndex: true,
+          globalId: true,
+          id: true,
 
           item: {
             select: {
@@ -265,12 +259,14 @@ export class InventoryControllerBase {
             },
           },
 
+          lotNumber: true,
           notes: true,
-          units: true,
-          globalId: true,
-          customers: true,
           proof: true,
-          fifoIndex: true,
+          revision: true,
+          schemaVersion: true,
+          units: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -301,23 +297,20 @@ export class InventoryControllerBase {
       return await this.service.deleteInventory({
         where: params,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          schemaVersion: true,
-
           asset: {
             select: {
               id: true,
             },
           },
 
-          revision: true,
-          correctionNote: true,
           correctedBy: true,
-          lotNumber: true,
+          correctionNote: true,
+          createdAt: true,
+          createdBy: true,
+          customers: true,
+          fifoIndex: true,
+          globalId: true,
+          id: true,
 
           item: {
             select: {
@@ -325,12 +318,14 @@ export class InventoryControllerBase {
             },
           },
 
+          lotNumber: true,
           notes: true,
-          units: true,
-          globalId: true,
-          customers: true,
           proof: true,
-          fifoIndex: true,
+          revision: true,
+          schemaVersion: true,
+          units: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {

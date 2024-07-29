@@ -27,8 +27,8 @@ import { CreateProductionOrderUnitProcedureArgs } from "./CreateProductionOrderU
 import { UpdateProductionOrderUnitProcedureArgs } from "./UpdateProductionOrderUnitProcedureArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
-import { Item } from "../../item/base/Item";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { Item } from "../../item/base/Item";
 import { ProductionOrderUnitProcedureService } from "../productionOrderUnitProcedure.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ProductionOrderUnitProcedure)
@@ -110,15 +110,15 @@ export class ProductionOrderUnitProcedureResolverBase {
             }
           : undefined,
 
-        wipItem: args.data.wipItem
-          ? {
-              connect: args.data.wipItem,
-            }
-          : undefined,
-
         unitProcedure: args.data.unitProcedure
           ? {
               connect: args.data.unitProcedure,
+            }
+          : undefined,
+
+        wipItem: args.data.wipItem
+          ? {
+              connect: args.data.wipItem,
             }
           : undefined,
       },
@@ -153,15 +153,15 @@ export class ProductionOrderUnitProcedureResolverBase {
               }
             : undefined,
 
-          wipItem: args.data.wipItem
-            ? {
-                connect: args.data.wipItem,
-              }
-            : undefined,
-
           unitProcedure: args.data.unitProcedure
             ? {
                 connect: args.data.unitProcedure,
+              }
+            : undefined,
+
+          wipItem: args.data.wipItem
+            ? {
+                connect: args.data.wipItem,
               }
             : undefined,
         },
@@ -219,27 +219,6 @@ export class ProductionOrderUnitProcedureResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Item, {
-    nullable: true,
-    name: "wipItem",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async getWipItem(
-    @graphql.Parent() parent: ProductionOrderUnitProcedure
-  ): Promise<Item | null> {
-    const result = await this.service.getWipItem(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => UnitProcedure, {
     nullable: true,
     name: "unitProcedure",
@@ -253,6 +232,27 @@ export class ProductionOrderUnitProcedureResolverBase {
     @graphql.Parent() parent: ProductionOrderUnitProcedure
   ): Promise<UnitProcedure | null> {
     const result = await this.service.getUnitProcedure(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Item, {
+    nullable: true,
+    name: "wipItem",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async getWipItem(
+    @graphql.Parent() parent: ProductionOrderUnitProcedure
+  ): Promise<Item | null> {
+    const result = await this.service.getWipItem(parent.id);
 
     if (!result) {
       return null;

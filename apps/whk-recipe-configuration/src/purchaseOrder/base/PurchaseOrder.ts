@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Asset } from "../../asset/base/Asset";
+import { Lot } from "../../lot/base/Lot";
 
 import {
   ValidateNested,
@@ -20,24 +20,33 @@ import {
   MaxLength,
   IsBoolean,
   IsDate,
+  IsEnum,
   IsInt,
   Max,
-  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
-import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
-import { Lot } from "../../lot/base/Lot";
+import { Asset } from "../../asset/base/Asset";
 import { Item } from "../../item/base/Item";
-import { TestParameter } from "../../testParameter/base/TestParameter";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { TestParameter } from "../../testParameter/base/TestParameter";
+import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
 class PurchaseOrder {
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  acceptedLots?: Array<Lot>;
+
   @ApiProperty({
     required: false,
     type: () => Asset,
@@ -91,39 +100,22 @@ class PurchaseOrder {
   createdBy!: string;
 
   @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  updatedAt!: Date | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy!: string | null;
+  @MaxLength(100)
+  @Field(() => String)
+  erpId!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  transactionGroup!: string | null;
+  @MaxLength(1000)
+  @Field(() => String)
+  globalId!: string;
 
   @ApiProperty({
     required: true,
@@ -135,24 +127,49 @@ class PurchaseOrder {
 
   @ApiProperty({
     required: true,
+    type: () => [Item],
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Array<Item>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ItemReceipt],
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipts?: Array<ItemReceipt>;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lineItems!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  lotsRejected?: Array<PurchaseOrder>;
+
+  @ApiProperty({
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(256)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalOrderQuantity!: number | null;
 
   @ApiProperty({
     required: false,
@@ -184,6 +201,15 @@ class PurchaseOrder {
   @Type(() => PurchaseOrder)
   @IsOptional()
   purchaseOrderRejectedLots?: PurchaseOrder | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  qualityTests?: Array<TestParameter>;
 
   @ApiProperty({
     required: false,
@@ -241,76 +267,50 @@ class PurchaseOrder {
 
   @ApiProperty({
     required: false,
-    type: () => [PurchaseOrder],
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => PurchaseOrder)
+  @IsInt()
+  @Max(99999999999)
   @IsOptional()
-  lotsRejected?: Array<PurchaseOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ItemReceipt],
-  })
-  @ValidateNested()
-  @Type(() => ItemReceipt)
-  @IsOptional()
-  itemReceipts?: Array<ItemReceipt>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Lot],
-  })
-  @ValidateNested()
-  @Type(() => Lot)
-  @IsOptional()
-  acceptedLots?: Array<Lot>;
-
-  @ApiProperty({
-    required: true,
-    type: () => [Item],
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  item?: Array<Item>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [TestParameter],
-  })
-  @ValidateNested()
-  @Type(() => TestParameter)
-  @IsOptional()
-  qualityTests?: Array<TestParameter>;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  globalId!: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => Number, {
     nullable: true,
   })
-  lineItems!: JsonValue;
+  totalOrderQuantity!: number | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(100)
-  @Field(() => String)
-  erpId!: string;
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  transactionGroup!: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  updatedAt!: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 
   @ApiProperty({
     required: false,

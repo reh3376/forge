@@ -16,15 +16,15 @@ import {
   MaxLength,
   IsDate,
   IsOptional,
+  ValidateNested,
   IsInt,
   Max,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
-import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 
 @ObjectType()
 class Customer {
@@ -53,6 +53,18 @@ class Customer {
   @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode!: string | null;
 
   @ApiProperty({
     required: false,
@@ -91,61 +103,6 @@ class Customer {
   email!: string | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  name!: string;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @Field(() => Number)
-  revision!: number;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: () => [SalesOrder],
-  })
-  @ValidateNested()
-  @Type(() => SalesOrder)
-  @IsOptional()
-  salesOrders?: Array<SalesOrder>;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
@@ -158,16 +115,30 @@ class Customer {
   globalId!: string | null;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(3)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLog,
   })
-  customerCode!: string | null;
+  @ValidateNested()
+  @Type(() => InventoryLog)
+  @IsOptional()
+  inventoryLog?: InventoryLog | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  name!: string;
 
   @ApiProperty({
     required: false,
@@ -200,13 +171,42 @@ class Customer {
   recipes?: Array<Recipe>;
 
   @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @Field(() => Number)
+  revision!: number;
+
+  @ApiProperty({
     required: false,
-    type: () => InventoryLog,
+    type: () => [SalesOrder],
   })
   @ValidateNested()
-  @Type(() => InventoryLog)
+  @Type(() => SalesOrder)
   @IsOptional()
-  inventoryLog?: InventoryLog | null;
+  salesOrders?: Array<SalesOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 }
 
 export { Customer as Customer };

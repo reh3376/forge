@@ -54,12 +54,12 @@ export class ItemGroupControllerBase {
     return await this.service.createItemGroup({
       data: data,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
-        name: true,
         description: true,
         globalId: true,
+        id: true,
+        name: true,
+        updatedAt: true,
       },
     });
   }
@@ -81,12 +81,12 @@ export class ItemGroupControllerBase {
     return this.service.itemGroups({
       ...args,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
-        name: true,
         description: true,
         globalId: true,
+        id: true,
+        name: true,
+        updatedAt: true,
       },
     });
   }
@@ -109,12 +109,12 @@ export class ItemGroupControllerBase {
     const result = await this.service.itemGroup({
       where: params,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
-        name: true,
         description: true,
         globalId: true,
+        id: true,
+        name: true,
+        updatedAt: true,
       },
     });
     if (result === null) {
@@ -149,12 +149,12 @@ export class ItemGroupControllerBase {
         where: params,
         data: data,
         select: {
-          id: true,
           createdAt: true,
-          updatedAt: true,
-          name: true,
           description: true,
           globalId: true,
+          id: true,
+          name: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
