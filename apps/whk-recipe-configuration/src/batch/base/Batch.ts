@@ -11,17 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { Asset } from "../../asset/base/Asset";
 
 import {
-  IsString,
-  IsDate,
-  MaxLength,
   ValidateNested,
   IsOptional,
+  IsString,
+  MaxLength,
+  IsDate,
+  IsEnum,
   IsInt,
   Min,
   Max,
-  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -30,136 +31,11 @@ import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
-import { Asset } from "../../asset/base/Asset";
-import { Recipe } from "../../recipe/base/Recipe";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Batch {
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  batchId!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => Batch,
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  parent?: Batch | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Batch],
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  children?: Array<Batch>;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  quantity!: number | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  batchData!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  customers!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
-    type: () => Lot,
-  })
-  @ValidateNested()
-  @Type(() => Lot)
-  @IsOptional()
-  lot?: Lot | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  parameterData!: JsonValue;
-
   @ApiProperty({
     required: false,
     type: () => Asset,
@@ -183,12 +59,22 @@ class Batch {
 
   @ApiProperty({
     required: false,
-    type: () => Recipe,
   })
-  @ValidateNested()
-  @Type(() => Recipe)
+  @IsJSONValue()
   @IsOptional()
-  recipe?: Recipe | null;
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  batchData!: JsonValue;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  batchId!: string;
 
   @ApiProperty({
     required: false,
@@ -199,6 +85,71 @@ class Batch {
     nullable: true,
   })
   batchInitData!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  children?: Array<Batch>;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  customers!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => [FermentationChemistry],
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistries?: Array<FermentationChemistry>;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Lot,
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lot?: Lot | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  operationIndex!: string | null;
 
   @ApiProperty({
     required: false,
@@ -219,15 +170,44 @@ class Batch {
 
   @ApiProperty({
     required: false,
-    type: String,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsJSONValue()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  operationIndex!: string | null;
+  parameterData!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => Batch,
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  parent?: Batch | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Recipe,
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipe?: Recipe | null;
 
   @ApiProperty({
     required: false,
@@ -240,6 +220,26 @@ class Batch {
     nullable: true,
   })
   recipeName!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 }
 
 export { Batch as Batch };

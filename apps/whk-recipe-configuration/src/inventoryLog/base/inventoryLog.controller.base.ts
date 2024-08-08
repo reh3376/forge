@@ -67,20 +67,16 @@ export class InventoryLogControllerBase {
         },
       },
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        dateTime: true,
-        date: true,
-
         asset: {
           select: {
             id: true,
           },
         },
 
-        quantity: true,
-        loggedBy: true,
+        createdAt: true,
+        date: true,
+        dateTime: true,
+        id: true,
 
         item: {
           select: {
@@ -88,11 +84,14 @@ export class InventoryLogControllerBase {
           },
         },
 
-        revision: true,
-        revisedBy: true,
-        rawMeasurementValue: true,
+        loggedBy: true,
+        quantity: true,
         rawMeasurementUnits: true,
+        rawMeasurementValue: true,
+        revisedBy: true,
+        revision: true,
         units: true,
+        updatedAt: true,
       },
     });
   }
@@ -114,20 +113,16 @@ export class InventoryLogControllerBase {
     return this.service.inventoryLogs({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        dateTime: true,
-        date: true,
-
         asset: {
           select: {
             id: true,
           },
         },
 
-        quantity: true,
-        loggedBy: true,
+        createdAt: true,
+        date: true,
+        dateTime: true,
+        id: true,
 
         item: {
           select: {
@@ -135,11 +130,14 @@ export class InventoryLogControllerBase {
           },
         },
 
-        revision: true,
-        revisedBy: true,
-        rawMeasurementValue: true,
+        loggedBy: true,
+        quantity: true,
         rawMeasurementUnits: true,
+        rawMeasurementValue: true,
+        revisedBy: true,
+        revision: true,
         units: true,
+        updatedAt: true,
       },
     });
   }
@@ -162,20 +160,16 @@ export class InventoryLogControllerBase {
     const result = await this.service.inventoryLog({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        dateTime: true,
-        date: true,
-
         asset: {
           select: {
             id: true,
           },
         },
 
-        quantity: true,
-        loggedBy: true,
+        createdAt: true,
+        date: true,
+        dateTime: true,
+        id: true,
 
         item: {
           select: {
@@ -183,11 +177,14 @@ export class InventoryLogControllerBase {
           },
         },
 
-        revision: true,
-        revisedBy: true,
-        rawMeasurementValue: true,
+        loggedBy: true,
+        quantity: true,
         rawMeasurementUnits: true,
+        rawMeasurementValue: true,
+        revisedBy: true,
+        revision: true,
         units: true,
+        updatedAt: true,
       },
     });
     if (result === null) {
@@ -232,20 +229,16 @@ export class InventoryLogControllerBase {
           },
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          dateTime: true,
-          date: true,
-
           asset: {
             select: {
               id: true,
             },
           },
 
-          quantity: true,
-          loggedBy: true,
+          createdAt: true,
+          date: true,
+          dateTime: true,
+          id: true,
 
           item: {
             select: {
@@ -253,11 +246,14 @@ export class InventoryLogControllerBase {
             },
           },
 
-          revision: true,
-          revisedBy: true,
-          rawMeasurementValue: true,
+          loggedBy: true,
+          quantity: true,
           rawMeasurementUnits: true,
+          rawMeasurementValue: true,
+          revisedBy: true,
+          revision: true,
           units: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
@@ -288,20 +284,16 @@ export class InventoryLogControllerBase {
       return await this.service.deleteInventoryLog({
         where: params,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          dateTime: true,
-          date: true,
-
           asset: {
             select: {
               id: true,
             },
           },
 
-          quantity: true,
-          loggedBy: true,
+          createdAt: true,
+          date: true,
+          dateTime: true,
+          id: true,
 
           item: {
             select: {
@@ -309,11 +301,14 @@ export class InventoryLogControllerBase {
             },
           },
 
-          revision: true,
-          revisedBy: true,
-          rawMeasurementValue: true,
+          loggedBy: true,
+          quantity: true,
           rawMeasurementUnits: true,
+          rawMeasurementValue: true,
+          revisedBy: true,
+          revision: true,
           units: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
@@ -345,23 +340,24 @@ export class InventoryLogControllerBase {
         address: true,
         createdAt: true,
         createdBy: true,
+        customerCode: true,
         description: true,
         editedBy: true,
         email: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
         globalId: true,
-        customerCode: true,
-        phone: true,
+        id: true,
 
         inventoryLog: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        phone: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
       },
     });
     if (results === null) {

@@ -20,68 +20,68 @@ const existingId = "existingId";
 const CREATE_INPUT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  customerCode: "exampleCustomerCode",
+  erpId: "exampleErpId",
+  globalId: "exampleGlobalId",
   id: "exampleId",
+  name: "exampleName",
   orderType: "exampleOrderType",
   quantity: 42,
+  requestedShipDate: new Date(),
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
-  customerCode: "exampleCustomerCode",
-  erpId: "exampleErpId",
-  requestedShipDate: new Date(),
-  name: "exampleName",
 };
 const CREATE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  customerCode: "exampleCustomerCode",
+  erpId: "exampleErpId",
+  globalId: "exampleGlobalId",
   id: "exampleId",
+  name: "exampleName",
   orderType: "exampleOrderType",
   quantity: 42,
+  requestedShipDate: new Date(),
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
-  customerCode: "exampleCustomerCode",
-  erpId: "exampleErpId",
-  requestedShipDate: new Date(),
-  name: "exampleName",
 };
 const FIND_MANY_RESULT = [
   {
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
+    customerCode: "exampleCustomerCode",
+    erpId: "exampleErpId",
+    globalId: "exampleGlobalId",
     id: "exampleId",
+    name: "exampleName",
     orderType: "exampleOrderType",
     quantity: 42,
+    requestedShipDate: new Date(),
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
-    globalId: "exampleGlobalId",
-    customerCode: "exampleCustomerCode",
-    erpId: "exampleErpId",
-    requestedShipDate: new Date(),
-    name: "exampleName",
   },
 ];
 const FIND_ONE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
+  customerCode: "exampleCustomerCode",
+  erpId: "exampleErpId",
+  globalId: "exampleGlobalId",
   id: "exampleId",
+  name: "exampleName",
   orderType: "exampleOrderType",
   quantity: 42,
+  requestedShipDate: new Date(),
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
-  customerCode: "exampleCustomerCode",
-  erpId: "exampleErpId",
-  requestedShipDate: new Date(),
-  name: "exampleName",
 };
 
 const service = {
@@ -167,8 +167,8 @@ describe("SalesOrder", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         requestedShipDate: CREATE_RESULT.requestedShipDate.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -180,9 +180,9 @@ describe("SalesOrder", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
           requestedShipDate:
             FIND_MANY_RESULT[0].requestedShipDate.toISOString(),
+          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
   });
@@ -205,8 +205,8 @@ describe("SalesOrder", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
         requestedShipDate: FIND_ONE_RESULT.requestedShipDate.toISOString(),
+        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -219,8 +219,8 @@ describe("SalesOrder", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
         requestedShipDate: CREATE_RESULT.requestedShipDate.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {
         agent

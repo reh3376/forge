@@ -65,9 +65,18 @@ export class MashingProtocolStepControllerBase {
           : undefined,
       },
       select: {
-        id: true,
+        agitatorEnabled: true,
+        agitatorSpdSp: true,
+        coolEnabled: true,
+        coolTempSp: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        heatEnabled: true,
+        heatTempSp: true,
+        holdType: true,
+        id: true,
+        index: true,
+        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -75,19 +84,10 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
-        index: true,
-        agitatorEnabled: true,
-        agitatorSpdSp: true,
-        coolEnabled: true,
-        coolTempSp: true,
-        heatEnabled: true,
-        heatTempSp: true,
-        isClassDefinition: true,
         stepType: true,
-        holdType: true,
-        temperatureSetpoint: true,
         temperatureActual: true,
-        createdBy: true,
+        temperatureSetpoint: true,
+        updatedAt: true,
         updatedBy: true,
       },
     });
@@ -112,9 +112,18 @@ export class MashingProtocolStepControllerBase {
     return this.service.mashingProtocolSteps({
       ...args,
       select: {
-        id: true,
+        agitatorEnabled: true,
+        agitatorSpdSp: true,
+        coolEnabled: true,
+        coolTempSp: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        heatEnabled: true,
+        heatTempSp: true,
+        holdType: true,
+        id: true,
+        index: true,
+        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -122,19 +131,10 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
-        index: true,
-        agitatorEnabled: true,
-        agitatorSpdSp: true,
-        coolEnabled: true,
-        coolTempSp: true,
-        heatEnabled: true,
-        heatTempSp: true,
-        isClassDefinition: true,
         stepType: true,
-        holdType: true,
-        temperatureSetpoint: true,
         temperatureActual: true,
-        createdBy: true,
+        temperatureSetpoint: true,
+        updatedAt: true,
         updatedBy: true,
       },
     });
@@ -158,9 +158,18 @@ export class MashingProtocolStepControllerBase {
     const result = await this.service.mashingProtocolStep({
       where: params,
       select: {
-        id: true,
+        agitatorEnabled: true,
+        agitatorSpdSp: true,
+        coolEnabled: true,
+        coolTempSp: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        heatEnabled: true,
+        heatTempSp: true,
+        holdType: true,
+        id: true,
+        index: true,
+        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -168,19 +177,10 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
-        index: true,
-        agitatorEnabled: true,
-        agitatorSpdSp: true,
-        coolEnabled: true,
-        coolTempSp: true,
-        heatEnabled: true,
-        heatTempSp: true,
-        isClassDefinition: true,
         stepType: true,
-        holdType: true,
-        temperatureSetpoint: true,
         temperatureActual: true,
-        createdBy: true,
+        temperatureSetpoint: true,
+        updatedAt: true,
         updatedBy: true,
       },
     });
@@ -224,9 +224,18 @@ export class MashingProtocolStepControllerBase {
             : undefined,
         },
         select: {
-          id: true,
+          agitatorEnabled: true,
+          agitatorSpdSp: true,
+          coolEnabled: true,
+          coolTempSp: true,
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          heatEnabled: true,
+          heatTempSp: true,
+          holdType: true,
+          id: true,
+          index: true,
+          isClassDefinition: true,
 
           mashingProtocol: {
             select: {
@@ -234,19 +243,10 @@ export class MashingProtocolStepControllerBase {
             },
           },
 
-          index: true,
-          agitatorEnabled: true,
-          agitatorSpdSp: true,
-          coolEnabled: true,
-          coolTempSp: true,
-          heatEnabled: true,
-          heatTempSp: true,
-          isClassDefinition: true,
           stepType: true,
-          holdType: true,
-          temperatureSetpoint: true,
           temperatureActual: true,
-          createdBy: true,
+          temperatureSetpoint: true,
+          updatedAt: true,
           updatedBy: true,
         },
       });
@@ -278,9 +278,18 @@ export class MashingProtocolStepControllerBase {
       return await this.service.deleteMashingProtocolStep({
         where: params,
         select: {
-          id: true,
+          agitatorEnabled: true,
+          agitatorSpdSp: true,
+          coolEnabled: true,
+          coolTempSp: true,
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          heatEnabled: true,
+          heatTempSp: true,
+          holdType: true,
+          id: true,
+          index: true,
+          isClassDefinition: true,
 
           mashingProtocol: {
             select: {
@@ -288,19 +297,10 @@ export class MashingProtocolStepControllerBase {
             },
           },
 
-          index: true,
-          agitatorEnabled: true,
-          agitatorSpdSp: true,
-          coolEnabled: true,
-          coolTempSp: true,
-          heatEnabled: true,
-          heatTempSp: true,
-          isClassDefinition: true,
           stepType: true,
-          holdType: true,
-          temperatureSetpoint: true,
           temperatureActual: true,
-          createdBy: true,
+          temperatureSetpoint: true,
+          updatedAt: true,
           updatedBy: true,
         },
       });
@@ -330,9 +330,17 @@ export class MashingProtocolStepControllerBase {
     const results = await this.service.findRecipeBomItem(params.id, {
       ...query,
       select: {
-        id: true,
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
 
         item: {
           select: {
@@ -340,29 +348,21 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        createdBy: true,
-        updatedBy: true,
-        operation: true,
-        operationIndex: true,
-        isClassDefinition: true,
-        quantity: true,
         units: true,
-        quantityActual: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        lot: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

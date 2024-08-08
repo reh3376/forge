@@ -14,58 +14,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
+import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 
 @InputType()
 class RecipeGroupWhereInput {
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  recipe?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  revision?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  schemaVersion?: StringNullableFilter;
-
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -86,7 +42,41 @@ class RecipeGroupWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderListRelationFilter, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  recipe?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -102,15 +92,14 @@ class RecipeGroupWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderListRelationFilter,
+    type: IntNullableFilter,
   })
-  @ValidateNested()
-  @Type(() => ProductionOrderListRelationFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => ProductionOrderListRelationFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  productionOrders?: ProductionOrderListRelationFilter;
+  revision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -133,7 +122,18 @@ class RecipeGroupWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
+  schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 }
 
 export { RecipeGroupWhereInput as RecipeGroupWhereInput };

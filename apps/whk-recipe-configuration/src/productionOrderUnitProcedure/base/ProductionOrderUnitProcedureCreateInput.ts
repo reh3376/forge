@@ -11,26 +11,65 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { EnumProductionOrderUnitProcedureAbbreviation } from "./EnumProductionOrderUnitProcedureAbbreviation";
 import {
+  IsEnum,
+  IsOptional,
   IsString,
   MaxLength,
-  IsEnum,
   ValidateNested,
-  IsOptional,
 } from "class-validator";
-import { EnumProductionOrderUnitProcedureAbbreviation } from "./EnumProductionOrderUnitProcedureAbbreviation";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { Type } from "class-transformer";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { Type } from "class-transformer";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumProductionOrderUnitProcedureStatus } from "./EnumProductionOrderUnitProcedureStatus";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @InputType()
 class ProductionOrderUnitProcedureCreateInput {
+  @ApiProperty({
+    required: true,
+    enum: EnumProductionOrderUnitProcedureAbbreviation,
+  })
+  @IsEnum(EnumProductionOrderUnitProcedureAbbreviation)
+  @Field(() => EnumProductionOrderUnitProcedureAbbreviation)
+  abbreviation!: "MAS" | "FER" | "DIS" | "DPR" | "MIL" | "GLD";
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  bom?: InputJsonValue;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @Field(() => String)
+  customer!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
   @ApiProperty({
     required: true,
     type: String,
@@ -39,14 +78,6 @@ class ProductionOrderUnitProcedureCreateInput {
   @MaxLength(1000)
   @Field(() => String)
   name!: string;
-
-  @ApiProperty({
-    required: true,
-    enum: EnumProductionOrderUnitProcedureAbbreviation,
-  })
-  @IsEnum(EnumProductionOrderUnitProcedureAbbreviation)
-  @Field(() => EnumProductionOrderUnitProcedureAbbreviation)
-  abbreviation!: "MAS" | "FER" | "DIS" | "DPR" | "MIL" | "GLD";
 
   @ApiProperty({
     required: false,
@@ -74,61 +105,6 @@ class ProductionOrderUnitProcedureCreateInput {
 
   @ApiProperty({
     required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  bom?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  wipItem?: ItemWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(3)
-  @Field(() => String)
-  customer!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  unitProcedure?: UnitProcedureWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     enum: EnumProductionOrderUnitProcedureStatus,
   })
   @IsEnum(EnumProductionOrderUnitProcedureStatus)
@@ -144,6 +120,30 @@ class ProductionOrderUnitProcedureCreateInput {
     | "Complete"
     | "Abandoned"
     | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  wipItem?: ItemWhereUniqueInput | null;
 }
 
 export { ProductionOrderUnitProcedureCreateInput as ProductionOrderUnitProcedureCreateInput };

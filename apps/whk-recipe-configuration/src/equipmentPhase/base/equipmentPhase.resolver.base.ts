@@ -25,14 +25,14 @@ import { EquipmentPhaseFindManyArgs } from "./EquipmentPhaseFindManyArgs";
 import { EquipmentPhaseFindUniqueArgs } from "./EquipmentPhaseFindUniqueArgs";
 import { CreateEquipmentPhaseArgs } from "./CreateEquipmentPhaseArgs";
 import { UpdateEquipmentPhaseArgs } from "./UpdateEquipmentPhaseArgs";
-import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
-import { Instruction } from "../../instruction/base/Instruction";
-import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
-import { TestParameter } from "../../testParameter/base/TestParameter";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
+import { InstructionFindManyArgs } from "../../instruction/base/InstructionFindManyArgs";
+import { Instruction } from "../../instruction/base/Instruction";
 import { PhaseParameterFindManyArgs } from "../../phaseParameter/base/PhaseParameterFindManyArgs";
 import { PhaseParameter } from "../../phaseParameter/base/PhaseParameter";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Operation } from "../../operation/base/Operation";
 import { EquipmentPhaseService } from "../equipmentPhase.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -103,15 +103,15 @@ export class EquipmentPhaseResolverBase {
       data: {
         ...args.data,
 
-        operation: {
-          connect: args.data.operation,
-        },
-
         classId: args.data.classId
           ? {
               connect: args.data.classId,
             }
           : undefined,
+
+        operation: {
+          connect: args.data.operation,
+        },
       },
     });
   }
@@ -132,15 +132,15 @@ export class EquipmentPhaseResolverBase {
         data: {
           ...args.data,
 
-          operation: {
-            connect: args.data.operation,
-          },
-
           classId: args.data.classId
             ? {
                 connect: args.data.classId,
               }
             : undefined,
+
+          operation: {
+            connect: args.data.operation,
+          },
         },
       });
     } catch (error) {
@@ -154,37 +154,17 @@ export class EquipmentPhaseResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Instruction], { name: "instructions" })
+  @graphql.ResolveField(() => [BomItem], { name: "bomItem" })
   @nestAccessControl.UseRoles({
-    resource: "Instruction",
+    resource: "BomItem",
     action: "read",
     possession: "any",
   })
-  async findInstructions(
+  async findBomItem(
     @graphql.Parent() parent: EquipmentPhase,
-    @graphql.Args() args: InstructionFindManyArgs
-  ): Promise<Instruction[]> {
-    const results = await this.service.findInstructions(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
-  @nestAccessControl.UseRoles({
-    resource: "TestParameter",
-    action: "read",
-    possession: "any",
-  })
-  async findTestParameters(
-    @graphql.Parent() parent: EquipmentPhase,
-    @graphql.Args() args: TestParameterFindManyArgs
-  ): Promise<TestParameter[]> {
-    const results = await this.service.findTestParameters(parent.id, args);
+    @graphql.Args() args: BomItemFindManyArgs
+  ): Promise<BomItem[]> {
+    const results = await this.service.findBomItem(parent.id, args);
 
     if (!results) {
       return [];
@@ -214,17 +194,17 @@ export class EquipmentPhaseResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [BomItem], { name: "bomItem" })
+  @graphql.ResolveField(() => [Instruction], { name: "instructions" })
   @nestAccessControl.UseRoles({
-    resource: "BomItem",
+    resource: "Instruction",
     action: "read",
     possession: "any",
   })
-  async findBomItem(
+  async findInstructions(
     @graphql.Parent() parent: EquipmentPhase,
-    @graphql.Args() args: BomItemFindManyArgs
-  ): Promise<BomItem[]> {
-    const results = await this.service.findBomItem(parent.id, args);
+    @graphql.Args() args: InstructionFindManyArgs
+  ): Promise<Instruction[]> {
+    const results = await this.service.findInstructions(parent.id, args);
 
     if (!results) {
       return [];
@@ -254,24 +234,23 @@ export class EquipmentPhaseResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Operation, {
-    nullable: true,
-    name: "operation",
-  })
+  @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
   @nestAccessControl.UseRoles({
-    resource: "Operation",
+    resource: "TestParameter",
     action: "read",
     possession: "any",
   })
-  async getOperation(
-    @graphql.Parent() parent: EquipmentPhase
-  ): Promise<Operation | null> {
-    const result = await this.service.getOperation(parent.id);
+  async findTestParameters(
+    @graphql.Parent() parent: EquipmentPhase,
+    @graphql.Args() args: TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    const results = await this.service.findTestParameters(parent.id, args);
 
-    if (!result) {
-      return null;
+    if (!results) {
+      return [];
     }
-    return result;
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -288,6 +267,27 @@ export class EquipmentPhaseResolverBase {
     @graphql.Parent() parent: EquipmentPhase
   ): Promise<EquipmentPhase | null> {
     const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Operation, {
+    nullable: true,
+    name: "operation",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "read",
+    possession: "any",
+  })
+  async getOperation(
+    @graphql.Parent() parent: EquipmentPhase
+  ): Promise<Operation | null> {
+    const result = await this.service.getOperation(parent.id);
 
     if (!result) {
       return null;

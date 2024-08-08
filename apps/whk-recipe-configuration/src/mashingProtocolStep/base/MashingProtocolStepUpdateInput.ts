@@ -11,52 +11,28 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 
 import {
-  ValidateNested,
-  IsOptional,
-  IsInt,
-  Max,
   IsBoolean,
+  IsOptional,
   IsNumber,
-  IsEnum,
+  Max,
   IsString,
   MaxLength,
+  IsEnum,
+  IsInt,
+  ValidateNested,
 } from "class-validator";
 
-import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
+import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
+import { Type } from "class-transformer";
 import { RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput } from "./RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
-import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 
 @InputType()
 class MashingProtocolStepUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: () => MashingProtocolWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingProtocolWhereUniqueInput)
-  @IsOptional()
-  @Field(() => MashingProtocolWhereUniqueInput, {
-    nullable: true,
-  })
-  mashingProtocol?: MashingProtocolWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(40)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  index?: number | null;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -105,6 +81,18 @@ class MashingProtocolStepUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string;
+
+  @ApiProperty({
+    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -128,15 +116,26 @@ class MashingProtocolStepUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput,
+    enum: EnumMashingProtocolStepHoldType,
   })
-  @ValidateNested()
-  @Type(() => RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput)
+  @IsEnum(EnumMashingProtocolStepHoldType)
   @IsOptional()
-  @Field(() => RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput, {
+  @Field(() => EnumMashingProtocolStepHoldType, {
     nullable: true,
   })
-  recipeBomItem?: RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput;
+  holdType?: "Heat" | "Cool" | "Hold" | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(40)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  index?: number | null;
 
   @ApiProperty({
     required: false,
@@ -148,6 +147,30 @@ class MashingProtocolStepUpdateInput {
     nullable: true,
   })
   isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput, {
+    nullable: true,
+  })
+  recipeBomItem?: RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput;
 
   @ApiProperty({
     required: false,
@@ -172,29 +195,6 @@ class MashingProtocolStepUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumMashingProtocolStepHoldType,
-  })
-  @IsEnum(EnumMashingProtocolStepHoldType)
-  @IsOptional()
-  @Field(() => EnumMashingProtocolStepHoldType, {
-    nullable: true,
-  })
-  holdType?: "Heat" | "Cool" | "Hold" | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(250)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  temperatureSetpoint?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsNumber()
@@ -207,15 +207,15 @@ class MashingProtocolStepUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsNumber()
+  @Max(250)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Float, {
     nullable: true,
   })
-  createdBy?: string;
+  temperatureSetpoint?: Decimal | null;
 
   @ApiProperty({
     required: false,

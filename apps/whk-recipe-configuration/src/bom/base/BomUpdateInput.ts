@@ -11,45 +11,33 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BomItemUpdateManyWithoutBomsInput } from "./BomItemUpdateManyWithoutBomsInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  ValidateNested,
-  IsBoolean,
   IsDate,
+  IsBoolean,
 } from "class-validator";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
-import { UnitProcedureUpdateManyWithoutBomsInput } from "./UnitProcedureUpdateManyWithoutBomsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderUpdateManyWithoutBomsInput } from "./ProductionOrderUpdateManyWithoutBomsInput";
-import { BomItemUpdateManyWithoutBomsInput } from "./BomItemUpdateManyWithoutBomsInput";
+import { UnitProcedureUpdateManyWithoutBomsInput } from "./UnitProcedureUpdateManyWithoutBomsInput";
 
 @InputType()
 class BomUpdateInput {
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => BomItemUpdateManyWithoutBomsInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => BomItemUpdateManyWithoutBomsInput)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(() => BomItemUpdateManyWithoutBomsInput, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput;
+  bomItem?: BomItemUpdateManyWithoutBomsInput;
 
   @ApiProperty({
     required: false,
@@ -61,7 +49,31 @@ class BomUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
+  bomName?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bomRevision?: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bomType?: string | null;
 
   @ApiProperty({
     required: false,
@@ -92,12 +104,105 @@ class BomUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  bomName?: string;
+  editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveEndDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveStartDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  inactive?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUpdateManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUpdateManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUpdateManyWithoutBomsInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderUpdateManyWithoutBomsInput;
 
   @ApiProperty({
     required: false,
@@ -109,7 +214,7 @@ class BomUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  bomRevision?: string;
+  schemaVersion?: string | null;
 
   @ApiProperty({
     required: false,
@@ -134,111 +239,6 @@ class BomUpdateInput {
     nullable: true,
   })
   unitProceduresPrimary?: UnitProcedureUpdateManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUpdateManyWithoutBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUpdateManyWithoutBomsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUpdateManyWithoutBomsInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderUpdateManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomItemUpdateManyWithoutBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => BomItemUpdateManyWithoutBomsInput)
-  @IsOptional()
-  @Field(() => BomItemUpdateManyWithoutBomsInput, {
-    nullable: true,
-  })
-  bomItem?: BomItemUpdateManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  bomType?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  notes?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  inactive?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  effectiveStartDate?: Date | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  effectiveEndDate?: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(100)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  erpId?: string | null;
 }
 
 export { BomUpdateInput as BomUpdateInput };

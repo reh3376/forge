@@ -13,29 +13,76 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
+  IsBoolean,
+  IsOptional,
+  ValidateNested,
   IsString,
   MaxLength,
-  IsOptional,
+  IsEnum,
   IsInt,
   Max,
-  IsEnum,
-  ValidateNested,
-  IsBoolean,
 } from "class-validator";
 
-import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { BomItemUpdateManyWithoutEquipmentPhasesInput } from "./BomItemUpdateManyWithoutEquipmentPhasesInput";
 import { Type } from "class-transformer";
-import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
-import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 import { EquipmentPhaseWhereUniqueInput } from "./EquipmentPhaseWhereUniqueInput";
 import { EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput } from "./EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput";
-import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
-import { BomItemUpdateManyWithoutEquipmentPhasesInput } from "./BomItemUpdateManyWithoutEquipmentPhasesInput";
+import { InstructionUpdateManyWithoutEquipmentPhasesInput } from "./InstructionUpdateManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseName } from "./EnumEquipmentPhaseName";
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { PhaseParameterUpdateManyWithoutEquipmentPhasesInput } from "./PhaseParameterUpdateManyWithoutEquipmentPhasesInput";
+import { EnumEquipmentPhaseStepType } from "./EnumEquipmentPhaseStepType";
+import { TestParameterUpdateManyWithoutEquipmentPhasesInput } from "./TestParameterUpdateManyWithoutEquipmentPhasesInput";
 
 @InputType()
 class EquipmentPhaseUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomItemUpdateManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => BomItemUpdateManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => BomItemUpdateManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  bomItem?: BomItemUpdateManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseWhereUniqueInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: EquipmentPhaseWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  className?: string | null;
+
   @ApiProperty({
     required: false,
     type: String,
@@ -58,19 +105,78 @@ class EquipmentPhaseUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
+  description?: string | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: String,
   })
-  @IsInt()
-  @Max(99)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => String, {
     nullable: true,
   })
-  operationSequenceIndex?: number | null;
+  editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  instances?: EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => InstructionUpdateManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => InstructionUpdateManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => InstructionUpdateManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  instructions?: InstructionUpdateManyWithoutEquipmentPhasesInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  message?: string | null;
 
   @ApiProperty({
     required: false,
@@ -126,15 +232,39 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  operationSequenceIndex?: number | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  editedBy?: string | null;
+  path?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PhaseParameterUpdateManyWithoutEquipmentPhasesInput,
+  })
+  @ValidateNested()
+  @Type(() => PhaseParameterUpdateManyWithoutEquipmentPhasesInput)
+  @IsOptional()
+  @Field(() => PhaseParameterUpdateManyWithoutEquipmentPhasesInput, {
+    nullable: true,
+  })
+  phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
 
   @ApiProperty({
     required: false,
@@ -158,113 +288,7 @@ class EquipmentPhaseUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  className?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  description?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => InstructionUpdateManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => InstructionUpdateManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => InstructionUpdateManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  instructions?: InstructionUpdateManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterUpdateManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterUpdateManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => TestParameterUpdateManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  testParameters?: TestParameterUpdateManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseWhereUniqueInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: EquipmentPhaseWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  instances?: EquipmentPhaseUpdateManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  path?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
+  schemaVersion?: string | null;
 
   @ApiProperty({
     required: false,
@@ -297,39 +321,15 @@ class EquipmentPhaseUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  message?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomItemUpdateManyWithoutEquipmentPhasesInput,
+    type: () => TestParameterUpdateManyWithoutEquipmentPhasesInput,
   })
   @ValidateNested()
-  @Type(() => BomItemUpdateManyWithoutEquipmentPhasesInput)
+  @Type(() => TestParameterUpdateManyWithoutEquipmentPhasesInput)
   @IsOptional()
-  @Field(() => BomItemUpdateManyWithoutEquipmentPhasesInput, {
+  @Field(() => TestParameterUpdateManyWithoutEquipmentPhasesInput, {
     nullable: true,
   })
-  bomItem?: BomItemUpdateManyWithoutEquipmentPhasesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => PhaseParameterUpdateManyWithoutEquipmentPhasesInput,
-  })
-  @ValidateNested()
-  @Type(() => PhaseParameterUpdateManyWithoutEquipmentPhasesInput)
-  @IsOptional()
-  @Field(() => PhaseParameterUpdateManyWithoutEquipmentPhasesInput, {
-    nullable: true,
-  })
-  phaseParameters?: PhaseParameterUpdateManyWithoutEquipmentPhasesInput;
+  testParameters?: TestParameterUpdateManyWithoutEquipmentPhasesInput;
 }
 
 export { EquipmentPhaseUpdateInput as EquipmentPhaseUpdateInput };

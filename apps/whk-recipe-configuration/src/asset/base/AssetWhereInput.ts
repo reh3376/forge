@@ -14,22 +14,22 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, IsEnum, ValidateNested } from "class-validator";
-import { DateTimeFilter } from "../../util/DateTimeFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
+import { AssetListRelationFilter } from "./AssetListRelationFilter";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
-import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
-import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
-import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
-import { AssetListRelationFilter } from "./AssetListRelationFilter";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
+import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
 class AssetWhereInput {
@@ -43,6 +43,51 @@ class AssetWhereInput {
     nullable: true,
   })
   assetPath?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumAssetAssetType,
+  })
+  @IsEnum(EnumAssetAssetType)
+  @IsOptional()
+  @Field(() => EnumAssetAssetType, {
+    nullable: true,
+  })
+  assetType?:
+    | "ENT"
+    | "SITE"
+    | "AREA"
+    | "LINE"
+    | "CELL"
+    | "EQUIPMOD"
+    | "EQUIPPHASE"
+    | "CONTROLMOD"
+    | "UNIT"
+    | "DEVICE";
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchListRelationFilter, {
+    nullable: true,
+  })
+  batches?: BatchListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => AssetListRelationFilter)
+  @IsOptional()
+  @Field(() => AssetListRelationFilter, {
+    nullable: true,
+  })
+  children?: AssetListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -79,116 +124,6 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  name?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  revision?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  schemaVersion?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumAssetAssetType,
-  })
-  @IsEnum(EnumAssetAssetType)
-  @IsOptional()
-  @Field(() => EnumAssetAssetType, {
-    nullable: true,
-  })
-  assetType?:
-    | "ENT"
-    | "SITE"
-    | "AREA"
-    | "LINE"
-    | "CELL"
-    | "EQUIPMOD"
-    | "EQUIPPHASE"
-    | "CONTROLMOD"
-    | "UNIT"
-    | "DEVICE";
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeFilter,
-  })
-  @Type(() => DateTimeFilter)
-  @IsOptional()
-  @Field(() => DateTimeFilter, {
-    nullable: true,
-  })
-  updatedAt?: DateTimeFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  updatedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderListRelationFilter)
-  @IsOptional()
-  @Field(() => PurchaseOrderListRelationFilter, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => FermentationChemistryListRelationFilter,
   })
   @ValidateNested()
@@ -213,27 +148,25 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumListRelationFilter,
+    type: StringNullableFilter,
   })
-  @ValidateNested()
-  @Type(() => MashDatumListRelationFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => MashDatumListRelationFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  mashData?: MashDatumListRelationFilter;
+  globalId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: () => BatchListRelationFilter,
+    type: StringFilter,
   })
-  @ValidateNested()
-  @Type(() => BatchListRelationFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => BatchListRelationFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  batches?: BatchListRelationFilter;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -285,30 +218,6 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  parent?: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => AssetListRelationFilter)
-  @IsOptional()
-  @Field(() => AssetListRelationFilter, {
-    nullable: true,
-  })
-  children?: AssetListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => ItemReceiptListRelationFilter,
   })
   @ValidateNested()
@@ -330,6 +239,97 @@ class AssetWhereInput {
     nullable: true,
   })
   lots?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => MashDatumListRelationFilter, {
+    nullable: true,
+  })
+  mashData?: MashDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => PurchaseOrderListRelationFilter, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  schemaVersion?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  updatedAt?: DateTimeFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 }
 
 export { AssetWhereInput as AssetWhereInput };

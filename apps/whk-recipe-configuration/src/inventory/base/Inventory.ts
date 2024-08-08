@@ -11,85 +11,28 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { Asset } from "../../asset/base/Asset";
 
 import {
+  ValidateNested,
   IsString,
-  IsDate,
   MaxLength,
   IsOptional,
-  ValidateNested,
+  IsDate,
   IsInt,
   Max,
   IsNumber,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Asset } from "../../asset/base/Asset";
-import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { Item } from "../../item/base/Item";
 import { Decimal } from "decimal.js";
 
 @ObjectType()
 class Inventory {
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion!: string | null;
-
   @ApiProperty({
     required: true,
     type: () => Asset,
@@ -97,30 +40,6 @@ class Inventory {
   @ValidateNested()
   @Type(() => Asset)
   asset?: Asset;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  correctionNote!: string | null;
 
   @ApiProperty({
     required: false,
@@ -144,7 +63,66 @@ class Inventory {
   @Field(() => String, {
     nullable: true,
   })
-  lotNumber!: string | null;
+  correctionNote!: string | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  customers!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  fifoIndex!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -164,19 +142,7 @@ class Inventory {
   @Field(() => String, {
     nullable: true,
   })
-  notes!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  units!: string | null;
+  lotNumber!: string | null;
 
   @ApiProperty({
     required: false,
@@ -188,17 +154,7 @@ class Inventory {
   @Field(() => String, {
     nullable: true,
   })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  customers!: JsonValue;
+  notes!: string | null;
 
   @ApiProperty({
     required: false,
@@ -217,12 +173,56 @@ class Inventory {
     type: Number,
   })
   @IsInt()
-  @Max(99999999999)
+  @Max(9999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  fifoIndex!: number | null;
+  revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  units!: string | null;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { Inventory as Inventory };

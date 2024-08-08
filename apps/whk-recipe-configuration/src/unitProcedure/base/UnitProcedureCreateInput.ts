@@ -16,26 +16,73 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  IsBoolean,
+  ValidateNested,
+  IsEnum,
   IsInt,
   Max,
-  IsEnum,
-  ValidateNested,
-  IsBoolean,
 } from "class-validator";
 
-import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
-import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { Type } from "class-transformer";
-import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { UnitProcedureWhereUniqueInput } from "./UnitProcedureWhereUniqueInput";
 import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitProcedureCreateNestedManyWithoutUnitProceduresInput";
-import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreateNestedManyWithoutUnitProceduresInput";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
-import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
+import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
+import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput";
+import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreateNestedManyWithoutUnitProceduresInput";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @InputType()
 class UnitProcedureCreateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  abbreviation?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BomWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BomWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BomWhereUniqueInput, {
+    nullable: true,
+  })
+  boms?: BomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: UnitProcedureWhereUniqueInput | null;
+
   @ApiProperty({
     required: true,
     type: String,
@@ -44,55 +91,6 @@ class UnitProcedureCreateInput {
   @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: true,
-    enum: EnumUnitProcedureName,
-  })
-  @IsEnum(EnumUnitProcedureName)
-  @Field(() => EnumUnitProcedureName)
-  name!:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Granary01";
 
   @ApiProperty({
     required: false,
@@ -108,47 +106,15 @@ class UnitProcedureCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => OperationCreateNestedManyWithoutUnitProceduresInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => OperationCreateNestedManyWithoutUnitProceduresInput)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => OperationCreateNestedManyWithoutUnitProceduresInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  operations?: OperationCreateNestedManyWithoutUnitProceduresInput;
-
-  @ApiProperty({
-    required: true,
-    type: () => ProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
-  @Field(() => ProcedureWhereUniqueInput)
-  procedure!: ProcedureWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDef?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: UnitProcedureWhereUniqueInput | null;
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -171,43 +137,32 @@ class UnitProcedureCreateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
-  active?: boolean | null;
+  isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumUnitProcedureName,
+  })
+  @IsEnum(EnumUnitProcedureName)
+  @Field(() => EnumUnitProcedureName)
+  name!:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | "Granary01";
 
   @ApiProperty({
     required: false,
-    type: () => RecipeCreateNestedManyWithoutUnitProceduresInput,
+    type: () => OperationCreateNestedManyWithoutUnitProceduresInput,
   })
   @ValidateNested()
-  @Type(() => RecipeCreateNestedManyWithoutUnitProceduresInput)
+  @Type(() => OperationCreateNestedManyWithoutUnitProceduresInput)
   @IsOptional()
-  @Field(() => RecipeCreateNestedManyWithoutUnitProceduresInput, {
+  @Field(() => OperationCreateNestedManyWithoutUnitProceduresInput, {
     nullable: true,
   })
-  recipe?: RecipeCreateNestedManyWithoutUnitProceduresInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  boms?: BomWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BomWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BomWhereUniqueInput, {
-    nullable: true,
-  })
-  primaryBom?: BomWhereUniqueInput | null;
+  operations?: OperationCreateNestedManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,
@@ -223,27 +178,24 @@ class UnitProcedureCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ScheduleOrderQueueWhereUniqueInput,
+    type: () => BomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @Type(() => BomWhereUniqueInput)
   @IsOptional()
-  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+  @Field(() => BomWhereUniqueInput, {
     nullable: true,
   })
-  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
+  primaryBom?: BomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => ProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
+  @Field(() => ProcedureWhereUniqueInput)
+  procedure!: ProcedureWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -266,15 +218,63 @@ class UnitProcedureCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => RecipeCreateNestedManyWithoutUnitProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutUnitProceduresInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutUnitProceduresInput, {
+    nullable: true,
+  })
+  recipe?: RecipeCreateNestedManyWithoutUnitProceduresInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(3)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  abbreviation?: string | null;
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { UnitProcedureCreateInput as UnitProcedureCreateInput };

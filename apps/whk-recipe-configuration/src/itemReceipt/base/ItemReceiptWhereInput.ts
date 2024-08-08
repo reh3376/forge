@@ -15,16 +15,17 @@ import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
-import { DecimalFilter } from "../../util/DecimalFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { JsonFilter } from "../../util/JsonFilter";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { DecimalFilter } from "../../util/DecimalFilter";
+import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 
 @InputType()
 class ItemReceiptWhereInput {
@@ -63,6 +64,17 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -71,6 +83,40 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  loadId?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  lots?: JsonFilter;
 
   @ApiProperty({
     required: false,
@@ -130,6 +176,41 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => TestParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => TestParameterListRelationFilter, {
+    nullable: true,
+  })
+  tests?: TestParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  testsPassed?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  toAsset?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -182,75 +263,6 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   weighOut?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => TestParameterListRelationFilter, {
-    nullable: true,
-  })
-  tests?: TestParameterListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  loadId?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  testsPassed?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  toAsset?: AssetWhereUniqueInput;
 }
 
 export { ItemReceiptWhereInput as ItemReceiptWhereInput };

@@ -26,15 +26,15 @@ import { Customer } from "./Customer";
 import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
 import { CustomerWhereUniqueInput } from "./CustomerWhereUniqueInput";
 import { CustomerUpdateInput } from "./CustomerUpdateInput";
-import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
-import { SalesOrder } from "../../salesOrder/base/SalesOrder";
-import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
+import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -74,23 +74,24 @@ export class CustomerControllerBase {
         address: true,
         createdAt: true,
         createdBy: true,
+        customerCode: true,
         description: true,
         editedBy: true,
         email: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
         globalId: true,
-        customerCode: true,
-        phone: true,
+        id: true,
 
         inventoryLog: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        phone: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
       },
     });
   }
@@ -115,23 +116,24 @@ export class CustomerControllerBase {
         address: true,
         createdAt: true,
         createdBy: true,
+        customerCode: true,
         description: true,
         editedBy: true,
         email: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
         globalId: true,
-        customerCode: true,
-        phone: true,
+        id: true,
 
         inventoryLog: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        phone: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
       },
     });
   }
@@ -157,23 +159,24 @@ export class CustomerControllerBase {
         address: true,
         createdAt: true,
         createdBy: true,
+        customerCode: true,
         description: true,
         editedBy: true,
         email: true,
-        id: true,
-        name: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
         globalId: true,
-        customerCode: true,
-        phone: true,
+        id: true,
 
         inventoryLog: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        phone: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
       },
     });
     if (result === null) {
@@ -219,23 +222,24 @@ export class CustomerControllerBase {
           address: true,
           createdAt: true,
           createdBy: true,
+          customerCode: true,
           description: true,
           editedBy: true,
           email: true,
-          id: true,
-          name: true,
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
           globalId: true,
-          customerCode: true,
-          phone: true,
+          id: true,
 
           inventoryLog: {
             select: {
               id: true,
             },
           },
+
+          name: true,
+          phone: true,
+          revision: true,
+          schemaVersion: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
@@ -246,126 +250,6 @@ export class CustomerControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/salesOrders")
-  @ApiNestedQuery(SalesOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "SalesOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findSalesOrders(
-    @common.Req() request: Request,
-    @common.Param() params: CustomerWhereUniqueInput
-  ): Promise<SalesOrder[]> {
-    const query = plainToClass(SalesOrderFindManyArgs, request.query);
-    const results = await this.service.findSalesOrders(params.id, {
-      ...query,
-      select: {
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        createdBy: true,
-        id: true,
-        orderType: true,
-        quantity: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customerCode: true,
-        lineItems: true,
-        erpId: true,
-        requestedShipDate: true,
-        name: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/salesOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "update",
-    possession: "any",
-  })
-  async connectSalesOrders(
-    @common.Param() params: CustomerWhereUniqueInput,
-    @common.Body() body: SalesOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      salesOrders: {
-        connect: body,
-      },
-    };
-    await this.service.updateCustomer({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/salesOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "update",
-    possession: "any",
-  })
-  async updateSalesOrders(
-    @common.Param() params: CustomerWhereUniqueInput,
-    @common.Body() body: SalesOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      salesOrders: {
-        set: body,
-      },
-    };
-    await this.service.updateCustomer({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/salesOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectSalesOrders(
-    @common.Param() params: CustomerWhereUniqueInput,
-    @common.Body() body: SalesOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      salesOrders: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateCustomer({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -384,10 +268,6 @@ export class CustomerControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-
         bom: {
           select: {
             id: true,
@@ -396,15 +276,34 @@ export class CustomerControllerBase {
 
         className: true,
         complete: true,
+        completedCooks: true,
+        completedFermenters: true,
+        completedQuantity: true,
+        createdAt: true,
         createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        endDate: true,
+        globalId: true,
+        id: true,
         inProcess: true,
-        updatedBy: true,
 
         item: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        plannedCooks: true,
+        plannedFermenters: true,
+        quantity: true,
 
         recipe: {
           select: {
@@ -418,7 +317,13 @@ export class CustomerControllerBase {
           },
         },
 
-        customer: {
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduleOrder: {
           select: {
             id: true,
           },
@@ -427,31 +332,10 @@ export class CustomerControllerBase {
         scheduled: true,
         schemaVersion: true,
         startDate: true,
-        endDate: true,
         status: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customerCode: true,
         units: true,
-        quantity: true,
-        name: true,
-        plannedCooks: true,
-        completedCooks: true,
-        plannedFermenters: true,
-        completedFermenters: true,
-        completedQuantity: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -544,24 +428,18 @@ export class CustomerControllerBase {
     const results = await this.service.findRecipes(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
         Recipe: true,
+        active: true,
 
-        recipeGroup: {
+        classId: {
           select: {
             id: true,
           },
         },
 
-        globalId: true,
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -569,24 +447,31 @@ export class CustomerControllerBase {
           },
         },
 
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
         item: {
           select: {
             id: true,
           },
         },
 
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
-
-        classId: {
+        recipeGroup: {
           select: {
             id: true,
           },
         },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -653,6 +538,127 @@ export class CustomerControllerBase {
   ): Promise<void> {
     const data = {
       recipes: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/salesOrders")
+  @ApiNestedQuery(SalesOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "SalesOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findSalesOrders(
+    @common.Req() request: Request,
+    @common.Param() params: CustomerWhereUniqueInput
+  ): Promise<SalesOrder[]> {
+    const query = plainToClass(SalesOrderFindManyArgs, request.query);
+    const results = await this.service.findSalesOrders(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        erpId: true,
+        globalId: true,
+        id: true,
+        lineItems: true,
+        name: true,
+        orderType: true,
+
+        productionOrders: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        requestedShipDate: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/salesOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async connectSalesOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: SalesOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      salesOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/salesOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async updateSalesOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: SalesOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      salesOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/salesOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectSalesOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: SalesOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      salesOrders: {
         disconnect: body,
       },
     };

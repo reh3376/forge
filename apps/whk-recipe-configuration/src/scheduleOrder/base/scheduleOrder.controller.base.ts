@@ -62,27 +62,47 @@ export class ScheduleOrderControllerBase {
           connect: data.recipeGroup,
         },
 
-        scheduleOrderRecipe: data.scheduleOrderRecipe
-          ? {
-              connect: data.scheduleOrderRecipe,
-            }
-          : undefined,
-
         scheduleOrderQueues: data.scheduleOrderQueues
           ? {
               connect: data.scheduleOrderQueues,
             }
           : undefined,
+
+        scheduleOrderRecipe: data.scheduleOrderRecipe
+          ? {
+              connect: data.scheduleOrderRecipe,
+            }
+          : undefined,
       },
       select: {
-        id: true,
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
-        updatedAt: true,
-        status: true,
         createdBy: true,
-        updatedBy: true,
+        customers: true,
+        duration: true,
+        durationUnits: true,
+        estimatedDistillationTime: true,
+        estimatedEnd: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedStart: true,
+        estimatedTotalProductionTime: true,
+        globalId: true,
+        id: true,
+        name: true,
+        productionOrderAllocation: true,
 
         recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleOrderQueues: {
           select: {
             id: true,
           },
@@ -94,31 +114,11 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        recipeName: true,
-        totalProofGallons: true,
-        estimatedTotalProductionTime: true,
-        estimatedMashingTime: true,
-        estimatedFermentationTime: true,
-        estimatedDistillationTime: true,
-        estimatedProcessing: true,
-        productionOrderAllocation: true,
+        status: true,
         totalBarrels: true,
-        globalId: true,
-        customers: true,
-        estimatedStart: true,
-        estimatedEnd: true,
-        actualStart: true,
-        actualEnd: true,
-        duration: true,
-        durationUnits: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
-        name: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -142,14 +142,34 @@ export class ScheduleOrderControllerBase {
     return this.service.scheduleOrders({
       ...args,
       select: {
-        id: true,
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
-        updatedAt: true,
-        status: true,
         createdBy: true,
-        updatedBy: true,
+        customers: true,
+        duration: true,
+        durationUnits: true,
+        estimatedDistillationTime: true,
+        estimatedEnd: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedStart: true,
+        estimatedTotalProductionTime: true,
+        globalId: true,
+        id: true,
+        name: true,
+        productionOrderAllocation: true,
 
         recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleOrderQueues: {
           select: {
             id: true,
           },
@@ -161,31 +181,11 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        recipeName: true,
-        totalProofGallons: true,
-        estimatedTotalProductionTime: true,
-        estimatedMashingTime: true,
-        estimatedFermentationTime: true,
-        estimatedDistillationTime: true,
-        estimatedProcessing: true,
-        productionOrderAllocation: true,
+        status: true,
         totalBarrels: true,
-        globalId: true,
-        customers: true,
-        estimatedStart: true,
-        estimatedEnd: true,
-        actualStart: true,
-        actualEnd: true,
-        duration: true,
-        durationUnits: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
-        name: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -208,14 +208,34 @@ export class ScheduleOrderControllerBase {
     const result = await this.service.scheduleOrder({
       where: params,
       select: {
-        id: true,
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
-        updatedAt: true,
-        status: true,
         createdBy: true,
-        updatedBy: true,
+        customers: true,
+        duration: true,
+        durationUnits: true,
+        estimatedDistillationTime: true,
+        estimatedEnd: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedStart: true,
+        estimatedTotalProductionTime: true,
+        globalId: true,
+        id: true,
+        name: true,
+        productionOrderAllocation: true,
 
         recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleOrderQueues: {
           select: {
             id: true,
           },
@@ -227,31 +247,11 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        recipeName: true,
-        totalProofGallons: true,
-        estimatedTotalProductionTime: true,
-        estimatedMashingTime: true,
-        estimatedFermentationTime: true,
-        estimatedDistillationTime: true,
-        estimatedProcessing: true,
-        productionOrderAllocation: true,
+        status: true,
         totalBarrels: true,
-        globalId: true,
-        customers: true,
-        estimatedStart: true,
-        estimatedEnd: true,
-        actualStart: true,
-        actualEnd: true,
-        duration: true,
-        durationUnits: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
-        name: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -291,27 +291,47 @@ export class ScheduleOrderControllerBase {
             connect: data.recipeGroup,
           },
 
-          scheduleOrderRecipe: data.scheduleOrderRecipe
-            ? {
-                connect: data.scheduleOrderRecipe,
-              }
-            : undefined,
-
           scheduleOrderQueues: data.scheduleOrderQueues
             ? {
                 connect: data.scheduleOrderQueues,
               }
             : undefined,
+
+          scheduleOrderRecipe: data.scheduleOrderRecipe
+            ? {
+                connect: data.scheduleOrderRecipe,
+              }
+            : undefined,
         },
         select: {
-          id: true,
+          actualEnd: true,
+          actualStart: true,
           createdAt: true,
-          updatedAt: true,
-          status: true,
           createdBy: true,
-          updatedBy: true,
+          customers: true,
+          duration: true,
+          durationUnits: true,
+          estimatedDistillationTime: true,
+          estimatedEnd: true,
+          estimatedFermentationTime: true,
+          estimatedMashingTime: true,
+          estimatedProcessing: true,
+          estimatedStart: true,
+          estimatedTotalProductionTime: true,
+          globalId: true,
+          id: true,
+          name: true,
+          productionOrderAllocation: true,
 
           recipeGroup: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipeName: true,
+
+          scheduleOrderQueues: {
             select: {
               id: true,
             },
@@ -323,31 +343,11 @@ export class ScheduleOrderControllerBase {
             },
           },
 
-          recipeName: true,
-          totalProofGallons: true,
-          estimatedTotalProductionTime: true,
-          estimatedMashingTime: true,
-          estimatedFermentationTime: true,
-          estimatedDistillationTime: true,
-          estimatedProcessing: true,
-          productionOrderAllocation: true,
+          status: true,
           totalBarrels: true,
-          globalId: true,
-          customers: true,
-          estimatedStart: true,
-          estimatedEnd: true,
-          actualStart: true,
-          actualEnd: true,
-          duration: true,
-          durationUnits: true,
-
-          scheduleOrderQueues: {
-            select: {
-              id: true,
-            },
-          },
-
-          name: true,
+          totalProofGallons: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -376,10 +376,6 @@ export class ScheduleOrderControllerBase {
     const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-
         bom: {
           select: {
             id: true,
@@ -388,15 +384,34 @@ export class ScheduleOrderControllerBase {
 
         className: true,
         complete: true,
+        completedCooks: true,
+        completedFermenters: true,
+        completedQuantity: true,
+        createdAt: true,
         createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        endDate: true,
+        globalId: true,
+        id: true,
         inProcess: true,
-        updatedBy: true,
 
         item: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        plannedCooks: true,
+        plannedFermenters: true,
+        quantity: true,
 
         recipe: {
           select: {
@@ -410,7 +425,13 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        customer: {
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduleOrder: {
           select: {
             id: true,
           },
@@ -419,31 +440,10 @@ export class ScheduleOrderControllerBase {
         scheduled: true,
         schemaVersion: true,
         startDate: true,
-        endDate: true,
         status: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        customerCode: true,
         units: true,
-        quantity: true,
-        name: true,
-        plannedCooks: true,
-        completedCooks: true,
-        plannedFermenters: true,
-        completedFermenters: true,
-        completedQuantity: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

@@ -14,19 +14,19 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Item as PrismaItem,
-  ProductionOrder as PrismaProductionOrder,
-  Bom as PrismaBom,
-  PurchaseOrder as PrismaPurchaseOrder,
-  ItemReceipt as PrismaItemReceipt,
   BomItem as PrismaBomItem,
-  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
-  Lot as PrismaLot,
-  SalesOrder as PrismaSalesOrder,
-  Recipe as PrismaRecipe,
+  Bom as PrismaBom,
   Inventory as PrismaInventory,
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
+  ItemReceipt as PrismaItemReceipt,
+  Lot as PrismaLot,
+  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
+  ProductionOrder as PrismaProductionOrder,
+  PurchaseOrder as PrismaPurchaseOrder,
   RecipeBomItem as PrismaRecipeBomItem,
+  Recipe as PrismaRecipe,
+  SalesOrder as PrismaSalesOrder,
   Vendor as PrismaVendor,
 } from "@prisma/client";
 
@@ -53,50 +53,6 @@ export class ItemServiceBase {
     return this.prisma.item.delete(args);
   }
 
-  async findProductionOrders(
-    parentId: string,
-    args: Prisma.ProductionOrderFindManyArgs
-  ): Promise<PrismaProductionOrder[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrders(args);
-  }
-
-  async findBomsWipItem(
-    parentId: string,
-    args: Prisma.BomFindManyArgs
-  ): Promise<PrismaBom[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .bomsWipItem(args);
-  }
-
-  async findPurchaseOrders(
-    parentId: string,
-    args: Prisma.PurchaseOrderFindManyArgs
-  ): Promise<PrismaPurchaseOrder[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .purchaseOrders(args);
-  }
-
-  async findItemReceipts(
-    parentId: string,
-    args: Prisma.ItemReceiptFindManyArgs
-  ): Promise<PrismaItemReceipt[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .itemReceipts(args);
-  }
-
   async findBomItems(
     parentId: string,
     args: Prisma.BomItemFindManyArgs
@@ -108,48 +64,15 @@ export class ItemServiceBase {
       .bomItems(args);
   }
 
-  async findProductionOrderUnitProcedures(
+  async findBomsWipItem(
     parentId: string,
-    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<PrismaProductionOrderUnitProcedure[]> {
+    args: Prisma.BomFindManyArgs
+  ): Promise<PrismaBom[]> {
     return this.prisma.item
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .productionOrderUnitProcedures(args);
-  }
-
-  async findLots(
-    parentId: string,
-    args: Prisma.LotFindManyArgs
-  ): Promise<PrismaLot[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .lots(args);
-  }
-
-  async findSalesOrders(
-    parentId: string,
-    args: Prisma.SalesOrderFindManyArgs
-  ): Promise<PrismaSalesOrder[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .salesOrders(args);
-  }
-
-  async findRecipes(
-    parentId: string,
-    args: Prisma.RecipeFindManyArgs
-  ): Promise<PrismaRecipe[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .recipes(args);
+      .bomsWipItem(args);
   }
 
   async findInventories(
@@ -185,6 +108,61 @@ export class ItemServiceBase {
       .inventoryTransfers(args);
   }
 
+  async findItemReceipts(
+    parentId: string,
+    args: Prisma.ItemReceiptFindManyArgs
+  ): Promise<PrismaItemReceipt[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .itemReceipts(args);
+  }
+
+  async findLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lots(args);
+  }
+
+  async findProductionOrderUnitProcedures(
+    parentId: string,
+    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<PrismaProductionOrderUnitProcedure[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrderUnitProcedures(args);
+  }
+
+  async findProductionOrders(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<PrismaProductionOrder[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrders(args);
+  }
+
+  async findPurchaseOrders(
+    parentId: string,
+    args: Prisma.PurchaseOrderFindManyArgs
+  ): Promise<PrismaPurchaseOrder[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .purchaseOrders(args);
+  }
+
   async findRecipeBoms(
     parentId: string,
     args: Prisma.RecipeBomItemFindManyArgs
@@ -194,6 +172,28 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .recipeBoms(args);
+  }
+
+  async findRecipes(
+    parentId: string,
+    args: Prisma.RecipeFindManyArgs
+  ): Promise<PrismaRecipe[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipes(args);
+  }
+
+  async findSalesOrders(
+    parentId: string,
+    args: Prisma.SalesOrderFindManyArgs
+  ): Promise<PrismaSalesOrder[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .salesOrders(args);
   }
 
   async getVendor(parentId: string): Promise<PrismaVendor | null> {

@@ -18,62 +18,62 @@ import { InventoryLogService } from "../inventoryLog.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
-  dateTime: new Date(),
   date: new Date(),
-  quantity: 42.424242424,
+  dateTime: new Date(),
+  id: "exampleId",
   loggedBy: "exampleLoggedBy",
-  revision: 42,
-  revisedBy: "exampleRevisedBy",
-  rawMeasurementValue: "exampleRawMeasurementValue",
+  quantity: 42.424242424,
   rawMeasurementUnits: "exampleRawMeasurementUnits",
+  rawMeasurementValue: "exampleRawMeasurementValue",
+  revisedBy: "exampleRevisedBy",
+  revision: 42,
   units: "exampleUnits",
+  updatedAt: new Date(),
 };
 const CREATE_RESULT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
-  dateTime: new Date(),
   date: new Date(),
-  quantity: 42.424242424,
+  dateTime: new Date(),
+  id: "exampleId",
   loggedBy: "exampleLoggedBy",
-  revision: 42,
-  revisedBy: "exampleRevisedBy",
-  rawMeasurementValue: "exampleRawMeasurementValue",
+  quantity: 42.424242424,
   rawMeasurementUnits: "exampleRawMeasurementUnits",
+  rawMeasurementValue: "exampleRawMeasurementValue",
+  revisedBy: "exampleRevisedBy",
+  revision: 42,
   units: "exampleUnits",
+  updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
-    id: "exampleId",
     createdAt: new Date(),
-    updatedAt: new Date(),
-    dateTime: new Date(),
     date: new Date(),
-    quantity: 42.424242424,
+    dateTime: new Date(),
+    id: "exampleId",
     loggedBy: "exampleLoggedBy",
-    revision: 42,
-    revisedBy: "exampleRevisedBy",
-    rawMeasurementValue: "exampleRawMeasurementValue",
+    quantity: 42.424242424,
     rawMeasurementUnits: "exampleRawMeasurementUnits",
+    rawMeasurementValue: "exampleRawMeasurementValue",
+    revisedBy: "exampleRevisedBy",
+    revision: 42,
     units: "exampleUnits",
+    updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
-  id: "exampleId",
   createdAt: new Date(),
-  updatedAt: new Date(),
-  dateTime: new Date(),
   date: new Date(),
-  quantity: 42.424242424,
+  dateTime: new Date(),
+  id: "exampleId",
   loggedBy: "exampleLoggedBy",
-  revision: 42,
-  revisedBy: "exampleRevisedBy",
-  rawMeasurementValue: "exampleRawMeasurementValue",
+  quantity: 42.424242424,
   rawMeasurementUnits: "exampleRawMeasurementUnits",
+  rawMeasurementValue: "exampleRawMeasurementValue",
+  revisedBy: "exampleRevisedBy",
+  revision: 42,
   units: "exampleUnits",
+  updatedAt: new Date(),
 };
 
 const service = {
@@ -159,9 +159,9 @@ describe("InventoryLog", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        dateTime: CREATE_RESULT.dateTime.toISOString(),
         date: CREATE_RESULT.date.toISOString(),
+        dateTime: CREATE_RESULT.dateTime.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -173,9 +173,9 @@ describe("InventoryLog", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
-          dateTime: FIND_MANY_RESULT[0].dateTime.toISOString(),
           date: FIND_MANY_RESULT[0].date.toISOString(),
+          dateTime: FIND_MANY_RESULT[0].dateTime.toISOString(),
+          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
   });
@@ -198,9 +198,9 @@ describe("InventoryLog", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
-        dateTime: FIND_ONE_RESULT.dateTime.toISOString(),
         date: FIND_ONE_RESULT.date.toISOString(),
+        dateTime: FIND_ONE_RESULT.dateTime.toISOString(),
+        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
 
@@ -213,9 +213,9 @@ describe("InventoryLog", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        dateTime: CREATE_RESULT.dateTime.toISOString(),
         date: CREATE_RESULT.date.toISOString(),
+        dateTime: CREATE_RESULT.dateTime.toISOString(),
+        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {
         agent

@@ -11,56 +11,43 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
-import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
+import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
 
 @InputType()
 class FermentationChemistryWhereInput {
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: BooleanNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => BooleanNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => BooleanNullableFilter, {
     nullable: true,
   })
-  id?: StringFilter;
+  approved?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderWhereUniqueInput,
+    type: StringNullableFilter,
   })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  productionOrder?: ProductionOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  operation?: OperationWhereUniqueInput;
+  approvedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -76,15 +63,15 @@ class FermentationChemistryWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationSettingDatumWhereUniqueInput,
+    type: () => BatchWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => FermentationSettingDatumWhereUniqueInput)
+  @Type(() => BatchWhereUniqueInput)
   @IsOptional()
-  @Field(() => FermentationSettingDatumWhereUniqueInput, {
+  @Field(() => BatchWhereUniqueInput, {
     nullable: true,
   })
-  settingData?: FermentationSettingDatumWhereUniqueInput;
+  batch?: BatchWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -100,25 +87,14 @@ class FermentationChemistryWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  approvedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  approved?: BooleanNullableFilter;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -134,18 +110,6 @@ class FermentationChemistryWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => BatchWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
-    nullable: true,
-  })
-  batch?: BatchWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: () => MashDatumListRelationFilter,
   })
   @ValidateNested()
@@ -155,6 +119,42 @@ class FermentationChemistryWhereInput {
     nullable: true,
   })
   mashData?: MashDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  operation?: OperationWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationSettingDatumWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatumWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationSettingDatumWhereUniqueInput, {
+    nullable: true,
+  })
+  settingData?: FermentationSettingDatumWhereUniqueInput;
 }
 
 export { FermentationChemistryWhereInput as FermentationChemistryWhereInput };

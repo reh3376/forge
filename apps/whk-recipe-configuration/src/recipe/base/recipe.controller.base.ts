@@ -26,30 +26,30 @@ import { Recipe } from "./Recipe";
 import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { RecipeUpdateInput } from "./RecipeUpdateInput";
-import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
-import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
-import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
-import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
+import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
+import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
+import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -77,9 +77,9 @@ export class RecipeControllerBase {
       data: {
         ...data,
 
-        recipeGroup: data.recipeGroup
+        classId: data.classId
           ? {
-              connect: data.recipeGroup,
+              connect: data.classId,
             }
           : undefined,
 
@@ -93,31 +93,25 @@ export class RecipeControllerBase {
             }
           : undefined,
 
-        classId: data.classId
+        recipeGroup: data.recipeGroup
           ? {
-              connect: data.classId,
+              connect: data.recipeGroup,
             }
           : undefined,
       },
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
         Recipe: true,
+        active: true,
 
-        recipeGroup: {
+        classId: {
           select: {
             id: true,
           },
         },
 
-        globalId: true,
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -125,24 +119,31 @@ export class RecipeControllerBase {
           },
         },
 
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
         item: {
           select: {
             id: true,
           },
         },
 
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
-
-        classId: {
+        recipeGroup: {
           select: {
             id: true,
           },
         },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -164,24 +165,18 @@ export class RecipeControllerBase {
     return this.service.recipes({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
         Recipe: true,
+        active: true,
 
-        recipeGroup: {
+        classId: {
           select: {
             id: true,
           },
         },
 
-        globalId: true,
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -189,24 +184,31 @@ export class RecipeControllerBase {
           },
         },
 
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
         item: {
           select: {
             id: true,
           },
         },
 
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
-
-        classId: {
+        recipeGroup: {
           select: {
             id: true,
           },
         },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -229,24 +231,18 @@ export class RecipeControllerBase {
     const result = await this.service.recipe({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
         Recipe: true,
+        active: true,
 
-        recipeGroup: {
+        classId: {
           select: {
             id: true,
           },
         },
 
-        globalId: true,
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -254,24 +250,31 @@ export class RecipeControllerBase {
           },
         },
 
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
         item: {
           select: {
             id: true,
           },
         },
 
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
-
-        classId: {
+        recipeGroup: {
           select: {
             id: true,
           },
         },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -307,9 +310,9 @@ export class RecipeControllerBase {
         data: {
           ...data,
 
-          recipeGroup: data.recipeGroup
+          classId: data.classId
             ? {
-                connect: data.recipeGroup,
+                connect: data.classId,
               }
             : undefined,
 
@@ -323,31 +326,25 @@ export class RecipeControllerBase {
               }
             : undefined,
 
-          classId: data.classId
+          recipeGroup: data.recipeGroup
             ? {
-                connect: data.classId,
+                connect: data.recipeGroup,
               }
             : undefined,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          schemaVersion: true,
-          revision: true,
-          active: true,
-          customerCode: true,
           Recipe: true,
+          active: true,
 
-          recipeGroup: {
+          classId: {
             select: {
               id: true,
             },
           },
 
-          globalId: true,
+          cooksPerFerm: true,
+          createdAt: true,
+          createdBy: true,
 
           customer: {
             select: {
@@ -355,24 +352,31 @@ export class RecipeControllerBase {
             },
           },
 
+          customerCode: true,
+          estimatedAbv: true,
+          globalId: true,
+          id: true,
+          isClassDefinition: true,
+
           item: {
             select: {
               id: true,
             },
           },
 
-          totalCooks: true,
-          cooksPerFerm: true,
-          estimatedAbv: true,
-          totalFermenters: true,
-          targetProof: true,
-          isClassDefinition: true,
-
-          classId: {
+          recipeGroup: {
             select: {
               id: true,
             },
           },
+
+          revision: true,
+          schemaVersion: true,
+          targetProof: true,
+          totalCooks: true,
+          totalFermenters: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -386,182 +390,52 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/unitProcedures")
-  @ApiNestedQuery(UnitProcedureFindManyArgs)
+  @common.Get("/:id/batches")
+  @ApiNestedQuery(BatchFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "UnitProcedure",
+    resource: "Batch",
     action: "read",
     possession: "any",
   })
-  async findUnitProcedures(
+  async findBatches(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<UnitProcedure[]> {
-    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
-    const results = await this.service.findUnitProcedures(params.id, {
+  ): Promise<Batch[]> {
+    const query = plainToClass(BatchFindManyArgs, request.query);
+    const results = await this.service.findBatches(params.id, {
       ...query,
       select: {
-        id: true,
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        batchData: true,
+        batchId: true,
+        batchInitData: true,
         createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        name: true,
-        description: true,
-
-        procedure: {
-          select: {
-            id: true,
-          },
-        },
-
-        isClassDef: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        active: true,
-
-        boms: {
-          select: {
-            id: true,
-          },
-        },
-
-        primaryBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        path: true,
-        globalId: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
-        abbreviation: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/unitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async connectUnitProcedures(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: UnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      unitProcedures: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/unitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async updateUnitProcedures(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: UnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      unitProcedures: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/unitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectUnitProcedures(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: UnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      unitProcedures: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/productionOrders")
-  @ApiNestedQuery(ProductionOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrders(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<ProductionOrder[]> {
-    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
-    const results = await this.service.findProductionOrders(params.id, {
-      ...query,
-      select: {
+        customers: true,
         id: true,
-        createdAt: true,
-        updatedAt: true,
 
-        bom: {
+        lot: {
           select: {
             id: true,
           },
         },
 
-        className: true,
-        complete: true,
-        createdBy: true,
-        inProcess: true,
-        updatedBy: true,
+        operationIndex: true,
+        operationType: true,
+        parameterData: true,
 
-        item: {
+        parent: {
           select: {
             id: true,
           },
         },
+
+        quantity: true,
 
         recipe: {
           select: {
@@ -569,11 +443,113 @@ export class RecipeControllerBase {
           },
         },
 
-        recipeGroup: {
+        recipeName: true,
+        revision: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatches(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatches(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatches(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/instances")
+  @ApiNestedQuery(RecipeFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findInstances(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<Recipe[]> {
+    const query = plainToClass(RecipeFindManyArgs, request.query);
+    const results = await this.service.findInstances(params.id, {
+      ...query,
+      select: {
+        Recipe: true,
+        active: true,
+
+        classId: {
           select: {
             id: true,
           },
         },
+
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -581,132 +557,17 @@ export class RecipeControllerBase {
           },
         },
 
-        scheduled: true,
-        schemaVersion: true,
-        startDate: true,
-        endDate: true,
-        status: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
         customerCode: true,
-        units: true,
-        quantity: true,
-        name: true,
-        plannedCooks: true,
-        completedCooks: true,
-        plannedFermenters: true,
-        completedFermenters: true,
-        completedQuantity: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async connectProductionOrders(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrders: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async updateProductionOrders(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrders: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectProductionOrders(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrders: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/scheduleOrders")
-  @ApiNestedQuery(ScheduleOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ScheduleOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findScheduleOrders(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<ScheduleOrder[]> {
-    const query = plainToClass(ScheduleOrderFindManyArgs, request.query);
-    const results = await this.service.findScheduleOrders(params.id, {
-      ...query,
-      select: {
+        estimatedAbv: true,
+        globalId: true,
         id: true,
-        createdAt: true,
-        updatedAt: true,
-        status: true,
-        createdBy: true,
-        updatedBy: true,
+        isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
 
         recipeGroup: {
           select: {
@@ -714,37 +575,13 @@ export class RecipeControllerBase {
           },
         },
 
-        scheduleOrderRecipe: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeName: true,
-        totalProofGallons: true,
-        estimatedTotalProductionTime: true,
-        estimatedMashingTime: true,
-        estimatedFermentationTime: true,
-        estimatedDistillationTime: true,
-        estimatedProcessing: true,
-        productionOrderAllocation: true,
-        totalBarrels: true,
-        globalId: true,
-        customers: true,
-        estimatedStart: true,
-        estimatedEnd: true,
-        actualStart: true,
-        actualEnd: true,
-        duration: true,
-        durationUnits: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
-        name: true,
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -755,18 +592,18 @@ export class RecipeControllerBase {
     return results;
   }
 
-  @common.Post("/:id/scheduleOrders")
+  @common.Post("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async connectScheduleOrders(
+  async connectInstances(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+    @common.Body() body: RecipeWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      scheduleOrders: {
+      instances: {
         connect: body,
       },
     };
@@ -777,18 +614,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Patch("/:id/scheduleOrders")
+  @common.Patch("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async updateScheduleOrders(
+  async updateInstances(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+    @common.Body() body: RecipeWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      scheduleOrders: {
+      instances: {
         set: body,
       },
     };
@@ -799,152 +636,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Delete("/:id/scheduleOrders")
+  @common.Delete("/:id/instances")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async disconnectScheduleOrders(
+  async disconnectInstances(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+    @common.Body() body: RecipeWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      scheduleOrders: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/productionOrderUnitProcedures")
-  @ApiNestedQuery(ProductionOrderUnitProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderUnitProcedures(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<ProductionOrderUnitProcedure[]> {
-    const query = plainToClass(
-      ProductionOrderUnitProcedureFindManyArgs,
-      request.query
-    );
-    const results = await this.service.findProductionOrderUnitProcedures(
-      params.id,
-      {
-        ...query,
-        select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          name: true,
-          abbreviation: true,
-
-          productionOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
-          bom: true,
-
-          wipItem: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
-          customer: true,
-
-          unitProcedure: {
-            select: {
-              id: true,
-            },
-          },
-
-          status: true,
-        },
-      }
-    );
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/productionOrderUnitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async connectProductionOrderUnitProcedures(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderUnitProcedures: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/productionOrderUnitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async updateProductionOrderUnitProcedures(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderUnitProcedures: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/productionOrderUnitProcedures")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectProductionOrderUnitProcedures(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderUnitProcedures: {
+      instances: {
         disconnect: body,
       },
     };
@@ -974,36 +677,6 @@ export class RecipeControllerBase {
         createdAt: true,
         createdBy: true,
         externalId: true,
-        id: true,
-        lotNumber: true,
-
-        purchaseOrderAcceptedLots: {
-          select: {
-            id: true,
-          },
-        },
-
-        schemaVersion: true,
-        updatedAt: true,
-        globalId: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
 
         fermentationChemistries: {
           select: {
@@ -1011,13 +684,44 @@ export class RecipeControllerBase {
           },
         },
 
-        isRawMaterial: true,
-
         fromAsset: {
           select: {
             id: true,
           },
         },
+
+        globalId: true,
+        id: true,
+        isRawMaterial: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotNumber: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
       },
     });
     if (results === null) {
@@ -1110,23 +814,7 @@ export class RecipeControllerBase {
     const results = await this.service.findParameters(params.id, {
       ...query,
       select: {
-        recipeSetpointType: true,
-        revision: true,
-        recipeSetpointUpperLimit: true,
-        recipeParamName: true,
-        className: true,
         active: true,
-        createdBy: true,
-        recipeSetpointLowerLimit: true,
-        updatedAt: true,
-        id: true,
-        recipeParamDescription: true,
-        updatedBy: true,
-        recipeSetpointBooleanValue: true,
-        createdAt: true,
-        recipeParamUnits: true,
-        schemaVersion: true,
-        isClassDefinition: true,
 
         classId: {
           select: {
@@ -1134,11 +822,27 @@ export class RecipeControllerBase {
           },
         },
 
-        globalId: true,
-        recipeNumericalSetpoint: true,
+        className: true,
+        createdAt: true,
+        createdBy: true,
         description: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
         operation: true,
         operationIndex: true,
+        recipeNumericalSetpoint: true,
+        recipeParamDescription: true,
+        recipeParamName: true,
+        recipeParamUnits: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -1216,39 +920,167 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/instances")
-  @ApiNestedQuery(RecipeFindManyArgs)
+  @common.Get("/:id/productionOrderUnitProcedures")
+  @ApiNestedQuery(ProductionOrderUnitProcedureFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Recipe",
+    resource: "ProductionOrderUnitProcedure",
     action: "read",
     possession: "any",
   })
-  async findInstances(
+  async findProductionOrderUnitProcedures(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<Recipe[]> {
-    const query = plainToClass(RecipeFindManyArgs, request.query);
-    const results = await this.service.findInstances(params.id, {
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const query = plainToClass(
+      ProductionOrderUnitProcedureFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findProductionOrderUnitProcedures(
+      params.id,
+      {
+        ...query,
+        select: {
+          abbreviation: true,
+          bom: true,
+          createdAt: true,
+          customer: true,
+          globalId: true,
+          id: true,
+          name: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          status: true,
+
+          unitProcedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+
+          wipItem: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderUnitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderUnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderUnitProcedures: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrders")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrders(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrders(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        revision: true,
-        active: true,
-        customerCode: true,
-        Recipe: true,
-
-        recipeGroup: {
+        bom: {
           select: {
             id: true,
           },
         },
 
-        globalId: true,
+        className: true,
+        complete: true,
+        completedCooks: true,
+        completedFermenters: true,
+        completedQuantity: true,
+        createdAt: true,
+        createdBy: true,
 
         customer: {
           select: {
@@ -1256,24 +1088,54 @@ export class RecipeControllerBase {
           },
         },
 
+        customerCode: true,
+        endDate: true,
+        globalId: true,
+        id: true,
+        inProcess: true,
+
         item: {
           select: {
             id: true,
           },
         },
 
-        totalCooks: true,
-        cooksPerFerm: true,
-        estimatedAbv: true,
-        totalFermenters: true,
-        targetProof: true,
-        isClassDefinition: true,
+        name: true,
+        plannedCooks: true,
+        plannedFermenters: true,
+        quantity: true,
 
-        classId: {
+        recipe: {
           select: {
             id: true,
           },
         },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        salesOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduled: true,
+        schemaVersion: true,
+        startDate: true,
+        status: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -1284,18 +1146,18 @@ export class RecipeControllerBase {
     return results;
   }
 
-  @common.Post("/:id/instances")
+  @common.Post("/:id/productionOrders")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async connectInstances(
+  async connectProductionOrders(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      instances: {
+      productionOrders: {
         connect: body,
       },
     };
@@ -1306,18 +1168,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Patch("/:id/instances")
+  @common.Patch("/:id/productionOrders")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async updateInstances(
+  async updateProductionOrders(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      instances: {
+      productionOrders: {
         set: body,
       },
     };
@@ -1328,18 +1190,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Delete("/:id/instances")
+  @common.Delete("/:id/productionOrders")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async disconnectInstances(
+  async disconnectProductionOrders(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      instances: {
+      productionOrders: {
         disconnect: body,
       },
     };
@@ -1351,24 +1213,32 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipeBoms")
+  @common.Get("/:id/recipeBomItems")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
   })
-  async findRecipeBoms(
+  async findRecipeBomItems(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
   ): Promise<RecipeBomItem[]> {
     const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
-    const results = await this.service.findRecipeBoms(params.id, {
+    const results = await this.service.findRecipeBomItems(params.id, {
       ...query,
       select: {
-        id: true,
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
 
         item: {
           select: {
@@ -1376,29 +1246,21 @@ export class RecipeControllerBase {
           },
         },
 
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        createdBy: true,
-        updatedBy: true,
-        operation: true,
-        operationIndex: true,
-        isClassDefinition: true,
-        quantity: true,
         units: true,
-        quantityActual: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        lot: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -1409,18 +1271,18 @@ export class RecipeControllerBase {
     return results;
   }
 
-  @common.Post("/:id/recipeBoms")
+  @common.Post("/:id/recipeBomItems")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async connectRecipeBoms(
+  async connectRecipeBomItems(
     @common.Param() params: RecipeWhereUniqueInput,
     @common.Body() body: RecipeBomItemWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeBoms: {
+      recipeBomItems: {
         connect: body,
       },
     };
@@ -1431,18 +1293,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Patch("/:id/recipeBoms")
+  @common.Patch("/:id/recipeBomItems")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async updateRecipeBoms(
+  async updateRecipeBomItems(
     @common.Param() params: RecipeWhereUniqueInput,
     @common.Body() body: RecipeBomItemWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeBoms: {
+      recipeBomItems: {
         set: body,
       },
     };
@@ -1453,18 +1315,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Delete("/:id/recipeBoms")
+  @common.Delete("/:id/recipeBomItems")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async disconnectRecipeBoms(
+  async disconnectRecipeBomItems(
     @common.Param() params: RecipeWhereUniqueInput,
     @common.Body() body: RecipeBomItemWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeBoms: {
+      recipeBomItems: {
         disconnect: body,
       },
     };
@@ -1476,63 +1338,65 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/batches")
-  @ApiNestedQuery(BatchFindManyArgs)
+  @common.Get("/:id/scheduleOrders")
+  @ApiNestedQuery(ScheduleOrderFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Batch",
+    resource: "ScheduleOrder",
     action: "read",
     possession: "any",
   })
-  async findBatches(
+  async findScheduleOrders(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<Batch[]> {
-    const query = plainToClass(BatchFindManyArgs, request.query);
-    const results = await this.service.findBatches(params.id, {
+  ): Promise<ScheduleOrder[]> {
+    const query = plainToClass(ScheduleOrderFindManyArgs, request.query);
+    const results = await this.service.findScheduleOrders(params.id, {
       ...query,
       select: {
-        id: true,
+        actualEnd: true,
+        actualStart: true,
         createdAt: true,
-        updatedAt: true,
-        batchId: true,
-
-        parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        quantity: true,
-        batchData: true,
-        revision: true,
+        createdBy: true,
         customers: true,
+        duration: true,
+        durationUnits: true,
+        estimatedDistillationTime: true,
+        estimatedEnd: true,
+        estimatedFermentationTime: true,
+        estimatedMashingTime: true,
+        estimatedProcessing: true,
+        estimatedStart: true,
+        estimatedTotalProductionTime: true,
+        globalId: true,
+        id: true,
+        name: true,
+        productionOrderAllocation: true,
 
-        lot: {
+        recipeGroup: {
           select: {
             id: true,
           },
         },
 
-        parameterData: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        assetPath: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
-        batchInitData: true,
-        operationType: true,
-        operationIndex: true,
         recipeName: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduleOrderRecipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        totalBarrels: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -1543,18 +1407,18 @@ export class RecipeControllerBase {
     return results;
   }
 
-  @common.Post("/:id/batches")
+  @common.Post("/:id/scheduleOrders")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async connectBatches(
+  async connectScheduleOrders(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      batches: {
+      scheduleOrders: {
         connect: body,
       },
     };
@@ -1565,18 +1429,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Patch("/:id/batches")
+  @common.Patch("/:id/scheduleOrders")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async updateBatches(
+  async updateScheduleOrders(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      batches: {
+      scheduleOrders: {
         set: body,
       },
     };
@@ -1587,18 +1451,157 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Delete("/:id/batches")
+  @common.Delete("/:id/scheduleOrders")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async disconnectBatches(
+  async disconnectScheduleOrders(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      batches: {
+      scheduleOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/unitProcedures")
+  @ApiNestedQuery(UnitProcedureFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitProcedures(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<UnitProcedure[]> {
+    const query = plainToClass(UnitProcedureFindManyArgs, request.query);
+    const results = await this.service.findUnitProcedures(params.id, {
+      ...query,
+      select: {
+        abbreviation: true,
+        active: true,
+
+        boms: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        globalId: true,
+        id: true,
+        isClassDef: true,
+        name: true,
+        path: true,
+
+        primaryBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        procedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/unitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedures: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/unitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedures: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/unitProcedures")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectUnitProcedures(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: UnitProcedureWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitProcedures: {
         disconnect: body,
       },
     };

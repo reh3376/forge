@@ -16,21 +16,24 @@ import {
   IsDate,
   IsString,
   MaxLength,
-  ValidateNested,
   IsOptional,
-  IsNumber,
-  Max,
-  IsEnum,
+  ValidateNested,
   IsInt,
+  Max,
+  IsNumber,
+  IsEnum,
   IsBoolean,
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { Item } from "../../item/base/Item";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { JsonValue } from "type-fest";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameter } from "../../testParameter/base/TestParameter";
-import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
 
 @ObjectType()
@@ -62,12 +65,54 @@ class ItemReceipt {
   driver!: string;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  loadId!: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lots!: JsonValue;
 
   @ApiProperty({
     required: false,
@@ -123,6 +168,35 @@ class ItemReceipt {
   supplierLot!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  tests?: Array<TestParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testsPassed!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  toAsset?: Asset | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -174,67 +248,6 @@ class ItemReceipt {
     nullable: true,
   })
   weighOut!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [TestParameter],
-  })
-  @ValidateNested()
-  @Type(() => TestParameter)
-  @IsOptional()
-  tests?: Array<TestParameter>;
-
-  @ApiProperty({
-    required: true,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  item?: Item;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  loadId!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testsPassed!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Asset,
-  })
-  @ValidateNested()
-  @Type(() => Asset)
-  @IsOptional()
-  toAsset?: Asset | null;
 }
 
 export { ItemReceipt as ItemReceipt };

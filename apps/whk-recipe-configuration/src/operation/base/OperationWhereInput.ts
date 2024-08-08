@@ -11,36 +11,70 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { Type } from "class-transformer";
-import { IsOptional, IsEnum, ValidateNested } from "class-validator";
-import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
-import { EnumOperationName } from "./EnumOperationName";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { IntFilter } from "../../util/IntFilter";
+import { Type } from "class-transformer";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
-import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
-import { OperationListRelationFilter } from "./OperationListRelationFilter";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { JsonFilter } from "../../util/JsonFilter";
+import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
-import { FermentationSettingDatumListRelationFilter } from "../../fermentationSettingDatum/base/FermentationSettingDatumListRelationFilter";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
+import { FermentationSettingDatumListRelationFilter } from "../../fermentationSettingDatum/base/FermentationSettingDatumListRelationFilter";
+import { OperationListRelationFilter } from "./OperationListRelationFilter";
+import { EnumOperationName } from "./EnumOperationName";
+import { IntFilter } from "../../util/IntFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
 class OperationWhereInput {
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  revision?: IntNullableFilter;
+  abbreviation?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  auxiliaryPhases?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: OperationWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -52,6 +86,143 @@ class OperationWhereInput {
     nullable: true,
   })
   createdAt?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  description?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  editedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseListRelationFilter)
+  @IsOptional()
+  @Field(() => EquipmentPhaseListRelationFilter, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationChemistryListRelationFilter, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationDayDatumListRelationFilter, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationSettingDatumListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => FermentationSettingDatumListRelationFilter)
+  @IsOptional()
+  @Field(() => FermentationSettingDatumListRelationFilter, {
+    nullable: true,
+  })
+  fermentationSettingData?: FermentationSettingDatumListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => OperationListRelationFilter)
+  @IsOptional()
+  @Field(() => OperationListRelationFilter, {
+    nullable: true,
+  })
+  instances?: OperationListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isClassDefinition?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  lotId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -81,29 +252,7 @@ class OperationWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  editedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  createdBy?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  description?: StringFilter;
+  path?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -118,6 +267,17 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -126,108 +286,6 @@ class OperationWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  active?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeNullableFilter,
-  })
-  @Type(() => DateTimeNullableFilter)
-  @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
-    nullable: true,
-  })
-  updatedAt?: DateTimeNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseListRelationFilter)
-  @IsOptional()
-  @Field(() => EquipmentPhaseListRelationFilter, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isClassDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: OperationWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => OperationListRelationFilter)
-  @IsOptional()
-  @Field(() => OperationListRelationFilter, {
-    nullable: true,
-  })
-  instances?: OperationListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  path?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  abbreviation?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -243,72 +301,14 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: DateTimeNullableFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => DateTimeNullableFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => DateTimeNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  auxiliaryPhases?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  lotId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationChemistryListRelationFilter, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationSettingDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationSettingData?: FermentationSettingDatumListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationDayDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumListRelationFilter;
+  updatedAt?: DateTimeNullableFilter;
 }
 
 export { OperationWhereInput as OperationWhereInput };

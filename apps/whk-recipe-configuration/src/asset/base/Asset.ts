@@ -15,26 +15,26 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
+  IsEnum,
+  ValidateNested,
+  IsOptional,
   IsDate,
   IsInt,
   Max,
-  IsOptional,
-  IsEnum,
-  ValidateNested,
 } from "class-validator";
 
-import { Type } from "class-transformer";
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
-import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { Batch } from "../../batch/base/Batch";
+import { Type } from "class-transformer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { Batch } from "../../batch/base/Batch";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
+import { MashDatum } from "../../mashDatum/base/MashDatum";
+import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 
 @ObjectType()
 class Asset {
@@ -46,6 +46,44 @@ class Asset {
   @MaxLength(256)
   @Field(() => String)
   assetPath!: string;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumAssetAssetType,
+  })
+  @IsEnum(EnumAssetAssetType)
+  @Field(() => EnumAssetAssetType, {
+    nullable: true,
+  })
+  assetType?:
+    | "ENT"
+    | "SITE"
+    | "AREA"
+    | "LINE"
+    | "CELL"
+    | "EQUIPMOD"
+    | "EQUIPPHASE"
+    | "CONTROLMOD"
+    | "UNIT"
+    | "DEVICE";
+
+  @ApiProperty({
+    required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Asset],
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  children?: Array<Asset>;
 
   @ApiProperty({
     required: true,
@@ -74,105 +112,6 @@ class Asset {
   description!: string;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  schemaVersion!: string;
-
-  @ApiProperty({
-    required: true,
-    enum: EnumAssetAssetType,
-  })
-  @IsEnum(EnumAssetAssetType)
-  @Field(() => EnumAssetAssetType, {
-    nullable: true,
-  })
-  assetType?:
-    | "ENT"
-    | "SITE"
-    | "AREA"
-    | "LINE"
-    | "CELL"
-    | "EQUIPMOD"
-    | "EQUIPPHASE"
-    | "CONTROLMOD"
-    | "UNIT"
-    | "DEVICE";
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [PurchaseOrder],
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrder)
-  @IsOptional()
-  purchaseOrders?: Array<PurchaseOrder>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
     required: false,
     type: () => [FermentationChemistry],
   })
@@ -192,21 +131,23 @@ class Asset {
 
   @ApiProperty({
     required: false,
-    type: () => [MashDatum],
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => MashDatum)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  mashData?: Array<MashDatum>;
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: () => [Batch],
+    required: true,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  batches?: Array<Batch>;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: false,
@@ -246,24 +187,6 @@ class Asset {
 
   @ApiProperty({
     required: false,
-    type: () => Asset,
-  })
-  @ValidateNested()
-  @Type(() => Asset)
-  @IsOptional()
-  parent?: Asset | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Asset],
-  })
-  @ValidateNested()
-  @Type(() => Asset)
-  @IsOptional()
-  children?: Array<Asset>;
-
-  @ApiProperty({
-    required: false,
     type: () => [ItemReceipt],
   })
   @ValidateNested()
@@ -279,6 +202,83 @@ class Asset {
   @Type(() => Lot)
   @IsOptional()
   lots?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashDatum],
+  })
+  @ValidateNested()
+  @Type(() => MashDatum)
+  @IsOptional()
+  mashData?: Array<MashDatum>;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  parent?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [PurchaseOrder],
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrder)
+  @IsOptional()
+  purchaseOrders?: Array<PurchaseOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  schemaVersion!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { Asset as Asset };

@@ -28,7 +28,7 @@ class InventoryLogOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  id?: SortOrder;
+  assetId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -50,7 +50,7 @@ class InventoryLogOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  updatedAt?: SortOrder;
+  date?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -72,40 +72,7 @@ class InventoryLogOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  date?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  assetId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  quantity?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  loggedBy?: SortOrder;
+  id?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -127,7 +94,7 @@ class InventoryLogOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  revision?: SortOrder;
+  loggedBy?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,18 +105,7 @@ class InventoryLogOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  revisedBy?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  rawMeasurementValue?: SortOrder;
+  quantity?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -171,7 +127,51 @@ class InventoryLogOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  rawMeasurementValue?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  revisedBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  revision?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   units?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  updatedAt?: SortOrder;
 }
 
 export { InventoryLogOrderByInput as InventoryLogOrderByInput };

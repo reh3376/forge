@@ -15,8 +15,8 @@ import {
   Prisma,
   ItemReceipt as PrismaItemReceipt,
   TestParameter as PrismaTestParameter,
-  PurchaseOrder as PrismaPurchaseOrder,
   Item as PrismaItem,
+  PurchaseOrder as PrismaPurchaseOrder,
   Asset as PrismaAsset,
 } from "@prisma/client";
 
@@ -66,6 +66,14 @@ export class ItemReceiptServiceBase {
       .tests(args);
   }
 
+  async getItem(parentId: string): Promise<PrismaItem | null> {
+    return this.prisma.itemReceipt
+      .findUnique({
+        where: { id: parentId },
+      })
+      .item();
+  }
+
   async getPurchaseOrder(
     parentId: string
   ): Promise<PrismaPurchaseOrder | null> {
@@ -74,14 +82,6 @@ export class ItemReceiptServiceBase {
         where: { id: parentId },
       })
       .purchaseOrder();
-  }
-
-  async getItem(parentId: string): Promise<PrismaItem | null> {
-    return this.prisma.itemReceipt
-      .findUnique({
-        where: { id: parentId },
-      })
-      .item();
   }
 
   async getToAsset(parentId: string): Promise<PrismaAsset | null> {
