@@ -14,26 +14,26 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  IsInt,
-  Max,
-  IsOptional,
   IsEnum,
   ValidateNested,
+  IsOptional,
+  IsInt,
+  Max,
 } from "class-validator";
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
-import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
+import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedManyWithoutAssetsInput";
 import { Type } from "class-transformer";
+import { AssetCreateNestedManyWithoutAssetsInput } from "./AssetCreateNestedManyWithoutAssetsInput";
 import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./FermentationChemistryCreateNestedManyWithoutAssetsInput";
 import { FermentationDayDatumCreateNestedManyWithoutAssetsInput } from "./FermentationDayDatumCreateNestedManyWithoutAssetsInput";
-import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
-import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedManyWithoutAssetsInput";
 import { InventoryCreateNestedManyWithoutAssetsInput } from "./InventoryCreateNestedManyWithoutAssetsInput";
 import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCreateNestedManyWithoutAssetsInput";
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
-import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
-import { AssetCreateNestedManyWithoutAssetsInput } from "./AssetCreateNestedManyWithoutAssetsInput";
 import { ItemReceiptCreateNestedManyWithoutAssetsInput } from "./ItemReceiptCreateNestedManyWithoutAssetsInput";
 import { LotCreateNestedManyWithoutAssetsInput } from "./LotCreateNestedManyWithoutAssetsInput";
+import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
+import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
 
 @InputType()
 class AssetCreateInput {
@@ -45,54 +45,6 @@ class AssetCreateInput {
   @MaxLength(256)
   @Field(() => String)
   assetPath!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  description!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  name!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  schemaVersion!: string;
 
   @ApiProperty({
     required: true,
@@ -114,39 +66,45 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => BatchCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => AssetCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  children?: AssetCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
+  @Field(() => String)
+  createdBy!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
+  @MaxLength(256)
+  @Field(() => String)
+  description!: string;
 
   @ApiProperty({
     required: false,
@@ -174,27 +132,15 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumCreateNestedManyWithoutAssetsInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => MashDatumCreateNestedManyWithoutAssetsInput)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => MashDatumCreateNestedManyWithoutAssetsInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => BatchCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  batches?: BatchCreateNestedManyWithoutAssetsInput;
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -246,30 +192,6 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  parent?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => AssetCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  children?: AssetCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
     type: () => ItemReceiptCreateNestedManyWithoutAssetsInput,
   })
   @ValidateNested()
@@ -291,6 +213,84 @@ class AssetCreateInput {
     nullable: true,
   })
   lots?: LotCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashDatumCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashDatumCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MashDatumCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  parent?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  schemaVersion!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { AssetCreateInput as AssetCreateInput };

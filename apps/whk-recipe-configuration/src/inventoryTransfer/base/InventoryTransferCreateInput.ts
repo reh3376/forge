@@ -11,71 +11,23 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import {
-  ValidateNested,
-  IsOptional,
   IsString,
   MaxLength,
+  IsOptional,
+  ValidateNested,
   IsInt,
   Min,
   Max,
 } from "class-validator";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
-import { AssetCreateNestedManyWithoutInventoryTransfersInput } from "./AssetCreateNestedManyWithoutInventoryTransfersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { AssetCreateNestedManyWithoutInventoryTransfersInput } from "./AssetCreateNestedManyWithoutInventoryTransfersInput";
 
 @InputType()
 class InventoryTransferCreateInput {
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  fromLocation?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetCreateNestedManyWithoutInventoryTransfersInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetCreateNestedManyWithoutInventoryTransfersInput)
-  @IsOptional()
-  @Field(() => AssetCreateNestedManyWithoutInventoryTransfersInput, {
-    nullable: true,
-  })
-  toLocation?: AssetCreateNestedManyWithoutInventoryTransfersInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  notes?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  department?: string | null;
-
   @ApiProperty({
     required: false,
     type: String,
@@ -93,25 +45,36 @@ class InventoryTransferCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  department?: string | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: () => AssetWhereUniqueInput,
   })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
-  quantity?: number | null;
+  fromLocation?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -147,7 +110,44 @@ class InventoryTransferCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  notes?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetCreateNestedManyWithoutInventoryTransfersInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetCreateNestedManyWithoutInventoryTransfersInput)
+  @IsOptional()
+  @Field(() => AssetCreateNestedManyWithoutInventoryTransfersInput, {
+    nullable: true,
+  })
+  toLocation?: AssetCreateNestedManyWithoutInventoryTransfersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { InventoryTransferCreateInput as InventoryTransferCreateInput };

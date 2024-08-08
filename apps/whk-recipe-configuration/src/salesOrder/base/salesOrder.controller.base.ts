@@ -71,21 +71,22 @@ export class SalesOrderControllerBase {
           : undefined,
       },
       select: {
+        createdAt: true,
+        createdBy: true,
+
         customer: {
           select: {
             id: true,
           },
         },
 
-        createdAt: true,
-        createdBy: true,
+        customerCode: true,
+        erpId: true,
+        globalId: true,
         id: true,
+        lineItems: true,
+        name: true,
         orderType: true,
-        quantity: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
 
         productionOrders: {
           select: {
@@ -93,12 +94,12 @@ export class SalesOrderControllerBase {
           },
         },
 
-        globalId: true,
-        customerCode: true,
-        lineItems: true,
-        erpId: true,
+        quantity: true,
         requestedShipDate: true,
-        name: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -120,21 +121,22 @@ export class SalesOrderControllerBase {
     return this.service.salesOrders({
       ...args,
       select: {
+        createdAt: true,
+        createdBy: true,
+
         customer: {
           select: {
             id: true,
           },
         },
 
-        createdAt: true,
-        createdBy: true,
+        customerCode: true,
+        erpId: true,
+        globalId: true,
         id: true,
+        lineItems: true,
+        name: true,
         orderType: true,
-        quantity: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
 
         productionOrders: {
           select: {
@@ -142,12 +144,12 @@ export class SalesOrderControllerBase {
           },
         },
 
-        globalId: true,
-        customerCode: true,
-        lineItems: true,
-        erpId: true,
+        quantity: true,
         requestedShipDate: true,
-        name: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -170,21 +172,22 @@ export class SalesOrderControllerBase {
     const result = await this.service.salesOrder({
       where: params,
       select: {
+        createdAt: true,
+        createdBy: true,
+
         customer: {
           select: {
             id: true,
           },
         },
 
-        createdAt: true,
-        createdBy: true,
+        customerCode: true,
+        erpId: true,
+        globalId: true,
         id: true,
+        lineItems: true,
+        name: true,
         orderType: true,
-        quantity: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
 
         productionOrders: {
           select: {
@@ -192,12 +195,12 @@ export class SalesOrderControllerBase {
           },
         },
 
-        globalId: true,
-        customerCode: true,
-        lineItems: true,
-        erpId: true,
+        quantity: true,
         requestedShipDate: true,
-        name: true,
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -246,21 +249,22 @@ export class SalesOrderControllerBase {
             : undefined,
         },
         select: {
+          createdAt: true,
+          createdBy: true,
+
           customer: {
             select: {
               id: true,
             },
           },
 
-          createdAt: true,
-          createdBy: true,
+          customerCode: true,
+          erpId: true,
+          globalId: true,
           id: true,
+          lineItems: true,
+          name: true,
           orderType: true,
-          quantity: true,
-          revision: true,
-          schemaVersion: true,
-          updatedAt: true,
-          updatedBy: true,
 
           productionOrders: {
             select: {
@@ -268,12 +272,12 @@ export class SalesOrderControllerBase {
             },
           },
 
-          globalId: true,
-          customerCode: true,
-          lineItems: true,
-          erpId: true,
+          quantity: true,
           requestedShipDate: true,
-          name: true,
+          revision: true,
+          schemaVersion: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -302,22 +306,22 @@ export class SalesOrderControllerBase {
     const results = await this.service.findItem(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
         active: true,
+        createdAt: true,
         createdBy: true,
-        updatedBy: true,
-        itemType: true,
-        itemDescription: true,
-        itemName: true,
-        itemRevision: true,
-        itemNumber: true,
-        schemaVersion: true,
-        itemClass: true,
-        itemGroup: true,
-        globalId: true,
         erpId: true,
+        globalId: true,
+        id: true,
+        itemClass: true,
+        itemDescription: true,
+        itemGroup: true,
+        itemName: true,
+        itemNumber: true,
+        itemRevision: true,
+        itemType: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
 
         vendor: {
           select: {

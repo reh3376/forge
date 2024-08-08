@@ -11,45 +11,33 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 import {
-  ValidateNested,
-  IsOptional,
   IsBoolean,
+  IsOptional,
+  ValidateNested,
   IsString,
   MaxLength,
   IsInt,
   Max,
 } from "class-validator";
+import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
 import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
-import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
-import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
-import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput";
-import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
-import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
-import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
-import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedManyWithoutItemsInput";
 import { InventoryCreateNestedManyWithoutItemsInput } from "./InventoryCreateNestedManyWithoutItemsInput";
 import { InventoryLogCreateNestedManyWithoutItemsInput } from "./InventoryLogCreateNestedManyWithoutItemsInput";
 import { InventoryTransferCreateNestedManyWithoutItemsInput } from "./InventoryTransferCreateNestedManyWithoutItemsInput";
+import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
+import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
+import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput";
+import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
+import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
 import { RecipeBomItemCreateNestedManyWithoutItemsInput } from "./RecipeBomItemCreateNestedManyWithoutItemsInput";
+import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedManyWithoutItemsInput";
+import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
+import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
 class ItemCreateInput {
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderCreateNestedManyWithoutItemsInput;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -60,162 +48,6 @@ class ItemCreateInput {
     nullable: true,
   })
   active?: boolean | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  itemType!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemDescription?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  itemName!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  itemRevision?: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  itemNumber!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemClass?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  itemGroup?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => BomCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => BomCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => BomCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  bomsWipItem?: BomCreateNestedManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemReceiptCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemReceiptCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ItemReceiptCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  itemReceipts?: ItemReceiptCreateNestedManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -231,27 +63,24 @@ class ItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput,
+    type: () => BomCreateNestedManyWithoutItemsInput,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput)
+  @Type(() => BomCreateNestedManyWithoutItemsInput)
   @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput, {
+  @Field(() => BomCreateNestedManyWithoutItemsInput, {
     nullable: true,
   })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput;
+  bomsWipItem?: BomCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
-    required: false,
-    type: () => LotCreateNestedManyWithoutItemsInput,
+    required: true,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => LotCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => LotCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  lots?: LotCreateNestedManyWithoutItemsInput;
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
 
   @ApiProperty({
     required: true,
@@ -264,39 +93,15 @@ class ItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => SalesOrderCreateNestedManyWithoutItemsInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => SalesOrderCreateNestedManyWithoutItemsInput)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => SalesOrderCreateNestedManyWithoutItemsInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  salesOrders?: SalesOrderCreateNestedManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => VendorWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => VendorWhereUniqueInput)
-  @IsOptional()
-  @Field(() => VendorWhereUniqueInput, {
-    nullable: true,
-  })
-  vendor?: VendorWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => RecipeCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  recipes?: RecipeCreateNestedManyWithoutItemsInput;
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -336,6 +141,141 @@ class ItemCreateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemClass?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemDescription?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemGroup?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  itemName!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  itemNumber!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemReceiptCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ItemReceiptCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  itemReceipts?: ItemReceiptCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  itemRevision?: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  itemType!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  purchaseOrders?: PurchaseOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
     type: () => RecipeBomItemCreateNestedManyWithoutItemsInput,
   })
   @ValidateNested()
@@ -345,6 +285,66 @@ class ItemCreateInput {
     nullable: true,
   })
   recipeBoms?: RecipeBomItemCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => SalesOrderCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => SalesOrderCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => VendorWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => VendorWhereUniqueInput)
+  @IsOptional()
+  @Field(() => VendorWhereUniqueInput, {
+    nullable: true,
+  })
+  vendor?: VendorWhereUniqueInput | null;
 }
 
 export { ItemCreateInput as ItemCreateInput };

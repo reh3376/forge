@@ -14,10 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   FermentationDayDatum as PrismaFermentationDayDatum,
-  ProductionOrder as PrismaProductionOrder,
-  Operation as PrismaOperation,
   Asset as PrismaAsset,
   FermentationChemistry as PrismaFermentationChemistry,
+  Operation as PrismaOperation,
+  ProductionOrder as PrismaProductionOrder,
 } from "@prisma/client";
 
 export class FermentationDayDatumServiceBase {
@@ -55,24 +55,6 @@ export class FermentationDayDatumServiceBase {
     return this.prisma.fermentationDayDatum.delete(args);
   }
 
-  async getProductionOrder(
-    parentId: string
-  ): Promise<PrismaProductionOrder | null> {
-    return this.prisma.fermentationDayDatum
-      .findUnique({
-        where: { id: parentId },
-      })
-      .productionOrder();
-  }
-
-  async getOperation(parentId: string): Promise<PrismaOperation | null> {
-    return this.prisma.fermentationDayDatum
-      .findUnique({
-        where: { id: parentId },
-      })
-      .operation();
-  }
-
   async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.fermentationDayDatum
       .findUnique({
@@ -89,5 +71,23 @@ export class FermentationDayDatumServiceBase {
         where: { id: parentId },
       })
       .fermentationChemistry();
+  }
+
+  async getOperation(parentId: string): Promise<PrismaOperation | null> {
+    return this.prisma.fermentationDayDatum
+      .findUnique({
+        where: { id: parentId },
+      })
+      .operation();
+  }
+
+  async getProductionOrder(
+    parentId: string
+  ): Promise<PrismaProductionOrder | null> {
+    return this.prisma.fermentationDayDatum
+      .findUnique({
+        where: { id: parentId },
+      })
+      .productionOrder();
   }
 }

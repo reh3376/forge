@@ -12,21 +12,56 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
-  IsNumber,
-  Max,
-  IsOptional,
   IsString,
   MaxLength,
-  IsBoolean,
+  IsOptional,
   ValidateNested,
+  IsBoolean,
+  IsNumber,
+  Max,
 } from "class-validator";
-import { Decimal } from "decimal.js";
 import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
 import { Type } from "class-transformer";
+import { Decimal } from "decimal.js";
 import { UnitLookupUpdateManyWithoutUnitLookupsInput } from "./UnitLookupUpdateManyWithoutUnitLookupsInput";
 
 @InputType()
 class UnitLookupUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  abbreviation?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitLookupWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitLookupWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitLookupWhereUniqueInput, {
+    nullable: true,
+  })
+  baseRecord?: UnitLookupWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  baseUnit?: boolean | null;
+
   @ApiProperty({
     required: false,
     type: Number,
@@ -61,30 +96,6 @@ class UnitLookupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  typeName?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  abbreviation?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
   pluralAbbreviation?: string;
 
   @ApiProperty({
@@ -101,26 +112,15 @@ class UnitLookupUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
+    type: String,
   })
-  @IsBoolean()
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => String, {
     nullable: true,
   })
-  baseUnit?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitLookupWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitLookupWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitLookupWhereUniqueInput, {
-    nullable: true,
-  })
-  baseRecord?: UnitLookupWhereUniqueInput | null;
+  typeName?: string;
 
   @ApiProperty({
     required: false,

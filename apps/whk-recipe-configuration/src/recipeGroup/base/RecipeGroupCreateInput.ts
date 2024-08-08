@@ -14,51 +14,18 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  IsInt,
-  Max,
   IsOptional,
   ValidateNested,
+  IsInt,
+  Max,
 } from "class-validator";
-import { RecipeCreateNestedManyWithoutRecipeGroupsInput } from "./RecipeCreateNestedManyWithoutRecipeGroupsInput";
-import { Type } from "class-transformer";
 import { ProductionOrderCreateNestedManyWithoutRecipeGroupsInput } from "./ProductionOrderCreateNestedManyWithoutRecipeGroupsInput";
+import { Type } from "class-transformer";
+import { RecipeCreateNestedManyWithoutRecipeGroupsInput } from "./RecipeCreateNestedManyWithoutRecipeGroupsInput";
 import { ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput } from "./ScheduleOrderCreateNestedManyWithoutRecipeGroupsInput";
 
 @InputType()
 class RecipeGroupCreateInput {
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  recipe!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
   @ApiProperty({
     required: true,
     type: String,
@@ -73,12 +40,33 @@ class RecipeGroupCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutRecipeGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutRecipeGroupsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutRecipeGroupsInput, {
+    nullable: true,
+  })
+  productionOrders?: ProductionOrderCreateNestedManyWithoutRecipeGroupsInput;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  recipe!: string;
 
   @ApiProperty({
     required: false,
@@ -94,15 +82,15 @@ class RecipeGroupCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ProductionOrderCreateNestedManyWithoutRecipeGroupsInput,
+    type: Number,
   })
-  @ValidateNested()
-  @Type(() => ProductionOrderCreateNestedManyWithoutRecipeGroupsInput)
+  @IsInt()
+  @Max(9999)
   @IsOptional()
-  @Field(() => ProductionOrderCreateNestedManyWithoutRecipeGroupsInput, {
+  @Field(() => Number, {
     nullable: true,
   })
-  productionOrders?: ProductionOrderCreateNestedManyWithoutRecipeGroupsInput;
+  revision?: number | null;
 
   @ApiProperty({
     required: false,
@@ -121,12 +109,24 @@ class RecipeGroupCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { RecipeGroupCreateInput as RecipeGroupCreateInput };

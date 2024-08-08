@@ -11,37 +11,50 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 import {
-  IsDate,
-  IsOptional,
   ValidateNested,
+  IsOptional,
+  IsDate,
+  IsString,
+  MaxLength,
   IsNumber,
   Min,
   Max,
-  IsString,
-  MaxLength,
   IsInt,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { Decimal } from "decimal.js";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { CustomerUpdateManyWithoutInventoryLogsInput } from "./CustomerUpdateManyWithoutInventoryLogsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { Decimal } from "decimal.js";
 
 @InputType()
 class InventoryLogUpdateInput {
   @ApiProperty({
     required: false,
+    type: () => AssetWhereUniqueInput,
   })
-  @IsDate()
-  @Type(() => Date)
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
-  dateTime?: Date;
+  asset?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CustomerUpdateManyWithoutInventoryLogsInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerUpdateManyWithoutInventoryLogsInput)
+  @IsOptional()
+  @Field(() => CustomerUpdateManyWithoutInventoryLogsInput, {
+    nullable: true,
+  })
+  customers?: CustomerUpdateManyWithoutInventoryLogsInput;
 
   @ApiProperty({
     required: false,
@@ -56,15 +69,38 @@ class InventoryLogUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => AssetWhereUniqueInput,
   })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
+  @Field(() => Date, {
     nullable: true,
   })
-  asset?: AssetWhereUniqueInput;
+  dateTime?: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  loggedBy?: string;
 
   @ApiProperty({
     required: false,
@@ -89,55 +125,7 @@ class InventoryLogUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  loggedBy?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  revisedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => CustomerUpdateManyWithoutInventoryLogsInput,
-  })
-  @ValidateNested()
-  @Type(() => CustomerUpdateManyWithoutInventoryLogsInput)
-  @IsOptional()
-  @Field(() => CustomerUpdateManyWithoutInventoryLogsInput, {
-    nullable: true,
-  })
-  customers?: CustomerUpdateManyWithoutInventoryLogsInput;
+  rawMeasurementUnits?: string | null;
 
   @ApiProperty({
     required: false,
@@ -161,7 +149,19 @@ class InventoryLogUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  rawMeasurementUnits?: string | null;
+  revisedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
 
   @ApiProperty({
     required: false,

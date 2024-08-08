@@ -25,18 +25,6 @@ class ItemGroupUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  name?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
   description?: string | null;
 
   @ApiProperty({
@@ -50,6 +38,18 @@ class ItemGroupUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string;
 }
 
 export { ItemGroupUpdateInput as ItemGroupUpdateInput };

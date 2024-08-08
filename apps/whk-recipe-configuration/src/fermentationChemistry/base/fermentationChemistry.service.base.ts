@@ -16,12 +16,12 @@ import {
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   MashDatum as PrismaMashDatum,
-  ProductionOrder as PrismaProductionOrder,
-  Operation as PrismaOperation,
   Asset as PrismaAsset,
-  FermentationSettingDatum as PrismaFermentationSettingDatum,
-  Lot as PrismaLot,
   Batch as PrismaBatch,
+  Lot as PrismaLot,
+  Operation as PrismaOperation,
+  ProductionOrder as PrismaProductionOrder,
+  FermentationSettingDatum as PrismaFermentationSettingDatum,
 } from "@prisma/client";
 
 export class FermentationChemistryServiceBase {
@@ -81,24 +81,6 @@ export class FermentationChemistryServiceBase {
       .mashData(args);
   }
 
-  async getProductionOrder(
-    parentId: string
-  ): Promise<PrismaProductionOrder | null> {
-    return this.prisma.fermentationChemistry
-      .findUnique({
-        where: { id: parentId },
-      })
-      .productionOrder();
-  }
-
-  async getOperation(parentId: string): Promise<PrismaOperation | null> {
-    return this.prisma.fermentationChemistry
-      .findUnique({
-        where: { id: parentId },
-      })
-      .operation();
-  }
-
   async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.fermentationChemistry
       .findUnique({
@@ -107,14 +89,12 @@ export class FermentationChemistryServiceBase {
       .asset();
   }
 
-  async getSettingData(
-    parentId: string
-  ): Promise<PrismaFermentationSettingDatum | null> {
+  async getBatch(parentId: string): Promise<PrismaBatch | null> {
     return this.prisma.fermentationChemistry
       .findUnique({
         where: { id: parentId },
       })
-      .settingData();
+      .batch();
   }
 
   async getLot(parentId: string): Promise<PrismaLot | null> {
@@ -125,11 +105,31 @@ export class FermentationChemistryServiceBase {
       .lot();
   }
 
-  async getBatch(parentId: string): Promise<PrismaBatch | null> {
+  async getOperation(parentId: string): Promise<PrismaOperation | null> {
     return this.prisma.fermentationChemistry
       .findUnique({
         where: { id: parentId },
       })
-      .batch();
+      .operation();
+  }
+
+  async getProductionOrder(
+    parentId: string
+  ): Promise<PrismaProductionOrder | null> {
+    return this.prisma.fermentationChemistry
+      .findUnique({
+        where: { id: parentId },
+      })
+      .productionOrder();
+  }
+
+  async getSettingData(
+    parentId: string
+  ): Promise<PrismaFermentationSettingDatum | null> {
+    return this.prisma.fermentationChemistry
+      .findUnique({
+        where: { id: parentId },
+      })
+      .settingData();
   }
 }

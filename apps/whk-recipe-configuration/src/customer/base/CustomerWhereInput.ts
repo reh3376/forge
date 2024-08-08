@@ -16,11 +16,11 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { IntFilter } from "../../util/IntFilter";
-import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
-import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
+import { IntFilter } from "../../util/IntFilter";
+import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
 
 @InputType()
 class CustomerWhereInput {
@@ -66,6 +66,17 @@ class CustomerWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
+  customerCode?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
   description?: StringNullableFilter;
 
   @ApiProperty({
@@ -92,73 +103,6 @@ class CustomerWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  name?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  revision?: IntFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeFilter,
-  })
-  @Type(() => DateTimeFilter)
-  @IsOptional()
-  @Field(() => DateTimeFilter, {
-    nullable: true,
-  })
-  updatedAt?: DateTimeFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderListRelationFilter)
-  @IsOptional()
-  @Field(() => SalesOrderListRelationFilter, {
-    nullable: true,
-  })
-  salesOrders?: SalesOrderListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -170,14 +114,37 @@ class CustomerWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => StringNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => StringNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  customerCode?: StringNullableFilter;
+  id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryLogWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryLogWhereUniqueInput)
+  @IsOptional()
+  @Field(() => InventoryLogWhereUniqueInput, {
+    nullable: true,
+  })
+  inventoryLog?: InventoryLogWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  name?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -216,15 +183,48 @@ class CustomerWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => InventoryLogWhereUniqueInput,
+    type: IntFilter,
   })
-  @ValidateNested()
-  @Type(() => InventoryLogWhereUniqueInput)
+  @Type(() => IntFilter)
   @IsOptional()
-  @Field(() => InventoryLogWhereUniqueInput, {
+  @Field(() => IntFilter, {
     nullable: true,
   })
-  inventoryLog?: InventoryLogWhereUniqueInput;
+  revision?: IntFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => SalesOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => SalesOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => SalesOrderListRelationFilter, {
+    nullable: true,
+  })
+  salesOrders?: SalesOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  updatedAt?: DateTimeFilter;
 }
 
 export { CustomerWhereInput as CustomerWhereInput };

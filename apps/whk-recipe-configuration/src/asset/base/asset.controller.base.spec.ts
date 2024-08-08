@@ -22,26 +22,26 @@ const CREATE_INPUT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   name: "exampleName",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
 };
 const CREATE_RESULT = {
   assetPath: "exampleAssetPath",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   name: "exampleName",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
 };
 const FIND_MANY_RESULT = [
   {
@@ -49,13 +49,13 @@ const FIND_MANY_RESULT = [
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     description: "exampleDescription",
+    globalId: "exampleGlobalId",
     id: "exampleId",
     name: "exampleName",
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
-    globalId: "exampleGlobalId",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -63,13 +63,13 @@ const FIND_ONE_RESULT = {
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   description: "exampleDescription",
+  globalId: "exampleGlobalId",
   id: "exampleId",
   name: "exampleName",
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
-  globalId: "exampleGlobalId",
 };
 
 const service = {

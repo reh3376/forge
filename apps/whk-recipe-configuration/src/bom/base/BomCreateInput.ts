@@ -11,42 +11,51 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BomItemCreateNestedManyWithoutBomsInput } from "./BomItemCreateNestedManyWithoutBomsInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  ValidateNested,
-  IsBoolean,
   IsDate,
+  IsBoolean,
 } from "class-validator";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
-import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderCreateNestedManyWithoutBomsInput } from "./ProductionOrderCreateNestedManyWithoutBomsInput";
-import { BomItemCreateNestedManyWithoutBomsInput } from "./BomItemCreateNestedManyWithoutBomsInput";
+import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
 
 @InputType()
 class BomCreateInput {
   @ApiProperty({
-    required: false,
-    type: String,
+    required: true,
+    type: () => BomItemCreateNestedManyWithoutBomsInput,
   })
-  @IsString()
-  @MaxLength(64)
+  @ValidateNested()
+  @Type(() => BomItemCreateNestedManyWithoutBomsInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => BomItemCreateNestedManyWithoutBomsInput, {
     nullable: true,
   })
-  editedBy?: string | null;
+  bomItem?: BomItemCreateNestedManyWithoutBomsInput;
 
   @ApiProperty({
     required: true,
-    type: () => ItemWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @Field(() => ItemWhereUniqueInput)
-  item!: ItemWhereUniqueInput;
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  bomName!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  bomRevision!: string;
 
   @ApiProperty({
     required: false,
@@ -58,7 +67,7 @@ class BomCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
+  bomType?: string | null;
 
   @ApiProperty({
     required: false,
@@ -82,22 +91,118 @@ class BomCreateInput {
   createdBy!: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  bomName!: string;
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  editedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveEndDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveStartDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  erpId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  inactive?: boolean | null;
 
   @ApiProperty({
     required: true,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutBomsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutBomsInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderCreateNestedManyWithoutBomsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @Field(() => String)
-  bomRevision!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
 
   @ApiProperty({
     required: false,
@@ -122,111 +227,6 @@ class BomCreateInput {
     nullable: true,
   })
   unitProceduresPrimary?: UnitProcedureCreateNestedManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderCreateNestedManyWithoutBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderCreateNestedManyWithoutBomsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderCreateNestedManyWithoutBomsInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderCreateNestedManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: true,
-    type: () => BomItemCreateNestedManyWithoutBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => BomItemCreateNestedManyWithoutBomsInput)
-  @IsOptional()
-  @Field(() => BomItemCreateNestedManyWithoutBomsInput, {
-    nullable: true,
-  })
-  bomItem?: BomItemCreateNestedManyWithoutBomsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  bomType?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  notes?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  inactive?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  effectiveStartDate?: Date | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  effectiveEndDate?: Date | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(100)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  erpId?: string | null;
 }
 
 export { BomCreateInput as BomCreateInput };

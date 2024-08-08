@@ -11,52 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
-import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
-import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { ValidateNested, IsOptional } from "class-validator";
+import { Type } from "class-transformer";
 import { CustomerListRelationFilter } from "../../customer/base/CustomerListRelationFilter";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { StringFilter } from "../../util/StringFilter";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
 class InventoryLogWhereInput {
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeFilter,
-  })
-  @Type(() => DateTimeFilter)
-  @IsOptional()
-  @Field(() => DateTimeFilter, {
-    nullable: true,
-  })
-  dateTime?: DateTimeFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeFilter,
-  })
-  @Type(() => DateTimeFilter)
-  @IsOptional()
-  @Field(() => DateTimeFilter, {
-    nullable: true,
-  })
-  date?: DateTimeFilter;
-
   @ApiProperty({
     required: false,
     type: () => AssetWhereUniqueInput,
@@ -71,14 +38,37 @@ class InventoryLogWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: () => CustomerListRelationFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @ValidateNested()
+  @Type(() => CustomerListRelationFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => CustomerListRelationFilter, {
     nullable: true,
   })
-  quantity?: DecimalNullableFilter;
+  customers?: CustomerListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  date?: DateTimeFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  dateTime?: DateTimeFilter;
 
   @ApiProperty({
     required: false,
@@ -89,7 +79,7 @@ class InventoryLogWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  loggedBy?: StringFilter;
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -105,14 +95,25 @@ class InventoryLogWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: StringFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => StringFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => StringFilter, {
     nullable: true,
   })
-  revision?: IntNullableFilter;
+  loggedBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  quantity?: DecimalNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -123,19 +124,7 @@ class InventoryLogWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  revisedBy?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => CustomerListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => CustomerListRelationFilter)
-  @IsOptional()
-  @Field(() => CustomerListRelationFilter, {
-    nullable: true,
-  })
-  customers?: CustomerListRelationFilter;
+  rawMeasurementUnits?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -157,7 +146,18 @@ class InventoryLogWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  rawMeasurementUnits?: StringNullableFilter;
+  revisedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  revision?: IntNullableFilter;
 
   @ApiProperty({
     required: false,

@@ -16,15 +16,6 @@ import { IsString, MaxLength, IsOptional } from "class-validator";
 @InputType()
 class ItemGroupCreateInput {
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  name!: string;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
@@ -47,6 +38,15 @@ class ItemGroupCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  name!: string;
 }
 
 export { ItemGroupCreateInput as ItemGroupCreateInput };

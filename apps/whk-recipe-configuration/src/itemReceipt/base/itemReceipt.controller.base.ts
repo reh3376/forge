@@ -58,15 +58,15 @@ export class ItemReceiptControllerBase {
       data: {
         ...data,
 
+        item: {
+          connect: data.item,
+        },
+
         purchaseOrder: data.purchaseOrder
           ? {
               connect: data.purchaseOrder,
             }
           : undefined,
-
-        item: {
-          connect: data.item,
-        },
 
         toAsset: data.toAsset
           ? {
@@ -78,7 +78,17 @@ export class ItemReceiptControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
+        globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        loadId: true,
+        lots: true,
 
         purchaseOrder: {
           select: {
@@ -90,20 +100,6 @@ export class ItemReceiptControllerBase {
         schemaVersion: true,
         status: true,
         supplierLot: true,
-        units: true,
-        updatedAt: true,
-        updatedBy: true,
-        weighIn: true,
-        weighOut: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        loadId: true,
         testsPassed: true,
 
         toAsset: {
@@ -111,6 +107,12 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+        weighIn: true,
+        weighOut: true,
       },
     });
   }
@@ -135,7 +137,17 @@ export class ItemReceiptControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
+        globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        loadId: true,
+        lots: true,
 
         purchaseOrder: {
           select: {
@@ -147,20 +159,6 @@ export class ItemReceiptControllerBase {
         schemaVersion: true,
         status: true,
         supplierLot: true,
-        units: true,
-        updatedAt: true,
-        updatedBy: true,
-        weighIn: true,
-        weighOut: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        loadId: true,
         testsPassed: true,
 
         toAsset: {
@@ -168,6 +166,12 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+        weighIn: true,
+        weighOut: true,
       },
     });
   }
@@ -193,7 +197,17 @@ export class ItemReceiptControllerBase {
         createdAt: true,
         createdBy: true,
         driver: true,
+        globalId: true,
         id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        loadId: true,
+        lots: true,
 
         purchaseOrder: {
           select: {
@@ -205,20 +219,6 @@ export class ItemReceiptControllerBase {
         schemaVersion: true,
         status: true,
         supplierLot: true,
-        units: true,
-        updatedAt: true,
-        updatedBy: true,
-        weighIn: true,
-        weighOut: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        loadId: true,
         testsPassed: true,
 
         toAsset: {
@@ -226,6 +226,12 @@ export class ItemReceiptControllerBase {
             id: true,
           },
         },
+
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+        weighIn: true,
+        weighOut: true,
       },
     });
     if (result === null) {
@@ -261,15 +267,15 @@ export class ItemReceiptControllerBase {
         data: {
           ...data,
 
+          item: {
+            connect: data.item,
+          },
+
           purchaseOrder: data.purchaseOrder
             ? {
                 connect: data.purchaseOrder,
               }
             : undefined,
-
-          item: {
-            connect: data.item,
-          },
 
           toAsset: data.toAsset
             ? {
@@ -281,7 +287,17 @@ export class ItemReceiptControllerBase {
           createdAt: true,
           createdBy: true,
           driver: true,
+          globalId: true,
           id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
+          loadId: true,
+          lots: true,
 
           purchaseOrder: {
             select: {
@@ -293,20 +309,6 @@ export class ItemReceiptControllerBase {
           schemaVersion: true,
           status: true,
           supplierLot: true,
-          units: true,
-          updatedAt: true,
-          updatedBy: true,
-          weighIn: true,
-          weighOut: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
-          loadId: true,
           testsPassed: true,
 
           toAsset: {
@@ -314,6 +316,12 @@ export class ItemReceiptControllerBase {
               id: true,
             },
           },
+
+          units: true,
+          updatedAt: true,
+          updatedBy: true,
+          weighIn: true,
+          weighOut: true,
         },
       });
     } catch (error) {
@@ -342,25 +350,7 @@ export class ItemReceiptControllerBase {
     const results = await this.service.findTests(params.id, {
       ...query,
       select: {
-        description: true,
-        testPass: true,
-        createdAt: true,
-        id: true,
-        testSetpointBooleanValue: true,
-        updatedBy: true,
-        name: true,
         active: true,
-        schemaVersion: true,
-        testSetpointValue: true,
-        testParamUnits: true,
-        testSetpointUpperLimit: true,
-        testParamRevision: true,
-        testSetpointLowerLimit: true,
-        testResult: true,
-        createdBy: true,
-        testSetpointType: true,
-        updatedAt: true,
-        isClassDef: true,
 
         classId: {
           select: {
@@ -368,17 +358,36 @@ export class ItemReceiptControllerBase {
           },
         },
 
-        tooltip: true,
-        testDetails: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
         globalId: true,
-        testedBy: true,
-        testedAt: true,
+        id: true,
+        isClassDef: true,
 
         itemReceipt: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        testedAt: true,
+        testedBy: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

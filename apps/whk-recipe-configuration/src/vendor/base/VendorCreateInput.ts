@@ -11,34 +11,22 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ItemCreateNestedManyWithoutVendorsInput } from "./ItemCreateNestedManyWithoutVendorsInput";
 import {
-  ValidateNested,
-  IsOptional,
   IsBoolean,
+  IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
 } from "class-validator";
-import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { ItemCreateNestedManyWithoutVendorsInput } from "./ItemCreateNestedManyWithoutVendorsInput";
+import { Type } from "class-transformer";
 import { PurchaseOrderCreateNestedManyWithoutVendorsInput } from "./PurchaseOrderCreateNestedManyWithoutVendorsInput";
 
 @InputType()
 class VendorCreateInput {
-  @ApiProperty({
-    required: false,
-    type: () => ItemCreateNestedManyWithoutVendorsInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemCreateNestedManyWithoutVendorsInput)
-  @IsOptional()
-  @Field(() => ItemCreateNestedManyWithoutVendorsInput, {
-    nullable: true,
-  })
-  items?: ItemCreateNestedManyWithoutVendorsInput;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -84,30 +72,6 @@ class VendorCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
@@ -129,6 +93,30 @@ class VendorCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemCreateNestedManyWithoutVendorsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemCreateNestedManyWithoutVendorsInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutVendorsInput, {
+    nullable: true,
+  })
+  items?: ItemCreateNestedManyWithoutVendorsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrderCreateNestedManyWithoutVendorsInput,
   })
   @ValidateNested()
@@ -138,6 +126,18 @@ class VendorCreateInput {
     nullable: true,
   })
   purchaseOrders?: PurchaseOrderCreateNestedManyWithoutVendorsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { VendorCreateInput as VendorCreateInput };

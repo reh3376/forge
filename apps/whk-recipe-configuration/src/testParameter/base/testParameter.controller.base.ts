@@ -74,25 +74,7 @@ export class TestParameterControllerBase {
           : undefined,
       },
       select: {
-        description: true,
-        testPass: true,
-        createdAt: true,
-        id: true,
-        testSetpointBooleanValue: true,
-        updatedBy: true,
-        name: true,
         active: true,
-        schemaVersion: true,
-        testSetpointValue: true,
-        testParamUnits: true,
-        testSetpointUpperLimit: true,
-        testParamRevision: true,
-        testSetpointLowerLimit: true,
-        testResult: true,
-        createdBy: true,
-        testSetpointType: true,
-        updatedAt: true,
-        isClassDef: true,
 
         classId: {
           select: {
@@ -100,17 +82,36 @@ export class TestParameterControllerBase {
           },
         },
 
-        tooltip: true,
-        testDetails: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
         globalId: true,
-        testedBy: true,
-        testedAt: true,
+        id: true,
+        isClassDef: true,
 
         itemReceipt: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        testedAt: true,
+        testedBy: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -134,25 +135,7 @@ export class TestParameterControllerBase {
     return this.service.testParameters({
       ...args,
       select: {
-        description: true,
-        testPass: true,
-        createdAt: true,
-        id: true,
-        testSetpointBooleanValue: true,
-        updatedBy: true,
-        name: true,
         active: true,
-        schemaVersion: true,
-        testSetpointValue: true,
-        testParamUnits: true,
-        testSetpointUpperLimit: true,
-        testParamRevision: true,
-        testSetpointLowerLimit: true,
-        testResult: true,
-        createdBy: true,
-        testSetpointType: true,
-        updatedAt: true,
-        isClassDef: true,
 
         classId: {
           select: {
@@ -160,17 +143,36 @@ export class TestParameterControllerBase {
           },
         },
 
-        tooltip: true,
-        testDetails: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
         globalId: true,
-        testedBy: true,
-        testedAt: true,
+        id: true,
+        isClassDef: true,
 
         itemReceipt: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        testedAt: true,
+        testedBy: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -193,25 +195,7 @@ export class TestParameterControllerBase {
     const result = await this.service.testParameter({
       where: params,
       select: {
-        description: true,
-        testPass: true,
-        createdAt: true,
-        id: true,
-        testSetpointBooleanValue: true,
-        updatedBy: true,
-        name: true,
         active: true,
-        schemaVersion: true,
-        testSetpointValue: true,
-        testParamUnits: true,
-        testSetpointUpperLimit: true,
-        testParamRevision: true,
-        testSetpointLowerLimit: true,
-        testResult: true,
-        createdBy: true,
-        testSetpointType: true,
-        updatedAt: true,
-        isClassDef: true,
 
         classId: {
           select: {
@@ -219,17 +203,36 @@ export class TestParameterControllerBase {
           },
         },
 
-        tooltip: true,
-        testDetails: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
         globalId: true,
-        testedBy: true,
-        testedAt: true,
+        id: true,
+        isClassDef: true,
 
         itemReceipt: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        testedAt: true,
+        testedBy: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -278,25 +281,7 @@ export class TestParameterControllerBase {
             : undefined,
         },
         select: {
-          description: true,
-          testPass: true,
-          createdAt: true,
-          id: true,
-          testSetpointBooleanValue: true,
-          updatedBy: true,
-          name: true,
           active: true,
-          schemaVersion: true,
-          testSetpointValue: true,
-          testParamUnits: true,
-          testSetpointUpperLimit: true,
-          testParamRevision: true,
-          testSetpointLowerLimit: true,
-          testResult: true,
-          createdBy: true,
-          testSetpointType: true,
-          updatedAt: true,
-          isClassDef: true,
 
           classId: {
             select: {
@@ -304,17 +289,36 @@ export class TestParameterControllerBase {
             },
           },
 
-          tooltip: true,
-          testDetails: true,
+          createdAt: true,
+          createdBy: true,
+          description: true,
           globalId: true,
-          testedBy: true,
-          testedAt: true,
+          id: true,
+          isClassDef: true,
 
           itemReceipt: {
             select: {
               id: true,
             },
           },
+
+          name: true,
+          schemaVersion: true,
+          testDetails: true,
+          testParamRevision: true,
+          testParamUnits: true,
+          testPass: true,
+          testResult: true,
+          testSetpointBooleanValue: true,
+          testSetpointLowerLimit: true,
+          testSetpointType: true,
+          testSetpointUpperLimit: true,
+          testSetpointValue: true,
+          testedAt: true,
+          testedBy: true,
+          tooltip: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -343,10 +347,24 @@ export class TestParameterControllerBase {
     const results = await this.service.findEquipmentPhases(params.id, {
       ...query,
       select: {
-        createdBy: true,
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        className: true,
         createdAt: true,
-        schemaVersion: true,
-        operationSequenceIndex: true,
+        createdBy: true,
+        description: true,
+        editedAt: true,
+        editedBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+        message: true,
         name: true,
 
         operation: {
@@ -355,25 +373,11 @@ export class TestParameterControllerBase {
           },
         },
 
-        id: true,
-        editedBy: true,
-        revision: true,
-        editedAt: true,
-        className: true,
-        description: true,
-        isClassDefinition: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        active: true,
+        operationSequenceIndex: true,
         path: true,
-        globalId: true,
+        revision: true,
+        schemaVersion: true,
         stepType: true,
-        message: true,
       },
     });
     if (results === null) {
@@ -466,25 +470,7 @@ export class TestParameterControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
-        description: true,
-        testPass: true,
-        createdAt: true,
-        id: true,
-        testSetpointBooleanValue: true,
-        updatedBy: true,
-        name: true,
         active: true,
-        schemaVersion: true,
-        testSetpointValue: true,
-        testParamUnits: true,
-        testSetpointUpperLimit: true,
-        testParamRevision: true,
-        testSetpointLowerLimit: true,
-        testResult: true,
-        createdBy: true,
-        testSetpointType: true,
-        updatedAt: true,
-        isClassDef: true,
 
         classId: {
           select: {
@@ -492,17 +478,36 @@ export class TestParameterControllerBase {
           },
         },
 
-        tooltip: true,
-        testDetails: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
         globalId: true,
-        testedBy: true,
-        testedAt: true,
+        id: true,
+        isClassDef: true,
 
         itemReceipt: {
           select: {
             id: true,
           },
         },
+
+        name: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        testedAt: true,
+        testedBy: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -605,12 +610,11 @@ export class TestParameterControllerBase {
         complete: true,
         createdAt: true,
         createdBy: true,
-        updatedAt: true,
-        updatedBy: true,
-        transactionGroup: true,
+        erpId: true,
+        globalId: true,
         id: true,
+        lineItems: true,
         name: true,
-        totalOrderQuantity: true,
         purchaseOrderReceiptDate: true,
         purchaseOrderReceived: true,
 
@@ -624,9 +628,10 @@ export class TestParameterControllerBase {
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
-        globalId: true,
-        lineItems: true,
-        erpId: true,
+        totalOrderQuantity: true,
+        transactionGroup: true,
+        updatedAt: true,
+        updatedBy: true,
 
         vendor: {
           select: {

@@ -13,73 +13,75 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsInt,
-  Max,
-  IsOptional,
-  IsEnum,
   IsString,
   MaxLength,
+  IsOptional,
   IsBoolean,
   ValidateNested,
+  IsEnum,
+  IsInt,
+  Max,
 } from "class-validator";
 
-import { EnumOperationName } from "./EnumOperationName";
-import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
-import { Type } from "class-transformer";
-import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
-import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
+import { Type } from "class-transformer";
+import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhaseUpdateManyWithoutOperationsInput";
 import { FermentationChemistryUpdateManyWithoutOperationsInput } from "./FermentationChemistryUpdateManyWithoutOperationsInput";
-import { FermentationSettingDatumUpdateManyWithoutOperationsInput } from "./FermentationSettingDatumUpdateManyWithoutOperationsInput";
 import { FermentationDayDatumUpdateManyWithoutOperationsInput } from "./FermentationDayDatumUpdateManyWithoutOperationsInput";
+import { FermentationSettingDatumUpdateManyWithoutOperationsInput } from "./FermentationSettingDatumUpdateManyWithoutOperationsInput";
+import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
+import { EnumOperationName } from "./EnumOperationName";
+import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @InputType()
 class OperationUpdateInput {
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumOperationName,
-  })
-  @IsEnum(EnumOperationName)
-  @IsOptional()
-  @Field(() => EnumOperationName, {
-    nullable: true,
-  })
-  name?:
-    | "Cook"
-    | "FermenterSet"
-    | "Fermenter"
-    | "Clean"
-    | "StillRun"
-    | "BlendingTank"
-    | "CisternTank"
-    | "Barreling";
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(4)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  editedBy?: string | null;
+  abbreviation?: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  auxiliaryPhases?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => OperationWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: OperationWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -107,38 +109,15 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  procedureSequenceIndex?: number;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
+  @MaxLength(64)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean | null;
+  editedBy?: string | null;
 
   @ApiProperty({
     required: false,
@@ -154,111 +133,6 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationWhereUniqueInput)
-  @IsOptional()
-  @Field(() => OperationWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: OperationWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => OperationUpdateManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => OperationUpdateManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => OperationUpdateManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  instances?: OperationUpdateManyWithoutOperationsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  path?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(4)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  abbreviation?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  unitProcedure?: UnitProcedureWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  auxiliaryPhases?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lotId?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: () => FermentationChemistryUpdateManyWithoutOperationsInput,
   })
   @ValidateNested()
@@ -268,6 +142,18 @@ class OperationUpdateInput {
     nullable: true,
   })
   fermentationChemistries?: FermentationChemistryUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationDayDatumUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => FermentationDayDatumUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  fermentationDayData?: FermentationDayDatumUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,
@@ -283,15 +169,129 @@ class OperationUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationDayDatumUpdateManyWithoutOperationsInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumUpdateManyWithoutOperationsInput)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => FermentationDayDatumUpdateManyWithoutOperationsInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  fermentationDayData?: FermentationDayDatumUpdateManyWithoutOperationsInput;
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperationUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperationUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => OperationUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  instances?: OperationUpdateManyWithoutOperationsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumOperationName,
+  })
+  @IsEnum(EnumOperationName)
+  @IsOptional()
+  @Field(() => EnumOperationName, {
+    nullable: true,
+  })
+  name?:
+    | "Cook"
+    | "FermenterSet"
+    | "Fermenter"
+    | "Clean"
+    | "StillRun"
+    | "BlendingTank"
+    | "CisternTank"
+    | "Barreling";
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  path?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  procedureSequenceIndex?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(9999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitProcedureWhereUniqueInput, {
+    nullable: true,
+  })
+  unitProcedure?: UnitProcedureWhereUniqueInput | null;
 }
 
 export { OperationUpdateInput as OperationUpdateInput };
