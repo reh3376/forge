@@ -322,13 +322,16 @@ class ProductionOrderCreateInput {
   recipeGroup?: RecipeGroupWhereUniqueInput | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: () => SalesOrderWhereUniqueInput,
   })
   @ValidateNested()
   @Type(() => SalesOrderWhereUniqueInput)
-  @Field(() => SalesOrderWhereUniqueInput)
-  salesOrder!: SalesOrderWhereUniqueInput;
+  @IsOptional()
+  @Field(() => SalesOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  salesOrder?: SalesOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
