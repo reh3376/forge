@@ -91,9 +91,11 @@ export class ProductionOrderControllerBase {
             }
           : undefined,
 
-        salesOrder: {
-          connect: data.salesOrder,
-        },
+        salesOrder: data.salesOrder
+          ? {
+              connect: data.salesOrder,
+            }
+          : undefined,
 
         scheduleOrder: data.scheduleOrder
           ? {
@@ -410,9 +412,11 @@ export class ProductionOrderControllerBase {
               }
             : undefined,
 
-          salesOrder: {
-            connect: data.salesOrder,
-          },
+          salesOrder: data.salesOrder
+            ? {
+                connect: data.salesOrder,
+              }
+            : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {

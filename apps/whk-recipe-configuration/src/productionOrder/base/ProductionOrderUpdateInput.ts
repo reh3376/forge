@@ -333,7 +333,7 @@ class ProductionOrderUpdateInput {
   @Field(() => SalesOrderWhereUniqueInput, {
     nullable: true,
   })
-  salesOrder?: SalesOrderWhereUniqueInput;
+  salesOrder?: SalesOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

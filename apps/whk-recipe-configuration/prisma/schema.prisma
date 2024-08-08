@@ -366,8 +366,8 @@ model ProductionOrder {
   recipeId                      String?
   recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                 String?
-  salesOrder                    SalesOrder                     @relation(fields: [salesOrderId], references: [id])
-  salesOrderId                  String                         @unique
+  salesOrder                    SalesOrder?                    @relation(fields: [salesOrderId], references: [id])
+  salesOrderId                  String?                        @unique
   scheduleOrder                 ScheduleOrder?                 @relation(fields: [scheduleOrderId], references: [id])
   scheduleOrderId               String?
   scheduled                     Boolean?                       @default(false)
