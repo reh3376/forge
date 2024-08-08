@@ -25,6 +25,12 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { Decimal } from "decimal.js";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { Expose, Type } from "class-transformer";
+import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BomItemWhereUniqueInput } from "./BomItemWhereUniqueInput";
 import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
 import { BomItemCreateNestedManyWithoutBomItemsInput } from "./BomItemCreateNestedManyWithoutBomItemsInput";
@@ -57,6 +63,16 @@ class BomItemCreateInput {
     nullable: true,
   })
   classIdId?: BomItemWhereUniqueInput | null;
+  
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  @Expose()
+  item!: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
