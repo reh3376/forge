@@ -11,48 +11,48 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { EnumProcedureName } from "./EnumProcedureName";
 
 import {
-  IsEnum,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
   IsString,
   MaxLength,
+  IsEnum,
   IsInt,
   Max,
-  IsBoolean,
-  ValidateNested,
 } from "class-validator";
 
-import { UnitProcedureUpdateManyWithoutProceduresInput } from "./UnitProcedureUpdateManyWithoutProceduresInput";
-import { Type } from "class-transformer";
 import { ProcedureWhereUniqueInput } from "./ProcedureWhereUniqueInput";
+import { Type } from "class-transformer";
 import { ProcedureUpdateManyWithoutProceduresInput } from "./ProcedureUpdateManyWithoutProceduresInput";
+import { EnumProcedureName } from "./EnumProcedureName";
+import { UnitProcedureUpdateManyWithoutProceduresInput } from "./UnitProcedureUpdateManyWithoutProceduresInput";
 
 @InputType()
 class ProcedureUpdateInput {
   @ApiProperty({
     required: false,
-    enum: EnumProcedureName,
+    type: Boolean,
   })
-  @IsEnum(EnumProcedureName)
+  @IsBoolean()
   @IsOptional()
-  @Field(() => EnumProcedureName, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  name?: "Line1" | null;
+  active?: boolean | null;
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => ProcedureWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(1000)
+  @ValidateNested()
+  @Type(() => ProcedureWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => ProcedureWhereUniqueInput, {
     nullable: true,
   })
-  description?: string | null;
+  classId?: ProcedureWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -71,82 +71,24 @@ class ProcedureUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: string | null;
+  description?: string | null;
 
   @ApiProperty({
     required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  active?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureUpdateManyWithoutProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureUpdateManyWithoutProceduresInput)
-  @IsOptional()
-  @Field(() => UnitProcedureUpdateManyWithoutProceduresInput, {
-    nullable: true,
-  })
-  unitProcedures?: UnitProcedureUpdateManyWithoutProceduresInput;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: ProcedureWhereUniqueInput | null;
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -162,15 +104,73 @@ class ProcedureUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumProcedureName,
+  })
+  @IsEnum(EnumProcedureName)
+  @IsOptional()
+  @Field(() => EnumProcedureName, {
+    nullable: true,
+  })
+  name?: "Line1" | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision?: number | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(16)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitProcedureUpdateManyWithoutProceduresInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedureUpdateManyWithoutProceduresInput)
+  @IsOptional()
+  @Field(() => UnitProcedureUpdateManyWithoutProceduresInput, {
+    nullable: true,
+  })
+  unitProcedures?: UnitProcedureUpdateManyWithoutProceduresInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { ProcedureUpdateInput as ProcedureUpdateInput };

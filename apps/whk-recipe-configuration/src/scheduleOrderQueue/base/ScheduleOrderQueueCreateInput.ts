@@ -15,10 +15,10 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  ValidateNested,
   IsInt,
   Min,
   Max,
-  ValidateNested,
 } from "class-validator";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
@@ -34,43 +34,6 @@ class ScheduleOrderQueueCreateInput {
   @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(16)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-99)
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  queueIndex?: number | null;
 
   @ApiProperty({
     required: false,
@@ -103,6 +66,19 @@ class ScheduleOrderQueueCreateInput {
   nextUnitProcedureName!: string;
 
   @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-99)
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  queueIndex?: number | null;
+
+  @ApiProperty({
     required: true,
     type: () => ScheduleOrderWhereUniqueInput,
   })
@@ -110,6 +86,30 @@ class ScheduleOrderQueueCreateInput {
   @Type(() => ScheduleOrderWhereUniqueInput)
   @Field(() => ScheduleOrderWhereUniqueInput)
   scheduleOrder!: ScheduleOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { ScheduleOrderQueueCreateInput as ScheduleOrderQueueCreateInput };

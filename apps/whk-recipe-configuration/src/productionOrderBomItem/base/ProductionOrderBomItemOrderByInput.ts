@@ -28,7 +28,7 @@ class ProductionOrderBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  id?: SortOrder;
+  createdAt?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -39,7 +39,7 @@ class ProductionOrderBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  createdAt?: SortOrder;
+  id?: SortOrder;
 
   @ApiProperty({
     required: false,

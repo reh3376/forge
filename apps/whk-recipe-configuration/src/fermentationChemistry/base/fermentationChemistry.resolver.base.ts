@@ -29,12 +29,12 @@ import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/bas
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
 import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { Operation } from "../../operation/base/Operation";
 import { Asset } from "../../asset/base/Asset";
-import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
-import { Lot } from "../../lot/base/Lot";
 import { Batch } from "../../batch/base/Batch";
+import { Lot } from "../../lot/base/Lot";
+import { Operation } from "../../operation/base/Operation";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
+import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { FermentationChemistryService } from "../fermentationChemistry.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => FermentationChemistry)
@@ -104,25 +104,13 @@ export class FermentationChemistryResolverBase {
       data: {
         ...args.data,
 
-        productionOrder: args.data.productionOrder
-          ? {
-              connect: args.data.productionOrder,
-            }
-          : undefined,
-
-        operation: {
-          connect: args.data.operation,
-        },
-
         asset: {
           connect: args.data.asset,
         },
 
-        settingData: args.data.settingData
-          ? {
-              connect: args.data.settingData,
-            }
-          : undefined,
+        batch: {
+          connect: args.data.batch,
+        },
 
         lot: args.data.lot
           ? {
@@ -130,9 +118,21 @@ export class FermentationChemistryResolverBase {
             }
           : undefined,
 
-        batch: {
-          connect: args.data.batch,
+        operation: {
+          connect: args.data.operation,
         },
+
+        productionOrder: args.data.productionOrder
+          ? {
+              connect: args.data.productionOrder,
+            }
+          : undefined,
+
+        settingData: args.data.settingData
+          ? {
+              connect: args.data.settingData,
+            }
+          : undefined,
       },
     });
   }
@@ -153,25 +153,13 @@ export class FermentationChemistryResolverBase {
         data: {
           ...args.data,
 
-          productionOrder: args.data.productionOrder
-            ? {
-                connect: args.data.productionOrder,
-              }
-            : undefined,
-
-          operation: {
-            connect: args.data.operation,
-          },
-
           asset: {
             connect: args.data.asset,
           },
 
-          settingData: args.data.settingData
-            ? {
-                connect: args.data.settingData,
-              }
-            : undefined,
+          batch: {
+            connect: args.data.batch,
+          },
 
           lot: args.data.lot
             ? {
@@ -179,9 +167,21 @@ export class FermentationChemistryResolverBase {
               }
             : undefined,
 
-          batch: {
-            connect: args.data.batch,
+          operation: {
+            connect: args.data.operation,
           },
+
+          productionOrder: args.data.productionOrder
+            ? {
+                connect: args.data.productionOrder,
+              }
+            : undefined,
+
+          settingData: args.data.settingData
+            ? {
+                connect: args.data.settingData,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -235,48 +235,6 @@ export class FermentationChemistryResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ProductionOrder, {
-    nullable: true,
-    name: "productionOrder",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async getProductionOrder(
-    @graphql.Parent() parent: FermentationChemistry
-  ): Promise<ProductionOrder | null> {
-    const result = await this.service.getProductionOrder(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Operation, {
-    nullable: true,
-    name: "operation",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Operation",
-    action: "read",
-    possession: "any",
-  })
-  async getOperation(
-    @graphql.Parent() parent: FermentationChemistry
-  ): Promise<Operation | null> {
-    const result = await this.service.getOperation(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Asset, {
     nullable: true,
     name: "asset",
@@ -298,19 +256,19 @@ export class FermentationChemistryResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => FermentationSettingDatum, {
+  @graphql.ResolveField(() => Batch, {
     nullable: true,
-    name: "settingData",
+    name: "batch",
   })
   @nestAccessControl.UseRoles({
-    resource: "FermentationSettingDatum",
+    resource: "Batch",
     action: "read",
     possession: "any",
   })
-  async getSettingData(
+  async getBatch(
     @graphql.Parent() parent: FermentationChemistry
-  ): Promise<FermentationSettingDatum | null> {
-    const result = await this.service.getSettingData(parent.id);
+  ): Promise<Batch | null> {
+    const result = await this.service.getBatch(parent.id);
 
     if (!result) {
       return null;
@@ -340,19 +298,61 @@ export class FermentationChemistryResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Batch, {
+  @graphql.ResolveField(() => Operation, {
     nullable: true,
-    name: "batch",
+    name: "operation",
   })
   @nestAccessControl.UseRoles({
-    resource: "Batch",
+    resource: "Operation",
     action: "read",
     possession: "any",
   })
-  async getBatch(
+  async getOperation(
     @graphql.Parent() parent: FermentationChemistry
-  ): Promise<Batch | null> {
-    const result = await this.service.getBatch(parent.id);
+  ): Promise<Operation | null> {
+    const result = await this.service.getOperation(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrder, {
+    nullable: true,
+    name: "productionOrder",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrder(
+    @graphql.Parent() parent: FermentationChemistry
+  ): Promise<ProductionOrder | null> {
+    const result = await this.service.getProductionOrder(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => FermentationSettingDatum, {
+    nullable: true,
+    name: "settingData",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "FermentationSettingDatum",
+    action: "read",
+    possession: "any",
+  })
+  async getSettingData(
+    @graphql.Parent() parent: FermentationChemistry
+  ): Promise<FermentationSettingDatum | null> {
+    const result = await this.service.getSettingData(parent.id);
 
     if (!result) {
       return null;

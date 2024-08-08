@@ -11,34 +11,22 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ItemUpdateManyWithoutVendorsInput } from "./ItemUpdateManyWithoutVendorsInput";
 import {
-  ValidateNested,
-  IsOptional,
   IsBoolean,
+  IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
 } from "class-validator";
-import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { ItemUpdateManyWithoutVendorsInput } from "./ItemUpdateManyWithoutVendorsInput";
+import { Type } from "class-transformer";
 import { PurchaseOrderUpdateManyWithoutVendorsInput } from "./PurchaseOrderUpdateManyWithoutVendorsInput";
 
 @InputType()
 class VendorUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: () => ItemUpdateManyWithoutVendorsInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemUpdateManyWithoutVendorsInput)
-  @IsOptional()
-  @Field(() => ItemUpdateManyWithoutVendorsInput, {
-    nullable: true,
-  })
-  items?: ItemUpdateManyWithoutVendorsInput;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -87,30 +75,6 @@ class VendorUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(100)
   @IsOptional()
   @Field(() => String, {
@@ -132,6 +96,30 @@ class VendorUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemUpdateManyWithoutVendorsInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemUpdateManyWithoutVendorsInput)
+  @IsOptional()
+  @Field(() => ItemUpdateManyWithoutVendorsInput, {
+    nullable: true,
+  })
+  items?: ItemUpdateManyWithoutVendorsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrderUpdateManyWithoutVendorsInput,
   })
   @ValidateNested()
@@ -141,6 +129,18 @@ class VendorUpdateInput {
     nullable: true,
   })
   purchaseOrders?: PurchaseOrderUpdateManyWithoutVendorsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { VendorUpdateInput as VendorUpdateInput };

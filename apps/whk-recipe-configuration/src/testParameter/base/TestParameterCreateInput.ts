@@ -13,83 +13,28 @@ import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
+  IsBoolean,
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  IsBoolean,
   IsNumber,
   Max,
   IsEnum,
-  ValidateNested,
   IsDate,
 } from "class-validator";
 
+import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
+import { Type } from "class-transformer";
+import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
+import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
+import { PurchaseOrderCreateNestedManyWithoutTestParametersInput } from "./PurchaseOrderCreateNestedManyWithoutTestParametersInput";
 import { Decimal } from "decimal.js";
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
-import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
-import { Type } from "class-transformer";
-import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
-import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
-import { PurchaseOrderCreateNestedManyWithoutTestParametersInput } from "./PurchaseOrderCreateNestedManyWithoutTestParametersInput";
-import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 
 @InputType()
 class TestParameterCreateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  description?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testPass?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testSetpointBooleanValue?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  updatedBy?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  name!: string;
-
   @ApiProperty({
     required: true,
     type: Boolean,
@@ -100,84 +45,15 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: () => TestParameterWhereUniqueInput,
   })
-  @IsString()
-  @MaxLength(256)
+  @ValidateNested()
+  @Type(() => TestParameterWhereUniqueInput)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => TestParameterWhereUniqueInput, {
     nullable: true,
   })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointValue?: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  testParamUnits!: string;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointUpperLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamRevision?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointLowerLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  testResult?: Decimal | null;
+  classId?: TestParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -190,14 +66,15 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumTestParameterTestSetpointType,
+    type: String,
   })
-  @IsEnum(EnumTestParameterTestSetpointType)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => EnumTestParameterTestSetpointType, {
+  @Field(() => String, {
     nullable: true,
   })
-  testSetpointType?: "Boolean" | "Numerical" | null;
+  description?: string | null;
 
   @ApiProperty({
     required: false,
@@ -213,26 +90,15 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
+    type: String,
   })
-  @IsBoolean()
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Boolean, {
+  @Field(() => String, {
     nullable: true,
   })
-  isClassDef?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterWhereUniqueInput)
-  @IsOptional()
-  @Field(() => TestParameterWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: TestParameterWhereUniqueInput | null;
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -248,27 +114,35 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Boolean,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsBoolean()
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Boolean, {
     nullable: true,
   })
-  tooltip?: string | null;
+  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceiptWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemReceiptWhereUniqueInput, {
+    nullable: true,
+  })
+  itemReceipt?: ItemReceiptWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testDetails?: string | null;
+  @MaxLength(256)
+  @Field(() => String)
+  name!: string;
 
   @ApiProperty({
     required: false,
@@ -287,12 +161,137 @@ class TestParameterCreateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
   @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  globalId?: string | null;
+  testDetails?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testParamRevision?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @Field(() => String)
+  testParamUnits!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testPass?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  testResult?: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testSetpointBooleanValue?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointLowerLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTestParameterTestSetpointType,
+  })
+  @IsEnum(EnumTestParameterTestSetpointType)
+  @IsOptional()
+  @Field(() => EnumTestParameterTestSetpointType, {
+    nullable: true,
+  })
+  testSetpointType?: "Boolean" | "Numerical" | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointUpperLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointValue?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  testedAt?: Date | null;
 
   @ApiProperty({
     required: false,
@@ -308,26 +307,27 @@ class TestParameterCreateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  testedAt?: Date | null;
+  tooltip?: string | null;
 
   @ApiProperty({
     required: false,
-    type: () => ItemReceiptWhereUniqueInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  @Field(() => ItemReceiptWhereUniqueInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  itemReceipt?: ItemReceiptWhereUniqueInput | null;
+  updatedBy?: string | null;
 }
 
 export { TestParameterCreateInput as TestParameterCreateInput };

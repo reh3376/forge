@@ -14,8 +14,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   FermentationSettingDatum as PrismaFermentationSettingDatum,
-  Operation as PrismaOperation,
   FermentationChemistry as PrismaFermentationChemistry,
+  Operation as PrismaOperation,
 } from "@prisma/client";
 
 export class FermentationSettingDatumServiceBase {
@@ -53,14 +53,6 @@ export class FermentationSettingDatumServiceBase {
     return this.prisma.fermentationSettingDatum.delete(args);
   }
 
-  async getOperation(parentId: string): Promise<PrismaOperation | null> {
-    return this.prisma.fermentationSettingDatum
-      .findUnique({
-        where: { id: parentId },
-      })
-      .operation();
-  }
-
   async getFermentationChemistries(
     parentId: string
   ): Promise<PrismaFermentationChemistry | null> {
@@ -69,5 +61,13 @@ export class FermentationSettingDatumServiceBase {
         where: { id: parentId },
       })
       .fermentationChemistries();
+  }
+
+  async getOperation(parentId: string): Promise<PrismaOperation | null> {
+    return this.prisma.fermentationSettingDatum
+      .findUnique({
+        where: { id: parentId },
+      })
+      .operation();
   }
 }

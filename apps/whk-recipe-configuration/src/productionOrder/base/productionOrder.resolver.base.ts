@@ -25,21 +25,21 @@ import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderFindUniqueArgs } from "./ProductionOrderFindUniqueArgs";
 import { CreateProductionOrderArgs } from "./CreateProductionOrderArgs";
 import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
+import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
+import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Bom } from "../../bom/base/Bom";
+import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
-import { Customer } from "../../customer/base/Customer";
-import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ProductionOrderService } from "../productionOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ProductionOrder)
@@ -113,6 +113,10 @@ export class ProductionOrderResolverBase {
           connect: args.data.bom,
         },
 
+        customer: {
+          connect: args.data.customer,
+        },
+
         item: {
           connect: args.data.item,
         },
@@ -129,8 +133,8 @@ export class ProductionOrderResolverBase {
             }
           : undefined,
 
-        customer: {
-          connect: args.data.customer,
+        salesOrder: {
+          connect: args.data.salesOrder,
         },
 
         scheduleOrder: args.data.scheduleOrder
@@ -138,10 +142,6 @@ export class ProductionOrderResolverBase {
               connect: args.data.scheduleOrder,
             }
           : undefined,
-
-        salesOrder: {
-          connect: args.data.salesOrder,
-        },
       },
     });
   }
@@ -166,6 +166,10 @@ export class ProductionOrderResolverBase {
             connect: args.data.bom,
           },
 
+          customer: {
+            connect: args.data.customer,
+          },
+
           item: {
             connect: args.data.item,
           },
@@ -182,8 +186,8 @@ export class ProductionOrderResolverBase {
               }
             : undefined,
 
-          customer: {
-            connect: args.data.customer,
+          salesOrder: {
+            connect: args.data.salesOrder,
           },
 
           scheduleOrder: args.data.scheduleOrder
@@ -191,10 +195,6 @@ export class ProductionOrderResolverBase {
                 connect: args.data.scheduleOrder,
               }
             : undefined,
-
-          salesOrder: {
-            connect: args.data.salesOrder,
-          },
         },
       });
     } catch (error) {
@@ -205,31 +205,6 @@ export class ProductionOrderResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
-    name: "productionOrderUnitProcedures",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderUnitProcedures(
-    @graphql.Parent() parent: ProductionOrder,
-    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<ProductionOrderUnitProcedure[]> {
-    const results = await this.service.findProductionOrderUnitProcedures(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -300,6 +275,31 @@ export class ProductionOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
+    name: "productionOrderUnitProcedures",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderUnitProcedure",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderUnitProcedures(
+    @graphql.Parent() parent: ProductionOrder,
+    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
+  ): Promise<ProductionOrderUnitProcedure[]> {
+    const results = await this.service.findProductionOrderUnitProcedures(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Bom, {
     nullable: true,
     name: "bom",
@@ -311,6 +311,27 @@ export class ProductionOrderResolverBase {
   })
   async getBom(@graphql.Parent() parent: ProductionOrder): Promise<Bom | null> {
     const result = await this.service.getBom(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Customer, {
+    nullable: true,
+    name: "customer",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "read",
+    possession: "any",
+  })
+  async getCustomer(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<Customer | null> {
+    const result = await this.service.getCustomer(parent.id);
 
     if (!result) {
       return null;
@@ -382,19 +403,19 @@ export class ProductionOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Customer, {
+  @graphql.ResolveField(() => SalesOrder, {
     nullable: true,
-    name: "customer",
+    name: "salesOrder",
   })
   @nestAccessControl.UseRoles({
-    resource: "Customer",
+    resource: "SalesOrder",
     action: "read",
     possession: "any",
   })
-  async getCustomer(
+  async getSalesOrder(
     @graphql.Parent() parent: ProductionOrder
-  ): Promise<Customer | null> {
-    const result = await this.service.getCustomer(parent.id);
+  ): Promise<SalesOrder | null> {
+    const result = await this.service.getSalesOrder(parent.id);
 
     if (!result) {
       return null;
@@ -416,27 +437,6 @@ export class ProductionOrderResolverBase {
     @graphql.Parent() parent: ProductionOrder
   ): Promise<ScheduleOrder | null> {
     const result = await this.service.getScheduleOrder(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => SalesOrder, {
-    nullable: true,
-    name: "salesOrder",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "SalesOrder",
-    action: "read",
-    possession: "any",
-  })
-  async getSalesOrder(
-    @graphql.Parent() parent: ProductionOrder
-  ): Promise<SalesOrder | null> {
-    const result = await this.service.getSalesOrder(parent.id);
 
     if (!result) {
       return null;

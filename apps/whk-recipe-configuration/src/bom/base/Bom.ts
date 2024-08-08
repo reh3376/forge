@@ -11,98 +11,30 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BomItem } from "../../bomItem/base/BomItem";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  ValidateNested,
   IsDate,
   IsBoolean,
 } from "class-validator";
-import { Item } from "../../item/base/Item";
 import { Type } from "class-transformer";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { BomItem } from "../../bomItem/base/BomItem";
+import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
 @ObjectType()
 class Bom {
   @ApiProperty({
     required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  editedBy!: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: () => Item,
+    type: () => [BomItem],
   })
   @ValidateNested()
-  @Type(() => Item)
-  item?: Item;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
+  @Type(() => BomItem)
   @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  className!: string | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  editedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  createdBy!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
+  bomItem?: Array<BomItem>;
 
   @ApiProperty({
     required: true,
@@ -124,54 +56,6 @@ class Bom {
 
   @ApiProperty({
     required: false,
-    type: () => [UnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProcedure?: Array<UnitProcedure>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [UnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  unitProceduresPrimary?: Array<UnitProcedure>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrder],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrder?: Array<ProductionOrder>;
-
-  @ApiProperty({
-    required: true,
-    type: () => [BomItem],
-  })
-  @ValidateNested()
-  @Type(() => BomItem)
-  @IsOptional()
-  bomItem?: Array<BomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -187,34 +71,49 @@ class Bom {
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  notes!: string | null;
+  className!: string | null;
 
   @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  inactive!: boolean | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
   })
   @IsDate()
   @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  editedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  effectiveStartDate!: Date | null;
+  editedBy!: string | null;
 
   @ApiProperty({
     required: false,
@@ -229,6 +128,17 @@ class Bom {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  effectiveStartDate!: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -238,6 +148,96 @@ class Bom {
     nullable: true,
   })
   erpId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  inactive!: boolean | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
+  productionOrder?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProcedure?: Array<UnitProcedure>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UnitProcedure],
+  })
+  @ValidateNested()
+  @Type(() => UnitProcedure)
+  @IsOptional()
+  unitProceduresPrimary?: Array<UnitProcedure>;
 }
 
 export { Bom as Bom };

@@ -51,14 +51,10 @@ export class ScheduleOrderQueueControllerBase {
     return this.service.scheduleOrderQueues({
       ...args,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
         createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        queueIndex: true,
         globalId: true,
+        id: true,
 
         nextUnitProcedure: {
           select: {
@@ -67,12 +63,17 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
+        queueIndex: true,
 
         scheduleOrder: {
           select: {
             id: true,
           },
         },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -95,14 +96,10 @@ export class ScheduleOrderQueueControllerBase {
     const result = await this.service.scheduleOrderQueue({
       where: params,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
         createdBy: true,
-        updatedBy: true,
-        schemaVersion: true,
-        queueIndex: true,
         globalId: true,
+        id: true,
 
         nextUnitProcedure: {
           select: {
@@ -111,12 +108,17 @@ export class ScheduleOrderQueueControllerBase {
         },
 
         nextUnitProcedureName: true,
+        queueIndex: true,
 
         scheduleOrder: {
           select: {
             id: true,
           },
         },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {

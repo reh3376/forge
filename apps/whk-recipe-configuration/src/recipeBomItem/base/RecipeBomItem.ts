@@ -13,35 +13,36 @@ import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsString,
-  IsDate,
   ValidateNested,
   IsOptional,
+  IsDate,
+  IsString,
   MaxLength,
+  IsBoolean,
   IsEnum,
   IsInt,
   Min,
   Max,
-  IsBoolean,
   IsNumber,
 } from "class-validator";
 
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
-import { Recipe } from "../../recipe/base/Recipe";
+import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { Decimal } from "decimal.js";
-import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
+import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class RecipeBomItem {
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: () => RecipeBomItem,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  classId?: RecipeBomItem | null;
 
   @ApiProperty({
     required: true,
@@ -50,32 +51,6 @@ class RecipeBomItem {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  item?: Item | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Recipe,
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipe?: Recipe | null;
 
   @ApiProperty({
     required: true,
@@ -88,14 +63,73 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  updatedBy!: Date | null;
+  globalId!: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomItem],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  instances?: Array<RecipeBomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Item | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lot!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingProtocolStep],
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStep)
+  @IsOptional()
+  mashingProtocolSteps?: Array<MashingProtocolStep>;
 
   @ApiProperty({
     required: true,
@@ -123,36 +157,15 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Float, {
     nullable: true,
   })
-  quantity!: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  units!: string;
+  quantity!: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -168,54 +181,40 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItem,
+    type: () => Recipe,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItem)
+  @Type(() => Recipe)
   @IsOptional()
-  classId?: RecipeBomItem | null;
+  recipe?: Recipe | null;
 
   @ApiProperty({
-    required: false,
-    type: () => [RecipeBomItem],
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItem)
-  @IsOptional()
-  instances?: Array<RecipeBomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId!: string | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
+  @Field(() => String)
+  units!: string;
+
+  @ApiProperty({
+    required: true,
   })
-  lot!: string | null;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 
   @ApiProperty({
     required: false,
-    type: () => [MashingProtocolStep],
   })
-  @ValidateNested()
-  @Type(() => MashingProtocolStep)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  mashingProtocolSteps?: Array<MashingProtocolStep>;
+  @Field(() => Date, {
+    nullable: true,
+  })
+  updatedBy!: Date | null;
 }
 
 export { RecipeBomItem as RecipeBomItem };

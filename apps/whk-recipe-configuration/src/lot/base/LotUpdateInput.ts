@@ -11,157 +11,26 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BatchUpdateManyWithoutLotsInput } from "./BatchUpdateManyWithoutLotsInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  ValidateNested,
   IsBoolean,
 } from "class-validator";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { Type } from "class-transformer";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { BomItemUpdateManyWithoutLotsInput } from "./BomItemUpdateManyWithoutLotsInput";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { InventoryTransferUpdateManyWithoutLotsInput } from "./InventoryTransferUpdateManyWithoutLotsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { BatchUpdateManyWithoutLotsInput } from "./BatchUpdateManyWithoutLotsInput";
-import { BomItemUpdateManyWithoutLotsInput } from "./BomItemUpdateManyWithoutLotsInput";
-import { InventoryTransferUpdateManyWithoutLotsInput } from "./InventoryTransferUpdateManyWithoutLotsInput";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class LotUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  createdBy?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  externalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lotNumber?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => PurchaseOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => PurchaseOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => PurchaseOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  purchaseOrderAcceptedLots?: PurchaseOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isRawMaterial?: boolean | null;
-
   @ApiProperty({
     required: false,
     type: () => BatchUpdateManyWithoutLotsInput,
@@ -188,15 +57,39 @@ class LotUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => InventoryTransferUpdateManyWithoutLotsInput,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => InventoryTransferUpdateManyWithoutLotsInput)
+  @IsString()
+  @MaxLength(256)
   @IsOptional()
-  @Field(() => InventoryTransferUpdateManyWithoutLotsInput, {
+  @Field(() => String, {
     nullable: true,
   })
-  inventoryTransfers?: InventoryTransferUpdateManyWithoutLotsInput;
+  createdBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  externalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -209,6 +102,113 @@ class LotUpdateInput {
     nullable: true,
   })
   fromAsset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryTransferUpdateManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryTransferUpdateManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => InventoryTransferUpdateManyWithoutLotsInput, {
+    nullable: true,
+  })
+  inventoryTransfers?: InventoryTransferUpdateManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isRawMaterial?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotNumber?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrder?: ProductionOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PurchaseOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => PurchaseOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => PurchaseOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  purchaseOrderAcceptedLots?: PurchaseOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeWhereUniqueInput, {
+    nullable: true,
+  })
+  recipe?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
 }
 
 export { LotUpdateInput as LotUpdateInput };

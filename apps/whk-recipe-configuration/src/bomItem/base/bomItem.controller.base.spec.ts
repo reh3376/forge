@@ -18,58 +18,58 @@ import { BomItemService } from "../bomItem.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  id: "exampleId",
+  consumedAt: new Date(),
   createdAt: new Date(),
-  updatedAt: new Date(),
   createdBy: "exampleCreatedBy",
-  updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  id: "exampleId",
+  isClassDefinition: "true",
   quantity: 42.424242424,
   quantityActual: 42.424242424,
   units: "exampleUnits",
-  consumedAt: new Date(),
-  globalId: "exampleGlobalId",
-  isClassDefinition: "true",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const CREATE_RESULT = {
-  id: "exampleId",
+  consumedAt: new Date(),
   createdAt: new Date(),
-  updatedAt: new Date(),
   createdBy: "exampleCreatedBy",
-  updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  id: "exampleId",
+  isClassDefinition: "true",
   quantity: 42.424242424,
   quantityActual: 42.424242424,
   units: "exampleUnits",
-  consumedAt: new Date(),
-  globalId: "exampleGlobalId",
-  isClassDefinition: "true",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 const FIND_MANY_RESULT = [
   {
-    id: "exampleId",
+    consumedAt: new Date(),
     createdAt: new Date(),
-    updatedAt: new Date(),
     createdBy: "exampleCreatedBy",
-    updatedBy: "exampleUpdatedBy",
+    globalId: "exampleGlobalId",
+    id: "exampleId",
+    isClassDefinition: "true",
     quantity: 42.424242424,
     quantityActual: 42.424242424,
     units: "exampleUnits",
-    consumedAt: new Date(),
-    globalId: "exampleGlobalId",
-    isClassDefinition: "true",
+    updatedAt: new Date(),
+    updatedBy: "exampleUpdatedBy",
   },
 ];
 const FIND_ONE_RESULT = {
-  id: "exampleId",
+  consumedAt: new Date(),
   createdAt: new Date(),
-  updatedAt: new Date(),
   createdBy: "exampleCreatedBy",
-  updatedBy: "exampleUpdatedBy",
+  globalId: "exampleGlobalId",
+  id: "exampleId",
+  isClassDefinition: "true",
   quantity: 42.424242424,
   quantityActual: 42.424242424,
   units: "exampleUnits",
-  consumedAt: new Date(),
-  globalId: "exampleGlobalId",
-  isClassDefinition: "true",
+  updatedAt: new Date(),
+  updatedBy: "exampleUpdatedBy",
 };
 
 const service = {
@@ -154,9 +154,9 @@ describe("BomItem", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
+        consumedAt: CREATE_RESULT.consumedAt.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        consumedAt: CREATE_RESULT.consumedAt.toISOString(),
       });
   });
 
@@ -167,9 +167,9 @@ describe("BomItem", () => {
       .expect([
         {
           ...FIND_MANY_RESULT[0],
+          consumedAt: FIND_MANY_RESULT[0].consumedAt.toISOString(),
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
-          consumedAt: FIND_MANY_RESULT[0].consumedAt.toISOString(),
         },
       ]);
   });
@@ -191,9 +191,9 @@ describe("BomItem", () => {
       .expect(HttpStatus.OK)
       .expect({
         ...FIND_ONE_RESULT,
+        consumedAt: FIND_ONE_RESULT.consumedAt.toISOString(),
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
-        consumedAt: FIND_ONE_RESULT.consumedAt.toISOString(),
       });
   });
 
@@ -205,9 +205,9 @@ describe("BomItem", () => {
       .expect(HttpStatus.CREATED)
       .expect({
         ...CREATE_RESULT,
+        consumedAt: CREATE_RESULT.consumedAt.toISOString(),
         createdAt: CREATE_RESULT.createdAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        consumedAt: CREATE_RESULT.consumedAt.toISOString(),
       })
       .then(function () {
         agent

@@ -58,6 +58,12 @@ export class RecipeBomItemControllerBase {
       data: {
         ...data,
 
+        classId: data.classId
+          ? {
+              connect: data.classId,
+            }
+          : undefined,
+
         item: data.item
           ? {
               connect: data.item,
@@ -69,17 +75,19 @@ export class RecipeBomItemControllerBase {
               connect: data.recipe,
             }
           : undefined,
-
-        classId: data.classId
-          ? {
-              connect: data.classId,
-            }
-          : undefined,
       },
       select: {
-        id: true,
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
 
         item: {
           select: {
@@ -87,29 +95,21 @@ export class RecipeBomItemControllerBase {
           },
         },
 
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        createdBy: true,
-        updatedBy: true,
-        operation: true,
-        operationIndex: true,
-        isClassDefinition: true,
-        quantity: true,
         units: true,
-        quantityActual: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        lot: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -133,9 +133,17 @@ export class RecipeBomItemControllerBase {
     return this.service.recipeBomItems({
       ...args,
       select: {
-        id: true,
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
 
         item: {
           select: {
@@ -143,29 +151,21 @@ export class RecipeBomItemControllerBase {
           },
         },
 
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        createdBy: true,
-        updatedBy: true,
-        operation: true,
-        operationIndex: true,
-        isClassDefinition: true,
-        quantity: true,
         units: true,
-        quantityActual: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        lot: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -188,9 +188,17 @@ export class RecipeBomItemControllerBase {
     const result = await this.service.recipeBomItem({
       where: params,
       select: {
-        id: true,
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
 
         item: {
           select: {
@@ -198,29 +206,21 @@ export class RecipeBomItemControllerBase {
           },
         },
 
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        createdBy: true,
-        updatedBy: true,
-        operation: true,
-        operationIndex: true,
-        isClassDefinition: true,
-        quantity: true,
         units: true,
-        quantityActual: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        lot: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -256,6 +256,12 @@ export class RecipeBomItemControllerBase {
         data: {
           ...data,
 
+          classId: data.classId
+            ? {
+                connect: data.classId,
+              }
+            : undefined,
+
           item: data.item
             ? {
                 connect: data.item,
@@ -267,17 +273,19 @@ export class RecipeBomItemControllerBase {
                 connect: data.recipe,
               }
             : undefined,
-
-          classId: data.classId
-            ? {
-                connect: data.classId,
-              }
-            : undefined,
         },
         select: {
-          id: true,
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          globalId: true,
+          id: true,
+          isClassDefinition: true,
 
           item: {
             select: {
@@ -285,29 +293,21 @@ export class RecipeBomItemControllerBase {
             },
           },
 
+          lot: true,
+          operation: true,
+          operationIndex: true,
+          quantity: true,
+          quantityActual: true,
+
           recipe: {
             select: {
               id: true,
             },
           },
 
-          createdBy: true,
-          updatedBy: true,
-          operation: true,
-          operationIndex: true,
-          isClassDefinition: true,
-          quantity: true,
           units: true,
-          quantityActual: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
-          lot: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -338,9 +338,17 @@ export class RecipeBomItemControllerBase {
       return await this.service.deleteRecipeBomItem({
         where: params,
         select: {
-          id: true,
+          classId: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          globalId: true,
+          id: true,
+          isClassDefinition: true,
 
           item: {
             select: {
@@ -348,29 +356,21 @@ export class RecipeBomItemControllerBase {
             },
           },
 
+          lot: true,
+          operation: true,
+          operationIndex: true,
+          quantity: true,
+          quantityActual: true,
+
           recipe: {
             select: {
               id: true,
             },
           },
 
-          createdBy: true,
-          updatedBy: true,
-          operation: true,
-          operationIndex: true,
-          isClassDefinition: true,
-          quantity: true,
           units: true,
-          quantityActual: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
-          globalId: true,
-          lot: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -399,9 +399,17 @@ export class RecipeBomItemControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
-        id: true,
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
 
         item: {
           select: {
@@ -409,29 +417,21 @@ export class RecipeBomItemControllerBase {
           },
         },
 
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
         recipe: {
           select: {
             id: true,
           },
         },
 
-        createdBy: true,
-        updatedBy: true,
-        operation: true,
-        operationIndex: true,
-        isClassDefinition: true,
-        quantity: true,
         units: true,
-        quantityActual: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        globalId: true,
-        lot: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {
@@ -524,9 +524,18 @@ export class RecipeBomItemControllerBase {
     const results = await this.service.findMashingProtocolSteps(params.id, {
       ...query,
       select: {
-        id: true,
+        agitatorEnabled: true,
+        agitatorSpdSp: true,
+        coolEnabled: true,
+        coolTempSp: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        heatEnabled: true,
+        heatTempSp: true,
+        holdType: true,
+        id: true,
+        index: true,
+        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -534,19 +543,10 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        index: true,
-        agitatorEnabled: true,
-        agitatorSpdSp: true,
-        coolEnabled: true,
-        coolTempSp: true,
-        heatEnabled: true,
-        heatTempSp: true,
-        isClassDefinition: true,
         stepType: true,
-        holdType: true,
-        temperatureSetpoint: true,
         temperatureActual: true,
-        createdBy: true,
+        temperatureSetpoint: true,
+        updatedAt: true,
         updatedBy: true,
       },
     });

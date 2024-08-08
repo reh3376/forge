@@ -11,34 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { Asset } from "../../asset/base/Asset";
 
 import {
-  IsString,
-  IsDate,
   ValidateNested,
+  IsDate,
+  IsOptional,
+  IsString,
+  MaxLength,
   IsNumber,
   Min,
   Max,
-  IsOptional,
-  MaxLength,
   IsInt,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Asset } from "../../asset/base/Asset";
-import { Decimal } from "decimal.js";
-import { Item } from "../../item/base/Item";
 import { Customer } from "../../customer/base/Customer";
+import { Item } from "../../item/base/Item";
+import { Decimal } from "decimal.js";
 
 @ObjectType()
 class InventoryLog {
   @ApiProperty({
     required: true,
-    type: String,
+    type: () => Asset,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  @ValidateNested()
+  @Type(() => Asset)
+  asset?: Asset;
 
   @ApiProperty({
     required: true,
@@ -49,20 +49,13 @@ class InventoryLog {
   createdAt!: Date;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    type: () => [Customer],
   })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  dateTime!: Date;
+  @ValidateNested()
+  @Type(() => Customer)
+  @IsOptional()
+  customers?: Array<Customer>;
 
   @ApiProperty({
     required: true,
@@ -74,11 +67,36 @@ class InventoryLog {
 
   @ApiProperty({
     required: true,
-    type: () => Asset,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  dateTime!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => Item,
   })
   @ValidateNested()
-  @Type(() => Asset)
-  asset?: Asset;
+  @Type(() => Item)
+  item?: Item;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  loggedBy!: string;
 
   @ApiProperty({
     required: false,
@@ -94,35 +112,6 @@ class InventoryLog {
   quantity!: Decimal | null;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  loggedBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  item?: Item;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  revision!: number | null;
-
-  @ApiProperty({
     required: false,
     type: String,
   })
@@ -132,16 +121,7 @@ class InventoryLog {
   @Field(() => String, {
     nullable: true,
   })
-  revisedBy!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Customer],
-  })
-  @ValidateNested()
-  @Type(() => Customer)
-  @IsOptional()
-  customers?: Array<Customer>;
+  rawMeasurementUnits!: string | null;
 
   @ApiProperty({
     required: false,
@@ -165,7 +145,19 @@ class InventoryLog {
   @Field(() => String, {
     nullable: true,
   })
-  rawMeasurementUnits!: string | null;
+  revisedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  revision!: number | null;
 
   @ApiProperty({
     required: true,
@@ -175,6 +167,14 @@ class InventoryLog {
   @MaxLength(256)
   @Field(() => String)
   units!: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 }
 
 export { InventoryLog as InventoryLog };

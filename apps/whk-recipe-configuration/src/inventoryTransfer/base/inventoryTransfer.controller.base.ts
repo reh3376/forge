@@ -77,9 +77,9 @@ export class InventoryTransferControllerBase {
           : undefined,
       },
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        department: true,
 
         fromLocation: {
           select: {
@@ -87,11 +87,8 @@ export class InventoryTransferControllerBase {
           },
         },
 
-        notes: true,
-        department: true,
-        createdBy: true,
-        updatedBy: true,
-        quantity: true,
+        globalId: true,
+        id: true,
 
         item: {
           select: {
@@ -105,7 +102,10 @@ export class InventoryTransferControllerBase {
           },
         },
 
-        globalId: true,
+        notes: true,
+        quantity: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -129,9 +129,9 @@ export class InventoryTransferControllerBase {
     return this.service.inventoryTransfers({
       ...args,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        department: true,
 
         fromLocation: {
           select: {
@@ -139,11 +139,8 @@ export class InventoryTransferControllerBase {
           },
         },
 
-        notes: true,
-        department: true,
-        createdBy: true,
-        updatedBy: true,
-        quantity: true,
+        globalId: true,
+        id: true,
 
         item: {
           select: {
@@ -157,7 +154,10 @@ export class InventoryTransferControllerBase {
           },
         },
 
-        globalId: true,
+        notes: true,
+        quantity: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -180,9 +180,9 @@ export class InventoryTransferControllerBase {
     const result = await this.service.inventoryTransfer({
       where: params,
       select: {
-        id: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        department: true,
 
         fromLocation: {
           select: {
@@ -190,11 +190,8 @@ export class InventoryTransferControllerBase {
           },
         },
 
-        notes: true,
-        department: true,
-        createdBy: true,
-        updatedBy: true,
-        quantity: true,
+        globalId: true,
+        id: true,
 
         item: {
           select: {
@@ -208,7 +205,10 @@ export class InventoryTransferControllerBase {
           },
         },
 
-        globalId: true,
+        notes: true,
+        quantity: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -263,9 +263,9 @@ export class InventoryTransferControllerBase {
             : undefined,
         },
         select: {
-          id: true,
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          department: true,
 
           fromLocation: {
             select: {
@@ -273,11 +273,8 @@ export class InventoryTransferControllerBase {
             },
           },
 
-          notes: true,
-          department: true,
-          createdBy: true,
-          updatedBy: true,
-          quantity: true,
+          globalId: true,
+          id: true,
 
           item: {
             select: {
@@ -291,7 +288,10 @@ export class InventoryTransferControllerBase {
             },
           },
 
-          globalId: true,
+          notes: true,
+          quantity: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -322,9 +322,9 @@ export class InventoryTransferControllerBase {
       return await this.service.deleteInventoryTransfer({
         where: params,
         select: {
-          id: true,
           createdAt: true,
-          updatedAt: true,
+          createdBy: true,
+          department: true,
 
           fromLocation: {
             select: {
@@ -332,11 +332,8 @@ export class InventoryTransferControllerBase {
             },
           },
 
-          notes: true,
-          department: true,
-          createdBy: true,
-          updatedBy: true,
-          quantity: true,
+          globalId: true,
+          id: true,
 
           item: {
             select: {
@@ -350,7 +347,10 @@ export class InventoryTransferControllerBase {
             },
           },
 
-          globalId: true,
+          notes: true,
+          quantity: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -380,23 +380,24 @@ export class InventoryTransferControllerBase {
       ...query,
       select: {
         assetPath: true,
+        assetType: true,
         createdAt: true,
         createdBy: true,
         description: true,
+        globalId: true,
         id: true,
         name: true,
-        revision: true,
-        schemaVersion: true,
-        assetType: true,
-        updatedAt: true,
-        updatedBy: true,
-        globalId: true,
 
         parent: {
           select: {
             id: true,
           },
         },
+
+        revision: true,
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
       },
     });
     if (results === null) {

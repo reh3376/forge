@@ -36,6 +36,18 @@ class UnitUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
   name?: string | null;
 
   @ApiProperty({
@@ -49,18 +61,6 @@ class UnitUpdateInput {
     nullable: true,
   })
   unitType?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
 }
 
 export { UnitUpdateInput as UnitUpdateInput };

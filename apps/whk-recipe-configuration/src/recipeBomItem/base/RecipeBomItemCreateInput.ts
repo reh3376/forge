@@ -11,32 +11,88 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 
 import {
   ValidateNested,
   IsOptional,
   IsString,
   MaxLength,
-  IsDate,
+  IsBoolean,
   IsEnum,
   IsInt,
   Min,
   Max,
-  IsBoolean,
   IsNumber,
+  IsDate,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput } from "./RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { Decimal } from "decimal.js";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
-import { RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput } from "./RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput";
-import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class RecipeBomItemCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemWhereUniqueInput, {
+    nullable: true,
+  })
+  classId?: RecipeBomItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput, {
+    nullable: true,
+  })
+  instances?: RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
   @ApiProperty({
     required: false,
     type: () => ItemWhereUniqueInput,
@@ -51,35 +107,27 @@ class RecipeBomItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: true,
     type: String,
   })
   @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  createdBy!: string;
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lot?: string | null;
 
   @ApiProperty({
     required: false,
+    type: () => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput,
   })
-  @IsDate()
-  @Type(() => Date)
+  @ValidateNested()
+  @Type(() => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput, {
     nullable: true,
   })
-  updatedBy?: Date | null;
+  mashingProtocolSteps?: MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput;
 
   @ApiProperty({
     required: true,
@@ -105,36 +153,15 @@ class RecipeBomItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Float, {
     nullable: true,
   })
-  quantity?: number | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  units!: string;
+  quantity?: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -150,63 +177,35 @@ class RecipeBomItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemWhereUniqueInput,
+    type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemWhereUniqueInput)
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomItemWhereUniqueInput, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  classId?: RecipeBomItemWhereUniqueInput | null;
+  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput)
-  @IsOptional()
-  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput, {
-    nullable: true,
-  })
-  instances?: RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
   @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lot?: string | null;
+  @Field(() => String)
+  units!: string;
 
   @ApiProperty({
     required: false,
-    type: () => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput,
   })
-  @ValidateNested()
-  @Type(() => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  @Field(() => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput, {
+  @Field(() => Date, {
     nullable: true,
   })
-  mashingProtocolSteps?: MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput;
+  updatedBy?: Date | null;
 }
 
 export { RecipeBomItemCreateInput as RecipeBomItemCreateInput };

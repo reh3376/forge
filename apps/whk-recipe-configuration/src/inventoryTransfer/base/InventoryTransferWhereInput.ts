@@ -11,75 +11,18 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { AssetListRelationFilter } from "../../asset/base/AssetListRelationFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { StringFilter } from "../../util/StringFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { AssetListRelationFilter } from "../../asset/base/AssetListRelationFilter";
 
 @InputType()
 class InventoryTransferWhereInput {
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  fromLocation?: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => AssetListRelationFilter)
-  @IsOptional()
-  @Field(() => AssetListRelationFilter, {
-    nullable: true,
-  })
-  toLocation?: AssetListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  notes?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  department?: StringNullableFilter;
-
   @ApiProperty({
     required: false,
     type: StringNullableFilter,
@@ -100,18 +43,41 @@ class InventoryTransferWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  updatedBy?: StringNullableFilter;
+  department?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: () => AssetWhereUniqueInput,
   })
-  @Type(() => IntNullableFilter)
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
-  quantity?: IntNullableFilter;
+  fromLocation?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  id?: StringFilter;
 
   @ApiProperty({
     required: false,
@@ -146,7 +112,41 @@ class InventoryTransferWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  globalId?: StringNullableFilter;
+  notes?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  quantity?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => AssetListRelationFilter)
+  @IsOptional()
+  @Field(() => AssetListRelationFilter, {
+    nullable: true,
+  })
+  toLocation?: AssetListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 }
 
 export { InventoryTransferWhereInput as InventoryTransferWhereInput };

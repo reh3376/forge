@@ -14,9 +14,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   PurchaseOrder as PrismaPurchaseOrder,
-  ItemReceipt as PrismaItemReceipt,
   Lot as PrismaLot,
   Item as PrismaItem,
+  ItemReceipt as PrismaItemReceipt,
   TestParameter as PrismaTestParameter,
   Asset as PrismaAsset,
   Vendor as PrismaVendor,
@@ -57,28 +57,6 @@ export class PurchaseOrderServiceBase {
     return this.prisma.purchaseOrder.delete(args);
   }
 
-  async findLotsRejected(
-    parentId: string,
-    args: Prisma.PurchaseOrderFindManyArgs
-  ): Promise<PrismaPurchaseOrder[]> {
-    return this.prisma.purchaseOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .lotsRejected(args);
-  }
-
-  async findItemReceipts(
-    parentId: string,
-    args: Prisma.ItemReceiptFindManyArgs
-  ): Promise<PrismaItemReceipt[]> {
-    return this.prisma.purchaseOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .itemReceipts(args);
-  }
-
   async findAcceptedLots(
     parentId: string,
     args: Prisma.LotFindManyArgs
@@ -99,6 +77,28 @@ export class PurchaseOrderServiceBase {
         where: { id: parentId },
       })
       .item(args);
+  }
+
+  async findItemReceipts(
+    parentId: string,
+    args: Prisma.ItemReceiptFindManyArgs
+  ): Promise<PrismaItemReceipt[]> {
+    return this.prisma.purchaseOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .itemReceipts(args);
+  }
+
+  async findLotsRejected(
+    parentId: string,
+    args: Prisma.PurchaseOrderFindManyArgs
+  ): Promise<PrismaPurchaseOrder[]> {
+    return this.prisma.purchaseOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lotsRejected(args);
   }
 
   async findQualityTests(

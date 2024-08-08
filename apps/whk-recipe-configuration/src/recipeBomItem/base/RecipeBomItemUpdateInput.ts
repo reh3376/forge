@@ -11,55 +11,43 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 
 import {
   ValidateNested,
   IsOptional,
   IsString,
   MaxLength,
-  IsDate,
+  IsBoolean,
   IsEnum,
   IsInt,
   Min,
   Max,
-  IsBoolean,
   IsNumber,
+  IsDate,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomItemUpdateManyWithoutRecipeBomItemsInput } from "./RecipeBomItemUpdateManyWithoutRecipeBomItemsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { Decimal } from "decimal.js";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
-import { RecipeBomItemUpdateManyWithoutRecipeBomItemsInput } from "./RecipeBomItemUpdateManyWithoutRecipeBomItemsInput";
-import { MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class RecipeBomItemUpdateInput {
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => RecipeBomItemWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => RecipeBomItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(() => RecipeBomItemWhereUniqueInput, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
+  classId?: RecipeBomItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -75,14 +63,74 @@ class RecipeBomItemUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Date, {
+  @Field(() => String, {
     nullable: true,
   })
-  updatedBy?: Date | null;
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput, {
+    nullable: true,
+  })
+  instances?: RecipeBomItemUpdateManyWithoutRecipeBomItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDefinition?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lot?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput)
+  @IsOptional()
+  @Field(() => MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput, {
+    nullable: true,
+  })
+  mashingProtocolSteps?: MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput;
 
   @ApiProperty({
     required: false,
@@ -114,39 +162,15 @@ class RecipeBomItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Float, {
     nullable: true,
   })
-  quantity?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  units?: string;
+  quantity?: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -162,39 +186,15 @@ class RecipeBomItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemWhereUniqueInput,
+    type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemWhereUniqueInput)
+  @Type(() => RecipeWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomItemWhereUniqueInput, {
+  @Field(() => RecipeWhereUniqueInput, {
     nullable: true,
   })
-  classId?: RecipeBomItemWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput)
-  @IsOptional()
-  @Field(() => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput, {
-    nullable: true,
-  })
-  instances?: RecipeBomItemUpdateManyWithoutRecipeBomItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
+  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -206,19 +206,18 @@ class RecipeBomItemUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  lot?: string | null;
+  units?: string;
 
   @ApiProperty({
     required: false,
-    type: () => MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput,
   })
-  @ValidateNested()
-  @Type(() => MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  @Field(() => MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput, {
+  @Field(() => Date, {
     nullable: true,
   })
-  mashingProtocolSteps?: MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput;
+  updatedBy?: Date | null;
 }
 
 export { RecipeBomItemUpdateInput as RecipeBomItemUpdateInput };

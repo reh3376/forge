@@ -14,9 +14,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Bom as PrismaBom,
-  UnitProcedure as PrismaUnitProcedure,
-  ProductionOrder as PrismaProductionOrder,
   BomItem as PrismaBomItem,
+  ProductionOrder as PrismaProductionOrder,
+  UnitProcedure as PrismaUnitProcedure,
   Item as PrismaItem,
 } from "@prisma/client";
 
@@ -43,6 +43,28 @@ export class BomServiceBase {
     return this.prisma.bom.delete(args);
   }
 
+  async findBomItem(
+    parentId: string,
+    args: Prisma.BomItemFindManyArgs
+  ): Promise<PrismaBomItem[]> {
+    return this.prisma.bom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .bomItem(args);
+  }
+
+  async findProductionOrder(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<PrismaProductionOrder[]> {
+    return this.prisma.bom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrder(args);
+  }
+
   async findUnitProcedure(
     parentId: string,
     args: Prisma.UnitProcedureFindManyArgs
@@ -63,28 +85,6 @@ export class BomServiceBase {
         where: { id: parentId },
       })
       .unitProceduresPrimary(args);
-  }
-
-  async findProductionOrder(
-    parentId: string,
-    args: Prisma.ProductionOrderFindManyArgs
-  ): Promise<PrismaProductionOrder[]> {
-    return this.prisma.bom
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrder(args);
-  }
-
-  async findBomItem(
-    parentId: string,
-    args: Prisma.BomItemFindManyArgs
-  ): Promise<PrismaBomItem[]> {
-    return this.prisma.bom
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .bomItem(args);
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {

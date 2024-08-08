@@ -57,8 +57,8 @@ export class MashingProtocolControllerBase {
     return await this.service.createMashingProtocol({
       data: data,
       select: {
-        id: true,
         createdAt: true,
+        id: true,
         updatedAt: true,
       },
     });
@@ -83,8 +83,8 @@ export class MashingProtocolControllerBase {
     return this.service.mashingProtocols({
       ...args,
       select: {
-        id: true,
         createdAt: true,
+        id: true,
         updatedAt: true,
       },
     });
@@ -108,8 +108,8 @@ export class MashingProtocolControllerBase {
     const result = await this.service.mashingProtocol({
       where: params,
       select: {
-        id: true,
         createdAt: true,
+        id: true,
         updatedAt: true,
       },
     });
@@ -145,8 +145,8 @@ export class MashingProtocolControllerBase {
         where: params,
         data: data,
         select: {
-          id: true,
           createdAt: true,
+          id: true,
           updatedAt: true,
         },
       });
@@ -178,8 +178,8 @@ export class MashingProtocolControllerBase {
       return await this.service.deleteMashingProtocol({
         where: params,
         select: {
-          id: true,
           createdAt: true,
+          id: true,
           updatedAt: true,
         },
       });
@@ -209,9 +209,18 @@ export class MashingProtocolControllerBase {
     const results = await this.service.findSteps(params.id, {
       ...query,
       select: {
-        id: true,
+        agitatorEnabled: true,
+        agitatorSpdSp: true,
+        coolEnabled: true,
+        coolTempSp: true,
         createdAt: true,
-        updatedAt: true,
+        createdBy: true,
+        heatEnabled: true,
+        heatTempSp: true,
+        holdType: true,
+        id: true,
+        index: true,
+        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -219,19 +228,10 @@ export class MashingProtocolControllerBase {
           },
         },
 
-        index: true,
-        agitatorEnabled: true,
-        agitatorSpdSp: true,
-        coolEnabled: true,
-        coolTempSp: true,
-        heatEnabled: true,
-        heatTempSp: true,
-        isClassDefinition: true,
         stepType: true,
-        holdType: true,
-        temperatureSetpoint: true,
         temperatureActual: true,
-        createdBy: true,
+        temperatureSetpoint: true,
+        updatedAt: true,
         updatedBy: true,
       },
     });

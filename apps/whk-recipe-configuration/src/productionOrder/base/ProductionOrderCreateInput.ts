@@ -19,27 +19,27 @@ import {
   MaxLength,
   IsOptional,
   IsBoolean,
-  IsDate,
-  IsEnum,
   IsInt,
-  Min,
   Max,
   IsNumber,
+  IsDate,
+  Min,
+  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { Decimal } from "decimal.js";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
-import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
-import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput";
 import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
 import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutProductionOrdersInput } from "./LotCreateNestedManyWithoutProductionOrdersInput";
-import { Decimal } from "decimal.js";
+import { ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
+import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
 @InputType()
 class ProductionOrderCreateInput {
@@ -76,6 +76,42 @@ class ProductionOrderCreateInput {
   complete?: boolean | null;
 
   @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  completedCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  completedFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  completedQuantity?: Decimal | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -83,6 +119,82 @@ class ProductionOrderCreateInput {
   @MaxLength(64)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @Field(() => CustomerWhereUniqueInput)
+  customer!: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(3)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  customerCode?: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  endDate?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(
+    () => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(
+    () => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -96,17 +208,6 @@ class ProductionOrderCreateInput {
   inProcess?: boolean | null;
 
   @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  updatedBy?: Date | null;
-
-  @ApiProperty({
     required: true,
     type: () => ItemWhereUniqueInput,
   })
@@ -114,6 +215,87 @@ class ProductionOrderCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  lots?: LotCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  plannedCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  plannedFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(
+    () =>
+      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput
+  )
+  @IsOptional()
+  @Field(
+    () =>
+      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity?: number | null;
 
   @ApiProperty({
     required: false,
@@ -141,12 +323,24 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: true,
-    type: () => CustomerWhereUniqueInput,
+    type: () => SalesOrderWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => CustomerWhereUniqueInput)
-  @Field(() => CustomerWhereUniqueInput)
-  customer!: CustomerWhereUniqueInput;
+  @Type(() => SalesOrderWhereUniqueInput)
+  @Field(() => SalesOrderWhereUniqueInput)
+  salesOrder!: SalesOrderWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderWhereUniqueInput, {
+    nullable: true,
+  })
+  scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -184,17 +378,6 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  endDate?: Date | null;
-
-  @ApiProperty({
-    required: false,
     enum: EnumProductionOrderStatus,
   })
   @IsEnum(EnumProductionOrderStatus)
@@ -212,115 +395,6 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ScheduleOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ScheduleOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  scheduleOrder?: ScheduleOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: true,
-    type: () => SalesOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderWhereUniqueInput)
-  @Field(() => SalesOrderWhereUniqueInput)
-  salesOrder!: SalesOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(
-    () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput
-  )
-  @IsOptional()
-  @Field(
-    () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(
-    () => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(
-    () => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => LotCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(() => LotCreateNestedManyWithoutProductionOrdersInput, {
-    nullable: true,
-  })
-  lots?: LotCreateNestedManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(3)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  customerCode?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -333,88 +407,14 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
   })
-  @IsInt()
-  @Min(-999999999)
-  @Max(999999999)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Date, {
     nullable: true,
   })
-  quantity?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  plannedCooks?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  completedCooks?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  plannedFermenters?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  completedFermenters?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  completedQuantity?: Decimal | null;
+  updatedBy?: Date | null;
 }
 
 export { ProductionOrderCreateInput as ProductionOrderCreateInput };

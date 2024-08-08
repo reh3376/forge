@@ -15,21 +15,24 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  ValidateNested,
   IsOptional,
-  IsNumber,
-  Max,
-  IsEnum,
+  ValidateNested,
   IsInt,
+  Max,
+  IsNumber,
+  IsEnum,
   IsBoolean,
 } from "class-validator";
 
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { Type } from "class-transformer";
+import { IsJSONValue } from "../../validators";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { Decimal } from "decimal.js";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameterCreateNestedManyWithoutItemReceiptsInput } from "./TestParameterCreateNestedManyWithoutItemReceiptsInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @InputType()
@@ -51,6 +54,49 @@ class ItemReceiptCreateInput {
   @MaxLength(256)
   @Field(() => String)
   driver!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  globalId?: string | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @Field(() => ItemWhereUniqueInput)
+  item!: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  loadId?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  lots?: InputJsonValue;
 
   @ApiProperty({
     required: false,
@@ -109,6 +155,41 @@ class ItemReceiptCreateInput {
   supplierLot?: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => TestParameterCreateNestedManyWithoutItemReceiptsInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutItemReceiptsInput)
+  @IsOptional()
+  @Field(() => TestParameterCreateNestedManyWithoutItemReceiptsInput, {
+    nullable: true,
+  })
+  tests?: TestParameterCreateNestedManyWithoutItemReceiptsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  testsPassed?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  toAsset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -152,74 +233,6 @@ class ItemReceiptCreateInput {
     nullable: true,
   })
   weighOut?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => TestParameterCreateNestedManyWithoutItemReceiptsInput,
-  })
-  @ValidateNested()
-  @Type(() => TestParameterCreateNestedManyWithoutItemReceiptsInput)
-  @IsOptional()
-  @Field(() => TestParameterCreateNestedManyWithoutItemReceiptsInput, {
-    nullable: true,
-  })
-  tests?: TestParameterCreateNestedManyWithoutItemReceiptsInput;
-
-  @ApiProperty({
-    required: true,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @Field(() => ItemWhereUniqueInput)
-  item!: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  loadId?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  testsPassed?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  toAsset?: AssetWhereUniqueInput | null;
 }
 
 export { ItemReceiptCreateInput as ItemReceiptCreateInput };

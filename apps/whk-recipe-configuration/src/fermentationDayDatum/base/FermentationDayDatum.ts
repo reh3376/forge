@@ -13,96 +13,44 @@ import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsString,
-  IsDate,
-  ValidateNested,
-  MaxLength,
-  IsEnum,
-  IsOptional,
   IsNumber,
   Max,
+  ValidateNested,
+  IsOptional,
+  IsDate,
+  IsEnum,
   IsInt,
+  IsString,
+  MaxLength,
 } from "class-validator";
 
-import { Type } from "class-transformer";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { EnumFermentationDayDatumDay } from "./EnumFermentationDayDatumDay";
 import { Decimal } from "decimal.js";
-import { Operation } from "../../operation/base/Operation";
 import { Asset } from "../../asset/base/Asset";
+import { Type } from "class-transformer";
+import { EnumFermentationDayDatumDay } from "./EnumFermentationDayDatumDay";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { Operation } from "../../operation/base/Operation";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 
 @ObjectType()
 class FermentationDayDatum {
   @ApiProperty({
     required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  id!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  createdAt!: Date;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: () => ProductionOrder,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  productionOrder?: ProductionOrder;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  lotId!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  loggedBy!: string;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumFermentationDayDatumDay,
-  })
-  @IsEnum(EnumFermentationDayDatumDay)
-  @IsOptional()
-  @Field(() => EnumFermentationDayDatumDay, {
-    nullable: true,
-  })
-  day?: "First" | "Second" | "Third" | "Final" | null;
-
-  @ApiProperty({
-    required: true,
     type: Number,
   })
   @IsNumber()
-  @Max(212)
+  @Max(99999999999)
   @Field(() => Float)
-  temperature!: Decimal;
+  acid!: Decimal;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  asset?: Asset | null;
 
   @ApiProperty({
     required: true,
@@ -115,21 +63,22 @@ class FermentationDayDatum {
 
   @ApiProperty({
     required: true,
-    type: Number,
   })
-  @IsNumber()
-  @Max(99999999999)
-  @Field(() => Float)
-  acid!: Decimal;
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  createdAt!: Date;
 
   @ApiProperty({
-    required: true,
-    type: Number,
+    required: false,
+    enum: EnumFermentationDayDatumDay,
   })
-  @IsNumber()
-  @Max(14)
-  @Field(() => Float)
-  pH!: Decimal;
+  @IsEnum(EnumFermentationDayDatumDay)
+  @IsOptional()
+  @Field(() => EnumFermentationDayDatumDay, {
+    nullable: true,
+  })
+  day?: "First" | "Second" | "Third" | "Final" | null;
 
   @ApiProperty({
     required: false,
@@ -144,12 +93,13 @@ class FermentationDayDatum {
   dryInches!: Decimal | null;
 
   @ApiProperty({
-    required: true,
-    type: () => Operation,
+    required: false,
+    type: () => FermentationChemistry,
   })
   @ValidateNested()
-  @Type(() => Operation)
-  operation?: Operation;
+  @Type(() => FermentationChemistry)
+  @IsOptional()
+  fermentationChemistry?: FermentationChemistry | null;
 
   @ApiProperty({
     required: true,
@@ -161,22 +111,72 @@ class FermentationDayDatum {
   fermenterNumber!: number;
 
   @ApiProperty({
-    required: false,
-    type: () => Asset,
+    required: true,
+    type: String,
   })
-  @ValidateNested()
-  @Type(() => Asset)
-  @IsOptional()
-  asset?: Asset | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => FermentationChemistry,
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  loggedBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  lotId!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => Operation,
   })
   @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistry?: FermentationChemistry | null;
+  @Type(() => Operation)
+  operation?: Operation;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @Field(() => Float)
+  pH!: Decimal;
+
+  @ApiProperty({
+    required: true,
+    type: () => ProductionOrder,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  productionOrder?: ProductionOrder;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(212)
+  @Field(() => Float)
+  temperature!: Decimal;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
 }
 
 export { FermentationDayDatum as FermentationDayDatum };

@@ -62,22 +62,23 @@ export class UnitLookupControllerBase {
           : undefined,
       },
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        conversionRate: true,
-        name: true,
-        typeName: true,
         abbreviation: true,
-        pluralAbbreviation: true,
-        pluralName: true,
-        baseUnit: true,
 
         baseRecord: {
           select: {
             id: true,
           },
         },
+
+        baseUnit: true,
+        conversionRate: true,
+        createdAt: true,
+        id: true,
+        name: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        typeName: true,
+        updatedAt: true,
       },
     });
   }
@@ -99,22 +100,23 @@ export class UnitLookupControllerBase {
     return this.service.unitLookups({
       ...args,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        conversionRate: true,
-        name: true,
-        typeName: true,
         abbreviation: true,
-        pluralAbbreviation: true,
-        pluralName: true,
-        baseUnit: true,
 
         baseRecord: {
           select: {
             id: true,
           },
         },
+
+        baseUnit: true,
+        conversionRate: true,
+        createdAt: true,
+        id: true,
+        name: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        typeName: true,
+        updatedAt: true,
       },
     });
   }
@@ -137,22 +139,23 @@ export class UnitLookupControllerBase {
     const result = await this.service.unitLookup({
       where: params,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        conversionRate: true,
-        name: true,
-        typeName: true,
         abbreviation: true,
-        pluralAbbreviation: true,
-        pluralName: true,
-        baseUnit: true,
 
         baseRecord: {
           select: {
             id: true,
           },
         },
+
+        baseUnit: true,
+        conversionRate: true,
+        createdAt: true,
+        id: true,
+        name: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        typeName: true,
+        updatedAt: true,
       },
     });
     if (result === null) {
@@ -195,22 +198,23 @@ export class UnitLookupControllerBase {
             : undefined,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          conversionRate: true,
-          name: true,
-          typeName: true,
           abbreviation: true,
-          pluralAbbreviation: true,
-          pluralName: true,
-          baseUnit: true,
 
           baseRecord: {
             select: {
               id: true,
             },
           },
+
+          baseUnit: true,
+          conversionRate: true,
+          createdAt: true,
+          id: true,
+          name: true,
+          pluralAbbreviation: true,
+          pluralName: true,
+          typeName: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
@@ -241,22 +245,23 @@ export class UnitLookupControllerBase {
       return await this.service.deleteUnitLookup({
         where: params,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          conversionRate: true,
-          name: true,
-          typeName: true,
           abbreviation: true,
-          pluralAbbreviation: true,
-          pluralName: true,
-          baseUnit: true,
 
           baseRecord: {
             select: {
               id: true,
             },
           },
+
+          baseUnit: true,
+          conversionRate: true,
+          createdAt: true,
+          id: true,
+          name: true,
+          pluralAbbreviation: true,
+          pluralName: true,
+          typeName: true,
+          updatedAt: true,
         },
       });
     } catch (error) {
@@ -285,22 +290,23 @@ export class UnitLookupControllerBase {
     const results = await this.service.findUnitLookupRecords(params.id, {
       ...query,
       select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        conversionRate: true,
-        name: true,
-        typeName: true,
         abbreviation: true,
-        pluralAbbreviation: true,
-        pluralName: true,
-        baseUnit: true,
 
         baseRecord: {
           select: {
             id: true,
           },
         },
+
+        baseUnit: true,
+        conversionRate: true,
+        createdAt: true,
+        id: true,
+        name: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        typeName: true,
+        updatedAt: true,
       },
     });
     if (results === null) {
