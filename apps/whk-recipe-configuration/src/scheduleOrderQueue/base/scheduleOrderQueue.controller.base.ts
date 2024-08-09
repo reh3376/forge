@@ -55,6 +55,7 @@ export class ScheduleOrderQueueControllerBase {
         createdBy: true,
         globalId: true,
         id: true,
+        nextOperation: true,
 
         nextUnitProcedure: {
           select: {
@@ -100,6 +101,7 @@ export class ScheduleOrderQueueControllerBase {
         createdBy: true,
         globalId: true,
         id: true,
+        nextOperation: true,
 
         nextUnitProcedure: {
           select: {

@@ -272,17 +272,18 @@ model Bom {
 }
 
 model ScheduleOrderQueue {
-  createdAt             DateTime       @default(now())
+  createdAt             DateTime                             @default(now())
   createdBy             String
-  globalId              String?        @unique @default(cuid())
-  id                    String         @id @default(cuid())
-  nextUnitProcedure     UnitProcedure  @relation(fields: [nextUnitProcedureId], references: [id])
-  nextUnitProcedureId   String         @unique
-  nextUnitProcedureName String
-  queueIndex            Int?           @unique
+  globalId              String?                              @unique @default(cuid())
+  id                    String                               @id @default(cuid())
+  nextOperation         EnumScheduleOrderQueueNextOperation?
+  nextUnitProcedure     UnitProcedure?                       @relation(fields: [nextUnitProcedureId], references: [id])
+  nextUnitProcedureId   String?                              @unique
+  nextUnitProcedureName String?
+  queueIndex            Int?                                 @unique
   scheduleOrder         ScheduleOrder?
-  schemaVersion         String?        @default("0001-b")
-  updatedAt             DateTime       @updatedAt
+  schemaVersion         String?                              @default("0001-b")
+  updatedAt             DateTime                             @updatedAt
   updatedBy             String?
 
   @@unique([queueIndex, nextUnitProcedureId])
@@ -1059,6 +1060,13 @@ enum EnumOperationName {
 
 enum EnumProcedureName {
   Line1
+}
+
+enum EnumScheduleOrderQueueNextOperation {
+  Mashing01
+  Fermentation01
+  Distillation01
+  Processing01
 }
 
 enum EnumUnitProcedureName {
