@@ -24,6 +24,7 @@ import {
   UnitProcedure as PrismaUnitProcedure,
   Customer as PrismaCustomer,
   Item as PrismaItem,
+  MashingProtocol as PrismaMashingProtocol,
   RecipeGroup as PrismaRecipeGroup,
 } from "@prisma/client";
 
@@ -173,6 +174,16 @@ export class RecipeServiceBase {
         where: { id: parentId },
       })
       .item();
+  }
+
+  async getMashingProtocol(
+    parentId: string
+  ): Promise<PrismaMashingProtocol | null> {
+    return this.prisma.recipe
+      .findUnique({
+        where: { id: parentId },
+      })
+      .mashingProtocol();
   }
 
   async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {

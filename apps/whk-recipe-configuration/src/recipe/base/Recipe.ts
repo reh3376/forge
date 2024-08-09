@@ -30,6 +30,7 @@ import { Customer } from "../../customer/base/Customer";
 import { Decimal } from "decimal.js";
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
+import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -196,6 +197,15 @@ class Recipe {
   @Type(() => Lot)
   @IsOptional()
   lots?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocol,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  mashingProtocol?: MashingProtocol | null;
 
   @ApiProperty({
     required: false,

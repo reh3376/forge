@@ -227,6 +227,8 @@ model Recipe {
   item                          Item?                          @relation(fields: [itemId], references: [id])
   itemId                        String?
   lots                          Lot[]
+  mashingProtocol               MashingProtocol?               @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId             String?
   parameters                    RecipeParameter[]
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   productionOrders              ProductionOrder[]
@@ -932,9 +934,14 @@ model RecipeBomItem {
 
 model MashingProtocol {
   createdAt DateTime              @default(now())
+  createdBy String
   id        String                @id @default(cuid())
+  name      String                @unique
+  recipes   Recipe[]
+  revision  String?
   steps     MashingProtocolStep[]
   updatedAt DateTime              @updatedAt
+  updatedBy String?
 }
 
 model MashingProtocolStep {

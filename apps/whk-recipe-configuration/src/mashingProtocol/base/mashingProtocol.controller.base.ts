@@ -26,6 +26,9 @@ import { MashingProtocol } from "./MashingProtocol";
 import { MashingProtocolFindManyArgs } from "./MashingProtocolFindManyArgs";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { MashingProtocolUpdateInput } from "./MashingProtocolUpdateInput";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
@@ -58,8 +61,12 @@ export class MashingProtocolControllerBase {
       data: data,
       select: {
         createdAt: true,
+        createdBy: true,
         id: true,
+        name: true,
+        revision: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -84,8 +91,12 @@ export class MashingProtocolControllerBase {
       ...args,
       select: {
         createdAt: true,
+        createdBy: true,
         id: true,
+        name: true,
+        revision: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
   }
@@ -109,8 +120,12 @@ export class MashingProtocolControllerBase {
       where: params,
       select: {
         createdAt: true,
+        createdBy: true,
         id: true,
+        name: true,
+        revision: true,
         updatedAt: true,
+        updatedBy: true,
       },
     });
     if (result === null) {
@@ -146,8 +161,12 @@ export class MashingProtocolControllerBase {
         data: data,
         select: {
           createdAt: true,
+          createdBy: true,
           id: true,
+          name: true,
+          revision: true,
           updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -179,8 +198,12 @@ export class MashingProtocolControllerBase {
         where: params,
         select: {
           createdAt: true,
+          createdBy: true,
           id: true,
+          name: true,
+          revision: true,
           updatedAt: true,
+          updatedBy: true,
         },
       });
     } catch (error) {
@@ -191,6 +214,148 @@ export class MashingProtocolControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipes")
+  @ApiNestedQuery(RecipeFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipes(
+    @common.Req() request: Request,
+    @common.Param() params: MashingProtocolWhereUniqueInput
+  ): Promise<Recipe[]> {
+    const query = plainToClass(RecipeFindManyArgs, request.query);
+    const results = await this.service.findRecipes(params.id, {
+      ...query,
+      select: {
+        Recipe: true,
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        cooksPerFerm: true,
+        createdAt: true,
+        createdBy: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customerCode: true,
+        estimatedAbv: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        revision: true,
+        schemaVersion: true,
+        targetProof: true,
+        totalCooks: true,
+        totalFermenters: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipes(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        connect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipes(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        set: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipes")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipes(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: RecipeWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipes: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
