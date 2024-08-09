@@ -448,6 +448,12 @@ export class RecipeParameterControllerBase {
           },
         },
 
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeGroup: {
           select: {
             id: true,

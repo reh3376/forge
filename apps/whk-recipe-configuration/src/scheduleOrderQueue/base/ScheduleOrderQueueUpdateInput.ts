@@ -15,11 +15,13 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  IsEnum,
   ValidateNested,
   IsInt,
   Min,
   Max,
 } from "class-validator";
+import { EnumScheduleOrderQueueNextOperation } from "./EnumScheduleOrderQueueNextOperation";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
@@ -52,6 +54,22 @@ class ScheduleOrderQueueUpdateInput {
 
   @ApiProperty({
     required: false,
+    enum: EnumScheduleOrderQueueNextOperation,
+  })
+  @IsEnum(EnumScheduleOrderQueueNextOperation)
+  @IsOptional()
+  @Field(() => EnumScheduleOrderQueueNextOperation, {
+    nullable: true,
+  })
+  nextOperation?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | null;
+
+  @ApiProperty({
+    required: false,
     type: () => UnitProcedureWhereUniqueInput,
   })
   @ValidateNested()
@@ -60,7 +78,7 @@ class ScheduleOrderQueueUpdateInput {
   @Field(() => UnitProcedureWhereUniqueInput, {
     nullable: true,
   })
-  nextUnitProcedure?: UnitProcedureWhereUniqueInput;
+  nextUnitProcedure?: UnitProcedureWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -72,7 +90,7 @@ class ScheduleOrderQueueUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  nextUnitProcedureName?: string;
+  nextUnitProcedureName?: string | null;
 
   @ApiProperty({
     required: false,

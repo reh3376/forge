@@ -133,9 +133,11 @@ export class ProductionOrderResolverBase {
             }
           : undefined,
 
-        salesOrder: {
-          connect: args.data.salesOrder,
-        },
+        salesOrder: args.data.salesOrder
+          ? {
+              connect: args.data.salesOrder,
+            }
+          : undefined,
 
         scheduleOrder: args.data.scheduleOrder
           ? {
@@ -186,9 +188,11 @@ export class ProductionOrderResolverBase {
               }
             : undefined,
 
-          salesOrder: {
-            connect: args.data.salesOrder,
-          },
+          salesOrder: args.data.salesOrder
+            ? {
+                connect: args.data.salesOrder,
+              }
+            : undefined,
 
           scheduleOrder: args.data.scheduleOrder
             ? {
