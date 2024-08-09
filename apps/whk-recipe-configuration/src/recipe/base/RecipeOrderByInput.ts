@@ -172,6 +172,17 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  mashingProtocolId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   recipeGroupId?: SortOrder;
 
   @ApiProperty({

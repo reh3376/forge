@@ -11,8 +11,15 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, ValidateNested, IsOptional } from "class-validator";
+import {
+  IsDate,
+  IsString,
+  MaxLength,
+  ValidateNested,
+  IsOptional,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 
 @ObjectType()
@@ -30,8 +37,47 @@ class MashingProtocol {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Recipe],
+  })
+  @ValidateNested()
+  @Type(() => Recipe)
+  @IsOptional()
+  recipes?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  revision!: string | null;
 
   @ApiProperty({
     required: true,
@@ -49,6 +95,18 @@ class MashingProtocol {
   @Type(() => Date)
   @Field(() => Date)
   updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy!: string | null;
 }
 
 export { MashingProtocol as MashingProtocol };

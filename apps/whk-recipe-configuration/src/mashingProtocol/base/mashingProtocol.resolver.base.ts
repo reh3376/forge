@@ -26,6 +26,8 @@ import { MashingProtocolFindUniqueArgs } from "./MashingProtocolFindUniqueArgs";
 import { CreateMashingProtocolArgs } from "./CreateMashingProtocolArgs";
 import { UpdateMashingProtocolArgs } from "./UpdateMashingProtocolArgs";
 import { DeleteMashingProtocolArgs } from "./DeleteMashingProtocolArgs";
+import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
+import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { MashingProtocolService } from "../mashingProtocol.service";
@@ -142,6 +144,26 @@ export class MashingProtocolResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Recipe], { name: "recipes" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipes(
+    @graphql.Parent() parent: MashingProtocol,
+    @graphql.Args() args: RecipeFindManyArgs
+  ): Promise<Recipe[]> {
+    const results = await this.service.findRecipes(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

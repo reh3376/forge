@@ -301,12 +301,13 @@ class ProductionOrder {
   recipeGroup?: RecipeGroup | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: () => SalesOrder,
   })
   @ValidateNested()
   @Type(() => SalesOrder)
-  salesOrder?: SalesOrder;
+  @IsOptional()
+  salesOrder?: SalesOrder | null;
 
   @ApiProperty({
     required: false,
