@@ -32,6 +32,7 @@ import { Decimal } from "decimal.js";
 import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
@@ -207,6 +208,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   lots?: LotUpdateManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

@@ -14,6 +14,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
 
 @InputType()
@@ -27,7 +29,52 @@ class MashingProtocolWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
+  createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringFilter,
+  })
+  @Type(() => StringFilter)
+  @IsOptional()
+  @Field(() => StringFilter, {
+    nullable: true,
+  })
+  name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeListRelationFilter, {
+    nullable: true,
+  })
+  recipes?: RecipeListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  revision?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -40,6 +87,17 @@ class MashingProtocolWhereInput {
     nullable: true,
   })
   steps?: MashingProtocolStepListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 }
 
 export { MashingProtocolWhereInput as MashingProtocolWhereInput };

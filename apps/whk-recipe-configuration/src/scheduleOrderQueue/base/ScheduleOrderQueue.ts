@@ -11,17 +11,21 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsDate,
   IsString,
   MaxLength,
   IsOptional,
+  IsEnum,
   ValidateNested,
   IsInt,
   Min,
   Max,
 } from "class-validator";
+
 import { Type } from "class-transformer";
+import { EnumScheduleOrderQueueNextOperation } from "./EnumScheduleOrderQueueNextOperation";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
@@ -65,21 +69,41 @@ class ScheduleOrderQueue {
   id!: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    enum: EnumScheduleOrderQueueNextOperation,
+  })
+  @IsEnum(EnumScheduleOrderQueueNextOperation)
+  @IsOptional()
+  @Field(() => EnumScheduleOrderQueueNextOperation, {
+    nullable: true,
+  })
+  nextOperation?:
+    | "Mashing01"
+    | "Fermentation01"
+    | "Distillation01"
+    | "Processing01"
+    | null;
+
+  @ApiProperty({
+    required: false,
     type: () => UnitProcedure,
   })
   @ValidateNested()
   @Type(() => UnitProcedure)
-  nextUnitProcedure?: UnitProcedure;
+  @IsOptional()
+  nextUnitProcedure?: UnitProcedure | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
   @MaxLength(1000)
-  @Field(() => String)
-  nextUnitProcedureName!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  nextUnitProcedureName!: string | null;
 
   @ApiProperty({
     required: false,

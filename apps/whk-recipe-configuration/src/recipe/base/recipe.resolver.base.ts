@@ -43,6 +43,7 @@ import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedur
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
+import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { RecipeService } from "../recipe.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -125,6 +126,12 @@ export class RecipeResolverBase {
             }
           : undefined,
 
+        mashingProtocol: args.data.mashingProtocol
+          ? {
+              connect: args.data.mashingProtocol,
+            }
+          : undefined,
+
         recipeGroup: args.data.recipeGroup
           ? {
               connect: args.data.recipeGroup,
@@ -163,6 +170,12 @@ export class RecipeResolverBase {
           item: args.data.item
             ? {
                 connect: args.data.item,
+              }
+            : undefined,
+
+          mashingProtocol: args.data.mashingProtocol
+            ? {
+                connect: args.data.mashingProtocol,
               }
             : undefined,
 
@@ -420,6 +433,27 @@ export class RecipeResolverBase {
   })
   async getItem(@graphql.Parent() parent: Recipe): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => MashingProtocol, {
+    nullable: true,
+    name: "mashingProtocol",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async getMashingProtocol(
+    @graphql.Parent() parent: Recipe
+  ): Promise<MashingProtocol | null> {
+    const result = await this.service.getMashingProtocol(parent.id);
 
     if (!result) {
       return null;
