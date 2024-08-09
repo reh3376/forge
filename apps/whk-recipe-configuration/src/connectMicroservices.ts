@@ -18,4 +18,41 @@ export async function connectMicroservices(app: INestApplication) {
       generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.item").options
     )
   });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: new RabbitMQ(
+      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.bom").options
+    )
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: new RabbitMQ(
+      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.bomitem").options
+    )
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: new RabbitMQ(
+      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.customer").options
+    )
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: new RabbitMQ(
+      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.vendor").options
+    )
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: new RabbitMQ(
+      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.purchaseorder").options
+    )
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: new RabbitMQ(
+      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.salesorder").options
+    )
+  });
+
 }
