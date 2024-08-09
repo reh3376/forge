@@ -844,6 +844,12 @@ export class UnitProcedureControllerBase {
           },
         },
 
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeGroup: {
           select: {
             id: true,

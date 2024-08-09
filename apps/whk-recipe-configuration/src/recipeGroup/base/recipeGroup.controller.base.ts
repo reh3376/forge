@@ -395,6 +395,12 @@ export class RecipeGroupControllerBase {
           },
         },
 
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeGroup: {
           select: {
             id: true,

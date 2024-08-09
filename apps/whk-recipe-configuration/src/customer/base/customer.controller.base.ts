@@ -459,6 +459,12 @@ export class CustomerControllerBase {
           },
         },
 
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeGroup: {
           select: {
             id: true,

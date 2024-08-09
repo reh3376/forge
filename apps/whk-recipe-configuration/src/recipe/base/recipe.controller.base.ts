@@ -93,6 +93,12 @@ export class RecipeControllerBase {
             }
           : undefined,
 
+        mashingProtocol: data.mashingProtocol
+          ? {
+              connect: data.mashingProtocol,
+            }
+          : undefined,
+
         recipeGroup: data.recipeGroup
           ? {
               connect: data.recipeGroup,
@@ -126,6 +132,12 @@ export class RecipeControllerBase {
         isClassDefinition: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },
@@ -191,6 +203,12 @@ export class RecipeControllerBase {
         isClassDefinition: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },
@@ -262,6 +280,12 @@ export class RecipeControllerBase {
           },
         },
 
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeGroup: {
           select: {
             id: true,
@@ -326,6 +350,12 @@ export class RecipeControllerBase {
               }
             : undefined,
 
+          mashingProtocol: data.mashingProtocol
+            ? {
+                connect: data.mashingProtocol,
+              }
+            : undefined,
+
           recipeGroup: data.recipeGroup
             ? {
                 connect: data.recipeGroup,
@@ -359,6 +389,12 @@ export class RecipeControllerBase {
           isClassDefinition: true,
 
           item: {
+            select: {
+              id: true,
+            },
+          },
+
+          mashingProtocol: {
             select: {
               id: true,
             },
@@ -564,6 +600,12 @@ export class RecipeControllerBase {
         isClassDefinition: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },

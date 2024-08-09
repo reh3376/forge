@@ -11,12 +11,60 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput";
-import { ValidateNested, IsOptional } from "class-validator";
+import {
+  IsString,
+  MaxLength,
+  ValidateNested,
+  IsOptional,
+} from "class-validator";
+import { RecipeCreateNestedManyWithoutMashingProtocolsInput } from "./RecipeCreateNestedManyWithoutMashingProtocolsInput";
 import { Type } from "class-transformer";
+import { MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput";
 
 @InputType()
 class MashingProtocolCreateInput {
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  createdBy!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeCreateNestedManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeCreateNestedManyWithoutMashingProtocolsInput)
+  @IsOptional()
+  @Field(() => RecipeCreateNestedManyWithoutMashingProtocolsInput, {
+    nullable: true,
+  })
+  recipes?: RecipeCreateNestedManyWithoutMashingProtocolsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  revision?: string | null;
+
   @ApiProperty({
     required: true,
     type: () => MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput,
@@ -31,6 +79,18 @@ class MashingProtocolCreateInput {
     }
   )
   steps?: MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 }
 
 export { MashingProtocolCreateInput as MashingProtocolCreateInput };
