@@ -28,8 +28,9 @@ import { UpdateRecipeBomItemArgs } from "./UpdateRecipeBomItemArgs";
 import { DeleteRecipeBomItemArgs } from "./DeleteRecipeBomItemArgs";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
+import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
+import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { Item } from "../../item/base/Item";
-import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeBomItemService } from "../recipeBomItem.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeBomItem)
@@ -110,12 +111,6 @@ export class RecipeBomItemResolverBase {
               connect: args.data.item,
             }
           : undefined,
-
-        recipe: args.data.recipe
-          ? {
-              connect: args.data.recipe,
-            }
-          : undefined,
       },
     });
   }
@@ -145,12 +140,6 @@ export class RecipeBomItemResolverBase {
           item: args.data.item
             ? {
                 connect: args.data.item,
-              }
-            : undefined,
-
-          recipe: args.data.recipe
-            ? {
-                connect: args.data.recipe,
               }
             : undefined,
         },
@@ -232,6 +221,26 @@ export class RecipeBomItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeBom], { name: "recipeBoms" })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBoms(
+    @graphql.Parent() parent: RecipeBomItem,
+    @graphql.Args() args: RecipeBomFindManyArgs
+  ): Promise<RecipeBom[]> {
+    const results = await this.service.findRecipeBoms(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => RecipeBomItem, {
     nullable: true,
     name: "classId",
@@ -264,27 +273,6 @@ export class RecipeBomItemResolverBase {
   })
   async getItem(@graphql.Parent() parent: RecipeBomItem): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Recipe, {
-    nullable: true,
-    name: "recipe",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async getRecipe(
-    @graphql.Parent() parent: RecipeBomItem
-  ): Promise<Recipe | null> {
-    const result = await this.service.getRecipe(parent.id);
 
     if (!result) {
       return null;

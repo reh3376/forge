@@ -25,7 +25,6 @@ import { MashingProtocolFindManyArgs } from "./MashingProtocolFindManyArgs";
 import { MashingProtocolFindUniqueArgs } from "./MashingProtocolFindUniqueArgs";
 import { CreateMashingProtocolArgs } from "./CreateMashingProtocolArgs";
 import { UpdateMashingProtocolArgs } from "./UpdateMashingProtocolArgs";
-import { DeleteMashingProtocolArgs } from "./DeleteMashingProtocolArgs";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
@@ -96,7 +95,21 @@ export class MashingProtocolResolverBase {
   ): Promise<MashingProtocol> {
     return await this.service.createMashingProtocol({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        masterMashingProtocol: args.data.masterMashingProtocol
+          ? {
+              connect: args.data.masterMashingProtocol,
+            }
+          : undefined,
+
+        runningMashingProtocol: args.data.runningMashingProtocol
+          ? {
+              connect: args.data.runningMashingProtocol,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -113,7 +126,21 @@ export class MashingProtocolResolverBase {
     try {
       return await this.service.updateMashingProtocol({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          masterMashingProtocol: args.data.masterMashingProtocol
+            ? {
+                connect: args.data.masterMashingProtocol,
+              }
+            : undefined,
+
+          runningMashingProtocol: args.data.runningMashingProtocol
+            ? {
+                connect: args.data.runningMashingProtocol,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -125,25 +152,24 @@ export class MashingProtocolResolverBase {
     }
   }
 
-  @graphql.Mutation(() => MashingProtocol)
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MashingProtocol], { name: "masterInstances" })
   @nestAccessControl.UseRoles({
     resource: "MashingProtocol",
-    action: "delete",
+    action: "read",
     possession: "any",
   })
-  async deleteMashingProtocol(
-    @graphql.Args() args: DeleteMashingProtocolArgs
-  ): Promise<MashingProtocol | null> {
-    try {
-      return await this.service.deleteMashingProtocol(args);
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new GraphQLError(
-          `No resource was found for ${JSON.stringify(args.where)}`
-        );
-      }
-      throw error;
+  async findMasterInstances(
+    @graphql.Parent() parent: MashingProtocol,
+    @graphql.Args() args: MashingProtocolFindManyArgs
+  ): Promise<MashingProtocol[]> {
+    const results = await this.service.findMasterInstances(parent.id, args);
+
+    if (!results) {
+      return [];
     }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -158,6 +184,26 @@ export class MashingProtocolResolverBase {
     @graphql.Args() args: RecipeFindManyArgs
   ): Promise<Recipe[]> {
     const results = await this.service.findRecipes(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MashingProtocol], { name: "runningInstances" })
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async findRunningInstances(
+    @graphql.Parent() parent: MashingProtocol,
+    @graphql.Args() args: MashingProtocolFindManyArgs
+  ): Promise<MashingProtocol[]> {
+    const results = await this.service.findRunningInstances(parent.id, args);
 
     if (!results) {
       return [];
@@ -184,5 +230,47 @@ export class MashingProtocolResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => MashingProtocol, {
+    nullable: true,
+    name: "masterMashingProtocol",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async getMasterMashingProtocol(
+    @graphql.Parent() parent: MashingProtocol
+  ): Promise<MashingProtocol | null> {
+    const result = await this.service.getMasterMashingProtocol(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => MashingProtocol, {
+    nullable: true,
+    name: "runningMashingProtocol",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async getRunningMashingProtocol(
+    @graphql.Parent() parent: MashingProtocol
+  ): Promise<MashingProtocol | null> {
+    const result = await this.service.getRunningMashingProtocol(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

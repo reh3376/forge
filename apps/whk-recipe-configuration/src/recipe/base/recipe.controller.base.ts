@@ -41,9 +41,9 @@ import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOr
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
-import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
-import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
+import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
+import { RecipeBom } from "../../recipeBom/base/RecipeBom";
+import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
@@ -1255,54 +1255,47 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipeBomItems")
-  @ApiNestedQuery(RecipeBomItemFindManyArgs)
+  @common.Get("/:id/recipeBoms")
+  @ApiNestedQuery(RecipeBomFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "RecipeBomItem",
+    resource: "RecipeBom",
     action: "read",
     possession: "any",
   })
-  async findRecipeBomItems(
+  async findRecipeBoms(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<RecipeBomItem[]> {
-    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
-    const results = await this.service.findRecipeBomItems(params.id, {
+  ): Promise<RecipeBom[]> {
+    const query = plainToClass(RecipeBomFindManyArgs, request.query);
+    const results = await this.service.findRecipeBoms(params.id, {
       ...query,
       select: {
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
-        createdBy: true,
-        globalId: true,
         id: true,
-        isClassDefinition: true,
+        master: true,
 
-        item: {
+        masterRecipeBom: {
           select: {
             id: true,
           },
         },
 
-        lot: true,
-        operation: true,
-        operationIndex: true,
-        quantity: true,
-        quantityActual: true,
-
-        recipe: {
+        recipeBomITem: {
           select: {
             id: true,
           },
         },
 
-        units: true,
+        revision: true,
+        running: true,
+
+        runningRecipeBom: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
-        updatedBy: true,
       },
     });
     if (results === null) {
@@ -1313,18 +1306,18 @@ export class RecipeControllerBase {
     return results;
   }
 
-  @common.Post("/:id/recipeBomItems")
+  @common.Post("/:id/recipeBoms")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async connectRecipeBomItems(
+  async connectRecipeBoms(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+    @common.Body() body: RecipeBomWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeBomItems: {
+      recipeBoms: {
         connect: body,
       },
     };
@@ -1335,18 +1328,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Patch("/:id/recipeBomItems")
+  @common.Patch("/:id/recipeBoms")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async updateRecipeBomItems(
+  async updateRecipeBoms(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+    @common.Body() body: RecipeBomWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeBomItems: {
+      recipeBoms: {
         set: body,
       },
     };
@@ -1357,18 +1350,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Delete("/:id/recipeBomItems")
+  @common.Delete("/:id/recipeBoms")
   @nestAccessControl.UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async disconnectRecipeBomItems(
+  async disconnectRecipeBoms(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+    @common.Body() body: RecipeBomWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      recipeBomItems: {
+      recipeBoms: {
         disconnect: body,
       },
     };

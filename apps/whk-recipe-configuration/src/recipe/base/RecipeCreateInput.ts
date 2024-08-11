@@ -36,7 +36,7 @@ import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/Mash
 import { RecipeParameterCreateNestedManyWithoutRecipesInput } from "./RecipeParameterCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
-import { RecipeBomItemCreateNestedManyWithoutRecipesInput } from "./RecipeBomItemCreateNestedManyWithoutRecipesInput";
+import { RecipeBomCreateNestedManyWithoutRecipesInput } from "./RecipeBomCreateNestedManyWithoutRecipesInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderCreateNestedManyWithoutRecipesInput } from "./ScheduleOrderCreateNestedManyWithoutRecipesInput";
 import { UnitProcedureCreateNestedManyWithoutRecipesInput } from "./UnitProcedureCreateNestedManyWithoutRecipesInput";
@@ -253,15 +253,15 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemCreateNestedManyWithoutRecipesInput,
+    type: () => RecipeBomCreateNestedManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipesInput)
+  @Type(() => RecipeBomCreateNestedManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipesInput, {
+  @Field(() => RecipeBomCreateNestedManyWithoutRecipesInput, {
     nullable: true,
   })
-  recipeBomItems?: RecipeBomItemCreateNestedManyWithoutRecipesInput;
+  recipeBoms?: RecipeBomCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
