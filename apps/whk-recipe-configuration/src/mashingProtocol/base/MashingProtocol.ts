@@ -15,8 +15,9 @@ import {
   IsDate,
   IsString,
   MaxLength,
-  ValidateNested,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Recipe } from "../../recipe/base/Recipe";
@@ -50,6 +51,35 @@ class MashingProtocol {
   id!: string;
 
   @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  master!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingProtocol],
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  masterInstances?: Array<MashingProtocol>;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocol,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  masterMashingProtocol?: MashingProtocol | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -78,6 +108,35 @@ class MashingProtocol {
     nullable: true,
   })
   revision!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  running!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingProtocol],
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  runningInstances?: Array<MashingProtocol>;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocol,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  runningMashingProtocol?: MashingProtocol | null;
 
   @ApiProperty({
     required: true,

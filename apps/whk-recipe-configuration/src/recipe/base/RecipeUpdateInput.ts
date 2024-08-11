@@ -36,7 +36,7 @@ import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/Mash
 import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
-import { RecipeBomItemUpdateManyWithoutRecipesInput } from "./RecipeBomItemUpdateManyWithoutRecipesInput";
+import { RecipeBomUpdateManyWithoutRecipesInput } from "./RecipeBomUpdateManyWithoutRecipesInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
@@ -259,15 +259,15 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemUpdateManyWithoutRecipesInput,
+    type: () => RecipeBomUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemUpdateManyWithoutRecipesInput)
+  @Type(() => RecipeBomUpdateManyWithoutRecipesInput)
   @IsOptional()
-  @Field(() => RecipeBomItemUpdateManyWithoutRecipesInput, {
+  @Field(() => RecipeBomUpdateManyWithoutRecipesInput, {
     nullable: true,
   })
-  recipeBomItems?: RecipeBomItemUpdateManyWithoutRecipesInput;
+  recipeBoms?: RecipeBomUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

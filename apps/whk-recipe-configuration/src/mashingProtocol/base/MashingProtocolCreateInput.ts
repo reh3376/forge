@@ -14,11 +14,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  ValidateNested,
+  IsBoolean,
   IsOptional,
+  ValidateNested,
 } from "class-validator";
-import { RecipeCreateNestedManyWithoutMashingProtocolsInput } from "./RecipeCreateNestedManyWithoutMashingProtocolsInput";
+import { MashingProtocolCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolCreateNestedManyWithoutMashingProtocolsInput";
 import { Type } from "class-transformer";
+import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
+import { RecipeCreateNestedManyWithoutMashingProtocolsInput } from "./RecipeCreateNestedManyWithoutMashingProtocolsInput";
 import { MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput";
 
 @InputType()
@@ -31,6 +34,41 @@ class MashingProtocolCreateInput {
   @MaxLength(1000)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  master?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolCreateNestedManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolCreateNestedManyWithoutMashingProtocolsInput)
+  @IsOptional()
+  @Field(() => MashingProtocolCreateNestedManyWithoutMashingProtocolsInput, {
+    nullable: true,
+  })
+  masterInstances?: MashingProtocolCreateNestedManyWithoutMashingProtocolsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  masterMashingProtocol?: MashingProtocolWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
@@ -64,6 +102,41 @@ class MashingProtocolCreateInput {
     nullable: true,
   })
   revision?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  running?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolCreateNestedManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolCreateNestedManyWithoutMashingProtocolsInput)
+  @IsOptional()
+  @Field(() => MashingProtocolCreateNestedManyWithoutMashingProtocolsInput, {
+    nullable: true,
+  })
+  runningInstances?: MashingProtocolCreateNestedManyWithoutMashingProtocolsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  runningMashingProtocol?: MashingProtocolWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,
