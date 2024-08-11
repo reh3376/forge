@@ -15,8 +15,8 @@ import {
   Prisma,
   RecipeBomItem as PrismaRecipeBomItem,
   MashingProtocolStep as PrismaMashingProtocolStep,
+  RecipeBom as PrismaRecipeBom,
   Item as PrismaItem,
-  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class RecipeBomItemServiceBase {
@@ -76,6 +76,17 @@ export class RecipeBomItemServiceBase {
       .mashingProtocolSteps(args);
   }
 
+  async findRecipeBoms(
+    parentId: string,
+    args: Prisma.RecipeBomFindManyArgs
+  ): Promise<PrismaRecipeBom[]> {
+    return this.prisma.recipeBomItem
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipeBoms(args);
+  }
+
   async getClassId(parentId: string): Promise<PrismaRecipeBomItem | null> {
     return this.prisma.recipeBomItem
       .findUnique({
@@ -90,13 +101,5 @@ export class RecipeBomItemServiceBase {
         where: { id: parentId },
       })
       .item();
-  }
-
-  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
-    return this.prisma.recipeBomItem
-      .findUnique({
-        where: { id: parentId },
-      })
-      .recipe();
   }
 }

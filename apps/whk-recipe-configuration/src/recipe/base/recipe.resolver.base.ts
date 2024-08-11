@@ -35,8 +35,8 @@ import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderU
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
-import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
+import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
@@ -322,17 +322,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBomItems" })
+  @graphql.ResolveField(() => [RecipeBom], { name: "recipeBoms" })
   @nestAccessControl.UseRoles({
-    resource: "RecipeBomItem",
+    resource: "RecipeBom",
     action: "read",
     possession: "any",
   })
-  async findRecipeBomItems(
+  async findRecipeBoms(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: RecipeBomItemFindManyArgs
-  ): Promise<RecipeBomItem[]> {
-    const results = await this.service.findRecipeBomItems(parent.id, args);
+    @graphql.Args() args: RecipeBomFindManyArgs
+  ): Promise<RecipeBom[]> {
+    const results = await this.service.findRecipeBoms(parent.id, args);
 
     if (!results) {
       return [];

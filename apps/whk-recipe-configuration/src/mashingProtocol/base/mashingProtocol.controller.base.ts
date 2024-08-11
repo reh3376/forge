@@ -58,13 +58,43 @@ export class MashingProtocolControllerBase {
     @common.Body() data: MashingProtocolCreateInput
   ): Promise<MashingProtocol> {
     return await this.service.createMashingProtocol({
-      data: data,
+      data: {
+        ...data,
+
+        masterMashingProtocol: data.masterMashingProtocol
+          ? {
+              connect: data.masterMashingProtocol,
+            }
+          : undefined,
+
+        runningMashingProtocol: data.runningMashingProtocol
+          ? {
+              connect: data.runningMashingProtocol,
+            }
+          : undefined,
+      },
       select: {
         createdAt: true,
         createdBy: true,
         id: true,
+        master: true,
+
+        masterMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         revision: true,
+        running: true,
+
+        runningMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
       },
@@ -93,8 +123,24 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        master: true,
+
+        masterMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         revision: true,
+        running: true,
+
+        runningMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
       },
@@ -122,8 +168,24 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        master: true,
+
+        masterMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         name: true,
         revision: true,
+        running: true,
+
+        runningMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
       },
@@ -158,13 +220,43 @@ export class MashingProtocolControllerBase {
     try {
       return await this.service.updateMashingProtocol({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          masterMashingProtocol: data.masterMashingProtocol
+            ? {
+                connect: data.masterMashingProtocol,
+              }
+            : undefined,
+
+          runningMashingProtocol: data.runningMashingProtocol
+            ? {
+                connect: data.runningMashingProtocol,
+              }
+            : undefined,
+        },
         select: {
           createdAt: true,
           createdBy: true,
           id: true,
+          master: true,
+
+          masterMashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
+
           name: true,
           revision: true,
+          running: true,
+
+          runningMashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
           updatedBy: true,
         },
@@ -179,41 +271,119 @@ export class MashingProtocolControllerBase {
     }
   }
 
-  @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: MashingProtocol })
-  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/masterInstances")
+  @ApiNestedQuery(MashingProtocolFindManyArgs)
   @nestAccessControl.UseRoles({
     resource: "MashingProtocol",
-    action: "delete",
+    action: "read",
     possession: "any",
   })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  async deleteMashingProtocol(
+  async findMasterInstances(
+    @common.Req() request: Request,
     @common.Param() params: MashingProtocolWhereUniqueInput
-  ): Promise<MashingProtocol | null> {
-    try {
-      return await this.service.deleteMashingProtocol({
-        where: params,
-        select: {
-          createdAt: true,
-          createdBy: true,
-          id: true,
-          name: true,
-          revision: true,
-          updatedAt: true,
-          updatedBy: true,
+  ): Promise<MashingProtocol[]> {
+    const query = plainToClass(MashingProtocolFindManyArgs, request.query);
+    const results = await this.service.findMasterInstances(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        id: true,
+        master: true,
+
+        masterMashingProtocol: {
+          select: {
+            id: true,
+          },
         },
-      });
-    } catch (error) {
-      if (isRecordNotFoundError(error)) {
-        throw new errors.NotFoundException(
-          `No resource was found for ${JSON.stringify(params)}`
-        );
-      }
-      throw error;
+
+        name: true,
+        revision: true,
+        running: true,
+
+        runningMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
     }
+    return results;
+  }
+
+  @common.Post("/:id/masterInstances")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async connectMasterInstances(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      masterInstances: {
+        connect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/masterInstances")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async updateMasterInstances(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      masterInstances: {
+        set: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/masterInstances")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMasterInstances(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      masterInstances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -348,6 +518,121 @@ export class MashingProtocolControllerBase {
   ): Promise<void> {
     const data = {
       recipes: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/runningInstances")
+  @ApiNestedQuery(MashingProtocolFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async findRunningInstances(
+    @common.Req() request: Request,
+    @common.Param() params: MashingProtocolWhereUniqueInput
+  ): Promise<MashingProtocol[]> {
+    const query = plainToClass(MashingProtocolFindManyArgs, request.query);
+    const results = await this.service.findRunningInstances(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        id: true,
+        master: true,
+
+        masterMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
+        name: true,
+        revision: true,
+        running: true,
+
+        runningMashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/runningInstances")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async connectRunningInstances(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      runningInstances: {
+        connect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/runningInstances")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async updateRunningInstances(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      runningInstances: {
+        set: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/runningInstances")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRunningInstances(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      runningInstances: {
         disconnect: body,
       },
     };
