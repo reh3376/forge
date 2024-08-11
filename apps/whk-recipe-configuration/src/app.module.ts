@@ -56,6 +56,7 @@ import { ProductionOrderBomItemModule } from "./productionOrderBomItem/productio
 import { RecipeBomItemModule } from "./recipeBomItem/recipeBomItem.module";
 import { MashingProtocolModule } from "./mashingProtocol/mashingProtocol.module";
 import { MashingProtocolStepModule } from "./mashingProtocolStep/mashingProtocolStep.module";
+import { RecipeBomModule } from "./recipeBom/recipeBom.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -121,6 +122,7 @@ import {SyncModule} from "./sync/sync.module";
     RecipeBomItemModule,
     MashingProtocolModule,
     MashingProtocolStepModule,
+    RecipeBomModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

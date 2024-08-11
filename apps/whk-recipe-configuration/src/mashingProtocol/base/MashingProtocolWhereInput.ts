@@ -14,6 +14,9 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { MashingProtocolListRelationFilter } from "./MashingProtocolListRelationFilter";
+import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
@@ -41,6 +44,41 @@ class MashingProtocolWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  master?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolListRelationFilter)
+  @IsOptional()
+  @Field(() => MashingProtocolListRelationFilter, {
+    nullable: true,
+  })
+  masterInstances?: MashingProtocolListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  masterMashingProtocol?: MashingProtocolWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -75,6 +113,41 @@ class MashingProtocolWhereInput {
     nullable: true,
   })
   revision?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  running?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolListRelationFilter)
+  @IsOptional()
+  @Field(() => MashingProtocolListRelationFilter, {
+    nullable: true,
+  })
+  runningInstances?: MashingProtocolListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  runningMashingProtocol?: MashingProtocolWhereUniqueInput;
 
   @ApiProperty({
     required: false,

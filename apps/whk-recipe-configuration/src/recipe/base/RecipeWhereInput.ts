@@ -29,7 +29,7 @@ import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/Mash
 import { RecipeParameterListRelationFilter } from "../../recipeParameter/base/RecipeParameterListRelationFilter";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
-import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
+import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
@@ -257,15 +257,15 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemListRelationFilter,
+    type: () => RecipeBomListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemListRelationFilter)
+  @Type(() => RecipeBomListRelationFilter)
   @IsOptional()
-  @Field(() => RecipeBomItemListRelationFilter, {
+  @Field(() => RecipeBomListRelationFilter, {
     nullable: true,
   })
-  recipeBomItems?: RecipeBomItemListRelationFilter;
+  recipeBoms?: RecipeBomListRelationFilter;
 
   @ApiProperty({
     required: false,
