@@ -11,7 +11,6 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 
 import {
   ValidateNested,
@@ -24,12 +23,13 @@ import {
   Max,
 } from "class-validator";
 
-import { Type } from "class-transformer";
-import { BomItemWhereUniqueInput } from "./BomItemWhereUniqueInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { Expose, Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutBomItemsInput } from "./EquipmentPhaseCreateNestedManyWithoutBomItemsInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { BomItemWhereUniqueInput } from "./BomItemWhereUniqueInput";
 import { BomItemCreateNestedManyWithoutBomItemsInput } from "./BomItemCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { Decimal } from "decimal.js";
 
 @InputType()
