@@ -19,7 +19,7 @@ import {
   RecipeParameter as PrismaRecipeParameter,
   ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   ProductionOrder as PrismaProductionOrder,
-  RecipeBomItem as PrismaRecipeBomItem,
+  RecipeBom as PrismaRecipeBom,
   ScheduleOrder as PrismaScheduleOrder,
   UnitProcedure as PrismaUnitProcedure,
   Customer as PrismaCustomer,
@@ -119,15 +119,15 @@ export class RecipeServiceBase {
       .productionOrders(args);
   }
 
-  async findRecipeBomItems(
+  async findRecipeBoms(
     parentId: string,
-    args: Prisma.RecipeBomItemFindManyArgs
-  ): Promise<PrismaRecipeBomItem[]> {
+    args: Prisma.RecipeBomFindManyArgs
+  ): Promise<PrismaRecipeBom[]> {
     return this.prisma.recipe
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .recipeBomItems(args);
+      .recipeBoms(args);
   }
 
   async findScheduleOrders(

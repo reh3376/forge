@@ -232,7 +232,7 @@ model Recipe {
   parameters                    RecipeParameter[]
   productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   productionOrders              ProductionOrder[]
-  recipeBomItems                RecipeBomItem[]
+  recipeBoms                    RecipeBom[]
   recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                 String?
   revision                      Int?                           @default(0)
@@ -925,23 +925,30 @@ model RecipeBomItem {
   operationIndex       Int                        @default(-1)
   quantity             Decimal?
   quantityActual       Decimal?
-  recipe               Recipe?                    @relation(fields: [recipeId], references: [id])
-  recipeId             String?
+  recipeBoms           RecipeBom[]
   units                String
   updatedAt            DateTime                   @updatedAt
   updatedBy            DateTime?
 }
 
 model MashingProtocol {
-  createdAt DateTime              @default(now())
-  createdBy String
-  id        String                @id @default(cuid())
-  name      String                @unique
-  recipes   Recipe[]
-  revision  String?
-  steps     MashingProtocolStep[]
-  updatedAt DateTime              @updatedAt
-  updatedBy String?
+  createdAt                DateTime              @default(now())
+  createdBy                String
+  id                       String                @id @default(cuid())
+  master                   Boolean?              @default(false)
+  masterInstances          MashingProtocol[]     @relation(name: "masterMashingProtocol")
+  masterMashingProtocol    MashingProtocol?      @relation(name: "masterMashingProtocol", fields: [masterMashingProtocolId], references: [id])
+  masterMashingProtocolId  String?
+  name                     String                @unique
+  recipes                  Recipe[]
+  revision                 String?
+  running                  Boolean?              @default(false)
+  runningInstances         MashingProtocol[]     @relation(name: "runningMashingProtocol")
+  runningMashingProtocol   MashingProtocol?      @relation(name: "runningMashingProtocol", fields: [runningMashingProtocolId], references: [id])
+  runningMashingProtocolId String?
+  steps                    MashingProtocolStep[]
+  updatedAt                DateTime              @updatedAt
+  updatedBy                String?
 }
 
 model MashingProtocolStep {
@@ -965,6 +972,24 @@ model MashingProtocolStep {
   temperatureSetpoint Decimal?
   updatedAt           DateTime                         @updatedAt
   updatedBy           String?
+}
+
+model RecipeBom {
+  createdAt          DateTime      @default(now())
+  id                 String        @id @default(cuid())
+  master             Boolean?      @default(false)
+  masterInstances    RecipeBom[]   @relation(name: "masterRecipeBom")
+  masterRecipeBom    RecipeBom?    @relation(name: "masterRecipeBom", fields: [masterReceipeBomId], references: [id])
+  masterReceipeBomId String?
+  recipe             Recipe[]
+  recipeBomITem      RecipeBomItem @relation(fields: [recipeBomITemId], references: [id])
+  recipeBomITemId    String
+  revision           String?
+  running            Boolean?      @default(false)
+  runningInstances   RecipeBom[]   @relation(name: "runningRecipeBom")
+  runningRecipeBom   RecipeBom?    @relation(name: "runningRecipeBom", fields: [runningRecipeBomId], references: [id])
+  runningRecipeBomId String?
+  updatedAt          DateTime      @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {

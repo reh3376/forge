@@ -10,19 +10,19 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
+import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class RecipeBomItemCreateNestedManyWithoutRecipesInput {
-  @Field(() => [RecipeBomItemWhereUniqueInput], {
+class RecipeBomCreateNestedManyWithoutRecipeBomItemsInput {
+  @Field(() => [RecipeBomWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [RecipeBomItemWhereUniqueInput],
+    type: () => [RecipeBomWhereUniqueInput],
   })
-  connect?: Array<RecipeBomItemWhereUniqueInput>;
+  connect?: Array<RecipeBomWhereUniqueInput>;
 }
 
-export { RecipeBomItemCreateNestedManyWithoutRecipesInput as RecipeBomItemCreateNestedManyWithoutRecipesInput };
+export { RecipeBomCreateNestedManyWithoutRecipeBomItemsInput as RecipeBomCreateNestedManyWithoutRecipeBomItemsInput };

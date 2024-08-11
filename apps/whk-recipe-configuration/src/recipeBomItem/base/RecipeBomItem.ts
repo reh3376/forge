@@ -31,7 +31,7 @@ import { Item } from "../../item/base/Item";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { Decimal } from "decimal.js";
-import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 
 @ObjectType()
 class RecipeBomItem {
@@ -181,12 +181,12 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
-    type: () => Recipe,
+    type: () => [RecipeBom],
   })
   @ValidateNested()
-  @Type(() => Recipe)
+  @Type(() => RecipeBom)
   @IsOptional()
-  recipe?: Recipe | null;
+  recipeBoms?: Array<RecipeBom>;
 
   @ApiProperty({
     required: true,

@@ -53,6 +53,17 @@ export class MashingProtocolServiceBase {
     return this.prisma.mashingProtocol.delete(args);
   }
 
+  async findMasterInstances(
+    parentId: string,
+    args: Prisma.MashingProtocolFindManyArgs
+  ): Promise<PrismaMashingProtocol[]> {
+    return this.prisma.mashingProtocol
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .masterInstances(args);
+  }
+
   async findRecipes(
     parentId: string,
     args: Prisma.RecipeFindManyArgs
@@ -64,6 +75,17 @@ export class MashingProtocolServiceBase {
       .recipes(args);
   }
 
+  async findRunningInstances(
+    parentId: string,
+    args: Prisma.MashingProtocolFindManyArgs
+  ): Promise<PrismaMashingProtocol[]> {
+    return this.prisma.mashingProtocol
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .runningInstances(args);
+  }
+
   async findSteps(
     parentId: string,
     args: Prisma.MashingProtocolStepFindManyArgs
@@ -73,5 +95,25 @@ export class MashingProtocolServiceBase {
         where: { id: parentId },
       })
       .steps(args);
+  }
+
+  async getMasterMashingProtocol(
+    parentId: string
+  ): Promise<PrismaMashingProtocol | null> {
+    return this.prisma.mashingProtocol
+      .findUnique({
+        where: { id: parentId },
+      })
+      .masterMashingProtocol();
+  }
+
+  async getRunningMashingProtocol(
+    parentId: string
+  ): Promise<PrismaMashingProtocol | null> {
+    return this.prisma.mashingProtocol
+      .findUnique({
+        where: { id: parentId },
+      })
+      .runningMashingProtocol();
   }
 }
