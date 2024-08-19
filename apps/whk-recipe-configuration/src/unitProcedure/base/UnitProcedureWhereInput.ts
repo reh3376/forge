@@ -22,7 +22,6 @@ import { UnitProcedureListRelationFilter } from "./UnitProcedureListRelationFilt
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationListRelationFilter } from "../../operation/base/OperationListRelationFilter";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
@@ -204,18 +203,6 @@ class UnitProcedureWhereInput {
     nullable: true,
   })
   procedure?: ProcedureWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,

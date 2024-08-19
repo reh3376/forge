@@ -29,12 +29,8 @@ import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
-import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
-import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
@@ -259,26 +255,6 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeParameter], { name: "parameters" })
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "read",
-    possession: "any",
-  })
-  async findParameters(
-    @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: RecipeParameterFindManyArgs
-  ): Promise<RecipeParameter[]> {
-    const results = await this.service.findParameters(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
     name: "productionOrderRecipeInstances",
   })
@@ -292,31 +268,6 @@ export class RecipeResolverBase {
     @graphql.Args() args: ProductionOrderRecipeInstanceFindManyArgs
   ): Promise<ProductionOrderRecipeInstance[]> {
     const results = await this.service.findProductionOrderRecipeInstances(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
-    name: "productionOrderUnitProcedures",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderUnitProcedures(
-    @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<ProductionOrderUnitProcedure[]> {
-    const results = await this.service.findProductionOrderUnitProcedures(
       parent.id,
       args
     );

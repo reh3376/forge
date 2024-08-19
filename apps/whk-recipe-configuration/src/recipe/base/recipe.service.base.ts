@@ -16,9 +16,7 @@ import {
   Recipe as PrismaRecipe,
   Batch as PrismaBatch,
   Lot as PrismaLot,
-  RecipeParameter as PrismaRecipeParameter,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
-  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   ProductionOrder as PrismaProductionOrder,
   RecipeBom as PrismaRecipeBom,
   ScheduleOrder as PrismaScheduleOrder,
@@ -87,17 +85,6 @@ export class RecipeServiceBase {
       .lots(args);
   }
 
-  async findParameters(
-    parentId: string,
-    args: Prisma.RecipeParameterFindManyArgs
-  ): Promise<PrismaRecipeParameter[]> {
-    return this.prisma.recipe
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .parameters(args);
-  }
-
   async findProductionOrderRecipeInstances(
     parentId: string,
     args: Prisma.ProductionOrderRecipeInstanceFindManyArgs
@@ -107,17 +94,6 @@ export class RecipeServiceBase {
         where: { id: parentId },
       })
       .productionOrderRecipeInstances(args);
-  }
-
-  async findProductionOrderUnitProcedures(
-    parentId: string,
-    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<PrismaProductionOrderUnitProcedure[]> {
-    return this.prisma.recipe
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderUnitProcedures(args);
   }
 
   async findProductionOrders(

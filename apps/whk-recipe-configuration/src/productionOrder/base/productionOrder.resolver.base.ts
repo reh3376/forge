@@ -33,8 +33,6 @@ import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
-import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Bom } from "../../bom/base/Bom";
 import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
@@ -294,31 +292,6 @@ export class ProductionOrderResolverBase {
     @graphql.Args() args: ProductionOrderRecipeInstanceFindManyArgs
   ): Promise<ProductionOrderRecipeInstance[]> {
     const results = await this.service.findProductionOrderRecipeInstances(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderUnitProcedure], {
-    name: "productionOrderUnitProcedures",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "ProductionOrderUnitProcedure",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderUnitProcedures(
-    @graphql.Parent() parent: ProductionOrder,
-    @graphql.Args() args: ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<ProductionOrderUnitProcedure[]> {
-    const results = await this.service.findProductionOrderUnitProcedures(
       parent.id,
       args
     );
