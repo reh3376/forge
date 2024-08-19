@@ -19,9 +19,9 @@ import { StringFilter } from "../../util/StringFilter";
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
 class MashingProtocolStepWhereInput {
@@ -160,6 +160,17 @@ class MashingProtocolStepWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  promptMessage?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => RecipeBomItemListRelationFilter,
   })
   @ValidateNested()
@@ -169,6 +180,17 @@ class MashingProtocolStepWhereInput {
     nullable: true,
   })
   recipeBomItem?: RecipeBomItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  stepTime?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
