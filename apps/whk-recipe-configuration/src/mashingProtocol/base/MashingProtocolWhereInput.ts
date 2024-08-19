@@ -18,6 +18,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { MashingProtocolListRelationFilter } from "./MashingProtocolListRelationFilter";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
+import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
@@ -103,6 +104,18 @@ class MashingProtocolWhereInput {
     nullable: true,
   })
   name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstanceListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderRecipeInstanceListRelationFilter, {
+    nullable: true,
+  })
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceListRelationFilter;
 
   @ApiProperty({
     required: false,

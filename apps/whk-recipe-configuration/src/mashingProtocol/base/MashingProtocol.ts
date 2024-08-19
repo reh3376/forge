@@ -21,6 +21,7 @@ import {
   IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 
@@ -97,6 +98,15 @@ class MashingProtocol {
   @MaxLength(1000)
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderRecipeInstance],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstance)
+  @IsOptional()
+  productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
 
   @ApiProperty({
     required: false,

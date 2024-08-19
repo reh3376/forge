@@ -35,6 +35,9 @@ import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
+import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
+import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { ProductionOrderUnitProcedureFindManyArgs } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureFindManyArgs";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrderUnitProcedureWhereUniqueInput } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureWhereUniqueInput";
@@ -479,6 +482,12 @@ export class RecipeControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },
@@ -964,6 +973,122 @@ export class RecipeControllerBase {
   ): Promise<void> {
     const data = {
       parameters: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderRecipeInstances")
+  @ApiNestedQuery(ProductionOrderRecipeInstanceFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderRecipeInstances(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeWhereUniqueInput
+  ): Promise<ProductionOrderRecipeInstance[]> {
+    const query = plainToClass(
+      ProductionOrderRecipeInstanceFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findProductionOrderRecipeInstances(
+      params.id,
+      {
+        ...query,
+        select: {
+          createdAt: true,
+          createdBy: true,
+          id: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+          updatedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderRecipeInstances")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderRecipeInstances(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderRecipeInstances: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderRecipeInstances")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderRecipeInstances(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderRecipeInstances: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipe({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderRecipeInstances")
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderRecipeInstances(
+    @common.Param() params: RecipeWhereUniqueInput,
+    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderRecipeInstances: {
         disconnect: body,
       },
     };

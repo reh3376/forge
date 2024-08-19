@@ -32,6 +32,7 @@ import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
@@ -215,6 +216,15 @@ class Recipe {
   @Type(() => RecipeParameter)
   @IsOptional()
   parameters?: Array<RecipeParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderRecipeInstance],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstance)
+  @IsOptional()
+  productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
 
   @ApiProperty({
     required: false,

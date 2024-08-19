@@ -21,6 +21,7 @@ import {
 import { RecipeBomUpdateManyWithoutRecipeBomsInput } from "./RecipeBomUpdateManyWithoutRecipeBomsInput";
 import { Type } from "class-transformer";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
+import { ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput";
 import { RecipeUpdateManyWithoutRecipeBomsInput } from "./RecipeUpdateManyWithoutRecipeBomsInput";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
@@ -60,6 +61,18 @@ class RecipeBomUpdateInput {
     nullable: true,
   })
   masterRecipeBom?: RecipeBomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput, {
+    nullable: true,
+  })
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput;
 
   @ApiProperty({
     required: false,
