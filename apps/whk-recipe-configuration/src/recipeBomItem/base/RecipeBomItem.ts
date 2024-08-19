@@ -11,6 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { Batch } from "../../batch/base/Batch";
 
 import {
   ValidateNested,
@@ -35,6 +36,15 @@ import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 
 @ObjectType()
 class RecipeBomItem {
+  @ApiProperty({
+    required: false,
+    type: () => Batch,
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batch?: Batch | null;
+
   @ApiProperty({
     required: false,
     type: () => RecipeBomItem,

@@ -330,6 +330,12 @@ export class MashingProtocolStepControllerBase {
     const results = await this.service.findRecipeBomItem(params.id, {
       ...query,
       select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,

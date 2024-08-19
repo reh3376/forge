@@ -30,6 +30,7 @@ import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
+import { Batch } from "../../batch/base/Batch";
 import { Item } from "../../item/base/Item";
 import { RecipeBomItemService } from "../recipeBomItem.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -100,6 +101,12 @@ export class RecipeBomItemResolverBase {
       data: {
         ...args.data,
 
+        batch: args.data.batch
+          ? {
+              connect: args.data.batch,
+            }
+          : undefined,
+
         classId: args.data.classId
           ? {
               connect: args.data.classId,
@@ -130,6 +137,12 @@ export class RecipeBomItemResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          batch: args.data.batch
+            ? {
+                connect: args.data.batch,
+              }
+            : undefined,
 
           classId: args.data.classId
             ? {
@@ -238,6 +251,27 @@ export class RecipeBomItemResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Batch, {
+    nullable: true,
+    name: "batch",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async getBatch(
+    @graphql.Parent() parent: RecipeBomItem
+  ): Promise<Batch | null> {
+    const result = await this.service.getBatch(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

@@ -25,6 +25,8 @@ import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
 import { CustomerFindUniqueArgs } from "./CustomerFindUniqueArgs";
 import { CreateCustomerArgs } from "./CreateCustomerArgs";
 import { UpdateCustomerArgs } from "./UpdateCustomerArgs";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
@@ -141,6 +143,26 @@ export class CustomerResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Batch], { name: "batches" })
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @graphql.Parent() parent: Customer,
+    @graphql.Args() args: BatchFindManyArgs
+  ): Promise<Batch[]> {
+    const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
