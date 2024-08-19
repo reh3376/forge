@@ -11,9 +11,10 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { MashingProtocolListRelationFilter } from "./MashingProtocolListRelationFilter";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
@@ -23,6 +24,18 @@ import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep
 
 @InputType()
 class MashingProtocolWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchListRelationFilter, {
+    nullable: true,
+  })
+  batches?: BatchListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,

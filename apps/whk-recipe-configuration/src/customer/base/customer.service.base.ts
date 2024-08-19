@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Customer as PrismaCustomer,
+  Batch as PrismaBatch,
   ProductionOrder as PrismaProductionOrder,
   Recipe as PrismaRecipe,
   SalesOrder as PrismaSalesOrder,
@@ -51,6 +52,17 @@ export class CustomerServiceBase {
     args: Prisma.CustomerDeleteArgs
   ): Promise<PrismaCustomer> {
     return this.prisma.customer.delete(args);
+  }
+
+  async findBatches(
+    parentId: string,
+    args: Prisma.BatchFindManyArgs
+  ): Promise<PrismaBatch[]> {
+    return this.prisma.customer
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batches(args);
   }
 
   async findProductionOrders(

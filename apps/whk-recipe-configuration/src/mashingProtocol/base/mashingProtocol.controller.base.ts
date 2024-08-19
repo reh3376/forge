@@ -26,6 +26,9 @@ import { MashingProtocol } from "./MashingProtocol";
 import { MashingProtocolFindManyArgs } from "./MashingProtocolFindManyArgs";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { MashingProtocolUpdateInput } from "./MashingProtocolUpdateInput";
+import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
+import { Batch } from "../../batch/base/Batch";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -269,6 +272,152 @@ export class MashingProtocolControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batches")
+  @ApiNestedQuery(BatchFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "read",
+    possession: "any",
+  })
+  async findBatches(
+    @common.Req() request: Request,
+    @common.Param() params: MashingProtocolWhereUniqueInput
+  ): Promise<Batch[]> {
+    const query = plainToClass(BatchFindManyArgs, request.query);
+    const results = await this.service.findBatches(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        assetPath: true,
+        batchData: true,
+        batchId: true,
+        batchInitData: true,
+        createdAt: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
+        customers: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
+        operationIndex: true,
+        operationType: true,
+        parameterData: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+        revision: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatches(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        connect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatches(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        set: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batches")
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatches(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: BatchWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batches: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

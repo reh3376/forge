@@ -461,6 +461,7 @@ model ItemGroup {
 
 model Customer {
   address          String
+  batches          Batch[]
   createdAt        DateTime          @default(now())
   createdBy        String
   customerCode     String?
@@ -788,11 +789,15 @@ model Batch {
   batchInitData           Json?
   children                Batch[]                 @relation(name: "BatchChildrenBatchParent")
   createdAt               DateTime                @default(now())
+  customer                Customer?               @relation(fields: [customerId], references: [id])
+  customerId              String?
   customers               Json?
   fermentationChemistries FermentationChemistry[]
   id                      String                  @id @default(cuid())
   lot                     Lot?                    @relation(fields: [lotId], references: [id])
   lotId                   String?
+  mashingProtocol         MashingProtocol?        @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId       String?
   operationIndex          String?
   operationType           EnumBatchOperationType?
   parameterData           Json?
@@ -801,6 +806,7 @@ model Batch {
   quantity                Int?
   recipe                  Recipe?                 @relation(fields: [recipeId], references: [id])
   recipeId                String?
+  recipeBomItems          RecipeBomItem[]
   recipeName              String?
   revision                Int?                    @default(0)
   updatedAt               DateTime                @updatedAt
@@ -909,6 +915,8 @@ model ProductionOrderBomItem {
 }
 
 model RecipeBomItem {
+  batch                Batch?                     @relation(fields: [batchId], references: [id])
+  batchId              String?
   classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classIdid], references: [id])
   classIdid            String?
   createdAt            DateTime                   @default(now())
@@ -932,6 +940,7 @@ model RecipeBomItem {
 }
 
 model MashingProtocol {
+  batches                  Batch[]
   createdAt                DateTime              @default(now())
   createdBy                String
   id                       String                @id @default(cuid())

@@ -11,21 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BatchCreateNestedManyWithoutMashingProtocolsInput } from "./BatchCreateNestedManyWithoutMashingProtocolsInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
   IsBoolean,
-  IsOptional,
-  ValidateNested,
 } from "class-validator";
-import { MashingProtocolCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolCreateNestedManyWithoutMashingProtocolsInput";
 import { Type } from "class-transformer";
+import { MashingProtocolCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolCreateNestedManyWithoutMashingProtocolsInput";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { RecipeCreateNestedManyWithoutMashingProtocolsInput } from "./RecipeCreateNestedManyWithoutMashingProtocolsInput";
 import { MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput";
 
 @InputType()
 class MashingProtocolCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchCreateNestedManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutMashingProtocolsInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutMashingProtocolsInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutMashingProtocolsInput;
+
   @ApiProperty({
     required: true,
     type: String,

@@ -94,6 +94,17 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  customerId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   customers?: SortOrder;
 
   @ApiProperty({
@@ -117,6 +128,17 @@ class BatchOrderByInput {
     nullable: true,
   })
   lotId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  mashingProtocolId?: SortOrder;
 
   @ApiProperty({
     required: false,
