@@ -18,7 +18,6 @@ import { redisStore } from "cache-manager-ioredis-yet";
 import { UserModule } from "./user/user.module";
 import { PhaseParameterModule } from "./phaseParameter/phaseParameter.module";
 import { TestParameterModule } from "./testParameter/testParameter.module";
-import { RecipeParameterModule } from "./recipeParameter/recipeParameter.module";
 import { InstructionModule } from "./instruction/instruction.module";
 import { EquipmentPhaseModule } from "./equipmentPhase/equipmentPhase.module";
 import { OperationModule } from "./operation/operation.module";
@@ -83,7 +82,6 @@ import { AuthModule } from "./auth/auth.module";
     UserModule,
     PhaseParameterModule,
     TestParameterModule,
-    RecipeParameterModule,
     InstructionModule,
     EquipmentPhaseModule,
     OperationModule,
