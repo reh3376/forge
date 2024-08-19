@@ -89,6 +89,12 @@ export class BatchControllerBase {
             }
           : undefined,
 
+        productionOrderRecipeInstance: data.productionOrderRecipeInstance
+          ? {
+              connect: data.productionOrderRecipeInstance,
+            }
+          : undefined,
+
         recipe: data.recipe
           ? {
               connect: data.recipe,
@@ -134,6 +140,12 @@ export class BatchControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },
@@ -209,6 +221,12 @@ export class BatchControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },
@@ -290,6 +308,12 @@ export class BatchControllerBase {
           },
         },
 
+        productionOrderRecipeInstance: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
 
         recipe: {
@@ -366,6 +390,12 @@ export class BatchControllerBase {
               }
             : undefined,
 
+          productionOrderRecipeInstance: data.productionOrderRecipeInstance
+            ? {
+                connect: data.productionOrderRecipeInstance,
+              }
+            : undefined,
+
           recipe: data.recipe
             ? {
                 connect: data.recipe,
@@ -411,6 +441,12 @@ export class BatchControllerBase {
           parameterData: true,
 
           parent: {
+            select: {
+              id: true,
+            },
+          },
+
+          productionOrderRecipeInstance: {
             select: {
               id: true,
             },
@@ -493,6 +529,12 @@ export class BatchControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },

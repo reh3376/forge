@@ -22,6 +22,7 @@ import {
 import { Type } from "class-transformer";
 import { MashingProtocolUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolUpdateManyWithoutMashingProtocolsInput";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
+import { ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput";
 import { RecipeUpdateManyWithoutMashingProtocolsInput } from "./RecipeUpdateManyWithoutMashingProtocolsInput";
 import { MashingProtocolStepUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolStepUpdateManyWithoutMashingProtocolsInput";
 
@@ -97,6 +98,24 @@ class MashingProtocolUpdateInput {
     nullable: true,
   })
   name?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput
+  )
+  @IsOptional()
+  @Field(
+    () => ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput;
 
   @ApiProperty({
     required: false,

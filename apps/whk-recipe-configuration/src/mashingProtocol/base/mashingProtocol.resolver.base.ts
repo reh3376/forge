@@ -27,6 +27,8 @@ import { CreateMashingProtocolArgs } from "./CreateMashingProtocolArgs";
 import { UpdateMashingProtocolArgs } from "./UpdateMashingProtocolArgs";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
+import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
@@ -186,6 +188,31 @@ export class MashingProtocolResolverBase {
     @graphql.Args() args: MashingProtocolFindManyArgs
   ): Promise<MashingProtocol[]> {
     const results = await this.service.findMasterInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
+    name: "productionOrderRecipeInstances",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderRecipeInstances(
+    @graphql.Parent() parent: MashingProtocol,
+    @graphql.Args() args: ProductionOrderRecipeInstanceFindManyArgs
+  ): Promise<ProductionOrderRecipeInstance[]> {
+    const results = await this.service.findProductionOrderRecipeInstances(
+      parent.id,
+      args
+    );
 
     if (!results) {
       return [];

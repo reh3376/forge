@@ -24,6 +24,7 @@ import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
+import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
@@ -217,6 +218,18 @@ class BatchWhereInput {
     nullable: true,
   })
   parent?: BatchWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstanceWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderRecipeInstanceWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrderRecipeInstance?: ProductionOrderRecipeInstanceWhereUniqueInput;
 
   @ApiProperty({
     required: false,

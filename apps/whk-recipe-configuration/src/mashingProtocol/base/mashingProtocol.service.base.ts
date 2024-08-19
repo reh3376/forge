@@ -15,6 +15,7 @@ import {
   Prisma,
   MashingProtocol as PrismaMashingProtocol,
   Batch as PrismaBatch,
+  ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Recipe as PrismaRecipe,
   MashingProtocolStep as PrismaMashingProtocolStep,
 } from "@prisma/client";
@@ -74,6 +75,17 @@ export class MashingProtocolServiceBase {
         where: { id: parentId },
       })
       .masterInstances(args);
+  }
+
+  async findProductionOrderRecipeInstances(
+    parentId: string,
+    args: Prisma.ProductionOrderRecipeInstanceFindManyArgs
+  ): Promise<PrismaProductionOrderRecipeInstance[]> {
+    return this.prisma.mashingProtocol
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrderRecipeInstances(args);
   }
 
   async findRecipes(

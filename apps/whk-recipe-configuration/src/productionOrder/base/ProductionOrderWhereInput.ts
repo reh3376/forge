@@ -25,6 +25,7 @@ import { FermentationChemistryListRelationFilter } from "../../fermentationChemi
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -259,6 +260,18 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   plannedFermenters?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstanceListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderRecipeInstanceListRelationFilter, {
+    nullable: true,
+  })
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceListRelationFilter;
 
   @ApiProperty({
     required: false,

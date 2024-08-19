@@ -26,6 +26,9 @@ import { RecipeBom } from "./RecipeBom";
 import { RecipeBomFindManyArgs } from "./RecipeBomFindManyArgs";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { RecipeBomUpdateInput } from "./RecipeBomUpdateInput";
+import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
+import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -394,6 +397,122 @@ export class RecipeBomControllerBase {
   ): Promise<void> {
     const data = {
       masterInstances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderRecipeInstances")
+  @ApiNestedQuery(ProductionOrderRecipeInstanceFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderRecipeInstances(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeBomWhereUniqueInput
+  ): Promise<ProductionOrderRecipeInstance[]> {
+    const query = plainToClass(
+      ProductionOrderRecipeInstanceFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findProductionOrderRecipeInstances(
+      params.id,
+      {
+        ...query,
+        select: {
+          createdAt: true,
+          createdBy: true,
+          id: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+          updatedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderRecipeInstances")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderRecipeInstances(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderRecipeInstances: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderRecipeInstances")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderRecipeInstances(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderRecipeInstances: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderRecipeInstances")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderRecipeInstances(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderRecipeInstances: {
         disconnect: body,
       },
     };

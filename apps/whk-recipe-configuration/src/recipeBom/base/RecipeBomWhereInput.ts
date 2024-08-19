@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { RecipeBomListRelationFilter } from "./RecipeBomListRelationFilter";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
+import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
@@ -68,6 +69,18 @@ class RecipeBomWhereInput {
     nullable: true,
   })
   masterRecipeBom?: RecipeBomWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstanceListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderRecipeInstanceListRelationFilter, {
+    nullable: true,
+  })
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceListRelationFilter;
 
   @ApiProperty({
     required: false,

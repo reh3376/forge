@@ -34,6 +34,7 @@ import { FermentationChemistry } from "../../fermentationChemistry/base/Fermenta
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
@@ -207,6 +208,15 @@ class Batch {
   @Type(() => Batch)
   @IsOptional()
   parent?: Batch | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstance,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstance)
+  @IsOptional()
+  productionOrderRecipeInstance?: ProductionOrderRecipeInstance | null;
 
   @ApiProperty({
     required: false,

@@ -475,6 +475,12 @@ export class LotControllerBase {
           },
         },
 
+        productionOrderRecipeInstance: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
 
         recipe: {
