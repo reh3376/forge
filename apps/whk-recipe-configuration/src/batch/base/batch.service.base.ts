@@ -15,8 +15,11 @@ import {
   Prisma,
   Batch as PrismaBatch,
   FermentationChemistry as PrismaFermentationChemistry,
+  RecipeBomItem as PrismaRecipeBomItem,
   Asset as PrismaAsset,
+  Customer as PrismaCustomer,
   Lot as PrismaLot,
+  MashingProtocol as PrismaMashingProtocol,
   Recipe as PrismaRecipe,
 } from "@prisma/client";
 
@@ -65,6 +68,17 @@ export class BatchServiceBase {
       .fermentationChemistries(args);
   }
 
+  async findRecipeBomItems(
+    parentId: string,
+    args: Prisma.RecipeBomItemFindManyArgs
+  ): Promise<PrismaRecipeBomItem[]> {
+    return this.prisma.batch
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipeBomItems(args);
+  }
+
   async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.batch
       .findUnique({
@@ -73,12 +87,30 @@ export class BatchServiceBase {
       .asset();
   }
 
+  async getCustomer(parentId: string): Promise<PrismaCustomer | null> {
+    return this.prisma.batch
+      .findUnique({
+        where: { id: parentId },
+      })
+      .customer();
+  }
+
   async getLot(parentId: string): Promise<PrismaLot | null> {
     return this.prisma.batch
       .findUnique({
         where: { id: parentId },
       })
       .lot();
+  }
+
+  async getMashingProtocol(
+    parentId: string
+  ): Promise<PrismaMashingProtocol | null> {
+    return this.prisma.batch
+      .findUnique({
+        where: { id: parentId },
+      })
+      .mashingProtocol();
   }
 
   async getParent(parentId: string): Promise<PrismaBatch | null> {

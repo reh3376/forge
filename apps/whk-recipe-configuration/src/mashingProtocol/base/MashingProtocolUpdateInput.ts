@@ -11,21 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { BatchUpdateManyWithoutMashingProtocolsInput } from "./BatchUpdateManyWithoutMashingProtocolsInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
   IsBoolean,
-  ValidateNested,
 } from "class-validator";
-import { MashingProtocolUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolUpdateManyWithoutMashingProtocolsInput";
 import { Type } from "class-transformer";
+import { MashingProtocolUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolUpdateManyWithoutMashingProtocolsInput";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { RecipeUpdateManyWithoutMashingProtocolsInput } from "./RecipeUpdateManyWithoutMashingProtocolsInput";
 import { MashingProtocolStepUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolStepUpdateManyWithoutMashingProtocolsInput";
 
 @InputType()
 class MashingProtocolUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchUpdateManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchUpdateManyWithoutMashingProtocolsInput)
+  @IsOptional()
+  @Field(() => BatchUpdateManyWithoutMashingProtocolsInput, {
+    nullable: true,
+  })
+  batches?: BatchUpdateManyWithoutMashingProtocolsInput;
+
   @ApiProperty({
     required: false,
     type: String,

@@ -29,10 +29,13 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { Customer } from "../../customer/base/Customer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
+import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
 @ObjectType()
 class Batch {
@@ -105,6 +108,15 @@ class Batch {
 
   @ApiProperty({
     required: false,
+    type: () => Customer,
+  })
+  @ValidateNested()
+  @Type(() => Customer)
+  @IsOptional()
+  customer?: Customer | null;
+
+  @ApiProperty({
+    required: false,
   })
   @IsJSONValue()
   @IsOptional()
@@ -138,6 +150,15 @@ class Batch {
   @Type(() => Lot)
   @IsOptional()
   lot?: Lot | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocol,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  @IsOptional()
+  mashingProtocol?: MashingProtocol | null;
 
   @ApiProperty({
     required: false,
@@ -208,6 +229,15 @@ class Batch {
   @Type(() => Recipe)
   @IsOptional()
   recipe?: Recipe | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomItem],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItem)
+  @IsOptional()
+  recipeBomItems?: Array<RecipeBomItem>;
 
   @ApiProperty({
     required: false,

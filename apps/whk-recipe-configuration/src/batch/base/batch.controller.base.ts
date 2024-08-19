@@ -29,6 +29,9 @@ import { BatchUpdateInput } from "./BatchUpdateInput";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -62,9 +65,21 @@ export class BatchControllerBase {
             }
           : undefined,
 
+        customer: data.customer
+          ? {
+              connect: data.customer,
+            }
+          : undefined,
+
         lot: data.lot
           ? {
               connect: data.lot,
+            }
+          : undefined,
+
+        mashingProtocol: data.mashingProtocol
+          ? {
+              connect: data.mashingProtocol,
             }
           : undefined,
 
@@ -92,10 +107,23 @@ export class BatchControllerBase {
         batchId: true,
         batchInitData: true,
         createdAt: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
         customers: true,
         id: true,
 
         lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },
@@ -154,10 +182,23 @@ export class BatchControllerBase {
         batchId: true,
         batchInitData: true,
         createdAt: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
         customers: true,
         id: true,
 
         lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },
@@ -217,10 +258,23 @@ export class BatchControllerBase {
         batchId: true,
         batchInitData: true,
         createdAt: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
         customers: true,
         id: true,
 
         lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },
@@ -288,9 +342,21 @@ export class BatchControllerBase {
               }
             : undefined,
 
+          customer: data.customer
+            ? {
+                connect: data.customer,
+              }
+            : undefined,
+
           lot: data.lot
             ? {
                 connect: data.lot,
+              }
+            : undefined,
+
+          mashingProtocol: data.mashingProtocol
+            ? {
+                connect: data.mashingProtocol,
               }
             : undefined,
 
@@ -318,10 +384,23 @@ export class BatchControllerBase {
           batchId: true,
           batchInitData: true,
           createdAt: true,
+
+          customer: {
+            select: {
+              id: true,
+            },
+          },
+
           customers: true,
           id: true,
 
           lot: {
+            select: {
+              id: true,
+            },
+          },
+
+          mashingProtocol: {
             select: {
               id: true,
             },
@@ -387,10 +466,23 @@ export class BatchControllerBase {
         batchId: true,
         batchInitData: true,
         createdAt: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
         customers: true,
         id: true,
 
         lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },
@@ -621,6 +713,130 @@ export class BatchControllerBase {
   ): Promise<void> {
     const data = {
       fermentationChemistries: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBomItems")
+  @ApiNestedQuery(RecipeBomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomItems(
+    @common.Req() request: Request,
+    @common.Param() params: BatchWhereUniqueInput
+  ): Promise<RecipeBomItem[]> {
+    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
+    const results = await this.service.findRecipeBomItems(params.id, {
+      ...query,
+      select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBomItems(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBomItems(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomItems: {
+        set: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBomItems")
+  @nestAccessControl.UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBomItems(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomItems: {
         disconnect: body,
       },
     };

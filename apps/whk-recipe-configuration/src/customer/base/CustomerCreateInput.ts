@@ -14,13 +14,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  IsOptional,
   ValidateNested,
+  IsOptional,
   IsInt,
   Max,
 } from "class-validator";
-import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
+import { BatchCreateNestedManyWithoutCustomersInput } from "./BatchCreateNestedManyWithoutCustomersInput";
 import { Type } from "class-transformer";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
 import { RecipeCreateNestedManyWithoutCustomersInput } from "./RecipeCreateNestedManyWithoutCustomersInput";
 import { SalesOrderCreateNestedManyWithoutCustomersInput } from "./SalesOrderCreateNestedManyWithoutCustomersInput";
@@ -35,6 +36,18 @@ class CustomerCreateInput {
   @MaxLength(256)
   @Field(() => String)
   address!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchCreateNestedManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchCreateNestedManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => BatchCreateNestedManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  batches?: BatchCreateNestedManyWithoutCustomersInput;
 
   @ApiProperty({
     required: true,

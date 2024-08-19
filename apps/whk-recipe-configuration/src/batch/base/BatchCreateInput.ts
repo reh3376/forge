@@ -27,11 +27,14 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { BatchCreateNestedManyWithoutBatchesInput } from "./BatchCreateNestedManyWithoutBatchesInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryCreateNestedManyWithoutBatchesInput } from "./FermentationChemistryCreateNestedManyWithoutBatchesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomItemCreateNestedManyWithoutBatchesInput } from "./RecipeBomItemCreateNestedManyWithoutBatchesInput";
 
 @InputType()
 class BatchCreateInput {
@@ -102,6 +105,18 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
   })
   @IsJSONValue()
   @IsOptional()
@@ -133,6 +148,18 @@ class BatchCreateInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -209,6 +236,18 @@ class BatchCreateInput {
     nullable: true,
   })
   recipe?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemCreateNestedManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemCreateNestedManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemCreateNestedManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  recipeBomItems?: RecipeBomItemCreateNestedManyWithoutBatchesInput;
 
   @ApiProperty({
     required: false,
