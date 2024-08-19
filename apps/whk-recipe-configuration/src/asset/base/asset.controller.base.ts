@@ -290,10 +290,23 @@ export class AssetControllerBase {
         batchId: true,
         batchInitData: true,
         createdAt: true,
+
+        customer: {
+          select: {
+            id: true,
+          },
+        },
+
         customers: true,
         id: true,
 
         lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        mashingProtocol: {
           select: {
             id: true,
           },

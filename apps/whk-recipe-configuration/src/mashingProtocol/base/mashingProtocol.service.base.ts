@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   MashingProtocol as PrismaMashingProtocol,
+  Batch as PrismaBatch,
   Recipe as PrismaRecipe,
   MashingProtocolStep as PrismaMashingProtocolStep,
 } from "@prisma/client";
@@ -51,6 +52,17 @@ export class MashingProtocolServiceBase {
     args: Prisma.MashingProtocolDeleteArgs
   ): Promise<PrismaMashingProtocol> {
     return this.prisma.mashingProtocol.delete(args);
+  }
+
+  async findBatches(
+    parentId: string,
+    args: Prisma.BatchFindManyArgs
+  ): Promise<PrismaBatch[]> {
+    return this.prisma.mashingProtocol
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batches(args);
   }
 
   async findMasterInstances(

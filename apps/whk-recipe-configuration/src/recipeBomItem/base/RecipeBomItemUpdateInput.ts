@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 
 import {
   ValidateNested,
@@ -28,6 +28,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 import { RecipeBomItemUpdateManyWithoutRecipeBomItemsInput } from "./RecipeBomItemUpdateManyWithoutRecipeBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput";
@@ -37,6 +38,18 @@ import { RecipeBomUpdateManyWithoutRecipeBomItemsInput } from "./RecipeBomUpdate
 
 @InputType()
 class RecipeBomItemUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BatchWhereUniqueInput, {
+    nullable: true,
+  })
+  batch?: BatchWhereUniqueInput | null;
+
   @ApiProperty({
     required: false,
     type: () => RecipeBomItemWhereUniqueInput,

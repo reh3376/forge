@@ -11,9 +11,10 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
+import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { RecipeBomItemListRelationFilter } from "./RecipeBomItemListRelationFilter";
@@ -28,6 +29,18 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
 @InputType()
 class RecipeBomItemWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchWhereUniqueInput)
+  @IsOptional()
+  @Field(() => BatchWhereUniqueInput, {
+    nullable: true,
+  })
+  batch?: BatchWhereUniqueInput;
+
   @ApiProperty({
     required: false,
     type: () => RecipeBomItemWhereUniqueInput,

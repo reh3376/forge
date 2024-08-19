@@ -18,12 +18,15 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { BatchListRelationFilter } from "./BatchListRelationFilter";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 
 @InputType()
 class BatchWhereInput {
@@ -97,6 +100,18 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: JsonFilter,
   })
   @Type(() => JsonFilter)
@@ -140,6 +155,18 @@ class BatchWhereInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -213,6 +240,18 @@ class BatchWhereInput {
     nullable: true,
   })
   recipe?: RecipeWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeBomItemListRelationFilter, {
+    nullable: true,
+  })
+  recipeBomItems?: RecipeBomItemListRelationFilter;
 
   @ApiProperty({
     required: false,

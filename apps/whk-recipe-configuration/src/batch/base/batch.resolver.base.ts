@@ -27,8 +27,12 @@ import { CreateBatchArgs } from "./CreateBatchArgs";
 import { UpdateBatchArgs } from "./UpdateBatchArgs";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { Asset } from "../../asset/base/Asset";
+import { Customer } from "../../customer/base/Customer";
 import { Lot } from "../../lot/base/Lot";
+import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -101,9 +105,21 @@ export class BatchResolverBase {
             }
           : undefined,
 
+        customer: args.data.customer
+          ? {
+              connect: args.data.customer,
+            }
+          : undefined,
+
         lot: args.data.lot
           ? {
               connect: args.data.lot,
+            }
+          : undefined,
+
+        mashingProtocol: args.data.mashingProtocol
+          ? {
+              connect: args.data.mashingProtocol,
             }
           : undefined,
 
@@ -144,9 +160,21 @@ export class BatchResolverBase {
               }
             : undefined,
 
+          customer: args.data.customer
+            ? {
+                connect: args.data.customer,
+              }
+            : undefined,
+
           lot: args.data.lot
             ? {
                 connect: args.data.lot,
+              }
+            : undefined,
+
+          mashingProtocol: args.data.mashingProtocol
+            ? {
+                connect: args.data.mashingProtocol,
               }
             : undefined,
 
@@ -219,6 +247,26 @@ export class BatchResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBomItems" })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomItems(
+    @graphql.Parent() parent: Batch,
+    @graphql.Args() args: RecipeBomItemFindManyArgs
+  ): Promise<RecipeBomItem[]> {
+    const results = await this.service.findRecipeBomItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Asset, {
     nullable: true,
     name: "asset",
@@ -238,6 +286,25 @@ export class BatchResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Customer, {
+    nullable: true,
+    name: "customer",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "read",
+    possession: "any",
+  })
+  async getCustomer(@graphql.Parent() parent: Batch): Promise<Customer | null> {
+    const result = await this.service.getCustomer(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Lot, {
     nullable: true,
     name: "lot",
@@ -249,6 +316,27 @@ export class BatchResolverBase {
   })
   async getLot(@graphql.Parent() parent: Batch): Promise<Lot | null> {
     const result = await this.service.getLot(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => MashingProtocol, {
+    nullable: true,
+    name: "mashingProtocol",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async getMashingProtocol(
+    @graphql.Parent() parent: Batch
+  ): Promise<MashingProtocol | null> {
+    const result = await this.service.getMashingProtocol(parent.id);
 
     if (!result) {
       return null;

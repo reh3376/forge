@@ -27,11 +27,14 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { BatchUpdateManyWithoutBatchesInput } from "./BatchUpdateManyWithoutBatchesInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryUpdateManyWithoutBatchesInput } from "./FermentationChemistryUpdateManyWithoutBatchesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomItemUpdateManyWithoutBatchesInput } from "./RecipeBomItemUpdateManyWithoutBatchesInput";
 
 @InputType()
 class BatchUpdateInput {
@@ -105,6 +108,18 @@ class BatchUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  customer?: CustomerWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
   })
   @IsJSONValue()
   @IsOptional()
@@ -136,6 +151,18 @@ class BatchUpdateInput {
     nullable: true,
   })
   lot?: LotWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -212,6 +239,18 @@ class BatchUpdateInput {
     nullable: true,
   })
   recipe?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomItemUpdateManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomItemUpdateManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemUpdateManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  recipeBomItems?: RecipeBomItemUpdateManyWithoutBatchesInput;
 
   @ApiProperty({
     required: false,

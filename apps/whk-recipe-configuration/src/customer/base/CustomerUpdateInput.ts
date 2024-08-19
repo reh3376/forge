@@ -19,8 +19,9 @@ import {
   IsInt,
   Max,
 } from "class-validator";
-import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
+import { BatchUpdateManyWithoutCustomersInput } from "./BatchUpdateManyWithoutCustomersInput";
 import { Type } from "class-transformer";
+import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
 import { RecipeUpdateManyWithoutCustomersInput } from "./RecipeUpdateManyWithoutCustomersInput";
 import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
@@ -38,6 +39,18 @@ class CustomerUpdateInput {
     nullable: true,
   })
   address?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchUpdateManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchUpdateManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => BatchUpdateManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  batches?: BatchUpdateManyWithoutCustomersInput;
 
   @ApiProperty({
     required: false,
