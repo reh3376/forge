@@ -22,6 +22,7 @@ import {
 import { Type } from "class-transformer";
 import { MashingProtocolCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolCreateNestedManyWithoutMashingProtocolsInput";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
+import { ProductionOrderRecipeInstanceCreateNestedManyWithoutMashingProtocolsInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutMashingProtocolsInput";
 import { RecipeCreateNestedManyWithoutMashingProtocolsInput } from "./RecipeCreateNestedManyWithoutMashingProtocolsInput";
 import { MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput } from "./MashingProtocolStepCreateNestedManyWithoutMashingProtocolsInput";
 
@@ -91,6 +92,26 @@ class MashingProtocolCreateInput {
   @MaxLength(1000)
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      ProductionOrderRecipeInstanceCreateNestedManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(
+    () =>
+      ProductionOrderRecipeInstanceCreateNestedManyWithoutMashingProtocolsInput
+  )
+  @IsOptional()
+  @Field(
+    () =>
+      ProductionOrderRecipeInstanceCreateNestedManyWithoutMashingProtocolsInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceCreateNestedManyWithoutMashingProtocolsInput;
 
   @ApiProperty({
     required: false,

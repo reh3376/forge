@@ -20,6 +20,7 @@ import {
   MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
@@ -69,6 +70,15 @@ class RecipeBom {
   @Type(() => RecipeBom)
   @IsOptional()
   masterRecipeBom?: RecipeBom | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderRecipeInstance],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstance)
+  @IsOptional()
+  productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
 
   @ApiProperty({
     required: false,
