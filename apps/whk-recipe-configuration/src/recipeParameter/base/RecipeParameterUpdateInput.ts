@@ -15,20 +15,18 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsBoolean,
   IsOptional,
-  ValidateNested,
   IsString,
   MaxLength,
   IsEnum,
   IsInt,
   Max,
+  ValidateNested,
   IsNumber,
 } from "class-validator";
 
-import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
-import { Type } from "class-transformer";
-import { RecipeParameterUpdateManyWithoutRecipeParametersInput } from "./RecipeParameterUpdateManyWithoutRecipeParametersInput";
 import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 import { RecipeUpdateManyWithoutRecipeParametersInput } from "./RecipeUpdateManyWithoutRecipeParametersInput";
+import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 
@@ -44,18 +42,6 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   active?: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeParameterWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeParameterWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: RecipeParameterWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -104,18 +90,6 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeParameterUpdateManyWithoutRecipeParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterUpdateManyWithoutRecipeParametersInput)
-  @IsOptional()
-  @Field(() => RecipeParameterUpdateManyWithoutRecipeParametersInput, {
-    nullable: true,
-  })
-  instances?: RecipeParameterUpdateManyWithoutRecipeParametersInput;
 
   @ApiProperty({
     required: false,

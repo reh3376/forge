@@ -14,14 +14,14 @@ import { ApiProperty } from "@nestjs/swagger";
 
 import {
   IsBoolean,
-  ValidateNested,
-  IsOptional,
   IsString,
   MaxLength,
   IsDate,
+  IsOptional,
   IsEnum,
   IsInt,
   Max,
+  ValidateNested,
   IsNumber,
 } from "class-validator";
 
@@ -40,15 +40,6 @@ class RecipeParameter {
   @IsBoolean()
   @Field(() => Boolean)
   active!: boolean;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeParameter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameter)
-  @IsOptional()
-  classId?: RecipeParameter | null;
 
   @ApiProperty({
     required: true,
@@ -107,15 +98,6 @@ class RecipeParameter {
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [RecipeParameter],
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameter)
-  @IsOptional()
-  instances?: Array<RecipeParameter>;
 
   @ApiProperty({
     required: false,
