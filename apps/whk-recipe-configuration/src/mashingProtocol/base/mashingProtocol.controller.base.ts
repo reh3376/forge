@@ -827,6 +827,8 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        promptMessage: true,
+        stepTime: true,
         stepType: true,
         temperatureActual: true,
         temperatureSetpoint: true,
