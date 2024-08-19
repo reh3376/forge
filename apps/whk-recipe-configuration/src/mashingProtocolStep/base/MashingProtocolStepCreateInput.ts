@@ -159,6 +159,18 @@ class MashingProtocolStepCreateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  promptMessage?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => RecipeBomItemCreateNestedManyWithoutMashingProtocolStepsInput,
   })
   @ValidateNested()
@@ -168,6 +180,18 @@ class MashingProtocolStepCreateInput {
     nullable: true,
   })
   recipeBomItem?: RecipeBomItemCreateNestedManyWithoutMashingProtocolStepsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  stepTime?: number | null;
 
   @ApiProperty({
     required: false,

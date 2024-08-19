@@ -540,6 +540,8 @@ export class RecipeBomItemControllerBase {
           },
         },
 
+        promptMessage: true,
+        stepTime: true,
         stepType: true,
         temperatureActual: true,
         temperatureSetpoint: true,

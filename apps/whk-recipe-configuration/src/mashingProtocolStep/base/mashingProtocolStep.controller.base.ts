@@ -84,6 +84,8 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
+        promptMessage: true,
+        stepTime: true,
         stepType: true,
         temperatureActual: true,
         temperatureSetpoint: true,
@@ -131,6 +133,8 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
+        promptMessage: true,
+        stepTime: true,
         stepType: true,
         temperatureActual: true,
         temperatureSetpoint: true,
@@ -177,6 +181,8 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
+        promptMessage: true,
+        stepTime: true,
         stepType: true,
         temperatureActual: true,
         temperatureSetpoint: true,
@@ -243,6 +249,8 @@ export class MashingProtocolStepControllerBase {
             },
           },
 
+          promptMessage: true,
+          stepTime: true,
           stepType: true,
           temperatureActual: true,
           temperatureSetpoint: true,
@@ -297,6 +305,8 @@ export class MashingProtocolStepControllerBase {
             },
           },
 
+          promptMessage: true,
+          stepTime: true,
           stepType: true,
           temperatureActual: true,
           temperatureSetpoint: true,
