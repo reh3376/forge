@@ -34,6 +34,7 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { RecipeParameterCreateNestedManyWithoutRecipesInput } from "./RecipeParameterCreateNestedManyWithoutRecipesInput";
+import { ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { RecipeBomCreateNestedManyWithoutRecipesInput } from "./RecipeBomCreateNestedManyWithoutRecipesInput";
@@ -223,6 +224,22 @@ class RecipeCreateInput {
     nullable: true,
   })
   parameters?: RecipeParameterCreateNestedManyWithoutRecipesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(
+    () => ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

@@ -322,6 +322,12 @@ export class AssetControllerBase {
           },
         },
 
+        productionOrderRecipeInstance: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
 
         recipe: {

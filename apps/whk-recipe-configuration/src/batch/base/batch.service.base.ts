@@ -20,6 +20,7 @@ import {
   Customer as PrismaCustomer,
   Lot as PrismaLot,
   MashingProtocol as PrismaMashingProtocol,
+  ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Recipe as PrismaRecipe,
 } from "@prisma/client";
 
@@ -119,6 +120,16 @@ export class BatchServiceBase {
         where: { id: parentId },
       })
       .parent();
+  }
+
+  async getProductionOrderRecipeInstance(
+    parentId: string
+  ): Promise<PrismaProductionOrderRecipeInstance | null> {
+    return this.prisma.batch
+      .findUnique({
+        where: { id: parentId },
+      })
+      .productionOrderRecipeInstance();
   }
 
   async getRecipe(parentId: string): Promise<PrismaRecipe | null> {

@@ -314,6 +314,12 @@ export class CustomerControllerBase {
           },
         },
 
+        productionOrderRecipeInstance: {
+          select: {
+            id: true,
+          },
+        },
+
         quantity: true,
 
         recipe: {

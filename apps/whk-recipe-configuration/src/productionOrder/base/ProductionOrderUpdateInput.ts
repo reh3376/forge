@@ -34,6 +34,7 @@ import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./F
 import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutProductionOrdersInput } from "./LotUpdateManyWithoutProductionOrdersInput";
+import { ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput";
 import { ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -267,6 +268,24 @@ class ProductionOrderUpdateInput {
     nullable: true,
   })
   plannedFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput
+  )
+  @IsOptional()
+  @Field(
+    () => ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,
