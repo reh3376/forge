@@ -28,7 +28,6 @@ import { InventoryLogCreateNestedManyWithoutItemsInput } from "./InventoryLogCre
 import { InventoryTransferCreateNestedManyWithoutItemsInput } from "./InventoryTransferCreateNestedManyWithoutItemsInput";
 import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
 import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
 import { RecipeBomItemCreateNestedManyWithoutItemsInput } from "./RecipeBomItemCreateNestedManyWithoutItemsInput";
@@ -237,18 +236,6 @@ class ItemCreateInput {
     nullable: true,
   })
   lots?: LotCreateNestedManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

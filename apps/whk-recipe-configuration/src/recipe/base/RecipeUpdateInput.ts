@@ -33,9 +33,7 @@ import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRe
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
-import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { RecipeBomUpdateManyWithoutRecipesInput } from "./RecipeBomUpdateManyWithoutRecipesInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -224,18 +222,6 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeParameterUpdateManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterUpdateManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => RecipeParameterUpdateManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  parameters?: RecipeParameterUpdateManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
     type: () => ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
@@ -245,18 +231,6 @@ class RecipeUpdateInput {
     nullable: true,
   })
   productionOrderRecipeInstances?: ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

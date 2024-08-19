@@ -35,7 +35,6 @@ import { FermentationDayDatum } from "../../fermentationDayDatum/base/Fermentati
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
@@ -269,15 +268,6 @@ class ProductionOrder {
   @Type(() => ProductionOrderRecipeInstance)
   @IsOptional()
   productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrderUnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedure)
-  @IsOptional()
-  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
 
   @ApiProperty({
     required: false,

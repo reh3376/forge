@@ -28,7 +28,6 @@ import { InventoryLogUpdateManyWithoutItemsInput } from "./InventoryLogUpdateMan
 import { InventoryTransferUpdateManyWithoutItemsInput } from "./InventoryTransferUpdateManyWithoutItemsInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
 import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutItemsInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
 import { RecipeBomItemUpdateManyWithoutItemsInput } from "./RecipeBomItemUpdateManyWithoutItemsInput";
@@ -252,18 +251,6 @@ class ItemUpdateInput {
     nullable: true,
   })
   lots?: LotUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

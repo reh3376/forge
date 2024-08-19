@@ -35,7 +35,6 @@ import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutProductionOrdersInput } from "./LotCreateNestedManyWithoutProductionOrdersInput";
 import { ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
@@ -284,26 +283,6 @@ class ProductionOrderCreateInput {
     }
   )
   productionOrderRecipeInstances?: ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(
-    () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput
-  )
-  @IsOptional()
-  @Field(
-    () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,

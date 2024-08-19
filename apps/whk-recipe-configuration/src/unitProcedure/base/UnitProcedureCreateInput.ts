@@ -30,7 +30,6 @@ import { UnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./UnitP
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationCreateNestedManyWithoutUnitProceduresInput } from "./OperationCreateNestedManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput";
 import { RecipeCreateNestedManyWithoutUnitProceduresInput } from "./RecipeCreateNestedManyWithoutUnitProceduresInput";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
@@ -196,25 +195,6 @@ class UnitProcedureCreateInput {
   @Type(() => ProcedureWhereUniqueInput)
   @Field(() => ProcedureWhereUniqueInput)
   procedure!: ProcedureWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput,
-  })
-  @ValidateNested()
-  @Type(
-    () => ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput
-  )
-  @IsOptional()
-  @Field(
-    () =>
-      ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,

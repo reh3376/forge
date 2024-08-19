@@ -29,7 +29,6 @@ import { Type } from "class-transformer";
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { Operation } from "../../operation/base/Operation";
 import { Procedure } from "../../procedure/base/Procedure";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Recipe } from "../../recipe/base/Recipe";
 import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 
@@ -197,15 +196,6 @@ class UnitProcedure {
   @ValidateNested()
   @Type(() => Procedure)
   procedure?: Procedure;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrderUnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedure)
-  @IsOptional()
-  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
 
   @ApiProperty({
     required: false,
