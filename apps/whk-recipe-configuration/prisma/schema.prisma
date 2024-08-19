@@ -208,42 +208,43 @@ model Procedure {
 }
 
 model Recipe {
-  Recipe                        String
-  active                        Boolean?                       @default(true)
-  batches                       Batch[]
-  classId                       Recipe?                        @relation(name: "RecipeClassIdRecipeInstances", fields: [classIdId], references: [id])
-  classIdId                     String?
-  cooksPerFerm                  Int?                           @default(3)
-  createdAt                     DateTime                       @default(now())
-  createdBy                     String
-  customer                      Customer                       @relation(fields: [customerId], references: [id])
-  customerId                    String
-  customerCode                  String?
-  estimatedAbv                  Decimal?
-  globalId                      String?                        @unique @default(cuid())
-  id                            String                         @id @default(cuid())
-  instances                     Recipe[]                       @relation(name: "RecipeClassIdRecipeInstances")
-  isClassDefinition             Boolean?                       @default(true)
-  item                          Item?                          @relation(fields: [itemId], references: [id])
-  itemId                        String?
-  lots                          Lot[]
-  mashingProtocol               MashingProtocol?               @relation(fields: [mashingProtocolId], references: [id])
-  mashingProtocolId             String?
-  parameters                    RecipeParameter[]
-  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
-  productionOrders              ProductionOrder[]
-  recipeBoms                    RecipeBom[]
-  recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId                 String?
-  revision                      Int?                           @default(0)
-  scheduleOrders                ScheduleOrder[]
-  schemaVersion                 String?                        @default("0001-b")
-  targetProof                   Decimal?
-  totalCooks                    Int?
-  totalFermenters               Int?
-  unitProcedures                UnitProcedure[]
-  updatedAt                     DateTime                       @updatedAt
-  updatedBy                     String?
+  Recipe                         String
+  active                         Boolean?                        @default(true)
+  batches                        Batch[]
+  classId                        Recipe?                         @relation(name: "RecipeClassIdRecipeInstances", fields: [classIdId], references: [id])
+  classIdId                      String?
+  cooksPerFerm                   Int?                            @default(3)
+  createdAt                      DateTime                        @default(now())
+  createdBy                      String
+  customer                       Customer                        @relation(fields: [customerId], references: [id])
+  customerId                     String
+  customerCode                   String?
+  estimatedAbv                   Decimal?
+  globalId                       String?                         @unique @default(cuid())
+  id                             String                          @id @default(cuid())
+  instances                      Recipe[]                        @relation(name: "RecipeClassIdRecipeInstances")
+  isClassDefinition              Boolean?                        @default(true)
+  item                           Item?                           @relation(fields: [itemId], references: [id])
+  itemId                         String?
+  lots                           Lot[]
+  mashingProtocol                MashingProtocol?                @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId              String?
+  parameters                     RecipeParameter[]
+  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
+  productionOrderUnitProcedures  ProductionOrderUnitProcedure[]
+  productionOrders               ProductionOrder[]
+  recipeBoms                     RecipeBom[]
+  recipeGroup                    RecipeGroup?                    @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                  String?
+  revision                       Int?                            @default(0)
+  scheduleOrders                 ScheduleOrder[]
+  schemaVersion                  String?                         @default("0001-b")
+  targetProof                    Decimal?
+  totalCooks                     Int?
+  totalFermenters                Int?
+  unitProcedures                 UnitProcedure[]
+  updatedAt                      DateTime                        @updatedAt
+  updatedBy                      String?
 
   @@unique([itemId, customerId])
 }
@@ -339,47 +340,48 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
-  bom                           Bom                            @relation(fields: [bomId], references: [id])
-  bomId                         String
-  className                     String?
-  complete                      Boolean?                       @default(false)
-  completedCooks                Int?
-  completedFermenters           Int?
-  completedQuantity             Decimal?
-  createdAt                     DateTime                       @default(now())
-  createdBy                     String
-  customer                      Customer                       @relation(fields: [customerId], references: [id])
-  customerId                    String
-  customerCode                  String?
-  endDate                       DateTime?
-  fermentationChemistries       FermentationChemistry[]
-  fermentationDayData           FermentationDayDatum[]
-  globalId                      String?                        @default(cuid())
-  id                            String                         @id @default(cuid())
-  inProcess                     Boolean?                       @default(false)
-  item                          Item                           @relation(fields: [fgItemId], references: [id])
-  fgItemId                      String
-  lots                          Lot[]
-  name                          String?                        @unique
-  plannedCooks                  Int?
-  plannedFermenters             Int?
-  productionOrderUnitProcedures ProductionOrderUnitProcedure[]
-  quantity                      Int?
-  recipe                        Recipe?                        @relation(fields: [recipeId], references: [id])
-  recipeId                      String?
-  recipeGroup                   RecipeGroup?                   @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId                 String?
-  salesOrder                    SalesOrder?                    @relation(fields: [salesOrderId], references: [id])
-  salesOrderId                  String?                        @unique
-  scheduleOrder                 ScheduleOrder?                 @relation(fields: [scheduleOrderId], references: [id])
-  scheduleOrderId               String?
-  scheduled                     Boolean?                       @default(false)
-  schemaVersion                 String?                        @default("0001-alpha")
-  startDate                     DateTime?                      @default(now())
-  status                        EnumProductionOrderStatus?     @default(Initiated)
-  units                         String?
-  updatedAt                     DateTime                       @updatedAt
-  updatedBy                     DateTime?
+  bom                            Bom                             @relation(fields: [bomId], references: [id])
+  bomId                          String
+  className                      String?
+  complete                       Boolean?                        @default(false)
+  completedCooks                 Int?
+  completedFermenters            Int?
+  completedQuantity              Decimal?
+  createdAt                      DateTime                        @default(now())
+  createdBy                      String
+  customer                       Customer                        @relation(fields: [customerId], references: [id])
+  customerId                     String
+  customerCode                   String?
+  endDate                        DateTime?
+  fermentationChemistries        FermentationChemistry[]
+  fermentationDayData            FermentationDayDatum[]
+  globalId                       String?                         @default(cuid())
+  id                             String                          @id @default(cuid())
+  inProcess                      Boolean?                        @default(false)
+  item                           Item                            @relation(fields: [fgItemId], references: [id])
+  fgItemId                       String
+  lots                           Lot[]
+  name                           String?                         @unique
+  plannedCooks                   Int?
+  plannedFermenters              Int?
+  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
+  productionOrderUnitProcedures  ProductionOrderUnitProcedure[]
+  quantity                       Int?
+  recipe                         Recipe?                         @relation(fields: [recipeId], references: [id])
+  recipeId                       String?
+  recipeGroup                    RecipeGroup?                    @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                  String?
+  salesOrder                     SalesOrder?                     @relation(fields: [salesOrderId], references: [id])
+  salesOrderId                   String?                         @unique
+  scheduleOrder                  ScheduleOrder?                  @relation(fields: [scheduleOrderId], references: [id])
+  scheduleOrderId                String?
+  scheduled                      Boolean?                        @default(false)
+  schemaVersion                  String?                         @default("0001-alpha")
+  startDate                      DateTime?                       @default(now())
+  status                         EnumProductionOrderStatus?      @default(Initiated)
+  units                          String?
+  updatedAt                      DateTime                        @updatedAt
+  updatedBy                      DateTime?
 }
 
 model ScheduleOrder {
@@ -781,35 +783,37 @@ model FermentationDayDatum {
 }
 
 model Batch {
-  asset                   Asset?                  @relation(fields: [assetId], references: [id])
-  assetId                 String?
-  assetPath               String?
-  batchData               Json?
-  batchId                 String                  @unique
-  batchInitData           Json?
-  children                Batch[]                 @relation(name: "BatchChildrenBatchParent")
-  createdAt               DateTime                @default(now())
-  customer                Customer?               @relation(fields: [customerId], references: [id])
-  customerId              String?
-  customers               Json?
-  fermentationChemistries FermentationChemistry[]
-  id                      String                  @id @default(cuid())
-  lot                     Lot?                    @relation(fields: [lotId], references: [id])
-  lotId                   String?
-  mashingProtocol         MashingProtocol?        @relation(fields: [mashingProtocolId], references: [id])
-  mashingProtocolId       String?
-  operationIndex          String?
-  operationType           EnumBatchOperationType?
-  parameterData           Json?
-  parent                  Batch?                  @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
-  parentId                String?
-  quantity                Int?
-  recipe                  Recipe?                 @relation(fields: [recipeId], references: [id])
-  recipeId                String?
-  recipeBomItems          RecipeBomItem[]
-  recipeName              String?
-  revision                Int?                    @default(0)
-  updatedAt               DateTime                @updatedAt
+  asset                           Asset?                         @relation(fields: [assetId], references: [id])
+  assetId                         String?
+  assetPath                       String?
+  batchData                       Json?
+  batchId                         String                         @unique
+  batchInitData                   Json?
+  children                        Batch[]                        @relation(name: "BatchChildrenBatchParent")
+  createdAt                       DateTime                       @default(now())
+  customer                        Customer?                      @relation(fields: [customerId], references: [id])
+  customerId                      String?
+  customers                       Json?
+  fermentationChemistries         FermentationChemistry[]
+  id                              String                         @id @default(cuid())
+  lot                             Lot?                           @relation(fields: [lotId], references: [id])
+  lotId                           String?
+  mashingProtocol                 MashingProtocol?               @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId               String?
+  operationIndex                  String?
+  operationType                   EnumBatchOperationType?
+  parameterData                   Json?
+  parent                          Batch?                         @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
+  parentId                        String?
+  productionOrderRecipeInstance   ProductionOrderRecipeInstance? @relation(fields: [productionOrderRecipeInstanceId], references: [id])
+  productionOrderRecipeInstanceId String?
+  quantity                        Int?
+  recipe                          Recipe?                        @relation(fields: [recipeId], references: [id])
+  recipeId                        String?
+  recipeBomItems                  RecipeBomItem[]
+  recipeName                      String?
+  revision                        Int?                           @default(0)
+  updatedAt                       DateTime                       @updatedAt
 }
 
 model Vendor {
@@ -940,24 +944,25 @@ model RecipeBomItem {
 }
 
 model MashingProtocol {
-  batches                  Batch[]
-  createdAt                DateTime              @default(now())
-  createdBy                String
-  id                       String                @id @default(cuid())
-  master                   Boolean?              @default(false)
-  masterInstances          MashingProtocol[]     @relation(name: "masterMashingProtocol")
-  masterMashingProtocol    MashingProtocol?      @relation(name: "masterMashingProtocol", fields: [masterMashingProtocolId], references: [id])
-  masterMashingProtocolId  String?
-  name                     String                @unique
-  recipes                  Recipe[]
-  revision                 String?
-  running                  Boolean?              @default(false)
-  runningInstances         MashingProtocol[]     @relation(name: "runningMashingProtocol")
-  runningMashingProtocol   MashingProtocol?      @relation(name: "runningMashingProtocol", fields: [runningMashingProtocolId], references: [id])
-  runningMashingProtocolId String?
-  steps                    MashingProtocolStep[]
-  updatedAt                DateTime              @updatedAt
-  updatedBy                String?
+  batches                        Batch[]
+  createdAt                      DateTime                        @default(now())
+  createdBy                      String
+  id                             String                          @id @default(cuid())
+  master                         Boolean?                        @default(false)
+  masterInstances                MashingProtocol[]               @relation(name: "masterMashingProtocol")
+  masterMashingProtocol          MashingProtocol?                @relation(name: "masterMashingProtocol", fields: [masterMashingProtocolId], references: [id])
+  masterMashingProtocolId        String?
+  name                           String                          @unique
+  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
+  recipes                        Recipe[]
+  revision                       String?
+  running                        Boolean?                        @default(false)
+  runningInstances               MashingProtocol[]               @relation(name: "runningMashingProtocol")
+  runningMashingProtocol         MashingProtocol?                @relation(name: "runningMashingProtocol", fields: [runningMashingProtocolId], references: [id])
+  runningMashingProtocolId       String?
+  steps                          MashingProtocolStep[]
+  updatedAt                      DateTime                        @updatedAt
+  updatedBy                      String?
 }
 
 model MashingProtocolStep {
@@ -986,21 +991,37 @@ model MashingProtocolStep {
 }
 
 model RecipeBom {
-  createdAt          DateTime      @default(now())
-  id                 String        @id @default(cuid())
-  master             Boolean?      @default(false)
-  masterInstances    RecipeBom[]   @relation(name: "masterRecipeBom")
-  masterRecipeBom    RecipeBom?    @relation(name: "masterRecipeBom", fields: [masterReceipeBomId], references: [id])
-  masterReceipeBomId String?
-  recipe             Recipe[]
-  recipeBomITem      RecipeBomItem @relation(fields: [recipeBomITemId], references: [id])
-  recipeBomITemId    String
-  revision           String?
-  running            Boolean?      @default(false)
-  runningInstances   RecipeBom[]   @relation(name: "runningRecipeBom")
-  runningRecipeBom   RecipeBom?    @relation(name: "runningRecipeBom", fields: [runningRecipeBomId], references: [id])
-  runningRecipeBomId String?
-  updatedAt          DateTime      @updatedAt
+  createdAt                      DateTime                        @default(now())
+  id                             String                          @id @default(cuid())
+  master                         Boolean?                        @default(false)
+  masterInstances                RecipeBom[]                     @relation(name: "masterRecipeBom")
+  masterRecipeBom                RecipeBom?                      @relation(name: "masterRecipeBom", fields: [masterReceipeBomId], references: [id])
+  masterReceipeBomId             String?
+  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
+  recipe                         Recipe[]
+  recipeBomITem                  RecipeBomItem                   @relation(fields: [recipeBomITemId], references: [id])
+  recipeBomITemId                String
+  revision                       String?
+  running                        Boolean?                        @default(false)
+  runningInstances               RecipeBom[]                     @relation(name: "runningRecipeBom")
+  runningRecipeBom               RecipeBom?                      @relation(name: "runningRecipeBom", fields: [runningRecipeBomId], references: [id])
+  runningRecipeBomId             String?
+  updatedAt                      DateTime                        @updatedAt
+}
+
+model ProductionOrderRecipeInstance {
+  batches           Batch[]
+  createdAt         DateTime          @default(now())
+  createdBy         String
+  id                String            @id @default(cuid())
+  mashingProtocol   MashingProtocol[]
+  productionOrder   ProductionOrder   @relation(fields: [productionOrderId], references: [id])
+  productionOrderId String
+  recipe            Recipe            @relation(fields: [recipeId], references: [id])
+  recipeId          String
+  recipeBom         RecipeBom[]
+  updatedAt         DateTime          @updatedAt
+  updatedBy         String?
 }
 
 enum EnumPhaseParameterSetpointType {

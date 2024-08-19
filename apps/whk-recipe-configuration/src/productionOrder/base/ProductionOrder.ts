@@ -34,6 +34,7 @@ import { FermentationChemistry } from "../../fermentationChemistry/base/Fermenta
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -259,6 +260,15 @@ class ProductionOrder {
     nullable: true,
   })
   plannedFermenters!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrderRecipeInstance],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstance)
+  @IsOptional()
+  productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
 
   @ApiProperty({
     required: false,

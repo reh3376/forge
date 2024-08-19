@@ -21,6 +21,7 @@ import {
 import { RecipeBomCreateNestedManyWithoutRecipeBomsInput } from "./RecipeBomCreateNestedManyWithoutRecipeBomsInput";
 import { Type } from "class-transformer";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
+import { ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput";
 import { RecipeCreateNestedManyWithoutRecipeBomsInput } from "./RecipeCreateNestedManyWithoutRecipeBomsInput";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
@@ -60,6 +61,24 @@ class RecipeBomCreateInput {
     nullable: true,
   })
   masterRecipeBom?: RecipeBomWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput
+  )
+  @IsOptional()
+  @Field(
+    () => ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput,
+    {
+      nullable: true,
+    }
+  )
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput;
 
   @ApiProperty({
     required: false,

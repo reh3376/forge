@@ -33,6 +33,7 @@ import { Asset } from "../../asset/base/Asset";
 import { Customer } from "../../customer/base/Customer";
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -129,6 +130,12 @@ export class BatchResolverBase {
             }
           : undefined,
 
+        productionOrderRecipeInstance: args.data.productionOrderRecipeInstance
+          ? {
+              connect: args.data.productionOrderRecipeInstance,
+            }
+          : undefined,
+
         recipe: args.data.recipe
           ? {
               connect: args.data.recipe,
@@ -181,6 +188,12 @@ export class BatchResolverBase {
           parent: args.data.parent
             ? {
                 connect: args.data.parent,
+              }
+            : undefined,
+
+          productionOrderRecipeInstance: args.data.productionOrderRecipeInstance
+            ? {
+                connect: args.data.productionOrderRecipeInstance,
               }
             : undefined,
 
@@ -356,6 +369,29 @@ export class BatchResolverBase {
   })
   async getParent(@graphql.Parent() parent: Batch): Promise<Batch | null> {
     const result = await this.service.getParent(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrderRecipeInstance, {
+    nullable: true,
+    name: "productionOrderRecipeInstance",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrderRecipeInstance(
+    @graphql.Parent() parent: Batch
+  ): Promise<ProductionOrderRecipeInstance | null> {
+    const result = await this.service.getProductionOrderRecipeInstance(
+      parent.id
+    );
 
     if (!result) {
       return null;
