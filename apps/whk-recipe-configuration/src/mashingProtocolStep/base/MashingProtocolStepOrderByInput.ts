@@ -171,6 +171,28 @@ class MashingProtocolStepOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  promptMessage?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  stepTime?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   stepType?: SortOrder;
 
   @ApiProperty({

@@ -975,7 +975,9 @@ model MashingProtocolStep {
   isClassDefinition   Boolean?                         @default(false)
   mashingProtocol     MashingProtocol?                 @relation(fields: [mashingProtocolId], references: [id])
   mashingProtocolId   String?
+  promptMessage       String?
   recipeBomItem       RecipeBomItem[]
+  stepTime            Int?
   stepType            EnumMashingProtocolStepStepType?
   temperatureActual   Decimal?
   temperatureSetpoint Decimal?
