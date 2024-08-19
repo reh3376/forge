@@ -32,9 +32,6 @@ import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
-import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
-import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
@@ -849,120 +846,6 @@ export class RecipeControllerBase {
   ): Promise<void> {
     const data = {
       lots: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/parameters")
-  @ApiNestedQuery(RecipeParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "read",
-    possession: "any",
-  })
-  async findParameters(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<RecipeParameter[]> {
-    const query = plainToClass(RecipeParameterFindManyArgs, request.query);
-    const results = await this.service.findParameters(params.id, {
-      ...query,
-      select: {
-        active: true,
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        operation: true,
-        operationIndex: true,
-        recipeNumericalSetpoint: true,
-        recipeParamDescription: true,
-        recipeParamName: true,
-        recipeParamUnits: true,
-        recipeSetpointBooleanValue: true,
-        recipeSetpointLowerLimit: true,
-        recipeSetpointType: true,
-        recipeSetpointUpperLimit: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/parameters")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async connectParameters(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeParameterWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      parameters: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/parameters")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async updateParameters(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeParameterWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      parameters: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipe({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/parameters")
-  @nestAccessControl.UseRoles({
-    resource: "Recipe",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectParameters(
-    @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: RecipeParameterWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      parameters: {
         disconnect: body,
       },
     };
