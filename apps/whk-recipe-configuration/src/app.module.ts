@@ -41,7 +41,6 @@ import { ItemReceiptModule } from "./itemReceipt/itemReceipt.module";
 import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
-import { ProductionOrderUnitProcedureModule } from "./productionOrderUnitProcedure/productionOrderUnitProcedure.module";
 import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
 import { MashDatumModule } from "./mashDatum/mashDatum.module";
 import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
@@ -107,7 +106,6 @@ import { AuthModule } from "./auth/auth.module";
     LotModule,
     BomItemModule,
     UnitModule,
-    ProductionOrderUnitProcedureModule,
     FermentationChemistryModule,
     MashDatumModule,
     FermentationSettingDatumModule,

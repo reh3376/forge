@@ -55,24 +55,9 @@ export class RecipeParameterControllerBase {
     @common.Body() data: RecipeParameterCreateInput
   ): Promise<RecipeParameter> {
     return await this.service.createRecipeParameter({
-      data: {
-        ...data,
-
-        classId: data.classId
-          ? {
-              connect: data.classId,
-            }
-          : undefined,
-      },
+      data: data,
       select: {
         active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         className: true,
         createdAt: true,
         createdBy: true,
@@ -118,13 +103,6 @@ export class RecipeParameterControllerBase {
       ...args,
       select: {
         active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         className: true,
         createdAt: true,
         createdBy: true,
@@ -169,13 +147,6 @@ export class RecipeParameterControllerBase {
       where: params,
       select: {
         active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
         className: true,
         createdAt: true,
         createdBy: true,
@@ -229,24 +200,9 @@ export class RecipeParameterControllerBase {
     try {
       return await this.service.updateRecipeParameter({
         where: params,
-        data: {
-          ...data,
-
-          classId: data.classId
-            ? {
-                connect: data.classId,
-              }
-            : undefined,
-        },
+        data: data,
         select: {
           active: true,
-
-          classId: {
-            select: {
-              id: true,
-            },
-          },
-
           className: true,
           createdAt: true,
           createdBy: true,
@@ -278,127 +234,6 @@ export class RecipeParameterControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/instances")
-  @ApiNestedQuery(RecipeParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "read",
-    possession: "any",
-  })
-  async findInstances(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeParameterWhereUniqueInput
-  ): Promise<RecipeParameter[]> {
-    const query = plainToClass(RecipeParameterFindManyArgs, request.query);
-    const results = await this.service.findInstances(params.id, {
-      ...query,
-      select: {
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        className: true,
-        createdAt: true,
-        createdBy: true,
-        description: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-        operation: true,
-        operationIndex: true,
-        recipeNumericalSetpoint: true,
-        recipeParamDescription: true,
-        recipeParamName: true,
-        recipeParamUnits: true,
-        recipeSetpointBooleanValue: true,
-        recipeSetpointLowerLimit: true,
-        recipeSetpointType: true,
-        recipeSetpointUpperLimit: true,
-        revision: true,
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "update",
-    possession: "any",
-  })
-  async connectInstances(
-    @common.Param() params: RecipeParameterWhereUniqueInput,
-    @common.Body() body: RecipeParameterWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeParameter({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "update",
-    possession: "any",
-  })
-  async updateInstances(
-    @common.Param() params: RecipeParameterWhereUniqueInput,
-    @common.Body() body: RecipeParameterWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeParameter({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectInstances(
-    @common.Param() params: RecipeParameterWhereUniqueInput,
-    @common.Body() body: RecipeParameterWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeParameter({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

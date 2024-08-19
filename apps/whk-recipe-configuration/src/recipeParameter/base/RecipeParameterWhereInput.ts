@@ -13,12 +13,10 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BooleanFilter } from "../../util/BooleanFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested, IsEnum } from "class-validator";
-import { RecipeParameterWhereUniqueInput } from "./RecipeParameterWhereUniqueInput";
+import { IsOptional, IsEnum, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { RecipeParameterListRelationFilter } from "./RecipeParameterListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -40,18 +38,6 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   active?: BooleanFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeParameterWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeParameterWhereUniqueInput, {
-    nullable: true,
-  })
-  classId?: RecipeParameterWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -118,18 +104,6 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeParameterListRelationFilter, {
-    nullable: true,
-  })
-  instances?: RecipeParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

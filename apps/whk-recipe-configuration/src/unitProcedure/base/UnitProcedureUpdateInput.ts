@@ -30,7 +30,6 @@ import { UnitProcedureUpdateManyWithoutUnitProceduresInput } from "./UnitProcedu
 import { EnumUnitProcedureName } from "./EnumUnitProcedureName";
 import { OperationUpdateManyWithoutUnitProceduresInput } from "./OperationUpdateManyWithoutUnitProceduresInput";
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput";
 import { RecipeUpdateManyWithoutUnitProceduresInput } from "./RecipeUpdateManyWithoutUnitProceduresInput";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
@@ -205,22 +204,6 @@ class UnitProcedureUpdateInput {
     nullable: true,
   })
   procedure?: ProcedureWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput)
-  @IsOptional()
-  @Field(
-    () => ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutUnitProceduresInput;
 
   @ApiProperty({
     required: false,

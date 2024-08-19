@@ -21,7 +21,6 @@ import {
   InventoryTransfer as PrismaInventoryTransfer,
   ItemReceipt as PrismaItemReceipt,
   Lot as PrismaLot,
-  ProductionOrderUnitProcedure as PrismaProductionOrderUnitProcedure,
   ProductionOrder as PrismaProductionOrder,
   PurchaseOrder as PrismaPurchaseOrder,
   RecipeBomItem as PrismaRecipeBomItem,
@@ -128,17 +127,6 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .lots(args);
-  }
-
-  async findProductionOrderUnitProcedures(
-    parentId: string,
-    args: Prisma.ProductionOrderUnitProcedureFindManyArgs
-  ): Promise<PrismaProductionOrderUnitProcedure[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderUnitProcedures(args);
   }
 
   async findProductionOrders(

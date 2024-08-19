@@ -93,15 +93,7 @@ export class RecipeParameterResolverBase {
   ): Promise<RecipeParameter> {
     return await this.service.createRecipeParameter({
       ...args,
-      data: {
-        ...args.data,
-
-        classId: args.data.classId
-          ? {
-              connect: args.data.classId,
-            }
-          : undefined,
-      },
+      data: args.data,
     });
   }
 
@@ -118,15 +110,7 @@ export class RecipeParameterResolverBase {
     try {
       return await this.service.updateRecipeParameter({
         ...args,
-        data: {
-          ...args.data,
-
-          classId: args.data.classId
-            ? {
-                connect: args.data.classId,
-              }
-            : undefined,
-        },
+        data: args.data,
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -136,26 +120,6 @@ export class RecipeParameterResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeParameter], { name: "instances" })
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "read",
-    possession: "any",
-  })
-  async findInstances(
-    @graphql.Parent() parent: RecipeParameter,
-    @graphql.Args() args: RecipeParameterFindManyArgs
-  ): Promise<RecipeParameter[]> {
-    const results = await this.service.findInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -176,26 +140,5 @@ export class RecipeParameterResolverBase {
     }
 
     return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => RecipeParameter, {
-    nullable: true,
-    name: "classId",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "RecipeParameter",
-    action: "read",
-    possession: "any",
-  })
-  async getClassId(
-    @graphql.Parent() parent: RecipeParameter
-  ): Promise<RecipeParameter | null> {
-    const result = await this.service.getClassId(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 }
