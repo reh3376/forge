@@ -61,6 +61,12 @@ export class RecipeBomItemControllerBase {
       data: {
         ...data,
 
+        batch: data.batch
+          ? {
+              connect: data.batch,
+            }
+          : undefined,
+
         classId: data.classId
           ? {
               connect: data.classId,
@@ -74,6 +80,12 @@ export class RecipeBomItemControllerBase {
           : undefined,
       },
       select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -123,6 +135,12 @@ export class RecipeBomItemControllerBase {
     return this.service.recipeBomItems({
       ...args,
       select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -171,6 +189,12 @@ export class RecipeBomItemControllerBase {
     const result = await this.service.recipeBomItem({
       where: params,
       select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,
@@ -232,6 +256,12 @@ export class RecipeBomItemControllerBase {
         data: {
           ...data,
 
+          batch: data.batch
+            ? {
+                connect: data.batch,
+              }
+            : undefined,
+
           classId: data.classId
             ? {
                 connect: data.classId,
@@ -245,6 +275,12 @@ export class RecipeBomItemControllerBase {
             : undefined,
         },
         select: {
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
           classId: {
             select: {
               id: true,
@@ -301,6 +337,12 @@ export class RecipeBomItemControllerBase {
       return await this.service.deleteRecipeBomItem({
         where: params,
         select: {
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
           classId: {
             select: {
               id: true,
@@ -355,6 +397,12 @@ export class RecipeBomItemControllerBase {
     const results = await this.service.findInstances(params.id, {
       ...query,
       select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
         classId: {
           select: {
             id: true,

@@ -14,12 +14,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   MaxLength,
-  IsDate,
-  IsOptional,
   ValidateNested,
+  IsOptional,
+  IsDate,
   IsInt,
   Max,
 } from "class-validator";
+import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -36,6 +37,15 @@ class Customer {
   @MaxLength(256)
   @Field(() => String)
   address!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
 
   @ApiProperty({
     required: true,
