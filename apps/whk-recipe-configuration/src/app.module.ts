@@ -18,7 +18,6 @@ import { redisStore } from "cache-manager-ioredis-yet";
 import { UserModule } from "./user/user.module";
 import { PhaseParameterModule } from "./phaseParameter/phaseParameter.module";
 import { TestParameterModule } from "./testParameter/testParameter.module";
-import { RecipeParameterModule } from "./recipeParameter/recipeParameter.module";
 import { InstructionModule } from "./instruction/instruction.module";
 import { EquipmentPhaseModule } from "./equipmentPhase/equipmentPhase.module";
 import { OperationModule } from "./operation/operation.module";
@@ -41,7 +40,6 @@ import { ItemReceiptModule } from "./itemReceipt/itemReceipt.module";
 import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
-import { ProductionOrderUnitProcedureModule } from "./productionOrderUnitProcedure/productionOrderUnitProcedure.module";
 import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
 import { MashDatumModule } from "./mashDatum/mashDatum.module";
 import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
@@ -85,7 +83,6 @@ import {SyncModule} from "./sync/sync.module";
     UserModule,
     PhaseParameterModule,
     TestParameterModule,
-    RecipeParameterModule,
     InstructionModule,
     EquipmentPhaseModule,
     OperationModule,
@@ -108,7 +105,6 @@ import {SyncModule} from "./sync/sync.module";
     LotModule,
     BomItemModule,
     UnitModule,
-    ProductionOrderUnitProcedureModule,
     FermentationChemistryModule,
     MashDatumModule,
     FermentationSettingDatumModule,

@@ -35,7 +35,6 @@ import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./Fe
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutProductionOrdersInput } from "./LotUpdateManyWithoutProductionOrdersInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput";
-import { ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
@@ -286,24 +285,6 @@ class ProductionOrderUpdateInput {
     }
   )
   productionOrderRecipeInstances?: ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(
-    () => ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput
-  )
-  @IsOptional()
-  @Field(
-    () => ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureUpdateManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,

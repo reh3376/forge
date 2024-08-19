@@ -33,9 +33,7 @@ import { RecipeCreateNestedManyWithoutRecipesInput } from "./RecipeCreateNestedM
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
-import { RecipeParameterCreateNestedManyWithoutRecipesInput } from "./RecipeParameterCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput";
-import { ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput } from "./ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput";
 import { ProductionOrderCreateNestedManyWithoutRecipesInput } from "./ProductionOrderCreateNestedManyWithoutRecipesInput";
 import { RecipeBomCreateNestedManyWithoutRecipesInput } from "./RecipeBomCreateNestedManyWithoutRecipesInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -215,18 +213,6 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeParameterCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => RecipeParameterCreateNestedManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  parameters?: RecipeParameterCreateNestedManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
     type: () =>
       ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput,
   })
@@ -240,21 +226,6 @@ class RecipeCreateInput {
     }
   )
   productionOrderRecipeInstances?: ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(
-    () => ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureCreateNestedManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

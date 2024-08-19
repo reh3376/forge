@@ -24,7 +24,6 @@ import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/bas
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
-import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
@@ -249,18 +248,6 @@ class ItemWhereInput {
     nullable: true,
   })
   lots?: LotListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,

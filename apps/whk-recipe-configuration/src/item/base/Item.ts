@@ -31,7 +31,6 @@ import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
-import { ProductionOrderUnitProcedure } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedure";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
@@ -235,15 +234,6 @@ class Item {
   @Type(() => Lot)
   @IsOptional()
   lots?: Array<Lot>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [ProductionOrderUnitProcedure],
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedure)
-  @IsOptional()
-  productionOrderUnitProcedures?: Array<ProductionOrderUnitProcedure>;
 
   @ApiProperty({
     required: false,

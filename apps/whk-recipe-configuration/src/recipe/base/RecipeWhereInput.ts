@@ -26,9 +26,7 @@ import { RecipeListRelationFilter } from "./RecipeListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
-import { RecipeParameterListRelationFilter } from "../../recipeParameter/base/RecipeParameterListRelationFilter";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
-import { ProductionOrderUnitProcedureListRelationFilter } from "../../productionOrderUnitProcedure/base/ProductionOrderUnitProcedureListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
@@ -222,18 +220,6 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeParameterListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeParameterListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeParameterListRelationFilter, {
-    nullable: true,
-  })
-  parameters?: RecipeParameterListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => ProductionOrderRecipeInstanceListRelationFilter,
   })
   @ValidateNested()
@@ -243,18 +229,6 @@ class RecipeWhereInput {
     nullable: true,
   })
   productionOrderRecipeInstances?: ProductionOrderRecipeInstanceListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUnitProcedureListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUnitProcedureListRelationFilter)
-  @IsOptional()
-  @Field(() => ProductionOrderUnitProcedureListRelationFilter, {
-    nullable: true,
-  })
-  productionOrderUnitProcedures?: ProductionOrderUnitProcedureListRelationFilter;
 
   @ApiProperty({
     required: false,
