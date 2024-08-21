@@ -97,8 +97,8 @@ async function seed() {
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 9; // This should be configurable or fetched from a setting
-  const startCook = 1;
+  const totalNumberOfCooks = 90; // This should be configurable or fetched from a setting
+  const startCook = 80;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -169,21 +169,41 @@ async function seed() {
 
   // Create the cook equipment phases for each cook using the mashing protocol
   // Create the cook equipment phases for each cook using the mashing protocol
+  // const mashingProtocol = [
+  //   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+  //   { action: "Hold", holdType: "Heat", temperature: 130 },
+  //   { action: "Add Additive", additiveType: "Citric", qty: 0 },
+  //   { action: "Add Grain", grainType: "Malt", qty: 82 },
+  //   { action: "Add Grain", grainType: "Corn" },
+  //   { action: "Add Liquid", liquidType01: "Water", qty: 0 },
+  //   { action: "Add Additive", additiveType: "Termamyl" },
+  //   { action: "Hold", holdType: "Heat", temperature: 200, time: 15 },
+  //   { action: "Hold", holdType: "Cool", temperature: 170 },
+  //   { action: "Add Grain", grainType: "Rye" },
+  //   { action: "Hold", holdType: "Hold", time: 15 },
+  //   { action: "Hold", holdType: "Cool", temperature: 145 },
+  //   { action: "Add Grain", grainType: "Malt", qty: 738 },
+  //   { action: "Add Additive", additiveType: "Saczyme" },
+  //   { action: "Hold", holdType: "Hold", time: 10 },
+  // ]; // this was the first 9. Changes to have saczyme does at the temp of 152 at ryan/jim request
+
   const mashingProtocol = [
     { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 130 },
     { action: "Add Additive", additiveType: "Citric", qty: 0 },
-    { action: "Add Grain", grainType: "Malt", qty: 82 },
+    { action: "Add Additive", additiveType: "Termamyl" },
+    { action: "Add Grain", grainType: "Malt", qty: 91 },
     { action: "Add Grain", grainType: "Corn" },
     { action: "Add Liquid", liquidType01: "Water", qty: 0 },
-    { action: "Add Additive", additiveType: "Termamyl" },
     { action: "Hold", holdType: "Heat", temperature: 200, time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 170 },
     { action: "Add Grain", grainType: "Rye" },
     { action: "Hold", holdType: "Hold", time: 15 },
-    { action: "Hold", holdType: "Cool", temperature: 145 },
-    { action: "Add Grain", grainType: "Malt", qty: 738 },
+    { action: "Hold", holdType: "Cool", temperature: 152 },
     { action: "Add Additive", additiveType: "Saczyme" },
+    { action: "Add Additive", additiveType: "Viscoferm" },
+    { action: "Hold", holdType: "Cool", temperature: 145 },
+    { action: "Add Grain", grainType: "Malt", qty: 822 },
     { action: "Hold", holdType: "Hold", time: 10 },
   ];
 
