@@ -28,6 +28,7 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
       i.id as itemId,
       i."itemNumber" as itemNumber,
       i."itemClass",
+      i."itemGroup",
       v."name" as "vendorName"
     FROM "PurchaseOrder" po
     CROSS JOIN LATERAL jsonb_to_recordset(po."lineItems") "li" (
@@ -38,7 +39,8 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
     )
     LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
     LEFT JOIN "Vendor" v on i."vendorId" = v.id
-     WHERE po."transactionGroup" LIKE ${`%${purchaseOrderType}%`}
+     WHERE i."itemGroup" LIKE ${`%${purchaseOrderType}%`}
+     AND po.complete = false
     ORDER BY li."itemName"`;
     // WHERE i."itemGroup" LIKE ${`%${purchaseOrderType}%`}`;
 
