@@ -203,6 +203,17 @@ export class RecipeCookCreationService {
     protected readonly numberOfCooksPerFerm: number = 3,
   ) {}
 
+  /**
+   * @description Loop through the equipment phases from the last cook
+      1. Get the equipment phases and all sub-entities
+      2. Use the data to create the new equipment phases and all sub-entities for the new cook
+      3. Link to the new cook instance
+   * @author Patrick Mannion
+   *
+   * @async
+   * @param {string} scheduleOrderQueueId
+   * @returns {*}
+   */
   async createCook(scheduleOrderQueueId: string) {
     const { recipe, mashingUnitProcedure } = await this.getRecipeAndMashingUnitProcedure(scheduleOrderQueueId);
     const lastCook = await this.getLastCook(mashingUnitProcedure?.id);
