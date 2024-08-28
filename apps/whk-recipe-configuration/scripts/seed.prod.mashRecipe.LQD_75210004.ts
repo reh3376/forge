@@ -98,8 +98,8 @@ async function seed() {
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 2; // This should be configurable or fetched from a setting
-  const startCook = 1;
+  const totalNumberOfCooks = 12; // This should be configurable or fetched from a setting
+  const startCook = 8;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -175,7 +175,7 @@ async function seed() {
     { action: "Hold", holdType: "Heat", temperature: 130 },
     { action: "Add Additive", additiveType: "Citric", qty: 0 },
     { action: "Add Grain", grainType: "Malt", qty: 96.32 },
-    { action: "Add Additive", additiveType: "Termamyl" },
+    { action: "Add Additive", additiveType: "Liquozyme" },
     { action: "Add Grain", grainType: "Corn" },
     { action: "Add Liquid", liquidType01: "Water", qty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
@@ -183,8 +183,8 @@ async function seed() {
     { action: "Add Grain", grainType: "Rye" },
     { action: "Hold", holdType: "Hold", time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 152 },
-    { action: "Add Additive", additiveType: "Saczyme" },
-    { action: "Add Additive", additiveType: "Viscoferm", qty: 0.23 },
+    { action: "Add Additive", additiveType: "DIAZYME" },
+    { action: "Add Additive", additiveType: "Viscoferm" },
     { action: "Hold", holdType: "Cool", temperature: 145 },
     { action: "Add Grain", grainType: "Malt", qty: 866.88 },
     { action: "Hold", holdType: "Hold", time: 10 },
