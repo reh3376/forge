@@ -172,6 +172,12 @@ export class ProductionOrderControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        quantity: true,
+        name: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
   }
@@ -263,6 +269,12 @@ export class ProductionOrderControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        quantity: true,
+        name: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
   }
@@ -353,6 +365,12 @@ export class ProductionOrderControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        quantity: true,
+        name: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
     if (result === null) {
@@ -493,6 +511,12 @@ export class ProductionOrderControllerBase {
           units: true,
           updatedAt: true,
           updatedBy: true,
+          quantity: true,
+          name: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
         },
       });
     } catch (error) {
