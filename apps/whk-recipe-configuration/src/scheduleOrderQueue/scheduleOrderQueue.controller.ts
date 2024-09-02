@@ -151,4 +151,74 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
       throw error;
     }
   }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Patch("/:id/activate-next-schedule-order-queue")
+  @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiBody({
+    type: ScheduleOrderQueueUpdateInput,
+  })
+  async activateNextScheduleOrderQueue(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() data: ScheduleOrderQueueUpdateInput
+  ): Promise<ScheduleOrderQueue | null> {
+    try {
+      return await this.service.setActiveScheduleOrderQueue({
+        where: params,
+        data: {
+          ...data,
+
+          nextUnitProcedure: {
+            connect: data.nextUnitProcedure,
+          },
+
+          scheduleOrder: data.scheduleOrder
+            ? {
+                connect: data.scheduleOrder,
+              }
+            : undefined,
+        },
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          createdBy: true,
+          updatedBy: true,
+          schemaVersion: true,
+          queueIndex: true,
+          globalId: true,
+
+          nextUnitProcedure: {
+            select: {
+              id: true,
+            },
+          },
+
+          nextUnitProcedureName: true,
+
+          scheduleOrder: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
 }
