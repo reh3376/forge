@@ -45,7 +45,7 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
         return newScheduleOrderQueue;
     }
 
-        async setActiveScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>): Promise<ScheduleOrderQueue> {
+    async setActiveScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>): Promise<ScheduleOrderQueue> {
         /*
         This will set the 0th index SchO in the queue to -1 and set the status to In Progress. 
         All other index SchOs will be decremented by 1
@@ -59,7 +59,7 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
                 }
             },
             orderBy: {
-                queueIndex: 'desc'
+                queueIndex: 'asc'
             }
         });
 
@@ -67,23 +67,35 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
         return await this.prisma.$transaction(async (prisma) => {
             // decrement all schO queue indexs
             // Update all schedule order queues
-            const updatePromises = scheduleOrderQueues.map((schO, index) => {
-                const newIndex = index === 0 ? -1 : schO.queueIndex !== null ? schO.queueIndex - 1 : null;
-                return prisma.scheduleOrderQueue.update({
+            for (const schO of scheduleOrderQueues) {
+                const newIndex = schO.queueIndex !== null ? schO.queueIndex - 1 : null;
+                await prisma.scheduleOrderQueue.update({
                     where: { id: schO.id },
                     data: {
                         queueIndex: newIndex,
                     }
                 });
-            });
+            }
+            // const updatePromises = scheduleOrderQueues.map((schO, index) => {
+            //     const newIndex = index === 0 ? 0 : schO.queueIndex !== null ? schO.queueIndex - 1 : null;
+            //     return prisma.scheduleOrderQueue.update({
+            //         where: { id: schO.id },
+            //         data: {
+            //             queueIndex: newIndex,
+            //         }
+            //     });
+            // });
 
-            // Execute all updates
-            await Promise.all(updatePromises);
+            // // Execute all updates
+            // await Promise.all(updatePromises);
             this.logger.log('Decremented all schedule order queue indexes');
 
-            // Set the schO of interest that just became -1 to be in progress
+            // Set the schO of interest that just became 0 to be in progress
+            const scheduleOrder = await prisma.scheduleOrder.findFirst({
+                where: { scheduleOrderQueues: { id: args.where.id } }
+            });
             await prisma.scheduleOrder.update({
-                where: { id: args.where.id },
+                where: { id: scheduleOrder?.id },
                 data: {
                     status: 'InProgress'
                 }
@@ -94,11 +106,11 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
                 where: { id: args.where.id }
             });
 
-            if (!updatedScheduleOrderQueue || updatedScheduleOrderQueue.queueIndex !== -1) {
-                this.logger.error(`Failed to set active schedule order queue. Expected queue isndex -1, but got ${updatedScheduleOrderQueue?.queueIndex}`);
-                throw new Error(`Failed to set active schedule order queue. Expected queue index -1, but got ${updatedScheduleOrderQueue?.queueIndex}`);
+            if (!updatedScheduleOrderQueue || updatedScheduleOrderQueue.queueIndex !== 0) {
+                this.logger.error(`Failed to set active schedule order queue. Expected queue index 0, but got ${updatedScheduleOrderQueue?.queueIndex}`);
+                throw new Error(`Failed to set active schedule order queue. Expected queue index 0, but got ${updatedScheduleOrderQueue?.queueIndex}`);
             }
-            this.logger.log(`Set schedule order ${args.where.id} as active with queue index -1`);
+            this.logger.log(`Set schedule order ${args.where.id} as active with queue index 0`);
             return updatedScheduleOrderQueue;
         });
     }
