@@ -1,6 +1,7 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, ProductionOrder, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class RecipeCookCreationService {
@@ -9,6 +10,7 @@ export class RecipeCookCreationService {
   private numberOfCooksPerFerm: number = 3
   constructor(
     protected readonly prisma: PrismaService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {}
 
   /**
@@ -23,34 +25,60 @@ export class RecipeCookCreationService {
    * @returns {*}
    */
   async createCook(scheduleOrderQueueId: string, username: string, numberOfCooksPerFerm: number) {
-    this.username = username;
-    this.mashingProtocolData = {};
+    this.validateInputParameters(scheduleOrderQueueId, username, numberOfCooksPerFerm);
 
-    this.numberOfCooksPerFerm = numberOfCooksPerFerm;
-    const { recipe, mashingUnitProcedure } = await this.getRecipeAndMashingUnitProcedure(scheduleOrderQueueId);
-    const productionOrder = await this.getProductionOrder(scheduleOrderQueueId);
-    const lastCook = await this.getLastCook(mashingUnitProcedure?.id);
+    return this.prisma.$transaction(async (prisma) => {
+      this.username = username;
+      this.mashingProtocolData = {};
 
-    console.log(`production order: ${productionOrder?.id}`);
-    console.log(`last cook: ${lastCook?.id}`);
+      this.numberOfCooksPerFerm = numberOfCooksPerFerm;
+      const { recipe, mashingUnitProcedure } = await this.getRecipeAndMashingUnitProcedure(scheduleOrderQueueId);
+      const productionOrder = await this.getProductionOrder(scheduleOrderQueueId);
+      const lastCook = await this.getLastCook(mashingUnitProcedure?.id);
 
-    if (this.isMaxCooksReached(lastCook, productionOrder)) {
-      console.log(`No more cooks to create`);
-      return;
+      this.logger.debug(`production order: ${productionOrder?.id}`);
+      this.logger.debug(`last cook: ${lastCook?.id}`);
+
+      if (this.isMaxCooksReached(lastCook, productionOrder)) {
+        this.logger.error('No more cooks to create');
+        throw new Error('No more cooks to create');
+      }
+
+      const newCookInstance = await this.createNewCookInstance(mashingUnitProcedure, lastCook);
+
+      this.logger.debug(`Mashing protocol data: ${JSON.stringify(this.mashingProtocolData, null, 2)}`);
+      if (this.mashingProtocolData && Object.keys(this.mashingProtocolData).length > 0) {
+        // Use provided mashing protocol data
+        // Implementation for using mashingProtocolData would go here
+        this.logger.error('Not implemented');
+        throw new Error('Not implemented');
+      } else if (lastCook) {
+        this.logger.debug(`Creating equipment phases from last cook`);
+        this.logger.debug(JSON.stringify(lastCook));
+        await this.createEquipmentPhasesFromLastCook(lastCook, newCookInstance, mashingUnitProcedure);
+        return await this.prisma.operation.findUniqueOrThrow({
+          where: { id: newCookInstance.id },
+          include: { equipmentPhases: {include: {bomItem: true, phaseParameters: true}} }
+        });
+      } else {
+        this.logger.error('No mashing protocol provided and no last cook found');
+        throw new Error('No mashing protocol provided and no last cook found');
+      }
+    });
+  }
+
+  private validateInputParameters(scheduleOrderQueueId: string, username: string, numberOfCooksPerFerm: number): void {
+    if (!scheduleOrderQueueId) {
+      this.logger.error('scheduleOrderQueueId is required');
+      throw new Error('scheduleOrderQueueId is required');
     }
-
-    const newCookInstance = await this.createNewCookInstance(mashingUnitProcedure, lastCook);
-
-    console.log(`Mashing protocol data: ${JSON.stringify(this.mashingProtocolData, null, 2)}`);
-    if (this.mashingProtocolData && Object.keys(this.mashingProtocolData).length > 0) {
-      // Use provided mashing protocol data
-      // Implementation for using mashingProtocolData would go here
-    } else if (lastCook) {
-      console.log(`Creating equipment phases from last cook`);
-      console.log(JSON.stringify(lastCook));
-      await this.createEquipmentPhasesFromLastCook(lastCook, newCookInstance, mashingUnitProcedure);
-    } else {
-      throw new Error('No mashing protocol provided and no last cook found');
+    if (!username) {
+      this.logger.error('username is required');
+      throw new Error('username is required');
+    }
+    if (!numberOfCooksPerFerm || numberOfCooksPerFerm <= 0) {
+      this.logger.error('numberOfCooksPerFerm must be a positive number');
+      throw new Error('numberOfCooksPerFerm must be a positive number');
     }
   }
 
@@ -71,12 +99,8 @@ export class RecipeCookCreationService {
       include: { scheduleOrder: {include: {productionOrders: true}} }
     });
 
-    const scheduleOrder = await this.prisma.scheduleOrder.findFirst({
-      where: { id: scheduleOrderQueue?.scheduleOrder?.id },
-      include: { scheduleOrderRecipe: true }
-    });
-
     if (!scheduleOrderQueue?.scheduleOrder?.productionOrders) {
+      this.logger.error('Associated production order not found');
       throw new Error('Associated production order not found');
     }
 
@@ -85,7 +109,7 @@ export class RecipeCookCreationService {
       include: { unitProcedures: true, parameters: true }
     });
 
-    console.log(`recipe: ${recipe?.id}`);
+    this.logger.debug(`recipe: ${recipe?.id}`);
 
     const mashingUnitProcedure = recipe?.unitProcedures.find(up => up.name === EnumUnitProcedureName.Mashing01);
 
@@ -113,10 +137,10 @@ export class RecipeCookCreationService {
   }
 
   private isMaxCooksReached(lastCook: Operation | null, productionOrder: ProductionOrder | null) {
-    const executedCooks = lastCook?.procedureSequenceIndex ?? 0;
+    const executedCooks = lastCook?.procedureSequenceIndex !== undefined ? lastCook.procedureSequenceIndex + 1 : 0;
     const totalCooks = productionOrder?.totalCooks ?? 0;
-    console.log(`executedCooks: ${executedCooks}, totalCooks: ${totalCooks}`);
-    console.log(`production order: ${productionOrder?.id}`);
+    this.logger.debug(`executedCooks: ${executedCooks}, totalCooks: ${totalCooks}`);
+    this.logger.debug(`production order: ${productionOrder?.id}`);
     return executedCooks >= totalCooks;
   }
 
@@ -136,7 +160,6 @@ export class RecipeCookCreationService {
   }
 
   private async createEquipmentPhasesFromLastCook(lastCook: any, newCookInstance: Operation, mashingUnitProcedure: UnitProcedure | undefined) {
-    // TODO: can we use typing for the lastCook?
     for (const phase of lastCook.equipmentPhases) {
       const newPhase = await this.createNewEquipmentPhase(phase, newCookInstance, mashingUnitProcedure, lastCook);
       await this.mapBomItems(newPhase, phase);
