@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "start": "nest start",
+    "dev:start": "pm2 reload ecosystem.config.js --update-env",
     "prod:start": "pm2 reload ecosystem.config.js --update-env --env production",
     "start:dev:watch": "nest start --watch -e 'node -r newrelic'",
     "start:dev:debug": "nest start --debug --watch -e 'node -r newrelic'",
