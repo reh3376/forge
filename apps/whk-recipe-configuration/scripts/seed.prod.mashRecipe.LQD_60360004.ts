@@ -59,8 +59,8 @@ async function seed() {
       }
     });
     mashInstance = existingInstance;
-    // if (!existingInstance) {
-    if (true) {
+    if (!existingInstance) {
+    // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -98,8 +98,8 @@ async function seed() {
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 1; // This should be configurable or fetched from a setting
-  const startCook = 0;
+  const totalNumberOfCooks = 18; // This should be configurable or fetched from a setting
+  const startCook = 6;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
