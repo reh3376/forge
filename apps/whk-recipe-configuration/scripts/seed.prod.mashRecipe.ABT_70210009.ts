@@ -96,8 +96,8 @@ async function seed() {
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 9; // This should be configurable or fetched from a setting
-  const startCook = 3;
+  const totalNumberOfCooks = 36; // This should be configurable or fetched from a setting
+  const startCook = 18;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
