@@ -4,10 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import {PrismaService} from "../prisma/prisma.service";
 import { ItemCreateInput } from '../item/base/ItemCreateInput';
 import { SalesOrderCreateInput } from '../salesOrder/base/SalesOrderCreateInput';
-import { PurchaseOrderCreateInput } from '../purchaseOrder/base/PurchaseOrderCreateInput';
+import { PurchaseOrderCreateInput } from '../purchaseOrder/PurchaseOrderCreateInput';
 import { ItemReceiptCreateInput } from '../itemReceipt/base/ItemReceiptCreateInput';
 import { ItemReceiptUpdateInput } from '../itemReceipt/base/ItemReceiptUpdateInput';
-import { PurchaseOrderUpdateInput } from '../purchaseOrder/base/PurchaseOrderUpdateInput';
+import { PurchaseOrderUpdateInput } from '../purchaseOrder/PurchaseOrderUpdateInput';
 import { SalesOrderUpdateInput } from '../salesOrder/base/SalesOrderUpdateInput';
 import { ItemUpdateInput } from '../item/base/ItemUpdateInput';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -252,39 +252,44 @@ export class SyncService implements OnModuleInit {
         // If the entity exists, update it with the new data.
         // If the entity does not exist, create a new one with the data
         if (type === 'update' && existingEntity && existingEntity.length > 0) {
-            // const payload = {
-            //     ...payloadData,
-            // };
-            // this.logger.debug(`Updating ${entity} with data: ${JSON.stringify(payload)}`);
+        // if (existingEntity && existingEntity.length > 0) {
+            const payload = {
+                ...payloadData,
+            };
+            this.logger.debug(`Updating ${entity} with data: ${JSON.stringify(payload)}`);
 
-            // // Validate the payload
-            // const validatedInstance = await this.validatePayload(entity, payload);
+            // Validate the payload
+            const validatedInstance = await this.validatePayload(entity, payload);
+            this.logger.debug(`Validated instance: ${JSON.stringify(validatedInstance)}`);
 
-            // try {
-            //     await this.prismaEntityMap[entity].update(
-            //         {
-            //         where: { globalId: globalId },
-            //         data: validatedInstance
-            //     });
-            // } catch (error: unknown) {
-            //     this.logger.error(`Error updating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
-            // }
+            try {
+                const updatedEntity = await this.prismaEntityMap[entity].update(
+                    {
+                    where: { globalId: globalId },
+                    data: validatedInstance
+                    // data: payload
+                });
+                this.logger.debug(`Updated entity: ${JSON.stringify(updatedEntity)}`);
+            } catch (error: unknown) {
+                this.logger.error(`Error: ${error}\n\nUpdating ${entity} with data: ${JSON.stringify(payload)}`);
+            }
         } else if (type === 'create' && (!existingEntity || existingEntity.length === 0)) {
             const payload = {
                 ...payloadData,
             };
             this.logger.debug(`Creating ${entity} with data: ${JSON.stringify(payload)}`);
 
-            // Validate the payload
-            const validatedInstance = await this.validatePayload(entity, payload);
 
-            this.logger.debug(`Finally creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
+            // Validate the payload
+            // const validatedInstance = await this.validatePayload(entity, payload);
+            // this.logger.debug(`Finally creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
 
             // Create a new entity with the data
             try {
-                await this.prismaEntityMap[entity].create({ data: validatedInstance });
+                // await this.prismaEntityMap[entity].create({ data: validatedInstance });
+                await this.prismaEntityMap[entity].create({ data: payload });
             } catch (error: unknown) {
-                this.logger.error(`Error creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
+                this.logger.error(`Error: ${error}\n\nCreating ${entity} with data: ${JSON.stringify(payload)}`);
             }
         }
     }
