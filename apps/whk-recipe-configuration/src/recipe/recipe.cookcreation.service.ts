@@ -176,7 +176,8 @@ export class RecipeCookCreationService {
         operation: {
           connect: { id: newCookInstance.id }
         },
-        operationSequenceIndex: phase.operationSequenceIndex
+        operationSequenceIndex: phase.operationSequenceIndex,
+        stepType: phase.stepType as EnumEquipmentPhaseStepType
       }
     });
   }
