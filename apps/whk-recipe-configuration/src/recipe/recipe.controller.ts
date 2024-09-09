@@ -73,12 +73,17 @@ export class RecipeController extends RecipeControllerBase {
     @common.Body() createCookDto: {
       scheduleOrderQueueId: string;
       username: string;
-    },
-    @common.Body() mashingProtocolData: any = {}
+      mashingProtocolData: any;
+    }
   ) {
     try {
-      const result = await this.cookCreationService.createCook(createCookDto.scheduleOrderQueueId, createCookDto.username, 3);
-      return result;
+      if (createCookDto.mashingProtocolData) {
+        const result = await this.cookCreationService.createCook(createCookDto.scheduleOrderQueueId, createCookDto.username, 3, createCookDto.mashingProtocolData);
+        return result;
+      } else {
+        const result = await this.cookCreationService.createCook(createCookDto.scheduleOrderQueueId, createCookDto.username, 3);
+        return result;
+      }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while creating the cook';
       throw new common.HttpException(
