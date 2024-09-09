@@ -8,6 +8,12 @@ export class RecipeCookCreationService {
   private username: string = ''
   private mashingProtocolData: any = {}
   private numberOfCooksPerFerm: number = 3
+  private scheduleOrderQueueId: string = ''
+  private totalNumberOfCooks: number = 0
+  private executedCooks: number = 0
+  private cookOperations: Operation[] = []
+  private mashingUnitProcedure: UnitProcedure | undefined
+
   constructor(
     protected readonly prisma: PrismaService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
@@ -24,15 +30,17 @@ export class RecipeCookCreationService {
    * @param {string} scheduleOrderQueueId
    * @returns {*}
    */
-  async createCook(scheduleOrderQueueId: string, username: string, numberOfCooksPerFerm: number) {
+  async createCook(scheduleOrderQueueId: string, username: string, numberOfCooksPerFerm: number, mashingProtocolData: any= {}) {
+    this.scheduleOrderQueueId = scheduleOrderQueueId;
     this.validateInputParameters(scheduleOrderQueueId, username, numberOfCooksPerFerm);
 
     return this.prisma.$transaction(async (prisma) => {
       this.username = username;
-      this.mashingProtocolData = {};
+      this.mashingProtocolData = mashingProtocolData;
 
       this.numberOfCooksPerFerm = numberOfCooksPerFerm;
       const { recipe, mashingUnitProcedure } = await this.getRecipeAndMashingUnitProcedure(scheduleOrderQueueId);
+      this.mashingUnitProcedure = mashingUnitProcedure;
       const productionOrder = await this.getProductionOrder(scheduleOrderQueueId);
       const lastCook = await this.getLastCook(mashingUnitProcedure?.id);
 
@@ -44,15 +52,21 @@ export class RecipeCookCreationService {
         throw new Error('No more cooks to create');
       }
 
-      const newCookInstance = await this.createNewCookInstance(mashingUnitProcedure, lastCook);
-
+      
       this.logger.debug(`Mashing protocol data: ${JSON.stringify(this.mashingProtocolData, null, 2)}`);
       if (this.mashingProtocolData && Object.keys(this.mashingProtocolData).length > 0) {
         // Use provided mashing protocol data
         // Implementation for using mashingProtocolData would go here
-        this.logger.error('Not implemented');
-        throw new Error('Not implemented');
+        
+        const newCook = await this.createCookOperations();
+        if (!newCook) return;
+        await this.createEquipmentPhases(newCook, mashingProtocolData);
+        return await this.prisma.operation.findUniqueOrThrow({
+          where: { id: newCook.id },
+          include: { equipmentPhases: {include: {bomItem: true, phaseParameters: true}} }
+        });
       } else if (lastCook) {
+        const newCookInstance = await this.createNewCookInstance(mashingUnitProcedure, lastCook);
         this.logger.debug(`Creating equipment phases from last cook`);
         this.logger.debug(JSON.stringify(lastCook));
         await this.createEquipmentPhasesFromLastCook(lastCook, newCookInstance, mashingUnitProcedure);
@@ -65,6 +79,266 @@ export class RecipeCookCreationService {
         throw new Error('No mashing protocol provided and no last cook found');
       }
     });
+  }
+
+  private async createCookOperations() {
+    const operationClassDef = await this.prisma.operation.findFirst({
+      where: {
+        isClassDefinition: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    console.log("Operation Class Definition:", operationClassDef);
+
+    const totalNumberOfCooks = this.totalNumberOfCooks;
+    const cookOperations: Operation[] = [];
+
+      
+    const newCook = await this.prisma.operation.create({
+      data: {
+        name: EnumOperationName.Cook,
+        path: `WH/WHK01/Distillery01/Mashing01/Cook/Cook${this.executedCooks + 2}`,
+        isClassDefinition: false,
+        classId: { connect: { id: operationClassDef?.id } },
+        revision: 0,
+        description: `Cook ${this.executedCooks + 2}`,
+        procedureSequenceIndex: this.executedCooks + 1,
+        createdBy: this.username,
+        unitProcedure: { connect: { id: this.mashingUnitProcedure?.id } },
+        abbreviation: 'MAS'
+      }
+    });
+    
+    console.log(`Created new Operation instance: ${newCook.name}`);
+    cookOperations.push(newCook);
+
+    return newCook;
+  }
+
+  private async getBom(scheduleOrderQueueId: string) {
+    const bom = await this.prisma.bom.findFirst({
+      where: {
+        productionOrder: {
+          some: {
+            scheduleOrder: {
+              scheduleOrderQueues: {
+                id: scheduleOrderQueueId
+              }
+            }
+          }
+        }
+      }
+    });
+    return bom;
+  }
+
+  private async createEquipmentPhases(newCook: Operation, mashingProtocolData: any) {
+    const bom = await this.getBom(this.scheduleOrderQueueId);
+    const totalNumberOfCooks = this.totalNumberOfCooks;
+
+    const mashingProtocol = mashingProtocolData;
+  
+    if (!newCook) {
+      console.log(`Cook operation not found, skipping phase creation.`);
+      return;
+    }
+
+    // Map the provided phase names to the actual enum values
+    const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
+      "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
+      "Hold": EnumEquipmentPhaseName.Hold,
+      "Add Grain": EnumEquipmentPhaseName.GrainAdd,
+      "Add Additive": EnumEquipmentPhaseName.AdditiveAdd
+    };
+
+    for (const [phaseIndex, phase] of mashingProtocol.entries()) {
+      const existingPhase = await this.prisma.equipmentPhase.findFirst({
+        where: {
+          name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
+          operation: {
+            id: newCook.id
+          },
+          operationSequenceIndex: phaseIndex,
+        },
+        include: {
+          operation: true
+        }
+      });
+
+      if (!existingPhase) {
+        const cookOperation: Operation | null = await this.prisma.operation.findFirst({
+          where: {
+            name: EnumOperationName.Cook,
+            isClassDefinition: false,
+            unitProcedure: { id: this.mashingUnitProcedure?.id },
+            procedureSequenceIndex: this.executedCooks + 1
+          },
+          orderBy: { createdAt: 'desc' }
+        });
+
+        if (cookOperation) {
+
+          const stepType = (phase.action === "Hold") ? phase.holdType : (phase.action === "Add Grain") ? phase.grainType : (phase.action === "Add Liquid") ? phase.liquidType01 : undefined;
+          const newPhase = await this.prisma.equipmentPhase.create({
+            data: {
+              name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
+              path: `${this.mashingUnitProcedure?.path}/Cook${this.executedCooks + 2}/${phase.action}`,
+              isClassDefinition: false,
+              revision: 0,
+              description: `Cook ${this.executedCooks + 2}`,
+              createdBy: this.username,
+              operation: {
+                connect: {
+                  id: (cookOperation as Operation).id as string
+                }
+              },
+              stepType: stepType as EnumEquipmentPhaseStepType,
+              operationSequenceIndex: phaseIndex
+            }
+          });
+          console.log(`Created new Equipment Phase: ${newPhase.name} for Cook ${this.executedCooks + 2}`);
+
+          // Add phase parameters based on the action
+          const parameterData: { name: string; value: number | string; units: string }[] = [];
+          if (phase.temperature) {
+            parameterData.push({ name: "Temperature", value: phase.temperature, units: "°F" });
+          }
+          if (phase.time) {
+            parameterData.push({ name: "Time", value: phase.time, units: "minutes" });
+          }
+
+          for (const param of parameterData) {
+            await this.prisma.phaseParameter.create({
+              data: {
+                name: param.name,
+                staticName: param.name as EnumPhaseParameterStaticName,
+                setpointNumericalValue: param.value as number,
+                units: param.units,
+                description: param.name,
+                isClassDef: false,
+                equipmentPhases: { connect: { id: newPhase.id } },
+                createdBy: this.username,
+                setpointType: EnumPhaseParameterSetpointType.Numeric,
+              }
+            });
+          }
+
+          // Link BOM components to their equipment phases - these will be the "class definitions"
+          if (bom) {
+            const bomComponents = await this.prisma.bomItem.findMany({
+              where: {
+                bom: { id: bom.id },
+                isClassDefinition: true,
+              },
+              include: {
+                item: true
+              }
+            });
+
+            for (const component of bomComponents) {
+              if (
+                (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
+                (phase.action === "Add Liquid" && (
+                  (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
+                  // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
+                ))
+              ) {
+                // Check if the quantity field is present in the phase object
+                if (phase.qty !== undefined) {
+                  // Only match if the bomItem quantity equals the phase quantity
+                  if (component.quantity.equals(phase.qty)) {
+                    await this.prisma.equipmentPhase.update({
+                      where: { id: newPhase.id },
+                      data: {
+                        bomItem: {
+                          connect: { id: component.id },
+                        },
+                      },
+                    });
+                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                  } else {
+                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                  }
+                } else if (phase.notQty !== undefined) {
+                  // Only match if the bomItem quantity does not equal the phase notQty
+                  if (!component.quantity.equals(phase.notQty)) {
+                    await this.prisma.equipmentPhase.update({
+                      where: { id: newPhase.id },
+                      data: {
+                        bomItem: {
+                          connect: { id: component.id },
+                        },
+                      },
+                    });
+                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                  } else {
+                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
+                  }
+                } else {
+                  await this.prisma.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+
+                }
+              } else if (phase.grainType == "Corn") {
+                console.log(`Corn: ${component.item.itemNumber}`);
+                if (component.item.itemNumber === "COR-DLF02-US #2 Yellow Dent GMO") {
+                  if (phase.qty !== undefined) {
+                    // Only match if the bomItem quantity equals the phase quantity
+                    if (component.quantity.equals(phase.qty)) {
+                      await this.prisma.equipmentPhase.update({
+                        where: { id: newPhase.id },
+                        data: {
+                          bomItem: {
+                            connect: { id: component.id },
+                          },
+                        },
+                      });
+                      console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                    } else {
+                      console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                    }
+                  } else {
+                    await this.prisma.equipmentPhase.update({
+                      where: { id: newPhase.id },
+                      data: {
+                        bomItem: {
+                          connect: { id: component.id },
+                        },
+                      },
+                    });
+                    console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  }
+                }
+              } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
+                console.log(`Add Additive: ${component.item.itemNumber}`);
+                await this.prisma.equipmentPhase.update({
+                  where: { id: newPhase.id },
+                  data: {
+                    bomItem: {
+                      connect: { id: component.id },
+                    },
+                  },
+                });
+                console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+              }
+
+            }
+          } else {
+            console.log("BOM not found, skipping linking BOM components to Equipment Phases");
+          }
+        }
+      } else {
+        console.log(`Equipment Phase ${phase.action} already exists, skipping.`);
+      }
+    }
   }
 
   private validateInputParameters(scheduleOrderQueueId: string, username: string, numberOfCooksPerFerm: number): void {
@@ -141,6 +415,8 @@ export class RecipeCookCreationService {
     const totalCooks = productionOrder?.totalCooks ?? 0;
     this.logger.debug(`executedCooks: ${executedCooks}, totalCooks: ${totalCooks}`);
     this.logger.debug(`production order: ${productionOrder?.id}`);
+    this.totalNumberOfCooks = totalCooks;
+    this.executedCooks = executedCooks;
     return executedCooks >= totalCooks;
   }
 
