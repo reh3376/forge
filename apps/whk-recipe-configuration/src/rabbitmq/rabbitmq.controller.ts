@@ -106,15 +106,15 @@ export class RabbitMQController {
     await this.processEvent(message, context);
   }
 
-  @EventPattern("wh.whk01.distillery01.bomitem")
-  async onWhWhk01Distillery01BomItem(
-      @Payload()
-          message: RabbitMQMessage,
-      @Ctx()
-          context: RmqContext
-  ): Promise<void> {
-    await this.processEvent(message, context);
-  }
+  // @EventPattern("wh.whk01.distillery01.bomitem")
+  // async onWhWhk01Distillery01BomItem(
+  //     @Payload()
+  //         message: RabbitMQMessage,
+  //     @Ctx()
+  //         context: RmqContext
+  // ): Promise<void> {
+  //   await this.processEvent(message, context);
+  // }
 
   @EventPattern("wh.whk01.distillery01.bom")
   async onWhWhk01Distillery01Bom(
