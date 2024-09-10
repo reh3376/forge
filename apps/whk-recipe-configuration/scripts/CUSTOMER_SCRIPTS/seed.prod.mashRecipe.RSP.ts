@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
+import { Salt, parseSalt } from "../../src/auth/password.service";
 import { hash } from "bcrypt";
 
 async function seed() {

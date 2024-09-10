@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
+import { Salt, parseSalt } from "../../src/auth/password.service";
 import { hash } from "bcrypt";
 
 async function seed() {
@@ -90,16 +90,14 @@ async function seed() {
   // find the appropriate BOM / BOM Version
   const bom = await client.bom.findFirst({
     where: {
-      bomName: "-34",
-      bomRevision: 'BOM-LQD-60-00-36-04-R01',
-
+      bomRevision: 'BOM-ABT-70-21-00-09-R01',
     }
   });
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 18; // This should be configurable or fetched from a setting
-  const startCook = 12;
+  const totalNumberOfCooks = 36; // This should be configurable or fetched from a setting
+  const startCook = 18;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -174,19 +172,20 @@ async function seed() {
     { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 130 },
     { action: "Add Additive", additiveType: "Citric", qty: 0 },
-    { action: "Add Grain", grainType: "Malt", qty: 96.32 },
+    { action: "Add Grain", grainType: "Malt", qty: 216.72 },
     { action: "Add Additive", additiveType: "Liquozyme" },
     { action: "Add Grain", grainType: "Corn" },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Wheat", qty: 5000 },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Wheat", qty: 3668.8 },
     { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
+    { action: "Hold", holdType: "Cool", temperature: 170 },
+    { action: "Add Grain", grainType: "Rye" },
+    { action: "Hold", holdType: "Hold", time: 10 },
     { action: "Hold", holdType: "Cool", temperature: 152 },
     { action: "Add Additive", additiveType: "DIAZYME" },
     { action: "Add Additive", additiveType: "Viscoferm" },
     { action: "Hold", holdType: "Cool", temperature: 145 },
-    { action: "Add Grain", grainType: "Malt", qty: 866.88 },
+    { action: "Add Grain", grainType: "Malt", qty: 1800 },
+    { action: "Hold", holdType: "Hold", time: 5 },
+    { action: "Add Grain", grainType: "Malt", qty: 150.5 },
     { action: "Hold", holdType: "Hold", time: 10 },
   ];
 
@@ -434,13 +433,13 @@ async function seed() {
     return item;
   };
 
-  const item = await getItemByItemNumber('LQD-60-00-36-04-53-06-4-0-0-120-R01');
+  const item = await getItemByItemNumber('ABT-70-21-00-09-53-06-4-0-0-120-R01');
   if (item) {
     console.log(`Found item: ${item.id}, ${item.itemNumber}`);
   }
 
   // Find customer with "KWH Venture, LLC" name
-  const CUSTOMER_NAME = "LQD Assets, LLC";
+  const CUSTOMER_NAME = "BHAWK";
   const customer = await client.customer.findFirst({
     where: {
       name: CUSTOMER_NAME
@@ -456,7 +455,7 @@ async function seed() {
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
-      Recipe: "LQD-60-00-36-04-R01",
+      Recipe: "ABT-70-21-00-09-R01",
     }
   });
 
@@ -530,7 +529,7 @@ async function seed() {
     console.log("Creating new Mashing Recipe...");
     recipe = await client.recipe.create({
       data: {
-        Recipe: "LQD-60-00-36-04-R01",
+        Recipe: "ABT-70-21-00-09-R01",
         revision: 1,
         createdBy: "pmannion",
         // parameters: {
@@ -548,7 +547,7 @@ async function seed() {
         parameters: {
           connect: newParams.map(param => ({ id: param.id }))
         },
-        customerCode: 'LQD'
+        customerCode: 'ABT'
       }
     });
     console.log("New Mashing Recipe created successfully:", recipe.id);
@@ -559,7 +558,7 @@ async function seed() {
   let recipeGroup: RecipeGroup;
   const existingRecipeGroup = await client.recipeGroup.findFirst({
     where: {
-      recipe: { equals: "60-00-36-04" }
+      recipe: { equals: "70-21-00-09" }
     }
   });
 
@@ -578,7 +577,7 @@ async function seed() {
     console.log("Creating new recipe group 'Mashing Recipes'...");
     recipeGroup = await client.recipeGroup.create({
       data: {
-        recipe: "60-00-36-04",
+        recipe: "70-21-00-09",
         createdBy: "pmannion",
         recipes: {
           connect: { id: recipe.id }
@@ -594,7 +593,7 @@ async function seed() {
   const existingSalesOrder = await client.salesOrder.findFirst({
     where: {
       customer: { id: customer?.id },
-      name: 'SO37'
+      name: 'SO40'
     }
   });
 
@@ -613,8 +612,8 @@ async function seed() {
         createdBy: "pmannion",
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        quantity: 500, // Adjust as needed
-        name: 'SO37'
+        quantity: 1000, // Adjust as needed
+        name: 'SO40'
         // units: "Barrels",
       }
     });
@@ -630,7 +629,7 @@ async function seed() {
 
   const existingProductionOrder = await client.productionOrder.findFirst({
     where: {
-      recipe: { Recipe: "LQD-60-00-36-04-R01" },
+      recipe: { Recipe: "ABT-70-21-00-09-R01" },
       item: { id: (item as Item).id },
       bom: { id: bom?.id }
     }
@@ -658,10 +657,10 @@ async function seed() {
         },
         createdBy: "pmannion",
         status: EnumProductionOrderStatus.Initiated,
-        customerCode: 'LQD',
+        customerCode: 'ABT',
         units: 'Barrels',
-        quantity: 500,
-        name: 'PRO2424101',// TODO: add name
+        quantity: 1000,
+        name: 'PRO24244021',// TODO: add name
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }
@@ -678,12 +677,12 @@ async function seed() {
         createdBy: "pmannion",
         estimatedStart: new Date(),
         estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
-        recipeName: "LQD-60-00-36-04-R01",
-        productionOrderAllocation: 500,
+        recipeName: "ABT-70-21-00-09-R01",
+        productionOrderAllocation: 1000,
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: 'SHO2424101',// TODO: add name
+        name: 'SHO2424401',// TODO: add name
       }
     });
 
