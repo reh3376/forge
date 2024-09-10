@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
+import { Salt, parseSalt } from "../../src/auth/password.service";
 import { hash } from "bcrypt";
 
 async function seed() {
@@ -24,8 +24,7 @@ async function seed() {
   // Find Unit Procedure class definitions
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
     where: {
-      isClassDef: true,
-      name: 'Mashing01'
+      isClassDef: true
     }
   });
 
@@ -90,14 +89,16 @@ async function seed() {
   // find the appropriate BOM / BOM Version
   const bom = await client.bom.findFirst({
     where: {
-      bomRevision: 'BOM-FDP-78-10-00-12-R01',
+      bomName: "-5",
+      bomRevision: 'BOM-JBM-75-21-00-04-R01',
+
     }
   });
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 2; // This should be configurable or fetched from a setting
-  const startCook = 1;
+  const totalNumberOfCooks = 112; // This should be configurable or fetched from a setting
+  const startCook = 90;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -172,22 +173,19 @@ async function seed() {
     { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 130 },
     { action: "Add Additive", additiveType: "Citric", qty: 0 },
-    { action: "Add Grain", grainType: "Malt", qty: 288.96 },
-    { action: "Add Additive", additiveType: "Liquozyme" },
-    { action: "Add Grain", grainType: "Corn", qty: 16782.4 },
-    { action: "Hold", holdType: "Hold", time: 3 },
-    { action: "Add Grain", grainType: "Corn", qty: 2000 },
+    { action: "Add Grain", grainType: "Malt", qty: 96 },
+    { action: "Add Additive", additiveType: "Termamyl" },
+    { action: "Add Grain", grainType: "Corn" },
+    { action: "Add Liquid", liquidType01: "Water", qty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 170 },
     { action: "Add Grain", grainType: "Rye" },
-    { action: "Hold", holdType: "Hold", time: 10 },
+    { action: "Hold", holdType: "Hold", time: 15 },
     { action: "Hold", holdType: "Cool", temperature: 152 },
-    { action: "Add Additive", additiveType: "DIAZYME" },
-    { action: "Add Additive", additiveType: "Viscoferm" },
+    { action: "Add Additive", additiveType: "Saczyme" },
+    { action: "Add Additive", additiveType: "ENZ-UNI03-Enzyme" },
     { action: "Hold", holdType: "Cool", temperature: 145 },
-    { action: "Add Grain", grainType: "Malt", qty: 1800 },
-    { action: "Hold", holdType: "Hold", time: 3 },
-    { action: "Add Grain", grainType: "Malt", qty: 800.64 },
+    { action: "Add Grain", grainType: "Malt", qty: 867 },
     { action: "Hold", holdType: "Hold", time: 10 },
   ];
 
@@ -364,6 +362,38 @@ async function seed() {
                   } else {
                     console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
                   }
+
+                  // } else {
+                  //   // If quantity is not specified in the phase, proceed with the existing logic
+                  // if (phase.action == "Add Grain") {
+                  //   if (phase.grainType == "Malt") {
+                  //   if (component.quantity.lt(500)) {
+                  //     await client.equipmentPhase.update({
+                  //       where: { id: newPhase.id },
+                  //       data: {
+                  //         bomItem: {
+                  //           connect: { id: component.id },
+                  //         },
+                  //       },
+                  //     });
+                  //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  //   } else {
+                  //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                  //   }
+                  // } else if ((phase.grainType == "Malt") ){
+                  //   if (component.quantity.gte(500)) {
+                  //     await client.equipmentPhase.update({
+                  //       where: { id: newPhase.id },
+                  //       data: {
+                  //         bomItem: {
+                  //           connect: { id: component.id },
+                  //         },
+                  //       },
+                  //     });
+                  //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  //   } else {
+                  //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                  //   }
                 } else {
                   await client.equipmentPhase.update({
                     where: { id: newPhase.id },
@@ -378,34 +408,16 @@ async function seed() {
                 }
               } else if (phase.grainType == "Corn") {
                 console.log(`Corn: ${component.item.itemNumber}`);
-                if (component.item.itemNumber === "COR-DLF02-US #2 Yellow Dent GMO") {
-                  // Check if the quantity field is present in the phase object
-                  if (phase.qty !== undefined) {
-                    // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity.equals(phase.qty)) {
-                      await client.equipmentPhase.update({
-                        where: { id: newPhase.id },
-                        data: {
-                          bomItem: {
-                            connect: { id: component.id },
-                          },
-                        },
-                      });
-                      console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
-                    } else {
-                      console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
-                    }
-                  } else {
-                    await client.equipmentPhase.update({
-                      where: { id: newPhase.id },
-                      data: {
-                        bomItem: {
-                          connect: { id: component.id },
-                        },
+                if (component.item.itemNumber === "COR-DLF01-US #2 Yellow Dent GMO") {
+                  await client.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
                       },
-                    });
-                    console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
-                  }
+                    },
+                  });
+                  console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
                 }
               } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
                 console.log(`Add Additive: ${component.item.itemNumber}`);
@@ -453,13 +465,13 @@ async function seed() {
     return item;
   };
 
-  const item = await getItemByItemNumber('FDP-78-10-00-12-53-06-4-0-0-120-R01');
+  const item = await getItemByItemNumber('JBM-75-21-00-04-53-06-4-0-0-125-R01');
   if (item) {
     console.log(`Found item: ${item.id}, ${item.itemNumber}`);
   }
 
   // Find customer with "KWH Venture, LLC" name
-  const CUSTOMER_NAME = "Frank-Lin Distillers Products Ltd";
+  const CUSTOMER_NAME = "Western Spirits Beverage Company, LLC";
   const customer = await client.customer.findFirst({
     where: {
       name: CUSTOMER_NAME
@@ -475,7 +487,7 @@ async function seed() {
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
-      Recipe: "FDP-78-10-00-12-R01",
+      Recipe: "	JBM-75-21-00-04-R01",
     }
   });
 
@@ -549,7 +561,7 @@ async function seed() {
     console.log("Creating new Mashing Recipe...");
     recipe = await client.recipe.create({
       data: {
-        Recipe: "FDP-78-10-00-12-R01",
+        Recipe: "JBM-75-21-00-04-R01",
         revision: 1,
         createdBy: "pmannion",
         // parameters: {
@@ -566,8 +578,7 @@ async function seed() {
         },
         parameters: {
           connect: newParams.map(param => ({ id: param.id }))
-        },
-        customerCode: 'FDP'
+        }
       }
     });
     console.log("New Mashing Recipe created successfully:", recipe.id);
@@ -578,7 +589,7 @@ async function seed() {
   let recipeGroup: RecipeGroup;
   const existingRecipeGroup = await client.recipeGroup.findFirst({
     where: {
-      recipe: { equals: "78-10-00-12" }
+      recipe: { equals: "75-21-00-04" }
     }
   });
 
@@ -597,7 +608,7 @@ async function seed() {
     console.log("Creating new recipe group 'Mashing Recipes'...");
     recipeGroup = await client.recipeGroup.create({
       data: {
-        recipe: "78-10-00-12",
+        recipe: "75-21-00-04",
         createdBy: "pmannion",
         recipes: {
           connect: { id: recipe.id }
@@ -612,8 +623,7 @@ async function seed() {
   let salesOrder: SalesOrder;
   const existingSalesOrder = await client.salesOrder.findFirst({
     where: {
-      customer: { id: customer?.id },
-      name: 'SO42'
+      customer: { id: customer?.id }
     }
   });
 
@@ -632,8 +642,8 @@ async function seed() {
         createdBy: "pmannion",
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        quantity: 1000, // Adjust as needed
-        name: 'SO42'
+        quantity: 3000, // Adjust as needed
+        name: 'SO29'
         // units: "Barrels",
       }
     });
@@ -649,7 +659,7 @@ async function seed() {
 
   const existingProductionOrder = await client.productionOrder.findFirst({
     where: {
-      recipe: { Recipe: "FDP-78-10-00-12-R01" },
+      recipe: { Recipe: "JBM-75-21-00-04-R01" },
       item: { id: (item as Item).id },
       bom: { id: bom?.id }
     }
@@ -677,10 +687,10 @@ async function seed() {
         },
         createdBy: "pmannion",
         status: EnumProductionOrderStatus.Initiated,
-        customerCode: 'FDP',
+        customerCode: 'JBM',
         units: 'Barrels',
-        quantity: 1000,
-        name: 'PRO2425101',// TODO: add name
+        quantity: 3000,
+        name: 'PRO2421201',// TODO: add name
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }
@@ -697,12 +707,11 @@ async function seed() {
         createdBy: "pmannion",
         estimatedStart: new Date(),
         estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
-        recipeName: "FDP-78-10-00-12-R01",
-        productionOrderAllocation: 1000,
+        recipeName: "JBM-75-21-00-04-R01",
+        productionOrderAllocation: 3000,
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: 'SHO2425101',// TODO: add name
       }
     });
 

@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
+import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder } from "@prisma/client";
+import { Salt, parseSalt } from "../../src/auth/password.service";
 import { hash } from "bcrypt";
 
 async function seed() {
@@ -24,8 +24,7 @@ async function seed() {
   // Find Unit Procedure class definitions
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
     where: {
-      isClassDef: true,
-      name: 'Mashing01'
+      isClassDef: true
     }
   });
 
@@ -35,7 +34,7 @@ async function seed() {
   const mashingRecipeProcedure = await client.procedure.findFirst({
     where: {
       name: "Line1",
-      isClassDefinition: false,
+      isClassDefinition: false
     }
   });
 
@@ -46,19 +45,18 @@ async function seed() {
 
   console.log("Found Mashing Recipe procedure instance:", mashingRecipeProcedure.id);
 
-  let mashInstance: UnitProcedure | null = null;
   // Create instances of Unit Procedures
   for (const classDef of unitProcedureClassDefs) {
     const existingInstance = await client.unitProcedure.findFirst({
       where: {
         name: classDef.name,
-        isClassDef: false,
+        isClassDef: false
       },
       orderBy: {
         createdAt: 'desc'
       }
     });
-    mashInstance = existingInstance;
+
     if (!existingInstance) {
     // if (true) {
       const newInstance = await client.unitProcedure.create({
@@ -74,32 +72,24 @@ async function seed() {
         }
       });
       console.log(`Created new Unit Procedure instance: ${newInstance.name}`);
-      if (newInstance.name.includes("Mashing01")) {
-        mashInstance = newInstance;
-      }
     } else {
       console.log(`Instance of ${classDef.name} already exists, skipping.`);
-      // mashIstance = existingInstance;
-    }
-    if (!mashInstance) {
-      console.log(`Mashing unit procedure instance not found`);
-      mashInstance = existingInstance;
     }
   }
 
   // find the appropriate BOM / BOM Version
   const bom = await client.bom.findFirst({
     where: {
-      bomName: "-9",
-      bomRevision: 'BOM-HNW-51-39-00-10-R01',
-
+      bomName: "15",
+      bomRevision: 'WSC-74-18-00-08-53-06-3-0-0-100 Rev',
+      
     }
   });
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 21; // This should be configurable or fetched from a setting
-  const startCook = 18;
+  const totalNumberOfCooks = 120; // This should be configurable or fetched from a setting
+  const startCook = 110;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -109,16 +99,11 @@ async function seed() {
 
   console.log("Operation Class Definitions:", operationClassDefs);
 
-  if (!mashInstance) {
-    console.log(`Mashing unit procedure instance not found`);
-    return;
-  }
   const mashingUnitProcedure = await client.unitProcedure.findFirst({
     where: {
-      id: mashInstance.id,
-      // name: EnumUnitProcedureName.Mashing01,
-      // isClassDef: false,
-      // procedure: { id: mashingRecipeProcedure.id }
+      name: EnumUnitProcedureName.Mashing01,
+      isClassDef: false,
+      procedure: { id: mashingRecipeProcedure.id }
     },
     orderBy: {
       createdAt: 'desc'
@@ -135,13 +120,12 @@ async function seed() {
       where: {
         name: EnumOperationName.Cook,
         isClassDefinition: false,
-        // unitProcedure: { id: mashingUnitProcedure.id },
-        unitProcedureId: mashInstance.id,
+        unitProcedure: { id: mashingUnitProcedure.id },
         procedureSequenceIndex: cookIndex
       }
     });
-    // if (!existingInstance) {
-    if (true) {
+    if (!existingInstance) {
+      // if (true) {
       const cookClassDef = operationClassDefs.find(def => def.name === EnumOperationName.Cook);
 
       if (cookClassDef) {
@@ -171,24 +155,21 @@ async function seed() {
   // Create the cook equipment phases for each cook using the mashing protocol
   // Create the cook equipment phases for each cook using the mashing protocol
   const mashingProtocol = [
-    { action: "Add Liquid", liquidType01: "Water", qty: 7500},
-    { action: "Hold", holdType: "Heat", temperature: 192 },
-    { action: "Add Additive", additiveType: "Termamyl", qty: 2.25},
-    { action: "Add Grain", grainType: "Corn" , qty: 12280.8},
-    { action: "Hold", holdType: "Hold", time: 45 },
-    { action: "Add Liquid", liquidType01: "Water", qty: 0},
-    { action: "Hold", holdType: "Cool", temperature: 155 },
-    { action: "Add Additive", additiveType: "Termamyl", qty: 2.2500000001},
-    { action: "Add Additive", additiveType: "DIAZYME"},
-    { action: "Add Grain", grainType: "Rye", qty: 4696.6 },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Rye", qty: 4694.6 },
-    { action: "Add Additive", additiveType: "Laminex" },
-    { action: "Hold", holdType: "Cool", temperature: 142 },
-    { action: "Add Grain", grainType: "Malt", qty: 1600 },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Malt", qty: 808 },
-    { action: "Hold", holdType: "Hold", time: 30 },
+    { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+    { action: "Hold", holdType: "Heat", temperature: 130 },
+    { action: "Add Additive", additiveType: "Citric", qty: 0},
+    { action: "Add Grain", grainType: "Malt", qty: 164 },
+    { action: "Add Grain", grainType: "Corn" },
+    { action: "Add Liquid", liquidType01: "Water", qty: 0 },
+    { action: "Add Additive", additiveType: "Termamyl"},
+    { action: "Hold", holdType: "Heat", temperature: 200, time: 15 },
+    { action: "Hold", holdType: "Cool", temperature: 170 },
+    { action: "Add Grain", grainType: "Rye" },
+    { action: "Hold", holdType: "Hold", time: 15 },
+    { action: "Hold", holdType: "Cool", temperature: 145 },
+    { action: "Add Grain", grainType: "Malt" , qty: 1476 },
+    { action: "Add Additive", additiveType: "Saczyme" },
+    { action: "Hold", holdType: "Hold", time: 10 },
   ];
 
   for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
@@ -245,11 +226,11 @@ async function seed() {
             unitProcedure: { id: mashingUnitProcedure.id },
             procedureSequenceIndex: cookIndex
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: {createdAt: 'desc'}
         });
 
         if (cookOperation) {
-
+          
           const stepType = (phase.action === "Hold") ? phase.holdType : (phase.action === "Add Grain") ? phase.grainType : (phase.action === "Add Liquid") ? phase.liquidType01 : undefined;
           const newPhase = await client.equipmentPhase.create({
             data: {
@@ -313,58 +294,30 @@ async function seed() {
             });
           }
 
-          // Link BOM components to their equipment phases - these will be the "class definitions"
-          if (bom) {
-            const bomComponents = await client.bomItem.findMany({
-              where: {
-                bom: { id: bom.id },
-                isClassDefinition: true,
-              },
-              include: {
-                item: true
-              }
-            });
+        // Link BOM components to their equipment phases - these will be the "class definitions"
+        if (bom) {
+          const bomComponents = await client.bomItem.findMany({
+            where: {
+              bom: { id: bom.id },
+              isClassDefinition: true, 
+            },
+            include: {
+              item: true
+            }
+          });
 
-            for (const component of bomComponents) {
-              if (
-                (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
-                (phase.action === "Add Liquid" && (
-                  (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
-                  // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
-                ))
-              ) {
-                // Check if the quantity field is present in the phase object
-                if (phase.qty !== undefined) {
-                  // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity.equals(phase.qty)) {
-                    await client.equipmentPhase.update({
-                      where: { id: newPhase.id },
-                      data: {
-                        bomItem: {
-                          connect: { id: component.id },
-                        },
-                      },
-                    });
-                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
-                  } else {
-                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
-                  }
-                // } else if (phase.notQty !== undefined) {
-                //   // Only match if the bomItem quantity does not equal the phase notQty
-                //   if (!component.quantity.equals(phase.notQty)) {
-                //     await client.equipmentPhase.update({
-                //       where: { id: newPhase.id },
-                //       data: {
-                //         bomItem: {
-                //           connect: { id: component.id },
-                //         },
-                //       },
-                //     });
-                //     console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
-                //   } else {
-                //     console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
-                //   }
-                } else {
+          for (const component of bomComponents) {
+            if (
+              (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
+              (phase.action === "Add Liquid" && (
+                (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
+                // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
+              ))
+            ) {
+              // Check if the quantity field is present in the phase object
+              if (phase.qty !== undefined) {
+                // Only match if the bomItem quantity equals the phase quantity
+                if (component.quantity.equals(phase.qty)) {
                   await client.equipmentPhase.update({
                     where: { id: newPhase.id },
                     data: {
@@ -373,12 +326,72 @@ async function seed() {
                       },
                     },
                   });
-                  console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
-
+                  console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                } else {
+                  console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                }
+              } else if (phase.notQty !== undefined) {
+                // Only match if the bomItem quantity does not equal the phase notQty
+                if (!component.quantity.equals(phase.notQty)) {
+                  await client.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                } else {
+                  console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
+                }
+              
+              // } else {
+              //   // If quantity is not specified in the phase, proceed with the existing logic
+              // if (phase.action == "Add Grain") {
+              //   if (phase.grainType == "Malt") {
+              //   if (component.quantity.lt(500)) {
+              //     await client.equipmentPhase.update({
+              //       where: { id: newPhase.id },
+              //       data: {
+              //         bomItem: {
+              //           connect: { id: component.id },
+              //         },
+              //       },
+              //     });
+              //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+              //   } else {
+              //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+              //   }
+              // } else if ((phase.grainType == "Malt") ){
+              //   if (component.quantity.gte(500)) {
+              //     await client.equipmentPhase.update({
+              //       where: { id: newPhase.id },
+              //       data: {
+              //         bomItem: {
+              //           connect: { id: component.id },
+              //         },
+              //       },
+              //     });
+              //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+              //   } else {
+              //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+              //   }
+              } else {
+              await client.equipmentPhase.update({
+                where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked BOM component ${component.item.itemNumber  } to Equipment Phase ${newPhase.name}`);
+                  
                 }
               } else if (phase.grainType == "Corn") {
                 console.log(`Corn: ${component.item.itemNumber}`);
-                if (component.item.itemNumber === "COR-DLF02-US #2 Yellow Dent GMO") {
+                if (component.item.itemNumber === "COR-DLF01-US #2 Yellow Dent GMO") {
                   await client.equipmentPhase.update({
                     where: { id: newPhase.id },
                     data: {
@@ -388,27 +401,26 @@ async function seed() {
                     },
                   });
                   console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
-                }
-              } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
-                console.log(`Add Additive: ${component.item.itemNumber}`);
-                // if (phase.additiveType == "Teramyl") {
-                //   console.log(`Teramyl: ${component.item.itemNumber}`);
-                // } else if (phase.additiveType)
+                } 
+            } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
+              console.log(`Add Additive: ${component.item.itemNumber}`);
+              // if (phase.additiveType == "Teramyl") {
+              //   console.log(`Teramyl: ${component.item.itemNumber}`);
+              // } else if (phase.additiveType)
                 await client.equipmentPhase.update({
-                  where: { id: newPhase.id },
-                  data: {
-                    bomItem: {
-                      connect: { id: component.id },
-                    },
+                where: { id: newPhase.id },
+                data: {
+                  bomItem: {
+                    connect: { id: component.id },
                   },
-                });
-                console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
-              }
+                },
+              });
+              console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);            }
 
-            }
-          } else {
-            console.log("BOM not found, skipping linking BOM components to Equipment Phases");
           }
+        } else {
+          console.log("BOM not found, skipping linking BOM components to Equipment Phases");
+        }
         }
       } else {
         console.log(`Equipment Phase ${phase.action} already exists, skipping.`);
@@ -426,22 +438,22 @@ async function seed() {
         }
       }
     });
-
+    
     if (!item) {
       console.log(`Item with item number ${itemNumber} not found`);
       return null;
     }
-
+    
     return item;
   };
 
-  const item = await getItemByItemNumber('HNW-51-39-00-10-53-18-4-2-0-120-R01');
+  const item = await getItemByItemNumber('WSC-74-18-00-08-ISC-53-06-04-0-0-00-125');
   if (item) {
     console.log(`Found item: ${item.id}, ${item.itemNumber}`);
   }
 
   // Find customer with "KWH Venture, LLC" name
-  const CUSTOMER_NAME = "High N Wicked LLC";
+  const CUSTOMER_NAME = "Western Spirits Beverage Company, LLC";
   const customer = await client.customer.findFirst({
     where: {
       name: CUSTOMER_NAME
@@ -457,7 +469,7 @@ async function seed() {
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
-      Recipe: "HNW-51-39-00-10-R01",
+      Recipe: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125",
     }
   });
 
@@ -469,20 +481,20 @@ async function seed() {
     { name: 'BaseLoss', setpointValue: 0.5 },
     { name: 'BeerFeedTray', setpointValue: 15 },
     { name: 'FermentationAge', setpointValue: 72 },
-    { name: 'ControlTemperature', setpointValue: 80 },
+    { name: 'ControlTemperature', setpointValue: 85 },
     { name: 'CooksPerFerm', setpointValue: 3 },
     { name: 'TopOffFrequency', setpointValue: 24 },
     { name: 'TopOffQuantity', setpointValue: 100 },
     { name: 'TopOffTemperature', setpointValue: 80 },
-    { name: 'MashpH', setpointValue: 5.1 },
+    { name: 'MashpH', setpointValue: 5.2 },
     { name: 'MashRatio', setpointValue: 3.5 },
     { name: 'RatioByFerm', setpointValue: 2.8 },
-    { name: 'FermSetTemp', setpointValue: 80 },
-    { name: 'StarterSweetpH', setpointValue: 5.1 },
-    { name: 'TotalGrainWeight', setpointValue: 20500 },
+    { name: 'FermSetTemp', setpointValue: 86 },
+    { name: 'StarterSweetpH', setpointValue: 5.8 },
+    { name: 'TotalGrainWeight', setpointValue: 20000 },
     { name: 'TotalLiquid', setpointValue: 70000 },
-    { name: 'NumberOfCooks', setpointValue: 9 },
-    { name: 'AssumedFermABV', setpointValue: 12.5 }
+    { name: 'NumberOfCooks', setpointValue: 18 },
+    { name: 'AssumbedFermABV', setpointValue: 12.5 }
   ];
 
   let newParams: RecipeParameter[] = [];
@@ -531,7 +543,7 @@ async function seed() {
     console.log("Creating new Mashing Recipe...");
     recipe = await client.recipe.create({
       data: {
-        Recipe: "HNW-51-39-00-10-R01",
+        Recipe: "WSC-74-18-00-08-R001",
         revision: 1,
         createdBy: "pmannion",
         // parameters: {
@@ -559,7 +571,7 @@ async function seed() {
   let recipeGroup: RecipeGroup;
   const existingRecipeGroup = await client.recipeGroup.findFirst({
     where: {
-      recipe: { equals: "75-15-00-10" }
+      recipe: { equals: "74-18-00-08" }
     }
   });
 
@@ -578,7 +590,7 @@ async function seed() {
     console.log("Creating new recipe group 'Mashing Recipes'...");
     recipeGroup = await client.recipeGroup.create({
       data: {
-        recipe: "75-15-00-10",
+        recipe: "74-18-00-08",
         createdBy: "pmannion",
         recipes: {
           connect: { id: recipe.id }
@@ -612,8 +624,7 @@ async function seed() {
         createdBy: "pmannion",
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        quantity: 1000, // Adjust as needed
-        name: 'SO32'
+        quantity: 3000, // Adjust as needed
         // units: "Barrels",
       }
     });
@@ -629,7 +640,7 @@ async function seed() {
 
   const existingProductionOrder = await client.productionOrder.findFirst({
     where: {
-      recipe: { Recipe: "HNW-51-39-00-10-R01" },
+      recipe: { Recipe: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125" },
       item: { id: (item as Item).id },
       bom: { id: bom?.id }
     }
@@ -657,10 +668,10 @@ async function seed() {
         },
         createdBy: "pmannion",
         status: EnumProductionOrderStatus.Initiated,
-        customerCode: 'WCL',
+        customerCode: 'WSC',
         units: 'Barrels',
-        quantity: 1000,
-        name: 'PRO2423302',// TODO: add name
+        quantity: 3000,
+        // name: 'WSC-74-18-00-08-ISC-53-06-04-0-0-00-125',// TODO: add name
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }
@@ -677,12 +688,11 @@ async function seed() {
         createdBy: "pmannion",
         estimatedStart: new Date(),
         estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
-        recipeName: "HNW-51-39-00-10-R01",
+        recipeName: "WSC-74-18-00-08-ISC-53-06-04-0-0-00-125",
         productionOrderAllocation: 1000,
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: 'SHO2423302',// TODO: add name
       }
     });
 
