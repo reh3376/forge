@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
+import { Salt, parseSalt } from "../../src/auth/password.service";
 import { hash } from "bcrypt";
 
 async function seed() {
@@ -24,8 +24,7 @@ async function seed() {
   // Find Unit Procedure class definitions
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
     where: {
-      isClassDef: true,
-      name: 'Mashing01'
+      isClassDef: true
     }
   });
 
@@ -59,8 +58,8 @@ async function seed() {
       }
     });
     mashInstance = existingInstance;
-    // if (!existingInstance) {
-    if (true) {
+    if (!existingInstance) {
+    // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -90,16 +89,16 @@ async function seed() {
   // find the appropriate BOM / BOM Version
   const bom = await client.bom.findFirst({
     where: {
-      bomName: "-31",
-      bomRevision: 'BOM-BHK-00-95-00-05-R01',
+      bomName: "-6",
+      bomRevision: 'BOM-ULP-75-21-00-04-R01',
 
     }
   });
 
   // Seed operations based on number of cooks per ferm and number of cooks
   const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-  const totalNumberOfCooks = 3; // This should be configurable or fetched from a settin
-  const startCook = 1;
+  const totalNumberOfCooks = 60; // This should be configurable or fetched from a setting
+  const startCook = 36;
 
   const operationClassDefs = await client.operation.findMany({
     where: {
@@ -169,24 +168,25 @@ async function seed() {
   }
 
   // Create the cook equipment phases for each cook using the mashing protocol
+  // Create the cook equipment phases for each cook using the mashing protocol
   const mashingProtocol = [
     { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
     { action: "Hold", holdType: "Heat", temperature: 130 },
-    { action: "Add Additive", additiveType: "Citric"},
-    { action: "Add Additive", additiveType: "Liquozyme" },
-    { action: "Add Grain", grainType: "Malt" },
-    { action: "Add Grain", grainType: "Rye", qty: 5717 },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Rye", qty: 5718 },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Rye", qty: 5721 },
-    { action: "Hold", holdType: "Hold", time: 5 },
-    { action: "Add Grain", grainType: "Rye", qty: 5722 },
-    { action: "Add Additive", additiveType: "DIAZYME" },
-    { action: "Add Additive", additiveType: "Viscoferm" },
-    { action: "Hold", holdType: "Heat", temperature: 130, time: 15 },
-    { action: "Hold", holdType: "Heat", temperature: 145 },
-    { action: "Hold", holdType: "Hold", time: 30 },
+    { action: "Add Additive", additiveType: "Citric", qty: 0 },
+    { action: "Add Grain", grainType: "Malt", qty: 96 },
+    { action: "Add Additive", additiveType: "Termamyl" },
+    { action: "Add Grain", grainType: "Corn" },
+    { action: "Add Liquid", liquidType01: "Water", qty: 0 },
+    { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
+    { action: "Hold", holdType: "Cool", temperature: 170 },
+    { action: "Add Grain", grainType: "Rye" },
+    { action: "Hold", holdType: "Hold", time: 15 },
+    { action: "Hold", holdType: "Cool", temperature: 152 },
+    { action: "Add Additive", additiveType: "Saczyme" },
+    { action: "Add Additive", additiveType: "Viscoferm", qty: 0.23 },
+    { action: "Hold", holdType: "Cool", temperature: 145 },
+    { action: "Add Grain", grainType: "Malt", qty: 867 },
+    { action: "Hold", holdType: "Hold", time: 10 },
   ];
 
   for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
@@ -362,6 +362,38 @@ async function seed() {
                   } else {
                     console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
                   }
+
+                  // } else {
+                  //   // If quantity is not specified in the phase, proceed with the existing logic
+                  // if (phase.action == "Add Grain") {
+                  //   if (phase.grainType == "Malt") {
+                  //   if (component.quantity.lt(500)) {
+                  //     await client.equipmentPhase.update({
+                  //       where: { id: newPhase.id },
+                  //       data: {
+                  //         bomItem: {
+                  //           connect: { id: component.id },
+                  //         },
+                  //       },
+                  //     });
+                  //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  //   } else {
+                  //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                  //   }
+                  // } else if ((phase.grainType == "Malt") ){
+                  //   if (component.quantity.gte(500)) {
+                  //     await client.equipmentPhase.update({
+                  //       where: { id: newPhase.id },
+                  //       data: {
+                  //         bomItem: {
+                  //           connect: { id: component.id },
+                  //         },
+                  //       },
+                  //     });
+                  //     console.log(`Linked specific malt BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  //   } else {
+                  //     console.log(`Skipped linking malt BOM component ${component.item.itemNumber} due to quantity being ${component.quantity} lbs`);
+                  //   }
                 } else {
                   await client.equipmentPhase.update({
                     where: { id: newPhase.id },
@@ -433,13 +465,13 @@ async function seed() {
     return item;
   };
 
-  const item = await getItemByItemNumber('BHK-00-95-00-05-53-06-4-0-0-110-R01');
+  const item = await getItemByItemNumber('ULP-75-21-00-04-53-06-4-0-0-125-R01');
   if (item) {
     console.log(`Found item: ${item.id}, ${item.itemNumber}`);
   }
 
   // Find customer with "KWH Venture, LLC" name
-  const CUSTOMER_NAME = "BHAWK";
+  const CUSTOMER_NAME = "Ultra Pure LLC";
   const customer = await client.customer.findFirst({
     where: {
       name: CUSTOMER_NAME
@@ -455,7 +487,7 @@ async function seed() {
   // Create or update the Recipe record and link it to the Mashing Unit Procedure
   const existingRecipe = await client.recipe.findFirst({
     where: {
-      Recipe: "BHK-00-95-00-05-R01",
+      Recipe: "	ULP-75-21-00-04-R01",
     }
   });
 
@@ -463,7 +495,7 @@ async function seed() {
   const recipeParameters = [
     { name: 'HighWineProof', setpointValue: 140 },
     { name: 'LowWineProof', setpointValue: 100 },
-    { name: 'FinalProof', setpointValue: 110 },
+    { name: 'FinalProof', setpointValue: 125 },
     { name: 'BaseLoss', setpointValue: 0.5 },
     { name: 'BeerFeedTray', setpointValue: 15 },
     { name: 'FermentationAge', setpointValue: 72 },
@@ -477,8 +509,8 @@ async function seed() {
     { name: 'RatioByFerm', setpointValue: 2.8 },
     { name: 'FermSetTemp', setpointValue: 80 },
     { name: 'StarterSweetpH', setpointValue: 5.1 },
-    { name: 'TotalGrainWeight', setpointValue: 24080 },
-    { name: 'TotalLiquid', setpointValue: 7000 },
+    { name: 'TotalGrainWeight', setpointValue: 20500 },
+    { name: 'TotalLiquid', setpointValue: 70000 },
     { name: 'NumberOfCooks', setpointValue: 9 },
     { name: 'AssumedFermABV', setpointValue: 12.5 }
   ];
@@ -529,7 +561,7 @@ async function seed() {
     console.log("Creating new Mashing Recipe...");
     recipe = await client.recipe.create({
       data: {
-        Recipe: "BHK-00-95-00-05-R01",
+        Recipe: "ULP-75-21-00-04-R01",
         revision: 1,
         createdBy: "pmannion",
         // parameters: {
@@ -557,7 +589,7 @@ async function seed() {
   let recipeGroup: RecipeGroup;
   const existingRecipeGroup = await client.recipeGroup.findFirst({
     where: {
-      recipe: { equals: "00-95-00-05" }
+      recipe: { equals: "75-21-00-04" }
     }
   });
 
@@ -576,7 +608,7 @@ async function seed() {
     console.log("Creating new recipe group 'Mashing Recipes'...");
     recipeGroup = await client.recipeGroup.create({
       data: {
-        recipe: "00-95-00-05",
+        recipe: "75-21-00-04",
         createdBy: "pmannion",
         recipes: {
           connect: { id: recipe.id }
@@ -591,8 +623,7 @@ async function seed() {
   let salesOrder: SalesOrder;
   const existingSalesOrder = await client.salesOrder.findFirst({
     where: {
-      customer: { id: customer?.id },
-      name: 'SO34'
+      customer: { id: customer?.id }
     }
   });
 
@@ -611,8 +642,8 @@ async function seed() {
         createdBy: "pmannion",
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        quantity: 85, // Adjust as needed
-        name: 'SO34' 
+        quantity: 3000, // Adjust as needed
+        name: 'SO29'
         // units: "Barrels",
       }
     });
@@ -628,7 +659,7 @@ async function seed() {
 
   const existingProductionOrder = await client.productionOrder.findFirst({
     where: {
-      recipe: { Recipe: "BHK-00-95-00-05-R01" },
+      recipe: { Recipe: "ULP-75-21-00-04-R01" },
       item: { id: (item as Item).id },
       bom: { id: bom?.id }
     }
@@ -656,10 +687,10 @@ async function seed() {
         },
         createdBy: "pmannion",
         status: EnumProductionOrderStatus.Initiated,
-        customerCode: 'BHK',
+        customerCode: 'ULP',
         units: 'Barrels',
-        quantity: 85,
-        name: 'PRO2423802',// TODO: add name
+        quantity: 3000,
+        name: 'PRO2422301',// TODO: add name
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }
@@ -676,12 +707,12 @@ async function seed() {
         createdBy: "pmannion",
         estimatedStart: new Date(),
         estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
-        recipeName: "BHK-00-95-00-05-R01",
-        productionOrderAllocation: 85,
+        recipeName: "UPL-75-21-00-04-R01",
+        productionOrderAllocation: 3000,
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: 'SHO2423802',// TODO: add name
+        name: 'SHO24223001',// TODO: add name
       }
     });
 

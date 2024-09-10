@@ -1,290 +1,77 @@
+import * as dotenv from "dotenv";
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
+import { Salt, parseSalt } from "../src/auth/password.service";
+import { hash } from "bcrypt";
 
-const CUSTOMER_CODE = "WGS";
-const MASH_BILL = '60-36-00-04'; //  Match Item Record
-const FINAL_PROOF = 120;
-const BARREL_INFO = '53-06-3-0-0'; // Match Item Record
-const CUSTOMER_NAME = "William Grant & Sons, Inc."; // This needs to match ERP / MESDB customer reocrd
-const ORDER_QTY = 500; // barrels
-const TOTAL_GRAIN_WEIGHT = 24080;
-const BBLS_PER_FERM = 85;
-const USER = 'pmannion@whiskeyhouse.com';
-
-const WATER_QTY = 6000;
-const BACKSET_QTY = 1000;
-
-const BBL_ITEM_NUMBERS = [
-  'BBL-ISC02-53-06-4-0-0-Standard4',
-  'BBL-WVG02-53-06-4-0-0-Standard4',
-]
-
-const YEAST_ITEM_NUMBERS_QTYS = [{
-  'YEA-FER01-Yeast (USW6)': 10,
-}]
-
-/* 
-MAXIMUM GRAIN WEIGHTS IN BINS 
-(Normal bin assignment...)
-
-Current total grain weight: 24080
-
-Corn: 180000
-Rye: 7000
-Wheat: 7000
-Malt: 1800
-
-
-Each grain weight for the recipe is the % from the mash bill (Corn-Rye-Wheat-Malt) multiplied by total grain weight
-But malt, 10% of the malt weight is the premalt, 90% is the big malt
-*/
-
+const ITEM_NUMBER = "FDP-78-10-00-12-53-06-4-0-0-120-R01";
+const BOM_REVISION = "BOM-FDP-78-10-00-12-R01";
+const CUSTOMER_NAME = "Frank-Lin Distillers Products Ltd";
+const CUSTOMER_CODE = "FDP";
 const MASHING_PROTOCOL = [
-  { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
-  { action: "Hold", holdType: "Heat", temperature: 130 },
-  { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "Malt", qty: 96 },
-  { action: "Add Additive", additiveType: "Liquozyme" },
-  { action: "Add Grain", grainType: "Corn", qty: 14448 },
-  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
-  { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Rye", qty: 7000 },
-  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Hold", time: 10 },
-  { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME" },
-  { action: "Add Additive", additiveType: "Viscoferm" },
-  { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt", qty: 963 },
-  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Hold", time: 10 },
-];
+    { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+    { action: "Hold", holdType: "Heat", temperature: 130 },
+    { action: "Add Additive", additiveType: "Citric", qty: 0 },
+    { action: "Add Grain", grainType: "Malt", qty: 288.96 },
+    { action: "Add Additive", additiveType: "Liquozyme" },
+    { action: "Add Grain", grainType: "Corn", qty: 16782.4 },
+    { action: "Hold", holdType: "Hold", time: 3 },
+    { action: "Add Grain", grainType: "Corn", qty: 2000 },
+    { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
+    { action: "Hold", holdType: "Cool", temperature: 170 },
+    { action: "Add Grain", grainType: "Rye" },
+    { action: "Hold", holdType: "Hold", time: 10 },
+    { action: "Hold", holdType: "Cool", temperature: 152 },
+    { action: "Add Additive", additiveType: "DIAZYME" },
+    { action: "Add Additive", additiveType: "Viscoferm" },
+    { action: "Hold", holdType: "Cool", temperature: 145 },
+    { action: "Add Grain", grainType: "Malt", qty: 1800 },
+    { action: "Hold", holdType: "Hold", time: 3 },
+    { action: "Add Grain", grainType: "Malt", qty: 800.64 },
+    { action: "Hold", holdType: "Hold", time: 10 },
+  ];
+const RECIPE = "FDP-78-10-00-12-R01";
+const ORDER_QTY = 1000;
 const RECIPE_PARAMETERS = [
-  { name: 'HighWineProof', setpointValue: 140 },
-  { name: 'LowWineProof', setpointValue: 100 },
-  { name: 'FinalProof', setpointValue: 125 },
-  { name: 'BaseLoss', setpointValue: 0.5 },
-  { name: 'BeerFeedTray', setpointValue: 15 },
-  { name: 'FermentationAge', setpointValue: 72 },
-  { name: 'ControlTemperature', setpointValue: 80 },
-  { name: 'CooksPerFerm', setpointValue: 3 },
-  { name: 'TopOffFrequency', setpointValue: 24 },
-  { name: 'TopOffQuantity', setpointValue: 100 },
-  { name: 'TopOffTemperature', setpointValue: 80 },
-  { name: 'MashpH', setpointValue: 5.1 },
-  { name: 'MashRatio', setpointValue: 3.5 },
-  { name: 'RatioByFerm', setpointValue: 2.8 },
-  { name: 'FermSetTemp', setpointValue: 80 },
-  { name: 'StarterSweetpH', setpointValue: 5.1 },
-  { name: 'TotalGrainWeight', setpointValue: 20500 },
-  { name: 'TotalLiquid', setpointValue: 70000 },
-  { name: 'NumberOfCooks', setpointValue: 9 },
-  { name: 'AssumedFermABV', setpointValue: 12.5 }
-];
-const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
-const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-
+    { name: 'HighWineProof', setpointValue: 140 },
+    { name: 'LowWineProof', setpointValue: 100 },
+    { name: 'FinalProof', setpointValue: 125 },
+    { name: 'BaseLoss', setpointValue: 0.5 },
+    { name: 'BeerFeedTray', setpointValue: 15 },
+    { name: 'FermentationAge', setpointValue: 72 },
+    { name: 'ControlTemperature', setpointValue: 80 },
+    { name: 'CooksPerFerm', setpointValue: 3 },
+    { name: 'TopOffFrequency', setpointValue: 24 },
+    { name: 'TopOffQuantity', setpointValue: 100 },
+    { name: 'TopOffTemperature', setpointValue: 80 },
+    { name: 'MashpH', setpointValue: 5.1 },
+    { name: 'MashRatio', setpointValue: 3.5 },
+    { name: 'RatioByFerm', setpointValue: 2.8 },
+    { name: 'FermSetTemp', setpointValue: 80 },
+    { name: 'StarterSweetpH', setpointValue: 5.1 },
+    { name: 'TotalGrainWeight', setpointValue: 20500 },
+    { name: 'TotalLiquid', setpointValue: 70000 },
+    { name: 'NumberOfCooks', setpointValue: 9 },
+    { name: 'AssumedFermABV', setpointValue: 12.5 }
+  ];
+  const USER = 'pmannion';
+ 
 async function seed() {
 
 
   console.info("Seeding database with custom seed for Mashing Recipe...");
 
-  // ------------------------------------ BOM CREATION ------------------------------------
-  // Base BOM Items
-  const waterItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const backsetItemId = 'clyd1oftx006jfd4514hrak80'
-  const viscofermItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const liquozymeItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const diazymeItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const termamylItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const saczymeItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const maltItemId = 'clyd1ofw0009ufd45hlzpnqa9'
-  const ryeItemId = 'clyd1ofy600d9fd45p99px0c0'
-  const cornItemId = 'clyd1ofw1009wfd45oghso7y5'
-  const wheatItemId = 'cm0e1ocx0012xl6xv4i696cfh'
-  const citricItemId = 'clyd1ofpw0032fd45omeixgvv'
+  /*
+  1. Seed instance of unit procedures, using the main procedure instance
+  2. Seed instances of operations for each UP. Using the parameters to seed the number of operations per UP
+  3. Find the appropriate BOM for the mashing recipe
+  4. Using the structure of the mashing protocol to map the equipment phases to cook. 
+    a. Connect the correct phase parameters
+    b. Connect the step type if applicable.  
+    c. Map the bom components to the proper equipment phase
 
+  */
 
   const client = new PrismaClient();
-
-  // Create the base BOM and bom items
-  const fgItem = await client.item.findFirst({
-    where: {
-      itemNumber: `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`
-    }
-  })
-  const baseBom = await client.bom.create({
-    data: {
-      bomRevision: BOM_REVISION,
-      bomName: `BOM-${CUSTOMER_CODE}-${MASH_BILL}`,
-      createdBy: USER,
-      item: {
-        connect: {
-          id: fgItem?.id
-        }
-      }
-    }
-  });
-
-  // add the base bom items
-  await client.bomItem.createMany({
-    data: [
-      {
-        bomId: baseBom.id,
-        itemId: waterItemId,
-        quantity: WATER_QTY,
-        createdBy: USER,
-        isClassDefinition: true
-      },
-      {
-        bomId: baseBom.id,
-        itemId: backsetItemId,
-        quantity: BACKSET_QTY,
-        createdBy: USER,
-        isClassDefinition: true
-      },
-      {
-        bomId: baseBom.id,
-        itemId: citricItemId,
-        quantity: 0,
-        createdBy: USER,
-        isClassDefinition: true
-      }
-    ]
-  })
-
-  // add the barrel bom items
-  for (const itemNumber of BBL_ITEM_NUMBERS) {
-    const itemId = await client.item.findFirst({
-      where: {
-        itemNumber: itemNumber
-      },
-    });
-    if (itemId) {
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: itemId?.id,
-          quantity: 1 / BBL_ITEM_NUMBERS.length,
-          createdBy: USER,
-          isClassDefinition: true
-        }
-      })
-    }
-  }
-
-  // add the yeast items
-  for (const [yeastItemNumber, quantity] of Object.entries(YEAST_ITEM_NUMBERS_QTYS)) {
-    const item = await client.item.findFirst({
-      where: {
-        itemNumber: yeastItemNumber
-      },
-    });
-    if (item) {
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: item.id,
-          quantity: YEAST_ITEM_NUMBERS_QTYS[yeastItemNumber],
-          createdBy: USER,
-          isClassDefinition: true
-        }
-      });
-    } else {
-      console.log(`Item not found for yeast item number: ${yeastItemNumber}`);
-    }
-  }
-  
-  // Add the bom items for the grains according to the mashingProtocol
-  // Add the bom items for the grains according to the mashingProtocol
-  for (const step of MASHING_PROTOCOL) {
-    if (step.action === "Add Grain") {
-      let itemId;
-      let quantity;
-
-      switch (step.grainType) {
-        case "Corn":
-          itemId = cornItemId;
-          quantity = step.qty || 0;
-          break;
-        case "Rye":
-          itemId = ryeItemId;
-          quantity = step.qty || 0;
-          break;
-        case "Malt":
-          itemId = maltItemId;
-          quantity = step.qty || 0;
-          break;
-        case "Wheat":
-          itemId = wheatItemId;
-          quantity = step.qty || 0;
-          break;
-        default:
-          console.log(`Unknown grain type: ${step.grainType}`);
-          continue;
-      }
-
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: itemId,
-          quantity: quantity,
-          createdBy: USER,
-          isClassDefinition: true
-        }
-      });
-
-      console.log(`Added ${step.grainType} to BOM with quantity ${quantity}`);
-    } else if (step.action === "Add Additive") {
-      let itemId;
-      let quantity;
-
-      switch (step.additiveType?.toLowerCase()) {
-        case "viscoferm":
-          itemId = viscofermItemId;
-          quantity = step.qty || 0;
-          break;
-        case "liquozyme":
-          itemId = liquozymeItemId;
-          quantity = step.qty || 0;
-          break;
-        case "diazyme":
-          itemId = diazymeItemId;
-          quantity = step.qty || 0;
-          break;
-        case "termamyl":
-          itemId = termamylItemId;
-          quantity = step.qty || 0;
-          break;
-        case "saczyme":
-          itemId = saczymeItemId;
-          quantity = step.qty || 0;
-          break;  
-        case "termamyl":
-          itemId = termamylItemId;
-          quantity = step.qty || 0;
-          break;
-      }
-
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: itemId,
-          quantity: quantity,
-          createdBy: USER,
-          isClassDefinition: true
-        }
-      });
-
-      console.log(`Added ${step.additiveType} to BOM with quantity ${quantity}`);
-    }
-  }
-
-  // ------------------------------------ END OF BOM CREATION ------------------------------------
 
   // Find Unit Procedure class definitions
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
@@ -317,12 +104,7 @@ async function seed() {
     const existingInstance = await client.unitProcedure.findFirst({
       where: {
         name: classDef.name,
-        isClassDef: false,
-        recipe: {
-          some: {
-            Recipe: RECIPE
-          }
-        }
+        isClassDef: false
       },
       orderBy: {
         createdAt: 'desc'
@@ -330,7 +112,7 @@ async function seed() {
     });
     mashInstance = existingInstance;
     if (!existingInstance) {
-      // if (true) {
+    // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -581,7 +363,7 @@ async function seed() {
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
                   // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity == phase.qty) {
+                  if (component.quantity.equals(phase.qty)) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -596,7 +378,7 @@ async function seed() {
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
-                  if (component.quantity != phase.notQty) {
+                  if (!component.quantity.equals(phase.notQty)) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -627,7 +409,7 @@ async function seed() {
                   // Check if the quantity field is present in the phase object
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity == phase.qty) {
+                    if (component.quantity.equals(phase.qty)) {
                       await client.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -836,45 +618,19 @@ async function seed() {
 
   // Get the current date
   const currentDate = new Date();
-
+  
   // Calculate the day of the year
   const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
   const diff = currentDate.getTime() - startOfYear.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-
+  
   console.log(`Current day of the year: ${dayOfYear}`);
 
   if (existingSalesOrder) {
     console.log("Sample sales order already exists, skipping creation.");
     salesOrder = existingSalesOrder;
   } else {
-    // Get the most recent production order created today, if it exists
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const mostRecentSalesOrder = await client.salesOrder.findFirst({
-      where: {
-        createdAt: {
-          gte: today
-        },
-        name: {
-          startsWith: 'SO'
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-    const salesOrderNumber = mostRecentSalesOrder?.name?.split('SO')[1] ?? '01';
-    const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
-
-    if (mostRecentSalesOrder) {
-      console.log(`Most recent sales order created today: ${mostRecentSalesOrder.name ?? 'Unknown'}`);
-    } else {
-      console.log("No sales orders created today.");
-    }
-
     const newSalesOrder = await client.salesOrder.create({
       data: {
         item: {
@@ -887,7 +643,7 @@ async function seed() {
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
         quantity: ORDER_QTY, // Adjust as needed
-        name: `SO${dayOfYear}${newSalesOrderNumber}`,
+        name: 'SO42'
         // units: "Barrels",
       }
     });
@@ -917,32 +673,6 @@ async function seed() {
   if (existingProductionOrder) {
     console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
   } else {
-    // Get the most recent production order created today, if it exists
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const mostRecentProductionOrder = await client.productionOrder.findFirst({
-      where: {
-        createdAt: {
-          gte: today
-        },
-        name: {
-          startsWith: 'PRO'
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-    const productionOrderNumber = mostRecentProductionOrder?.name?.split('PRO')[1] ?? '01';
-    const newProductionOrderNumber = parseInt(productionOrderNumber, 10) + 1;
-
-    if (mostRecentProductionOrder) {
-      console.log(`Most recent production order created today: ${mostRecentProductionOrder.name ?? 'Unknown'}`);
-    } else {
-      console.log("No production orders created today.");
-    }
-
     console.log("Creating new production order...");
     const newProductionOrder = await client.productionOrder.create({
       data: {
@@ -966,13 +696,9 @@ async function seed() {
         customerCode: CUSTOMER_CODE,
         units: 'Barrels',
         quantity: ORDER_QTY,
-        name: `${productionOrderName}${newProductionOrderNumber}`,
+        name: `${productionOrderName}01`,
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        totalCooks: Math.ceil(ORDER_QTY / BBLS_PER_FERM) * 3,
-        totalFermenters: Math.ceil(ORDER_QTY / BBLS_PER_FERM),
-        executedCooks: 0,
-        executedFermenters: 0,
       }
     });
 
@@ -1001,24 +727,12 @@ async function seed() {
 
     // Create a sample schedule order queue record
     console.log("Creating sample schedule order queue record...");
-
-    const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
-      orderBy: {
-        queueIndex: 'desc'
-      },
-      select: {
-        queueIndex: true
-      }
-    });
-
-    const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
-
     const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
       data: {
         scheduleOrder: {
           connect: { id: newScheduleOrder.id }
         },
-        queueIndex: newQueueIndex,
+        queueIndex: 1,
         createdBy: USER,
         nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
         nextUnitProcedure: {
