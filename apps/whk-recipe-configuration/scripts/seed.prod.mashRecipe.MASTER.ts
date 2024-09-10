@@ -1,45 +1,47 @@
-import * as dotenv from "dotenv";
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
-import { hash } from "bcrypt";
 
-const ITEM_NUMBER = "FDP-78-10-00-12-53-06-4-0-0-120-R01";
-const BOM_REVISION = "BOM-FDP-78-10-00-12-R01";
-const CUSTOMER_NAME = "Frank-Lin Distillers Products Ltd";
-const CUSTOMER_CODE = "FDP";
+const CUSTOMER_CODE = "WGS";
+const MASH_BILL = '60-36-00-04'; //  Match Item Record
+const FINAL_PROOF = 120;
+const BARREL_INFO = '53-06-3-0-0'; // Match Item Record
+const CUSTOMER_NAME = "William Grant & Sons, Inc."; // This needs to match ERP / MESDB customer reocrd
+const ORDER_QTY = 500;
+const TOTAL_GRAIN_WEIGHT = 24080;
+const USER = 'pmannion@whiskeyhouse.com';
+
 const MASHING_PROTOCOL = [
-    { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
-    { action: "Hold", holdType: "Heat", temperature: 130 },
-    { action: "Add Additive", additiveType: "Citric", qty: 0 },
-    { action: "Add Grain", grainType: "Malt", qty: 288.96 },
-    { action: "Add Additive", additiveType: "Liquozyme" },
-    { action: "Add Grain", grainType: "Corn", qty: 16782.4 },
-    { action: "Hold", holdType: "Hold", time: 3 },
-    { action: "Add Grain", grainType: "Corn", qty: 2000 },
-    { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
-    { action: "Hold", holdType: "Cool", temperature: 170 },
-    { action: "Add Grain", grainType: "Rye" },
-    { action: "Hold", holdType: "Hold", time: 10 },
-    { action: "Hold", holdType: "Cool", temperature: 152 },
-    { action: "Add Additive", additiveType: "DIAZYME" },
-    { action: "Add Additive", additiveType: "Viscoferm" },
-    { action: "Hold", holdType: "Cool", temperature: 145 },
-    { action: "Add Grain", grainType: "Malt", qty: 1800 },
-    { action: "Hold", holdType: "Hold", time: 3 },
-    { action: "Add Grain", grainType: "Malt", qty: 800.64 },
-    { action: "Hold", holdType: "Hold", time: 10 },
-  ];
-const RECIPE = "FDP-78-10-00-12-R01";
-const ORDER_QTY = 1000;
+  { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+  { action: "Hold", holdType: "Heat", temperature: 130 },
+  { action: "Add Additive", additiveType: "Citric", qty: 0 },
+  { action: "Add Grain", grainType: "Malt", qty: 96 },
+  { action: "Add Additive", additiveType: "Liquozyme" },
+  { action: "Add Grain", grainType: "Corn", qty: 14448 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
+  { action: "Hold", holdType: "Cool", temperature: 170 },
+  { action: "Add Grain", grainType: "Rye", qty: 7000 },
+  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Hold", time: 10 },
+  { action: "Hold", holdType: "Cool", temperature: 152 },
+  { action: "Add Additive", additiveType: "DIAZYME" },
+  { action: "Add Additive", additiveType: "Viscoferm" },
+  { action: "Hold", holdType: "Cool", temperature: 145 },
+  { action: "Add Grain", grainType: "Malt", qty: 963 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Hold", time: 10 },
+];
 const RECIPE_PARAMETERS = [
-    { name: 'HighWineProof', setpointValue: 140 },
-    { name: 'LowWineProof', setpointValue: 100 },
-    { name: 'FinalProof', setpointValue: 125 },
-    { name: 'BaseLoss', setpointValue: 0.5 },
-    { name: 'BeerFeedTray', setpointValue: 15 },
-    { name: 'FermentationAge', setpointValue: 72 },
-    { name: 'ControlTemperature', setpointValue: 80 },
-    { name: 'CooksPerFerm', setpointValue: 3 },
+  { name: 'HighWineProof', setpointValue: 140 },
+  { name: 'LowWineProof', setpointValue: 100 },
+  { name: 'FinalProof', setpointValue: 125 },
+  { name: 'BaseLoss', setpointValue: 0.5 },
+  { name: 'BeerFeedTray', setpointValue: 15 },
+  { name: 'FermentationAge', setpointValue: 72 },
+  { name: 'ControlTemperature', setpointValue: 80 },
+  { name: 'CooksPerFerm', setpointValue: 3 },
     { name: 'TopOffFrequency', setpointValue: 24 },
     { name: 'TopOffQuantity', setpointValue: 100 },
     { name: 'TopOffTemperature', setpointValue: 80 },
@@ -53,12 +55,14 @@ const RECIPE_PARAMETERS = [
     { name: 'NumberOfCooks', setpointValue: 9 },
     { name: 'AssumedFermABV', setpointValue: 12.5 }
   ];
-  const USER = 'pmannion';
- 
-async function seed() {
-
-
-  console.info("Seeding database with custom seed for Mashing Recipe...");
+  const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+  const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
+  const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+  
+  async function seed() {
+    
+    
+    console.info("Seeding database with custom seed for Mashing Recipe...");
 
   /*
   1. Seed instance of unit procedures, using the main procedure instance
@@ -104,7 +108,12 @@ async function seed() {
     const existingInstance = await client.unitProcedure.findFirst({
       where: {
         name: classDef.name,
-        isClassDef: false
+        isClassDef: false,
+        recipe: {
+          some: {
+            Recipe: RECIPE
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
@@ -631,6 +640,32 @@ async function seed() {
     console.log("Sample sales order already exists, skipping creation.");
     salesOrder = existingSalesOrder;
   } else {
+    // Get the most recent production order created today, if it exists
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const mostRecentSalesOrder = await client.salesOrder.findFirst({
+      where: {
+        createdAt: {
+          gte: today
+        },
+        name: {
+          startsWith: 'SO'
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    const salesOrderNumber = mostRecentSalesOrder?.name?.split('SO')[1] ?? '01';
+    const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
+
+    if (mostRecentSalesOrder) {
+      console.log(`Most recent sales order created today: ${mostRecentSalesOrder.name ?? 'Unknown'}`);
+    } else {
+      console.log("No sales orders created today.");
+    }
+
     const newSalesOrder = await client.salesOrder.create({
       data: {
         item: {
@@ -643,7 +678,7 @@ async function seed() {
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
         quantity: ORDER_QTY, // Adjust as needed
-        name: 'SO42'
+        name: `SO${dayOfYear}${newSalesOrderNumber}`,
         // units: "Barrels",
       }
     });
@@ -673,6 +708,32 @@ async function seed() {
   if (existingProductionOrder) {
     console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
   } else {
+    // Get the most recent production order created today, if it exists
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const mostRecentProductionOrder = await client.productionOrder.findFirst({
+      where: {
+        createdAt: {
+          gte: today
+        },
+        name: {
+          startsWith: 'PRO'
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    const productionOrderNumber = mostRecentProductionOrder?.name?.split('PRO')[1] ?? '01';
+    const newProductionOrderNumber = parseInt(productionOrderNumber, 10) + 1;
+
+    if (mostRecentProductionOrder) {
+      console.log(`Most recent production order created today: ${mostRecentProductionOrder.name ?? 'Unknown'}`);
+    } else {
+      console.log("No production orders created today.");
+    }
+    
     console.log("Creating new production order...");
     const newProductionOrder = await client.productionOrder.create({
       data: {
@@ -696,9 +757,13 @@ async function seed() {
         customerCode: CUSTOMER_CODE,
         units: 'Barrels',
         quantity: ORDER_QTY,
-        name: `${productionOrderName}01`,
+        name: `${productionOrderName}${newProductionOrderNumber}`,
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        totalCooks: Math.ceil(ORDER_QTY / 85) * 3,
+        totalFermenters: Math.ceil(ORDER_QTY / 85),
+        executedCooks: 0,
+        executedFermenters: 0,
       }
     });
 
@@ -727,12 +792,24 @@ async function seed() {
 
     // Create a sample schedule order queue record
     console.log("Creating sample schedule order queue record...");
+
+    const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
+      orderBy: {
+        queueIndex: 'desc'
+      },
+      select: {
+        queueIndex: true
+      }
+    });
+
+    const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
+
     const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
       data: {
         scheduleOrder: {
           connect: { id: newScheduleOrder.id }
         },
-        queueIndex: 1,
+        queueIndex: newQueueIndex,
         createdBy: USER,
         nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
         nextUnitProcedure: {

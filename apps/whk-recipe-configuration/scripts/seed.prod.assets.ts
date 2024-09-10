@@ -1,897 +1,830 @@
-import * as dotenv from "dotenv";
-import { EnumAssetAssetType, EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumTestParameterTestSetpointType, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, SalesOrder } from "@prisma/client";
-import { Salt, parseSalt } from "../src/auth/password.service";
-import { hash } from "bcrypt";
+import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 
-import { AssetCreateInput } from "../src/asset/base/AssetCreateInput";
+const CUSTOMER_CODE = "WGS";
+const MASH_BILL = '60-36-00-04';
+const FINAL_PROOF = 120;
+const BARREL_INFO = '53-06-3-0-0';
+const CUSTOMER_NAME = "William Grant & Sons, Inc."; // This needs to match ERP / MESDB
+const ORDER_QTY = 500;
+const TOTAL_GRAIN_WEIGHT = 24080;
+const USER = 'pmannion@whiskeyhouse.com';
 
-async function seed() {
+const MASHING_PROTOCOL = [
+  { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+  { action: "Hold", holdType: "Heat", temperature: 130 },
+  { action: "Add Additive", additiveType: "Citric", qty: 0 },
+  { action: "Add Grain", grainType: "Malt", qty: 96 },
+  { action: "Add Additive", additiveType: "Liquozyme" },
+  { action: "Add Grain", grainType: "Corn", qty: 14448 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
+  { action: "Hold", holdType: "Cool", temperature: 170 },
+  { action: "Add Grain", grainType: "Rye", qty: 7000 },
+  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Hold", time: 10 },
+  { action: "Hold", holdType: "Cool", temperature: 152 },
+  { action: "Add Additive", additiveType: "DIAZYME" },
+  { action: "Add Additive", additiveType: "Viscoferm" },
+  { action: "Hold", holdType: "Cool", temperature: 145 },
+  { action: "Add Grain", grainType: "Malt", qty: 963 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Hold", time: 10 },
+];
+const RECIPE_PARAMETERS = [
+  { name: 'HighWineProof', setpointValue: 140 },
+  { name: 'LowWineProof', setpointValue: 100 },
+  { name: 'FinalProof', setpointValue: 125 },
+  { name: 'BaseLoss', setpointValue: 0.5 },
+  { name: 'BeerFeedTray', setpointValue: 15 },
+  { name: 'FermentationAge', setpointValue: 72 },
+  { name: 'ControlTemperature', setpointValue: 80 },
+  { name: 'CooksPerFerm', setpointValue: 3 },
+    { name: 'TopOffFrequency', setpointValue: 24 },
+    { name: 'TopOffQuantity', setpointValue: 100 },
+    { name: 'TopOffTemperature', setpointValue: 80 },
+    { name: 'MashpH', setpointValue: 5.1 },
+    { name: 'MashRatio', setpointValue: 3.5 },
+    { name: 'RatioByFerm', setpointValue: 2.8 },
+    { name: 'FermSetTemp', setpointValue: 80 },
+    { name: 'StarterSweetpH', setpointValue: 5.1 },
+    { name: 'TotalGrainWeight', setpointValue: 20500 },
+    { name: 'TotalLiquid', setpointValue: 70000 },
+    { name: 'NumberOfCooks', setpointValue: 9 },
+    { name: 'AssumedFermABV', setpointValue: 12.5 }
+  ];
+  const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+  const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
+  const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+  
+  async function seed() {
+    
+    
+    console.info("Seeding database with custom seed for Mashing Recipe...");
 
+  /*
+  1. Seed instance of unit procedures, using the main procedure instance
+  2. Seed instances of operations for each UP. Using the parameters to seed the number of operations per UP
+  3. Find the appropriate BOM for the mashing recipe
+  4. Using the structure of the mashing protocol to map the equipment phases to cook. 
+    a. Connect the correct phase parameters
+    b. Connect the step type if applicable.  
+    c. Map the bom components to the proper equipment phase
 
-  console.info("Seeding database with custom seed for Mashing Recipe...");
+  */
 
   const client = new PrismaClient();
 
-  const assets = [
-    {
-      // id: "clygzlkz2000308l94m140qt3",
-      name: "WH",
-      description: "Whiskey House",
-      assetType: EnumAssetAssetType.ENT,
-      revision: 1,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH",
-    },
-    {
-      // id: "clx60pmnc005p10wyhcqz2g48",
-      name: "WHK01",
-      description: "WHK01",
-      assetType: EnumAssetAssetType.SITE,
-      revision: 1,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01"
-    },
-    {
-      // id: "clx60pmni005q10wyy71x2154",
-      name: "Distillery01",
-      description: "Distillery01",
-      assetType: EnumAssetAssetType.AREA,
-      revision: 1,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01"
-    },
-    {
-      // id: "clx60pmnl005r10wy5dd6oojb",
-      name: "Granary01",
-      description: "Granary01",
-      assetType: EnumAssetAssetType.CELL,
-      revision: 1,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01"
-    },
-    {
-      // id: "clx60pmnp005s10wya5804n7y",
-      name: "TruckScales",
-      description: "TruckScales",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 1,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/TruckScales"
-    },
-    // ... (remaining assets follow the same pattern)
-    {
-      name: "SamplingRobot",
-      description: "SamplingRobot",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SamplingRobot"
-    },
-    {
-      name: "DumpPit",
-      description: "DumpPit",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/DumpPit"
-    },
-    {
-      name: "BucketElevator",
-      description: "BucketElevator",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/BucketElevator"
-    },
-    {
-      name: "GrainDistributionHead",
-      description: "GrainDistributionHead",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/GrainDistributionHead"
-    },
-    {
-      name: "SIL-025",
-      description: "SIL-025",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-025"
-    },
-    {
-      name: "SIL-030",
-      description: "SIL-030",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-030"
-    },
-    {
-      name: "SIL-035",
-      description: "SIL-035",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-035"
-    },
-    {
-      name: "SIL-040",
-      description: "SIL-040",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-040"
-    },
-    {
-      name: "SIL-045",
-      description: "SIL-045",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-045"
-    },
-    {
-      name: "SIL-050",
-      description: "SIL-050",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-050"
-    },
-    {
-      name: "CNV-050",
-      description: "CNV-050",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-050"
-    },
-    {
-      name: "CNV-055",
-      description: "CNV-055",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-055"
-    },
-    {
-      name: "SIL-060",
-      description: "SIL-060",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-060"
-    },
-    {
-      name: "Magnet",
-      description: "Magnet",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/Magnet"
-    },
-    {
-      name: "MIL-070",
-      description: "MIL-070",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/MIL-070"
-    },
-    {
-      name: "DC-075",
-      description: "DC-075",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/DC-075"
-    },
-    {
-      name: "CNV-105",
-      description: "CNV-105",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-105"
-    },
-    {
-      name: "SIL-110",
-      description: "SIL-110",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-110"
-    },
-    {
-      name: "SIL-125",
-      description: "SIL-125",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-125"
-    },
-    {
-      name: "CNV-130",
-      description: "CNV-130",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-130"
-    },
-    {
-      name: "SIL-115",
-      description: "SIL-115",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-115"
-    },
-    {
-      name: "SIL-135",
-      description: "SIL-135",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-135"
-    },
-    {
-      name: "CNV-140",
-      description: "CNV-140",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-140"
-    },
-    {
-      name: "SIL-120",
-      description: "SIL-120",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-120"
-    },
-    {
-      name: "SIL-145",
-      description: "SIL-145",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/SIL-145"
-    },
-    {
-      name: "CNV-150",
-      description: "CNV-150",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-150"
-    },
-    {
-      name: "CNV-155",
-      description: "CNV-155",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Granary01/CNV-155"
-    },
-    {
-      name: "Mashing01",
-      description: "Mashing01",
-      assetType: EnumAssetAssetType.CELL,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Mashing01"
-    },
-    {
-      name: "T-200",
-      description: "T-200",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Mashing01/T-200"
-    },
-    {
-      name: "T-201",
-      description: "T-201",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Mashing01/T-201"
-    },
-    {
-      name: "T-202",
-      description: "T-202",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Mashing01/T-202"
-    },
-    {
-      name: "T-204",
-      description: "T-204",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Mashing01/T-204"
-    },
-    {
-      name: "Fermentation01",
-      description: "Fermentation01",
-      assetType: EnumAssetAssetType.CELL,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01"
-    },
-    {
-      name: "HEX-2040A",
-      description: "HEX-2040A",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/HEX-2040A"
-    },
-    {
-      name: "HEX-2040B",
-      description: "HEX-2040B",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/HEX-2040B"
-    },
-    {
-      name: "HEX-2040C",
-      description: "HEX-2040C",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/HEX-2040C"
-    },
-    {
-      name: "HEX-2040D",
-      description: "HEX-2040D",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/HEX-2040D"
-    },
-    {
-      name: "T-301",
-      description: "T-301",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-301"
-    },
-    {
-      name: "T-302",
-      description: "T-302",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-302"
-    },
-    {
-      name: "T-303",
-      description: "T-303",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-303"
-    },
-    {
-      name: "T-304",
-      description: "T-304",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-304"
-    },
-    {
-      name: "T-305",
-      description: "T-305",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-305"
-    },
-    {
-      name: "T-306",
-      description: "T-306",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-306"
-    },
-    {
-      name: "T-307",
-      description: "T-307",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-307"
-    },
-    {
-      name: "T-308",
-      description: "T-308",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-308"
-    },
-    {
-      name: "T-309",
-      description: "T-309",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-309"
-    },
-    {
-      name: "T-310",
-      description: "T-310",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-310"
-    },
-    {
-      name: "T-311",
-      description: "T-311",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-311"
-    },
-    {
-      name: "T-312",
-      description: "T-312",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-312"
-    },
-    {
-      name: "T-313",
-      description: "T-313",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-313"
-    },
-    {
-      name: "T-314",
-      description: "T-314",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Fermentation01/T-314"
-    },
-    {
-      name: "Distillation01",
-      description: "Distillation01",
-      assetType: EnumAssetAssetType.CELL,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01"
-    },
-    {
-      name: "T-4002",
-      description: "T-4002",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-4002"
-    },
-    {
-      name: "PMP-4000A",
-      description: "PMP-4000A",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-4000A"
-    },
-    {
-      name: "PMP-4000B",
-      description: "PMP-4000B",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-4000B"
-    },
-    {
-      name: "C-401",
-      description: "C-401",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/C-401"
-    },
-    {
-      name: "T-4057",
-      description: "T-4057",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-4057"
-    },
-    {
-      name: "C-410",
-      description: "C-410",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/C-410"
-    },
-    {
-      name: "T-414",
-      description: "T-414",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-414"
-    },
-    {
-      name: "T-413",
-      description: "T-413",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-413"
-    },
-    {
-      name: "T-421",
-      description: "T-421",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-421"
-    },
-    {
-      name: "T-422",
-      description: "T-422",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-422"
-    },
-    {
-      name: "T-430",
-      description: "T-430",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-430"
-    },
-    {
-      name: "S-430",
-      description: "S-430",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/S-430"
-    },
-    {
-      name: "T-435",
-      description: "T-435",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-435"
-    },
-    {
-      name: "T-431",
-      description: "T-431",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-431"
-    },
-    {
-      name: "T-432",
-      description: "T-432",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-432"
-    },
-    {
-      name: "T-433",
-      description: "T-433",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-433"
-    },
-    {
-      name: "T-434",
-      description: "T-434",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-434"
-    },
-    {
-      name: "StillageLoadout",
-      description: "StillageLoadout",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/StillageLoadout"
-    },
-    {
-      name: "T-602",
-      description: "T-602",
-      assetType: EnumAssetAssetType.UNIT,
-      revision: 0,
-      createdAt: new Date("2024-07-11T03:07:00.000Z"),
-      createdBy: "pmannion@whiskeyhouse.com",
-      updatedAt: new Date("2024-07-11T03:08:00.000Z"),
-      updatedBy: "pmannion@whiskeyhouse.com",
-      assetPath: "WH/WHK01/Distillery01/Distillation01/T-602"
+  // Find Unit Procedure class definitions
+  const unitProcedureClassDefs = await client.unitProcedure.findMany({
+    where: {
+      isClassDef: true,
+      name: 'Mashing01'
     }
-  ];
+  });
 
-  async function findParentAsset(client: PrismaClient, assetPath: string): Promise<string | null> {
-    const parentPath = assetPath.split('/').slice(0, -1).join('/');
-    if (parentPath === '') {
-      return null;
+  console.log("Unit Procedure Class Definitions:", unitProcedureClassDefs);
+
+  // Find the procedure instance for the mashing recipe
+  const mashingRecipeProcedure = await client.procedure.findFirst({
+    where: {
+      name: "Line1",
+      isClassDefinition: false
     }
-    const parentAsset = await client.asset.findFirst({
-      where: { assetPath: parentPath },
-      select: { id: true }
-    });
-    return parentAsset?.id || null;
+  });
+
+  if (!mashingRecipeProcedure) {
+    console.error("Mashing Recipe procedure instance not found");
+    return;
   }
 
-  // Modify the asset creation loop
-  console.log("Seeding Assets...");
-  for (const asset of assets) {
-    const existingAsset = await client.asset.findFirst({
-      where: { assetPath: asset.assetPath }
-    });
+  console.log("Found Mashing Recipe procedure instance:", mashingRecipeProcedure.id);
 
-    if (existingAsset) {
-      console.log(`Asset ${asset.name} already exists. Skipping...`);
-    } else {
-      const parentId = await findParentAsset(client, asset.assetPath);
-      console.log(`Seeding asset: ${asset.name} with parentId: ${parentId}`);
-      await client.asset.create({
+  let mashInstance: UnitProcedure | null = null;
+  // Create instances of Unit Procedures
+  for (const classDef of unitProcedureClassDefs) {
+    const existingInstance = await client.unitProcedure.findFirst({
+      where: {
+        name: classDef.name,
+        isClassDef: false,
+        recipe: {
+          some: {
+            Recipe: RECIPE
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    mashInstance = existingInstance;
+    if (!existingInstance) {
+    // if (true) {
+      const newInstance = await client.unitProcedure.create({
         data: {
-          ...asset,
-          schemaVersion: "0001-alpha",
-          assetType: asset.assetType as EnumAssetAssetType,
-          ...(parentId ? { parent: { connect: { id: parentId } } } : {})
+          name: classDef.name,
+          path: classDef.path,
+          isClassDef: false,
+          classId: { connect: { id: classDef.id } },
+          revision: 0,
+          description: `Instance of ${classDef.name}`,
+          createdBy: "seed",
+          procedure: { connect: { id: mashingRecipeProcedure.id } }
         }
       });
+      console.log(`Created new Unit Procedure instance: ${newInstance.name}`);
+      if (newInstance.name.includes("Mashing01")) {
+        mashInstance = newInstance;
+      }
+    } else {
+      console.log(`Instance of ${classDef.name} already exists, skipping.`);
+      // mashIstance = existingInstance;
+    }
+    if (!mashInstance) {
+      console.log(`Mashing unit procedure instance not found`);
+      mashInstance = existingInstance;
     }
   }
-  console.log("Assets seeded successfully.");
+
+  // find the appropriate BOM / BOM Version
+  const bom = await client.bom.findFirst({
+    where: {
+      bomRevision: BOM_REVISION,
+    }
+  });
+
+  // Seed operations based on number of cooks per ferm and number of cooks
+  const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
+  const totalNumberOfCooks = 1; // This should be configurable or fetched from a setting
+  const startCook = 0;
+
+  const operationClassDefs = await client.operation.findMany({
+    where: {
+      isClassDefinition: true
+    }
+  });
+
+  console.log("Operation Class Definitions:", operationClassDefs);
+
+  if (!mashInstance) {
+    console.log(`Mashing unit procedure instance not found`);
+    return;
+  }
+  const mashingUnitProcedure = await client.unitProcedure.findFirst({
+    where: {
+      id: mashInstance.id,
+      // name: EnumUnitProcedureName.Mashing01,
+      // isClassDef: false,
+      // procedure: { id: mashingRecipeProcedure.id }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  if (!mashingUnitProcedure) {
+    console.error("Mashing Unit Procedure instance not found");
+    return;
+  }
+  let newCookInstances: Operation[] = [];
+  for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
+    const existingInstance = await client.operation.findFirst({
+      where: {
+        name: EnumOperationName.Cook,
+        isClassDefinition: false,
+        // unitProcedure: { id: mashingUnitProcedure.id },
+        unitProcedureId: mashInstance.id,
+        procedureSequenceIndex: cookIndex
+      }
+    });
+    // if (!existingInstance) {
+    if (true) {
+      const cookClassDef = operationClassDefs.find(def => def.name === EnumOperationName.Cook);
+
+      if (cookClassDef) {
+        newCookInstances[cookIndex] = await client.operation.create({
+          data: {
+            name: EnumOperationName.Cook,
+            path: `${cookClassDef.path}/Cook${cookIndex + 1}`,
+            isClassDefinition: false,
+            classId: { connect: { id: cookClassDef.id } },
+            revision: 0,
+            description: `Instance of Cook for Cook ${cookIndex + 1}`,
+            createdBy: "seed",
+            unitProcedure: { connect: { id: mashingUnitProcedure.id } },
+            procedureSequenceIndex: cookIndex,
+            abbreviation: 'MAS'
+          }
+        });
+        console.log(`Created new Operation instance: ${newCookInstances[cookIndex].name} for Cook ${cookIndex + 1}`);
+      } else {
+        console.log(`Cook class definition not found, skipping Cook ${cookIndex + 1}`);
+      }
+    } else {
+      console.log(`Instance of Cook for Cook ${cookIndex + 1} already exists, skipping.`);
+    }
+  }
+
+  for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
+    // const fermIndex = Math.floor(cookIndex / numberOfCooksPerFerm);
+
+    const cookOperation = await client.operation.findFirst({
+      where: {
+        // name: EnumOperationName.Cook,
+        // isClassDefinition: false,
+        // unitProcedure: { id: mashingUnitProcedure.id },
+        // procedureSequenceIndex: cookIndex
+        id: newCookInstances[cookIndex].id
+      }
+    });
+
+    if (!cookOperation) {
+      console.log(`Cook operation not found for Cook ${cookIndex + 1}, skipping phase creation.`);
+      continue;
+    }
+
+    // Map the provided phase names to the actual enum values
+    const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
+      "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
+      "Hold": EnumEquipmentPhaseName.Hold,
+      "Add Grain": EnumEquipmentPhaseName.GrainAdd,
+      "Add Additive": EnumEquipmentPhaseName.AdditiveAdd
+    };
+
+    // Update the MASHING_PROTOCOL with the mapped enum values
+    const mappedMASHING_PROTOCOL = MASHING_PROTOCOL.map(phase => ({
+      ...phase,
+      action: phaseNameMap[phase.action] || phase.action
+    }));
+
+    for (const [phaseIndex, phase] of MASHING_PROTOCOL.entries()) {
+      const existingPhase = await client.equipmentPhase.findFirst({
+        where: {
+          name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
+          operation: {
+            id: newCookInstances[cookIndex].id
+          },
+          operationSequenceIndex: phaseIndex,
+        },
+        include: {
+          operation: true
+        }
+      });
+
+      if (!existingPhase) {
+        const cookOperation: Operation | null = await client.operation.findFirst({
+          where: {
+            name: EnumOperationName.Cook,
+            isClassDefinition: false,
+            unitProcedure: { id: mashingUnitProcedure.id },
+            procedureSequenceIndex: cookIndex
+          },
+          orderBy: { createdAt: 'desc' }
+        });
+
+        if (cookOperation) {
+
+          const stepType = (phase.action === "Hold") ? phase.holdType : (phase.action === "Add Grain") ? phase.grainType : (phase.action === "Add Liquid") ? phase.liquidType01 : undefined;
+          const newPhase = await client.equipmentPhase.create({
+            data: {
+              name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
+              path: `${mashingUnitProcedure.path}/Cook${cookIndex + 1}/${phase.action}`,
+              isClassDefinition: false,
+              revision: 0,
+              description: `Cook ${cookIndex + 1}`,
+              createdBy: "seed",
+              operation: {
+                connect: {
+                  id: (cookOperation as Operation).id as string
+                }
+              },
+              stepType: stepType as EnumEquipmentPhaseStepType,
+              operationSequenceIndex: phaseIndex
+            }
+          });
+          console.log(`Created new Equipment Phase: ${newPhase.name} for Cook ${cookIndex + 1}`);
+
+          // Add phase parameters based on the action
+          const parameterData: { name: string; value: number | string; units: string }[] = [];
+          if (phase.temperature) {
+            parameterData.push({ name: "Temperature", value: phase.temperature, units: "°F" });
+          }
+          if (phase.time) {
+            parameterData.push({ name: "Time", value: phase.time, units: "minutes" });
+          }
+          // if (phase.grainType) {
+          //   parameterData.push({ name: "GrainType", value: phase.grainType, units: "" });
+          // }
+          // if (phase.additiveType) {
+          //   parameterData.push({ name: "AdditiveType", value: phase.additiveType, units: "" });
+          // }
+          // if (phase.liquidType01) {
+          //   parameterData.push({ name: "LiquidType01", value: phase.liquidType01, units: "" });
+          // }
+          // if (phase.liquidType02) {
+          //   parameterData.push({ name: "LiquidType02", value: phase.liquidType02, units: "" });
+          // }
+          // if (phase.holdType) {
+          //   parameterData.push({ name: "HoldType", value: phase.holdType, units: "" });
+          // }
+          // if (phase.step) {
+          //   parameterData.push({ name: "Step", value: phase.step, units: "" });
+          // }
+
+          for (const param of parameterData) {
+            await client.phaseParameter.create({
+              data: {
+                name: param.name,
+                staticName: param.name as EnumPhaseParameterStaticName,
+                setpointNumericalValue: param.value as number,
+                units: param.units,
+                description: param.name,
+                isClassDef: false,
+                equipmentPhases: { connect: { id: newPhase.id } },
+                createdBy: "seed",
+                setpointType: EnumPhaseParameterSetpointType.Numeric,
+              }
+            });
+          }
+
+          // Link BOM components to their equipment phases - these will be the "class definitions"
+          if (bom) {
+            const bomComponents = await client.bomItem.findMany({
+              where: {
+                bom: { id: bom.id },
+                isClassDefinition: true,
+              },
+              include: {
+                item: true
+              }
+            });
+
+            for (const component of bomComponents) {
+              if (
+                (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
+                (phase.action === "Add Liquid" && (
+                  (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
+                  // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
+                ))
+              ) {
+                // Check if the quantity field is present in the phase object
+                if (phase.qty !== undefined) {
+                  // Only match if the bomItem quantity equals the phase quantity
+                  if (component.quantity.equals(phase.qty)) {
+                    await client.equipmentPhase.update({
+                      where: { id: newPhase.id },
+                      data: {
+                        bomItem: {
+                          connect: { id: component.id },
+                        },
+                      },
+                    });
+                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                  } else {
+                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                  }
+                } else if (phase.notQty !== undefined) {
+                  // Only match if the bomItem quantity does not equal the phase notQty
+                  if (!component.quantity.equals(phase.notQty)) {
+                    await client.equipmentPhase.update({
+                      where: { id: newPhase.id },
+                      data: {
+                        bomItem: {
+                          connect: { id: component.id },
+                        },
+                      },
+                    });
+                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                  } else {
+                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
+                  }
+                } else {
+                  await client.equipmentPhase.update({
+                    where: { id: newPhase.id },
+                    data: {
+                      bomItem: {
+                        connect: { id: component.id },
+                      },
+                    },
+                  });
+                  console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+
+                }
+              } else if (phase.grainType == "Corn") {
+                console.log(`Corn: ${component.item.itemNumber}`);
+                if (component.item.itemNumber === "COR-DLF02-US #2 Yellow Dent GMO") {
+                  // Check if the quantity field is present in the phase object
+                  if (phase.qty !== undefined) {
+                    // Only match if the bomItem quantity equals the phase quantity
+                    if (component.quantity.equals(phase.qty)) {
+                      await client.equipmentPhase.update({
+                        where: { id: newPhase.id },
+                        data: {
+                          bomItem: {
+                            connect: { id: component.id },
+                          },
+                        },
+                      });
+                      console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                    } else {
+                      console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                    }
+                  } else {
+                    await client.equipmentPhase.update({
+                      where: { id: newPhase.id },
+                      data: {
+                        bomItem: {
+                          connect: { id: component.id },
+                        },
+                      },
+                    });
+                    console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  }
+                }
+              } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
+                console.log(`Add Additive: ${component.item.itemNumber}`);
+                // if (phase.additiveType == "Teramyl") {
+                //   console.log(`Teramyl: ${component.item.itemNumber}`);
+                // } else if (phase.additiveType)
+                await client.equipmentPhase.update({
+                  where: { id: newPhase.id },
+                  data: {
+                    bomItem: {
+                      connect: { id: component.id },
+                    },
+                  },
+                });
+                console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+              }
+
+            }
+          } else {
+            console.log("BOM not found, skipping linking BOM components to Equipment Phases");
+          }
+        }
+      } else {
+        console.log(`Equipment Phase ${phase.action} already exists, skipping.`);
+      }
+    }
+  }
+
+  // Get the item with the correct item number
+  const getItemByItemNumber = async (itemNumber: string) => {
+    const item = await client.item.findFirst({
+      where: {
+        itemNumber: {
+          equals: itemNumber,
+          mode: 'insensitive'
+        }
+      }
+    });
+
+    if (!item) {
+      console.log(`Item with item number ${itemNumber} not found`);
+      return null;
+    }
+
+    return item;
+  };
+
+  const item = await getItemByItemNumber(ITEM_NUMBER);
+  if (item) {
+    console.log(`Found item: ${item.id}, ${item.itemNumber}`);
+  }
+
+  const customer = await client.customer.findFirst({
+    where: {
+      name: CUSTOMER_NAME
+    }
+  });
+
+  if (customer) {
+    console.log(`Found customer: ${customer.id}, ${customer.name}`);
+  } else {
+    console.log(`Customer '${CUSTOMER_NAME}' not found`);
+  }
+
+  // Create or update the Recipe record and link it to the Mashing Unit Procedure
+  const existingRecipe = await client.recipe.findFirst({
+    where: {
+      Recipe: RECIPE,
+    }
+  });
+
+  let newParams: RecipeParameter[] = [];
+  for (const param of RECIPE_PARAMETERS) {
+    const classParam = await client.recipeParameter.findFirst({
+      where: {
+        recipeParamName: param.name,
+        isClassDefinition: true
+      }
+    });
+    if (classParam) {
+      console.log(`Updating existing recipe parameter: ${param.name}`);
+      newParams.push(await client.recipeParameter.create({
+        data: {
+          className: classParam.className,
+          recipeParamName: param.name,
+          recipeNumericalSetpoint: param.setpointValue,
+          description: classParam.description,
+          isClassDefinition: false,
+          recipeSetpointType: classParam.recipeSetpointType,
+          createdBy: USER,
+        }
+      }));
+    } else {
+      console.log(`Phase parameter ${param.name} already exists, skipping.`);
+    }
+  }
+
+  let recipe: Recipe;
+  if (existingRecipe) {
+    console.log("Mashing Recipe already exists, updating...");
+    recipe = await client.recipe.update({
+      where: { id: existingRecipe.id },
+      data: {
+        unitProcedures: {
+          connect: { id: mashingUnitProcedure.id }
+        },
+      }
+    });
+    console.log("Mashing Recipe updated successfully");
+  } else {
+    console.log("Creating new Mashing Recipe...");
+    recipe = await client.recipe.create({
+      data: {
+        Recipe: RECIPE,
+        revision: 1,
+        createdBy: USER,
+        // parameters: {
+        //   connect: newParams.map(param => ({ id: param.id }))
+        // },
+        unitProcedures: {
+          connect: { id: mashingUnitProcedure.id }
+        },
+        customer: {
+          connect: { id: customer?.id }
+        },
+        item: {
+          connect: { id: (item as Item).id }
+        },
+        parameters: {
+          connect: newParams.map(param => ({ id: param.id }))
+        },
+        customerCode: CUSTOMER_CODE
+      }
+    });
+    console.log("New Mashing Recipe created successfully:", recipe.id);
+  }
+
+  // Create a recipe group and add the recipe to it
+  console.log("Creating recipe group and adding recipe...");
+  let recipeGroup: RecipeGroup;
+  const recipeGroupName = RECIPE.split('-').slice(1, -1).join('-');
+  console.log(`Extracted recipe group name: ${recipeGroupName}`);
+  const existingRecipeGroup = await client.recipeGroup.findFirst({
+    where: {
+      recipe: { equals: recipeGroupName }
+    }
+  });
+
+  if (existingRecipeGroup) {
+    console.log("Recipe group 'Mashing Recipes' already exists, updating...");
+    recipeGroup = await client.recipeGroup.update({
+      where: { id: existingRecipeGroup.id },
+      data: {
+        recipes: {
+          connect: { id: recipe.id }
+        }
+      }
+    });
+    console.log("Recipe added to existing group successfully");
+  } else {
+    console.log("Creating new recipe group 'Mashing Recipes'...");
+    recipeGroup = await client.recipeGroup.create({
+      data: {
+        recipe: recipeGroupName,
+        createdBy: USER,
+        recipes: {
+          connect: { id: recipe.id }
+        }
+      }
+    });
+    console.log("New recipe group created and recipe added successfully:", recipeGroup.id);
+  }
+
+  // Create a sample sales order
+  console.log("Creating sample sales order...");
+  let salesOrder: SalesOrder;
+  const existingSalesOrder = await client.salesOrder.findFirst({
+    where: {
+      customer: { id: customer?.id },
+      name: 'SO42'
+    }
+  });
+
+  // Get the current date
+  const currentDate = new Date();
+  
+  // Calculate the day of the year
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
+  const diff = currentDate.getTime() - startOfYear.getTime();
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  
+  console.log(`Current day of the year: ${dayOfYear}`);
+
+  if (existingSalesOrder) {
+    console.log("Sample sales order already exists, skipping creation.");
+    salesOrder = existingSalesOrder;
+  } else {
+    // Get the most recent production order created today, if it exists
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const mostRecentSalesOrder = await client.salesOrder.findFirst({
+      where: {
+        createdAt: {
+          gte: today
+        },
+        name: {
+          startsWith: 'SO'
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    const salesOrderNumber = mostRecentSalesOrder?.name?.split('SO')[1] ?? '01';
+    const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
+
+    if (mostRecentSalesOrder) {
+      console.log(`Most recent sales order created today: ${mostRecentSalesOrder.name ?? 'Unknown'}`);
+    } else {
+      console.log("No sales orders created today.");
+    }
+
+    const newSalesOrder = await client.salesOrder.create({
+      data: {
+        item: {
+          connect: { id: (item as Item).id }
+        },
+        customer: {
+          connect: { id: customer?.id }
+        },
+        createdBy: USER,
+        // orderDate: new Date(),
+        // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+        quantity: ORDER_QTY, // Adjust as needed
+        name: `SO${dayOfYear}${newSalesOrderNumber}`,
+        // units: "Barrels",
+      }
+    });
+
+    console.log("Sample sales order created successfully:", newSalesOrder.id);
+
+    // Update the salesOrder variable for use in production order creation
+    salesOrder = newSalesOrder;
+  }
+
+  // Create a sample production order
+  console.log("Creating sample production order...");
+
+  const productionOrderName = `PRO${dayOfYear}`;
+  const existingProductionOrder = await client.productionOrder.findFirst({
+    where: {
+      name: {
+        contains: productionOrderName,
+        mode: 'insensitive'
+      },
+      bom: {
+        id: bom?.id
+      }
+    }
+  });
+
+  if (existingProductionOrder) {
+    console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
+  } else {
+    // Get the most recent production order created today, if it exists
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const mostRecentProductionOrder = await client.productionOrder.findFirst({
+      where: {
+        createdAt: {
+          gte: today
+        },
+        name: {
+          startsWith: 'PRO'
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    const productionOrderNumber = mostRecentProductionOrder?.name?.split('PRO')[1] ?? '01';
+    const newProductionOrderNumber = parseInt(productionOrderNumber, 10) + 1;
+
+    if (mostRecentProductionOrder) {
+      console.log(`Most recent production order created today: ${mostRecentProductionOrder.name ?? 'Unknown'}`);
+    } else {
+      console.log("No production orders created today.");
+    }
+    
+    console.log("Creating new production order...");
+    const newProductionOrder = await client.productionOrder.create({
+      data: {
+        recipe: {
+          connect: { id: recipe.id }
+        },
+        item: {
+          connect: { id: (item as Item).id }
+        },
+        bom: {
+          connect: { id: bom?.id }
+        },
+        customer: {
+          connect: { id: customer?.id }
+        },
+        salesOrder: {
+          connect: { id: salesOrder?.id }
+        },
+        createdBy: USER,
+        status: EnumProductionOrderStatus.Initiated,
+        customerCode: CUSTOMER_CODE,
+        units: 'Barrels',
+        quantity: ORDER_QTY,
+        name: `${productionOrderName}${newProductionOrderNumber}`,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        totalCooks: Math.ceil(ORDER_QTY / 85) * 3,
+        totalFermenters: Math.ceil(ORDER_QTY / 85),
+        executedCooks: 0,
+        executedFermenters: 0,
+      }
+    });
+
+    // Create a sample schedule order
+    console.log("Creating sample schedule order...");
+    const scheduleOrderName = `SHO${dayOfYear}`;
+    const newScheduleOrder = await client.scheduleOrder.create({
+      data: {
+        productionOrders: {
+          connect: { id: newProductionOrder.id }
+        },
+        status: EnumScheduleOrderStatus.Scheduled,
+        createdBy: USER,
+        estimatedStart: new Date(),
+        estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
+        recipeName: RECIPE,
+        productionOrderAllocation: ORDER_QTY,
+        recipeGroup: {
+          connect: { id: recipeGroup.id }
+        },
+        name: `${scheduleOrderName}01`,
+      }
+    });
+
+    console.log("Sample schedule order created successfully:", newScheduleOrder.id);
+
+    // Create a sample schedule order queue record
+    console.log("Creating sample schedule order queue record...");
+
+    const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
+      orderBy: {
+        queueIndex: 'desc'
+      },
+      select: {
+        queueIndex: true
+      }
+    });
+
+    const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
+
+    const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
+      data: {
+        scheduleOrder: {
+          connect: { id: newScheduleOrder.id }
+        },
+        queueIndex: newQueueIndex,
+        createdBy: USER,
+        nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
+        nextUnitProcedure: {
+          connect: { id: mashingUnitProcedure.id }
+        }
+      }
+    });
+
+    console.log("Sample schedule order queue record created successfully:", newScheduleOrderQueue.id);
+
+    console.log("Sample production order created successfully:", newProductionOrder.id);
+  }
+
+  // Close the Prisma client connection
+  await client.$disconnect();
 }
 
-seed();
+seed()
