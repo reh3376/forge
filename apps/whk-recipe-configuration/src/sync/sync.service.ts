@@ -281,13 +281,13 @@ export class SyncService implements OnModuleInit {
 
 
             // Validate the payload
-            // const validatedInstance = await this.validatePayload(entity, payload);
-            // this.logger.debug(`Finally creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
+            const validatedInstance = await this.validatePayload(entity, payload);
+            this.logger.debug(`Finally creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
 
             // Create a new entity with the data
             try {
-                // await this.prismaEntityMap[entity].create({ data: validatedInstance });
-                await this.prismaEntityMap[entity].create({ data: payload });
+                await this.prismaEntityMap[entity].create({ data: validatedInstance });
+                // await this.prismaEntityMap[entity].create({ data: payload });
             } catch (error: unknown) {
                 this.logger.error(`Error: ${error}\n\nCreating ${entity} with data: ${JSON.stringify(payload)}`);
             }
