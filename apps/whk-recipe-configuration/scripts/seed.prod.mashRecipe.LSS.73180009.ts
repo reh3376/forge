@@ -16,9 +16,13 @@ const MASHING_PROTOCOL = [
   { action: "Add Grain", grainType: "Malt", qty: 217 },
   { action: "Add Additive", additiveType: "Liquozyme" },
   { action: "Add Grain", grainType: "Corn", qty: 17578 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Corn", qty: 2000 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
   { action: "Add Grain", grainType: "Rye", qty: 4334 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 10 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
   { action: "Add Additive", additiveType: "DIAZYME" },
