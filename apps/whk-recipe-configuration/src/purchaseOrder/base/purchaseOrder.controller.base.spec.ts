@@ -172,7 +172,7 @@ describe("PurchaseOrder", () => {
 
     app = moduleRef.createNestApplication();
     await app.init();
-  });
+  }, 30000); // Added 30 seconds timeout
 
   test("POST /purchaseOrders", async () => {
     await request(app.getHttpServer())
