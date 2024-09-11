@@ -155,7 +155,7 @@ describe("PurchaseOrder", () => {
           provide: PurchaseOrderService,
           useValue: service,
         },
-        PrismaService,
+        // PrismaService,
       ],
       controllers: [PurchaseOrderController],
       imports: [ACLModule],
