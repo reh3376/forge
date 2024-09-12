@@ -25,61 +25,17 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 
 @ObjectType()
 class MashDatum {
   @ApiProperty({
     required: false,
-    type: () => Asset,
+    type: () => String,
   })
-  @ValidateNested()
-  @Type(() => Asset)
-  @IsOptional()
-  asset?: Asset | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @Field(() => Float)
-  backSetPH!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  backsetVolume!: Decimal | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(100)
-  @Field(() => Float)
-  balling!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  cornLbs!: Decimal | null;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 
   @ApiProperty({
     required: true,
@@ -88,6 +44,83 @@ class MashDatum {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
+
+  @ApiProperty({
+    required: true,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  lotId!: string;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @Field(() => Float)
+  balling!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @Field(() => Float)
+  pH!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @Field(() => Float)
+  backSetPH!: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  backsetVolume!: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @Field(() => Float)
+  waterVolume!: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  cornLbs!: number | null;
 
   @ApiProperty({
     required: false,
@@ -111,9 +144,31 @@ class MashDatum {
     required: true,
     type: String,
   })
-  @IsString()
-  @Field(() => String)
-  id!: string;
+  ryeLbs!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  maltLbs!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  wheatLbs!: number | null;
 
   @ApiProperty({
     required: true,
@@ -125,75 +180,13 @@ class MashDatum {
   loggedBy!: string;
 
   @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  lotId!: string;
-
-  @ApiProperty({
     required: false,
-    type: Number,
+    type: () => Asset,
   })
-  @IsNumber()
-  @Max(99999999999)
+  @ValidateNested()
+  @Type(() => Asset)
   @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  maltLbs!: Decimal | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @Field(() => Float)
-  pH!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  ryeLbs!: Decimal | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @Field(() => Float)
-  waterVolume!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  wheatLbs!: Decimal | null;
+  asset?: Asset | null;
 }
 
 export { MashDatum as MashDatum };

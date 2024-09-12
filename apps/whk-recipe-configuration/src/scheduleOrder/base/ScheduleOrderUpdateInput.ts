@@ -28,9 +28,9 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { Decimal } from "decimal.js";
 import { ProductionOrderUpdateManyWithoutScheduleOrdersInput } from "./ProductionOrderUpdateManyWithoutScheduleOrdersInput";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
@@ -91,7 +91,7 @@ class ScheduleOrderUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  duration?: Decimal | null;
+  duration?: number | null;
 
   @ApiProperty({
     required: false,

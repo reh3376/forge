@@ -72,7 +72,7 @@ class UnitLookupUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  conversionRate?: Decimal | null;
+  conversionRate?: number | null;
 
   @ApiProperty({
     required: false,

@@ -26,7 +26,6 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { Decimal } from "decimal.js";
 
 @InputType()
 class InventoryCreateInput {
@@ -149,7 +148,7 @@ class InventoryCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  proof?: Decimal | null;
+  proof?: number | null;
 
   @ApiProperty({
     required: false,

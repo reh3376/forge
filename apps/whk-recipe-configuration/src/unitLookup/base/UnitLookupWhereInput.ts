@@ -16,8 +16,8 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { UnitLookupListRelationFilter } from "./UnitLookupListRelationFilter";
+import { FloatNullableFilter } from "src/util/FloatNullableFilter";
 
 @InputType()
 class UnitLookupWhereInput {
@@ -57,14 +57,14 @@ class UnitLookupWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  conversionRate?: DecimalNullableFilter;
+  conversionRate?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
