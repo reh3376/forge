@@ -162,7 +162,7 @@ class BomItemUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity?: Decimal;
+  quantity?: number;
 
   @ApiProperty({
     required: false,
@@ -174,7 +174,7 @@ class BomItemUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantityActual?: Decimal | null;
+  quantityActual?: number | null;
 
   @ApiProperty({
     required: false,

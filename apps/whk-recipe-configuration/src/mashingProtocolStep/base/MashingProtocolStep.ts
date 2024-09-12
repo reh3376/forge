@@ -32,6 +32,8 @@ import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
 
+import { Recipe } from "../../recipe/base/Recipe";
+
 @ObjectType()
 class MashingProtocolStep {
   @ApiProperty({
@@ -236,6 +238,18 @@ class MashingProtocolStep {
     nullable: true,
   })
   temperatureActual!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(250)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  recipeNumericalSetpoint!: number | null;
 
   @ApiProperty({
     required: false,

@@ -236,6 +236,18 @@ class MashingProtocolStepCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
+  recipeNumericalSetpoint?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(250)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
   temperatureSetpoint?: Decimal | null;
 
   @ApiProperty({

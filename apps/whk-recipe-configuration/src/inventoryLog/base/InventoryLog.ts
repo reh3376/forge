@@ -109,7 +109,7 @@ class InventoryLog {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity!: Decimal | null;
+  quantity!: number | null;
 
   @ApiProperty({
     required: false,
