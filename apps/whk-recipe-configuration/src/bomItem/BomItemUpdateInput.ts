@@ -21,7 +21,7 @@ import {
   Max,
 } from "class-validator";
 import { Expose, Type } from "class-transformer";
-import { Decimal } from "decimal.js";
+
 import { ItemCreateNestedManyInput } from "../item/ItemCreateNestedManyInput";
 import { EquipmentPhaseUpdateManyWithoutBomItemsInput } from "./base/EquipmentPhaseUpdateManyWithoutBomItemsInput";
 import { BomWhereUniqueInput } from "../bom/base/BomWhereUniqueInput";
@@ -111,7 +111,7 @@ class BomItemUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity?: Decimal;
+  quantity?: number;
 
   @ApiProperty({
     required: false,
@@ -123,7 +123,7 @@ class BomItemUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantityActual?: Decimal | null;
+  quantityActual?: number | null;
 
   @ApiProperty({
     required: false,

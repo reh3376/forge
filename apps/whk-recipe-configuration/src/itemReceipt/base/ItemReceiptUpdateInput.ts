@@ -30,7 +30,7 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
-import { Decimal } from "decimal.js";
+
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameterUpdateManyWithoutItemReceiptsInput } from "./TestParameterUpdateManyWithoutItemReceiptsInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
@@ -129,7 +129,7 @@ class ItemReceiptUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity?: Decimal;
+  quantity?: number;
 
   @ApiProperty({
     required: false,
@@ -235,7 +235,7 @@ class ItemReceiptUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  weighIn?: Decimal | null;
+  weighIn?: number | null;
 
   @ApiProperty({
     required: false,
@@ -247,7 +247,32 @@ class ItemReceiptUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  weighOut?: Decimal | null;
+  weighOut?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  siloNumber?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput | null;
+
 }
 
 export { ItemReceiptUpdateInput as ItemReceiptUpdateInput };

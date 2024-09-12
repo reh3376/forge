@@ -151,7 +151,7 @@ class BomItem {
   @IsNumber()
   @Max(99999999999)
   @Field(() => Float)
-  quantity!: Decimal;
+  quantity!: number;
 
   @ApiProperty({
     required: false,
@@ -163,7 +163,7 @@ class BomItem {
   @Field(() => Float, {
     nullable: true,
   })
-  quantityActual!: Decimal | null;
+  quantityActual!: number | null;
 
   @ApiProperty({
     required: false,

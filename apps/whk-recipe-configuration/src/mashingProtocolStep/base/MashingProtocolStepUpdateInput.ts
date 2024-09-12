@@ -227,7 +227,7 @@ class MashingProtocolStepUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  temperatureActual?: Decimal | null;
+  recipeNumericalSetpoint?: number | null;
 
   @ApiProperty({
     required: false,

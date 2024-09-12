@@ -35,33 +35,30 @@ import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/Prod
 class FermentationDayDatumCreateInput {
   @ApiProperty({
     required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @Field(() => Float)
-  acid!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: () => AssetWhereUniqueInput,
+    type: () => ProductionOrderWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => AssetWhereUniqueInput)
-  @IsOptional()
-  @Field(() => AssetWhereUniqueInput, {
-    nullable: true,
-  })
-  asset?: AssetWhereUniqueInput | null;
+  @Type(() => ProductionOrderWhereUniqueInput)
+  @Field(() => ProductionOrderWhereUniqueInput)
+  productionOrder!: ProductionOrderWhereUniqueInput;
 
   @ApiProperty({
     required: true,
-    type: Number,
+    type: String,
   })
-  @IsNumber()
-  @Max(99999999999)
-  @Field(() => Float)
-  balling!: Decimal;
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  lotId!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @Field(() => String)
+  loggedBy!: string;
 
   @ApiProperty({
     required: false,
@@ -75,6 +72,42 @@ class FermentationDayDatumCreateInput {
   day?: "First" | "Second" | "Third" | "Final" | null;
 
   @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(212)
+  @Field(() => Float)
+  temperature!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @Field(() => Float)
+  balling!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @Field(() => Float)
+  acid!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @Field(() => Float)
+  pH!: number;
+
+  @ApiProperty({
     required: false,
     type: Number,
   })
@@ -84,46 +117,7 @@ class FermentationDayDatumCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  dryInches?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistry?: FermentationChemistryWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Max(100)
-  @Field(() => Number)
-  fermenterNumber!: number;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(64)
-  @Field(() => String)
-  loggedBy!: string;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  lotId!: string;
+  dryInches?: number | null;
 
   @ApiProperty({
     required: true,
@@ -138,28 +132,34 @@ class FermentationDayDatumCreateInput {
     required: true,
     type: Number,
   })
-  @IsNumber()
-  @Max(14)
-  @Field(() => Float)
-  pH!: Decimal;
+  @IsInt()
+  @Max(100)
+  @Field(() => Number)
+  fermenterNumber!: number;
 
   @ApiProperty({
-    required: true,
-    type: () => ProductionOrderWhereUniqueInput,
+    required: false,
+    type: () => AssetWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @Field(() => ProductionOrderWhereUniqueInput)
-  productionOrder!: ProductionOrderWhereUniqueInput;
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput | null;
 
   @ApiProperty({
-    required: true,
-    type: Number,
+    required: false,
+    type: () => FermentationChemistryWhereUniqueInput,
   })
-  @IsNumber()
-  @Max(212)
-  @Field(() => Float)
-  temperature!: Decimal;
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => FermentationChemistryWhereUniqueInput, {
+    nullable: true,
+  })
+  fermentationChemistry?: FermentationChemistryWhereUniqueInput | null;
 }
 
 export { FermentationDayDatumCreateInput as FermentationDayDatumCreateInput };

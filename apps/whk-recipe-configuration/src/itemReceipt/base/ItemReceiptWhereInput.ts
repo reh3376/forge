@@ -15,17 +15,17 @@ import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { FloatFilter } from "../../util/FloatFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
-import { DecimalFilter } from "../../util/DecimalFilter";
-import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
-import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 
 @InputType()
 class ItemReceiptWhereInput {
@@ -132,14 +132,14 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalFilter,
+    type: FloatFilter,
   })
-  @Type(() => DecimalFilter)
+  @Type(() => FloatFilter)
   @IsOptional()
-  @Field(() => DecimalFilter, {
+  @Field(() => FloatFilter, {
     nullable: true,
   })
-  quantity?: DecimalFilter;
+  quantity?: FloatFilter;
 
   @ApiProperty({
     required: false,
@@ -244,25 +244,25 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  weighIn?: DecimalNullableFilter;
+  weighIn?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  weighOut?: DecimalNullableFilter;
+  weighOut?: FloatNullableFilter;
 }
 
 export { ItemReceiptWhereInput as ItemReceiptWhereInput };

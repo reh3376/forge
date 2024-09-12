@@ -41,27 +41,15 @@ class MashDatumUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: String,
   })
-  @IsNumber()
-  @Max(14)
+  @IsString()
+  @MaxLength(1000)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => String, {
     nullable: true,
   })
-  backSetPH?: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  backsetVolume?: Decimal | null;
+  lotId?: string;
 
   @ApiProperty({
     required: false,
@@ -73,7 +61,31 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  balling?: Decimal;
+  balling?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  pH?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  backSetPH?: number;
 
   @ApiProperty({
     required: false,
@@ -85,7 +97,31 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  cornLbs?: Decimal | null;
+  backsetVolume?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  waterVolume?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  cornLbs?: number | null;
 
   @ApiProperty({
     required: false,
@@ -125,15 +161,15 @@ class MashDatumUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(1000)
+  @IsNumber()
+  @Max(99999999999)
   @IsOptional()
-  @Field(() => String, {
+  @Field(() => Float, {
     nullable: true,
   })
-  lotId?: string;
+  ryeLbs?: number | null;
 
   @ApiProperty({
     required: false,
@@ -145,19 +181,7 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  maltLbs?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH?: Decimal;
+  maltLbs?: number | null;
 
   @ApiProperty({
     required: false,
@@ -169,31 +193,7 @@ class MashDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  ryeLbs?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  waterVolume?: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  wheatLbs?: Decimal | null;
+  wheatLbs?: number | null;
 }
 
 export { MashDatumUpdateInput as MashDatumUpdateInput };
