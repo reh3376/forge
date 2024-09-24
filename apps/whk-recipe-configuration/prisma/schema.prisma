@@ -1035,6 +1035,7 @@ enum EnumEquipmentPhaseName {
   MaltAdd
   RyeAdd
   WheatAdd
+  // SpecialtyAdd
   Drop
   PhCapture
   Cooldown
@@ -1065,7 +1066,7 @@ enum EnumEquipmentPhaseStepType {
   Wheat
   Malt
   Premalt
-  Speciality
+  Specialty
   Enzyme
   Nutrient
   Yeast

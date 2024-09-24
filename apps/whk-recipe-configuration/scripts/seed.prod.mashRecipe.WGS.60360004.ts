@@ -9,6 +9,22 @@ const ORDER_QTY = 500;
 const TOTAL_GRAIN_WEIGHT = 24080;
 const USER = 'pmannion@whiskeyhouse.com';
 
+/* 
+MAXIMUM GRAIN WEIGHTS IN BINS 
+(Normal bin assignment...)
+
+Current total grain weight: 24080
+
+Corn: 180000
+Rye: 7000
+Wheat: 7000
+Malt: 1800
+
+
+Each grain weight for the recipe is the % from the mash bill (Corn-Rye-Wheat-Malt) multiplied by total grain weight
+But malt, 10% of the malt weight is the premalt, 90% is the big malt
+*/
+
 const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
@@ -30,7 +46,7 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Cool", temperature: 145 },
   { action: "Add Grain", grainType: "Malt", qty: 963 },
   // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Malt", qty: 300 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
@@ -42,27 +58,27 @@ const RECIPE_PARAMETERS = [
   { name: 'FermentationAge', setpointValue: 72 },
   { name: 'ControlTemperature', setpointValue: 80 },
   { name: 'CooksPerFerm', setpointValue: 3 },
-    { name: 'TopOffFrequency', setpointValue: 24 },
-    { name: 'TopOffQuantity', setpointValue: 100 },
-    { name: 'TopOffTemperature', setpointValue: 80 },
-    { name: 'MashpH', setpointValue: 5.1 },
-    { name: 'MashRatio', setpointValue: 3.5 },
-    { name: 'RatioByFerm', setpointValue: 2.8 },
-    { name: 'FermSetTemp', setpointValue: 80 },
-    { name: 'StarterSweetpH', setpointValue: 5.1 },
-    { name: 'TotalGrainWeight', setpointValue: 20500 },
-    { name: 'TotalLiquid', setpointValue: 70000 },
-    { name: 'NumberOfCooks', setpointValue: 9 },
-    { name: 'AssumedFermABV', setpointValue: 12.5 }
-  ];
-  const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-  const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
-  const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-  
-  async function seed() {
-    
-    
-    console.info("Seeding database with custom seed for Mashing Recipe...");
+  { name: 'TopOffFrequency', setpointValue: 24 },
+  { name: 'TopOffQuantity', setpointValue: 100 },
+  { name: 'TopOffTemperature', setpointValue: 80 },
+  { name: 'MashpH', setpointValue: 5.1 },
+  { name: 'MashRatio', setpointValue: 3.5 },
+  { name: 'RatioByFerm', setpointValue: 2.8 },
+  { name: 'FermSetTemp', setpointValue: 80 },
+  { name: 'StarterSweetpH', setpointValue: 5.1 },
+  { name: 'TotalGrainWeight', setpointValue: 20500 },
+  { name: 'TotalLiquid', setpointValue: 70000 },
+  { name: 'NumberOfCooks', setpointValue: 9 },
+  { name: 'AssumedFermABV', setpointValue: 12.5 }
+];
+const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
+const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+
+async function seed() {
+
+
+  console.info("Seeding database with custom seed for Mashing Recipe...");
 
   /*
   1. Seed instance of unit procedures, using the main procedure instance
@@ -121,7 +137,7 @@ const RECIPE_PARAMETERS = [
     });
     mashInstance = existingInstance;
     if (!existingInstance) {
-    // if (true) {
+      // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -627,13 +643,13 @@ const RECIPE_PARAMETERS = [
 
   // Get the current date
   const currentDate = new Date();
-  
+
   // Calculate the day of the year
   const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
   const diff = currentDate.getTime() - startOfYear.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  
+
   console.log(`Current day of the year: ${dayOfYear}`);
 
   if (existingSalesOrder) {
@@ -733,7 +749,7 @@ const RECIPE_PARAMETERS = [
     } else {
       console.log("No production orders created today.");
     }
-    
+
     console.log("Creating new production order...");
     const newProductionOrder = await client.productionOrder.create({
       data: {
