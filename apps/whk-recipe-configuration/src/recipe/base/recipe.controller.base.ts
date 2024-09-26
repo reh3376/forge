@@ -732,15 +732,18 @@ export class RecipeControllerBase {
     const results = await this.service.findLots(params.id, {
       ...query,
       select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
         createdAt: true,
         createdBy: true,
+        densityFinal: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
 
         fromAsset: {
           select: {
@@ -749,6 +752,8 @@ export class RecipeControllerBase {
         },
 
         globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
         id: true,
         isRawMaterial: true,
 
@@ -759,6 +764,8 @@ export class RecipeControllerBase {
         },
 
         lotNumber: true,
+        notes: true,
+        pgLosses: true,
 
         productionOrder: {
           select: {
@@ -779,7 +786,16 @@ export class RecipeControllerBase {
         },
 
         schemaVersion: true,
+        standardYield: true,
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
         updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
       },
     });
     if (results === null) {

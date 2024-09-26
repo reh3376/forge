@@ -31,7 +31,6 @@ import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Asset } from "../../asset/base/Asset";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -100,12 +99,6 @@ export class LotResolverBase {
       data: {
         ...args.data,
 
-        fermentationChemistries: args.data.fermentationChemistries
-          ? {
-              connect: args.data.fermentationChemistries,
-            }
-          : undefined,
-
         fromAsset: args.data.fromAsset
           ? {
               connect: args.data.fromAsset,
@@ -152,12 +145,6 @@ export class LotResolverBase {
         ...args,
         data: {
           ...args.data,
-
-          fermentationChemistries: args.data.fermentationChemistries
-            ? {
-                connect: args.data.fermentationChemistries,
-              }
-            : undefined,
 
           fromAsset: args.data.fromAsset
             ? {
@@ -260,27 +247,6 @@ export class LotResolverBase {
     }
 
     return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => FermentationChemistry, {
-    nullable: true,
-    name: "fermentationChemistries",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async getFermentationChemistries(
-    @graphql.Parent() parent: Lot
-  ): Promise<FermentationChemistry | null> {
-    const result = await this.service.getFermentationChemistries(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

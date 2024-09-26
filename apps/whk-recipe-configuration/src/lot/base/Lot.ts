@@ -9,29 +9,72 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field } from "@nestjs/graphql";
+import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Batch } from "../../batch/base/Batch";
+
 import {
-  ValidateNested,
+  IsNumber,
+  Max,
   IsOptional,
-  IsDate,
+  ValidateNested,
   IsString,
   MaxLength,
+  IsInt,
   IsBoolean,
+  IsDate,
+  IsEnum,
 } from "class-validator";
+
+import { Decimal } from "decimal.js";
+import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { BomItem } from "../../bomItem/base/BomItem";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Asset } from "../../asset/base/Asset";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
+import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @ObjectType()
 class Lot {
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  avgBblFillByPg!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  avgBblFillByWg!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  avgPGsFerm!: Decimal | null;
+
   @ApiProperty({
     required: true,
     type: () => [Batch],
@@ -43,12 +86,71 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  bblEntryProof!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bblOem!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  bblTotal!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bblType!: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [BomItem],
   })
   @ValidateNested()
   @Type(() => BomItem)
   @IsOptional()
   bomItems?: Array<BomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  confirmed!: boolean | null;
 
   @ApiProperty({
     required: true,
@@ -72,6 +174,18 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  densityFinal!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -81,15 +195,6 @@ class Lot {
     nullable: true,
   })
   externalId!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistry,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: FermentationChemistry | null;
 
   @ApiProperty({
     required: false,
@@ -111,6 +216,30 @@ class Lot {
     nullable: true,
   })
   globalId!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  grainLbsFerm!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  grainLbsPg!: Decimal | null;
 
   @ApiProperty({
     required: true,
@@ -160,6 +289,30 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  pgLosses!: number | null;
+
+  @ApiProperty({
+    required: false,
     type: () => ProductionOrder,
   })
   @ValidateNested()
@@ -198,12 +351,127 @@ class Lot {
   schemaVersion!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  standardYield!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalFermenters!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  totalPGs!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalPGsByRecipe!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalVolumeWg!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  totalWGs!: Decimal | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  totalWeight!: Decimal | null;
+
+  @ApiProperty({
     required: true,
   })
   @IsDate()
   @Type(() => Date)
   @Field(() => Date)
   updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  warehouseEntryNumber!: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotWhiskeyType,
+  })
+  @IsEnum(EnumLotWhiskeyType)
+  @IsOptional()
+  @Field(() => EnumLotWhiskeyType, {
+    nullable: true,
+  })
+  whiskeyType?:
+    | "AmericanSingleMalt"
+    | "CornBourbon"
+    | "CornWhiskey"
+    | "RyeBourbon"
+    | "RyeWhiskey"
+    | "WheatedBourbon"
+    | "WheatWhiskey"
+    | null;
 }
 
 export { Lot as Lot };
