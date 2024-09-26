@@ -664,12 +664,6 @@ export class BatchControllerBase {
         createdAt: true,
         id: true,
 
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
         operation: {
           select: {
             id: true,

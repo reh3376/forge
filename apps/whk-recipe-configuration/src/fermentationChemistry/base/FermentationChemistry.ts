@@ -23,7 +23,6 @@ import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
 import { Batch } from "../../batch/base/Batch";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { Lot } from "../../lot/base/Lot";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
@@ -93,15 +92,6 @@ class FermentationChemistry {
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => Lot,
-  })
-  @ValidateNested()
-  @Type(() => Lot)
-  @IsOptional()
-  lot?: Lot | null;
 
   @ApiProperty({
     required: true,

@@ -11,24 +11,60 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
-import { ValidateNested, IsOptional } from "class-validator";
+import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { Type } from "class-transformer";
-import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
-import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
-import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @InputType()
 class LotWhereInput {
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  avgBblFillByPg?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  avgBblFillByWg?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  avgPGsFerm?: DecimalNullableFilter;
+
   @ApiProperty({
     required: false,
     type: () => BatchListRelationFilter,
@@ -43,6 +79,50 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  bblEntryProof?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  bblOem?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  bblTotal?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  bblType?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => BomItemListRelationFilter,
   })
   @ValidateNested()
@@ -52,6 +132,17 @@ class LotWhereInput {
     nullable: true,
   })
   bomItems?: BomItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  confirmed?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -77,6 +168,17 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  densityFinal?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -85,18 +187,6 @@ class LotWhereInput {
     nullable: true,
   })
   externalId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -120,6 +210,28 @@ class LotWhereInput {
     nullable: true,
   })
   globalId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  grainLbsFerm?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  grainLbsPg?: DecimalNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -180,6 +292,28 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  notes?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  pgLosses?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => ProductionOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -227,6 +361,83 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  standardYield?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  totalFermenters?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  totalPGs?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  totalPGsByRecipe?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  totalVolumeWg?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  totalWGs?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  totalWeight?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: DateTimeFilter,
   })
   @Type(() => DateTimeFilter)
@@ -235,6 +446,35 @@ class LotWhereInput {
     nullable: true,
   })
   updatedAt?: DateTimeFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  warehouseEntryNumber?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotWhiskeyType,
+  })
+  @IsEnum(EnumLotWhiskeyType)
+  @IsOptional()
+  @Field(() => EnumLotWhiskeyType, {
+    nullable: true,
+  })
+  whiskeyType?:
+    | "AmericanSingleMalt"
+    | "CornBourbon"
+    | "CornWhiskey"
+    | "RyeBourbon"
+    | "RyeWhiskey"
+    | "WheatedBourbon"
+    | "WheatWhiskey";
 }
 
 export { LotWhereInput as LotWhereInput };

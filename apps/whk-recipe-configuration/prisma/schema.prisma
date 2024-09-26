@@ -586,29 +586,50 @@ model ItemReceipt {
 }
 
 model Lot {
+  avgBblFillByPg              Decimal?
+  avgBblFillByWg              Decimal?
+  avgPGsFerm                  Decimal?
   batches                     Batch[]
+  bblEntryProof               Decimal?
+  bblOem                      String?
+  bblTotal                    Int?
+  bblType                     String?
   bomItems                    BomItem[]
-  createdAt                   DateTime               @default(now())
+  confirmed                   Boolean?            @default(false)
+  createdAt                   DateTime            @default(now())
   createdBy                   String?
-  externalId                  String?                @unique
-  fermentationChemistries     FermentationChemistry?
-  fromAsset                   Asset?                 @relation(fields: [fromAssetId], references: [id])
+  densityFinal                Decimal?
+  externalId                  String?             @unique
+  fromAsset                   Asset?              @relation(fields: [fromAssetId], references: [id])
   fromAssetId                 String?
-  globalId                    String?                @unique @default(cuid())
-  id                          String                 @id @default(cuid())
+  globalId                    String?             @unique @default(cuid())
+  grainLbsFerm                Float?
+  grainLbsPg                  Decimal?
+  id                          String              @id @default(cuid())
   inventoryTransfers          InventoryTransfer[]
-  isRawMaterial               Boolean?               @default(false)
-  item                        Item?                  @relation(fields: [itemId], references: [id])
+  isRawMaterial               Boolean?            @default(false)
+  item                        Item?               @relation(fields: [itemId], references: [id])
   itemId                      String?
-  lotNumber                   String                 @unique
-  productionOrder             ProductionOrder?       @relation(fields: [productionOrderId], references: [id])
+  lotNumber                   String              @unique
+  notes                       String?
+  pgLosses                    Float?
+  productionOrder             ProductionOrder?    @relation(fields: [productionOrderId], references: [id])
   productionOrderId           String?
-  purchaseOrderAcceptedLots   PurchaseOrder?         @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
+  purchaseOrderAcceptedLots   PurchaseOrder?      @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
   purchaseOrderAcceptedLotsId String?
-  recipe                      Recipe?                @relation(fields: [recipeId], references: [id])
+  recipe                      Recipe?             @relation(fields: [recipeId], references: [id])
   recipeId                    String?
-  schemaVersion               String?                @default("0001-b")
-  updatedAt                   DateTime               @updatedAt
+  schemaVersion               String?             @default("0001-b")
+  standardYield               Decimal?
+  totalFermenters             Float?
+  totalPGs                    Decimal?
+  totalPGsByRecipe            Float?
+  totalVolumeWg               Float?
+  totalWGs                    Decimal?
+  totalWeight                 Decimal?
+  updatedAt                   DateTime            @updatedAt
+  warehouseEntryNumber        Int?
+  whiskeyType                 EnumLotWhiskeyType?
 }
 
 model BomItem {
@@ -655,8 +676,6 @@ model FermentationChemistry {
   createdAt         DateTime                  @default(now())
   dailyData         FermentationDayDatum[]
   id                String                    @id @default(cuid())
-  lot               Lot?                      @relation(fields: [lotId], references: [id])
-  lotId             String?                   @unique
   operation         Operation                 @relation(fields: [operationId], references: [id])
   operationId       String
   productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
@@ -1141,6 +1160,16 @@ enum EnumItemReceiptStatus {
   Complete
   Rejected
   Hold
+}
+
+enum EnumLotWhiskeyType {
+  AmericanSingleMalt
+  CornBourbon
+  CornWhiskey
+  RyeBourbon
+  RyeWhiskey
+  WheatedBourbon
+  WheatWhiskey
 }
 
 enum EnumFermentationDayDatumDay {

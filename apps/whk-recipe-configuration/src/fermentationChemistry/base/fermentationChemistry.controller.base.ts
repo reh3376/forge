@@ -66,12 +66,6 @@ export class FermentationChemistryControllerBase {
           connect: data.batch,
         },
 
-        lot: data.lot
-          ? {
-              connect: data.lot,
-            }
-          : undefined,
-
         operation: {
           connect: data.operation,
         },
@@ -106,12 +100,6 @@ export class FermentationChemistryControllerBase {
 
         createdAt: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
 
         operation: {
           select: {
@@ -173,12 +161,6 @@ export class FermentationChemistryControllerBase {
         createdAt: true,
         id: true,
 
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
         operation: {
           select: {
             id: true,
@@ -237,12 +219,6 @@ export class FermentationChemistryControllerBase {
 
         createdAt: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
 
         operation: {
           select: {
@@ -306,12 +282,6 @@ export class FermentationChemistryControllerBase {
             connect: data.batch,
           },
 
-          lot: data.lot
-            ? {
-                connect: data.lot,
-              }
-            : undefined,
-
           operation: {
             connect: data.operation,
           },
@@ -346,12 +316,6 @@ export class FermentationChemistryControllerBase {
 
           createdAt: true,
           id: true,
-
-          lot: {
-            select: {
-              id: true,
-            },
-          },
 
           operation: {
             select: {
