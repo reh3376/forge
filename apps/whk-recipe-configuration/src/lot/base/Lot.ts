@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -25,7 +25,6 @@ import {
   IsEnum,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { BomItem } from "../../bomItem/base/BomItem";
@@ -46,10 +45,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  avgBblFillByPg!: Decimal | null;
+  avgBblFillByPg!: number | null;
 
   @ApiProperty({
     required: false,
@@ -58,10 +57,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  avgBblFillByWg!: Decimal | null;
+  avgBblFillByWg!: number | null;
 
   @ApiProperty({
     required: false,
@@ -70,10 +69,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  avgPGsFerm!: Decimal | null;
+  avgPGsFerm!: number | null;
 
   @ApiProperty({
     required: true,
@@ -91,10 +90,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  bblEntryProof!: Decimal | null;
+  bblEntryProof!: number | null;
 
   @ApiProperty({
     required: false,
@@ -179,10 +178,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  densityFinal!: Decimal | null;
+  densityFinal!: number | null;
 
   @ApiProperty({
     required: false,
@@ -236,10 +235,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  grainLbsPg!: Decimal | null;
+  grainLbsPg!: number | null;
 
   @ApiProperty({
     required: true,
@@ -357,10 +356,10 @@ class Lot {
   @IsNumber()
   @Max(99)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  standardYield!: Decimal | null;
+  standardYield!: number | null;
 
   @ApiProperty({
     required: false,
@@ -381,10 +380,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  totalPGs!: Decimal | null;
+  totalPGs!: number | null;
 
   @ApiProperty({
     required: false,
@@ -417,10 +416,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  totalWGs!: Decimal | null;
+  totalWGs!: number | null;
 
   @ApiProperty({
     required: false,
@@ -429,10 +428,10 @@ class Lot {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  totalWeight!: Decimal | null;
+  totalWeight!: number | null;
 
   @ApiProperty({
     required: true,

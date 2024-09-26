@@ -586,11 +586,11 @@ model ItemReceipt {
 }
 
 model Lot {
-  avgBblFillByPg              Decimal?
-  avgBblFillByWg              Decimal?
-  avgPGsFerm                  Decimal?
+  avgBblFillByPg              Float?
+  avgBblFillByWg              Float?
+  avgPGsFerm                  Float?
   batches                     Batch[]
-  bblEntryProof               Decimal?
+  bblEntryProof               Float?
   bblOem                      String?
   bblTotal                    Int?
   bblType                     String?
@@ -598,13 +598,13 @@ model Lot {
   confirmed                   Boolean?            @default(false)
   createdAt                   DateTime            @default(now())
   createdBy                   String?
-  densityFinal                Decimal?
+  densityFinal                Float?
   externalId                  String?             @unique
   fromAsset                   Asset?              @relation(fields: [fromAssetId], references: [id])
   fromAssetId                 String?
   globalId                    String?             @unique @default(cuid())
   grainLbsFerm                Float?
-  grainLbsPg                  Decimal?
+  grainLbsPg                  Float?
   id                          String              @id @default(cuid())
   inventoryTransfers          InventoryTransfer[]
   isRawMaterial               Boolean?            @default(false)
@@ -620,13 +620,13 @@ model Lot {
   recipe                      Recipe?             @relation(fields: [recipeId], references: [id])
   recipeId                    String?
   schemaVersion               String?             @default("0001-b")
-  standardYield               Decimal?
+  standardYield               Float?
   totalFermenters             Float?
-  totalPGs                    Decimal?
+  totalPGs                    Float?
   totalPGsByRecipe            Float?
   totalVolumeWg               Float?
-  totalWGs                    Decimal?
-  totalWeight                 Decimal?
+  totalWGs                    Float?
+  totalWeight                 Float?
   updatedAt                   DateTime            @updatedAt
   warehouseEntryNumber        Int?
   whiskeyType                 EnumLotWhiskeyType?
