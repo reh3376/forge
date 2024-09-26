@@ -31,7 +31,7 @@ import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateMa
 import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
 import { ItemReceiptUpdateManyWithoutAssetsInput } from "./ItemReceiptUpdateManyWithoutAssetsInput";
 import { LotUpdateManyWithoutAssetsInput } from "./LotUpdateManyWithoutAssetsInput";
-import { MashDatumUpdateManyWithoutAssetsInput } from "./MashDatumUpdateManyWithoutAssetsInput";
+import { MashingDatumUpdateManyWithoutAssetsInput } from "./MashingDatumUpdateManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 
@@ -228,15 +228,15 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumUpdateManyWithoutAssetsInput,
+    type: () => MashingDatumUpdateManyWithoutAssetsInput,
   })
   @ValidateNested()
-  @Type(() => MashDatumUpdateManyWithoutAssetsInput)
+  @Type(() => MashingDatumUpdateManyWithoutAssetsInput)
   @IsOptional()
-  @Field(() => MashDatumUpdateManyWithoutAssetsInput, {
+  @Field(() => MashingDatumUpdateManyWithoutAssetsInput, {
     nullable: true,
   })
-  mashData?: MashDatumUpdateManyWithoutAssetsInput;
+  mashingData?: MashingDatumUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,

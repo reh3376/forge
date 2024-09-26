@@ -20,8 +20,9 @@ import {
   IsInt,
   Max,
 } from "class-validator";
-import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
+import { AdditiveActualCreateNestedManyWithoutItemsInput } from "./AdditiveActualCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
 import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
 import { InventoryCreateNestedManyWithoutItemsInput } from "./InventoryCreateNestedManyWithoutItemsInput";
 import { InventoryLogCreateNestedManyWithoutItemsInput } from "./InventoryLogCreateNestedManyWithoutItemsInput";
@@ -47,6 +48,18 @@ class ItemCreateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AdditiveActualCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => AdditiveActualCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => AdditiveActualCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  additiveActuals?: AdditiveActualCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

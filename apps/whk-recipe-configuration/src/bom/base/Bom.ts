@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
+import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
@@ -187,6 +188,15 @@ class Bom {
   @ValidateNested()
   @Type(() => Item)
   item?: Item;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingDatum],
+  })
+  @ValidateNested()
+  @Type(() => MashingDatum)
+  @IsOptional()
+  mashingData?: Array<MashingDatum>;
 
   @ApiProperty({
     required: false,

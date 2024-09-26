@@ -17,10 +17,10 @@
     "package:container": "docker build .",
     "compose:up": "docker-compose up -d",
     "compose:down": "docker-compose down --volumes",
+    "format": "prettier --write .",
     "lint": "eslint './src/**/*.{ts, tsx}'",
     "lint:fix": "eslint --fix './src/**/*.{ts, tsx}'",
-    "ssl:generate": "./scripts/generate-ssl.sh",
-    "format": "prettier --write ."
+    "ssl:generate": "./scripts/generate-ssl.sh"
   },
   "dependencies": {
     "@amplication/opentelemetry-nestjs": "^4.5.0",

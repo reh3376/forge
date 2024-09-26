@@ -31,7 +31,7 @@ import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCr
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
 import { ItemReceiptCreateNestedManyWithoutAssetsInput } from "./ItemReceiptCreateNestedManyWithoutAssetsInput";
 import { LotCreateNestedManyWithoutAssetsInput } from "./LotCreateNestedManyWithoutAssetsInput";
-import { MashDatumCreateNestedManyWithoutAssetsInput } from "./MashDatumCreateNestedManyWithoutAssetsInput";
+import { MashingDatumCreateNestedManyWithoutAssetsInput } from "./MashingDatumCreateNestedManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
 
@@ -216,15 +216,15 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumCreateNestedManyWithoutAssetsInput,
+    type: () => MashingDatumCreateNestedManyWithoutAssetsInput,
   })
   @ValidateNested()
-  @Type(() => MashDatumCreateNestedManyWithoutAssetsInput)
+  @Type(() => MashingDatumCreateNestedManyWithoutAssetsInput)
   @IsOptional()
-  @Field(() => MashDatumCreateNestedManyWithoutAssetsInput, {
+  @Field(() => MashingDatumCreateNestedManyWithoutAssetsInput, {
     nullable: true,
   })
-  mashData?: MashDatumCreateNestedManyWithoutAssetsInput;
+  mashingData?: MashingDatumCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: true,

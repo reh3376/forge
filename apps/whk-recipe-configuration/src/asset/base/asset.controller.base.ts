@@ -50,9 +50,9 @@ import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptW
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUniqueInput";
+import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
+import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
+import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
@@ -1547,19 +1547,19 @@ export class AssetControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/mashData")
-  @ApiNestedQuery(MashDatumFindManyArgs)
+  @common.Get("/:id/mashingData")
+  @ApiNestedQuery(MashingDatumFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "MashDatum",
+    resource: "MashingDatum",
     action: "read",
     possession: "any",
   })
-  async findMashData(
+  async findMashingData(
     @common.Req() request: Request,
     @common.Param() params: AssetWhereUniqueInput
-  ): Promise<MashDatum[]> {
-    const query = plainToClass(MashDatumFindManyArgs, request.query);
-    const results = await this.service.findMashData(params.id, {
+  ): Promise<MashingDatum[]> {
+    const query = plainToClass(MashingDatumFindManyArgs, request.query);
+    const results = await this.service.findMashingData(params.id, {
       ...query,
       select: {
         asset: {
@@ -1568,28 +1568,46 @@ export class AssetControllerBase {
           },
         },
 
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
+        backsetQuantity: true,
 
-        fermentationChemistry: {
+        bom: {
           select: {
             id: true,
           },
         },
 
-        fermenterNumber: true,
+        cookCompleteTime: true,
+        cookDropTime: true,
+        cookDuration: true,
+        cookStartTime: true,
+        cookStartedBy: true,
+        cookerNumber: true,
+        cornQuantity: true,
+        createdAt: true,
+        dropDuration: true,
         id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
+        maltQuantity: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        preMaltQuantity: true,
+
+        recipeBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        ryeQuantity: true,
+        specialtyQuantity: true,
+        totalDuration: true,
         updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
+        waterQuantity: true,
+        wheatQuantity: true,
       },
     });
     if (results === null) {
@@ -1600,18 +1618,18 @@ export class AssetControllerBase {
     return results;
   }
 
-  @common.Post("/:id/mashData")
+  @common.Post("/:id/mashingData")
   @nestAccessControl.UseRoles({
     resource: "Asset",
     action: "update",
     possession: "any",
   })
-  async connectMashData(
+  async connectMashingData(
     @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: MashDatumWhereUniqueInput[]
+    @common.Body() body: MashingDatumWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      mashData: {
+      mashingData: {
         connect: body,
       },
     };
@@ -1622,18 +1640,18 @@ export class AssetControllerBase {
     });
   }
 
-  @common.Patch("/:id/mashData")
+  @common.Patch("/:id/mashingData")
   @nestAccessControl.UseRoles({
     resource: "Asset",
     action: "update",
     possession: "any",
   })
-  async updateMashData(
+  async updateMashingData(
     @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: MashDatumWhereUniqueInput[]
+    @common.Body() body: MashingDatumWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      mashData: {
+      mashingData: {
         set: body,
       },
     };
@@ -1644,18 +1662,18 @@ export class AssetControllerBase {
     });
   }
 
-  @common.Delete("/:id/mashData")
+  @common.Delete("/:id/mashingData")
   @nestAccessControl.UseRoles({
     resource: "Asset",
     action: "update",
     possession: "any",
   })
-  async disconnectMashData(
+  async disconnectMashingData(
     @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: MashDatumWhereUniqueInput[]
+    @common.Body() body: MashingDatumWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      mashData: {
+      mashingData: {
         disconnect: body,
       },
     };
