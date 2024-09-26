@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 
@@ -30,7 +30,6 @@ import { EquipmentPhaseUpdateManyWithoutBomItemsInput } from "./EquipmentPhaseUp
 import { BomItemUpdateManyWithoutBomItemsInput } from "./BomItemUpdateManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { Decimal } from "decimal.js";
 
 @InputType()
 class BomItemUpdateInput {
@@ -159,10 +158,10 @@ class BomItemUpdateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  quantity?: Decimal;
+  quantity?: number;
 
   @ApiProperty({
     required: false,
@@ -171,10 +170,10 @@ class BomItemUpdateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  quantityActual?: Decimal | null;
+  quantityActual?: number | null;
 
   @ApiProperty({
     required: false,

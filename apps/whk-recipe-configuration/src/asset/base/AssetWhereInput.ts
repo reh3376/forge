@@ -26,7 +26,7 @@ import { InventoryLogListRelationFilter } from "../../inventoryLog/base/Inventor
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
-import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
+import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -242,15 +242,15 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashDatumListRelationFilter,
+    type: () => MashingDatumListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => MashDatumListRelationFilter)
+  @Type(() => MashingDatumListRelationFilter)
   @IsOptional()
-  @Field(() => MashDatumListRelationFilter, {
+  @Field(() => MashingDatumListRelationFilter, {
     nullable: true,
   })
-  mashData?: MashDatumListRelationFilter;
+  mashingData?: MashingDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

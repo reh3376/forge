@@ -1,5 +1,6 @@
-import { RabbitMQModule } from "./rabbitmq/rabbitmq.module";
 import { Module } from "@nestjs/common";
+import { CacheModule } from "@nestjs/cache-manager";
+import { redisStore } from "cache-manager-ioredis-yet";
 
 import {
   OpenTelemetryModule,
@@ -13,8 +14,7 @@ import {
 import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
-import { CacheModule } from "@nestjs/cache-manager";
-import { redisStore } from "cache-manager-ioredis-yet";
+import { RabbitMQModule } from "./rabbitmq/rabbitmq.module";
 import { UserModule } from "./user/user.module";
 import { PhaseParameterModule } from "./phaseParameter/phaseParameter.module";
 import { TestParameterModule } from "./testParameter/testParameter.module";
@@ -41,7 +41,6 @@ import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
 import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
-import { MashDatumModule } from "./mashDatum/mashDatum.module";
 import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
 import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
 import { BatchModule } from "./batch/batch.module";
@@ -56,6 +55,8 @@ import { MashingProtocolModule } from "./mashingProtocol/mashingProtocol.module"
 import { MashingProtocolStepModule } from "./mashingProtocolStep/mashingProtocolStep.module";
 import { RecipeBomModule } from "./recipeBom/recipeBom.module";
 import { ProductionOrderRecipeInstanceModule } from "./productionOrderRecipeInstance/productionOrderRecipeInstance.module";
+import { MashingDatumModule } from "./mashingDatum/mashingDatum.module";
+import { AdditiveActualModule } from "./additiveActual/additiveActual.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -66,19 +67,19 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
-import { LoggerModule } from "./logger/logger.module";
-
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
+
+import { LoggerModule } from "./logger/logger.module";
 
 @Module({
   controllers: [],
   imports: [
     StorageModule,
     RabbitMQModule,
+    LoggerModule,
     ACLModule,
     AuthModule,
-    LoggerModule,
     UserModule,
     PhaseParameterModule,
     TestParameterModule,
@@ -105,7 +106,6 @@ import { AuthModule } from "./auth/auth.module";
     BomItemModule,
     UnitModule,
     FermentationChemistryModule,
-    MashDatumModule,
     FermentationSettingDatumModule,
     FermentationDayDatumModule,
     BatchModule,
@@ -120,6 +120,8 @@ import { AuthModule } from "./auth/auth.module";
     MashingProtocolStepModule,
     RecipeBomModule,
     ProductionOrderRecipeInstanceModule,
+    MashingDatumModule,
+    AdditiveActualModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
@@ -141,26 +143,6 @@ import { AuthModule } from "./auth/auth.module";
       },
       inject: [ConfigService],
       imports: [ConfigModule],
-    }),
-    OpenTelemetryModule.forRoot({
-      serviceName: "whk-mes",
-      spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
-      instrumentations: [
-        new HttpInstrumentation({
-          requestHook: (span, request) => {
-            if (request.method)
-              span.setAttribute("http.method", request.method);
-          },
-        }),
-      ],
-
-      traceAutoInjectors: [
-        ControllerInjector,
-        EventEmitterInjector,
-        GraphQLResolverInjector,
-        GuardInjector,
-        PipeInjector,
-      ],
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -185,6 +167,26 @@ import { AuthModule } from "./auth/auth.module";
       },
 
       inject: [ConfigService],
+    }),
+    OpenTelemetryModule.forRoot({
+      serviceName: "whk-mes",
+      spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
+      instrumentations: [
+        new HttpInstrumentation({
+          requestHook: (span, request) => {
+            if (request.method)
+              span.setAttribute("http.method", request.method);
+          },
+        }),
+      ],
+
+      traceAutoInjectors: [
+        ControllerInjector,
+        EventEmitterInjector,
+        GraphQLResolverInjector,
+        GuardInjector,
+        PipeInjector,
+      ],
     }),
   ],
   providers: [],

@@ -147,6 +147,7 @@ model Operation {
   instances               Operation[]                @relation(name: "OperationClassIdOperationInstances")
   isClassDefinition       Boolean?                   @default(false)
   lotId                   String?                    @unique
+  mashingData             MashingDatum[]
   name                    EnumOperationName
   path                    String?
   procedureSequenceIndex  Int                        @default(0)
@@ -236,6 +237,7 @@ model Bom {
   inactive              Boolean?          @default(false)
   item                  Item              @relation(fields: [itemId], references: [id])
   itemId                String
+  mashingData           MashingDatum[]
   notes                 String?
   productionOrder       ProductionOrder[]
   schemaVersion         String?           @default("0001-alpha")
@@ -387,6 +389,7 @@ model ScheduleOrder {
 
 model Item {
   active             Boolean?            @default(true)
+  additiveActuals    AdditiveActual[]
   bomItems           BomItem[]
   bomsWipItem        Bom[]
   createdAt          DateTime            @default(now())
@@ -542,7 +545,7 @@ model Asset {
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
   itemReceipts            ItemReceipt[]
   lots                    Lot[]
-  mashData                MashDatum[]
+  mashingData             MashingDatum[]
   name                    String
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
   parentId                String?
@@ -625,8 +628,8 @@ model BomItem {
   itemId            String
   lot               Lot?             @relation(fields: [lotId], references: [id])
   lotId             String?
-  quantity          Decimal
-  quantityActual    Decimal?
+  quantity          Float
+  quantityActual    Float?
   units             String?
   updatedAt         DateTime         @updatedAt
   updatedBy         String?
@@ -654,7 +657,6 @@ model FermentationChemistry {
   id                String                    @id @default(cuid())
   lot               Lot?                      @relation(fields: [lotId], references: [id])
   lotId             String?                   @unique
-  mashData          MashDatum[]
   operation         Operation                 @relation(fields: [operationId], references: [id])
   operationId       String
   productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
@@ -662,28 +664,6 @@ model FermentationChemistry {
   settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
   settingDataId     String?                   @unique
   updatedAt         DateTime                  @updatedAt
-}
-
-model MashDatum {
-  asset                   Asset?                 @relation(fields: [assetId], references: [id])
-  assetId                 String?
-  backSetPH               Decimal
-  backsetVolume           Decimal?
-  balling                 Decimal
-  cornLbs                 Decimal?
-  createdAt               DateTime               @default(now())
-  fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
-  fermentationChemistryId String?
-  fermenterNumber         Int
-  id                      String                 @id @default(cuid())
-  loggedBy                String
-  lotId                   String
-  maltLbs                 Decimal?
-  pH                      Decimal
-  ryeLbs                  Decimal?
-  updatedAt               DateTime               @updatedAt
-  waterVolume             Decimal
-  wheatLbs                Decimal?
 }
 
 model FermentationSettingDatum {
@@ -939,6 +919,7 @@ model MashingProtocolStep {
 model RecipeBom {
   createdAt                      DateTime                        @default(now())
   id                             String                          @id @default(cuid())
+  mashingData                    MashingDatum[]
   master                         Boolean?                        @default(false)
   masterInstances                RecipeBom[]                     @relation(name: "masterRecipeBom")
   masterRecipeBom                RecipeBom?                      @relation(name: "masterRecipeBom", fields: [masterReceipeBomId], references: [id])
@@ -968,6 +949,50 @@ model ProductionOrderRecipeInstance {
   recipeBom         RecipeBom[]
   updatedAt         DateTime          @updatedAt
   updatedBy         String?
+}
+
+model MashingDatum {
+  additiveActuals   AdditiveActual[]
+  asset             Asset?           @relation(fields: [assetId], references: [id])
+  assetId           String?
+  backsetQuantity   Int?
+  bom               Bom?             @relation(fields: [bomId], references: [id])
+  bomId             String?
+  cookCompleteTime  DateTime?
+  cookDropTime      DateTime?
+  cookDuration      Int?
+  cookStartTime     DateTime?
+  cookStartedBy     String?
+  cookerNumber      Int?
+  cornQuantity      Int?
+  createdAt         DateTime         @default(now())
+  dropDuration      Int?
+  id                String           @id @default(cuid())
+  maltQuantity      Int?
+  operation         Operation?       @relation(fields: [operationId], references: [id])
+  operationId       String?
+  preMaltQuantity   Int?
+  recipeBom         RecipeBom?       @relation(fields: [recipeBomId], references: [id])
+  recipeBomId       String?
+  ryeQuantity       Int?
+  specialtyQuantity Int?
+  totalDuration     Int?
+  updatedAt         DateTime         @updatedAt
+  waterQuantity     Int?
+  wheatQuantity     Int?
+}
+
+model AdditiveActual {
+  createdAt      DateTime      @default(now())
+  id             String        @id @default(cuid())
+  item           Item?         @relation(fields: [itemId], references: [id])
+  itemId         String?
+  itemNumber     String
+  lotNumber      String
+  mashingDatum   MashingDatum? @relation(fields: [mashingDatumId], references: [id])
+  mashingDatumId String?
+  quantity       Int
+  updatedAt      DateTime      @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {

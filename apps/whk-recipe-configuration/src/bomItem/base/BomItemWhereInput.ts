@@ -23,8 +23,8 @@ import { BomItemListRelationFilter } from "./BomItemListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { DecimalFilter } from "../../util/DecimalFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FloatFilter } from "../../util/FloatFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class BomItemWhereInput {
@@ -157,25 +157,25 @@ class BomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalFilter,
+    type: FloatFilter,
   })
-  @Type(() => DecimalFilter)
+  @Type(() => FloatFilter)
   @IsOptional()
-  @Field(() => DecimalFilter, {
+  @Field(() => FloatFilter, {
     nullable: true,
   })
-  quantity?: DecimalFilter;
+  quantity?: FloatFilter;
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  quantityActual?: DecimalNullableFilter;
+  quantityActual?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

@@ -33,6 +33,7 @@ import { FermentationChemistryUpdateManyWithoutOperationsInput } from "./Ferment
 import { FermentationDayDatumUpdateManyWithoutOperationsInput } from "./FermentationDayDatumUpdateManyWithoutOperationsInput";
 import { FermentationSettingDatumUpdateManyWithoutOperationsInput } from "./FermentationSettingDatumUpdateManyWithoutOperationsInput";
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
+import { MashingDatumUpdateManyWithoutOperationsInput } from "./MashingDatumUpdateManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
@@ -213,6 +214,18 @@ class OperationUpdateInput {
     nullable: true,
   })
   lotId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingDatumUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingDatumUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => MashingDatumUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  mashingData?: MashingDatumUpdateManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,

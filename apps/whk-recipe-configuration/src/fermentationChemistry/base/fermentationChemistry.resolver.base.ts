@@ -27,8 +27,6 @@ import { CreateFermentationChemistryArgs } from "./CreateFermentationChemistryAr
 import { UpdateFermentationChemistryArgs } from "./UpdateFermentationChemistryArgs";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { Asset } from "../../asset/base/Asset";
 import { Batch } from "../../batch/base/Batch";
 import { Lot } from "../../lot/base/Lot";
@@ -206,26 +204,6 @@ export class FermentationChemistryResolverBase {
     @graphql.Args() args: FermentationDayDatumFindManyArgs
   ): Promise<FermentationDayDatum[]> {
     const results = await this.service.findDailyData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
-  @nestAccessControl.UseRoles({
-    resource: "MashDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashData(
-    @graphql.Parent() parent: FermentationChemistry,
-    @graphql.Args() args: MashDatumFindManyArgs
-  ): Promise<MashDatum[]> {
-    const results = await this.service.findMashData(parent.id, args);
 
     if (!results) {
       return [];
