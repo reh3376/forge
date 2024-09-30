@@ -3,7 +3,7 @@ import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, 
 const CUSTOMER_CODE = "GSC";
 const MASH_BILL = '00-95-00-05'; //  Match Item Record
 const FINAL_PROOF = 120;
-const BARREL_INFO = '53-06-4-2-0'; // Match Item Record
+const BARREL_INFO = '53-18-3-3-0'; // Match Item Record
 const CUSTOMER_NAME = "Graton Spirits Company LLC"; // This needs to match ERP / MESDB customer reocrd
 const ORDER_QTY = 250; // barrels
 const TOTAL_GRAIN_WEIGHT = 21000;
@@ -16,14 +16,13 @@ const MASHING_PROTOCOL = [
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
   { action: "Add Grain", grainType: "Malt", qty: 1050 },
   { action: "Add Additive", additiveType: "Liquozyme", qty: 2.0 },
-  { action: "Add Grain", grainType: "Corn", qty: 15000 },
-  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Rye", qty: 15000 },
+  { action: "Hold", holdType: "Hold", time: 1 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Add Grain", grainType: "Rye", qty: 4950 }, // UNCOMMENT IF NEED SECONDARY DROP
-    { action: "Hold", holdType: "Hold", time: 5 },
+  { action: "Hold", holdType: "Hold", time: 5 },
   { action: "Add Additive", additiveType: "DIAZYME", qty: 8.7 },
   { action: "Add Additive", additiveType: "Viscoferm", qty: 12 },
-  { action: "Hold", holdType: "Hold", time: 15 },
-  { action: "Hold", holdType: "Heat", temperature: 145, time: 15 },
+  { action: "Hold", holdType: "Heat", temperature: 145, time: 30 },
   //{ action: "Hold", holdType: "Cool", temperature: 170 },
   //{ action: "Add Grain", grainType: "Rye", qty: 7000 },
   //{ action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
