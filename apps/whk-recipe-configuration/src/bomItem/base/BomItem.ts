@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { Bom } from "../../bom/base/Bom";
 
@@ -149,7 +149,7 @@ class BomItem {
   })
   @IsNumber()
   @Max(99999999999)
-  @Field(() => Float)
+  @Field(() => Number)
   quantity!: number;
 
   @ApiProperty({
@@ -159,7 +159,7 @@ class BomItem {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantityActual!: number | null;

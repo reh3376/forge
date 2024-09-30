@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 
@@ -158,7 +158,7 @@ class BomItemUpdateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantity?: number;
@@ -170,7 +170,7 @@ class BomItemUpdateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantityActual?: number | null;

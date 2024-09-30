@@ -23,8 +23,9 @@ import {
   Max,
 } from "class-validator";
 
-import { BomItem } from "../../bomItem/base/BomItem";
+import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
 import { Type } from "class-transformer";
+import { BomItem } from "../../bomItem/base/BomItem";
 import { Bom } from "../../bom/base/Bom";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
@@ -50,6 +51,15 @@ class Item {
     nullable: true,
   })
   active!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [AdditiveActual],
+  })
+  @ValidateNested()
+  @Type(() => AdditiveActual)
+  @IsOptional()
+  additiveActuals?: Array<AdditiveActual>;
 
   @ApiProperty({
     required: false,

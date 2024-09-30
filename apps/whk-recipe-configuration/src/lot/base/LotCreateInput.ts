@@ -11,26 +11,68 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
+
 import {
-  ValidateNested,
+  IsNumber,
+  Max,
   IsOptional,
+  ValidateNested,
   IsString,
   MaxLength,
+  IsInt,
   IsBoolean,
+  IsEnum,
 } from "class-validator";
+
+import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
 import { Type } from "class-transformer";
 import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedManyWithoutLotsInput";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { InventoryTransferCreateNestedManyWithoutLotsInput } from "./InventoryTransferCreateNestedManyWithoutLotsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @InputType()
 class LotCreateInput {
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  avgBblFillByPg?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  avgBblFillByWg?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  avgPGsFerm?: number | null;
+
   @ApiProperty({
     required: true,
     type: () => BatchCreateNestedManyWithoutLotsInput,
@@ -42,6 +84,54 @@ class LotCreateInput {
     nullable: true,
   })
   batches?: BatchCreateNestedManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  bblEntryProof?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bblOem?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  bblTotal?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  bblType?: string | null;
 
   @ApiProperty({
     required: false,
@@ -57,6 +147,17 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  confirmed?: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -69,6 +170,18 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  densityFinal?: number | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -78,18 +191,6 @@ class LotCreateInput {
     nullable: true,
   })
   externalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -114,6 +215,30 @@ class LotCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  grainLbsFerm?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  grainLbsPg?: number | null;
 
   @ApiProperty({
     required: false,
@@ -158,6 +283,30 @@ class LotCreateInput {
   @MaxLength(256)
   @Field(() => String)
   lotNumber!: string;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  notes?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  pgLosses?: number | null;
 
   @ApiProperty({
     required: false,
@@ -206,6 +355,121 @@ class LotCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  standardYield?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalPGs?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalPGsByRecipe?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalVolumeWg?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalWGs?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalWeight?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  warehouseEntryNumber?: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotWhiskeyType,
+  })
+  @IsEnum(EnumLotWhiskeyType)
+  @IsOptional()
+  @Field(() => EnumLotWhiskeyType, {
+    nullable: true,
+  })
+  whiskeyType?:
+    | "AmericanSingleMalt"
+    | "CornBourbon"
+    | "CornWhiskey"
+    | "RyeBourbon"
+    | "RyeWhiskey"
+    | "WheatedBourbon"
+    | "WheatWhiskey"
+    | null;
 }
 
 export { LotCreateInput as LotCreateInput };

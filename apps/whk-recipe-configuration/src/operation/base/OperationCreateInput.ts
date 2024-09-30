@@ -33,6 +33,7 @@ import { FermentationChemistryCreateNestedManyWithoutOperationsInput } from "./F
 import { FermentationDayDatumCreateNestedManyWithoutOperationsInput } from "./FermentationDayDatumCreateNestedManyWithoutOperationsInput";
 import { FermentationSettingDatumCreateNestedManyWithoutOperationsInput } from "./FermentationSettingDatumCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
+import { MashingDatumCreateNestedManyWithoutOperationsInput } from "./MashingDatumCreateNestedManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
@@ -204,6 +205,18 @@ class OperationCreateInput {
     nullable: true,
   })
   lotId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingDatumCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingDatumCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => MashingDatumCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  mashingData?: MashingDatumCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: true,

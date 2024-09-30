@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Item as PrismaItem,
+  AdditiveActual as PrismaAdditiveActual,
   BomItem as PrismaBomItem,
   Bom as PrismaBom,
   Inventory as PrismaInventory,
@@ -50,6 +51,17 @@ export class ItemServiceBase {
   }
   async deleteItem(args: Prisma.ItemDeleteArgs): Promise<PrismaItem> {
     return this.prisma.item.delete(args);
+  }
+
+  async findAdditiveActuals(
+    parentId: string,
+    args: Prisma.AdditiveActualFindManyArgs
+  ): Promise<PrismaAdditiveActual[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .additiveActuals(args);
   }
 
   async findBomItems(

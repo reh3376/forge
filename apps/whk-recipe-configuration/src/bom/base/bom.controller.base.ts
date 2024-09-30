@@ -29,6 +29,9 @@ import { BomUpdateInput } from "./BomUpdateInput";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
+import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
+import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
+import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -370,6 +373,144 @@ export class BomControllerBase {
   ): Promise<void> {
     const data = {
       bomItem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/mashingData")
+  @ApiNestedQuery(MashingDatumFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "MashingDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findMashingData(
+    @common.Req() request: Request,
+    @common.Param() params: BomWhereUniqueInput
+  ): Promise<MashingDatum[]> {
+    const query = plainToClass(MashingDatumFindManyArgs, request.query);
+    const results = await this.service.findMashingData(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        backsetQuantity: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        cookCompleteTime: true,
+        cookDropTime: true,
+        cookDuration: true,
+        cookStartTime: true,
+        cookStartedBy: true,
+        cookerNumber: true,
+        cornQuantity: true,
+        createdAt: true,
+        dropDuration: true,
+        id: true,
+        maltQuantity: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        preMaltQuantity: true,
+
+        recipeBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        ryeQuantity: true,
+        specialtyQuantity: true,
+        totalDuration: true,
+        updatedAt: true,
+        waterQuantity: true,
+        wheatQuantity: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/mashingData")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async connectMashingData(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: MashingDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingData: {
+        connect: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/mashingData")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async updateMashingData(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: MashingDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingData: {
+        set: body,
+      },
+    };
+    await this.service.updateBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/mashingData")
+  @nestAccessControl.UseRoles({
+    resource: "Bom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMashingData(
+    @common.Param() params: BomWhereUniqueInput,
+    @common.Body() body: MashingDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingData: {
         disconnect: body,
       },
     };

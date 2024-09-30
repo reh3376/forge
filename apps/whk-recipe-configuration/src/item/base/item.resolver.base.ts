@@ -25,6 +25,8 @@ import { ItemFindManyArgs } from "./ItemFindManyArgs";
 import { ItemFindUniqueArgs } from "./ItemFindUniqueArgs";
 import { CreateItemArgs } from "./CreateItemArgs";
 import { UpdateItemArgs } from "./UpdateItemArgs";
+import { AdditiveActualFindManyArgs } from "../../additiveActual/base/AdditiveActualFindManyArgs";
+import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
@@ -151,6 +153,26 @@ export class ItemResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [AdditiveActual], { name: "additiveActuals" })
+  @nestAccessControl.UseRoles({
+    resource: "AdditiveActual",
+    action: "read",
+    possession: "any",
+  })
+  async findAdditiveActuals(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: AdditiveActualFindManyArgs
+  ): Promise<AdditiveActual[]> {
+    const results = await this.service.findAdditiveActuals(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

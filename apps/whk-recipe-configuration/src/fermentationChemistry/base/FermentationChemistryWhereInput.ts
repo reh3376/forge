@@ -19,8 +19,6 @@ import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { MashDatumListRelationFilter } from "../../mashDatum/base/MashDatumListRelationFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
@@ -95,30 +93,6 @@ class FermentationChemistryWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => LotWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => LotWhereUniqueInput)
-  @IsOptional()
-  @Field(() => LotWhereUniqueInput, {
-    nullable: true,
-  })
-  lot?: LotWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashData?: MashDatumListRelationFilter;
 
   @ApiProperty({
     required: false,
