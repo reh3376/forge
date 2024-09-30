@@ -29,9 +29,6 @@ import { FermentationChemistryUpdateInput } from "./FermentationChemistryUpdateI
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
-import { MashDatumWhereUniqueInput } from "../../mashDatum/base/MashDatumWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -69,12 +66,6 @@ export class FermentationChemistryControllerBase {
           connect: data.batch,
         },
 
-        lot: data.lot
-          ? {
-              connect: data.lot,
-            }
-          : undefined,
-
         operation: {
           connect: data.operation,
         },
@@ -109,12 +100,6 @@ export class FermentationChemistryControllerBase {
 
         createdAt: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
 
         operation: {
           select: {
@@ -176,12 +161,6 @@ export class FermentationChemistryControllerBase {
         createdAt: true,
         id: true,
 
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
         operation: {
           select: {
             id: true,
@@ -240,12 +219,6 @@ export class FermentationChemistryControllerBase {
 
         createdAt: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
 
         operation: {
           select: {
@@ -309,12 +282,6 @@ export class FermentationChemistryControllerBase {
             connect: data.batch,
           },
 
-          lot: data.lot
-            ? {
-                connect: data.lot,
-              }
-            : undefined,
-
           operation: {
             connect: data.operation,
           },
@@ -349,12 +316,6 @@ export class FermentationChemistryControllerBase {
 
           createdAt: true,
           id: true,
-
-          lot: {
-            select: {
-              id: true,
-            },
-          },
 
           operation: {
             select: {
@@ -509,126 +470,6 @@ export class FermentationChemistryControllerBase {
   ): Promise<void> {
     const data = {
       dailyData: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateFermentationChemistry({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/mashData")
-  @ApiNestedQuery(MashDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "MashDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashData(
-    @common.Req() request: Request,
-    @common.Param() params: FermentationChemistryWhereUniqueInput
-  ): Promise<MashDatum[]> {
-    const query = plainToClass(MashDatumFindManyArgs, request.query);
-    const results = await this.service.findMashData(params.id, {
-      ...query,
-      select: {
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        backSetPH: true,
-        backsetVolume: true,
-        balling: true,
-        cornLbs: true,
-        createdAt: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-        maltLbs: true,
-        pH: true,
-        ryeLbs: true,
-        updatedAt: true,
-        waterVolume: true,
-        wheatLbs: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/mashData")
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "update",
-    possession: "any",
-  })
-  async connectMashData(
-    @common.Param() params: FermentationChemistryWhereUniqueInput,
-    @common.Body() body: MashDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      mashData: {
-        connect: body,
-      },
-    };
-    await this.service.updateFermentationChemistry({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/mashData")
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "update",
-    possession: "any",
-  })
-  async updateMashData(
-    @common.Param() params: FermentationChemistryWhereUniqueInput,
-    @common.Body() body: MashDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      mashData: {
-        set: body,
-      },
-    };
-    await this.service.updateFermentationChemistry({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/mashData")
-  @nestAccessControl.UseRoles({
-    resource: "FermentationChemistry",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectMashData(
-    @common.Param() params: FermentationChemistryWhereUniqueInput,
-    @common.Body() body: MashDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      mashData: {
         disconnect: body,
       },
     };

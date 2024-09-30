@@ -27,11 +27,8 @@ import { CreateFermentationChemistryArgs } from "./CreateFermentationChemistryAr
 import { UpdateFermentationChemistryArgs } from "./UpdateFermentationChemistryArgs";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
 import { Asset } from "../../asset/base/Asset";
 import { Batch } from "../../batch/base/Batch";
-import { Lot } from "../../lot/base/Lot";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
@@ -112,12 +109,6 @@ export class FermentationChemistryResolverBase {
           connect: args.data.batch,
         },
 
-        lot: args.data.lot
-          ? {
-              connect: args.data.lot,
-            }
-          : undefined,
-
         operation: {
           connect: args.data.operation,
         },
@@ -160,12 +151,6 @@ export class FermentationChemistryResolverBase {
           batch: {
             connect: args.data.batch,
           },
-
-          lot: args.data.lot
-            ? {
-                connect: args.data.lot,
-              }
-            : undefined,
 
           operation: {
             connect: args.data.operation,
@@ -215,26 +200,6 @@ export class FermentationChemistryResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
-  @nestAccessControl.UseRoles({
-    resource: "MashDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashData(
-    @graphql.Parent() parent: FermentationChemistry,
-    @graphql.Args() args: MashDatumFindManyArgs
-  ): Promise<MashDatum[]> {
-    const results = await this.service.findMashData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Asset, {
     nullable: true,
     name: "asset",
@@ -269,27 +234,6 @@ export class FermentationChemistryResolverBase {
     @graphql.Parent() parent: FermentationChemistry
   ): Promise<Batch | null> {
     const result = await this.service.getBatch(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Lot, {
-    nullable: true,
-    name: "lot",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Lot",
-    action: "read",
-    possession: "any",
-  })
-  async getLot(
-    @graphql.Parent() parent: FermentationChemistry
-  ): Promise<Lot | null> {
-    const result = await this.service.getLot(parent.id);
 
     if (!result) {
       return null;

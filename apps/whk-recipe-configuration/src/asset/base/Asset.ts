@@ -33,7 +33,7 @@ import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
+import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 
 @ObjectType()
@@ -205,12 +205,12 @@ class Asset {
 
   @ApiProperty({
     required: false,
-    type: () => [MashDatum],
+    type: () => [MashingDatum],
   })
   @ValidateNested()
-  @Type(() => MashDatum)
+  @Type(() => MashingDatum)
   @IsOptional()
-  mashData?: Array<MashDatum>;
+  mashingData?: Array<MashingDatum>;
 
   @ApiProperty({
     required: true,
