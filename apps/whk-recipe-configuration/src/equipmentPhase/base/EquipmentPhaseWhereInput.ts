@@ -324,7 +324,7 @@ class EquipmentPhaseWhereInput {
     | "Wheat"
     | "Malt"
     | "Premalt"
-    | "Speciality"
+    | "Specialty"
     | "Enzyme"
     | "Nutrient"
     | "Yeast"

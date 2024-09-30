@@ -28,7 +28,6 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { Customer } from "../../customer/base/Customer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
@@ -108,7 +107,7 @@ class ProductionOrder {
   @Field(() => Float, {
     nullable: true,
   })
-  completedQuantity!: Decimal | null;
+  completedQuantity!: number | null;
 
   @ApiProperty({
     required: true,
