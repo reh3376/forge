@@ -17,7 +17,7 @@ import * as fs from "fs";
 import { Expose, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CustomerUpdateInput } from '../customer/base/CustomerUpdateInput';
-import { CustomerCreateInput } from 'src/customer/base/CustomerCreateInput';
+import { CustomerCreateInput } from '../customer/base/CustomerCreateInput';
 import { BomCreateInput } from '../bom/BomCreateInput';
 import { BomUpdateInput } from '../bom/BomUpdateInput';
 import { BomItemCreateInput } from '../bomItem/BomItemCreateInput';

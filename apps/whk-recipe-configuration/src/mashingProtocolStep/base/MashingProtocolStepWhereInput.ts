@@ -21,7 +21,7 @@ import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/Mash
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
-import { FloatNullableFilter } from "src/util/FloatNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class MashingProtocolStepWhereInput {
