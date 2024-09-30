@@ -176,6 +176,7 @@ model Operation {
   instances               Operation[]                @relation(name: "OperationClassIdOperationInstances")
   isClassDefinition       Boolean?                   @default(false)
   lotId                   String?                    @unique
+  mashingData             MashingDatum[]
   name                    EnumOperationName
   path                    String?
   procedureSequenceIndex  Int                        @default(0)
@@ -267,6 +268,7 @@ model Bom {
   inactive              Boolean?          @default(false)
   item                  Item              @relation(fields: [itemId], references: [id])
   itemId                String
+  mashingData           MashingDatum[]
   notes                 String?
   productionOrder       ProductionOrder[]
   schemaVersion         String?           @default("0001-alpha")
@@ -418,6 +420,7 @@ model ScheduleOrder {
 
 model Item {
   active             Boolean?            @default(true)
+  additiveActuals    AdditiveActual[]
   bomItems           BomItem[]
   bomsWipItem        Bom[]
   createdAt          DateTime            @default(now())
@@ -573,7 +576,7 @@ model Asset {
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
   itemReceipts            ItemReceipt[]
   lots                    Lot[]
-  mashData                MashDatum[]
+  mashingData             MashingDatum[]
   name                    String
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
   parentId                String?
@@ -582,6 +585,7 @@ model Asset {
   schemaVersion           String                  @default("0001-alpha")
   updatedAt               DateTime                @updatedAt
   updatedBy               String?
+  MashDatum               MashDatum[]
 
   @@unique([name, revision])
 }
@@ -617,29 +621,50 @@ model ItemReceipt {
 }
 
 model Lot {
+  avgBblFillByPg              Float?
+  avgBblFillByWg              Float?
+  avgPGsFerm                  Float?
   batches                     Batch[]
+  bblEntryProof               Float?
+  bblOem                      String?
+  bblTotal                    Int?
+  bblType                     String?
   bomItems                    BomItem[]
-  createdAt                   DateTime               @default(now())
+  confirmed                   Boolean?            @default(false)
+  createdAt                   DateTime            @default(now())
   createdBy                   String?
-  externalId                  String?                @unique
-  fermentationChemistries     FermentationChemistry?
-  fromAsset                   Asset?                 @relation(fields: [fromAssetId], references: [id])
+  densityFinal                Float?
+  externalId                  String?             @unique
+  fromAsset                   Asset?              @relation(fields: [fromAssetId], references: [id])
   fromAssetId                 String?
-  globalId                    String?                @unique @default(cuid())
-  id                          String                 @id @default(cuid())
+  globalId                    String?             @unique @default(cuid())
+  grainLbsFerm                Float?
+  grainLbsPg                  Float?
+  id                          String              @id @default(cuid())
   inventoryTransfers          InventoryTransfer[]
-  isRawMaterial               Boolean?               @default(false)
-  item                        Item?                  @relation(fields: [itemId], references: [id])
+  isRawMaterial               Boolean?            @default(false)
+  item                        Item?               @relation(fields: [itemId], references: [id])
   itemId                      String?
-  productionOrder             ProductionOrder?       @relation(fields: [productionOrderId], references: [id])
+  lotNumber                   String              @unique
+  notes                       String?
+  pgLosses                    Float?
+  productionOrder             ProductionOrder?    @relation(fields: [productionOrderId], references: [id])
   productionOrderId           String?
-  purchaseOrderAcceptedLots   PurchaseOrder?         @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
+  purchaseOrderAcceptedLots   PurchaseOrder?      @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
   purchaseOrderAcceptedLotsId String?
-  recipe                      Recipe?                @relation(fields: [recipeId], references: [id])
+  recipe                      Recipe?             @relation(fields: [recipeId], references: [id])
   recipeId                    String?
-  schemaVersion               String?                @default("0001-b")
-  updatedAt                   DateTime               @updatedAt
-  lotNumber                   String                 @unique
+  schemaVersion               String?             @default("0001-b")
+  standardYield               Float?
+  totalFermenters             Float?
+  totalPGs                    Float?
+  totalPGsByRecipe            Float?
+  totalVolumeWg               Float?
+  totalWGs                    Float?
+  totalWeight                 Float?
+  updatedAt                   DateTime            @updatedAt
+  warehouseEntryNumber        Int?
+  whiskeyType                 EnumLotWhiskeyType?
 }
 
 model BomItem {
@@ -686,9 +711,6 @@ model FermentationChemistry {
   createdAt         DateTime                  @default(now())
   dailyData         FermentationDayDatum[]
   id                String                    @id @default(cuid())
-  lot               Lot?                      @relation(fields: [lotId], references: [id])
-  lotId             String?                   @unique
-  mashData          MashDatum[]
   operation         Operation                 @relation(fields: [operationId], references: [id])
   operationId       String
   productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
@@ -696,6 +718,7 @@ model FermentationChemistry {
   settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
   settingDataId     String?                   @unique
   updatedAt         DateTime                  @updatedAt
+  MashDatum         MashDatum[]
 }
 
 model MashDatum {
@@ -973,6 +996,7 @@ model MashingProtocolStep {
 model RecipeBom {
   createdAt                      DateTime                        @default(now())
   id                             String                          @id @default(cuid())
+  mashingData                    MashingDatum[]
   master                         Boolean?                        @default(false)
   masterInstances                RecipeBom[]                     @relation(name: "masterRecipeBom")
   masterRecipeBom                RecipeBom?                      @relation(name: "masterRecipeBom", fields: [masterReceipeBomId], references: [id])
@@ -1002,6 +1026,50 @@ model ProductionOrderRecipeInstance {
   recipeBom         RecipeBom[]
   updatedAt         DateTime          @updatedAt
   updatedBy         String?
+}
+
+model MashingDatum {
+  additiveActuals   AdditiveActual[]
+  asset             Asset?           @relation(fields: [assetId], references: [id])
+  assetId           String?
+  backsetQuantity   Int?
+  bom               Bom?             @relation(fields: [bomId], references: [id])
+  bomId             String?
+  cookCompleteTime  DateTime?
+  cookDropTime      DateTime?
+  cookDuration      Int?
+  cookStartTime     DateTime?
+  cookStartedBy     String?
+  cookerNumber      Int?
+  cornQuantity      Int?
+  createdAt         DateTime         @default(now())
+  dropDuration      Int?
+  id                String           @id @default(cuid())
+  maltQuantity      Int?
+  operation         Operation?       @relation(fields: [operationId], references: [id])
+  operationId       String?
+  preMaltQuantity   Int?
+  recipeBom         RecipeBom?       @relation(fields: [recipeBomId], references: [id])
+  recipeBomId       String?
+  ryeQuantity       Int?
+  specialtyQuantity Int?
+  totalDuration     Int?
+  updatedAt         DateTime         @updatedAt
+  waterQuantity     Int?
+  wheatQuantity     Int?
+}
+
+model AdditiveActual {
+  createdAt      DateTime      @default(now())
+  id             String        @id @default(cuid())
+  item           Item?         @relation(fields: [itemId], references: [id])
+  itemId         String?
+  itemNumber     String
+  lotNumber      String
+  mashingDatum   MashingDatum? @relation(fields: [mashingDatumId], references: [id])
+  mashingDatumId String?
+  quantity       Int
+  updatedAt      DateTime      @updatedAt
 }
 
 enum EnumPhaseParameterSetpointType {
@@ -1151,6 +1219,16 @@ enum EnumItemReceiptStatus {
   Complete
   Rejected
   Hold
+}
+
+enum EnumLotWhiskeyType {
+  AmericanSingleMalt
+  CornBourbon
+  CornWhiskey
+  RyeBourbon
+  RyeWhiskey
+  WheatedBourbon
+  WheatWhiskey
 }
 
 enum EnumFermentationDayDatumDay {

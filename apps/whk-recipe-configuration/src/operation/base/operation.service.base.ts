@@ -18,6 +18,7 @@ import {
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   FermentationSettingDatum as PrismaFermentationSettingDatum,
+  MashingDatum as PrismaMashingDatum,
   UnitProcedure as PrismaUnitProcedure,
 } from "@prisma/client";
 
@@ -109,6 +110,17 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .instances(args);
+  }
+
+  async findMashingData(
+    parentId: string,
+    args: Prisma.MashingDatumFindManyArgs
+  ): Promise<PrismaMashingDatum[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .mashingData(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaOperation | null> {

@@ -22,7 +22,7 @@ import {
   InventoryTransfer as PrismaInventoryTransfer,
   ItemReceipt as PrismaItemReceipt,
   Lot as PrismaLot,
-  MashDatum as PrismaMashDatum,
+  MashingDatum as PrismaMashingDatum,
   PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
@@ -159,15 +159,15 @@ export class AssetServiceBase {
       .lots(args);
   }
 
-  async findMashData(
+  async findMashingData(
     parentId: string,
-    args: Prisma.MashDatumFindManyArgs
-  ): Promise<PrismaMashDatum[]> {
+    args: Prisma.MashingDatumFindManyArgs
+  ): Promise<PrismaMashingDatum[]> {
     return this.prisma.asset
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .mashData(args);
+      .mashingData(args);
   }
 
   async findPurchaseOrders(

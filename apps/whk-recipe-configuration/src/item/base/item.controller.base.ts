@@ -26,6 +26,9 @@ import { Item } from "./Item";
 import { ItemFindManyArgs } from "./ItemFindManyArgs";
 import { ItemWhereUniqueInput } from "./ItemWhereUniqueInput";
 import { ItemUpdateInput } from "./ItemUpdateInput";
+import { AdditiveActualFindManyArgs } from "../../additiveActual/base/AdditiveActualFindManyArgs";
+import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
+import { AdditiveActualWhereUniqueInput } from "../../additiveActual/base/AdditiveActualWhereUniqueInput";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
@@ -279,6 +282,118 @@ export class ItemControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/additiveActuals")
+  @ApiNestedQuery(AdditiveActualFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "AdditiveActual",
+    action: "read",
+    possession: "any",
+  })
+  async findAdditiveActuals(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<AdditiveActual[]> {
+    const query = plainToClass(AdditiveActualFindManyArgs, request.query);
+    const results = await this.service.findAdditiveActuals(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemNumber: true,
+        lotNumber: true,
+
+        mashingDatum: {
+          select: {
+            id: true,
+          },
+        },
+
+        quantity: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/additiveActuals")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectAdditiveActuals(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: AdditiveActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      additiveActuals: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/additiveActuals")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateAdditiveActuals(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: AdditiveActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      additiveActuals: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/additiveActuals")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectAdditiveActuals(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: AdditiveActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      additiveActuals: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -1029,15 +1144,18 @@ export class ItemControllerBase {
     const results = await this.service.findLots(params.id, {
       ...query,
       select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
         createdAt: true,
         createdBy: true,
+        densityFinal: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
 
         fromAsset: {
           select: {
@@ -1046,6 +1164,8 @@ export class ItemControllerBase {
         },
 
         globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
         id: true,
         isRawMaterial: true,
 
@@ -1056,6 +1176,8 @@ export class ItemControllerBase {
         },
 
         lotNumber: true,
+        notes: true,
+        pgLosses: true,
 
         productionOrder: {
           select: {
@@ -1076,7 +1198,16 @@ export class ItemControllerBase {
         },
 
         schemaVersion: true,
+        standardYield: true,
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
         updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
       },
     });
     if (results === null) {

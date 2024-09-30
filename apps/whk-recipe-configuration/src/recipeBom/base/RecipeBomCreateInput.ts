@@ -11,15 +11,16 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { MashingDatumCreateNestedManyWithoutRecipeBomsInput } from "./MashingDatumCreateNestedManyWithoutRecipeBomsInput";
 import {
-  IsBoolean,
-  IsOptional,
   ValidateNested,
+  IsOptional,
+  IsBoolean,
   IsString,
   MaxLength,
 } from "class-validator";
-import { RecipeBomCreateNestedManyWithoutRecipeBomsInput } from "./RecipeBomCreateNestedManyWithoutRecipeBomsInput";
 import { Type } from "class-transformer";
+import { RecipeBomCreateNestedManyWithoutRecipeBomsInput } from "./RecipeBomCreateNestedManyWithoutRecipeBomsInput";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput";
 import { RecipeCreateNestedManyWithoutRecipeBomsInput } from "./RecipeCreateNestedManyWithoutRecipeBomsInput";
@@ -27,6 +28,18 @@ import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBo
 
 @InputType()
 class RecipeBomCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => MashingDatumCreateNestedManyWithoutRecipeBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingDatumCreateNestedManyWithoutRecipeBomsInput)
+  @IsOptional()
+  @Field(() => MashingDatumCreateNestedManyWithoutRecipeBomsInput, {
+    nullable: true,
+  })
+  mashingData?: MashingDatumCreateNestedManyWithoutRecipeBomsInput;
+
   @ApiProperty({
     required: false,
     type: Boolean,

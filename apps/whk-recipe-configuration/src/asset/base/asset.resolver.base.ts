@@ -41,8 +41,8 @@ import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindM
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
-import { MashDatumFindManyArgs } from "../../mashDatum/base/MashDatumFindManyArgs";
-import { MashDatum } from "../../mashDatum/base/MashDatum";
+import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
+import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { AssetService } from "../asset.service";
@@ -370,17 +370,17 @@ export class AssetResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashDatum], { name: "mashData" })
+  @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
   @nestAccessControl.UseRoles({
-    resource: "MashDatum",
+    resource: "MashingDatum",
     action: "read",
     possession: "any",
   })
-  async findMashData(
+  async findMashingData(
     @graphql.Parent() parent: Asset,
-    @graphql.Args() args: MashDatumFindManyArgs
-  ): Promise<MashDatum[]> {
-    const results = await this.service.findMashData(parent.id, args);
+    @graphql.Args() args: MashingDatumFindManyArgs
+  ): Promise<MashingDatum[]> {
+    const results = await this.service.findMashingData(parent.id, args);
 
     if (!results) {
       return [];

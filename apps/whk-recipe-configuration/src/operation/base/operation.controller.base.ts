@@ -38,6 +38,9 @@ import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum
 import { FermentationSettingDatumFindManyArgs } from "../../fermentationSettingDatum/base/FermentationSettingDatumFindManyArgs";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
+import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
+import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
+import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -466,12 +469,6 @@ export class OperationControllerBase {
 
         createdAt: true,
         id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
 
         operation: {
           select: {
@@ -935,6 +932,144 @@ export class OperationControllerBase {
   ): Promise<void> {
     const data = {
       instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/mashingData")
+  @ApiNestedQuery(MashingDatumFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "MashingDatum",
+    action: "read",
+    possession: "any",
+  })
+  async findMashingData(
+    @common.Req() request: Request,
+    @common.Param() params: OperationWhereUniqueInput
+  ): Promise<MashingDatum[]> {
+    const query = plainToClass(MashingDatumFindManyArgs, request.query);
+    const results = await this.service.findMashingData(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        backsetQuantity: true,
+
+        bom: {
+          select: {
+            id: true,
+          },
+        },
+
+        cookCompleteTime: true,
+        cookDropTime: true,
+        cookDuration: true,
+        cookStartTime: true,
+        cookStartedBy: true,
+        cookerNumber: true,
+        cornQuantity: true,
+        createdAt: true,
+        dropDuration: true,
+        id: true,
+        maltQuantity: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        preMaltQuantity: true,
+
+        recipeBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        ryeQuantity: true,
+        specialtyQuantity: true,
+        totalDuration: true,
+        updatedAt: true,
+        waterQuantity: true,
+        wheatQuantity: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/mashingData")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async connectMashingData(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: MashingDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingData: {
+        connect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/mashingData")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async updateMashingData(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: MashingDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingData: {
+        set: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/mashingData")
+  @nestAccessControl.UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMashingData(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: MashingDatumWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingData: {
         disconnect: body,
       },
     };

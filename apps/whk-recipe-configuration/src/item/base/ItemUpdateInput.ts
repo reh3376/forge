@@ -20,8 +20,9 @@ import {
   IsInt,
   Max,
 } from "class-validator";
-import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
+import { AdditiveActualUpdateManyWithoutItemsInput } from "./AdditiveActualUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
 import { InventoryUpdateManyWithoutItemsInput } from "./InventoryUpdateManyWithoutItemsInput";
 import { InventoryLogUpdateManyWithoutItemsInput } from "./InventoryLogUpdateManyWithoutItemsInput";
@@ -47,6 +48,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   active?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AdditiveActualUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => AdditiveActualUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => AdditiveActualUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  additiveActuals?: AdditiveActualUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

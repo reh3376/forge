@@ -15,6 +15,7 @@ import {
   Prisma,
   Bom as PrismaBom,
   BomItem as PrismaBomItem,
+  MashingDatum as PrismaMashingDatum,
   ProductionOrder as PrismaProductionOrder,
   UnitProcedure as PrismaUnitProcedure,
   Item as PrismaItem,
@@ -52,6 +53,17 @@ export class BomServiceBase {
         where: { id: parentId },
       })
       .bomItem(args);
+  }
+
+  async findMashingData(
+    parentId: string,
+    args: Prisma.MashingDatumFindManyArgs
+  ): Promise<PrismaMashingDatum[]> {
+    return this.prisma.bom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .mashingData(args);
   }
 
   async findProductionOrder(

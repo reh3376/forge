@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
+import { AdditiveActualListRelationFilter } from "../../additiveActual/base/AdditiveActualListRelationFilter";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
@@ -43,6 +44,18 @@ class ItemWhereInput {
     nullable: true,
   })
   active?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AdditiveActualListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => AdditiveActualListRelationFilter)
+  @IsOptional()
+  @Field(() => AdditiveActualListRelationFilter, {
+    nullable: true,
+  })
+  additiveActuals?: AdditiveActualListRelationFilter;
 
   @ApiProperty({
     required: false,

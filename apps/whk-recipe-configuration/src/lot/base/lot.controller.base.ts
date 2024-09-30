@@ -62,12 +62,6 @@ export class LotControllerBase {
       data: {
         ...data,
 
-        fermentationChemistries: data.fermentationChemistries
-          ? {
-              connect: data.fermentationChemistries,
-            }
-          : undefined,
-
         fromAsset: data.fromAsset
           ? {
               connect: data.fromAsset,
@@ -99,15 +93,18 @@ export class LotControllerBase {
           : undefined,
       },
       select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
         createdAt: true,
         createdBy: true,
+        densityFinal: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
 
         fromAsset: {
           select: {
@@ -116,6 +113,8 @@ export class LotControllerBase {
         },
 
         globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
         id: true,
         isRawMaterial: true,
 
@@ -126,6 +125,8 @@ export class LotControllerBase {
         },
 
         lotNumber: true,
+        notes: true,
+        pgLosses: true,
 
         productionOrder: {
           select: {
@@ -146,7 +147,16 @@ export class LotControllerBase {
         },
 
         schemaVersion: true,
+        standardYield: true,
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
         updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
       },
     });
   }
@@ -168,15 +178,18 @@ export class LotControllerBase {
     return this.service.lots({
       ...args,
       select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
         createdAt: true,
         createdBy: true,
+        densityFinal: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
 
         fromAsset: {
           select: {
@@ -185,6 +198,8 @@ export class LotControllerBase {
         },
 
         globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
         id: true,
         isRawMaterial: true,
 
@@ -195,6 +210,8 @@ export class LotControllerBase {
         },
 
         lotNumber: true,
+        notes: true,
+        pgLosses: true,
 
         productionOrder: {
           select: {
@@ -215,7 +232,16 @@ export class LotControllerBase {
         },
 
         schemaVersion: true,
+        standardYield: true,
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
         updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
       },
     });
   }
@@ -236,15 +262,18 @@ export class LotControllerBase {
     const result = await this.service.lot({
       where: params,
       select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
         createdAt: true,
         createdBy: true,
+        densityFinal: true,
         externalId: true,
-
-        fermentationChemistries: {
-          select: {
-            id: true,
-          },
-        },
 
         fromAsset: {
           select: {
@@ -253,6 +282,8 @@ export class LotControllerBase {
         },
 
         globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
         id: true,
         isRawMaterial: true,
 
@@ -263,6 +294,8 @@ export class LotControllerBase {
         },
 
         lotNumber: true,
+        notes: true,
+        pgLosses: true,
 
         productionOrder: {
           select: {
@@ -283,7 +316,16 @@ export class LotControllerBase {
         },
 
         schemaVersion: true,
+        standardYield: true,
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
         updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
       },
     });
     if (result === null) {
@@ -319,12 +361,6 @@ export class LotControllerBase {
         data: {
           ...data,
 
-          fermentationChemistries: data.fermentationChemistries
-            ? {
-                connect: data.fermentationChemistries,
-              }
-            : undefined,
-
           fromAsset: data.fromAsset
             ? {
                 connect: data.fromAsset,
@@ -356,15 +392,18 @@ export class LotControllerBase {
             : undefined,
         },
         select: {
+          avgBblFillByPg: true,
+          avgBblFillByWg: true,
+          avgPGsFerm: true,
+          bblEntryProof: true,
+          bblOem: true,
+          bblTotal: true,
+          bblType: true,
+          confirmed: true,
           createdAt: true,
           createdBy: true,
+          densityFinal: true,
           externalId: true,
-
-          fermentationChemistries: {
-            select: {
-              id: true,
-            },
-          },
 
           fromAsset: {
             select: {
@@ -373,6 +412,8 @@ export class LotControllerBase {
           },
 
           globalId: true,
+          grainLbsFerm: true,
+          grainLbsPg: true,
           id: true,
           isRawMaterial: true,
 
@@ -383,6 +424,8 @@ export class LotControllerBase {
           },
 
           lotNumber: true,
+          notes: true,
+          pgLosses: true,
 
           productionOrder: {
             select: {
@@ -403,7 +446,16 @@ export class LotControllerBase {
           },
 
           schemaVersion: true,
+          standardYield: true,
+          totalFermenters: true,
+          totalPGs: true,
+          totalPGsByRecipe: true,
+          totalVolumeWg: true,
+          totalWGs: true,
+          totalWeight: true,
           updatedAt: true,
+          warehouseEntryNumber: true,
+          whiskeyType: true,
         },
       });
     } catch (error) {

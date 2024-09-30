@@ -10,10 +10,10 @@ services:
     environment:
       BCRYPT_SALT: ${BCRYPT_SALT}
       DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      LOG_LEVEL: ${LOG_LEVEL}
-      SERVICE_NAME: ${SERVICE_NAME}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
+      LOG_LEVEL: ${LOG_LEVEL}
+      SERVICE_NAME: ${SERVICE_NAME}
       JAEGER_AGENT_HOST: ${JAEGER_AGENT_HOST}
       JAEGER_AGENT_PORT: ${JAEGER_AGENT_PORT}
       OTEL_COLLECTOR_HOST: ${OTEL_COLLECTOR_HOST}
@@ -66,14 +66,13 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
-  rabbitmq:
-    image: rabbitmq:3-management
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
+  redis:
+    container_name: ${REDIS_HOST}
+    image: redis:7
     ports:
-      - 5672:5672
-      - 15672:15672
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis:/data
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
@@ -94,13 +93,14 @@ services:
       - --config=/etc/otel-config.yml
     depends_on:
       - jaeger
-  redis:
-    container_name: ${REDIS_HOST}
-    image: redis:7
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
     ports:
-      - ${REDIS_PORT}:6379
-    volumes:
-      - redis:/data
+      - 5672:5672
+      - 15672:15672
 volumes:
   postgres: ~
   redis:
