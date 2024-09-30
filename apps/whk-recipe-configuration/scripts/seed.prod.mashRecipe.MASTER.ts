@@ -17,9 +17,9 @@ const BBL_ITEM_NUMBERS = [
   'BBL-WVG02-53-06-4-0-0-Standard4',
 ]
 
-const YEAST_ITEM_NUMBERS_QTYS = [{
+const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
   'YEA-FER01-Yeast (USW6)': 10,
-}]
+}
 
 /* 
 MAXIMUM GRAIN WEIGHTS IN BINS 
@@ -92,15 +92,15 @@ async function seed() {
 
   console.info("Seeding database with custom seed for Mashing Recipe...");
 
-  // ------------------------------------ BOM CREATION ------------------------------------
+        // ------------------------------------ BOM CREATION ------------------------------------
   // Base BOM Items
   const waterItemId = 'clyd1ofw2009yfd4504c6wt1w'
   const backsetItemId = 'clyd1oftx006jfd4514hrak80'
-  const viscofermItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const liquozymeItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const diazymeItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const termamylItemId = 'clyd1ofw2009yfd4504c6wt1w'
-  const saczymeItemId = 'clyd1ofw2009yfd4504c6wt1w'
+  const viscofermItemId = 'clyd1ofou0024fd45e71gyxcu'
+  const liquozymeItemId = 'clzhhlwfj0f8ysuwb7whvgy9s'
+  const diazymeItemId = 'clzhhlsx30f09mbc9r5mj02z7'
+  const termamylItemId = 'clzelxl5v005osuwb3rfax6ix'
+  const saczymeItemId = 'clyd1ofot0022fd45d8j321v4'
   const maltItemId = 'clyd1ofw0009ufd45hlzpnqa9'
   const ryeItemId = 'clyd1ofy600d9fd45p99px0c0'
   const cornItemId = 'clyd1ofw1009wfd45oghso7y5'
@@ -116,172 +116,187 @@ async function seed() {
       itemNumber: `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`
     }
   })
-  const baseBom = await client.bom.create({
-    data: {
-      bomRevision: BOM_REVISION,
-      bomName: `BOM-${CUSTOMER_CODE}-${MASH_BILL}`,
-      createdBy: USER,
-      item: {
-        connect: {
-          id: fgItem?.id
-        }
-      }
+
+  // Check for existing BOM with the same revision
+  const existingBom = await client.bom.findFirst({
+    where: {
+      bomRevision: BOM_REVISION
     }
   });
 
-  // add the base bom items
-  await client.bomItem.createMany({
-    data: [
-      {
-        bomId: baseBom.id,
-        itemId: waterItemId,
-        quantity: WATER_QTY,
+  if (existingBom) {
+    console.log(`BOM with revision ${BOM_REVISION} already exists. Skipping creation.`);
+  } else {
+    const baseBom = await client.bom.create({
+      data: {
+        bomRevision: BOM_REVISION,
+        bomName: `BOM-${CUSTOMER_CODE}-${MASH_BILL}`,
         createdBy: USER,
-        isClassDefinition: true
-      },
-      {
-        bomId: baseBom.id,
-        itemId: backsetItemId,
-        quantity: BACKSET_QTY,
-        createdBy: USER,
-        isClassDefinition: true
-      },
-      {
-        bomId: baseBom.id,
-        itemId: citricItemId,
-        quantity: 0,
-        createdBy: USER,
-        isClassDefinition: true
+        item: {
+          connect: {
+            id: fgItem?.id
+          }
+        }
       }
-    ]
-  })
-
-  // add the barrel bom items
-  for (const itemNumber of BBL_ITEM_NUMBERS) {
-    const itemId = await client.item.findFirst({
-      where: {
-        itemNumber: itemNumber
-      },
     });
-    if (itemId) {
-      await client.bomItem.create({
-        data: {
+    // add the base bom items
+    await client.bomItem.createMany({
+      data: [
+        {
           bomId: baseBom.id,
-          itemId: itemId?.id,
-          quantity: 1 / BBL_ITEM_NUMBERS.length,
+          itemId: waterItemId,
+          quantity: WATER_QTY,
+          createdBy: USER,
+          isClassDefinition: true
+        },
+        {
+          bomId: baseBom.id,
+          itemId: backsetItemId,
+          quantity: BACKSET_QTY,
+          createdBy: USER,
+          isClassDefinition: true
+        },
+        {
+          bomId: baseBom.id,
+          itemId: citricItemId,
+          quantity: 0,
           createdBy: USER,
           isClassDefinition: true
         }
-      })
-    }
-  }
-
-  // add the yeast items
-  for (const [yeastItemNumber, quantity] of Object.entries(YEAST_ITEM_NUMBERS_QTYS)) {
-    const item = await client.item.findFirst({
-      where: {
-        itemNumber: yeastItemNumber
-      },
-    });
-    if (item) {
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: item.id,
-          quantity: YEAST_ITEM_NUMBERS_QTYS[yeastItemNumber],
-          createdBy: USER,
-          isClassDefinition: true
-        }
+      ]
+    })
+    
+    // add the barrel bom items
+    for (const itemNumber of BBL_ITEM_NUMBERS) {
+      const itemId = await client.item.findFirst({
+        where: {
+          itemNumber: itemNumber
+        },
       });
-    } else {
-      console.log(`Item not found for yeast item number: ${yeastItemNumber}`);
-    }
-  }
-  
-  // Add the bom items for the grains according to the mashingProtocol
-  // Add the bom items for the grains according to the mashingProtocol
-  for (const step of MASHING_PROTOCOL) {
-    if (step.action === "Add Grain") {
-      let itemId;
-      let quantity;
-
-      switch (step.grainType) {
-        case "Corn":
-          itemId = cornItemId;
-          quantity = step.qty || 0;
-          break;
-        case "Rye":
-          itemId = ryeItemId;
-          quantity = step.qty || 0;
-          break;
-        case "Malt":
-          itemId = maltItemId;
-          quantity = step.qty || 0;
-          break;
-        case "Wheat":
-          itemId = wheatItemId;
-          quantity = step.qty || 0;
-          break;
-        default:
-          console.log(`Unknown grain type: ${step.grainType}`);
-          continue;
+      if (itemId) {
+        await client.bomItem.create({
+          data: {
+            bomId: baseBom.id,
+            itemId: itemId?.id,
+            quantity: 1 / BBL_ITEM_NUMBERS.length,
+            createdBy: USER,
+            isClassDefinition: true
+          }
+        })
       }
-
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: itemId,
-          quantity: quantity,
-          createdBy: USER,
-          isClassDefinition: true
-        }
-      });
-
-      console.log(`Added ${step.grainType} to BOM with quantity ${quantity}`);
-    } else if (step.action === "Add Additive") {
-      let itemId;
-      let quantity;
-
-      switch (step.additiveType?.toLowerCase()) {
-        case "viscoferm":
-          itemId = viscofermItemId;
-          quantity = step.qty || 0;
-          break;
-        case "liquozyme":
-          itemId = liquozymeItemId;
-          quantity = step.qty || 0;
-          break;
-        case "diazyme":
-          itemId = diazymeItemId;
-          quantity = step.qty || 0;
-          break;
-        case "termamyl":
-          itemId = termamylItemId;
-          quantity = step.qty || 0;
-          break;
-        case "saczyme":
-          itemId = saczymeItemId;
-          quantity = step.qty || 0;
-          break;  
-        case "termamyl":
-          itemId = termamylItemId;
-          quantity = step.qty || 0;
-          break;
-      }
-
-      await client.bomItem.create({
-        data: {
-          bomId: baseBom.id,
-          itemId: itemId,
-          quantity: quantity,
-          createdBy: USER,
-          isClassDefinition: true
-        }
-      });
-
-      console.log(`Added ${step.additiveType} to BOM with quantity ${quantity}`);
     }
-  }
+    
+    // add the yeast items
+    for (const [yeastItemNumber, quantity] of Object.entries(YEAST_ITEM_NUMBERS_QTYS)) {
+      const item = await client.item.findFirst({
+        where: {
+          itemNumber: yeastItemNumber
+        },
+      });
+      if (item) {
+        await client.bomItem.create({
+          data: {
+            bomId: baseBom.id,
+            itemId: item.id,
+            quantity: YEAST_ITEM_NUMBERS_QTYS[yeastItemNumber],
+            createdBy: USER,
+            isClassDefinition: true
+          }
+        });
+      } else {
+        console.log(`Item not found for yeast item number: ${yeastItemNumber}`);
+      }
+    }
+    
+    // Add the bom items for the grains according to the mashingProtocol
+    // Add the bom items for the grains according to the mashingProtocol
+    for (const step of MASHING_PROTOCOL) {
+      if (step.action === "Add Grain") {
+        let itemId;
+        let quantity: number;
+    
+        switch (step.grainType) {
+          case "Corn":
+            itemId = cornItemId;
+            quantity = step.qty || 0;
+            break;
+          case "Rye":
+            itemId = ryeItemId;
+            quantity = step.qty || 0;
+            break;
+          case "Malt":
+            itemId = maltItemId;
+            quantity = step.qty || 0;
+            break;
+          case "Wheat":
+            itemId = wheatItemId;
+            quantity = step.qty || 0;
+            break;
+          default:
+            console.log(`Unknown grain type: ${step.grainType}`);
+            continue;
+        }
+    
+        if (itemId && quantity) {
+          await client.bomItem.create({
+            data: {
+              bomId: baseBom.id,
+              itemId: itemId,
+              quantity: quantity,
+              createdBy: USER,
+              isClassDefinition: true
+            }
+          });
+          console.log(`Added ${step.grainType} to BOM with quantity ${quantity}`);
+        }
+    
+      } else if (step.action === "Add Additive") {
+        let itemId;
+        let quantity;
+    
+        switch (step.additiveType?.toLowerCase()) {
+          case "viscoferm":
+            itemId = viscofermItemId;
+            quantity = step.qty || 0;
+            break;
+          case "liquozyme":
+            itemId = liquozymeItemId;
+            quantity = step.qty || 0;
+            break;
+          case "diazyme":
+            itemId = diazymeItemId;
+            quantity = step.qty || 0;
+            break;
+          case "termamyl":
+            itemId = termamylItemId;
+            quantity = step.qty || 0;
+            break;
+          case "saczyme":
+            itemId = saczymeItemId;
+            quantity = step.qty || 0;
+            break;  
+          case "termamyl":
+            itemId = termamylItemId;
+            quantity = step.qty || 0;
+            break;
+        }
+    
+        if (itemId && quantity) {
+          await client.bomItem.create({
+            data: {
+              bomId: baseBom.id,
+              itemId: itemId || '',
+              quantity: quantity || 0,
+              createdBy: USER,
+              isClassDefinition: true
+            }
+          });
+          console.log(`Added ${step.additiveType} to BOM with quantity ${quantity}`);
+        }
+      }
+    }
+}
+
 
   // ------------------------------------ END OF BOM CREATION ------------------------------------
 
