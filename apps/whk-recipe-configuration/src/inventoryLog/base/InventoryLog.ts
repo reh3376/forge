@@ -28,7 +28,6 @@ import {
 import { Type } from "class-transformer";
 import { Customer } from "../../customer/base/Customer";
 import { Item } from "../../item/base/Item";
-import { Decimal } from "decimal.js";
 
 @ObjectType()
 class InventoryLog {

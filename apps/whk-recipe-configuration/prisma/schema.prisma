@@ -49,30 +49,39 @@ model PhaseParameter {
 }
 
 model TestParameter {
-  active                 Boolean                            @default(true)
-  schemaVersion          String?
-  testSetpointValue      Float?
-  testParamUnits         String
-  testSetpointUpperLimit Float?
-  testParamRevision      String?
-  testSetpointLowerLimit Float?
-  testResult             Float?
-  createdBy              String
-  testSetpointType       EnumTestParameterTestSetpointType?
-  updatedAt              DateTime?                          @updatedAt
-  equipmentPhases        EquipmentPhase[]
-  isClassDef             Boolean?                           @default(false)
-  classId                TestParameter?                     @relation(name: "TestParameterClassIdTestParameterInstances", fields: [classIdId], references: [id])
-  classIdId              String?
-  createdAt              DateTime                           @default(now())
-  description            String?
-  globalId               String?                            @default(cuid())
-  id                     String                             @id @default(cuid())
-  instances              TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
-  itemReceipt            ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
-  itemReceiptId          String?
-  PurchaseOrder          PurchaseOrder?                     @relation(fields: [purchaseOrderId], references: [id])
-  purchaseOrderId        String?
+  active                   Boolean                            @default(true)
+  schemaVersion            String?
+  testSetpointValue        Float?
+  testParamUnits           String
+  testSetpointUpperLimit   Float?
+  testParamRevision        String?
+  testSetpointLowerLimit   Float?
+  testResult               Float?
+  testPass                 Boolean?                           @default(false)
+  testSetpointBooleanValue Boolean?
+  testedAt                 DateTime?
+  createdBy                String
+  testSetpointType         EnumTestParameterTestSetpointType?
+  testedBy                 String?
+  tooltip                  String?
+  name                     String
+  updatedAt                DateTime?                          @updatedAt
+  updatedBy                String?
+  testDetails              String?
+  equipmentPhases          EquipmentPhase[]
+  isClassDef               Boolean?                           @default(false)
+  classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterInstances", fields: [classIdId], references: [id])
+  classIdId                String?
+  createdAt                DateTime                           @default(now())
+  description              String?
+  globalId                 String?                            @default(cuid())
+  id                       String                             @id @default(cuid())
+  instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
+  itemReceipt              ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
+  itemReceiptId            String?
+  // PurchaseOrder            PurchaseOrder?                     @relation(fields: [purchaseOrderId], references: [id])
+  // purchaseOrderId          String?
+  purchaseOrder            PurchaseOrder[]
 }
 
 model RecipeParameter {
@@ -210,7 +219,7 @@ model Recipe {
   customer                       Customer                        @relation(fields: [customerId], references: [id])
   customerId                     String
   customerCode                   String?
-  estimatedAbv                   Decimal?
+  estimatedAbv                   Float?
   globalId                       String?                         @unique @default(cuid())
   id                             String                          @id @default(cuid())
   instances                      Recipe[]                        @relation(name: "RecipeClassIdRecipeInstances")
@@ -228,7 +237,7 @@ model Recipe {
   revision                       Int?                            @default(0)
   scheduleOrders                 ScheduleOrder[]
   schemaVersion                  String?                         @default("0001-b")
-  targetProof                    Decimal?
+  targetProof                    Float?
   totalCooks                     Int?
   totalFermenters                Int?
   unitProcedures                 UnitProcedure[]
@@ -336,7 +345,7 @@ model ProductionOrder {
   complete                       Boolean?                        @default(false)
   completedCooks                 Int?
   completedFermenters            Int?
-  completedQuantity              Decimal?
+  completedQuantity              Float?
   createdAt                      DateTime                        @default(now())
   createdBy                      String
   customer                       Customer                        @relation(fields: [customerId], references: [id])
@@ -622,7 +631,6 @@ model Lot {
   isRawMaterial               Boolean?               @default(false)
   item                        Item?                  @relation(fields: [itemId], references: [id])
   itemId                      String?
-  lotNumber                   String                 @unique
   productionOrder             ProductionOrder?       @relation(fields: [productionOrderId], references: [id])
   productionOrderId           String?
   purchaseOrderAcceptedLots   PurchaseOrder?         @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
@@ -631,6 +639,7 @@ model Lot {
   recipeId                    String?
   schemaVersion               String?                @default("0001-b")
   updatedAt                   DateTime               @updatedAt
+  lotNumber                   String                 @unique
 }
 
 model BomItem {
@@ -820,6 +829,10 @@ model Inventory {
   notes          String?
   units          String?
   proof          Float?
+  revision       Int?     @default(0)
+  schemaVersion  String?  @default("0001-b")
+  updatedAt      DateTime @updatedAt
+  updatedBy      String?
 
   @@unique([assetId, fifoIndex])
 }
@@ -902,8 +915,8 @@ model RecipeBomItem {
   mashingProtocolSteps MashingProtocolStep[]
   operation            EnumRecipeBomItemOperation
   operationIndex       Int                        @default(-1)
-  quantity             Decimal?
-  quantityActual       Decimal?
+  quantity             Float?
+  quantityActual       Float?
   recipeBoms           RecipeBom[]
   units                String
   updatedAt            DateTime                   @updatedAt
@@ -934,13 +947,13 @@ model MashingProtocol {
 
 model MashingProtocolStep {
   agitatorEnabled     Boolean?                         @default(false)
-  agitatorSpdSp       Decimal?
+  agitatorSpdSp       Float?
   coolEnabled         Boolean?                         @default(false)
-  coolTempSp          Decimal?
+  coolTempSp          Float?
   createdAt           DateTime                         @default(now())
   createdBy           String
   heatEnabled         Boolean?                         @default(false)
-  heatTempSp          Decimal?
+  heatTempSp          Float?
   holdType            EnumMashingProtocolStepHoldType?
   id                  String                           @id @default(cuid())
   index               Int?
@@ -951,8 +964,8 @@ model MashingProtocolStep {
   recipeBomItem       RecipeBomItem[]
   stepTime            Int?
   stepType            EnumMashingProtocolStepStepType?
-  temperatureActual   Decimal?
-  temperatureSetpoint Decimal?
+  temperatureActual   Float?
+  temperatureSetpoint Float?
   updatedAt           DateTime                         @updatedAt
   updatedBy           String?
 }
