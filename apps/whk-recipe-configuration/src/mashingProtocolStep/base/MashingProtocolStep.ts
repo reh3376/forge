@@ -25,7 +25,6 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { Type } from "class-transformer";
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
@@ -57,7 +56,7 @@ class MashingProtocolStep {
   @Field(() => Float, {
     nullable: true,
   })
-  agitatorSpdSp!: Decimal | null;
+  agitatorSpdSp!: number | null;
 
   @ApiProperty({
     required: false,
@@ -80,7 +79,7 @@ class MashingProtocolStep {
   @Field(() => Float, {
     nullable: true,
   })
-  coolTempSp!: Decimal | null;
+  coolTempSp!: number | null;
 
   @ApiProperty({
     required: true,
@@ -120,7 +119,7 @@ class MashingProtocolStep {
   @Field(() => Float, {
     nullable: true,
   })
-  heatTempSp!: Decimal | null;
+  heatTempSp!: number | null;
 
   @ApiProperty({
     required: false,
@@ -237,7 +236,7 @@ class MashingProtocolStep {
   @Field(() => Float, {
     nullable: true,
   })
-  temperatureActual!: Decimal | null;
+  temperatureActual!: number | null;
 
   @ApiProperty({
     required: false,
@@ -249,19 +248,7 @@ class MashingProtocolStep {
   @Field(() => Float, {
     nullable: true,
   })
-  recipeNumericalSetpoint!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(250)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  temperatureSetpoint!: Decimal | null;
+  temperatureSetpoint!: number | null;
 
   @ApiProperty({
     required: true,

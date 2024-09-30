@@ -28,7 +28,6 @@ import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
-import { Decimal } from "decimal.js";
 
 @ObjectType()
 class BomItem {

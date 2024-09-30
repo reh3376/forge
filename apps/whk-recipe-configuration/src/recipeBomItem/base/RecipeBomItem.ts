@@ -31,7 +31,6 @@ import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
-import { Decimal } from "decimal.js";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 
 @ObjectType()
@@ -175,7 +174,7 @@ class RecipeBomItem {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity!: Decimal | null;
+  quantity!: number | null;
 
   @ApiProperty({
     required: false,
@@ -187,7 +186,7 @@ class RecipeBomItem {
   @Field(() => Float, {
     nullable: true,
   })
-  quantityActual!: Decimal | null;
+  quantityActual!: number | null;
 
   @ApiProperty({
     required: false,

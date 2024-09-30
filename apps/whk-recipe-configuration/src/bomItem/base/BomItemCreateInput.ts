@@ -30,7 +30,6 @@ import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BomItemWhereUniqueInput } from "./BomItemWhereUniqueInput";
 import { BomItemCreateNestedManyWithoutBomItemsInput } from "./BomItemCreateNestedManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { Decimal } from "decimal.js";
 
 @InputType()
 class BomItemCreateInput {
