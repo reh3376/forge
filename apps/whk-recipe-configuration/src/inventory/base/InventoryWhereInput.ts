@@ -19,7 +19,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class InventoryWhereInput {
@@ -148,14 +148,25 @@ class InventoryWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: StringNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => StringNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  proof?: DecimalNullableFilter;
+  units?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  proof?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -178,17 +189,6 @@ class InventoryWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  units?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

@@ -14,11 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { CustomerListRelationFilter } from "../../customer/base/CustomerListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
@@ -72,6 +72,17 @@ class InventoryLogWhereInput {
 
   @ApiProperty({
     required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  quantity?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -103,17 +114,6 @@ class InventoryLogWhereInput {
     nullable: true,
   })
   loggedBy?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  quantity?: DecimalNullableFilter;
 
   @ApiProperty({
     required: false,

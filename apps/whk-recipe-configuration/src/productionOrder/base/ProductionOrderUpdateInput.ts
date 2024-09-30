@@ -28,7 +28,6 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./FermentationChemistryUpdateManyWithoutProductionOrdersInput";
 import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";
@@ -112,7 +111,7 @@ class ProductionOrderUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  completedQuantity?: Decimal | null;
+  completedQuantity?: number | null;
 
   @ApiProperty({
     required: false,
