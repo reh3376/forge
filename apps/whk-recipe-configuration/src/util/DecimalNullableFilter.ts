@@ -2,13 +2,14 @@ import { Field, InputType } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
+import Decimal from "decimal.js";
+
 
 @InputType({
   isAbstract: true,
   description: undefined,
 })
-export class DecimalNullableFilter {
+export class FloatNullableFilter {
   @ApiProperty({
     required: false,
     type: Decimal,
