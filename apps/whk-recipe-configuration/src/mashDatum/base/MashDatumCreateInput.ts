@@ -22,7 +22,6 @@ import {
   MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 
 @InputType()
@@ -47,6 +46,15 @@ class MashDatumCreateInput {
   @Max(100)
   @Field(() => Float)
   balling!: number;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  lotId!: string;
 
   @ApiProperty({
     required: true,

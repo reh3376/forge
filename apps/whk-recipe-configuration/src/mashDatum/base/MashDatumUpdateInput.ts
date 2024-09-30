@@ -22,7 +22,6 @@ import {
   MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 
 @InputType()

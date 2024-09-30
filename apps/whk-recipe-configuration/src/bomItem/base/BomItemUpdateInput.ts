@@ -30,7 +30,6 @@ import { EquipmentPhaseUpdateManyWithoutBomItemsInput } from "./EquipmentPhaseUp
 import { BomItemUpdateManyWithoutBomItemsInput } from "./BomItemUpdateManyWithoutBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { Decimal } from "decimal.js";
 
 @InputType()
 class BomItemUpdateInput {

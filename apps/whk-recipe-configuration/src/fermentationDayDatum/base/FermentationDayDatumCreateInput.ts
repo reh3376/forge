@@ -23,7 +23,6 @@ import {
   MaxLength,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EnumFermentationDayDatumDay } from "./EnumFermentationDayDatumDay";

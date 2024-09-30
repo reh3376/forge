@@ -1,7 +1,7 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, ProductionOrder, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+// import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class RecipeCookCreationService {
@@ -16,7 +16,8 @@ export class RecipeCookCreationService {
 
   constructor(
     protected readonly prisma: PrismaService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    // @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    private readonly logger: Logger = new Logger('RecipeCookCreationService')
   ) {}
 
   /**
@@ -380,7 +381,7 @@ export class RecipeCookCreationService {
 
     const recipe = await this.prisma.recipe.findFirst({
       where: { productionOrders: {some: {id: scheduleOrderQueue?.scheduleOrder?.productionOrders[0].id}} },
-      include: { unitProcedures: true, parameters: true }
+      include: { unitProcedures: true }
     });
 
     this.logger.debug(`recipe: ${recipe?.id}`);
@@ -412,7 +413,7 @@ export class RecipeCookCreationService {
 
   private isMaxCooksReached(lastCook: Operation | null, productionOrder: ProductionOrder | null) {
     const executedCooks = lastCook?.procedureSequenceIndex !== undefined ? lastCook.procedureSequenceIndex + 1 : 0;
-    const totalCooks = productionOrder?.totalCooks ?? 0;
+    const totalCooks = productionOrder?.completedCooks ?? 0;
     this.logger.debug(`executedCooks: ${executedCooks}, totalCooks: ${totalCooks}`);
     this.logger.debug(`production order: ${productionOrder?.id}`);
     this.totalNumberOfCooks = totalCooks;

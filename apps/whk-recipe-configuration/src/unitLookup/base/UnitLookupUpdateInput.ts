@@ -22,7 +22,6 @@ import {
 } from "class-validator";
 import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { UnitLookupUpdateManyWithoutUnitLookupsInput } from "./UnitLookupUpdateManyWithoutUnitLookupsInput";
 
 @InputType()

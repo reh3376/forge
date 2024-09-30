@@ -33,7 +33,6 @@ import { RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput } from "./Recip
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
-import { Decimal } from "decimal.js";
 import { RecipeBomCreateNestedManyWithoutRecipeBomItemsInput } from "./RecipeBomCreateNestedManyWithoutRecipeBomItemsInput";
 
 @InputType()
@@ -174,7 +173,7 @@ class RecipeBomItemCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity?: Decimal | null;
+  quantity?: number | null;
 
   @ApiProperty({
     required: false,
@@ -186,7 +185,7 @@ class RecipeBomItemCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantityActual?: Decimal | null;
+  quantityActual?: number | null;
 
   @ApiProperty({
     required: false,

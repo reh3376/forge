@@ -24,7 +24,6 @@ import {
   MaxLength,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
 import { EnumFermentationDayDatumDay } from "./EnumFermentationDayDatumDay";
