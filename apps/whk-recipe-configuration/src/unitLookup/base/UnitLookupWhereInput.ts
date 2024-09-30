@@ -17,7 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { UnitLookupListRelationFilter } from "./UnitLookupListRelationFilter";
-import { FloatNullableFilter } from "src/util/FloatNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class UnitLookupWhereInput {

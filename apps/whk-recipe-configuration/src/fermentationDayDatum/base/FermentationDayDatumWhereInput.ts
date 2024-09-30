@@ -20,8 +20,8 @@ import { IntFilter } from "../../util/IntFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { FloatFilter } from "src/util/FloatFilter";
-import { FloatNullableFilter } from "src/util/FloatNullableFilter";
+import { FloatFilter } from "../../util/FloatFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class FermentationDayDatumWhereInput {
