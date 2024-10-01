@@ -133,12 +133,6 @@ export class ProductionOrderResolverBase {
             }
           : undefined,
 
-        salesOrder: args.data.salesOrder
-          ? {
-              connect: args.data.salesOrder,
-            }
-          : undefined,
-
         scheduleOrder: args.data.scheduleOrder
           ? {
               connect: args.data.scheduleOrder,
@@ -185,12 +179,6 @@ export class ProductionOrderResolverBase {
           recipeGroup: args.data.recipeGroup
             ? {
                 connect: args.data.recipeGroup,
-              }
-            : undefined,
-
-          salesOrder: args.data.salesOrder
-            ? {
-                connect: args.data.salesOrder,
               }
             : undefined,
 
@@ -399,27 +387,6 @@ export class ProductionOrderResolverBase {
     @graphql.Parent() parent: ProductionOrder
   ): Promise<RecipeGroup | null> {
     const result = await this.service.getRecipeGroup(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => SalesOrder, {
-    nullable: true,
-    name: "salesOrder",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "SalesOrder",
-    action: "read",
-    possession: "any",
-  })
-  async getSalesOrder(
-    @graphql.Parent() parent: ProductionOrder
-  ): Promise<SalesOrder | null> {
-    const result = await this.service.getSalesOrder(parent.id);
 
     if (!result) {
       return null;
