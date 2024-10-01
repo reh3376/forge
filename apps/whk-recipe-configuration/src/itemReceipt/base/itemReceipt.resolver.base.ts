@@ -114,6 +114,12 @@ export class ItemReceiptResolverBase {
               connect: args.data.toAsset,
             }
           : undefined,
+
+        // asset: args.data.asset
+        //   ? {
+        //       connect: args.data.asset,
+        //     }
+        //   : undefined,
       },
     });
   }
@@ -149,6 +155,12 @@ export class ItemReceiptResolverBase {
                 connect: args.data.toAsset,
               }
             : undefined,
+
+          // asset: args.data.asset
+          //   ? {
+          //       connect: args.data.asset,
+          //     }
+          //   : undefined,
         },
       });
     } catch (error) {

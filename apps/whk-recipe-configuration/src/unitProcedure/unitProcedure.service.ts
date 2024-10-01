@@ -1,8 +1,8 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
+import {BadRequestException, Inject, Injectable, Logger} from "@nestjs/common";
 import {PrismaService} from "../prisma/prisma.service";
 import {UnitProcedureServiceBase} from "./base/unitProcedure.service.base";
 import {Prisma, UnitProcedure} from "@prisma/client";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import {OperationWhereUniqueInput} from "../operation/base/OperationWhereUniqueInput";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 import {WhMessageBrokerTopics} from "../rabbitmq/topics";
@@ -12,7 +12,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
-    private logger: PinoLogger,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     super(prisma);
   }
@@ -20,7 +20,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     Mashing01: ['Cook', 'Clean'],
     Fermentation01: ['FermenterSet', 'Fermenter', 'Clean'],
     Distillation01: ['StillRun', 'Clean'],
-    Processing01: ['TankProcessing', 'Barreling'],
+    Processing01: ['BlendingTank', 'CisternTank', 'Barreling'],
     Milling01: ['Mill'],
   };
 
@@ -29,25 +29,33 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
   ): Promise<UnitProcedure> {
     const name = args.data.name as string;
     const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
-    if (operations.length) {
-      const operationsData = await Promise.all(
-          operations.map(async (operation) => {
-            const operationRecord = await this.prisma.operation.findUnique({
-              where: { id: operation.id },
-            }) as any;
-            return { name: operationRecord.name, id: operationRecord.id };
-          })
-      );
-      this.logger.info(`Provided operations: ${operationsData}`);
-      const acceptableOperations = this.unitProcedureOperationsMap[name];
-      this.logger.info(`Acceptable operations: ${acceptableOperations}`);
-
-      if (!acceptableOperations) {
-        throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
+    try{
+      if (operations.length) {
+        const operationsData = await Promise.all(
+            operations.map(async (operation) => {
+              const operationRecord = await this.prisma.operation.findUnique({
+                where: { id: operation.id },
+              }) as any;
+              return { name: operationRecord.name, id: operationRecord.id };
+            })
+        );
+        this.logger.log(`Provided operations: ${operationsData}`);
+        const acceptableOperations = this.unitProcedureOperationsMap[name];
+        this.logger.log(`Acceptable operations: ${acceptableOperations}`);
+  
+        if (!acceptableOperations) {
+          throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
+        }
+  
+        if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
+          throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
+        }
       }
-
-      if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
-        throw new BadRequestException(`Provided operations do not match acceptable list for unitProcedure: ${name}`);
+    } catch (error) {
+      if (error instanceof TypeError) {
+        this.logger.log(`UnitProcedure being created without operations: ${error}`);
+      } else {
+        throw error;
       }
     }
 
@@ -59,7 +67,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
       event_type: 'create',
       data: createdUnitProcedure
     });
-    this.logger.info(`Created UnitProcedure: ${createdUnitProcedure.id} & pushed to topic`);
+    this.logger.log(`Created UnitProcedure: ${createdUnitProcedure.id} & pushed to topic`);
     return createdUnitProcedure;
   }
 
@@ -67,13 +75,13 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
       args: Prisma.SelectSubset<T, Prisma.UnitProcedureUpdateArgs>
   ): Promise<UnitProcedure> {
     const unitProcedure = await this.prisma.unitProcedure.findFirstOrThrow({where: {id: args.where.id}}) as UnitProcedure;
-    this.logger.info(`Updating Operation: ${unitProcedure.name}`);
+    this.logger.log(`Updating Operation: ${unitProcedure.name}`);
     const name = unitProcedure.name as string;
     const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
 
-    this.logger.info(`Provided operations: ${operations}`);
+    this.logger.log(`Provided operations: ${operations}`);
     if (operations.length) {
-      this.logger.info(`Provided operations: ${operations}`);
+      this.logger.log(`Provided operations: ${operations}`);
       const operationsData = await Promise.all(
           operations.map(async (operation) => {
             const operationRecord = await this.prisma.operation.findUnique({
@@ -83,9 +91,9 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
           })
       );
 
-      this.logger.info(`Provided operations: ${operationsData}`);
+      this.logger.log(`Provided operations: ${operationsData}`);
       const acceptableOperations = this.unitProcedureOperationsMap[name];
-      this.logger.info(`Acceptable operations: ${acceptableOperations}`);
+      this.logger.log(`Acceptable operations: ${acceptableOperations}`);
       if (!acceptableOperations) {
         throw new BadRequestException(`No operations mapping found for unitProcedure: ${name}`);
       }

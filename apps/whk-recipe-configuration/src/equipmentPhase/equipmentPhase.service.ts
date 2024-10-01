@@ -1,8 +1,8 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
+import {BadRequestException, Inject, Injectable, Logger} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { EquipmentPhaseServiceBase } from "./base/equipmentPhase.service.base";
 import {EquipmentPhase, Prisma} from "@prisma/client";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import {PhaseParameterWhereUniqueInput} from "../phaseParameter/base/PhaseParameterWhereUniqueInput";
 import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
 import {WhMessageBrokerTopics} from "../rabbitmq/topics";
@@ -12,7 +12,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
   constructor(
         protected readonly prisma: PrismaService,
         protected readonly rabbitProducer: RabbitMQProducerService,
-        private logger: PinoLogger,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     super(prisma);
   }
@@ -54,7 +54,8 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       'DropLineSteam'
     ],
     StillRun: ['StillStartup', 'StillRun', 'StillShutdown'],
-    TankProcessing: ['Cut', 'Hold', 'Gauge'],
+    CisternTank: ['Cut', 'Hold', 'Gauge'],
+    BlendingTank: ['Cut', 'Hold', 'Gauge'],
     Barreling: ['BarrelFill'],
     Mill: ['Mill'],
   };
@@ -218,11 +219,11 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     if (args.data.operation?.connect?.id) {
       const operationId = args.data.operation?.connect?.id;
       const operation = await this.prisma.operation.findFirstOrThrow({where: {id: operationId as string}});
-      this.logger.info(`Operation: ${operationId}`);
+      this.logger.log(`Operation: ${operationId}`);
 
       // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
       const acceptableUnitProcedures = this.operationEquipmentPhasesMap[operation.name];
-      this.logger.info(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
+      this.logger.log(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
 
       if (!acceptableUnitProcedures) {
         throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
@@ -233,10 +234,10 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     }
 
     const phaseParameters = args.data.phaseParameters?.connect as Array<PhaseParameterWhereUniqueInput>;
-    this.logger.info(`Phase Parameters: ${phaseParameters}`);
+    this.logger.log(`Phase Parameters: ${phaseParameters}`);
 
     if (phaseParameters) {
-      this.logger.info(`Provided phase parameters: ${phaseParameters}`);
+      this.logger.log(`Provided phase parameters: ${phaseParameters}`);
       const phaseParametersData = await Promise.all(
           phaseParameters.map(async (phaseParameter) => {
             const phaseParameterRecord = await this.prisma.phaseParameter.findUnique({
@@ -246,9 +247,9 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
           })
       );
 
-      this.logger.info(`Provided phase parameters: ${phaseParametersData}`);
+      this.logger.log(`Provided phase parameters: ${phaseParametersData}`);
       const acceptablePhaseParameters = this.equipmentPhaseToPhaseParameterMap[name];
-      this.logger.info(`Acceptable phase parameters: ${acceptablePhaseParameters}`);
+      this.logger.log(`Acceptable phase parameters: ${acceptablePhaseParameters}`);
       if (!acceptablePhaseParameters) {
         throw new BadRequestException(`No phase parameter mapping found for equipment phase: ${name}`);
       }
@@ -265,7 +266,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       data: equipmentPhase,
       recordName: 'EquipmentPhase',
     });
-    this.logger.info(`Created equipmentPhase & pushed to topic: ${equipmentPhase.name}`);
+    this.logger.log(`Created equipmentPhase & pushed to topic: ${equipmentPhase.name}`);
     return equipmentPhase;
   }
 
@@ -273,17 +274,17 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseUpdateArgs>
       ): Promise<EquipmentPhase> {
     const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({where: {id: args.where.id}}) as EquipmentPhase;
-    this.logger.info(`Updating equipmentPhase: ${equipmentPhase.name}`);
+    this.logger.log(`Updating equipmentPhase: ${equipmentPhase.name}`);
     const name = equipmentPhase.name as string;
 
     if (args.data.operation?.connect?.id) {
       const operationId = args.data.operation?.connect?.id;
       const operation = await this.prisma.operation.findFirstOrThrow({where: {id: operationId as string}});
-      this.logger.info(`Operation: ${operationId}`);
+      this.logger.log(`Operation: ${operationId}`);
 
       // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
       const acceptableUnitProcedures = this.operationEquipmentPhasesMap[operation.name];
-      this.logger.info(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
+      this.logger.log(`Acceptable Unit Procedures: ${acceptableUnitProcedures}`);
 
       if (!acceptableUnitProcedures) {
         throw new BadRequestException(`No Unit Procedure mapping found for Operation: ${name}`);
@@ -295,10 +296,10 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     }
 
     const phaseParameters = args.data.phaseParameters?.connect as Array<PhaseParameterWhereUniqueInput>;
-    this.logger.info(`Phase Parameters: ${phaseParameters}`);
+    this.logger.log(`Phase Parameters: ${phaseParameters}`);
 
     if (phaseParameters) {
-      this.logger.info(`Provided phase parameters: ${phaseParameters}`);
+      this.logger.log(`Provided phase parameters: ${phaseParameters}`);
       const phaseParametersData = await Promise.all(
           phaseParameters.map(async (phaseParameter) => {
             const phaseParameterRecord = await this.prisma.phaseParameter.findUnique({
@@ -308,9 +309,9 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
           })
       );
 
-      this.logger.info(`Provided phase parameters: ${phaseParametersData}`);
+      this.logger.log(`Provided phase parameters: ${phaseParametersData}`);
       const acceptablePhaseParameters = this.equipmentPhaseToPhaseParameterMap[name];
-      this.logger.info(`Acceptable phase parameters: ${acceptablePhaseParameters}`);
+      this.logger.log(`Acceptable phase parameters: ${acceptablePhaseParameters}`);
       if (!acceptablePhaseParameters) {
         throw new BadRequestException(`No phase parameter mapping found for equipment phase: ${name}`);
       }
@@ -327,7 +328,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       data: newEquipmentPhase,
       recordName: 'EquipmentPhase',
     });
-    this.logger.info(`Updated equipmentPhase & pushed to topic: ${newEquipmentPhase.name}`);
+    this.logger.log(`Updated equipmentPhase & pushed to topic: ${newEquipmentPhase.name}`);
 
     return newEquipmentPhase;
   }
@@ -342,7 +343,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
         data: equipmentPhase,
         recordName: 'EquipmentPhase',
         });
-        this.logger.info(`Deleted equipmentPhase & pushed to topic: ${equipmentPhase.name}`);
+        this.logger.log(`Deleted equipmentPhase & pushed to topic: ${equipmentPhase.name}`);
         return equipmentPhase;
     }
 }

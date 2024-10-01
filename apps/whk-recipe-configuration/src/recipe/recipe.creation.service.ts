@@ -1400,7 +1400,6 @@ export class RecipeCreationService {
         recipe: { connect: { id: this.recipe?.id } },
         item: { connect: { id: this.item?.id } },
         bom: { connect: { id: (this.bom as Bom).id } },
-        salesOrder: { connect: { id: this.salesOrder?.id } },
         recipeGroup: { connect: { id: this.recipeGroup?.id } },
         status: EnumProductionOrderStatus.Planned,
         quantity: quantity,
