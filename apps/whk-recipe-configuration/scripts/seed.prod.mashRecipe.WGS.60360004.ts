@@ -643,13 +643,11 @@ async function seed() {
 
   // Get the current date
   const currentDate = new Date();
-
   // Calculate the day of the year
   const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
   const diff = currentDate.getTime() - startOfYear.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-
   console.log(`Current day of the year: ${dayOfYear}`);
 
   if (existingSalesOrder) {
@@ -749,7 +747,6 @@ async function seed() {
     } else {
       console.log("No production orders created today.");
     }
-
     console.log("Creating new production order...");
     const newProductionOrder = await client.productionOrder.create({
       data: {
