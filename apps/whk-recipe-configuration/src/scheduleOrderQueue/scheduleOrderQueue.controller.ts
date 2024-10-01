@@ -45,9 +45,11 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
       data: {
         ...data,
 
-        nextUnitProcedure: {
-          connect: data.nextUnitProcedure,
-        },
+        nextUnitProcedure: data.nextUnitProcedure
+          ? {
+              connect: data.nextUnitProcedure,
+            }
+          : undefined,
 
         scheduleOrder: data.scheduleOrder
           ? {
@@ -107,9 +109,11 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
         data: {
           ...data,
 
-          nextUnitProcedure: {
-            connect: data.nextUnitProcedure,
-          },
+          nextUnitProcedure: data.nextUnitProcedure
+            ? {
+                connect: data.nextUnitProcedure,
+              }
+            : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
@@ -176,10 +180,11 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
         where: params,
         data: {
           ...data,
-
-          nextUnitProcedure: {
-            connect: data.nextUnitProcedure,
-          },
+          nextUnitProcedure: data.nextUnitProcedure
+            ? {
+                connect: data.nextUnitProcedure,
+              }
+            : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
