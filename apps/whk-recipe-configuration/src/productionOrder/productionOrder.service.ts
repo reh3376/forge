@@ -27,7 +27,6 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
                 item: true,
                 recipe: true,
                 recipeGroup: true,
-                salesOrder: true,
                 bom: true,
             }
         });
@@ -51,7 +50,6 @@ export class ProductionOrderService extends ProductionOrderServiceBase {
                 item: true,
                 recipe: true,
                 recipeGroup: true,
-                salesOrder: true,
                 bom: true,
             },
             where: args.where,

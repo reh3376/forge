@@ -145,7 +145,11 @@ export class BatchService extends BatchServiceBase {
             }
           }
         } : {asset: undefined}),
+        customer: undefined,
+        mashingProtocol: undefined,
+        productionOrderRecipeInstance: undefined,
         parent: undefined,
+        recipe: undefined,
         lot: undefined,
       },
       include: {
