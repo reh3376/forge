@@ -94,55 +94,55 @@ export class BatchService extends BatchServiceBase {
     return batch;
   }
 
-  async GetBatchId(args: BatchIdCreateInput): Promise<Batch> {
-    /* Generation function for batch entities and the batch field being of the form "WHK01.FER.24H15.0000"
-    where 24 is the year
-    H is the month, in this case August, which is the 8th letter in the alphabet
-    28 is the day, in this case 28th of the month
-    X is a sequential number, starting from one
-     */
+  // async GetBatchId(args: BatchIdCreateInput): Promise<Batch> {
+  //   /* Generation function for batch entities and the batch field being of the form "WHK01.FER.24H15.0000"
+  //   where 24 is the year
+  //   H is the month, in this case August, which is the 8th letter in the alphabet
+  //   28 is the day, in this case 28th of the month
+  //   X is a sequential number, starting from one
+  //    */
 
-    const acronym = this.operationsMapping[args.operation];
-    if (!acronym) {
-      throw new Error(`Unknown operation: ${args.operation}`);
-    }
-    // const site = "WHK01";
-    const date = new Date();
-    const year = date.getFullYear().toString().slice(-2);
-    const month = String.fromCharCode(64 + date.getMonth() + 1); // Convert month number to letter
-    const day = date.getDate().toString().padStart(2, "0");
+  //   const acronym = this.operationsMapping[args.operation];
+  //   if (!acronym) {
+  //     throw new Error(`Unknown operation: ${args.operation}`);
+  //   }
+  //   // const site = "WHK01";
+  //   const date = new Date();
+  //   const year = date.getFullYear().toString().slice(-2);
+  //   const month = String.fromCharCode(64 + date.getMonth() + 1); // Convert month number to letter
+  //   const day = date.getDate().toString().padStart(2, "0");
 
-    // const batchIdPrefix = `${site}.${acronym}.${year}${month}${day}`;
-    const batchIdPrefix = `${acronym}.${year}${month}${day}`;
+  //   // const batchIdPrefix = `${site}.${acronym}.${year}${month}${day}`;
+  //   const batchIdPrefix = `${acronym}.${year}${month}${day}`;
 
-    const lastBatch: Batch[] = await this.batches({
-      where: {
-        batchId: {
-          startsWith: batchIdPrefix,
-        },
-      },
-      orderBy: {
-        batchId: "desc",
-      },
-      take: 1,
-    });
-    const lastBatchIdIndex = lastBatch.length > 0 ? parseInt(lastBatch[0].batchId.split(".").pop()?.slice(-3) || "0") : -1;
-    const newIndex = `${lastBatchIdIndex + 1}`.padStart(3, "0");
-    const writeBatchData: BatchCreateInput = {
-      batchId: `${batchIdPrefix}${newIndex}`,
-    }
+  //   const lastBatch: Batch[] = await this.batches({
+  //     where: {
+  //       batchId: {
+  //         startsWith: batchIdPrefix,
+  //       },
+  //     },
+  //     orderBy: {
+  //       batchId: "desc",
+  //     },
+  //     take: 1,
+  //   });
+  //   const lastBatchIdIndex = lastBatch.length > 0 ? parseInt(lastBatch[0].batchId.split(".").pop()?.slice(-3) || "0") : -1;
+  //   const newIndex = `${lastBatchIdIndex + 1}`.padStart(3, "0");
+  //   const writeBatchData: BatchCreateInput = {
+  //     batchId: `${batchIdPrefix}${newIndex}`,
+  //   }
 
-    return await this.createBatch({
-      data: {
-        ...writeBatchData,
+  //   return await this.createBatch({
+  //     data: {
+  //       ...writeBatchData,
 
-        lot: undefined,
+  //       lot: undefined,
 
-        parent: undefined,
-      },
-      select: {
-        batchId: true,
-      },
-    });
-  }
+  //       parent: undefined,
+  //     },
+  //     select: {
+  //       batchId: true,
+  //     },
+  //   });
+  // }
 }
