@@ -1,15 +1,15 @@
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RabbitMQMessage } from "./RabbitMQMessage";
-import {Controller} from "@nestjs/common";
+import {Controller, Inject, Logger} from "@nestjs/common";
 import {SyncService} from "../sync/sync.service";
-import {PinoLogger} from "nestjs-pino";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Controller("rabbitmq-controller")
 export class RabbitMQController {
 
   constructor(
       private readonly syncService: SyncService,
-      private readonly logger: PinoLogger
+      @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {}
 
   private extractDataFromMessage(message: RabbitMQMessage): any {
@@ -33,22 +33,16 @@ export class RabbitMQController {
       message: RabbitMQMessage,
       context: RmqContext
   ): Promise<void> {
-    this.logger.info(`Event Received for record Name ${JSON.stringify(message.data.recordName)}`);
+    this.logger.log(`Event Received for record Name ${JSON.stringify(message.data.recordName)}`);
     // try {
       const eventType: string = message.data.event_type;
       if (eventType === 'create') {
-          await this.syncService.upsertEntity(message.data.recordName, message);
+          await this.syncService.upsertEntity(message.data.recordName, message, 'create');
           return;
       } else if (eventType === 'update') {
-          await this.syncService.upsertEntity(message.data.recordName, message);
-          return;
-      } else if (eventType === 'delete') {
-          await this.syncService.deleteEntity(message.data.recordName, message);
+          await this.syncService.upsertEntity(message.data.recordName, message, 'update');
           return;
       }
-    // } catch (error) {
-    //   this.logger.error(`Error handling event: ${error}`);
-    // }
   }
 
   @EventPattern("wh.whk01.distillery01.asset")
@@ -112,15 +106,15 @@ export class RabbitMQController {
     await this.processEvent(message, context);
   }
 
-  @EventPattern("wh.whk01.distillery01.bomitem")
-  async onWhWhk01Distillery01BomItem(
-      @Payload()
-          message: RabbitMQMessage,
-      @Ctx()
-          context: RmqContext
-  ): Promise<void> {
-    await this.processEvent(message, context);
-  }
+  // @EventPattern("wh.whk01.distillery01.bomitem")
+  // async onWhWhk01Distillery01BomItem(
+  //     @Payload()
+  //         message: RabbitMQMessage,
+  //     @Ctx()
+  //         context: RmqContext
+  // ): Promise<void> {
+  //   await this.processEvent(message, context);
+  // }
 
   @EventPattern("wh.whk01.distillery01.bom")
   async onWhWhk01Distillery01Bom(
