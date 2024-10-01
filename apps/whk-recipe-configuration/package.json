@@ -43,7 +43,7 @@
   "dependencies": {
     "@amplication/opentelemetry-nestjs": "^4.5.0",
     "@apollo/server": "^4.10.5",
-    "@azure/identity": "^4.0.0",
+    "@azure/identity": "^4.4.1",
     "@azure/keyvault-secrets": "^4.7.0",
     "@faker-js/faker": "^8.4.1",
     "@nestjs/apollo": "12.2.0",
