@@ -1,53 +1,52 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 
-const CUSTOMER_CODE = "DCB";
-const MASH_BILL = '52-00-36-12'; //  Match Item Record
-const FINAL_PROOF = 108;
-const BARREL_INFO = '53-18-3-0-0'; // Match Item Record
-const CUSTOMER_NAME = "Dynasty Bourbon Company"; // This needs to match ERP / MESDB customer reocrd
-const ORDER_QTY = 1250; // barrels
+const CUSTOMER_CODE = "WGS";
+const MASH_BILL = '60-36-00-04';
+const FINAL_PROOF = 120;
+const BARREL_INFO = '53-06-3-0-0';
+const CUSTOMER_NAME = "William Grant & Sons, Inc."; // This needs to match ERP / MESDB
+const ORDER_QTY = 500;
 const TOTAL_GRAIN_WEIGHT = 24080;
-const BBLS_PER_FERM = 99;
-const USER = 'csummers@whiskeyhouse.com';
+const USER = 'pmannion@whiskeyhouse.com';
 
 const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "Malt", qty: 289 },
-  { action: "Add Additive", additiveType: "Liquozyme", qty: 2.0 },
-  { action: "Add Grain", grainType: "Corn", qty: 12522 },
+  { action: "Add Grain", grainType: "Malt", qty: 96 },
+  { action: "Add Additive", additiveType: "Liquozyme" },
+  { action: "Add Grain", grainType: "Corn", qty: 14448 },
   // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
   // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Heat", temperature: 180, time: 20 },
+  { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Wheat", qty: 7000 },
+  { action: "Add Grain", grainType: "Rye", qty: 7000 },
   { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Wheat", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Hold", time: 15 },
+  { action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Hold", time: 10 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME", qty: 8.7},
-  { action: "Add Additive", additiveType: "Viscoferm", qty: 4.3 },
+  { action: "Add Additive", additiveType: "DIAZYME" },
+  { action: "Add Additive", additiveType: "Viscoferm" },
   { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt", qty: 1700 },
-  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Malt", qty: 901 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt", qty: 963 },
+  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
-  { name: 'HighWineProof', setpointValue: 130 },
-  { name: 'LowWineProof', setpointValue: 120 },
-  { name: 'FinalProof', setpointValue: 108 },
-  { name: 'BaseLoss', setpointValue: 0.1 },
+  { name: 'HighWineProof', setpointValue: 140 },
+  { name: 'LowWineProof', setpointValue: 100 },
+  { name: 'FinalProof', setpointValue: 125 },
+  { name: 'BaseLoss', setpointValue: 0.5 },
   { name: 'BeerFeedTray', setpointValue: 15 },
-  { name: 'FermentationAge', setpointValue: 96 },
-  { name: 'ControlTemperature', setpointValue: 87 },
+  { name: 'FermentationAge', setpointValue: 72 },
+  { name: 'ControlTemperature', setpointValue: 80 },
   { name: 'CooksPerFerm', setpointValue: 3 },
     { name: 'TopOffFrequency', setpointValue: 24 },
     { name: 'TopOffQuantity', setpointValue: 100 },
     { name: 'TopOffTemperature', setpointValue: 80 },
-    { name: 'MashpH', setpointValue: 5.8 },
-    { name: 'MashRatio', setpointValue: 3.0 },
+    { name: 'MashpH', setpointValue: 5.1 },
+    { name: 'MashRatio', setpointValue: 3.5 },
     { name: 'RatioByFerm', setpointValue: 2.8 },
     { name: 'FermSetTemp', setpointValue: 80 },
     { name: 'StarterSweetpH', setpointValue: 5.1 },
@@ -373,7 +372,7 @@ const RECIPE_PARAMETERS = [
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
                   // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity == phase.qty) {
+                  if (component.quantity.equals(phase.qty)) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -388,7 +387,7 @@ const RECIPE_PARAMETERS = [
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
-                  if (component.quantity != phase.notQty) {
+                  if (!component.quantity.equals(phase.notQty)) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -419,7 +418,7 @@ const RECIPE_PARAMETERS = [
                   // Check if the quantity field is present in the phase object
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity == phase.qty) {
+                    if (component.quantity.equals(phase.qty)) {
                       await client.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -761,8 +760,8 @@ const RECIPE_PARAMETERS = [
         name: `${productionOrderName}${newProductionOrderNumber}`,
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        totalCooks: Math.ceil(ORDER_QTY / BBLS_PER_FERM) * 3,
-        totalFermenters: Math.ceil(ORDER_QTY / BBLS_PER_FERM),
+        totalCooks: Math.ceil(ORDER_QTY / 85) * 3,
+        totalFermenters: Math.ceil(ORDER_QTY / 85),
         executedCooks: 0,
         executedFermenters: 0,
       }
