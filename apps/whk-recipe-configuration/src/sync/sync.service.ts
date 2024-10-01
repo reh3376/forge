@@ -1,16 +1,16 @@
 
-import {Injectable, OnModuleInit, } from '@nestjs/common';
+import {Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {PrismaService} from "../prisma/prisma.service";
 import { ItemCreateInput } from '../item/base/ItemCreateInput';
 import { SalesOrderCreateInput } from '../salesOrder/base/SalesOrderCreateInput';
-import { PurchaseOrderCreateInput } from '../purchaseOrder/base/PurchaseOrderCreateInput';
+import { PurchaseOrderCreateInput } from '../purchaseOrder/PurchaseOrderCreateInput';
 import { ItemReceiptCreateInput } from '../itemReceipt/base/ItemReceiptCreateInput';
 import { ItemReceiptUpdateInput } from '../itemReceipt/base/ItemReceiptUpdateInput';
-import { PurchaseOrderUpdateInput } from '../purchaseOrder/base/PurchaseOrderUpdateInput';
+import { PurchaseOrderUpdateInput } from '../purchaseOrder/PurchaseOrderUpdateInput';
 import { SalesOrderUpdateInput } from '../salesOrder/base/SalesOrderUpdateInput';
 import { ItemUpdateInput } from '../item/base/ItemUpdateInput';
-import { PinoLogger } from 'nestjs-pino';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import * as path from "path";
 import * as fs from "fs";
@@ -34,7 +34,7 @@ export class SyncService implements OnModuleInit {
 
     constructor(
         private configService: ConfigService,
-        private readonly logger: PinoLogger,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
         // private readonly moduleRef: ModuleRef,
         private readonly prisma: PrismaService,
     ) {
@@ -133,7 +133,7 @@ export class SyncService implements OnModuleInit {
         try {
             return this.parseModelRelations(schemaPath, entityName);  // Implement parsing logic as shown previously
         } catch (err) {
-            console.error('Error reading schema file:', err);
+            this.logger.error('Error reading schema file:', err);
         }
     }
 
@@ -222,7 +222,7 @@ export class SyncService implements OnModuleInit {
     }
 
 
-    async upsertEntity(entityName: string, data: any): Promise<void> {
+    async upsertEntity(entityName: string, data: any, type: string = 'create'): Promise<void> {
         // Convert the entityName to lowercase to match the Prisma model name
         this.logger.debug(`Upserting ${entityName} with data: ${JSON.stringify(data)}`);
         const entity = entityName.toLowerCase();
@@ -251,7 +251,8 @@ export class SyncService implements OnModuleInit {
 
         // If the entity exists, update it with the new data.
         // If the entity does not exist, create a new one with the data
-        if (existingEntity && existingEntity.length > 0) {
+        if (type === 'update' && existingEntity && existingEntity.length > 0) {
+        // if (existingEntity && existingEntity.length > 0) {
             const payload = {
                 ...payloadData,
             };
@@ -259,25 +260,37 @@ export class SyncService implements OnModuleInit {
 
             // Validate the payload
             const validatedInstance = await this.validatePayload(entity, payload);
+            this.logger.debug(`Validated instance: ${JSON.stringify(validatedInstance)}`);
 
-            await this.prismaEntityMap[entity].update(
-                {
+            try {
+                const updatedEntity = await this.prismaEntityMap[entity].update(
+                    {
                     where: { globalId: globalId },
                     data: validatedInstance
+                    // data: payload
                 });
-        } else {
+                this.logger.debug(`Updated entity: ${JSON.stringify(updatedEntity)}`);
+            } catch (error: unknown) {
+                this.logger.error(`Error: ${error}\n\nUpdating ${entity} with data: ${JSON.stringify(payload)}`);
+            }
+        } else if (type === 'create' && (!existingEntity || existingEntity.length === 0)) {
             const payload = {
                 ...payloadData,
             };
             this.logger.debug(`Creating ${entity} with data: ${JSON.stringify(payload)}`);
 
+
             // Validate the payload
             const validatedInstance = await this.validatePayload(entity, payload);
-
             this.logger.debug(`Finally creating ${entity} with data: ${JSON.stringify(validatedInstance)}`);
 
             // Create a new entity with the data
-            await this.prismaEntityMap[entity].create({ data: validatedInstance });
+            try {
+                await this.prismaEntityMap[entity].create({ data: validatedInstance });
+                // await this.prismaEntityMap[entity].create({ data: payload });
+            } catch (error: unknown) {
+                this.logger.error(`Error: ${error}\n\nCreating ${entity} with data: ${JSON.stringify(payload)}`);
+            }
         }
     }
 
@@ -374,7 +387,7 @@ export class SyncService implements OnModuleInit {
           }
       } catch (error) {
           if (error instanceof TypeError && error.message.includes("globalId")) {
-              this.logger.info("TypeError: 'globalId' does not exist on the nestedEntity object.");
+              this.logger.debug("TypeError: 'globalId' does not exist on the nestedEntity object.");
           } else {
               throw error; // rethrow the error if it's not the expected type error
           }

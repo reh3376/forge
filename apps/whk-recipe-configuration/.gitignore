@@ -15,7 +15,6 @@
 # Files that should be generated at runtime
 schema.graphql
 #package-lock.json
-prisma/migrations/*
 
 .env*
 .flaskenv*

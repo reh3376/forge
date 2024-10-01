@@ -341,47 +341,48 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
+  id                             String                          @id @default(cuid())
+  createdAt                      DateTime                        @default(now())
+  updatedAt                      DateTime                        @updatedAt
   bom                            Bom                             @relation(fields: [bomId], references: [id])
   bomId                          String
   className                      String?
   complete                       Boolean?                        @default(false)
-  completedCooks                 Int?
-  completedFermenters            Int?
-  completedQuantity              Float?
-  createdAt                      DateTime                        @default(now())
   createdBy                      String
-  customer                       Customer                        @relation(fields: [customerId], references: [id])
-  customerId                     String
-  customerCode                   String?
-  endDate                        DateTime?
-  fermentationChemistries        FermentationChemistry[]
-  fermentationDayData            FermentationDayDatum[]
-  globalId                       String?                         @default(cuid())
-  id                             String                          @id @default(cuid())
   inProcess                      Boolean?                        @default(false)
+  updatedBy                      DateTime?
   item                           Item                            @relation(fields: [fgItemId], references: [id])
   fgItemId                       String
-  lots                           Lot[]
-  name                           String?                         @unique
-  plannedCooks                   Int?
-  plannedFermenters              Int?
-  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
-  quantity                       Int?
   recipe                         Recipe?                         @relation(fields: [recipeId], references: [id])
   recipeId                       String?
   recipeGroup                    RecipeGroup?                    @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                  String?
-  salesOrder                     SalesOrder?                     @relation(fields: [salesOrderId], references: [id])
-  salesOrderId                   String?                         @unique
-  scheduleOrder                  ScheduleOrder?                  @relation(fields: [scheduleOrderId], references: [id])
-  scheduleOrderId                String?
+  customer                       Customer                        @relation(fields: [customerId], references: [id])
+  customerId                     String
   scheduled                      Boolean?                        @default(false)
   schemaVersion                  String?                         @default("0001-alpha")
   startDate                      DateTime?                       @default(now())
+  endDate                        DateTime?
   status                         EnumProductionOrderStatus?      @default(Initiated)
+  scheduleOrder                  ScheduleOrder?                  @relation(fields: [scheduleOrderId], references: [id])
+  scheduleOrderId                String?
+  // salesOrder                    SalesOrder                      @relation(fields: [salesOrderId], references: [id])
+  // salesOrderId                  String                          @unique
+  globalId                       String?                         @default(cuid())
+  // productionOrderUnitProcedures ProductionOrderUnitProcedure[]
+  fermentationChemistries        FermentationChemistry[]
+  fermentationDayData            FermentationDayDatum[]
+  lots                           Lot[]
+  customerCode                   String?
   units                          String?
-  updatedAt                      DateTime                        @updatedAt
-  updatedBy                      DateTime?
+  quantity                       Int?
+  name                           String?                         @unique
+  totalFermenters                Int?
+  totalCooks                     Int?
+  executedCooks                  Int?
+  executedFermenters             Int?
+  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
+  SalesOrder                     SalesOrder[]
 }
 
 model ScheduleOrder {
@@ -534,13 +535,14 @@ model SalesOrder {
   lineItems         Json?
   name              String?          @unique
   orderType         String?
-  productionOrders  ProductionOrder?
+  productionOrders  ProductionOrder? @relation(fields: [productionOrderId], references: [id])
   quantity          Int
   requestedShipDate DateTime?
   revision          Int              @default(0)
   schemaVersion     String?          @default("0001-alpha")
   updatedAt         DateTime         @updatedAt
   updatedBy         String?
+  productionOrderId String?
 }
 
 model Test {

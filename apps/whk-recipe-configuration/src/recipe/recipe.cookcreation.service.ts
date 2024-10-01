@@ -1,7 +1,7 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, ProductionOrder, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-// import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class RecipeCookCreationService {
@@ -16,8 +16,7 @@ export class RecipeCookCreationService {
 
   constructor(
     protected readonly prisma: PrismaService,
-    // @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
-    private readonly logger: Logger = new Logger('RecipeCookCreationService')
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {}
 
   /**
@@ -263,7 +262,7 @@ export class RecipeCookCreationService {
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
-                  if (component.quantity !== phase.notQty) {
+                  if (!component.quantity === phase.notQty) {
                     await this.prisma.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -413,7 +412,7 @@ export class RecipeCookCreationService {
 
   private isMaxCooksReached(lastCook: Operation | null, productionOrder: ProductionOrder | null) {
     const executedCooks = lastCook?.procedureSequenceIndex !== undefined ? lastCook.procedureSequenceIndex + 1 : 0;
-    const totalCooks = productionOrder?.completedCooks ?? 0;
+    const totalCooks = productionOrder?.totalCooks ?? 0;
     this.logger.debug(`executedCooks: ${executedCooks}, totalCooks: ${totalCooks}`);
     this.logger.debug(`production order: ${productionOrder?.id}`);
     this.totalNumberOfCooks = totalCooks;
