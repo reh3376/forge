@@ -1123,7 +1123,7 @@ export class RecipeCreationService {
                   // Check if the quantity field is present in the phase object
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity.equals(phase.qty)) {
+                    if (component.quantity === phase.qty) {
                       await this.prisma.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -1138,7 +1138,7 @@ export class RecipeCreationService {
                     }
                   } else if (phase.notQty !== undefined) {
                     // Only match if the bomItem quantity does not equal the phase notQty
-                    if (!component.quantity.equals(phase.notQty)) {
+                    if (component.quantity !== phase.notQty) {
                       await this.prisma.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -1400,7 +1400,6 @@ export class RecipeCreationService {
         recipe: { connect: { id: this.recipe?.id } },
         item: { connect: { id: this.item?.id } },
         bom: { connect: { id: (this.bom as Bom).id } },
-        salesOrder: { connect: { id: this.salesOrder?.id } },
         recipeGroup: { connect: { id: this.recipeGroup?.id } },
         status: EnumProductionOrderStatus.Planned,
         quantity: quantity,

@@ -247,7 +247,7 @@ export class RecipeCookCreationService {
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
                   // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity.equals(phase.qty)) {
+                  if (component.quantity === phase.qty) {
                     await this.prisma.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -262,7 +262,7 @@ export class RecipeCookCreationService {
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
-                  if (!component.quantity.equals(phase.notQty)) {
+                  if (!component.quantity === phase.notQty) {
                     await this.prisma.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -292,7 +292,7 @@ export class RecipeCookCreationService {
                 if (component.item.itemNumber === "COR-DLF02-US #2 Yellow Dent GMO") {
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity.equals(phase.qty)) {
+                    if (component.quantity === phase.qty) {
                       await this.prisma.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -380,7 +380,7 @@ export class RecipeCookCreationService {
 
     const recipe = await this.prisma.recipe.findFirst({
       where: { productionOrders: {some: {id: scheduleOrderQueue?.scheduleOrder?.productionOrders[0].id}} },
-      include: { unitProcedures: true, parameters: true }
+      include: { unitProcedures: true }
     });
 
     this.logger.debug(`recipe: ${recipe?.id}`);
