@@ -26,11 +26,12 @@ Note: If none of the above options apply, please check "Not applicable" and prov
 [Describe the tests you ran to verify your changes. Provide instructions so we can reproduce.]
 
 ## Checklist:
-- [ ] My code follows the style guidelines of this project
+- [ ] My code follows the style guidelines of this project (ESLint6)
 - [ ] I have performed `prisma migrate dev` and added migrations to the PR. These changes have been reviewed for how they would affect production data.
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
+- [ ] I have added proper seeding for adding data to development environments and modified any seeding based off model changes
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
