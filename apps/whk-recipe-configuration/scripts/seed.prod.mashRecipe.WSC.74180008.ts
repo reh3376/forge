@@ -806,9 +806,9 @@ const RECIPE_PARAMETERS = [
         item: {
           connect: { id: (item as Item).id }
         },
-        parameters: {
-          connect: newParams.map(param => ({ id: param.id }))
-        },
+        // parameters: {
+        //   connect: newParams.map(param => ({ id: param.id }))
+        // },
         customerCode: CUSTOMER_CODE
       }
     });
@@ -985,9 +985,9 @@ const RECIPE_PARAMETERS = [
         customer: {
           connect: { id: customer?.id }
         },
-        salesOrder: {
-          connect: { id: salesOrder?.id }
-        },
+        // salesOrder: {
+        //   connect: { id: salesOrder?.id }
+        // },
         createdBy: USER,
         status: EnumProductionOrderStatus.Initiated,
         customerCode: CUSTOMER_CODE,
