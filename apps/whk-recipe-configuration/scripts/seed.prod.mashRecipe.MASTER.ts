@@ -595,7 +595,7 @@ async function seed() {
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
                   // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity.equals(phase.qty)) {
+                  if (component.quantity ===phase.qty) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -610,7 +610,7 @@ async function seed() {
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
-                  if (!component.quantity.equals(phase.notQty)) {
+                  if (!(component.quantity === phase.notQty)) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -641,7 +641,7 @@ async function seed() {
                   // Check if the quantity field is present in the phase object
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity.equals(phase.qty)) {
+                    if (component.quantity === phase.qty) {
                       await client.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -793,9 +793,9 @@ async function seed() {
         item: {
           connect: { id: (item as Item).id }
         },
-        parameters: {
-          connect: newParams.map(param => ({ id: param.id }))
-        },
+        // parameters: {
+        //   connect: newParams.map(param => ({ id: param.id }))
+        // },
         customerCode: CUSTOMER_CODE
       }
     });
@@ -972,9 +972,9 @@ async function seed() {
         customer: {
           connect: { id: customer?.id }
         },
-        salesOrder: {
-          connect: { id: salesOrder?.id }
-        },
+        // salesOrder: {
+        //   connect: { id: salesOrder?.id }
+        // },
         createdBy: USER,
         status: EnumProductionOrderStatus.Initiated,
         customerCode: CUSTOMER_CODE,
