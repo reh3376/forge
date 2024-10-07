@@ -805,6 +805,8 @@ export class ProductionOrderControllerBase {
         },
 
         filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
 
         fromAsset: {
           select: {
@@ -816,6 +818,8 @@ export class ProductionOrderControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
