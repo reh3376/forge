@@ -1199,6 +1199,7 @@ export class ItemControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,

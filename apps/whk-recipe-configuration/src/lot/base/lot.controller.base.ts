@@ -148,6 +148,7 @@ export class LotControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -233,6 +234,7 @@ export class LotControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -317,6 +319,7 @@ export class LotControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -447,6 +450,7 @@ export class LotControllerBase {
 
           schemaVersion: true,
           standardYield: true,
+          status: true,
           totalFermenters: true,
           totalPGs: true,
           totalPGsByRecipe: true,

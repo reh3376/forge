@@ -34,6 +34,7 @@ import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
+import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @ObjectType()
@@ -360,6 +361,17 @@ class Lot {
     nullable: true,
   })
   standardYield!: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotStatus,
+  })
+  @IsEnum(EnumLotStatus)
+  @IsOptional()
+  @Field(() => EnumLotStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "PendingBarrelCount" | "Complete" | null;
 
   @ApiProperty({
     required: false,
