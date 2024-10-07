@@ -99,6 +99,12 @@ export class LotResolverBase {
       data: {
         ...args.data,
 
+        filledFrom: args.data.filledFrom
+          ? {
+              connect: args.data.filledFrom,
+            }
+          : undefined,
+
         fromAsset: args.data.fromAsset
           ? {
               connect: args.data.fromAsset,
@@ -145,6 +151,12 @@ export class LotResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          filledFrom: args.data.filledFrom
+            ? {
+                connect: args.data.filledFrom,
+              }
+            : undefined,
 
           fromAsset: args.data.fromAsset
             ? {
@@ -247,6 +259,25 @@ export class LotResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "filledFrom",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getFilledFrom(@graphql.Parent() parent: Lot): Promise<Asset | null> {
+    const result = await this.service.getFilledFrom(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

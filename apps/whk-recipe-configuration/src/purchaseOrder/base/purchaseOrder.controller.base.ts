@@ -378,6 +378,16 @@ export class PurchaseOrderControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -388,6 +398,8 @@ export class PurchaseOrderControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -396,6 +408,7 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -420,6 +433,7 @@ export class PurchaseOrderControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,

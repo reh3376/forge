@@ -1157,6 +1157,16 @@ export class ItemControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -1167,6 +1177,8 @@ export class ItemControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -1175,6 +1187,7 @@ export class ItemControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -1199,6 +1212,7 @@ export class ItemControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -1753,8 +1767,6 @@ export class ItemControllerBase {
         revision: true,
         schemaVersion: true,
         targetProof: true,
-        totalCooks: true,
-        totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
       },

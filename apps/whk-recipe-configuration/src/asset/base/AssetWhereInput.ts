@@ -242,6 +242,18 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => LotListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
+  @IsOptional()
+  @Field(() => LotListRelationFilter, {
+    nullable: true,
+  })
+  lotsFilledFrom?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => MashingDatumListRelationFilter,
   })
   @ValidateNested()
