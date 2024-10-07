@@ -31,8 +31,6 @@ const CREATE_INPUT = {
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   targetProof: 42.424242424,
-  totalCooks: 42,
-  totalFermenters: 42,
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
@@ -50,8 +48,6 @@ const CREATE_RESULT = {
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   targetProof: 42.424242424,
-  totalCooks: 42,
-  totalFermenters: 42,
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
@@ -70,8 +66,6 @@ const FIND_MANY_RESULT = [
     revision: 42,
     schemaVersion: "exampleSchemaVersion",
     targetProof: 42.424242424,
-    totalCooks: 42,
-    totalFermenters: 42,
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
   },
@@ -90,8 +84,6 @@ const FIND_ONE_RESULT = {
   revision: 42,
   schemaVersion: "exampleSchemaVersion",
   targetProof: 42.424242424,
-  totalCooks: 42,
-  totalFermenters: 42,
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
 };
