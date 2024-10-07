@@ -840,6 +840,7 @@ export class ProductionOrderControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,

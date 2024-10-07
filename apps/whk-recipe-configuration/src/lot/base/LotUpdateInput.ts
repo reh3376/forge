@@ -33,6 +33,7 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @InputType()
@@ -370,6 +371,17 @@ class LotUpdateInput {
     nullable: true,
   })
   standardYield?: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotStatus,
+  })
+  @IsEnum(EnumLotStatus)
+  @IsOptional()
+  @Field(() => EnumLotStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "PendingBarrelCount" | "Complete" | null;
 
   @ApiProperty({
     required: false,
