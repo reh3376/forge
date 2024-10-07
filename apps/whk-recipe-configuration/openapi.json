@@ -5173,6 +5173,29 @@
         ]
       }
     },
+    "/api/recipes/active-recipes": {
+      "get": {
+        "operationId": "RecipeController_getActiveRecipes",
+        "summary": "Get recipes for active production orders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Active recipes retrieved successfully"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "recipes"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/recipes": {
       "post": {
         "operationId": "RecipeController_createRecipe",
