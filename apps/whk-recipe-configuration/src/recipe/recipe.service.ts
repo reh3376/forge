@@ -26,7 +26,7 @@ export class RecipeService extends RecipeServiceBase {
   async getActiveRecipes() {
     const query = `
       SELECT
-          soq."createdAt",
+          soq."createdAt" as ScheduledAt,
           r. *
       FROM "Recipe" r
       JOIN public."ProductionOrder" PO on r.id = PO."recipeId"
