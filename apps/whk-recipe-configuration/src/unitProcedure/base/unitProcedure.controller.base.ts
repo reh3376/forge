@@ -723,8 +723,6 @@ export class UnitProcedureControllerBase {
         revision: true,
         schemaVersion: true,
         targetProof: true,
-        totalCooks: true,
-        totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
       },

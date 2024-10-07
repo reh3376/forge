@@ -210,8 +210,6 @@ model Recipe {
   scheduleOrders                 ScheduleOrder[]
   schemaVersion                  String?                         @default("0001-b")
   targetProof                    Decimal?
-  totalCooks                     Int?
-  totalFermenters                Int?
   unitProcedures                 UnitProcedure[]
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
