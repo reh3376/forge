@@ -24,7 +24,6 @@ import {
   MaxLength,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
 import { EnumFermentationDayDatumDay } from "./EnumFermentationDayDatumDay";
@@ -41,7 +40,7 @@ class FermentationDayDatum {
   @IsNumber()
   @Max(99999999999)
   @Field(() => Float)
-  acid!: Decimal;
+  acid!: number;
 
   @ApiProperty({
     required: false,
@@ -59,7 +58,7 @@ class FermentationDayDatum {
   @IsNumber()
   @Max(99999999999)
   @Field(() => Float)
-  balling!: Decimal;
+  balling!: number;
 
   @ApiProperty({
     required: true,
@@ -90,7 +89,7 @@ class FermentationDayDatum {
   @Field(() => Float, {
     nullable: true,
   })
-  dryInches!: Decimal | null;
+  dryInches!: number | null;
 
   @ApiProperty({
     required: false,
@@ -151,7 +150,7 @@ class FermentationDayDatum {
   @IsNumber()
   @Max(14)
   @Field(() => Float)
-  pH!: Decimal;
+  pH!: number;
 
   @ApiProperty({
     required: true,
@@ -168,7 +167,7 @@ class FermentationDayDatum {
   @IsNumber()
   @Max(212)
   @Field(() => Float)
-  temperature!: Decimal;
+  temperature!: number;
 
   @ApiProperty({
     required: true,

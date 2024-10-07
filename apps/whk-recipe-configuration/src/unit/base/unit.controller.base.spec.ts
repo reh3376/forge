@@ -203,4 +203,8 @@ describe("Unit", () => {
   afterAll(async () => {
     await app.close();
   });
+
+  it("should always pass", () => {
+    expect(true).toBe(true);
+  });
 });

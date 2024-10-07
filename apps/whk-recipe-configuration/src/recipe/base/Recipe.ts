@@ -27,7 +27,6 @@ import {
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { Customer } from "../../customer/base/Customer";
-import { Decimal } from "decimal.js";
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
@@ -137,7 +136,7 @@ class Recipe {
   @Field(() => Float, {
     nullable: true,
   })
-  estimatedAbv!: Decimal | null;
+  estimatedAbv!: number | null;
 
   @ApiProperty({
     required: false,
@@ -285,7 +284,7 @@ class Recipe {
   @Field(() => Float, {
     nullable: true,
   })
-  targetProof!: Decimal | null;
+  targetProof!: number | null;
 
   @ApiProperty({
     required: false,

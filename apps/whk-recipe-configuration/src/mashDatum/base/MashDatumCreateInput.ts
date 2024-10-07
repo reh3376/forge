@@ -22,7 +22,6 @@ import {
   MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 
 @InputType()
@@ -44,9 +43,36 @@ class MashDatumCreateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(100)
+  @Field(() => Float)
+  balling!: number;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @Field(() => String)
+  lotId!: string;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
   @Max(14)
   @Field(() => Float)
-  backSetPH!: Decimal;
+  pH!: number;
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @Field(() => Float)
+  backSetPH!: number;
 
   @ApiProperty({
     required: false,
@@ -58,7 +84,7 @@ class MashDatumCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  backsetVolume?: Decimal | null;
+  backsetVolume?: number | null;
 
   @ApiProperty({
     required: true,
@@ -67,7 +93,7 @@ class MashDatumCreateInput {
   @IsNumber()
   @Max(100)
   @Field(() => Float)
-  balling!: Decimal;
+  waterVolume!: number;
 
   @ApiProperty({
     required: false,
@@ -79,7 +105,7 @@ class MashDatumCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  cornLbs?: Decimal | null;
+  cornLbs?: number | null;
 
   @ApiProperty({
     required: false,
@@ -91,16 +117,31 @@ class MashDatumCreateInput {
   @Field(() => FermentationChemistryWhereUniqueInput, {
     nullable: true,
   })
-  fermentationChemistry?: FermentationChemistryWhereUniqueInput | null;
+  ryeLbs?: number | null;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: Number,
   })
-  @IsInt()
-  @Max(1000)
-  @Field(() => Number)
-  fermenterNumber!: number;
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  maltLbs?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  wheatLbs?: number | null;
 
   @ApiProperty({
     required: true,
@@ -113,66 +154,24 @@ class MashDatumCreateInput {
 
   @ApiProperty({
     required: true,
-    type: String,
+    type: Number,
   })
-  @IsString()
-  @MaxLength(1000)
-  @Field(() => String)
-  lotId!: string;
+  @IsInt()
+  @Max(1000)
+  @Field(() => Number)
+  fermenterNumber!: number;
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: () => FermentationChemistryWhereUniqueInput,
   })
-  @IsNumber()
-  @Max(99999999999)
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => FermentationChemistryWhereUniqueInput, {
     nullable: true,
   })
-  maltLbs?: Decimal | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @Field(() => Float)
-  pH!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  ryeLbs?: Decimal | null;
-
-  @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @Field(() => Float)
-  waterVolume!: Decimal;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  wheatLbs?: Decimal | null;
+  fermentationChemistry?: FermentationChemistryWhereUniqueInput | null;
 }
 
 export { MashDatumCreateInput as MashDatumCreateInput };
