@@ -62,6 +62,12 @@ export class LotControllerBase {
       data: {
         ...data,
 
+        filledFrom: data.filledFrom
+          ? {
+              connect: data.filledFrom,
+            }
+          : undefined,
+
         fromAsset: data.fromAsset
           ? {
               connect: data.fromAsset,
@@ -106,6 +112,16 @@ export class LotControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -116,6 +132,8 @@ export class LotControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -124,6 +142,7 @@ export class LotControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -148,6 +167,7 @@ export class LotControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -191,6 +211,16 @@ export class LotControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -201,6 +231,8 @@ export class LotControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -209,6 +241,7 @@ export class LotControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -233,6 +266,7 @@ export class LotControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -275,6 +309,16 @@ export class LotControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -285,6 +329,8 @@ export class LotControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -293,6 +339,7 @@ export class LotControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -317,6 +364,7 @@ export class LotControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -360,6 +408,12 @@ export class LotControllerBase {
         where: params,
         data: {
           ...data,
+
+          filledFrom: data.filledFrom
+            ? {
+                connect: data.filledFrom,
+              }
+            : undefined,
 
           fromAsset: data.fromAsset
             ? {
@@ -405,6 +459,16 @@ export class LotControllerBase {
           densityFinal: true,
           externalId: true,
 
+          filledFrom: {
+            select: {
+              id: true,
+            },
+          },
+
+          filledFromString: true,
+          finalVolume: true,
+          finalWeight: true,
+
           fromAsset: {
             select: {
               id: true,
@@ -415,6 +479,8 @@ export class LotControllerBase {
           grainLbsFerm: true,
           grainLbsPg: true,
           id: true,
+          initialVolume: true,
+          initialWeight: true,
           isRawMaterial: true,
 
           item: {
@@ -423,6 +489,7 @@ export class LotControllerBase {
             },
           },
 
+          lotCreatedAt: true,
           lotNumber: true,
           notes: true,
           pgLosses: true,
@@ -447,6 +514,7 @@ export class LotControllerBase {
 
           schemaVersion: true,
           standardYield: true,
+          status: true,
           totalFermenters: true,
           totalPGs: true,
           totalPGsByRecipe: true,

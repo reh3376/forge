@@ -149,8 +149,6 @@ export class RecipeControllerBase {
         revision: true,
         schemaVersion: true,
         targetProof: true,
-        totalCooks: true,
-        totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -220,8 +218,6 @@ export class RecipeControllerBase {
         revision: true,
         schemaVersion: true,
         targetProof: true,
-        totalCooks: true,
-        totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -292,8 +288,6 @@ export class RecipeControllerBase {
         revision: true,
         schemaVersion: true,
         targetProof: true,
-        totalCooks: true,
-        totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -406,8 +400,6 @@ export class RecipeControllerBase {
           revision: true,
           schemaVersion: true,
           targetProof: true,
-          totalCooks: true,
-          totalFermenters: true,
           updatedAt: true,
           updatedBy: true,
         },
@@ -636,8 +628,6 @@ export class RecipeControllerBase {
         revision: true,
         schemaVersion: true,
         targetProof: true,
-        totalCooks: true,
-        totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -745,6 +735,16 @@ export class RecipeControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -755,6 +755,8 @@ export class RecipeControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -763,6 +765,7 @@ export class RecipeControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -787,6 +790,7 @@ export class RecipeControllerBase {
 
         schemaVersion: true,
         standardYield: true,
+        status: true,
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,

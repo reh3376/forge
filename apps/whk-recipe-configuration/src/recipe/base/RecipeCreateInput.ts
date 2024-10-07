@@ -312,30 +312,6 @@ class RecipeCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalCooks?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(99)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalFermenters?: number | null;
-
-  @ApiProperty({
-    required: false,
     type: () => UnitProcedureCreateNestedManyWithoutRecipesInput,
   })
   @ValidateNested()

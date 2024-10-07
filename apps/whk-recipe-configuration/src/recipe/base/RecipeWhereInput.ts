@@ -313,28 +313,6 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  totalCooks?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  totalFermenters?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => UnitProcedureListRelationFilter,
   })
   @ValidateNested()

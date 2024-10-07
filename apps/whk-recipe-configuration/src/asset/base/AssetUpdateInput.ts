@@ -228,6 +228,18 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => LotUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lotsFilledFrom?: LotUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: () => MashingDatumUpdateManyWithoutAssetsInput,
   })
   @ValidateNested()

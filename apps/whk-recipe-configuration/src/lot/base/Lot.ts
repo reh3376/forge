@@ -34,6 +34,7 @@ import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
+import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @ObjectType()
@@ -202,6 +203,51 @@ class Lot {
   @ValidateNested()
   @Type(() => Asset)
   @IsOptional()
+  filledFrom?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  filledFromString!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalVolume!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalWeight!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
   fromAsset?: Asset | null;
 
   @ApiProperty({
@@ -250,6 +296,30 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  initialVolume!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  initialWeight!: number | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [InventoryTransfer],
   })
   @ValidateNested()
@@ -276,6 +346,17 @@ class Lot {
   @Type(() => Item)
   @IsOptional()
   item?: Item | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  lotCreatedAt!: Date | null;
 
   @ApiProperty({
     required: true,
@@ -360,6 +441,17 @@ class Lot {
     nullable: true,
   })
   standardYield!: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotStatus,
+  })
+  @IsEnum(EnumLotStatus)
+  @IsOptional()
+  @Field(() => EnumLotStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "PendingBarrelCount" | "Complete" | null;
 
   @ApiProperty({
     required: false,
