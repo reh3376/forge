@@ -577,7 +577,8 @@ model Asset {
   inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
   itemReceipts            ItemReceipt[]
-  lots                    Lot[]
+  lots                    Lot[]                   @relation(name: "fromAsset")
+  lotsFilledFrom          Lot[]                   @relation(name: "filledFrom")
   mashingData             MashingDatum[]
   name                    String
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
@@ -637,16 +638,24 @@ model Lot {
   createdBy                   String?
   densityFinal                Float?
   externalId                  String?             @unique
-  fromAsset                   Asset?              @relation(fields: [fromAssetId], references: [id])
+  filledFrom                  Asset?              @relation(name: "filledFrom", fields: [filledFromId], references: [id])
+  filledFromId                String?
+  filledFromString            String?
+  finalVolume                 Float?
+  finalWeight                 Float?
+  fromAsset                   Asset?              @relation(name: "fromAsset", fields: [fromAssetId], references: [id])
   fromAssetId                 String?
   globalId                    String?             @unique @default(cuid())
   grainLbsFerm                Float?
   grainLbsPg                  Float?
   id                          String              @id @default(cuid())
+  initialVolume               Float?
+  initialWeight               Float?
   inventoryTransfers          InventoryTransfer[]
   isRawMaterial               Boolean?            @default(false)
   item                        Item?               @relation(fields: [itemId], references: [id])
   itemId                      String?
+  lotCreatedAt                DateTime?           @default(now())
   lotNumber                   String              @unique
   notes                       String?
   pgLosses                    Float?
@@ -658,6 +667,7 @@ model Lot {
   recipeId                    String?
   schemaVersion               String?             @default("0001-b")
   standardYield               Float?
+  status                      EnumLotStatus?      @default(Created)
   totalFermenters             Float?
   totalPGs                    Float?
   totalPGsByRecipe            Float?
@@ -1221,6 +1231,12 @@ enum EnumItemReceiptStatus {
   Complete
   Rejected
   Hold
+}
+
+enum EnumLotStatus {
+  Created
+  PendingBarrelCount
+  Complete
 }
 
 enum EnumLotWhiskeyType {

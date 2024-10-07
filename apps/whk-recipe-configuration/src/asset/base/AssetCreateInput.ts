@@ -216,6 +216,18 @@ class AssetCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => LotCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lotsFilledFrom?: LotCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: () => MashingDatumCreateNestedManyWithoutAssetsInput,
   })
   @ValidateNested()

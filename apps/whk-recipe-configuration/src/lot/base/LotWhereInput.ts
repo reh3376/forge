@@ -24,9 +24,11 @@ import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @InputType()
@@ -197,6 +199,51 @@ class LotWhereInput {
   @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
+  filledFrom?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  filledFromString?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  finalVolume?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  finalWeight?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
   fromAsset?: AssetWhereUniqueInput;
 
   @ApiProperty({
@@ -245,6 +292,28 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  initialVolume?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  initialWeight?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => InventoryTransferListRelationFilter,
   })
   @ValidateNested()
@@ -277,6 +346,17 @@ class LotWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  lotCreatedAt?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -368,6 +448,17 @@ class LotWhereInput {
     nullable: true,
   })
   standardYield?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotStatus,
+  })
+  @IsEnum(EnumLotStatus)
+  @IsOptional()
+  @Field(() => EnumLotStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "PendingBarrelCount" | "Complete";
 
   @ApiProperty({
     required: false,

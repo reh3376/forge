@@ -21,6 +21,7 @@ import {
   MaxLength,
   IsInt,
   IsBoolean,
+  IsDate,
   IsEnum,
 } from "class-validator";
 
@@ -33,6 +34,7 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
 
 @InputType()
@@ -202,6 +204,54 @@ class LotCreateInput {
   @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
+  filledFrom?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  filledFromString?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalVolume?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalWeight?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
   fromAsset?: AssetWhereUniqueInput | null;
 
   @ApiProperty({
@@ -242,6 +292,30 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  initialVolume?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  initialWeight?: number | null;
+
+  @ApiProperty({
+    required: false,
     type: () => InventoryTransferCreateNestedManyWithoutLotsInput,
   })
   @ValidateNested()
@@ -274,6 +348,17 @@ class LotCreateInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  lotCreatedAt?: Date | null;
 
   @ApiProperty({
     required: true,
@@ -367,6 +452,17 @@ class LotCreateInput {
     nullable: true,
   })
   standardYield?: number | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumLotStatus,
+  })
+  @IsEnum(EnumLotStatus)
+  @IsOptional()
+  @Field(() => EnumLotStatus, {
+    nullable: true,
+  })
+  status?: "Created" | "PendingBarrelCount" | "Complete" | null;
 
   @ApiProperty({
     required: false,
