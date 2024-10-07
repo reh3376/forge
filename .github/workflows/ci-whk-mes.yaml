@@ -1,36 +1,54 @@
-name: continuous integration - whk-mes
+name: continuous integration - whk-recipe-routing
 
 concurrency:
-  group: whk-mes
-  cancel-in-progress: true
+  group: whk-recipe-routing
+  cancel-in-progress: false
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
   push:
-    branches: ["*"]
-    paths: ["./apps/whk-recipe-configuration"]
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
   continuous-integration:
     name: continuous integration
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+      pull-requests: write
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup node.js
-        uses: actions/setup-node@v3
+      - name: Cache npm dependencies
+        uses: actions/cache@v2
         with:
-          node-version: 18.x
+          path: '~/.npm'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: install dependencies
-        run: npm install
+        run: npm ci
         working-directory: ./apps/whk-recipe-configuration
+
+      # - name: install dependencies
+      #   run: npm install
+      #   working-directory: ./apps/whk-recipe-configuration
 
       - name: build
         run: npm run build
         working-directory: ./apps/whk-recipe-configuration
 
-      - name: test
-        run: npm test
+      - name: Run tests
+        run: |
+          npx jest --coverage | tee ./coverage.txt && exit ${PIPESTATUS[0]}
         working-directory: ./apps/whk-recipe-configuration

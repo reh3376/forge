@@ -8,6 +8,8 @@ import { OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./filters/HttpExceptions.filter";
 import { AppModule } from "./app.module";
 import { connectMicroservices } from "./connectMicroservices";
+import { NewrelicInterceptor } from './newrelic.interceptor';
+
 import {
   swaggerPath,
   swaggerDocumentOptions,
@@ -58,6 +60,12 @@ async function main() {
     AppModule,
     getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
   );
+  // const app = await NestFactory.create(AppModule, {
+  //   cors: true,
+  //   bufferLogs: true
+  // });
+
+  app.useGlobalInterceptors(new NewrelicInterceptor());
 
   app.setGlobalPrefix("api");
   app.useGlobalPipes(
@@ -75,6 +83,9 @@ async function main() {
   };
 
   const document = SwaggerModule.createDocument(app, swaggerDocumentOptions);
+  SwaggerModule.setup('api', app, document);
+  // Write the OpenAPI document to a file
+  fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
 
   /** check if there is Public decorator for each path (action) and its method (findMany / findOne) on each controller */
   Object.values((document as OpenAPIObject).paths).forEach((path: any) => {
