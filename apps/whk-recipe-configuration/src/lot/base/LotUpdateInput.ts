@@ -220,6 +220,30 @@ class LotUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalVolume?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalWeight?: number | null;
+
+  @ApiProperty({
+    required: false,
     type: () => AssetWhereUniqueInput,
   })
   @ValidateNested()
@@ -265,6 +289,30 @@ class LotUpdateInput {
     nullable: true,
   })
   grainLbsPg?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  initialVolume?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  initialWeight?: number | null;
 
   @ApiProperty({
     required: false,

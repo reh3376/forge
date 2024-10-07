@@ -385,6 +385,8 @@ export class PurchaseOrderControllerBase {
         },
 
         filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
 
         fromAsset: {
           select: {
@@ -396,6 +398,8 @@ export class PurchaseOrderControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {

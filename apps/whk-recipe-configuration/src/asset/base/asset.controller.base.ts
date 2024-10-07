@@ -1436,6 +1436,8 @@ export class AssetControllerBase {
         },
 
         filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
 
         fromAsset: {
           select: {
@@ -1447,6 +1449,8 @@ export class AssetControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {
@@ -1602,6 +1606,8 @@ export class AssetControllerBase {
         },
 
         filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
 
         fromAsset: {
           select: {
@@ -1613,6 +1619,8 @@ export class AssetControllerBase {
         grainLbsFerm: true,
         grainLbsPg: true,
         id: true,
+        initialVolume: true,
+        initialWeight: true,
         isRawMaterial: true,
 
         item: {

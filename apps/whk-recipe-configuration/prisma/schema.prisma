@@ -602,12 +602,16 @@ model Lot {
   filledFrom                  Asset?              @relation(name: "filledFrom", fields: [filledFromId], references: [id])
   filledFromId                String?
   filledFromString            String?
+  finalVolume                 Float?
+  finalWeight                 Float?
   fromAsset                   Asset?              @relation(name: "fromAsset", fields: [fromAssetId], references: [id])
   fromAssetId                 String?
   globalId                    String?             @unique @default(cuid())
   grainLbsFerm                Float?
   grainLbsPg                  Float?
   id                          String              @id @default(cuid())
+  initialVolume               Float?
+  initialWeight               Float?
   inventoryTransfers          InventoryTransfer[]
   isRawMaterial               Boolean?            @default(false)
   item                        Item?               @relation(fields: [itemId], references: [id])
