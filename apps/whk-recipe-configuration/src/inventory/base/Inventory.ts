@@ -29,7 +29,6 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Item } from "../../item/base/Item";
-import { Decimal } from "decimal.js";
 
 @ObjectType()
 class Inventory {
@@ -166,7 +165,7 @@ class Inventory {
   @Field(() => Float, {
     nullable: true,
   })
-  proof!: Decimal | null;
+  proof!: number | null;
 
   @ApiProperty({
     required: false,

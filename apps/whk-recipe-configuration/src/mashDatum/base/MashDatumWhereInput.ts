@@ -14,10 +14,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { DecimalFilter } from "../../util/DecimalFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
+import { FloatFilter } from "../../util/FloatFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { IntFilter } from "../../util/IntFilter";
+import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 
 @InputType()
@@ -33,73 +33,6 @@ class MashDatumWhereInput {
     nullable: true,
   })
   asset?: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalFilter,
-  })
-  @Type(() => DecimalFilter)
-  @IsOptional()
-  @Field(() => DecimalFilter, {
-    nullable: true,
-  })
-  backSetPH?: DecimalFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  backsetVolume?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalFilter,
-  })
-  @Type(() => DecimalFilter)
-  @IsOptional()
-  @Field(() => DecimalFilter, {
-    nullable: true,
-  })
-  balling?: DecimalFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  cornLbs?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryWhereUniqueInput, {
-    nullable: true,
-  })
-  fermentationChemistry?: FermentationChemistryWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  fermenterNumber?: IntFilter;
 
   @ApiProperty({
     required: false,
@@ -121,7 +54,106 @@ class MashDatumWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  loggedBy?: StringFilter;
+  lotId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatFilter,
+  })
+  @Type(() => FloatFilter)
+  @IsOptional()
+  @Field(() => FloatFilter, {
+    nullable: true,
+  })
+  balling?: FloatFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatFilter,
+  })
+  @Type(() => FloatFilter)
+  @IsOptional()
+  @Field(() => FloatFilter, {
+    nullable: true,
+  })
+  pH?: FloatFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatFilter,
+  })
+  @Type(() => FloatFilter)
+  @IsOptional()
+  @Field(() => FloatFilter, {
+    nullable: true,
+  })
+  backSetPH?: FloatFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  backsetVolume?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatFilter,
+  })
+  @Type(() => FloatFilter)
+  @IsOptional()
+  @Field(() => FloatFilter, {
+    nullable: true,
+  })
+  waterVolume?: FloatFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  cornLbs?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  ryeLbs?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  maltLbs?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  wheatLbs?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -132,62 +164,30 @@ class MashDatumWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  lotId?: StringFilter;
+  loggedBy?: StringFilter;
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: () => AssetWhereUniqueInput,
   })
-  @Type(() => DecimalNullableFilter)
+  @ValidateNested()
+  @Type(() => FermentationChemistryWhereUniqueInput)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FermentationChemistryWhereUniqueInput, {
     nullable: true,
   })
-  maltLbs?: DecimalNullableFilter;
+  fermentationChemistry?: FermentationChemistryWhereUniqueInput;
 
   @ApiProperty({
     required: false,
-    type: DecimalFilter,
+    type: IntFilter,
   })
-  @Type(() => DecimalFilter)
+  @Type(() => IntFilter)
   @IsOptional()
-  @Field(() => DecimalFilter, {
+  @Field(() => IntFilter, {
     nullable: true,
   })
-  pH?: DecimalFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  ryeLbs?: DecimalNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalFilter,
-  })
-  @Type(() => DecimalFilter)
-  @IsOptional()
-  @Field(() => DecimalFilter, {
-    nullable: true,
-  })
-  waterVolume?: DecimalFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DecimalNullableFilter,
-  })
-  @Type(() => DecimalNullableFilter)
-  @IsOptional()
-  @Field(() => DecimalNullableFilter, {
-    nullable: true,
-  })
-  wheatLbs?: DecimalNullableFilter;
+  fermenterNumber?: IntFilter;
 }
 
 export { MashDatumWhereInput as MashDatumWhereInput };
