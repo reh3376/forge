@@ -544,7 +544,8 @@ model Asset {
   inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
   itemReceipts            ItemReceipt[]
-  lots                    Lot[]
+  lots                    Lot[]                   @relation(name: "fromAsset")
+  lotsFilledFrom          Lot[]                   @relation(name: "filledFrom")
   mashingData             MashingDatum[]
   name                    String
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
@@ -600,7 +601,10 @@ model Lot {
   createdBy                   String?
   densityFinal                Float?
   externalId                  String?             @unique
-  fromAsset                   Asset?              @relation(fields: [fromAssetId], references: [id])
+  filledFrom                  Asset?              @relation(name: "filledFrom", fields: [filledFromId], references: [id])
+  filledFromId                String?
+  filledFromString            String?
+  fromAsset                   Asset?              @relation(name: "fromAsset", fields: [fromAssetId], references: [id])
   fromAssetId                 String?
   globalId                    String?             @unique @default(cuid())
   grainLbsFerm                Float?
@@ -610,6 +614,7 @@ model Lot {
   isRawMaterial               Boolean?            @default(false)
   item                        Item?               @relation(fields: [itemId], references: [id])
   itemId                      String?
+  lotCreatedAt                DateTime?           @default(now())
   lotNumber                   String              @unique
   notes                       String?
   pgLosses                    Float?

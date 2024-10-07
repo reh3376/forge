@@ -798,6 +798,14 @@ export class ProductionOrderControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -816,6 +824,7 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,

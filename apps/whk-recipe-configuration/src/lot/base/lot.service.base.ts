@@ -80,6 +80,14 @@ export class LotServiceBase {
       .inventoryTransfers(args);
   }
 
+  async getFilledFrom(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .filledFrom();
+  }
+
   async getFromAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.lot
       .findUnique({

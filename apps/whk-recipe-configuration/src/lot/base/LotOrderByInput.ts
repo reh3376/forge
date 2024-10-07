@@ -160,6 +160,28 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  filledFromId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  filledFromString?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   fromAssetId?: SortOrder;
 
   @ApiProperty({
@@ -227,6 +249,17 @@ class LotOrderByInput {
     nullable: true,
   })
   itemId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  lotCreatedAt?: SortOrder;
 
   @ApiProperty({
     required: false,

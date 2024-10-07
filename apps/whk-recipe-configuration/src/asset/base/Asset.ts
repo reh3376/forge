@@ -205,6 +205,15 @@ class Asset {
 
   @ApiProperty({
     required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lotsFilledFrom?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
     type: () => [MashingDatum],
   })
   @ValidateNested()

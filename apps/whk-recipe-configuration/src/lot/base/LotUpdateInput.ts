@@ -21,6 +21,7 @@ import {
   MaxLength,
   IsInt,
   IsBoolean,
+  IsDate,
   IsEnum,
 } from "class-validator";
 
@@ -203,6 +204,30 @@ class LotUpdateInput {
   @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
+  filledFrom?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  filledFromString?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
   fromAsset?: AssetWhereUniqueInput | null;
 
   @ApiProperty({
@@ -275,6 +300,17 @@ class LotUpdateInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  lotCreatedAt?: Date | null;
 
   @ApiProperty({
     required: false,
