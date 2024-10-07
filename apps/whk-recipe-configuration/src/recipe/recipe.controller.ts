@@ -92,4 +92,26 @@ export class RecipeController extends RecipeControllerBase {
       );
     }
   }
+
+  @common.Get("/active-recipes")
+  @swagger.ApiOperation({ summary: "Get recipes for active production orders" })
+  @swagger.ApiResponse({ status: 200, description: "Active recipes retrieved successfully" })
+  @swagger.ApiResponse({ status: 500, description: "Internal Server Error" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "read",
+    possession: "any",
+  })
+  async getActiveRecipes() {
+    try {
+      const activeRecipes = await this.service.getActiveRecipes();
+      return activeRecipes;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while retrieving active recipes';
+      throw new common.HttpException(
+        errorMessage,
+        common.HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
