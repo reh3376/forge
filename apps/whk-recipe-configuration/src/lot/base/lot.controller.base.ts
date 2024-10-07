@@ -62,6 +62,12 @@ export class LotControllerBase {
       data: {
         ...data,
 
+        filledFrom: data.filledFrom
+          ? {
+              connect: data.filledFrom,
+            }
+          : undefined,
+
         fromAsset: data.fromAsset
           ? {
               connect: data.fromAsset,
@@ -106,6 +112,14 @@ export class LotControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -124,6 +138,7 @@ export class LotControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -192,6 +207,14 @@ export class LotControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -210,6 +233,7 @@ export class LotControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -277,6 +301,14 @@ export class LotControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -295,6 +327,7 @@ export class LotControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -364,6 +397,12 @@ export class LotControllerBase {
         data: {
           ...data,
 
+          filledFrom: data.filledFrom
+            ? {
+                connect: data.filledFrom,
+              }
+            : undefined,
+
           fromAsset: data.fromAsset
             ? {
                 connect: data.fromAsset,
@@ -408,6 +447,14 @@ export class LotControllerBase {
           densityFinal: true,
           externalId: true,
 
+          filledFrom: {
+            select: {
+              id: true,
+            },
+          },
+
+          filledFromString: true,
+
           fromAsset: {
             select: {
               id: true,
@@ -426,6 +473,7 @@ export class LotControllerBase {
             },
           },
 
+          lotCreatedAt: true,
           lotNumber: true,
           notes: true,
           pgLosses: true,

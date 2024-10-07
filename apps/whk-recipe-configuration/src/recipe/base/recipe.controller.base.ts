@@ -745,6 +745,14 @@ export class RecipeControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -763,6 +771,7 @@ export class RecipeControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,

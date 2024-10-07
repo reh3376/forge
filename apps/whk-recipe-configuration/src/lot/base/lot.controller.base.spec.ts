@@ -30,11 +30,13 @@ const CREATE_INPUT = {
   createdBy: "exampleCreatedBy",
   densityFinal: 42.42,
   externalId: "exampleExternalId",
+  filledFromString: "exampleFilledFromString",
   globalId: "exampleGlobalId",
   grainLbsFerm: 42.42,
   grainLbsPg: 42.42,
   id: "exampleId",
   isRawMaterial: "true",
+  lotCreatedAt: new Date(),
   lotNumber: "exampleLotNumber",
   notes: "exampleNotes",
   pgLosses: 42.42,
@@ -62,11 +64,13 @@ const CREATE_RESULT = {
   createdBy: "exampleCreatedBy",
   densityFinal: 42.42,
   externalId: "exampleExternalId",
+  filledFromString: "exampleFilledFromString",
   globalId: "exampleGlobalId",
   grainLbsFerm: 42.42,
   grainLbsPg: 42.42,
   id: "exampleId",
   isRawMaterial: "true",
+  lotCreatedAt: new Date(),
   lotNumber: "exampleLotNumber",
   notes: "exampleNotes",
   pgLosses: 42.42,
@@ -95,11 +99,13 @@ const FIND_MANY_RESULT = [
     createdBy: "exampleCreatedBy",
     densityFinal: 42.42,
     externalId: "exampleExternalId",
+    filledFromString: "exampleFilledFromString",
     globalId: "exampleGlobalId",
     grainLbsFerm: 42.42,
     grainLbsPg: 42.42,
     id: "exampleId",
     isRawMaterial: "true",
+    lotCreatedAt: new Date(),
     lotNumber: "exampleLotNumber",
     notes: "exampleNotes",
     pgLosses: 42.42,
@@ -128,11 +134,13 @@ const FIND_ONE_RESULT = {
   createdBy: "exampleCreatedBy",
   densityFinal: 42.42,
   externalId: "exampleExternalId",
+  filledFromString: "exampleFilledFromString",
   globalId: "exampleGlobalId",
   grainLbsFerm: 42.42,
   grainLbsPg: 42.42,
   id: "exampleId",
   isRawMaterial: "true",
+  lotCreatedAt: new Date(),
   lotNumber: "exampleLotNumber",
   notes: "exampleNotes",
   pgLosses: 42.42,
@@ -231,6 +239,7 @@ describe("Lot", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        lotCreatedAt: CREATE_RESULT.lotCreatedAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
@@ -243,6 +252,7 @@ describe("Lot", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
+          lotCreatedAt: FIND_MANY_RESULT[0].lotCreatedAt.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
@@ -266,6 +276,7 @@ describe("Lot", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
+        lotCreatedAt: FIND_ONE_RESULT.lotCreatedAt.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
@@ -279,6 +290,7 @@ describe("Lot", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        lotCreatedAt: CREATE_RESULT.lotCreatedAt.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {

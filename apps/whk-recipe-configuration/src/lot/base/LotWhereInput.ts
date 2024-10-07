@@ -24,6 +24,7 @@ import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -198,6 +199,29 @@ class LotWhereInput {
   @Field(() => AssetWhereUniqueInput, {
     nullable: true,
   })
+  filledFrom?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  filledFromString?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
   fromAsset?: AssetWhereUniqueInput;
 
   @ApiProperty({
@@ -278,6 +302,17 @@ class LotWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  lotCreatedAt?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,

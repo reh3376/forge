@@ -159,6 +159,17 @@ export class AssetServiceBase {
       .lots(args);
   }
 
+  async findLotsFilledFrom(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lotsFilledFrom(args);
+  }
+
   async findMashingData(
     parentId: string,
     args: Prisma.MashingDatumFindManyArgs

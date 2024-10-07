@@ -1429,6 +1429,14 @@ export class AssetControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -1447,6 +1455,7 @@ export class AssetControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
@@ -1547,6 +1556,172 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       lots: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lotsFilledFrom")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLotsFilledFrom(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLotsFilledFrom(params.id, {
+      ...query,
+      select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
+        createdAt: true,
+        createdBy: true,
+        densityFinal: true,
+        externalId: true,
+
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
+        id: true,
+        isRawMaterial: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotCreatedAt: true,
+        lotNumber: true,
+        notes: true,
+        pgLosses: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        standardYield: true,
+        status: true,
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
+        updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lotsFilledFrom")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectLotsFilledFrom(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotsFilledFrom: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lotsFilledFrom")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateLotsFilledFrom(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotsFilledFrom: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lotsFilledFrom")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLotsFilledFrom(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotsFilledFrom: {
         disconnect: body,
       },
     };

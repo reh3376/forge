@@ -203,6 +203,27 @@ class Lot {
   @ValidateNested()
   @Type(() => Asset)
   @IsOptional()
+  filledFrom?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  filledFromString!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
   fromAsset?: Asset | null;
 
   @ApiProperty({
@@ -277,6 +298,17 @@ class Lot {
   @Type(() => Item)
   @IsOptional()
   item?: Item | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  lotCreatedAt!: Date | null;
 
   @ApiProperty({
     required: true,

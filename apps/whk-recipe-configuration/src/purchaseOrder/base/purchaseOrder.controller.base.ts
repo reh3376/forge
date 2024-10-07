@@ -378,6 +378,14 @@ export class PurchaseOrderControllerBase {
         densityFinal: true,
         externalId: true,
 
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+
         fromAsset: {
           select: {
             id: true,
@@ -396,6 +404,7 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        lotCreatedAt: true,
         lotNumber: true,
         notes: true,
         pgLosses: true,
