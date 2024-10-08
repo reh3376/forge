@@ -142,6 +142,7 @@ export class LotControllerBase {
           },
         },
 
+        lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
         notes: true,
@@ -241,6 +242,7 @@ export class LotControllerBase {
           },
         },
 
+        lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
         notes: true,
@@ -339,6 +341,7 @@ export class LotControllerBase {
           },
         },
 
+        lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
         notes: true,
@@ -489,6 +492,7 @@ export class LotControllerBase {
             },
           },
 
+          lotAlphaChar: true,
           lotCreatedAt: true,
           lotNumber: true,
           notes: true,

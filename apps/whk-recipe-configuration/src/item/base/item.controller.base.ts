@@ -1187,6 +1187,7 @@ export class ItemControllerBase {
           },
         },
 
+        lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
         notes: true,
