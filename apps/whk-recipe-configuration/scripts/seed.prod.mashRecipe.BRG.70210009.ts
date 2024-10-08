@@ -55,11 +55,11 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
   { action: "Add Additive", additiveType: "DIAZYME", qty: 8.7 },
-  { action: "Add Additive", additiveType: "Viscoferm", qty: 2.1 },
+  { action: "Add Additive", additiveType: "Viscoferm", qty: 2.5 },
   { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt", qty:   1950 },
-  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt", qty:   1700 },
+  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt", qty: 250 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
