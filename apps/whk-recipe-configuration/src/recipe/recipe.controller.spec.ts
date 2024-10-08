@@ -81,6 +81,8 @@ const FIND_MANY_RESULT = [
 const FIND_MANY_RESULT_ACTIVE_RECIPES = [
   {
     Recipe: "exampleRecipe",
+    productionOrderName: "PRO123456",
+    productionOrderId: "exampleProductionOrderId",
     active: "true",
     cooksPerFerm: 42,
     createdAt: new Date(),
