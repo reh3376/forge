@@ -1323,9 +1323,6 @@ export class ItemControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -1348,8 +1345,6 @@ export class ItemControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -1359,12 +1354,6 @@ export class ItemControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
@@ -1383,6 +1372,10 @@ export class ItemControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
     if (results === null) {

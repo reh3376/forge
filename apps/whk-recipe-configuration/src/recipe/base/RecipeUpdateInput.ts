@@ -28,7 +28,6 @@ import { BatchUpdateManyWithoutRecipesInput } from "./BatchUpdateManyWithoutReci
 import { Type } from "class-transformer";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { Decimal } from "decimal.js";
 import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
@@ -147,7 +146,7 @@ class RecipeUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  estimatedAbv?: Decimal | null;
+  estimatedAbv?: number | null;
 
   @ApiProperty({
     required: false,
@@ -314,7 +313,7 @@ class RecipeUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  targetProof?: Decimal | null;
+  targetProof?: number | null;
 
   @ApiProperty({
     required: false,
