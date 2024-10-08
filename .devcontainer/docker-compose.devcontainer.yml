@@ -10,3 +10,6 @@ services:
     command: sleep infinity
     links:
       - server
+networks:
+  devcontainer_network:
+    name: devcontainer_network
