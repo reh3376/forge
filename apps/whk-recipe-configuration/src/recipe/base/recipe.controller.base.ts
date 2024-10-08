@@ -765,6 +765,7 @@ export class RecipeControllerBase {
           },
         },
 
+        lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
         notes: true,

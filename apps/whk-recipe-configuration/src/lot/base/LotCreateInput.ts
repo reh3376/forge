@@ -351,6 +351,18 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotAlphaChar?: string | null;
+
+  @ApiProperty({
+    required: false,
   })
   @IsDate()
   @Type(() => Date)
