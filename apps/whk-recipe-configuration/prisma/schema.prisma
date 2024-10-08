@@ -655,6 +655,7 @@ model Lot {
   isRawMaterial               Boolean?            @default(false)
   item                        Item?               @relation(fields: [itemId], references: [id])
   itemId                      String?
+  lotAlphaChar                String?
   lotCreatedAt                DateTime?           @default(now())
   lotNumber                   String              @unique
   notes                       String?

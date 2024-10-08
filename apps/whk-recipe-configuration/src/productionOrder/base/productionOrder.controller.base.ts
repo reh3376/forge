@@ -788,6 +788,7 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
         notes: true,
