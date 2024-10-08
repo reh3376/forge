@@ -19295,6 +19295,191 @@
         ]
       }
     },
+    "/api/assets/{id}/lotsFilledFrom": {
+      "get": {
+        "operationId": "AssetController_findLotsFilledFrom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/LotWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AssetController_connectLotsFilledFrom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "AssetController_updateLotsFilledFrom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "AssetController_disconnectLotsFilledFrom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/assets/{id}/mashingData": {
       "get": {
         "operationId": "AssetController_findMashingData",
@@ -32677,6 +32862,18 @@
           "externalId": {
             "type": "string"
           },
+          "filledFrom": {
+            "$ref": "#/components/schemas/Asset"
+          },
+          "filledFromString": {
+            "type": "string"
+          },
+          "finalVolume": {
+            "type": "number"
+          },
+          "finalWeight": {
+            "type": "number"
+          },
           "fromAsset": {
             "$ref": "#/components/schemas/Asset"
           },
@@ -32692,6 +32889,12 @@
           "id": {
             "type": "string"
           },
+          "initialVolume": {
+            "type": "number"
+          },
+          "initialWeight": {
+            "type": "number"
+          },
           "inventoryTransfers": {
             "type": "array",
             "items": {
@@ -32703,6 +32906,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/Item"
+          },
+          "lotCreatedAt": {
+            "type": "object"
           },
           "lotNumber": {
             "type": "string"
@@ -32727,6 +32933,14 @@
           },
           "standardYield": {
             "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Created",
+              "PendingBarrelCount",
+              "Complete"
+            ]
           },
           "totalFermenters": {
             "type": "number"
@@ -33489,12 +33703,6 @@
             "type": "string"
           },
           "targetProof": {
-            "type": "number"
-          },
-          "totalCooks": {
-            "type": "number"
-          },
-          "totalFermenters": {
             "type": "number"
           },
           "unitProcedures": {
@@ -34414,6 +34622,12 @@
             }
           },
           "lots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lot"
+            }
+          },
+          "lotsFilledFrom": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Lot"
@@ -36855,12 +37069,6 @@
           "targetProof": {
             "$ref": "#/components/schemas/FloatNullableFilter"
           },
-          "totalCooks": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "totalFermenters": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
           "unitProcedures": {
             "$ref": "#/components/schemas/UnitProcedureListRelationFilter"
           },
@@ -37856,6 +38064,9 @@
           "lots": {
             "$ref": "#/components/schemas/LotListRelationFilter"
           },
+          "lotsFilledFrom": {
+            "$ref": "#/components/schemas/LotListRelationFilter"
+          },
           "mashingData": {
             "$ref": "#/components/schemas/MashingDatumListRelationFilter"
           },
@@ -37993,6 +38204,18 @@
           "externalId": {
             "$ref": "#/components/schemas/StringNullableFilter"
           },
+          "filledFrom": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "filledFromString": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "finalVolume": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "finalWeight": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
           "fromAsset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
@@ -38008,6 +38231,12 @@
           "id": {
             "$ref": "#/components/schemas/StringFilter"
           },
+          "initialVolume": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "initialWeight": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
           "inventoryTransfers": {
             "$ref": "#/components/schemas/InventoryTransferListRelationFilter"
           },
@@ -38016,6 +38245,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "lotCreatedAt": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
           },
           "lotNumber": {
             "$ref": "#/components/schemas/StringFilter"
@@ -38040,6 +38272,14 @@
           },
           "standardYield": {
             "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Created",
+              "PendingBarrelCount",
+              "Complete"
+            ]
           },
           "totalFermenters": {
             "$ref": "#/components/schemas/FloatNullableFilter"
@@ -40152,12 +40392,6 @@
           "targetProof": {
             "type": "number"
           },
-          "totalCooks": {
-            "type": "number"
-          },
-          "totalFermenters": {
-            "type": "number"
-          },
           "unitProcedures": {
             "$ref": "#/components/schemas/UnitProcedureCreateNestedManyWithoutRecipesInput"
           },
@@ -40425,12 +40659,6 @@
             "type": "string"
           },
           "targetProof": {
-            "type": "number"
-          },
-          "totalCooks": {
-            "type": "number"
-          },
-          "totalFermenters": {
             "type": "number"
           },
           "unitProcedures": {
@@ -43676,6 +43904,9 @@
           "lots": {
             "$ref": "#/components/schemas/LotCreateNestedManyWithoutAssetsInput"
           },
+          "lotsFilledFrom": {
+            "$ref": "#/components/schemas/LotCreateNestedManyWithoutAssetsInput"
+          },
           "mashingData": {
             "$ref": "#/components/schemas/MashingDatumCreateNestedManyWithoutAssetsInput"
           },
@@ -44020,6 +44251,9 @@
           "lots": {
             "$ref": "#/components/schemas/LotUpdateManyWithoutAssetsInput"
           },
+          "lotsFilledFrom": {
+            "$ref": "#/components/schemas/LotUpdateManyWithoutAssetsInput"
+          },
           "mashingData": {
             "$ref": "#/components/schemas/MashingDatumUpdateManyWithoutAssetsInput"
           },
@@ -44302,6 +44536,18 @@
           "externalId": {
             "type": "string"
           },
+          "filledFrom": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "filledFromString": {
+            "type": "string"
+          },
+          "finalVolume": {
+            "type": "number"
+          },
+          "finalWeight": {
+            "type": "number"
+          },
           "fromAsset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
@@ -44314,6 +44560,12 @@
           "grainLbsPg": {
             "type": "number"
           },
+          "initialVolume": {
+            "type": "number"
+          },
+          "initialWeight": {
+            "type": "number"
+          },
           "inventoryTransfers": {
             "$ref": "#/components/schemas/InventoryTransferCreateNestedManyWithoutLotsInput"
           },
@@ -44322,6 +44574,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "lotCreatedAt": {
+            "type": "object"
           },
           "lotNumber": {
             "type": "string"
@@ -44346,6 +44601,14 @@
           },
           "standardYield": {
             "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Created",
+              "PendingBarrelCount",
+              "Complete"
+            ]
           },
           "totalFermenters": {
             "type": "number"
@@ -44497,6 +44760,18 @@
           "externalId": {
             "type": "string"
           },
+          "filledFrom": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "filledFromString": {
+            "type": "string"
+          },
+          "finalVolume": {
+            "type": "number"
+          },
+          "finalWeight": {
+            "type": "number"
+          },
           "fromAsset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
@@ -44509,6 +44784,12 @@
           "grainLbsPg": {
             "type": "number"
           },
+          "initialVolume": {
+            "type": "number"
+          },
+          "initialWeight": {
+            "type": "number"
+          },
           "inventoryTransfers": {
             "$ref": "#/components/schemas/InventoryTransferUpdateManyWithoutLotsInput"
           },
@@ -44517,6 +44798,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "lotCreatedAt": {
+            "type": "object"
           },
           "lotNumber": {
             "type": "string"
@@ -44541,6 +44825,14 @@
           },
           "standardYield": {
             "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Created",
+              "PendingBarrelCount",
+              "Complete"
+            ]
           },
           "totalFermenters": {
             "type": "number"
