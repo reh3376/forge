@@ -3,7 +3,10 @@ include:
 version: "3"
 services:
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/base:debian
+    # image: mcr.microsoft.com/devcontainers/base:debian
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
     command: sleep infinity
     # links:
     #   - server
