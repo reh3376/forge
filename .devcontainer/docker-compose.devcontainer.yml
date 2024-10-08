@@ -1,9 +1,9 @@
 include:
-  - ./apps/whk-recipe-configuration/docker-compose.yml
+  - ./apps/whk-recipe-configuration/docker-compose.dev.yml
 version: "3"
 services:
   devcontainer:
     image: mcr.microsoft.com/devcontainers/base:debian
     command: sleep infinity
-    links:
-      - server
+    # links:
+    #   - server
