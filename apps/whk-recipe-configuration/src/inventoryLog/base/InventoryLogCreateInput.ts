@@ -28,7 +28,6 @@ import {
 import { Type } from "class-transformer";
 import { CustomerCreateNestedManyWithoutInventoryLogsInput } from "./CustomerCreateNestedManyWithoutInventoryLogsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { Decimal } from "decimal.js";
 
 @InputType()
 class InventoryLogCreateInput {
@@ -98,7 +97,7 @@ class InventoryLogCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  quantity?: Decimal | null;
+  quantity?: number | null;
 
   @ApiProperty({
     required: false,

@@ -31,7 +31,7 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
-import { Decimal } from "decimal.js";
+
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Asset } from "../../asset/base/Asset";
@@ -130,7 +130,7 @@ class ItemReceipt {
   @IsNumber()
   @Max(99999999999)
   @Field(() => Float)
-  quantity!: Decimal;
+  quantity!: number;
 
   @ApiProperty({
     required: false,
@@ -235,7 +235,7 @@ class ItemReceipt {
   @Field(() => Float, {
     nullable: true,
   })
-  weighIn!: Decimal | null;
+  weighIn!: number | null;
 
   @ApiProperty({
     required: false,
@@ -247,7 +247,28 @@ class ItemReceipt {
   @Field(() => Float, {
     nullable: true,
   })
-  weighOut!: Decimal | null;
+  weighOut!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  siloNumber!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  asset?: Asset | null;
 }
 
 export { ItemReceipt as ItemReceipt };
