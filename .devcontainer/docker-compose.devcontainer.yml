@@ -6,7 +6,7 @@ services:
     # image: mcr.microsoft.com/devcontainers/base:debian
     build:
       context: .
-      dockerfile: .devcontainer/Dockerfile
+      dockerfile: Dockerfile
     command: sleep infinity
     # links:
     #   - server
