@@ -84,3 +84,18 @@ By default, your app comes with one user with the username "admin" and password 
 # start the server component as a docker container
 $ npm run compose:up
 ```
+
+
+## 4 - Database Restoration for Local Development
+
+If you are developing locally and need to restore the database, you can use the following command:
+
+Note you must have the `psql` command installed on your machine.
+- [Guide](https://www.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/)
+
+Commands:
+```sh
+dropdb -h localhost -p 5432 -U admin whk-mes # drop if exists
+createdb -h localhost -p 5432 -U admin whk-mes # create new db
+psql -h localhost -p 5432 -d whk-mes -U admin -f <pathToMy.sqlFileToRestore> # Restore from .sql file
+```
