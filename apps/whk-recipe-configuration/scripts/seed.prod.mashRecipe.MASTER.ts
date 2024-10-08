@@ -1,16 +1,17 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 
-const CUSTOMER_CODE = "WGS";
-const MASH_BILL = '60-36-00-04'; //  Match Item Record
+const CUSTOMER_CODE = "ABT";
+const MASH_BILL = '70-21-00-09'; //  Match Item Record
 const FINAL_PROOF = 120;
-const BARREL_INFO = '53-06-3-0-0'; // Match Item Record
-const CUSTOMER_NAME = "William Grant & Sons, Inc."; // This needs to match ERP / MESDB customer reocrd
-const ORDER_QTY = 500;
+const BARREL_INFO = '53-06-4-0-0'; // Match Item Record
+const CUSTOMER_NAME = "American Barrel Trust, LLC"; // This needs to match ERP / MESDB customer reocrd
+const ORDER_QTY = 850; // barrels
 const TOTAL_GRAIN_WEIGHT = 24080;
-const USER = 'pmannion@whiskeyhouse.com';
+const BBLS_PER_FERM = 108;
+const USER = 'csummers@whiskeyhouse.com';
 
-const WATER_QTY = 6000;
-const BACKSET_QTY = 1000;
+const WATER_QTY = 3900;
+const BACKSET_QTY = 3600;
 
 const BBL_ITEM_NUMBERS = [
   'BBL-ISC02-53-06-4-0-0-Standard4',
@@ -27,7 +28,7 @@ MAXIMUM GRAIN WEIGHTS IN BINS
 
 Current total grain weight: 24080
 
-Corn: 180000
+Corn: 18000
 Rye: 7000
 Wheat: 7000
 Malt: 1800
@@ -41,58 +42,57 @@ const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "Malt", qty: 96 },
-  { action: "Add Additive", additiveType: "Liquozyme" },
-  { action: "Add Grain", grainType: "Corn", qty: 14448 },
+  { action: "Add Grain", grainType: "Malt", qty:  217 },
+  { action: "Add Additive", additiveType: "Liquozyme", qty: 2.0 },
+  { action: "Add Grain", grainType: "Corn", qty:  16856 },
   // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
   // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Heat", temperature: 190, time: 15 },
+  { action: "Hold", holdType: "Heat", temperature: 200, time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Rye", qty: 7000 },
-  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Hold", time: 10 },
+  { action: "Add Grain", grainType: "Rye", qty:  5057 },
+  //{ action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  //{ action: "Add Grain", grainType: "Rye", qty: 1669 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME" },
-  { action: "Add Additive", additiveType: "Viscoferm" },
+  { action: "Add Additive", additiveType: "DIAZYME", qty: 8.7 },
+  { action: "Add Additive", additiveType: "Viscoferm", qty: 2.5 },
   { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt", qty: 963 },
-  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Malt", qty: 800.64 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt", qty:   1700 },
+  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt", qty: 250 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
   { name: 'HighWineProof', setpointValue: 140 },
-  { name: 'LowWineProof', setpointValue: 100 },
-  { name: 'FinalProof', setpointValue: 125 },
+  { name: 'LowWineProof', setpointValue: 130 },
+  { name: 'FinalProof', setpointValue: 120 },
   { name: 'BaseLoss', setpointValue: 0.5 },
   { name: 'BeerFeedTray', setpointValue: 15 },
   { name: 'FermentationAge', setpointValue: 72 },
-  { name: 'ControlTemperature', setpointValue: 80 },
+  { name: 'ControlTemperature', setpointValue: 85 },
   { name: 'CooksPerFerm', setpointValue: 3 },
-  { name: 'TopOffFrequency', setpointValue: 24 },
-  { name: 'TopOffQuantity', setpointValue: 100 },
-  { name: 'TopOffTemperature', setpointValue: 80 },
-  { name: 'MashpH', setpointValue: 5.1 },
-  { name: 'MashRatio', setpointValue: 3.5 },
-  { name: 'RatioByFerm', setpointValue: 2.8 },
-  { name: 'FermSetTemp', setpointValue: 80 },
-  { name: 'StarterSweetpH', setpointValue: 5.1 },
-  { name: 'TotalGrainWeight', setpointValue: 20500 },
-  { name: 'TotalLiquid', setpointValue: 70000 },
-  { name: 'NumberOfCooks', setpointValue: 9 },
-  { name: 'AssumedFermABV', setpointValue: 12.5 }
-];
-const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
-const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-
-async function seed() {
-
-
-  console.info("Seeding database with custom seed for Mashing Recipe...");
-
-        // ------------------------------------ BOM CREATION ------------------------------------
+    { name: 'TopOffFrequency', setpointValue: 24 },
+    { name: 'TopOffQuantity', setpointValue: 100 },
+    { name: 'TopOffTemperature', setpointValue: 80 },
+    { name: 'MashpH', setpointValue: 5.1 },
+    { name: 'MashRatio', setpointValue: 2.4 },
+    { name: 'RatioByFerm', setpointValue: 2.8 },
+    { name: 'FermSetTemp', setpointValue: 80 },
+    { name: 'StarterSweetpH', setpointValue: 5.1 },
+    { name: 'TotalGrainWeight', setpointValue: 24080 },
+    { name: 'TotalLiquid', setpointValue: 7500 },
+    { name: 'NumberOfCooks', setpointValue: ORDER_QTY * 3/ BBLS_PER_FERM },
+    { name: 'AssumedFermABV', setpointValue: 12.5 }
+  ];
+  const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+  const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
+  const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+  
+  async function seed() {
+    
+    
+    console.info("Seeding database with custom seed for Mashing Recipe...");
+ // ------------------------------------ BOM CREATION ------------------------------------
   // Base BOM Items
   const waterItemId = 'clyd1ofw2009yfd4504c6wt1w'
   const backsetItemId = 'clyd1oftx006jfd4514hrak80'
@@ -300,6 +300,19 @@ async function seed() {
 
   // ------------------------------------ END OF BOM CREATION ------------------------------------
 
+
+  /*
+  1. Seed instance of unit procedures, using the main procedure instance
+  2. Seed instances of operations for each UP. Using the parameters to seed the number of operations per UP
+  3. Find the appropriate BOM for the mashing recipe
+  4. Using the structure of the mashing protocol to map the equipment phases to cook. 
+    a. Connect the correct phase parameters
+    b. Connect the step type if applicable.  
+    c. Map the bom components to the proper equipment phase
+
+  */
+
+
   // Find Unit Procedure class definitions
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
     where: {
@@ -344,7 +357,7 @@ async function seed() {
     });
     mashInstance = existingInstance;
     if (!existingInstance) {
-      // if (true) {
+    // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -595,7 +608,7 @@ async function seed() {
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
                   // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity ===phase.qty) {
+                  if (component.quantity == phase.qty) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -610,7 +623,7 @@ async function seed() {
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
-                  if (!(component.quantity === phase.notQty)) {
+                  if (component.quantity != phase.notQty) {
                     await client.equipmentPhase.update({
                       where: { id: newPhase.id },
                       data: {
@@ -641,7 +654,7 @@ async function seed() {
                   // Check if the quantity field is present in the phase object
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity === phase.qty) {
+                    if (component.quantity == phase.qty) {
                       await client.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
@@ -850,13 +863,13 @@ async function seed() {
 
   // Get the current date
   const currentDate = new Date();
-
+  
   // Calculate the day of the year
   const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
   const diff = currentDate.getTime() - startOfYear.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-
+  
   console.log(`Current day of the year: ${dayOfYear}`);
 
   if (existingSalesOrder) {
@@ -956,7 +969,7 @@ async function seed() {
     } else {
       console.log("No production orders created today.");
     }
-
+    
     console.log("Creating new production order...");
     const newProductionOrder = await client.productionOrder.create({
       data: {
@@ -983,8 +996,8 @@ async function seed() {
         name: `${productionOrderName}${newProductionOrderNumber}`,
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        totalCooks: Math.ceil(ORDER_QTY / 85) * 3,
-        totalFermenters: Math.ceil(ORDER_QTY / 85),
+        totalCooks: Math.ceil(ORDER_QTY / BBLS_PER_FERM) * 3,
+        totalFermenters: Math.ceil(ORDER_QTY / BBLS_PER_FERM),
         executedCooks: 0,
         executedFermenters: 0,
       }
@@ -1007,7 +1020,7 @@ async function seed() {
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: `${scheduleOrderName}01`,
+        name: `${scheduleOrderName}03`,
       }
     });
 
