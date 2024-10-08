@@ -8,6 +8,8 @@ services:
       context: .
       dockerfile: Dockerfile
     command: sleep infinity
+    networks:
+      - devcontainer_network
     links:
       - server
 networks:
