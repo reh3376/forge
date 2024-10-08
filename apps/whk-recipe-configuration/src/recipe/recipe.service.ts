@@ -27,11 +27,14 @@ export class RecipeService extends RecipeServiceBase {
     const query = `
       SELECT
           soq."createdAt" as ScheduledAt,
+          pro.name as ProductionOrderNumber,
+          pro.id as ProductionOrderId,
           r. *
       FROM "Recipe" r
       JOIN public."ProductionOrder" PO on r.id = PO."recipeId"
       JOIN public."ScheduleOrder" SO on PO."scheduleOrderId" = SO.id
       JOIN public."ScheduleOrderQueue" SOQ on SO."scheduleOrderQueueId" = SOQ.id
+      JOIN public."ProductionOrder" pro on pro."scheduleOrderId" = so.id
       WHERE SoQ."queueIndex" <= 0
       ORDER BY SoQ."createdAt"`;
     const recipes = await this.prisma.$queryRaw<any>(Prisma.sql([query]));
