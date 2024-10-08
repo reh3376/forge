@@ -1,5 +1,5 @@
 include:
-  - ../apps/whk-recipe-configuration/docker-compose.yml
+  - ./apps/whk-recipe-configuration/docker-compose.dev.yml
 version: "3"
 services:
   devcontainer:
