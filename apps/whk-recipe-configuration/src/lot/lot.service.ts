@@ -8,6 +8,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 import { ar } from "@faker-js/faker";
 import { CreateLotArgs } from "./base/CreateLotArgs";
+import e from "express";
 
 @Injectable()
 export class LotService extends LotServiceBase {
@@ -19,7 +20,7 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
-  private calculateLotAnalytics(lot: LotCreateInput): any {
+  calculateLotAnalytics(lot: LotCreateInput): any {
     /* CALCULATION DEFINITIONS
 
     The key inputs to these are...
@@ -39,17 +40,28 @@ export class LotService extends LotServiceBase {
       lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
       const startWeight = lot.initialWeight ?? 0;
       const endWeight = lot.finalWeight ?? 0;
-      lot.totalWeight = endWeight - startWeight;
-
-
+      lot.totalWeight = startWeight - endWeight;
+      lot.totalVolumeWg = lot.totalWeight / lot.densityFinal;
+      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
+      lot.totalWGs = lot.totalVolumeWg;
+      if (lot.totalFermenters) {
+        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
+      }
+      if (lot.bblTotal) {
+        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
+        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
+      }
     } else if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
       lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
       const startVolume = lot.initialVolume ?? 0;
       const endVolume = lot.finalVolume ?? 0;
-      lot.totalWeight = (endVolume - startVolume) * lot.densityFinal;
-      lot.totalVolumeWg = endVolume - startVolume;
+      lot.totalWeight = (startVolume - endVolume) * lot.densityFinal;
+      lot.totalVolumeWg = startVolume - endVolume;
       lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
       lot.totalWGs = lot.totalVolumeWg;
+      if (lot.totalFermenters) {
+        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
+      }
       if (lot.bblTotal) {
         lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
         lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
