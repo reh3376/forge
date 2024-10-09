@@ -357,7 +357,6 @@ describe("Lot", () => {
     };
 
     const result = await lotService.calculateLotAnalytics(inputData);
-    console.log(result);
 
     // Expect the result to include the input data
     expect(result).toEqual(expect.objectContaining(inputData));
