@@ -32907,6 +32907,9 @@
           "item": {
             "$ref": "#/components/schemas/Item"
           },
+          "lotAlphaChar": {
+            "type": "string"
+          },
           "lotCreatedAt": {
             "type": "object"
           },
@@ -38245,6 +38248,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "lotAlphaChar": {
+            "$ref": "#/components/schemas/StringNullableFilter"
           },
           "lotCreatedAt": {
             "$ref": "#/components/schemas/DateTimeNullableFilter"
@@ -44575,6 +44581,9 @@
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
           },
+          "lotAlphaChar": {
+            "type": "string"
+          },
           "lotCreatedAt": {
             "type": "object"
           },
@@ -44798,6 +44807,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "lotAlphaChar": {
+            "type": "string"
           },
           "lotCreatedAt": {
             "type": "object"
