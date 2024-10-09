@@ -7,6 +7,7 @@ import { Lot, Prisma } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 import { ar } from "@faker-js/faker";
+import { CreateLotArgs } from "./base/CreateLotArgs";
 
 @Injectable()
 export class LotService extends LotServiceBase {
@@ -18,6 +19,46 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
+  private calculateLotAnalytics(lot: LotCreateInput): any {
+    /* CALCULATION DEFINITIONS
+
+    The key inputs to these are...
+    1. Weight. Depending on the source vessel for the lot, this will either be direct via start/end weights or via the start/end volumes and the final density
+    2. Barrel Entry Proof. This is the proof of the distillate entering the barrel. This 2*100 * the ABV
+    3. Distillate final density
+
+    The Metrics to be calculated are...
+    1. Density, simple unit conversion
+    2. Total WGs (Volume) = Total Weight / Density
+    3. Total PGs = Total WGs * EntryProof/100
+    4. Average PGs / Bbl = Total PGs / Total Barrels
+    5. Average WGs / Bbl = Total WGs / Total Barrels
+
+    */
+    if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
+      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
+      const startWeight = lot.initialWeight ?? 0;
+      const endWeight = lot.finalWeight ?? 0;
+      lot.totalWeight = endWeight - startWeight;
+
+
+    } else if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
+      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
+      const startVolume = lot.initialVolume ?? 0;
+      const endVolume = lot.finalVolume ?? 0;
+      lot.totalWeight = (endVolume - startVolume) * lot.densityFinal;
+      lot.totalVolumeWg = endVolume - startVolume;
+      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
+      lot.totalWGs = lot.totalVolumeWg;
+      if (lot.bblTotal) {
+        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
+        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
+      }
+    }
+
+    return lot;
+  }
+
   async createLot<T extends Prisma.LotCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotCreateArgs>
   ): Promise<Lot> {
@@ -26,7 +67,7 @@ export class LotService extends LotServiceBase {
     const month = String.fromCharCode(64 + date.getMonth() + 1);
     const day = date.getDate().toString().padStart(2, "0");
 
-    const lotNumberPrefix = `${year}${month}${day}`;
+    const lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}`;
 
     const lastLot: Lot[] = await this.lots({
       where: {
@@ -40,6 +81,10 @@ export class LotService extends LotServiceBase {
       take: 1,
     });
 
+    if (lastLot.length > 0) {
+      throw new Error(`Lot with character ${args.data.lotAlphaChar} has already been created today.`);
+    }
+
     const barrelTypeMapping: { [key: string]: string } = {
       "WVG": "01",
       "ISC": "10",
@@ -47,14 +92,30 @@ export class LotService extends LotServiceBase {
     if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
       throw new Error("BBL OEM must be provided and must be one of the following: WVG, ISC");
     }
-    const fullLotNumber = `${lotNumberPrefix}${args.data.lotAlphaChar}${barrelTypeMapping[args.data.bblOem]}`;
-    const lastLotIdIndex = lastLot.length > 0 ? parseInt(lastLot[0].lotNumber.split(".").pop()?.slice(-3) || "0") : -1;
-    const newIndex = `${lastLotIdIndex + 1}`.padStart(3, "0");
+    const fullLotNumber = `${lotNumberPrefix}.${barrelTypeMapping[args.data.bblOem]}`;
 
+    // Get the item from the recipe
+    const recipe = await this.prisma.recipe.findUnique({
+      where: { id: args.data.recipe?.connect?.id },
+      include: { item: true },
+    });
+    if (!recipe) {
+      throw new Error("Recipe not found");
+    } 
+
+    // Update the args.data with the item from the recipe
+    if (!recipe.item) {
+      throw new Error("Recipe does not have an associated item");
+    }
+    args.data.item = { connect: { id: recipe.item.id } };
+
+    // Calculate the lot analytics
+    args.data = this.calculateLotAnalytics(args.data as LotCreateInput);
+    
     const lot = await super.createLot({
       data: {
         ...args.data,
-        lotNumber: `${lotNumberPrefix}${newIndex}`,
+        lotNumber: `${fullLotNumber}`,
       },
       include: {
         ...args.include,
@@ -64,6 +125,12 @@ export class LotService extends LotServiceBase {
       },
     });
 
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
+      event_type: 'create',
+      data: lot,
+      recordName: 'Lot',
+    });
+    
     this.logger.log(`Created Lot: ${lot.lotNumber} & pushed to topic`);
     return lot;
   }
