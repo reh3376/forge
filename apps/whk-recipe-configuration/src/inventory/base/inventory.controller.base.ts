@@ -64,6 +64,8 @@ export class InventoryControllerBase {
         },
       },
       select: {
+        active: true,
+
         asset: {
           select: {
             id: true,
@@ -74,6 +76,7 @@ export class InventoryControllerBase {
         correctionNote: true,
         createdAt: true,
         createdBy: true,
+        currentQuantity: true,
         customers: true,
         fifoIndex: true,
         globalId: true,
@@ -87,6 +90,7 @@ export class InventoryControllerBase {
 
         lotNumber: true,
         notes: true,
+        originalQuantity: true,
         proof: true,
         revision: true,
         schemaVersion: true,
@@ -114,6 +118,8 @@ export class InventoryControllerBase {
     return this.service.inventories({
       ...args,
       select: {
+        active: true,
+
         asset: {
           select: {
             id: true,
@@ -124,6 +130,7 @@ export class InventoryControllerBase {
         correctionNote: true,
         createdAt: true,
         createdBy: true,
+        currentQuantity: true,
         customers: true,
         fifoIndex: true,
         globalId: true,
@@ -137,6 +144,7 @@ export class InventoryControllerBase {
 
         lotNumber: true,
         notes: true,
+        originalQuantity: true,
         proof: true,
         revision: true,
         schemaVersion: true,
@@ -165,6 +173,8 @@ export class InventoryControllerBase {
     const result = await this.service.inventory({
       where: params,
       select: {
+        active: true,
+
         asset: {
           select: {
             id: true,
@@ -175,6 +185,7 @@ export class InventoryControllerBase {
         correctionNote: true,
         createdAt: true,
         createdBy: true,
+        currentQuantity: true,
         customers: true,
         fifoIndex: true,
         globalId: true,
@@ -188,6 +199,7 @@ export class InventoryControllerBase {
 
         lotNumber: true,
         notes: true,
+        originalQuantity: true,
         proof: true,
         revision: true,
         schemaVersion: true,
@@ -238,6 +250,8 @@ export class InventoryControllerBase {
           },
         },
         select: {
+          active: true,
+
           asset: {
             select: {
               id: true,
@@ -248,6 +262,7 @@ export class InventoryControllerBase {
           correctionNote: true,
           createdAt: true,
           createdBy: true,
+          currentQuantity: true,
           customers: true,
           fifoIndex: true,
           globalId: true,
@@ -261,6 +276,7 @@ export class InventoryControllerBase {
 
           lotNumber: true,
           notes: true,
+          originalQuantity: true,
           proof: true,
           revision: true,
           schemaVersion: true,
@@ -297,6 +313,8 @@ export class InventoryControllerBase {
       return await this.service.deleteInventory({
         where: params,
         select: {
+          active: true,
+
           asset: {
             select: {
               id: true,
@@ -307,6 +325,7 @@ export class InventoryControllerBase {
           correctionNote: true,
           createdAt: true,
           createdBy: true,
+          currentQuantity: true,
           customers: true,
           fifoIndex: true,
           globalId: true,
@@ -320,6 +339,7 @@ export class InventoryControllerBase {
 
           lotNumber: true,
           notes: true,
+          originalQuantity: true,
           proof: true,
           revision: true,
           schemaVersion: true,
