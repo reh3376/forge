@@ -9,21 +9,23 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Asset } from "../../asset/base/Asset";
 
 import {
+  IsBoolean,
+  IsOptional,
   ValidateNested,
   IsString,
   MaxLength,
-  IsOptional,
   IsDate,
   IsInt,
+  Min,
   Max,
   IsNumber,
 } from "class-validator";
 
+import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -32,6 +34,17 @@ import { Item } from "../../item/base/Item";
 
 @ObjectType()
 class Inventory {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active!: boolean | null;
+
   @ApiProperty({
     required: true,
     type: () => Asset,
@@ -80,6 +93,19 @@ class Inventory {
   @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  currentQuantity!: number | null;
 
   @ApiProperty({
     required: false,
@@ -159,10 +185,23 @@ class Inventory {
     required: false,
     type: Number,
   })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  originalQuantity!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   proof!: number | null;

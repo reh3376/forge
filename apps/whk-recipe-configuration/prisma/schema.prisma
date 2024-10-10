@@ -849,26 +849,29 @@ model Vendor {
 }
 
 model Inventory {
-  asset          Asset    @relation(fields: [assetId], references: [id])
-  assetId        String
-  correctedBy    String?
-  correctionNote String?
-  createdAt      DateTime @default(now())
-  createdBy      String
-  customers      Json?
-  fifoIndex      Int?     @default(0)
-  globalId       String?  @unique @default(cuid())
-  id             String   @id @default(cuid())
-  item           Item     @relation(fields: [itemId], references: [id])
-  itemId         String
-  lotNumber      String?
-  notes          String?
-  units          String?
-  proof          Float?
-  revision       Int?     @default(0)
-  schemaVersion  String?  @default("0001-b")
-  updatedAt      DateTime @updatedAt
-  updatedBy      String?
+  active           Boolean? @default(true)
+  asset            Asset    @relation(fields: [assetId], references: [id])
+  assetId          String
+  correctedBy      String?
+  correctionNote   String?
+  createdAt        DateTime @default(now())
+  createdBy        String
+  currentQuantity  Int?
+  customers        Json?
+  fifoIndex        Int?     @default(0)
+  globalId         String?  @unique @default(cuid())
+  id               String   @id @default(cuid())
+  item             Item     @relation(fields: [itemId], references: [id])
+  itemId           String
+  lotNumber        String?
+  notes            String?
+  originalQuantity Int?
+  proof            Float?
+  revision         Int?     @default(0)
+  schemaVersion    String?
+  units            String?
+  updatedAt        DateTime @updatedAt
+  updatedBy        String?
 
   @@unique([assetId, fifoIndex])
 }

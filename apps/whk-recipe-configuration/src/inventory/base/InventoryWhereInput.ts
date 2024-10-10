@@ -11,18 +11,30 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { ValidateNested, IsOptional } from "class-validator";
+import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
+import { IsOptional, ValidateNested } from "class-validator";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { JsonFilter } from "../../util/JsonFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { JsonFilter } from "../../util/JsonFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class InventoryWhereInput {
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  active?: BooleanNullableFilter;
+
   @ApiProperty({
     required: false,
     type: () => AssetWhereUniqueInput,
@@ -67,6 +79,17 @@ class InventoryWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  currentQuantity?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -145,6 +168,17 @@ class InventoryWhereInput {
     nullable: true,
   })
   notes?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  originalQuantity?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
