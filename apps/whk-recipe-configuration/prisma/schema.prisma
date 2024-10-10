@@ -804,7 +804,7 @@ model Inventory {
   lotNumber        String?
   notes            String?
   originalQuantity Int?
-  proof            Decimal?
+  proof            Float?
   revision         Int?     @default(0)
   schemaVersion    String?
   units            String?

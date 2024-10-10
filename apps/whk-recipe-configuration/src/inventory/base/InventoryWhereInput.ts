@@ -20,7 +20,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class InventoryWhereInput {
@@ -182,14 +182,14 @@ class InventoryWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  proof?: DecimalNullableFilter;
+  proof?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

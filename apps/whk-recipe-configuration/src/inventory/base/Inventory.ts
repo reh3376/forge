@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -31,7 +31,6 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Item } from "../../item/base/Item";
-import { Decimal } from "decimal.js";
 
 @ObjectType()
 class Inventory {
@@ -202,10 +201,10 @@ class Inventory {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  proof!: Decimal | null;
+  proof!: number | null;
 
   @ApiProperty({
     required: false,
