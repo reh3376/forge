@@ -3,12 +3,13 @@ import { PrismaService } from "../prisma/prisma.service";
 import { LotServiceBase } from "./base/lot.service.base";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
-import { Lot, Prisma } from "@prisma/client";
+import { EnumLotStatus, Lot, Prisma } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 import { ar } from "@faker-js/faker";
 import { CreateLotArgs } from "./base/CreateLotArgs";
 import e from "express";
+import { LotUpdateInput } from "./base/LotUpdateInput";
 
 @Injectable()
 export class LotService extends LotServiceBase {
@@ -20,7 +21,7 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
-  calculateLotAnalytics(lot: LotCreateInput): any {
+  calculateLotAnalytics(lot: LotCreateInput | LotUpdateInput): any {
     /* CALCULATION DEFINITIONS
 
     The key inputs to these are...
@@ -36,7 +37,20 @@ export class LotService extends LotServiceBase {
     5. Average WGs / Bbl = Total WGs / Total Barrels
 
     */
-    if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
+
+    if (lot.totalWeight && lot.densityFinal) {
+      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
+      lot.totalVolumeWg = lot.totalWeight / lot.densityFinal;
+      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
+      lot.totalWGs = lot.totalVolumeWg;
+      if (lot.totalFermenters) {
+        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
+      }
+      if (lot.bblTotal) {
+        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
+        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
+      }
+    } else if (lot.initialWeight && lot.finalWeight && lot.densityFinal) {
       lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
       const startWeight = lot.initialWeight ?? 0;
       const endWeight = lot.finalWeight ?? 0;
@@ -52,6 +66,10 @@ export class LotService extends LotServiceBase {
         lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
       }
     } else if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
+      // convert % to vol, 301.38 gal/% LIT on cistern tanks
+      lot.initialVolume = lot.initialVolume * 301.38 ?? 0;
+      lot.finalVolume = lot.finalVolume * 301.38 ?? 0;
+
       lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
       const startVolume = lot.initialVolume ?? 0;
       const endVolume = lot.finalVolume ?? 0;
@@ -65,6 +83,9 @@ export class LotService extends LotServiceBase {
       if (lot.bblTotal) {
         lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
         lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
+        lot.status = EnumLotStatus.Complete;
+      } else {
+        lot.status = EnumLotStatus.PendingBarrelCount;
       }
     }
 
@@ -148,6 +169,7 @@ export class LotService extends LotServiceBase {
   }
 
   async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
+    args.data = this.calculateLotAnalytics(args.data as LotUpdateInput);
     const Lot = await super.updateLot({
       data: {
           ...args.data,
