@@ -28,6 +28,17 @@ class InventoryOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  active?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   assetId?: SortOrder;
 
   @ApiProperty({
@@ -73,6 +84,17 @@ class InventoryOrderByInput {
     nullable: true,
   })
   createdBy?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  currentQuantity?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -150,6 +172,17 @@ class InventoryOrderByInput {
     nullable: true,
   })
   notes?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  originalQuantity?: SortOrder;
 
   @ApiProperty({
     required: false,
