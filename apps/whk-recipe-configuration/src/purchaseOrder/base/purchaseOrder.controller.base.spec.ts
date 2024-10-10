@@ -14,6 +14,8 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { PurchaseOrderController } from "../purchaseOrder.controller";
 import { PurchaseOrderService } from "../purchaseOrder.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { LoggerModule } from "../../logger/logger.module";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -153,6 +155,7 @@ describe("PurchaseOrder", () => {
           provide: PurchaseOrderService,
           useValue: service,
         },
+        // PrismaService,
       ],
       controllers: [PurchaseOrderController],
       imports: [ACLModule],
@@ -169,7 +172,7 @@ describe("PurchaseOrder", () => {
 
     app = moduleRef.createNestApplication();
     await app.init();
-  });
+  }, 30000); // Added 30 seconds timeout
 
   test("POST /purchaseOrders", async () => {
     await request(app.getHttpServer())

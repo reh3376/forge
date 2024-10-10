@@ -16,11 +16,11 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
@@ -73,14 +73,14 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  duration?: DecimalNullableFilter;
+  duration?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
