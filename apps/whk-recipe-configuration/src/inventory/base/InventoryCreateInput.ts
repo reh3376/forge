@@ -11,16 +11,20 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+
 import {
+  IsBoolean,
+  IsOptional,
   ValidateNested,
   IsString,
   MaxLength,
-  IsOptional,
   IsInt,
+  Min,
   Max,
   IsNumber,
 } from "class-validator";
+
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -30,6 +34,17 @@ import { Decimal } from "decimal.js";
 
 @InputType()
 class InventoryCreateInput {
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  active?: boolean | null;
+
   @ApiProperty({
     required: true,
     type: () => AssetWhereUniqueInput,
@@ -71,6 +86,19 @@ class InventoryCreateInput {
   @MaxLength(256)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  currentQuantity?: number | null;
 
   @ApiProperty({
     required: false,
@@ -138,6 +166,19 @@ class InventoryCreateInput {
     nullable: true,
   })
   notes?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  originalQuantity?: number | null;
 
   @ApiProperty({
     required: false,

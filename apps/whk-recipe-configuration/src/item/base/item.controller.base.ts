@@ -655,6 +655,8 @@ export class ItemControllerBase {
     const results = await this.service.findInventories(params.id, {
       ...query,
       select: {
+        active: true,
+
         asset: {
           select: {
             id: true,
@@ -665,6 +667,7 @@ export class ItemControllerBase {
         correctionNote: true,
         createdAt: true,
         createdBy: true,
+        currentQuantity: true,
         customers: true,
         fifoIndex: true,
         globalId: true,
@@ -678,6 +681,7 @@ export class ItemControllerBase {
 
         lotNumber: true,
         notes: true,
+        originalQuantity: true,
         proof: true,
         revision: true,
         schemaVersion: true,
