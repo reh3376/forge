@@ -182,6 +182,17 @@ class InventoryWhereInput {
 
   @ApiProperty({
     required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  units?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: FloatNullableFilter,
   })
   @Type(() => FloatNullableFilter)
@@ -212,17 +223,6 @@ class InventoryWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  units?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

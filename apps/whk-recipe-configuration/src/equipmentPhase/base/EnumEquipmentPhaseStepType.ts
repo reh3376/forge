@@ -19,7 +19,7 @@ export enum EnumEquipmentPhaseStepType {
   Wheat = "Wheat",
   Malt = "Malt",
   Premalt = "Premalt",
-  Speciality = "Speciality",
+  Specialty = "Specialty",
   Enzyme = "Enzyme",
   Nutrient = "Nutrient",
   Yeast = "Yeast",

@@ -23,7 +23,6 @@ import {
   MaxLength,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { Type } from "class-transformer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Operation } from "../../operation/base/Operation";
@@ -31,48 +30,12 @@ import { Operation } from "../../operation/base/Operation";
 @ObjectType()
 class FermentationSettingDatum {
   @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  acid!: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(100)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  balling!: Decimal | null;
-
-  @ApiProperty({
     required: true,
   })
   @IsDate()
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(1000)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  dryInches!: Decimal | null;
 
   @ApiProperty({
     required: false,
@@ -128,18 +91,6 @@ class FermentationSettingDatum {
   operation?: Operation | null;
 
   @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH!: Decimal | null;
-
-  @ApiProperty({
     required: true,
   })
   @IsDate()
@@ -154,15 +105,54 @@ class FermentationSettingDatum {
   @IsNumber()
   @Max(212)
   @Field(() => Float)
-  temperature!: Decimal;
+  temperature!: number;
 
   @ApiProperty({
     required: true,
   })
   @IsDate()
   @Type(() => Date)
-  @Field(() => Date)
-  updatedAt!: Date;
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  dryInches!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  balling!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  acid!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  pH!: number | null;
 
   @ApiProperty({
     required: true,
