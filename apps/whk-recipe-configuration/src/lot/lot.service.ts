@@ -21,7 +21,10 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
-  calculateLotAnalytics(lot: LotCreateInput | LotUpdateInput): any {
+  async calculateLotAnalytics(
+    lot: LotCreateInput | (LotUpdateInput & { where: Prisma.LotWhereUniqueInput } & { data: Prisma.LotUpdateInput }),
+    type: string='create'
+  ): Promise<any> {
     /* CALCULATION DEFINITIONS
 
     The key inputs to these are...
@@ -37,59 +40,90 @@ export class LotService extends LotServiceBase {
     5. Average WGs / Bbl = Total WGs / Total Barrels
 
     */
+    let mergedLot: any = lot;
+    if (type !== 'create') {
+      // look up the lot based on the id
+      if ('where' in lot && 'data' in lot) {
+        const existingLot = await this.prisma.lot.findUnique({
+          where: { id: lot.where.id },
+        });
 
-    if (lot.totalWeight && lot.densityFinal) {
-      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
-      lot.totalVolumeWg = lot.totalWeight / lot.densityFinal;
-      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
-      lot.totalWGs = lot.totalVolumeWg;
-      if (lot.totalFermenters) {
-        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
-      }
-      if (lot.bblTotal) {
-        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
-        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
-      }
-    } else if (lot.initialWeight && lot.finalWeight && lot.densityFinal) {
-      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
-      const startWeight = lot.initialWeight ?? 0;
-      const endWeight = lot.finalWeight ?? 0;
-      lot.totalWeight = startWeight - endWeight;
-      lot.totalVolumeWg = lot.totalWeight / lot.densityFinal;
-      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
-      lot.totalWGs = lot.totalVolumeWg;
-      if (lot.totalFermenters) {
-        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
-      }
-      if (lot.bblTotal) {
-        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
-        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
-      }
-    } else if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
-      // convert % to vol, 301.38 gal/% LIT on cistern tanks
-      lot.initialVolume = lot.initialVolume * 301.38 ?? 0;
-      lot.finalVolume = lot.finalVolume * 301.38 ?? 0;
+        if (!existingLot) {
+          throw new Error('Lot not found');
+        }
 
-      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
-      const startVolume = lot.initialVolume ?? 0;
-      const endVolume = lot.finalVolume ?? 0;
-      lot.totalWeight = (startVolume - endVolume) * lot.densityFinal;
-      lot.totalVolumeWg = startVolume - endVolume;
-      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
-      lot.totalWGs = lot.totalVolumeWg;
-      if (lot.totalFermenters) {
-        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
-      }
-      if (lot.bblTotal) {
-        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
-        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
-        lot.status = EnumLotStatus.Complete;
+        // Merge existing lot data with update input, excluding undefined values
+        mergedLot = {
+          ...existingLot,
+          ...Object.fromEntries(
+            Object.entries(lot.data).filter(([_, value]) => value !== undefined)
+          )
+        };
       } else {
-        lot.status = EnumLotStatus.PendingBarrelCount;
+        throw new Error('Invalid input for update operation');
+      }
+    } else {
+      mergedLot = lot;
+    }
+
+    if (mergedLot.totalWeight && mergedLot.densityFinal) {
+      if (mergedLot.densityFinal <=1 ) {
+        mergedLot.densityFinal = mergedLot.densityFinal * 8.3454 ?? 0;
+      }
+      mergedLot.totalVolumeWg = mergedLot.totalWeight / mergedLot.densityFinal;
+      mergedLot.totalPGs = mergedLot.totalVolumeWg * (mergedLot.bblEntryProof ?? 0) / 100;
+      mergedLot.totalWGs = mergedLot.totalVolumeWg;
+      if (mergedLot.totalFermenters) {
+        mergedLot.avgPGsFerm = mergedLot.totalPGs / mergedLot.totalFermenters;
+      }
+      if (mergedLot.bblTotal) {
+        mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
+        mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
+      }
+    } else if (mergedLot.initialWeight && mergedLot.finalWeight && mergedLot.densityFinal) {
+      if (mergedLot.densityFinal <=1 ) {
+        mergedLot.densityFinal = mergedLot.densityFinal * 8.3454 ?? 0;
+      }
+      const startWeight = mergedLot.initialWeight ?? 0;
+      const endWeight = mergedLot.finalWeight ?? 0;
+      mergedLot.totalWeight = startWeight - endWeight;
+      mergedLot.totalVolumeWg = mergedLot.totalWeight / mergedLot.densityFinal;
+      mergedLot.totalPGs = mergedLot.totalVolumeWg * (mergedLot.bblEntryProof ?? 0) / 100;
+      mergedLot.totalWGs = mergedLot.totalVolumeWg;
+      if (mergedLot.totalFermenters) {
+        mergedLot.avgPGsFerm = mergedLot.totalPGs / mergedLot.totalFermenters;
+      }
+      if (mergedLot.bblTotal) {
+        mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
+        mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
+      }
+    } else if (mergedLot.initialVolume && mergedLot.finalVolume && mergedLot.densityFinal) {
+      // convert % to vol, 301.38 gal/% LIT on cistern tanks
+      mergedLot.initialVolume = mergedLot.initialVolume * 301.38 ?? 0;
+      mergedLot.finalVolume = mergedLot.finalVolume * 301.38 ?? 0;
+
+      if (mergedLot.densityFinal <=1 ) {
+        mergedLot.densityFinal = mergedLot.densityFinal * 8.3454 ?? 0;
+      }
+      const startVolume = mergedLot.initialVolume ?? 0;
+      const endVolume = mergedLot.finalVolume ?? 0;
+      mergedLot.totalWeight = (startVolume - endVolume) * mergedLot.densityFinal;
+      mergedLot.totalVolumeWg = startVolume - endVolume;
+      mergedLot.totalPGs = mergedLot.totalVolumeWg * (mergedLot.bblEntryProof ?? 0) / 100;
+      mergedLot.totalWGs = mergedLot.totalVolumeWg;
+      if (mergedLot.totalFermenters) {
+        mergedLot.avgPGsFerm = mergedLot.totalPGs / mergedLot.totalFermenters;
+      }
+      if (mergedLot.bblTotal) {
+        mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
+        mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
+        mergedLot.status = EnumLotStatus.Complete;
+      } else {
+        mergedLot.status = EnumLotStatus.PendingBarrelCount;
       }
     }
 
-    return lot;
+    return mergedLot;
   }
 
   async createLot<T extends Prisma.LotCreateArgs>(
@@ -143,7 +177,7 @@ export class LotService extends LotServiceBase {
     args.data.item = { connect: { id: recipe.item.id } };
 
     // Calculate the lot analytics
-    args.data = this.calculateLotAnalytics(args.data as LotCreateInput);
+    args.data = await this.calculateLotAnalytics(args as LotCreateInput);
     
     const lot = await super.createLot({
       data: {
@@ -169,7 +203,7 @@ export class LotService extends LotServiceBase {
   }
 
   async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
-    args.data = this.calculateLotAnalytics(args.data as LotUpdateInput);
+    args.data = await this.calculateLotAnalytics(args as LotUpdateInput, 'update');
     const Lot = await super.updateLot({
       data: {
           ...args.data,
