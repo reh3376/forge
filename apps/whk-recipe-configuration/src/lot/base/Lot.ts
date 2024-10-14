@@ -28,9 +28,9 @@ import {
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { BomItem } from "../../bomItem/base/BomItem";
+import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
-import { Item } from "../../item/base/Item";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
@@ -151,6 +151,15 @@ class Lot {
     nullable: true,
   })
   confirmed!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Item,
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  continerItem?: Item | null;
 
   @ApiProperty({
     required: true,

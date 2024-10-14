@@ -28,9 +28,9 @@ import {
 import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
 import { Type } from "class-transformer";
 import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedManyWithoutLotsInput";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { InventoryTransferCreateNestedManyWithoutLotsInput } from "./InventoryTransferCreateNestedManyWithoutLotsInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -157,6 +157,18 @@ class LotCreateInput {
     nullable: true,
   })
   confirmed?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  continerItem?: ItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

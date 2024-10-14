@@ -16,6 +16,7 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
@@ -83,6 +84,18 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryListRelationFilter, {
+    nullable: true,
+  })
+  inventories?: InventoryListRelationFilter;
 
   @ApiProperty({
     required: false,

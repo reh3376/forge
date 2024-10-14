@@ -406,7 +406,8 @@ model Item {
   itemReceipts       ItemReceipt[]
   itemRevision       Int?                @default(0)
   itemType           String
-  lots               Lot[]
+  lotContinerItem    Lot?                @relation(name: "continerItem")
+  lots               Lot[]               @relation(name: "ItemOnLots")
   productionOrders   ProductionOrder[]
   purchaseOrders     PurchaseOrder[]
   recipeBoms         RecipeBomItem[]
@@ -563,6 +564,7 @@ model ItemReceipt {
   driver          String
   globalId        String?                @unique @default(cuid())
   id              String                 @id @default(cuid())
+  inventories     Inventory[]
   item            Item                   @relation(fields: [itemId], references: [id])
   itemId          String
   loadId          Int?                   @default(autoincrement())
@@ -595,6 +597,8 @@ model Lot {
   bblType                     String?
   bomItems                    BomItem[]
   confirmed                   Boolean?            @default(false)
+  continerItem                Item?               @relation(name: "continerItem", fields: [continerItemId], references: [id])
+  continerItemId              String?             @unique
   createdAt                   DateTime            @default(now())
   createdBy                   String?
   densityFinal                Float?
@@ -614,7 +618,7 @@ model Lot {
   initialWeight               Float?
   inventoryTransfers          InventoryTransfer[]
   isRawMaterial               Boolean?            @default(false)
-  item                        Item?               @relation(fields: [itemId], references: [id])
+  item                        Item?               @relation(name: "ItemOnLots", fields: [itemId], references: [id])
   itemId                      String?
   lotAlphaChar                String?
   lotCreatedAt                DateTime?           @default(now())
@@ -787,28 +791,30 @@ model Vendor {
 }
 
 model Inventory {
-  active           Boolean? @default(true)
-  asset            Asset    @relation(fields: [assetId], references: [id])
+  active           Boolean?     @default(true)
+  asset            Asset        @relation(fields: [assetId], references: [id])
   assetId          String
   correctedBy      String?
   correctionNote   String?
-  createdAt        DateTime @default(now())
+  createdAt        DateTime     @default(now())
   createdBy        String
   currentQuantity  Int?
   customers        Json?
-  fifoIndex        Int?     @default(0)
-  globalId         String?  @unique @default(cuid())
-  id               String   @id @default(cuid())
-  item             Item     @relation(fields: [itemId], references: [id])
+  fifoIndex        Int?         @default(0)
+  globalId         String?      @unique @default(cuid())
+  id               String       @id @default(cuid())
+  item             Item         @relation(fields: [itemId], references: [id])
   itemId           String
+  itemReceipt      ItemReceipt? @relation(fields: [itemReceiptId], references: [id])
+  itemReceiptId    String?
   lotNumber        String?
   notes            String?
   originalQuantity Int?
   proof            Float?
-  revision         Int?     @default(0)
+  revision         Int?         @default(0)
   schemaVersion    String?
-  units            String?
-  updatedAt        DateTime @updatedAt
+  units            String?      @default("lbs")
+  updatedAt        DateTime     @updatedAt
   updatedBy        String?
 
   @@unique([assetId, fifoIndex])

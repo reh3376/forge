@@ -62,6 +62,12 @@ export class LotControllerBase {
       data: {
         ...data,
 
+        continerItem: data.continerItem
+          ? {
+              connect: data.continerItem,
+            }
+          : undefined,
+
         filledFrom: data.filledFrom
           ? {
               connect: data.filledFrom,
@@ -107,6 +113,13 @@ export class LotControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
@@ -207,6 +220,13 @@ export class LotControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
@@ -306,6 +326,13 @@ export class LotControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
@@ -412,6 +439,12 @@ export class LotControllerBase {
         data: {
           ...data,
 
+          continerItem: data.continerItem
+            ? {
+                connect: data.continerItem,
+              }
+            : undefined,
+
           filledFrom: data.filledFrom
             ? {
                 connect: data.filledFrom,
@@ -457,6 +490,13 @@ export class LotControllerBase {
           bblTotal: true,
           bblType: true,
           confirmed: true,
+
+          continerItem: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
           createdBy: true,
           densityFinal: true,
