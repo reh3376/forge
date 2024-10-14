@@ -26,6 +26,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { Inventory } from "../../inventory/base/Inventory";
 import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -83,6 +84,15 @@ class ItemReceipt {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Inventory],
+  })
+  @ValidateNested()
+  @Type(() => Inventory)
+  @IsOptional()
+  inventories?: Array<Inventory>;
 
   @ApiProperty({
     required: true,

@@ -830,6 +830,12 @@ export class AssetControllerBase {
           },
         },
 
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
         notes: true,
         originalQuantity: true,
@@ -1428,6 +1434,13 @@ export class AssetControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
@@ -1599,6 +1612,13 @@ export class AssetControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,

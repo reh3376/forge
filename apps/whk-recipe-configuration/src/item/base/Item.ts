@@ -238,6 +238,15 @@ class Item {
 
   @ApiProperty({
     required: false,
+    type: () => Lot,
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lotContinerItem?: Lot | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [Lot],
   })
   @ValidateNested()

@@ -24,8 +24,9 @@ import {
   IsBoolean,
 } from "class-validator";
 
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { InventoryUpdateManyWithoutItemReceiptsInput } from "./InventoryUpdateManyWithoutItemReceiptsInput";
 import { Type } from "class-transformer";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -72,6 +73,18 @@ class ItemReceiptUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryUpdateManyWithoutItemReceiptsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryUpdateManyWithoutItemReceiptsInput)
+  @IsOptional()
+  @Field(() => InventoryUpdateManyWithoutItemReceiptsInput, {
+    nullable: true,
+  })
+  inventories?: InventoryUpdateManyWithoutItemReceiptsInput;
 
   @ApiProperty({
     required: false,

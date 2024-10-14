@@ -24,8 +24,9 @@ import {
   IsBoolean,
 } from "class-validator";
 
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { InventoryCreateNestedManyWithoutItemReceiptsInput } from "./InventoryCreateNestedManyWithoutItemReceiptsInput";
 import { Type } from "class-transformer";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -66,6 +67,18 @@ class ItemReceiptCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryCreateNestedManyWithoutItemReceiptsInput,
+  })
+  @ValidateNested()
+  @Type(() => InventoryCreateNestedManyWithoutItemReceiptsInput)
+  @IsOptional()
+  @Field(() => InventoryCreateNestedManyWithoutItemReceiptsInput, {
+    nullable: true,
+  })
+  inventories?: InventoryCreateNestedManyWithoutItemReceiptsInput;
 
   @ApiProperty({
     required: true,

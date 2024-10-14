@@ -28,6 +28,7 @@ import { InventoryUpdateManyWithoutItemsInput } from "./InventoryUpdateManyWitho
 import { InventoryLogUpdateManyWithoutItemsInput } from "./InventoryLogUpdateManyWithoutItemsInput";
 import { InventoryTransferUpdateManyWithoutItemsInput } from "./InventoryTransferUpdateManyWithoutItemsInput";
 import { ItemReceiptUpdateManyWithoutItemsInput } from "./ItemReceiptUpdateManyWithoutItemsInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput";
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
@@ -252,6 +253,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   itemType?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lotContinerItem?: LotWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

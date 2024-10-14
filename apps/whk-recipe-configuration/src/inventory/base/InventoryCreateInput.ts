@@ -19,7 +19,6 @@ import {
   IsString,
   MaxLength,
   IsInt,
-  Min,
   Max,
   IsNumber,
 } from "class-validator";
@@ -30,6 +29,7 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
+import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 
 @InputType()
 class InventoryCreateInput {
@@ -91,7 +91,6 @@ class InventoryCreateInput {
     type: Number,
   })
   @IsInt()
-  @Min(-999999999)
   @Max(999999999)
   @IsOptional()
   @Field(() => Number, {
@@ -144,6 +143,18 @@ class InventoryCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceiptWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceiptWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemReceiptWhereUniqueInput, {
+    nullable: true,
+  })
+  itemReceipt?: ItemReceiptWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -171,7 +182,6 @@ class InventoryCreateInput {
     type: Number,
   })
   @IsInt()
-  @Min(-999999999)
   @Max(999999999)
   @IsOptional()
   @Field(() => Number, {

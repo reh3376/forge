@@ -793,6 +793,13 @@ export class ProductionOrderControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
