@@ -332,6 +332,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -372,6 +373,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });

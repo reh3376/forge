@@ -35,6 +35,7 @@ import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
 import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @ObjectType()
 class Asset {
@@ -268,6 +269,17 @@ class Asset {
   @MaxLength(256)
   @Field(() => String)
   schemaVersion!: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumAssetStatus,
+  })
+  @IsEnum(EnumAssetStatus)
+  @IsOptional()
+  @Field(() => EnumAssetStatus, {
+    nullable: true,
+  })
+  status?: "OOS" | "InService" | null;
 
   @ApiProperty({
     required: true,

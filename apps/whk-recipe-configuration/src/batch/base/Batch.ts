@@ -128,6 +128,16 @@ class Batch {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  durationSplits!: JsonValue;
+
+  @ApiProperty({
+    required: false,
     type: () => [FermentationChemistry],
   })
   @ValidateNested()
@@ -272,6 +282,18 @@ class Batch {
     nullable: true,
   })
   revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalDuration!: number | null;
 
   @ApiProperty({
     required: true,
