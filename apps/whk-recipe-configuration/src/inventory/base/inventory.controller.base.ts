@@ -62,6 +62,12 @@ export class InventoryControllerBase {
         item: {
           connect: data.item,
         },
+
+        itemReceipt: data.itemReceipt
+          ? {
+              connect: data.itemReceipt,
+            }
+          : undefined,
       },
       select: {
         active: true,
@@ -83,6 +89,12 @@ export class InventoryControllerBase {
         id: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemReceipt: {
           select: {
             id: true,
           },
@@ -137,6 +149,12 @@ export class InventoryControllerBase {
         id: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemReceipt: {
           select: {
             id: true,
           },
@@ -197,6 +215,12 @@ export class InventoryControllerBase {
           },
         },
 
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
         lotNumber: true,
         notes: true,
         originalQuantity: true,
@@ -248,6 +272,12 @@ export class InventoryControllerBase {
           item: {
             connect: data.item,
           },
+
+          itemReceipt: data.itemReceipt
+            ? {
+                connect: data.itemReceipt,
+              }
+            : undefined,
         },
         select: {
           active: true,
@@ -269,6 +299,12 @@ export class InventoryControllerBase {
           id: true,
 
           item: {
+            select: {
+              id: true,
+            },
+          },
+
+          itemReceipt: {
             select: {
               id: true,
             },
@@ -332,6 +368,12 @@ export class InventoryControllerBase {
           id: true,
 
           item: {
+            select: {
+              id: true,
+            },
+          },
+
+          itemReceipt: {
             select: {
               id: true,
             },

@@ -20,7 +20,6 @@ import {
   MaxLength,
   IsDate,
   IsInt,
-  Min,
   Max,
   IsNumber,
 } from "class-validator";
@@ -31,6 +30,7 @@ import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Item } from "../../item/base/Item";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 
 @ObjectType()
 class Inventory {
@@ -99,7 +99,6 @@ class Inventory {
     type: Number,
   })
   @IsInt()
-  @Min(-999999999)
   @Max(999999999)
   @IsOptional()
   @Field(() => Number, {
@@ -159,6 +158,15 @@ class Inventory {
 
   @ApiProperty({
     required: false,
+    type: () => ItemReceipt,
+  })
+  @ValidateNested()
+  @Type(() => ItemReceipt)
+  @IsOptional()
+  itemReceipt?: ItemReceipt | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -186,7 +194,6 @@ class Inventory {
     type: Number,
   })
   @IsInt()
-  @Min(-999999999)
   @Max(999999999)
   @IsOptional()
   @Field(() => Number, {

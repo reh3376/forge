@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ItemReceipt as PrismaItemReceipt,
+  Inventory as PrismaInventory,
   TestParameter as PrismaTestParameter,
   Item as PrismaItem,
   PurchaseOrder as PrismaPurchaseOrder,
@@ -53,6 +54,17 @@ export class ItemReceiptServiceBase {
     args: Prisma.ItemReceiptDeleteArgs
   ): Promise<PrismaItemReceipt> {
     return this.prisma.itemReceipt.delete(args);
+  }
+
+  async findInventories(
+    parentId: string,
+    args: Prisma.InventoryFindManyArgs
+  ): Promise<PrismaInventory[]> {
+    return this.prisma.itemReceipt
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .inventories(args);
   }
 
   async findTests(

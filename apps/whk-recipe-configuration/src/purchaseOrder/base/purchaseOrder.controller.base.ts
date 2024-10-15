@@ -373,6 +373,13 @@ export class PurchaseOrderControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
@@ -549,6 +556,13 @@ export class PurchaseOrderControllerBase {
         itemNumber: true,
         itemRevision: true,
         itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,

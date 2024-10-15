@@ -25,6 +25,8 @@ import { ItemReceiptFindManyArgs } from "./ItemReceiptFindManyArgs";
 import { ItemReceiptFindUniqueArgs } from "./ItemReceiptFindUniqueArgs";
 import { CreateItemReceiptArgs } from "./CreateItemReceiptArgs";
 import { UpdateItemReceiptArgs } from "./UpdateItemReceiptArgs";
+import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
+import { Inventory } from "../../inventory/base/Inventory";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Item } from "../../item/base/Item";
@@ -171,6 +173,26 @@ export class ItemReceiptResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Inventory], { name: "inventories" })
+  @nestAccessControl.UseRoles({
+    resource: "Inventory",
+    action: "read",
+    possession: "any",
+  })
+  async findInventories(
+    @graphql.Parent() parent: ItemReceipt,
+    @graphql.Args() args: InventoryFindManyArgs
+  ): Promise<Inventory[]> {
+    const results = await this.service.findInventories(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

@@ -319,6 +319,13 @@ export class SalesOrderControllerBase {
         itemNumber: true,
         itemRevision: true,
         itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,

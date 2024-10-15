@@ -26,6 +26,9 @@ import { ItemReceipt } from "./ItemReceipt";
 import { ItemReceiptFindManyArgs } from "./ItemReceiptFindManyArgs";
 import { ItemReceiptWhereUniqueInput } from "./ItemReceiptWhereUniqueInput";
 import { ItemReceiptUpdateInput } from "./ItemReceiptUpdateInput";
+import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
+import { Inventory } from "../../inventory/base/Inventory";
+import { InventoryWhereUniqueInput } from "../../inventory/base/InventoryWhereUniqueInput";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
@@ -356,6 +359,137 @@ export class ItemReceiptControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/inventories")
+  @ApiNestedQuery(InventoryFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Inventory",
+    action: "read",
+    possession: "any",
+  })
+  async findInventories(
+    @common.Req() request: Request,
+    @common.Param() params: ItemReceiptWhereUniqueInput
+  ): Promise<Inventory[]> {
+    const query = plainToClass(InventoryFindManyArgs, request.query);
+    const results = await this.service.findInventories(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        correctedBy: true,
+        correctionNote: true,
+        createdAt: true,
+        createdBy: true,
+        currentQuantity: true,
+        customers: true,
+        fifoIndex: true,
+        globalId: true,
+        id: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
+        lotNumber: true,
+        notes: true,
+        originalQuantity: true,
+        proof: true,
+        revision: true,
+        schemaVersion: true,
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/inventories")
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "update",
+    possession: "any",
+  })
+  async connectInventories(
+    @common.Param() params: ItemReceiptWhereUniqueInput,
+    @common.Body() body: InventoryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventories: {
+        connect: body,
+      },
+    };
+    await this.service.updateItemReceipt({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/inventories")
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "update",
+    possession: "any",
+  })
+  async updateInventories(
+    @common.Param() params: ItemReceiptWhereUniqueInput,
+    @common.Body() body: InventoryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventories: {
+        set: body,
+      },
+    };
+    await this.service.updateItemReceipt({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/inventories")
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectInventories(
+    @common.Param() params: ItemReceiptWhereUniqueInput,
+    @common.Body() body: InventoryWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      inventories: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItemReceipt({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

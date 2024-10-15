@@ -28,6 +28,7 @@ import { InventoryCreateNestedManyWithoutItemsInput } from "./InventoryCreateNes
 import { InventoryLogCreateNestedManyWithoutItemsInput } from "./InventoryLogCreateNestedManyWithoutItemsInput";
 import { InventoryTransferCreateNestedManyWithoutItemsInput } from "./InventoryTransferCreateNestedManyWithoutItemsInput";
 import { ItemReceiptCreateNestedManyWithoutItemsInput } from "./ItemReceiptCreateNestedManyWithoutItemsInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWithoutItemsInput";
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
@@ -237,6 +238,18 @@ class ItemCreateInput {
   @MaxLength(256)
   @Field(() => String)
   itemType!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereUniqueInput)
+  @IsOptional()
+  @Field(() => LotWhereUniqueInput, {
+    nullable: true,
+  })
+  lotContinerItem?: LotWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
