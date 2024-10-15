@@ -196,6 +196,14 @@ export class ItemServiceBase {
       .salesOrders(args);
   }
 
+  async getLotContinerItem(parentId: string): Promise<PrismaLot | null> {
+    return this.prisma.item
+      .findUnique({
+        where: { id: parentId },
+      })
+      .lotContinerItem();
+  }
+
   async getVendor(parentId: string): Promise<PrismaVendor | null> {
     return this.prisma.item
       .findUnique({

@@ -19,11 +19,11 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
@@ -144,6 +144,18 @@ class LotWhereInput {
     nullable: true,
   })
   confirmed?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ItemWhereUniqueInput, {
+    nullable: true,
+  })
+  continerItem?: ItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,

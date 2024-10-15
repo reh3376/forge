@@ -31,8 +31,8 @@ import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
-import { Asset } from "../../asset/base/Asset";
 import { Item } from "../../item/base/Item";
+import { Asset } from "../../asset/base/Asset";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
@@ -99,6 +99,12 @@ export class LotResolverBase {
       data: {
         ...args.data,
 
+        continerItem: args.data.continerItem
+          ? {
+              connect: args.data.continerItem,
+            }
+          : undefined,
+
         filledFrom: args.data.filledFrom
           ? {
               connect: args.data.filledFrom,
@@ -151,6 +157,12 @@ export class LotResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          continerItem: args.data.continerItem
+            ? {
+                connect: args.data.continerItem,
+              }
+            : undefined,
 
           filledFrom: args.data.filledFrom
             ? {
@@ -259,6 +271,25 @@ export class LotResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Item, {
+    nullable: true,
+    name: "continerItem",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async getContinerItem(@graphql.Parent() parent: Lot): Promise<Item | null> {
+    const result = await this.service.getContinerItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

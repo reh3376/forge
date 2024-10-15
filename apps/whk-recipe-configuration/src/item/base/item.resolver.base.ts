@@ -115,6 +115,12 @@ export class ItemResolverBase {
       data: {
         ...args.data,
 
+        lotContinerItem: args.data.lotContinerItem
+          ? {
+              connect: args.data.lotContinerItem,
+            }
+          : undefined,
+
         vendor: args.data.vendor
           ? {
               connect: args.data.vendor,
@@ -137,6 +143,12 @@ export class ItemResolverBase {
         ...args,
         data: {
           ...args.data,
+
+          lotContinerItem: args.data.lotContinerItem
+            ? {
+                connect: args.data.lotContinerItem,
+              }
+            : undefined,
 
           vendor: args.data.vendor
             ? {
@@ -415,6 +427,27 @@ export class ItemResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Lot, {
+    nullable: true,
+    name: "lotContinerItem",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async getLotContinerItem(
+    @graphql.Parent() parent: Item
+  ): Promise<Lot | null> {
+    const result = await this.service.getLotContinerItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

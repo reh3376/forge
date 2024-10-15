@@ -28,6 +28,7 @@ import { UpdateInventoryArgs } from "./UpdateInventoryArgs";
 import { DeleteInventoryArgs } from "./DeleteInventoryArgs";
 import { Asset } from "../../asset/base/Asset";
 import { Item } from "../../item/base/Item";
+import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { InventoryService } from "../inventory.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Inventory)
@@ -104,6 +105,12 @@ export class InventoryResolverBase {
         item: {
           connect: args.data.item,
         },
+
+        itemReceipt: args.data.itemReceipt
+          ? {
+              connect: args.data.itemReceipt,
+            }
+          : undefined,
       },
     });
   }
@@ -131,6 +138,12 @@ export class InventoryResolverBase {
           item: {
             connect: args.data.item,
           },
+
+          itemReceipt: args.data.itemReceipt
+            ? {
+                connect: args.data.itemReceipt,
+              }
+            : undefined,
         },
       });
     } catch (error) {
@@ -195,6 +208,27 @@ export class InventoryResolverBase {
   })
   async getItem(@graphql.Parent() parent: Inventory): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ItemReceipt, {
+    nullable: true,
+    name: "itemReceipt",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ItemReceipt",
+    action: "read",
+    possession: "any",
+  })
+  async getItemReceipt(
+    @graphql.Parent() parent: Inventory
+  ): Promise<ItemReceipt | null> {
+    const result = await this.service.getItemReceipt(parent.id);
 
     if (!result) {
       return null;

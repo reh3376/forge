@@ -16,6 +16,7 @@ import {
   Inventory as PrismaInventory,
   Asset as PrismaAsset,
   Item as PrismaItem,
+  ItemReceipt as PrismaItemReceipt,
 } from "@prisma/client";
 
 export class InventoryServiceBase {
@@ -67,5 +68,13 @@ export class InventoryServiceBase {
         where: { id: parentId },
       })
       .item();
+  }
+
+  async getItemReceipt(parentId: string): Promise<PrismaItemReceipt | null> {
+    return this.prisma.inventory
+      .findUnique({
+        where: { id: parentId },
+      })
+      .itemReceipt();
   }
 }

@@ -18,6 +18,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { FloatFilter } from "../../util/FloatFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
@@ -83,6 +84,18 @@ class ItemReceiptWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => InventoryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => InventoryListRelationFilter)
+  @IsOptional()
+  @Field(() => InventoryListRelationFilter, {
+    nullable: true,
+  })
+  inventories?: InventoryListRelationFilter;
 
   @ApiProperty({
     required: false,

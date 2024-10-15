@@ -92,6 +92,12 @@ export class ItemControllerBase {
       data: {
         ...data,
 
+        lotContinerItem: data.lotContinerItem
+          ? {
+              connect: data.lotContinerItem,
+            }
+          : undefined,
+
         vendor: data.vendor
           ? {
               connect: data.vendor,
@@ -112,6 +118,13 @@ export class ItemControllerBase {
         itemNumber: true,
         itemRevision: true,
         itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -155,6 +168,13 @@ export class ItemControllerBase {
         itemNumber: true,
         itemRevision: true,
         itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -199,6 +219,13 @@ export class ItemControllerBase {
         itemNumber: true,
         itemRevision: true,
         itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -243,6 +270,12 @@ export class ItemControllerBase {
         data: {
           ...data,
 
+          lotContinerItem: data.lotContinerItem
+            ? {
+                connect: data.lotContinerItem,
+              }
+            : undefined,
+
           vendor: data.vendor
             ? {
                 connect: data.vendor,
@@ -263,6 +296,13 @@ export class ItemControllerBase {
           itemNumber: true,
           itemRevision: true,
           itemType: true,
+
+          lotContinerItem: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,
@@ -674,6 +714,12 @@ export class ItemControllerBase {
         id: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        itemReceipt: {
           select: {
             id: true,
           },
@@ -1156,6 +1202,13 @@ export class ItemControllerBase {
         bblTotal: true,
         bblType: true,
         confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
         createdBy: true,
         densityFinal: true,
