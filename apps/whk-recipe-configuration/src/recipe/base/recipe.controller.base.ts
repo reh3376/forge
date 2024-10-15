@@ -449,6 +449,7 @@ export class RecipeControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -489,6 +490,7 @@ export class RecipeControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });

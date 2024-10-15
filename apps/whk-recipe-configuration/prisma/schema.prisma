@@ -552,6 +552,7 @@ model Asset {
   purchaseOrders          PurchaseOrder[]
   revision                Int?                    @default(0)
   schemaVersion           String                  @default("0001-alpha")
+  status                  EnumAssetStatus?        @default(InService)
   updatedAt               DateTime                @updatedAt
   updatedBy               String?
 
@@ -752,6 +753,7 @@ model Batch {
   customer                        Customer?                      @relation(fields: [customerId], references: [id])
   customerId                      String?
   customers                       Json?
+  durationSplits                  Json?
   fermentationChemistries         FermentationChemistry[]
   id                              String                         @id @default(cuid())
   lot                             Lot?                           @relation(fields: [lotId], references: [id])
@@ -771,6 +773,7 @@ model Batch {
   recipeBomItems                  RecipeBomItem[]
   recipeName                      String?
   revision                        Int?                           @default(0)
+  totalDuration                   Int?
   updatedAt                       DateTime                       @updatedAt
 }
 
@@ -1171,6 +1174,11 @@ enum EnumAssetAssetType {
   CONTROLMOD
   UNIT
   DEVICE
+}
+
+enum EnumAssetStatus {
+  OOS
+  InService
 }
 
 enum EnumItemReceiptStatus {

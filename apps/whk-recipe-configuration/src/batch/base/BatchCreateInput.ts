@@ -128,6 +128,16 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  durationSplits?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
     type: () => FermentationChemistryCreateNestedManyWithoutBatchesInput,
   })
   @ValidateNested()
@@ -285,6 +295,18 @@ class BatchCreateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalDuration?: number | null;
 }
 
 export { BatchCreateInput as BatchCreateInput };
