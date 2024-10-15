@@ -1024,9 +1024,10 @@ export class RecipeControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
+        totalCooks: true,
+        totalFermenters: true,
+        executedCooks: true,
+        executedFermenters: true,
         createdAt: true,
         createdBy: true,
 
@@ -1049,8 +1050,6 @@ export class RecipeControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -1060,12 +1059,6 @@ export class RecipeControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
