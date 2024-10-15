@@ -1,9 +1,17 @@
 include:
-  - .././apps/whk-recipe-configuration/docker-compose.yml
+  - ./apps/whk-recipe-configuration/docker-compose.yml
 version: "3"
 services:
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/base:debian
+    # image: mcr.microsoft.com/devcontainers/base:debian
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: sleep infinity
+    networks:
+      - devcontainer_network
     links:
       - server
+networks:
+  devcontainer_network:
+    name: devcontainer_network
