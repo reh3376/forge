@@ -619,8 +619,7 @@ model Lot {
   initialWeight               Float?
   inventoryTransfers          InventoryTransfer[]
   isRawMaterial               Boolean?            @default(false)
-  item                        Item?               @relation(name: "ItemOnLots", fields: [itemId], references: [id])
-  itemId                      String?
+  item                        Item[]              @relation(name: "ItemOnLots")
   lotAlphaChar                String?
   lotCreatedAt                DateTime?           @default(now())
   lotNumber                   String              @unique

@@ -349,12 +349,12 @@ class Lot {
 
   @ApiProperty({
     required: false,
-    type: () => Item,
+    type: () => [Item],
   })
   @ValidateNested()
   @Type(() => Item)
   @IsOptional()
-  item?: Item | null;
+  item?: Array<Item>;
 
   @ApiProperty({
     required: false,

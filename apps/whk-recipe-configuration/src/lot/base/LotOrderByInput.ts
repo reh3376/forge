@@ -303,17 +303,6 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  itemId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   lotAlphaChar?: SortOrder;
 
   @ApiProperty({
