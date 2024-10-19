@@ -433,9 +433,6 @@ export class CustomerControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -458,9 +455,11 @@ export class CustomerControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
+        totalCooks: true,
+        totalFermenters: true,
+        executedCooks: true,
+        executedFermenters: true,
 
         recipe: {
           select: {
@@ -469,12 +468,6 @@ export class CustomerControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },

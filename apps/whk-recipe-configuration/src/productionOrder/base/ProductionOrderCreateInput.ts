@@ -28,7 +28,6 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
 import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
@@ -109,7 +108,7 @@ class ProductionOrderCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  completedQuantity?: Decimal | null;
+  completedQuantity?: number | null;
 
   @ApiProperty({
     required: true,
@@ -418,6 +417,50 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   updatedBy?: Date | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  executedCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  executedFermenters?: number | null;
 }
 
 export { ProductionOrderCreateInput as ProductionOrderCreateInput };
