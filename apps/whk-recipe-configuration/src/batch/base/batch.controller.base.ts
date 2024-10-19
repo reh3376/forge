@@ -121,6 +121,7 @@ export class BatchControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -161,6 +162,7 @@ export class BatchControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });
@@ -202,6 +204,7 @@ export class BatchControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -242,6 +245,7 @@ export class BatchControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });
@@ -284,6 +288,7 @@ export class BatchControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -324,6 +329,7 @@ export class BatchControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });
@@ -422,6 +428,7 @@ export class BatchControllerBase {
           },
 
           customers: true,
+          durationSplits: true,
           id: true,
 
           lot: {
@@ -462,6 +469,7 @@ export class BatchControllerBase {
 
           recipeName: true,
           revision: true,
+          totalDuration: true,
           updatedAt: true,
         },
       });
@@ -510,6 +518,7 @@ export class BatchControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -550,6 +559,7 @@ export class BatchControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });

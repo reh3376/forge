@@ -124,6 +124,17 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  durationSplits?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => FermentationChemistryListRelationFilter,
   })
   @ValidateNested()
@@ -287,6 +298,17 @@ class BatchWhereInput {
     nullable: true,
   })
   revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  totalDuration?: IntNullableFilter;
 }
 
 export { BatchWhereInput as BatchWhereInput };

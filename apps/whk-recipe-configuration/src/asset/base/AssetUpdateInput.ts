@@ -34,6 +34,7 @@ import { LotUpdateManyWithoutAssetsInput } from "./LotUpdateManyWithoutAssetsInp
 import { MashingDatumUpdateManyWithoutAssetsInput } from "./MashingDatumUpdateManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
+import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @InputType()
 class AssetUpdateInput {
@@ -309,6 +310,17 @@ class AssetUpdateInput {
     nullable: true,
   })
   schemaVersion?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumAssetStatus,
+  })
+  @IsEnum(EnumAssetStatus)
+  @IsOptional()
+  @Field(() => EnumAssetStatus, {
+    nullable: true,
+  })
+  status?: "OOS" | "InService" | null;
 
   @ApiProperty({
     required: false,

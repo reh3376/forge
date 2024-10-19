@@ -31,6 +31,7 @@ import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -117,12 +118,6 @@ export class LotResolverBase {
             }
           : undefined,
 
-        item: args.data.item
-          ? {
-              connect: args.data.item,
-            }
-          : undefined,
-
         productionOrder: args.data.productionOrder
           ? {
               connect: args.data.productionOrder,
@@ -173,12 +168,6 @@ export class LotResolverBase {
           fromAsset: args.data.fromAsset
             ? {
                 connect: args.data.fromAsset,
-              }
-            : undefined,
-
-          item: args.data.item
-            ? {
-                connect: args.data.item,
               }
             : undefined,
 
@@ -274,6 +263,26 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Item], { name: "item" })
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findItem(
+    @graphql.Parent() parent: Lot,
+    @graphql.Args() args: ItemFindManyArgs
+  ): Promise<Item[]> {
+    const results = await this.service.findItem(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Item, {
     nullable: true,
     name: "continerItem",
@@ -323,25 +332,6 @@ export class LotResolverBase {
   })
   async getFromAsset(@graphql.Parent() parent: Lot): Promise<Asset | null> {
     const result = await this.service.getFromAsset(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Item, {
-    nullable: true,
-    name: "item",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async getItem(@graphql.Parent() parent: Lot): Promise<Item | null> {
-    const result = await this.service.getItem(parent.id);
 
     if (!result) {
       return null;
