@@ -31,6 +31,7 @@ import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedMa
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { InventoryTransferCreateNestedManyWithoutLotsInput } from "./InventoryTransferCreateNestedManyWithoutLotsInput";
+import { ItemCreateNestedManyWithoutLotsInput } from "./ItemCreateNestedManyWithoutLotsInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -351,15 +352,15 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => ItemCreateNestedManyWithoutLotsInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => ItemCreateNestedManyWithoutLotsInput)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(() => ItemCreateNestedManyWithoutLotsInput, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput | null;
+  item?: ItemCreateNestedManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,

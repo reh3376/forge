@@ -408,13 +408,6 @@ export class PurchaseOrderControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,

@@ -31,6 +31,7 @@ import { BomItemUpdateManyWithoutLotsInput } from "./BomItemUpdateManyWithoutLot
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { InventoryTransferUpdateManyWithoutLotsInput } from "./InventoryTransferUpdateManyWithoutLotsInput";
+import { ItemUpdateManyWithoutLotsInput } from "./ItemUpdateManyWithoutLotsInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -351,15 +352,15 @@ class LotUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => ItemUpdateManyWithoutLotsInput,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => ItemUpdateManyWithoutLotsInput)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(() => ItemUpdateManyWithoutLotsInput, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput | null;
+  item?: ItemUpdateManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,
