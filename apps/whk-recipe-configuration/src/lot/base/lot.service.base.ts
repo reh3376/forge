@@ -80,6 +80,17 @@ export class LotServiceBase {
       .inventoryTransfers(args);
   }
 
+  async findItem(
+    parentId: string,
+    args: Prisma.ItemFindManyArgs
+  ): Promise<PrismaItem[]> {
+    return this.prisma.lot
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .item(args);
+  }
+
   async getContinerItem(parentId: string): Promise<PrismaItem | null> {
     return this.prisma.lot
       .findUnique({
@@ -102,14 +113,6 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .fromAsset();
-  }
-
-  async getItem(parentId: string): Promise<PrismaItem | null> {
-    return this.prisma.lot
-      .findUnique({
-        where: { id: parentId },
-      })
-      .item();
   }
 
   async getProductionOrder(

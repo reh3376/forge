@@ -449,6 +449,7 @@ export class RecipeControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -489,6 +490,7 @@ export class RecipeControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });
@@ -765,13 +767,6 @@ export class RecipeControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,

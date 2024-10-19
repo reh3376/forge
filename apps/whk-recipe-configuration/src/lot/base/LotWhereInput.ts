@@ -24,6 +24,7 @@ import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
+import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
@@ -349,15 +350,15 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
+    type: () => ItemListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
+  @Type(() => ItemListRelationFilter)
   @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
+  @Field(() => ItemListRelationFilter, {
     nullable: true,
   })
-  item?: ItemWhereUniqueInput;
+  item?: ItemListRelationFilter;
 
   @ApiProperty({
     required: false,

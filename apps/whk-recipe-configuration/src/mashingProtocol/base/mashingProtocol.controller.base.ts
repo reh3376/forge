@@ -312,6 +312,7 @@ export class MashingProtocolControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -352,6 +353,7 @@ export class MashingProtocolControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });

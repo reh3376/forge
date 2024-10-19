@@ -131,6 +131,16 @@ class BatchUpdateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  durationSplits?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
     type: () => FermentationChemistryUpdateManyWithoutBatchesInput,
   })
   @ValidateNested()
@@ -288,6 +298,18 @@ class BatchUpdateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalDuration?: number | null;
 }
 
 export { BatchUpdateInput as BatchUpdateInput };
