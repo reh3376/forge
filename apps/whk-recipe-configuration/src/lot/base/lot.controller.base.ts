@@ -35,6 +35,9 @@ import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueIn
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { InventoryTransferWhereUniqueInput } from "../../inventoryTransfer/base/InventoryTransferWhereUniqueInput";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -77,12 +80,6 @@ export class LotControllerBase {
         fromAsset: data.fromAsset
           ? {
               connect: data.fromAsset,
-            }
-          : undefined,
-
-        item: data.item
-          ? {
-              connect: data.item,
             }
           : undefined,
 
@@ -148,13 +145,6 @@ export class LotControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
@@ -255,13 +245,6 @@ export class LotControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
@@ -361,13 +344,6 @@ export class LotControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
@@ -457,12 +433,6 @@ export class LotControllerBase {
               }
             : undefined,
 
-          item: data.item
-            ? {
-                connect: data.item,
-              }
-            : undefined,
-
           productionOrder: data.productionOrder
             ? {
                 connect: data.productionOrder,
@@ -525,13 +495,6 @@ export class LotControllerBase {
           initialVolume: true,
           initialWeight: true,
           isRawMaterial: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
-
           lotAlphaChar: true,
           lotCreatedAt: true,
           lotNumber: true,
@@ -615,6 +578,7 @@ export class LotControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -655,6 +619,7 @@ export class LotControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });
@@ -971,6 +936,127 @@ export class LotControllerBase {
   ): Promise<void> {
     const data = {
       inventoryTransfers: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/item")
+  @ApiNestedQuery(ItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findItem(
+    @common.Req() request: Request,
+    @common.Param() params: LotWhereUniqueInput
+  ): Promise<Item[]> {
+    const query = plainToClass(ItemFindManyArgs, request.query);
+    const results = await this.service.findItem(params.id, {
+      ...query,
+      select: {
+        active: true,
+        createdAt: true,
+        createdBy: true,
+        erpId: true,
+        globalId: true,
+        id: true,
+        itemClass: true,
+        itemDescription: true,
+        itemGroup: true,
+        itemName: true,
+        itemNumber: true,
+        itemRevision: true,
+        itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async connectItem(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        connect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async updateItem(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
+        set: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/item")
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectItem(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      item: {
         disconnect: body,
       },
     };

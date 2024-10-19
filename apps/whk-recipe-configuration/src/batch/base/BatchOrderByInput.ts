@@ -116,6 +116,17 @@ class BatchOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  durationSplits?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   id?: SortOrder;
 
   @ApiProperty({
@@ -238,6 +249,17 @@ class BatchOrderByInput {
     nullable: true,
   })
   revision?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  totalDuration?: SortOrder;
 
   @ApiProperty({
     required: false,

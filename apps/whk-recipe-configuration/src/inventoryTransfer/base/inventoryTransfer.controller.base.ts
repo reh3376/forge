@@ -396,6 +396,7 @@ export class InventoryTransferControllerBase {
 
         revision: true,
         schemaVersion: true,
+        status: true,
         updatedAt: true,
         updatedBy: true,
       },

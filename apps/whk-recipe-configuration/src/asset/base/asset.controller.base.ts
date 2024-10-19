@@ -107,6 +107,7 @@ export class AssetControllerBase {
 
         revision: true,
         schemaVersion: true,
+        status: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -147,6 +148,7 @@ export class AssetControllerBase {
 
         revision: true,
         schemaVersion: true,
+        status: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -188,6 +190,7 @@ export class AssetControllerBase {
 
         revision: true,
         schemaVersion: true,
+        status: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -249,6 +252,7 @@ export class AssetControllerBase {
 
           revision: true,
           schemaVersion: true,
+          status: true,
           updatedAt: true,
           updatedBy: true,
         },
@@ -298,6 +302,7 @@ export class AssetControllerBase {
         },
 
         customers: true,
+        durationSplits: true,
         id: true,
 
         lot: {
@@ -338,6 +343,7 @@ export class AssetControllerBase {
 
         recipeName: true,
         revision: true,
+        totalDuration: true,
         updatedAt: true,
       },
     });
@@ -448,6 +454,7 @@ export class AssetControllerBase {
 
         revision: true,
         schemaVersion: true,
+        status: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -1469,13 +1476,6 @@ export class AssetControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,
@@ -1647,13 +1647,6 @@ export class AssetControllerBase {
         initialVolume: true,
         initialWeight: true,
         isRawMaterial: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
         lotAlphaChar: true,
         lotCreatedAt: true,
         lotNumber: true,

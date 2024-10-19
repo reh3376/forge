@@ -30,6 +30,7 @@ import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingD
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @InputType()
 class AssetWhereInput {
@@ -320,6 +321,17 @@ class AssetWhereInput {
     nullable: true,
   })
   schemaVersion?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumAssetStatus,
+  })
+  @IsEnum(EnumAssetStatus)
+  @IsOptional()
+  @Field(() => EnumAssetStatus, {
+    nullable: true,
+  })
+  status?: "OOS" | "InService";
 
   @ApiProperty({
     required: false,

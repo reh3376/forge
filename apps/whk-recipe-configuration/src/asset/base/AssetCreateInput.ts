@@ -34,6 +34,7 @@ import { LotCreateNestedManyWithoutAssetsInput } from "./LotCreateNestedManyWith
 import { MashingDatumCreateNestedManyWithoutAssetsInput } from "./MashingDatumCreateNestedManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
+import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @InputType()
 class AssetCreateInput {
@@ -291,6 +292,17 @@ class AssetCreateInput {
   @MaxLength(256)
   @Field(() => String)
   schemaVersion!: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumAssetStatus,
+  })
+  @IsEnum(EnumAssetStatus)
+  @IsOptional()
+  @Field(() => EnumAssetStatus, {
+    nullable: true,
+  })
+  status?: "OOS" | "InService" | null;
 
   @ApiProperty({
     required: false,
