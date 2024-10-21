@@ -55,7 +55,9 @@ export class LotService extends LotServiceBase {
 
       mergedLot = {
         ...existingLot,
-        ...lot.data,
+        ...Object.fromEntries(
+          Object.entries(lot.data).filter(([_, value]) => value !== undefined)
+        ),
       };
     } else {
       throw new Error('Invalid input for lot calculation');
@@ -105,7 +107,13 @@ export class LotService extends LotServiceBase {
       avgBblFillByPg: mergedLot.avgBblFillByPg,
       avgBblFillByWg: mergedLot.avgBblFillByWg,
       status: mergedLot.status,
-      // Add any other essential fields here
+      // bblTotal: mergedLot.bblTotal,
+      // bblEntryProof: mergedLot.bblEntryProof,
+      // densityFinal: mergedLot.densityFinal,
+      // finalWeight: mergedLot.finalWeight,
+      // initialWeight: mergedLot.initialWeight,
+      // initialVolume: mergedLot.initialVolume,
+      // finalVolume: mergedLot.finalVolume,
     };
   }
 
@@ -187,7 +195,11 @@ export class LotService extends LotServiceBase {
   }
 
   async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
-    args.data = await this.calculateLotAnalytics(args as LotUpdateInput, 'update');
+    const calculatedData = await this.calculateLotAnalytics(args as LotUpdateInput, 'update');
+    args.data = {
+      ...args.data,
+      ...calculatedData
+    };
     const Lot = await super.updateLot({
       data: {
           ...args.data,
