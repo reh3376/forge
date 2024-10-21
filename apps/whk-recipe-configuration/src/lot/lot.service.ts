@@ -6,9 +6,6 @@ import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { EnumLotStatus, Lot, Prisma } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
-import { ar } from "@faker-js/faker";
-import { CreateLotArgs } from "./base/CreateLotArgs";
-import e from "express";
 import { LotUpdateInput } from "./base/LotUpdateInput";
 
 @Injectable()
@@ -107,13 +104,7 @@ export class LotService extends LotServiceBase {
       avgBblFillByPg: mergedLot.avgBblFillByPg,
       avgBblFillByWg: mergedLot.avgBblFillByWg,
       status: mergedLot.status,
-      // bblTotal: mergedLot.bblTotal,
-      // bblEntryProof: mergedLot.bblEntryProof,
-      // densityFinal: mergedLot.densityFinal,
-      // finalWeight: mergedLot.finalWeight,
-      // initialWeight: mergedLot.initialWeight,
-      // initialVolume: mergedLot.initialVolume,
-      // finalVolume: mergedLot.finalVolume,
+      densityFinal: mergedLot.densityFinal,
     };
   }
 
