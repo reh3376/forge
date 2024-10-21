@@ -97,6 +97,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.4.5",
     "@nestjs/testing": "^10.3.9",
+    "@nestjs/devtools-integration": "latest",
     "@types/cache-manager": "4.0.4",
     "@types/express": "^4.17.19",
     "@types/graphql-type-json": "0.3.3",
