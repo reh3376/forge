@@ -186,7 +186,15 @@ export class LotService extends LotServiceBase {
   }
 
   async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
-    const calculatedData = await this.calculateLotAnalytics(args as LotUpdateInput, 'update');
+    const calculatedData = await this.calculateLotAnalytics({
+      where: args.where,
+      data: {
+        ...args.data,
+        filledFrom: args.data.filledFrom
+          ? { connect: { id: args.data.filledFrom.connect?.id } }
+          : undefined
+      }
+    }, 'update');
     args.data = {
       ...args.data,
       ...calculatedData
