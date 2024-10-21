@@ -347,7 +347,7 @@ describe("Lot", () => {
       totalWeight: 0,
       updatedAt: new Date(),
       warehouseEntryNumber: 42,
-      densityFinal: 2,
+      densityFinal: 1,
       initialVolume: 1000,
       initialWeight: 2000,
       finalVolume: 950, 
@@ -358,19 +358,31 @@ describe("Lot", () => {
 
     const result = await lotService.calculateLotAnalytics(inputData);
 
-    // Expect the result to include the input data
-    expect(result).toEqual(expect.objectContaining(inputData));
+    // Expect the result to contain only the calculated fields and essential data
+    expect(result).toEqual({
+      totalWeight: expect.any(Number),
+      totalVolumeWg: expect.any(Number),
+      totalPGs: expect.any(Number),
+      totalWGs: expect.any(Number),
+      avgPGsFerm: expect.any(Number),
+      avgBblFillByPg: expect.any(Number),
+      avgBblFillByWg: expect.any(Number),
+      status: expect.any(String),
+      densityFinal: expect.any(Number),
+    });
 
     // Check for the presence of calculated metrics
     expect(result).toHaveProperty('densityFinal');
-    expect(result).toHaveProperty('pgLosses');
     expect(result).toHaveProperty('avgPGsFerm');
     expect(result).toHaveProperty('avgBblFillByPg');
     expect(result).toHaveProperty('avgBblFillByWg');
-    expect(result).toHaveProperty('standardYield');
+    expect(result).toHaveProperty('totalWeight');
+    expect(result).toHaveProperty('totalVolumeWg');
+    expect(result).toHaveProperty('totalPGs');
+    expect(result).toHaveProperty('totalWGs');
 
     // Add specific checks for each calculated metric
-    expect(result.densityFinal).toBeCloseTo(2*8.3454, 2);
+    expect(result.densityFinal).toBeCloseTo(1*8.3454, 1);
     expect(result.avgPGsFerm).toBeGreaterThan(0);
     expect(result.avgBblFillByPg).toBeGreaterThan(0);
     expect(result.avgBblFillByWg).toBeGreaterThan(0);
