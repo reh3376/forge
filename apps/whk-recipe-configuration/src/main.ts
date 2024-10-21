@@ -56,10 +56,18 @@ function getHttpsServer(
 
 async function main() {
   const server = express();
-  const app = await NestFactory.create(
-    AppModule,
-    getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
-  );
+  let app = null;
+  if (process.env.DEV_TOOLS_ENABLE === 'false') {
+    app = await NestFactory.create(
+      AppModule,
+      getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
+    );
+  } else {
+    app = await NestFactory.create(
+      AppModule,
+      { snapshot: true }
+    );
+  }
   // const app = await NestFactory.create(AppModule, {
   //   cors: true,
   //   bufferLogs: true
