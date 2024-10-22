@@ -6,12 +6,14 @@ import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import Decimal from "decimal.js";
+import { InventorySiloTrackingService } from "../inventory/inventory.silotracking.service";
 
 @Injectable()
 export class ItemReceiptService extends ItemReceiptServiceBase {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
+    @Inject() private readonly siloTrackingService: InventorySiloTrackingService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     super(prisma);
@@ -75,7 +77,6 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
           include: {
             vendor: true,
             item: true,
-            // Include other fields as needed
           }
         },
         item: true,
@@ -89,7 +90,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       this.logger.debug(`Purchase order for the itemReceipt: ${itemReceiptPayload?.purchaseOrder}`);
 
       /* 
-      PATRICK MANNION - WHISKEY HOUSE OF KENTUCK
+      PATRICK MANNION - WHISKEY HOUSE OF KENTUCKY
       2024-07-17
 
       ERP BUDDIES PLACED LOGIC TO DO THIS CONVERSION. LEAVING THIS IN, IN CASE FUTURE NEED ARISES
@@ -155,6 +156,50 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         recordName: 'ItemReceipt',
       });
       this.logger.log(`Emitted large quantity update for ItemReceipt: ${itemReceipt.id}`);
+
+      this.logger.debug(`Updating inventory for itemReceipt: ${itemReceipt.id}`);
+      const item = itemReceiptPayload?.item;
+      if (!item) {
+        throw new Error('Item not found');
+      }
+
+      // Map silo number to the silos and look up in the asset model
+      if (itemReceiptPayload.siloNumber) {
+        // Look up the asset based on the silo number
+        const siloNumberAssetNameMapping = {
+          1: 'SIL-025',
+          2: 'SIL-030',
+          3: 'SIL-035',
+          4: 'SIL-040',
+          5: 'SIL-045',
+        }
+
+        const asset = await this.prisma.asset.findFirst({
+          where: {
+            name: {
+              contains: siloNumberAssetNameMapping[itemReceiptPayload.siloNumber as keyof typeof siloNumberAssetNameMapping],
+              mode: 'insensitive'
+            },
+            assetType: 'UNIT'
+          }
+        });
+        
+        if (asset) {
+          // If asset is found, use its ID for inventory tracking
+          await this.siloTrackingService.addLotToAsset(
+            itemReceiptPayload.supplierLot as string,
+            asset.id,
+            itemReceiptPayload.quantity,
+            item.id,
+            itemReceipt.createdBy
+          );
+          this.logger.log(`Added lot ${itemReceiptPayload.supplierLot} to asset ${asset.id} (Silo ${itemReceiptPayload.siloNumber})`);
+        } else {
+          this.logger.warn(`Asset not found for Silo ${itemReceiptPayload.siloNumber}`);
+        }
+      } else {
+        this.logger.warn('No silo number found for itemReceipt');
+      }
     }
 
     return itemReceipt;
