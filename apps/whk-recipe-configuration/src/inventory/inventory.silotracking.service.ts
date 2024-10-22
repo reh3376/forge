@@ -9,13 +9,27 @@ export class InventorySiloTrackingService {
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService
   ) {}
+  async getItemIdFromAsset(assetId: string): Promise<string> {
+    const inv = await this.prisma.inventory.findFirst({
+      where: { assetId },
+      orderBy: { fifoIndex: 'desc' },
+      include: { item: true }
+    });
+    if (!inv) {
+      throw new Error('Inventory not found');
+    }
+    return inv.item.id;
+  }
 
-  async addLotToAsset(lotId: string, assetId: string, quantity: number, itemId: string,createdBy?: string): Promise<void> {
+  async addLotToAsset(lotId: string, assetId: string, quantity: number, itemId?: string, createdBy?: string): Promise<void> {
     const lot = await this.prisma.lot.findUnique({ where: { id: lotId } });
     const asset = await this.prisma.asset.findUnique({ where: { id: assetId } });
 
     if (!lot || !asset) {
       throw new Error('Lot or Asset not found');
+    }
+    if (!itemId) {
+      itemId = await this.getItemIdFromAsset(assetId);
     }
     await this.prisma.inventory.create({
       data: {
