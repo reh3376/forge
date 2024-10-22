@@ -30,9 +30,13 @@ export class InventorySiloTrackingService {
 
   async deductFromAsset(assetId: string, quantityToDeduct: number): Promise<void> {
     const inventoryItems = await this.prisma.inventory.findMany({
-      where: { assetId: assetId },
+      where: { assetId },
       orderBy: { fifoIndex: 'asc' },
     });
+
+    if (!inventoryItems || inventoryItems.length === 0) {
+      throw new Error('No inventory items found for the asset');
+    }
 
     let remainingQuantityToDeduct = quantityToDeduct;
 
@@ -69,17 +73,41 @@ export class InventorySiloTrackingService {
     });
   }
 
-  async transferBetweenAssets(fromAssetId: string, toAssetId: string, quantity: number, itemId: string): Promise<void> {
-    await this.deductFromAsset(fromAssetId, quantity);
+  async transferBetweenAssets(sourceAssetId: string, destAssetId: string, quantity: number, itemId: string): Promise<void> {
+    await this.deductFromAsset(sourceAssetId, quantity);
     
-    const oldestLot = await this.prisma.inventory.findFirst({
-      where: { assetId: fromAssetId },
+    const sourceInventoryItem = await this.prisma.inventory.findFirst({
+      where: { assetId: sourceAssetId, itemId },
       orderBy: { fifoIndex: 'asc' },
     });
-    if (oldestLot && oldestLot.lotNumber) {
-      await this.addLotToAsset(oldestLot.lotNumber, toAssetId, quantity, itemId);
-    } else {
+
+    if (!sourceInventoryItem || sourceInventoryItem.lotNumber === null) {
       throw new Error('No lot found to transfer or lot number is null');
     }
+
+    const nextFifoIndex = await this.getNextFifoIndex(destAssetId);
+    await this.prisma.inventory.create({
+      data: {
+        assetId: destAssetId,
+        itemId,
+        currentQuantity: quantity,
+        lotNumber: sourceInventoryItem.lotNumber,
+        createdBy: 'system', // Adding the required 'createdBy' field
+        fifoIndex: nextFifoIndex,
+      },
+    });
+  }
+  
+  async getNextFifoIndex(assetId: string): Promise<number> {
+    const latestInventory = await this.prisma.inventory.findFirst({
+      where: { assetId },
+      orderBy: { fifoIndex: 'desc' },
+    });
+
+    if (!latestInventory) {
+      return 1; // If no inventory exists for this asset, start with 1
+    }
+
+    return (latestInventory.fifoIndex ?? 0) + 1;
   }
 }
