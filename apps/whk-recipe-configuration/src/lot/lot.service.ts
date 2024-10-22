@@ -3,12 +3,10 @@ import { PrismaService } from "../prisma/prisma.service";
 import { LotServiceBase } from "./base/lot.service.base";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
-import { Lot, Prisma } from "@prisma/client";
+import { EnumLotStatus, Lot, Prisma } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
-import { ar } from "@faker-js/faker";
-import { CreateLotArgs } from "./base/CreateLotArgs";
-import e from "express";
+import { LotUpdateInput } from "./base/LotUpdateInput";
 
 @Injectable()
 export class LotService extends LotServiceBase {
@@ -20,7 +18,10 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
-  calculateLotAnalytics(lot: LotCreateInput): any {
+  async calculateLotAnalytics(
+    lot: LotCreateInput | (LotUpdateInput & { where: Prisma.LotWhereUniqueInput } & { data: Prisma.LotUpdateInput }),
+    type: string='create'
+  ): Promise<any> {
     /* CALCULATION DEFINITIONS
 
     The key inputs to these are...
@@ -36,39 +37,75 @@ export class LotService extends LotServiceBase {
     5. Average WGs / Bbl = Total WGs / Total Barrels
 
     */
-    if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
-      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
-      const startWeight = lot.initialWeight ?? 0;
-      const endWeight = lot.finalWeight ?? 0;
-      lot.totalWeight = startWeight - endWeight;
-      lot.totalVolumeWg = lot.totalWeight / lot.densityFinal;
-      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
-      lot.totalWGs = lot.totalVolumeWg;
-      if (lot.totalFermenters) {
-        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
+    let mergedLot: any = {};
+
+    if (type === 'create') {
+      mergedLot = { ...lot };
+    } else if (type === 'update' && 'where' in lot && 'data' in lot) {
+      const existingLot = await this.prisma.lot.findUnique({
+        where: { id: lot.where.id },
+      });
+
+      if (!existingLot) {
+        throw new Error('Lot not found');
       }
-      if (lot.bblTotal) {
-        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
-        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
+
+      mergedLot = {
+        ...existingLot,
+        ...Object.fromEntries(
+          Object.entries(lot.data).filter(([_, value]) => value !== undefined)
+        ),
+      };
+    } else {
+      throw new Error('Invalid input for lot calculation');
+    }
+
+    // Perform calculations
+    if (mergedLot.densityFinal && mergedLot.densityFinal <= 1) {
+      mergedLot.densityFinal *= 8.3454;
+    }
+
+    if (mergedLot.totalWeight && mergedLot.densityFinal) {
+      mergedLot.totalVolumeWg = mergedLot.totalWeight / mergedLot.densityFinal;
+    } else if (mergedLot.initialWeight && mergedLot.finalWeight && mergedLot.densityFinal) {
+      mergedLot.totalWeight = mergedLot.initialWeight - mergedLot.finalWeight;
+      mergedLot.totalVolumeWg = mergedLot.totalWeight / mergedLot.densityFinal;
+    } else if (mergedLot.initialVolume && mergedLot.finalVolume && mergedLot.densityFinal) {
+      mergedLot.initialVolume *= 301.38;
+      mergedLot.finalVolume *= 301.38;
+      mergedLot.totalWeight = (mergedLot.initialVolume - mergedLot.finalVolume) * mergedLot.densityFinal;
+      mergedLot.totalVolumeWg = mergedLot.initialVolume - mergedLot.finalVolume;
+    }
+
+    if (mergedLot.totalVolumeWg) {
+      mergedLot.totalPGs = mergedLot.totalVolumeWg * (mergedLot.bblEntryProof || 0) / 100;
+      mergedLot.totalWGs = mergedLot.totalVolumeWg;
+
+      if (mergedLot.totalFermenters) {
+        mergedLot.avgPGsFerm = mergedLot.totalPGs / mergedLot.totalFermenters;
       }
-    } else if (lot.initialVolume && lot.finalVolume && lot.densityFinal) {
-      lot.densityFinal = lot.densityFinal * 8.3454 ?? 0;
-      const startVolume = lot.initialVolume ?? 0;
-      const endVolume = lot.finalVolume ?? 0;
-      lot.totalWeight = (startVolume - endVolume) * lot.densityFinal;
-      lot.totalVolumeWg = startVolume - endVolume;
-      lot.totalPGs = lot.totalVolumeWg * (lot.bblEntryProof ?? 0) / 100;
-      lot.totalWGs = lot.totalVolumeWg;
-      if (lot.totalFermenters) {
-        lot.avgPGsFerm = lot.totalPGs / lot.totalFermenters;
-      }
-      if (lot.bblTotal) {
-        lot.avgBblFillByPg = lot.totalPGs / lot.bblTotal;
-        lot.avgBblFillByWg = lot.totalWGs / lot.bblTotal;
+
+      if (mergedLot.bblTotal) {
+        mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
+        mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
+        mergedLot.status = EnumLotStatus.Complete;
+      } else {
+        mergedLot.status = EnumLotStatus.PendingBarrelCount;
       }
     }
 
-    return lot;
+    // Return only the calculated fields and essential data
+    return {
+      totalWeight: mergedLot.totalWeight,
+      totalVolumeWg: mergedLot.totalVolumeWg,
+      totalPGs: mergedLot.totalPGs,
+      totalWGs: mergedLot.totalWGs,
+      avgPGsFerm: mergedLot.avgPGsFerm,
+      avgBblFillByPg: mergedLot.avgBblFillByPg,
+      avgBblFillByWg: mergedLot.avgBblFillByWg,
+      status: mergedLot.status,
+      densityFinal: mergedLot.densityFinal,
+    };
   }
 
   async createLot<T extends Prisma.LotCreateArgs>(
@@ -122,11 +159,12 @@ export class LotService extends LotServiceBase {
     args.data.item = { connect: { id: recipe.item.id } };
 
     // Calculate the lot analytics
-    args.data = this.calculateLotAnalytics(args.data as LotCreateInput);
+    const calculatedData = await this.calculateLotAnalytics(args.data as LotCreateInput);
     
     const lot = await super.createLot({
       data: {
         ...args.data,
+        ...calculatedData,
         lotNumber: `${fullLotNumber}`,
       },
       include: {
@@ -148,6 +186,19 @@ export class LotService extends LotServiceBase {
   }
 
   async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
+    const calculatedData = await this.calculateLotAnalytics({
+      where: args.where,
+      data: {
+        ...args.data,
+        filledFrom: args.data.filledFrom
+          ? { connect: { id: args.data.filledFrom.connect?.id } }
+          : undefined
+      }
+    }, 'update');
+    args.data = {
+      ...args.data,
+      ...calculatedData
+    };
     const Lot = await super.updateLot({
       data: {
           ...args.data,

@@ -73,6 +73,8 @@ import {SyncModule} from "./sync/sync.module";
 
 import { LoggerModule } from "./logger/logger.module";
 
+import { DevtoolsModule } from '@nestjs/devtools-integration';
+
 @Module({
   controllers: [],
   imports: [
@@ -189,6 +191,9 @@ import { LoggerModule } from "./logger/logger.module";
         GuardInjector,
         PipeInjector,
       ],
+    }),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production'
     }),
   ],
   providers: [],
