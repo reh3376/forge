@@ -34467,6 +34467,9 @@
       "Inventory": {
         "type": "object",
         "properties": {
+          "active": {
+            "type": "boolean"
+          },
           "asset": {
             "$ref": "#/components/schemas/Asset"
           },
@@ -34482,6 +34485,9 @@
           },
           "createdBy": {
             "type": "string"
+          },
+          "currentQuantity": {
+            "type": "number"
           },
           "customers": {
             "type": "object"
@@ -34503,6 +34509,9 @@
           },
           "notes": {
             "type": "string"
+          },
+          "originalQuantity": {
+            "type": "number"
           },
           "proof": {
             "type": "number"
@@ -37427,6 +37436,9 @@
       "InventoryWhereInput": {
         "type": "object",
         "properties": {
+          "active": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
           "asset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
@@ -37438,6 +37450,9 @@
           },
           "createdBy": {
             "$ref": "#/components/schemas/StringFilter"
+          },
+          "currentQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
           },
           "customers": {
             "$ref": "#/components/schemas/JsonFilter"
@@ -37459,6 +37474,9 @@
           },
           "notes": {
             "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "originalQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
           },
           "units": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -45906,6 +45924,9 @@
       "InventoryCreateInput": {
         "type": "object",
         "properties": {
+          "active": {
+            "type": "boolean"
+          },
           "asset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
@@ -45917,6 +45938,9 @@
           },
           "createdBy": {
             "type": "string"
+          },
+          "currentQuantity": {
+            "type": "number"
           },
           "customers": {
             "type": "object"
@@ -45935,6 +45959,9 @@
           },
           "notes": {
             "type": "string"
+          },
+          "originalQuantity": {
+            "type": "number"
           },
           "proof": {
             "type": "number"
@@ -45961,6 +45988,9 @@
       "InventoryUpdateInput": {
         "type": "object",
         "properties": {
+          "active": {
+            "type": "boolean"
+          },
           "asset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
@@ -45972,6 +46002,9 @@
           },
           "createdBy": {
             "type": "string"
+          },
+          "currentQuantity": {
+            "type": "number"
           },
           "customers": {
             "type": "object"
@@ -45990,6 +46023,9 @@
           },
           "notes": {
             "type": "string"
+          },
+          "originalQuantity": {
+            "type": "number"
           },
           "proof": {
             "type": "number"
