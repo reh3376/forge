@@ -13,7 +13,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
-    @Inject() private readonly siloTrackingService: InventorySiloTrackingService,
+    protected readonly siloTrackingService: InventorySiloTrackingService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     super(prisma);
