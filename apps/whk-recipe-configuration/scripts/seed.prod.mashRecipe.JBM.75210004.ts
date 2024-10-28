@@ -1,6 +1,6 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 
-const CUSTOMER_CODE = "GSC";
+const CUSTOMER_CODE = "JBM";
 const MASH_BILL = '75-21-00-04'; //  Match Item Record
 const FINAL_PROOF = 120;
 const BARREL_INFO = '53-06-4-0-0'; // Match Item Record
@@ -99,6 +99,7 @@ const RECIPE_PARAMETERS = [
   const diazymeItemId = 'clzhhlsx30f09mbc9r5mj02z7'
   const termamylItemId = 'clzelxl5v005osuwb3rfax6ix'
   const saczymeItemId = 'clyd1ofot0022fd45d8j321v4'
+  const laminexItemId = 'clyd1ofoq001xfd45678b666b'
   const maltItemId = 'clyd1ofw0009ufd45hlzpnqa9'
   const ryeItemId = 'clyd1ofy600d9fd45p99px0c0'
   const cornItemId = 'clyd1ofw1009wfd45oghso7y5'
@@ -273,8 +274,8 @@ const RECIPE_PARAMETERS = [
             itemId = saczymeItemId;
             quantity = step.qty || 0;
             break;  
-          case "termamyl":
-            itemId = termamylItemId;
+          case "laminex":
+            itemId = laminexItemId;
             quantity = step.qty || 0;
             break;
         }
@@ -939,9 +940,9 @@ const RECIPE_PARAMETERS = [
     }
   });
 
-  if (existingProductionOrder) {
-    console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
-  } else {
+  // if (existingProductionOrder) {
+  //   console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
+  // } else {
     // Get the most recent production order created today, if it exists
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1018,7 +1019,7 @@ const RECIPE_PARAMETERS = [
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: `${scheduleOrderName}03`,
+        name: `${scheduleOrderName}${newProductionOrderNumber}`,
       }
     });
 
@@ -1055,7 +1056,7 @@ const RECIPE_PARAMETERS = [
     console.log("Sample schedule order queue record created successfully:", newScheduleOrderQueue.id);
 
     console.log("Sample production order created successfully:", newProductionOrder.id);
-  }
+  // }
 
   // Close the Prisma client connection
   await client.$disconnect();

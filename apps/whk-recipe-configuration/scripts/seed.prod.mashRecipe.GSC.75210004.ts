@@ -3,7 +3,7 @@ import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, 
 const CUSTOMER_CODE = "GSC";
 const MASH_BILL = '75-21-00-04'; //  Match Item Record
 const FINAL_PROOF = 120;
-const BARREL_INFO = '53-18-3-4-0'; // Match Item Record
+const BARREL_INFO = '53-18-3-3-0'; // Match Item Record
 const CUSTOMER_NAME = "Brindiamo Group LLC"; // This needs to match ERP / MESDB customer reocrd
 const ORDER_QTY = 250; // barrels
 const TOTAL_GRAIN_WEIGHT = 24080;
