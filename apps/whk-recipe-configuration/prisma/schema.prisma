@@ -341,6 +341,7 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
+  batches                        Batch[]
   id                             String                          @id @default(cuid())
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
@@ -826,6 +827,8 @@ model Batch {
   parameterData                   Json?
   parent                          Batch?                         @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
   parentId                        String?
+  productionOrder                 ProductionOrder?               @relation(fields: [productionOrderId], references: [id])
+  productionOrderId               String?
   productionOrderRecipeInstance   ProductionOrderRecipeInstance? @relation(fields: [productionOrderRecipeInstanceId], references: [id])
   productionOrderRecipeInstanceId String?
   quantity                        Int?
@@ -964,7 +967,8 @@ model RecipeBomItem {
   operationIndex       Int                        @default(-1)
   quantity             Float?
   quantityActual       Float?
-  recipeBoms           RecipeBom[]
+  recipeBoms           RecipeBom?                 @relation(fields: [recipeBomsId], references: [id])
+  recipeBomsId         String?
   units                String
   updatedAt            DateTime                   @updatedAt
   updatedBy            DateTime?
@@ -1027,8 +1031,7 @@ model RecipeBom {
   masterReceipeBomId             String?
   productionOrderRecipeInstances ProductionOrderRecipeInstance[]
   recipe                         Recipe[]
-  recipeBomITem                  RecipeBomItem                   @relation(fields: [recipeBomITemId], references: [id])
-  recipeBomITemId                String
+  recipeBomITem                  RecipeBomItem[]
   revision                       String?
   running                        Boolean?                        @default(false)
   runningInstances               RecipeBom[]                     @relation(name: "runningRecipeBom")

@@ -29,9 +29,6 @@ import { RecipeBomItemUpdateInput } from "./RecipeBomItemUpdateInput";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
-import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
-import { RecipeBom } from "../../recipeBom/base/RecipeBom";
-import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -78,6 +75,12 @@ export class RecipeBomItemControllerBase {
               connect: data.item,
             }
           : undefined,
+
+        recipeBoms: data.recipeBoms
+          ? {
+              connect: data.recipeBoms,
+            }
+          : undefined,
       },
       select: {
         batch: {
@@ -109,6 +112,13 @@ export class RecipeBomItemControllerBase {
         operationIndex: true,
         quantity: true,
         quantityActual: true,
+
+        recipeBoms: {
+          select: {
+            id: true,
+          },
+        },
+
         units: true,
         updatedAt: true,
         updatedBy: true,
@@ -164,6 +174,13 @@ export class RecipeBomItemControllerBase {
         operationIndex: true,
         quantity: true,
         quantityActual: true,
+
+        recipeBoms: {
+          select: {
+            id: true,
+          },
+        },
+
         units: true,
         updatedAt: true,
         updatedBy: true,
@@ -218,6 +235,13 @@ export class RecipeBomItemControllerBase {
         operationIndex: true,
         quantity: true,
         quantityActual: true,
+
+        recipeBoms: {
+          select: {
+            id: true,
+          },
+        },
+
         units: true,
         updatedAt: true,
         updatedBy: true,
@@ -273,6 +297,12 @@ export class RecipeBomItemControllerBase {
                 connect: data.item,
               }
             : undefined,
+
+          recipeBoms: data.recipeBoms
+            ? {
+                connect: data.recipeBoms,
+              }
+            : undefined,
         },
         select: {
           batch: {
@@ -304,6 +334,13 @@ export class RecipeBomItemControllerBase {
           operationIndex: true,
           quantity: true,
           quantityActual: true,
+
+          recipeBoms: {
+            select: {
+              id: true,
+            },
+          },
+
           units: true,
           updatedAt: true,
           updatedBy: true,
@@ -366,6 +403,13 @@ export class RecipeBomItemControllerBase {
           operationIndex: true,
           quantity: true,
           quantityActual: true,
+
+          recipeBoms: {
+            select: {
+              id: true,
+            },
+          },
+
           units: true,
           updatedAt: true,
           updatedBy: true,
@@ -426,6 +470,13 @@ export class RecipeBomItemControllerBase {
         operationIndex: true,
         quantity: true,
         quantityActual: true,
+
+        recipeBoms: {
+          select: {
+            id: true,
+          },
+        },
+
         units: true,
         updatedAt: true,
         updatedBy: true,
@@ -613,124 +664,6 @@ export class RecipeBomItemControllerBase {
   ): Promise<void> {
     const data = {
       mashingProtocolSteps: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeBomItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipeBoms")
-  @ApiNestedQuery(RecipeBomFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "RecipeBom",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipeBoms(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeBomItemWhereUniqueInput
-  ): Promise<RecipeBom[]> {
-    const query = plainToClass(RecipeBomFindManyArgs, request.query);
-    const results = await this.service.findRecipeBoms(params.id, {
-      ...query,
-      select: {
-        createdAt: true,
-        id: true,
-        master: true,
-
-        masterRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBomITem: {
-          select: {
-            id: true,
-          },
-        },
-
-        revision: true,
-        running: true,
-
-        runningRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/recipeBoms")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeBomItem",
-    action: "update",
-    possession: "any",
-  })
-  async connectRecipeBoms(
-    @common.Param() params: RecipeBomItemWhereUniqueInput,
-    @common.Body() body: RecipeBomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBoms: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeBomItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/recipeBoms")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeBomItem",
-    action: "update",
-    possession: "any",
-  })
-  async updateRecipeBoms(
-    @common.Param() params: RecipeBomItemWhereUniqueInput,
-    @common.Body() body: RecipeBomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBoms: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeBomItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/recipeBoms")
-  @nestAccessControl.UseRoles({
-    resource: "RecipeBomItem",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectRecipeBoms(
-    @common.Param() params: RecipeBomItemWhereUniqueInput,
-    @common.Body() body: RecipeBomWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBoms: {
         disconnect: body,
       },
     };

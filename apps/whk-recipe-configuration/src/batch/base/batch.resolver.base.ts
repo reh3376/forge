@@ -33,6 +33,7 @@ import { Asset } from "../../asset/base/Asset";
 import { Customer } from "../../customer/base/Customer";
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
+import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
@@ -130,6 +131,12 @@ export class BatchResolverBase {
             }
           : undefined,
 
+        productionOrder: args.data.productionOrder
+          ? {
+              connect: args.data.productionOrder,
+            }
+          : undefined,
+
         productionOrderRecipeInstance: args.data.productionOrderRecipeInstance
           ? {
               connect: args.data.productionOrderRecipeInstance,
@@ -188,6 +195,12 @@ export class BatchResolverBase {
           parent: args.data.parent
             ? {
                 connect: args.data.parent,
+              }
+            : undefined,
+
+          productionOrder: args.data.productionOrder
+            ? {
+                connect: args.data.productionOrder,
               }
             : undefined,
 
@@ -369,6 +382,27 @@ export class BatchResolverBase {
   })
   async getParent(@graphql.Parent() parent: Batch): Promise<Batch | null> {
     const result = await this.service.getParent(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrder, {
+    nullable: true,
+    name: "productionOrder",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrder(
+    @graphql.Parent() parent: Batch
+  ): Promise<ProductionOrder | null> {
+    const result = await this.service.getProductionOrder(parent.id);
 
     if (!result) {
       return null;
