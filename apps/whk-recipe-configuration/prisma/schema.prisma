@@ -903,8 +903,8 @@ model RecipeBomItem {
   mashingProtocolSteps MashingProtocolStep[]
   operation            EnumRecipeBomItemOperation
   operationIndex       Int                        @default(-1)
-  quantity             Decimal?
-  quantityActual       Decimal?
+  quantity             Float?
+  quantityActual       Float?
   recipeBoms           RecipeBom?                 @relation(fields: [recipeBomsId], references: [id])
   recipeBomsId         String?
   units                String
