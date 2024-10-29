@@ -98,7 +98,7 @@ export class BatchService extends BatchServiceBase {
   async updateBatchRecipeBomItemQuantities(batchId: string, items: { [itemId: string]: number }): Promise<Batch> {
     const batchData = await this.prisma.batch.findUnique({
       where: {
-        batchId: batchId,
+        id: batchId,
       },
       include: {
         recipeBomItems: true,
