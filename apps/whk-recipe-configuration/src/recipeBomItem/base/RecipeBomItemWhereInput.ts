@@ -24,7 +24,7 @@ import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { IntFilter } from "../../util/IntFilter";
 import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
-import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
+import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
 @InputType()
@@ -194,15 +194,15 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomListRelationFilter,
+    type: () => RecipeBomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomListRelationFilter)
+  @Type(() => RecipeBomWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomListRelationFilter, {
+  @Field(() => RecipeBomWhereUniqueInput, {
     nullable: true,
   })
-  recipeBoms?: RecipeBomListRelationFilter;
+  recipeBoms?: RecipeBomWhereUniqueInput;
 
   @ApiProperty({
     required: false,

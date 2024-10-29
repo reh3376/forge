@@ -34,7 +34,7 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { Decimal } from "decimal.js";
-import { RecipeBomUpdateManyWithoutRecipeBomItemsInput } from "./RecipeBomUpdateManyWithoutRecipeBomItemsInput";
+import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 
 @InputType()
 class RecipeBomItemUpdateInput {
@@ -199,15 +199,15 @@ class RecipeBomItemUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomUpdateManyWithoutRecipeBomItemsInput,
+    type: () => RecipeBomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomUpdateManyWithoutRecipeBomItemsInput)
+  @Type(() => RecipeBomWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomUpdateManyWithoutRecipeBomItemsInput, {
+  @Field(() => RecipeBomWhereUniqueInput, {
     nullable: true,
   })
-  recipeBoms?: RecipeBomUpdateManyWithoutRecipeBomItemsInput;
+  recipeBoms?: RecipeBomWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

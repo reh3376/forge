@@ -171,6 +171,17 @@ class RecipeBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  recipeBomsId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   units?: SortOrder;
 
   @ApiProperty({

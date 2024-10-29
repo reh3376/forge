@@ -20,7 +20,7 @@ import { RecipeBomListRelationFilter } from "./RecipeBomListRelationFilter";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
-import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
+import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
@@ -109,15 +109,15 @@ class RecipeBomWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomItemWhereUniqueInput,
+    type: () => RecipeBomItemListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemWhereUniqueInput)
+  @Type(() => RecipeBomItemListRelationFilter)
   @IsOptional()
-  @Field(() => RecipeBomItemWhereUniqueInput, {
+  @Field(() => RecipeBomItemListRelationFilter, {
     nullable: true,
   })
-  recipeBomITem?: RecipeBomItemWhereUniqueInput;
+  recipeBomITem?: RecipeBomItemListRelationFilter;
 
   @ApiProperty({
     required: false,
