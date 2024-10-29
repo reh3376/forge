@@ -68,16 +68,15 @@ export class BatchService extends BatchServiceBase {
       },
     });
 
-    const recipeData = await recipe;
-    if (!recipeData || !recipeData.recipeBoms.length) {
+    if (!recipe || !recipe.recipeBoms.length) {
       throw new Error(`Recipe ${recipeName} not found or has no BOMs`);
     }
-    for (const recipeBom of recipeData.recipeBoms) {
+    for (const recipeBom of recipe.recipeBoms) {
       for (const recipeBomItem of recipeBom.recipeBomITem) {
         this.prisma.recipeBomItem.create({
           data: {
             batchId: recipeBomItem.batchId,
-            classId: {connect: {id: recipeBomItem.classId}},
+            classId: recipeBomItem.classId,
             createdBy: recipeBomItem.createdBy,
             globalId: recipeBomItem.globalId,
             id: recipeBomItem.id,
