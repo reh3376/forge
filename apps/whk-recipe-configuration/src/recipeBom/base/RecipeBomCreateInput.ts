@@ -24,7 +24,7 @@ import { RecipeBomCreateNestedManyWithoutRecipeBomsInput } from "./RecipeBomCrea
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipeBomsInput";
 import { RecipeCreateNestedManyWithoutRecipeBomsInput } from "./RecipeCreateNestedManyWithoutRecipeBomsInput";
-import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
+import { RecipeBomItemCreateNestedManyWithoutRecipeBomsInput } from "./RecipeBomItemCreateNestedManyWithoutRecipeBomsInput";
 
 @InputType()
 class RecipeBomCreateInput {
@@ -107,12 +107,15 @@ class RecipeBomCreateInput {
 
   @ApiProperty({
     required: true,
-    type: () => RecipeBomItemWhereUniqueInput,
+    type: () => RecipeBomItemCreateNestedManyWithoutRecipeBomsInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomItemWhereUniqueInput)
-  @Field(() => RecipeBomItemWhereUniqueInput)
-  recipeBomITem!: RecipeBomItemWhereUniqueInput;
+  @Type(() => RecipeBomItemCreateNestedManyWithoutRecipeBomsInput)
+  @IsOptional()
+  @Field(() => RecipeBomItemCreateNestedManyWithoutRecipeBomsInput, {
+    nullable: true,
+  })
+  recipeBomITem?: RecipeBomItemCreateNestedManyWithoutRecipeBomsInput;
 
   @ApiProperty({
     required: false,

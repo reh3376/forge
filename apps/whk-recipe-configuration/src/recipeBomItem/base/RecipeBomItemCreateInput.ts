@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 
@@ -33,7 +33,7 @@ import { RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput } from "./Recip
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
-import { RecipeBomCreateNestedManyWithoutRecipeBomItemsInput } from "./RecipeBomCreateNestedManyWithoutRecipeBomItemsInput";
+import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 
 @InputType()
 class RecipeBomItemCreateInput {
@@ -170,7 +170,7 @@ class RecipeBomItemCreateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantity?: number | null;
@@ -182,22 +182,22 @@ class RecipeBomItemCreateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantityActual?: number | null;
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomCreateNestedManyWithoutRecipeBomItemsInput,
+    type: () => RecipeBomWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomCreateNestedManyWithoutRecipeBomItemsInput)
+  @Type(() => RecipeBomWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomCreateNestedManyWithoutRecipeBomItemsInput, {
+  @Field(() => RecipeBomWhereUniqueInput, {
     nullable: true,
   })
-  recipeBoms?: RecipeBomCreateNestedManyWithoutRecipeBomItemsInput;
+  recipeBoms?: RecipeBomWhereUniqueInput | null;
 
   @ApiProperty({
     required: true,

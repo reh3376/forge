@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { Batch } from "../../batch/base/Batch";
 
@@ -171,7 +171,7 @@ class RecipeBomItem {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantity!: number | null;
@@ -183,19 +183,19 @@ class RecipeBomItem {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   quantityActual!: number | null;
 
   @ApiProperty({
     required: false,
-    type: () => [RecipeBom],
+    type: () => RecipeBom,
   })
   @ValidateNested()
   @Type(() => RecipeBom)
   @IsOptional()
-  recipeBoms?: Array<RecipeBom>;
+  recipeBoms?: RecipeBom | null;
 
   @ApiProperty({
     required: true,

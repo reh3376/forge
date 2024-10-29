@@ -11,13 +11,13 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Bom } from "../../bom/base/Bom";
+import { Batch } from "../../batch/base/Batch";
 
 import {
   ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
   IsBoolean,
   IsInt,
   Max,
@@ -28,6 +28,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { Bom } from "../../bom/base/Bom";
 import { Customer } from "../../customer/base/Customer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
@@ -42,6 +43,15 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
 @ObjectType()
 class ProductionOrder {
+  @ApiProperty({
+    required: false,
+    type: () => [Batch],
+  })
+  @ValidateNested()
+  @Type(() => Batch)
+  @IsOptional()
+  batches?: Array<Batch>;
+
   @ApiProperty({
     required: true,
     type: () => Bom,
