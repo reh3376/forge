@@ -35,6 +35,9 @@ import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionO
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -70,10 +73,6 @@ export class RecipeBomControllerBase {
             }
           : undefined,
 
-        recipeBomITem: {
-          connect: data.recipeBomITem,
-        },
-
         runningRecipeBom: data.runningRecipeBom
           ? {
               connect: data.runningRecipeBom,
@@ -86,12 +85,6 @@ export class RecipeBomControllerBase {
         master: true,
 
         masterRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBomITem: {
           select: {
             id: true,
           },
@@ -138,12 +131,6 @@ export class RecipeBomControllerBase {
           },
         },
 
-        recipeBomITem: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         running: true,
 
@@ -181,12 +168,6 @@ export class RecipeBomControllerBase {
         master: true,
 
         masterRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBomITem: {
           select: {
             id: true,
           },
@@ -243,10 +224,6 @@ export class RecipeBomControllerBase {
               }
             : undefined,
 
-          recipeBomITem: {
-            connect: data.recipeBomITem,
-          },
-
           runningRecipeBom: data.runningRecipeBom
             ? {
                 connect: data.runningRecipeBom,
@@ -259,12 +236,6 @@ export class RecipeBomControllerBase {
           master: true,
 
           masterRecipeBom: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipeBomITem: {
             select: {
               id: true,
             },
@@ -451,12 +422,6 @@ export class RecipeBomControllerBase {
         master: true,
 
         masterRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBomITem: {
           select: {
             id: true,
           },
@@ -805,6 +770,137 @@ export class RecipeBomControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBomITem")
+  @ApiNestedQuery(RecipeBomItemFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomITem(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeBomWhereUniqueInput
+  ): Promise<RecipeBomItem[]> {
+    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
+    const results = await this.service.findRecipeBomITem(params.id, {
+      ...query,
+      select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
+        item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lot: true,
+        operation: true,
+        operationIndex: true,
+        quantity: true,
+        quantityActual: true,
+
+        recipeBoms: {
+          select: {
+            id: true,
+          },
+        },
+
+        units: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBomITem")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBomITem(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomITem: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBomITem")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBomITem(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomITem: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBomITem")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBomITem(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: RecipeBomItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomITem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/runningInstances")
   @ApiNestedQuery(RecipeBomFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -825,12 +921,6 @@ export class RecipeBomControllerBase {
         master: true,
 
         masterRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBomITem: {
           select: {
             id: true,
           },

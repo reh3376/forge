@@ -474,6 +474,12 @@ export class RecipeControllerBase {
           },
         },
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         productionOrderRecipeInstance: {
           select: {
             id: true,
@@ -1169,12 +1175,6 @@ export class RecipeControllerBase {
         master: true,
 
         masterRecipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBomITem: {
           select: {
             id: true,
           },

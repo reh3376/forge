@@ -151,6 +151,7 @@ export class BatchService extends BatchServiceBase {
         parent: undefined,
         recipe: undefined,
         lot: undefined,
+        productionOrder: undefined,
       },
       include: {
         asset: true,

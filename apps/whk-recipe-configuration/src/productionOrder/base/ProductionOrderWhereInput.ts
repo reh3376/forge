@@ -11,9 +11,10 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
+import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -34,6 +35,18 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
 @InputType()
 class ProductionOrderWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => BatchListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchListRelationFilter, {
+    nullable: true,
+  })
+  batches?: BatchListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: () => BomWhereUniqueInput,

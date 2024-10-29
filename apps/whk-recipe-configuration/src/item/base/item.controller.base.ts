@@ -1677,6 +1677,13 @@ export class ItemControllerBase {
         operationIndex: true,
         quantity: true,
         quantityActual: true,
+
+        recipeBoms: {
+          select: {
+            id: true,
+          },
+        },
+
         units: true,
         updatedAt: true,
         updatedBy: true,
