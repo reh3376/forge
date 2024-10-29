@@ -21,7 +21,7 @@ import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { RecipeListRelationFilter } from "./RecipeListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
@@ -128,14 +128,14 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  estimatedAbv?: DecimalNullableFilter;
+  estimatedAbv?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -302,14 +302,14 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  targetProof?: DecimalNullableFilter;
+  targetProof?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

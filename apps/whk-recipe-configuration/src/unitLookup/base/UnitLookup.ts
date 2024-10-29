@@ -24,7 +24,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
+
 
 @ObjectType()
 class UnitLookup {
@@ -67,7 +67,7 @@ class UnitLookup {
   @Field(() => Float, {
     nullable: true,
   })
-  conversionRate!: Decimal | null;
+  conversionRate!: number | null;
 
   @ApiProperty({
     required: true,

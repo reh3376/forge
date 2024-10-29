@@ -14,6 +14,8 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { RecipeController } from "../recipe.controller";
 import { RecipeService } from "../recipe.service";
+import { RecipeCreationService } from "../recipe.creation.service";
+import { RecipeCookCreationService } from "../recipe.cookcreation.service";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -88,6 +90,36 @@ const FIND_ONE_RESULT = {
   updatedBy: "exampleUpdatedBy",
 };
 
+const recipeCreationService = {
+  createNewRecipe() {
+    return CREATE_RESULT;
+  },
+  recipes: () => FIND_MANY_RESULT,
+  recipe: ({ where }: { where: { id: string } }) => {
+    switch (where.id) {
+      case existingId:
+        return FIND_ONE_RESULT;
+      case nonExistingId:
+        return null;
+    }
+  },
+};
+
+const recipeCookCreationService = {
+  createNewCook() {
+    return CREATE_RESULT;
+  },
+  recipes: () => FIND_MANY_RESULT,
+  recipe: ({ where }: { where: { id: string } }) => {
+    switch (where.id) {
+      case existingId:
+        return FIND_ONE_RESULT;
+      case nonExistingId:
+        return null;
+    }
+  },
+};
+
 const service = {
   createRecipe() {
     return CREATE_RESULT;
@@ -144,6 +176,14 @@ describe("Recipe", () => {
         {
           provide: RecipeService,
           useValue: service,
+        },
+        {
+          provide: RecipeCreationService,
+          useValue: recipeCreationService,
+        },
+        {
+          provide: RecipeCookCreationService,
+          useValue: recipeCookCreationService,
         },
       ],
       controllers: [RecipeController],
