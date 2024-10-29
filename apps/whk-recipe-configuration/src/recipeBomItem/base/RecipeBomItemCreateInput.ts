@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 
@@ -33,7 +33,6 @@ import { RecipeBomItemCreateNestedManyWithoutRecipeBomItemsInput } from "./Recip
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
-import { Decimal } from "decimal.js";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 
 @InputType()
@@ -171,10 +170,10 @@ class RecipeBomItemCreateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  quantity?: Decimal | null;
+  quantity?: number | null;
 
   @ApiProperty({
     required: false,
@@ -183,10 +182,10 @@ class RecipeBomItemCreateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  quantityActual?: Decimal | null;
+  quantityActual?: number | null;
 
   @ApiProperty({
     required: false,

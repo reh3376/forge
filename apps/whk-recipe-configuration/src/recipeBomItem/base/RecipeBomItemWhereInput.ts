@@ -23,7 +23,7 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { IntFilter } from "../../util/IntFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
@@ -172,25 +172,25 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  quantity?: DecimalNullableFilter;
+  quantity?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  quantityActual?: DecimalNullableFilter;
+  quantityActual?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
