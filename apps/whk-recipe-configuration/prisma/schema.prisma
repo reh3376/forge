@@ -902,7 +902,8 @@ model RecipeBomItem {
   operationIndex       Int                        @default(-1)
   quantity             Decimal?
   quantityActual       Decimal?
-  recipeBoms           RecipeBom[]
+  recipeBoms           RecipeBom?                 @relation(fields: [recipeBomsId], references: [id])
+  recipeBomsId         String?
   units                String
   updatedAt            DateTime                   @updatedAt
   updatedBy            DateTime?
@@ -965,8 +966,7 @@ model RecipeBom {
   masterReceipeBomId             String?
   productionOrderRecipeInstances ProductionOrderRecipeInstance[]
   recipe                         Recipe[]
-  recipeBomITem                  RecipeBomItem                   @relation(fields: [recipeBomITemId], references: [id])
-  recipeBomITemId                String
+  recipeBomITem                  RecipeBomItem[]
   revision                       String?
   running                        Boolean?                        @default(false)
   runningInstances               RecipeBom[]                     @relation(name: "runningRecipeBom")

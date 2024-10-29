@@ -191,12 +191,12 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
-    type: () => [RecipeBom],
+    type: () => RecipeBom,
   })
   @ValidateNested()
   @Type(() => RecipeBom)
   @IsOptional()
-  recipeBoms?: Array<RecipeBom>;
+  recipeBoms?: RecipeBom | null;
 
   @ApiProperty({
     required: true,

@@ -592,12 +592,6 @@ export class ProductionOrderRecipeInstanceControllerBase {
           },
         },
 
-        recipeBomITem: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         running: true,
 

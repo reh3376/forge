@@ -99,6 +99,17 @@ export class RecipeBomServiceBase {
       .recipe(args);
   }
 
+  async findRecipeBomITem(
+    parentId: string,
+    args: Prisma.RecipeBomItemFindManyArgs
+  ): Promise<PrismaRecipeBomItem[]> {
+    return this.prisma.recipeBom
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .recipeBomITem(args);
+  }
+
   async findRunningInstances(
     parentId: string,
     args: Prisma.RecipeBomFindManyArgs
@@ -116,16 +127,6 @@ export class RecipeBomServiceBase {
         where: { id: parentId },
       })
       .masterRecipeBom();
-  }
-
-  async getRecipeBomITem(
-    parentId: string
-  ): Promise<PrismaRecipeBomItem | null> {
-    return this.prisma.recipeBom
-      .findUnique({
-        where: { id: parentId },
-      })
-      .recipeBomITem();
   }
 
   async getRunningRecipeBom(parentId: string): Promise<PrismaRecipeBom | null> {

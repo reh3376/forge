@@ -1181,12 +1181,6 @@ export class RecipeControllerBase {
           },
         },
 
-        recipeBomITem: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         running: true,
 
