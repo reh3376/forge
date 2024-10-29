@@ -357,6 +357,12 @@ export class ProductionOrderRecipeInstanceControllerBase {
           },
         },
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         productionOrderRecipeInstance: {
           select: {
             id: true,

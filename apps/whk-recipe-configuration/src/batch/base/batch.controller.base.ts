@@ -89,6 +89,12 @@ export class BatchControllerBase {
             }
           : undefined,
 
+        productionOrder: data.productionOrder
+          ? {
+              connect: data.productionOrder,
+            }
+          : undefined,
+
         productionOrderRecipeInstance: data.productionOrderRecipeInstance
           ? {
               connect: data.productionOrderRecipeInstance,
@@ -141,6 +147,12 @@ export class BatchControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
           select: {
             id: true,
           },
@@ -224,6 +236,12 @@ export class BatchControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
           select: {
             id: true,
           },
@@ -313,6 +331,12 @@ export class BatchControllerBase {
           },
         },
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         productionOrderRecipeInstance: {
           select: {
             id: true,
@@ -396,6 +420,12 @@ export class BatchControllerBase {
               }
             : undefined,
 
+          productionOrder: data.productionOrder
+            ? {
+                connect: data.productionOrder,
+              }
+            : undefined,
+
           productionOrderRecipeInstance: data.productionOrderRecipeInstance
             ? {
                 connect: data.productionOrderRecipeInstance,
@@ -448,6 +478,12 @@ export class BatchControllerBase {
           parameterData: true,
 
           parent: {
+            select: {
+              id: true,
+            },
+          },
+
+          productionOrder: {
             select: {
               id: true,
             },
@@ -538,6 +574,12 @@ export class BatchControllerBase {
         parameterData: true,
 
         parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrder: {
           select: {
             id: true,
           },

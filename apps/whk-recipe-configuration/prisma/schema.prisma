@@ -308,6 +308,7 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
+  batches                        Batch[]
   bom                            Bom                             @relation(fields: [bomId], references: [id])
   bomId                          String
   className                      String?
@@ -764,6 +765,8 @@ model Batch {
   parameterData                   Json?
   parent                          Batch?                         @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
   parentId                        String?
+  productionOrder                 ProductionOrder?               @relation(fields: [productionOrderId], references: [id])
+  productionOrderId               String?
   productionOrderRecipeInstance   ProductionOrderRecipeInstance? @relation(fields: [productionOrderRecipeInstanceId], references: [id])
   productionOrderRecipeInstanceId String?
   quantity                        Int?

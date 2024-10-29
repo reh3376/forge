@@ -337,6 +337,12 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         productionOrderRecipeInstance: {
           select: {
             id: true,

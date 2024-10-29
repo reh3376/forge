@@ -474,6 +474,12 @@ export class RecipeControllerBase {
           },
         },
 
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
         productionOrderRecipeInstance: {
           select: {
             id: true,
