@@ -164,7 +164,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       }
 
       // Map silo number to the silos and look up in the asset model
-      if (itemReceiptPayload.siloNumber) {
+      if (itemReceiptPayload. siloNumber) {
         // Look up the asset based on the silo number
         const siloNumberAssetNameMapping = {
           1: 'SIL-025',
@@ -186,14 +186,19 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         
         if (asset) {
           // If asset is found, use its ID for inventory tracking
-          await this.siloTrackingService.addLotToAsset(
-            itemReceiptPayload.supplierLot as string,
-            asset.id,
-            itemReceiptPayload.quantity,
-            item.id,
-            itemReceipt.createdBy
-          );
-          this.logger.log(`Added lot ${itemReceiptPayload.supplierLot} to asset ${asset.id} (Silo ${itemReceiptPayload.siloNumber})`);
+          try {
+            const inventory = await this.siloTrackingService.addLotToAsset(
+              itemReceiptPayload.supplierLot as string,
+              asset.id,
+              itemReceiptPayload.quantity,
+              item.id,
+              itemReceipt.createdBy,
+              itemReceipt.id,
+            );
+            this.logger.log(`Added lot ${itemReceiptPayload.supplierLot} to asset ${asset.id} (Silo ${itemReceiptPayload.siloNumber})`);
+          } catch (error) {
+            this.logger.error(`Error adding lot to asset: ${error}`);
+          }
         } else {
           this.logger.warn(`Asset not found for Silo ${itemReceiptPayload.siloNumber}`);
         }

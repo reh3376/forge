@@ -4,6 +4,7 @@ import * as nestAccessControl from "nest-access-control";
 import { InventoryService } from "./inventory.service";
 import { InventoryControllerBase } from "./base/inventory.controller.base";
 import { InventorySiloTrackingService } from "./inventory.silotracking.service";
+import { Inventory } from "./base/Inventory";
 
 @swagger.ApiTags("inventories")
 @common.Controller("inventories")
@@ -37,9 +38,9 @@ export class InventoryController extends InventoryControllerBase {
     possession: "any",
   })
   async addLotToAsset(
-    @common.Body() body: { lotId: string; assetId: string; quantity: number; itemId: string }
-  ): Promise<void> {
-    return this.siloTrackingService.addLotToAsset(body.lotId, body.assetId, body.quantity, body.itemId);
+    @common.Body() body: { lotId: string; assetId: string; quantity: number; itemId: string, itemReceiptId: string }
+  ): Promise<Inventory | undefined> {
+    return this.siloTrackingService.addLotToAsset(body.lotId, body.assetId, body.quantity, body.itemId, body.itemReceiptId);
   }
 
   @common.Post("silo/deduct")

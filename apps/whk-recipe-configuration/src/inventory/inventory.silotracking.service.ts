@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InventoryService } from './inventory.service';
 import { Lot, Asset, Inventory } from '@prisma/client';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class InventorySiloTrackingService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly inventoryService: InventoryService
+    private readonly inventoryService: InventoryService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {}
   async getItemIdFromAsset(assetId: string): Promise<string> {
     const inv = await this.prisma.inventory.findFirst({
@@ -21,25 +23,49 @@ export class InventorySiloTrackingService {
     return inv.item.id;
   }
 
-  async addLotToAsset(lotId: string, assetId: string, quantity: number, itemId?: string, createdBy?: string): Promise<void> {
-    const lot = await this.prisma.lot.findUnique({ where: { id: lotId } });
+  async addLotToAsset(lotId: string, assetId: string, quantity: number, itemId?: string, createdBy?: string, itemReceiptId?: string): Promise<Inventory | undefined> {
     const asset = await this.prisma.asset.findUnique({ where: { id: assetId } });
 
-    if (!lot || !asset) {
+    if (!lotId || !asset) {
       throw new Error('Lot or Asset not found');
     }
     if (!itemId) {
       itemId = await this.getItemIdFromAsset(assetId);
     }
-    await this.prisma.inventory.create({
-      data: {
-        lotNumber: lot.lotNumber,
-        asset: { connect: { id: assetId } },
-        currentQuantity: quantity,
-        createdBy: createdBy || 'mes', // Adding createdBy field
-        item: { connect: { id: itemId } }, // Connecting to the item through the lot
+
+    // Check for existing inventory in the asset for the lot
+    const existingInventory = await this.prisma.inventory.findFirst({
+      where: {
+        lotNumber: lotId,
+        assetId: assetId,
       },
     });
+
+    if (existingInventory) {
+      // If inventory already exists, update the quantity
+      this.logger.warn(`Inventory already exists for lot ${lotId} and asset ${assetId}. Updating quantity to ${quantity}.`);
+    } else {
+      // Find the highest fifoIndex for the asset
+      const highestIndexInventory = await this.prisma.inventory.findFirst({
+        where: { assetId: assetId },
+        orderBy: { fifoIndex: 'desc' },
+      });
+
+      const newFifoIndex = highestIndexInventory?.fifoIndex !== null && highestIndexInventory?.fifoIndex !== undefined ? highestIndexInventory.fifoIndex + 1 : 0;
+
+      return await this.prisma.inventory.create({
+        data: {
+          lotNumber: lotId,
+          asset: { connect: { id: assetId } },
+          currentQuantity: quantity,
+          originalQuantity: quantity,
+          createdBy: createdBy || 'mes', // Adding createdBy field
+          item: { connect: { id: itemId } }, // Connecting to the item through the lot
+          itemReceipt: { connect: { id: itemReceiptId } },
+          fifoIndex: newFifoIndex,
+        },
+      });
+    }
   }
 
   async deductFromAsset(assetId: string, quantityToDeduct: number): Promise<void> {
