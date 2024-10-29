@@ -54,6 +54,48 @@ export class BatchService extends BatchServiceBase {
     }
   }
 
+  createRecipeBomItems(recipeName: string): void {
+    const recipe = this.prisma.recipe.findFirst({
+      where: {
+        Recipe: recipeName,
+      },
+      include: {
+        recipeBoms: {
+          include: {
+            recipeBomITem: true,
+          },
+        },
+      },
+    });
+
+    const recipeData = await recipe;
+    if (!recipeData || !recipeData.recipeBoms.length) {
+      throw new Error(`Recipe ${recipeName} not found or has no BOMs`);
+    }
+    for (const recipeBom of recipeData.recipeBoms) {
+      for (const recipeBomItem of recipeBom.recipeBomITem) {
+        this.prisma.recipeBomItem.create({
+          data: {
+            batchId: recipeBomItem.batchId,
+            classId: {connect: {id: recipeBomItem.classId}},
+            createdBy: recipeBomItem.createdBy,
+            globalId: recipeBomItem.globalId,
+            id: recipeBomItem.id,
+            isClassDefinition: false,
+            itemId: recipeBomItem.itemId,
+            lot: recipeBomItem.lot,
+            operation: recipeBomItem.operation,
+            operationIndex: recipeBomItem.operationIndex,
+            quantity: recipeBomItem.quantity,
+            quantityActual: recipeBomItem.quantityActual,
+            units: recipeBomItem.units,
+            updatedBy: recipeBomItem.updatedBy,
+          },
+        });
+      }
+    }
+  }
+
   async createBatch <T extends Prisma.BatchCreateArgs>(args: Prisma.SelectSubset<T, Prisma.BatchCreateArgs>): Promise<Batch> {
     this.validateBatchId(args.data.batchId);
     const batch = await super.createBatch(args);
@@ -63,6 +105,10 @@ export class BatchService extends BatchServiceBase {
     });
 
     this.logger.verbose({ message: `Created Batch: ${batch.batchId} & pushed to topic` });
+    this.logger.verbose({ message: `Creating recipe bom items for recipe: ${args.data.recipeName}` });
+    if (args.data.recipeName) {
+      this.createRecipeBomItems(args.data.recipeName);
+    }
     return batch;
   }
 
