@@ -25,7 +25,6 @@ import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { IntFilter } from "../../util/IntFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
-import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
