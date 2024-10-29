@@ -29,7 +29,6 @@ import {
 
 import { Type } from "class-transformer";
 import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
-import { Decimal } from "decimal.js";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./FermentationChemistryUpdateManyWithoutProductionOrdersInput";
 import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";

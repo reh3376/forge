@@ -29,7 +29,6 @@ import {
 
 import { Type } from "class-transformer";
 import { Bom } from "../../bom/base/Bom";
-import { Decimal } from "decimal.js";
 import { Customer } from "../../customer/base/Customer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
