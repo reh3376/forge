@@ -34,7 +34,6 @@ import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
-import { RecipeBomCreateNestedManyWithoutRecipeBomItemsInput } from "./RecipeBomCreateNestedManyWithoutRecipeBomItemsInput";
 
 @InputType()
 class RecipeBomItemCreateInput {
