@@ -14,7 +14,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, IsEnum, ValidateNested } from "class-validator";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -22,6 +21,7 @@ import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/Mash
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class MashingProtocolStepWhereInput {
@@ -38,14 +38,14 @@ class MashingProtocolStepWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  agitatorSpdSp?: DecimalNullableFilter;
+  agitatorSpdSp?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -60,14 +60,14 @@ class MashingProtocolStepWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  coolTempSp?: DecimalNullableFilter;
+  coolTempSp?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -93,14 +93,14 @@ class MashingProtocolStepWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  heatTempSp?: DecimalNullableFilter;
+  heatTempSp?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -214,25 +214,25 @@ class MashingProtocolStepWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  temperatureActual?: DecimalNullableFilter;
+  temperatureActual?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  temperatureSetpoint?: DecimalNullableFilter;
+  temperatureSetpoint?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

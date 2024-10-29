@@ -4,11 +4,13 @@ import { RecipeModuleBase } from "./base/recipe.module.base";
 import { RecipeService } from "./recipe.service";
 import { RecipeController } from "./recipe.controller";
 import { RecipeResolver } from "./recipe.resolver";
+import { RecipeCookCreationService } from "./recipe.cookcreation.service";
+import { RecipeCreationService } from "./recipe.creation.service";
 
 @Module({
   imports: [RecipeModuleBase, forwardRef(() => AuthModule)],
   controllers: [RecipeController],
-  providers: [RecipeService, RecipeResolver],
+  providers: [RecipeService, RecipeResolver, RecipeCreationService, RecipeCookCreationService],
   exports: [RecipeService],
 })
 export class RecipeModule {}

@@ -30,7 +30,29 @@ Configuration for the server component can be provided through the use of enviro
 > **Note**
 > Amplication generates default values and stores them under the .env file. It is advised to use some form of secrets manager/vault solution when using in production. 
 
-## Step 2.1: Scripts - pre-requisites
+## Step 2: DotEnv Vault (Environment variables)
+
+We utilize the [DotEnv Vault](https://dotenv.org/) platform to store the environment variables in a secure and easily manageable way for different environments.
+
+### Local Development
+
+From the root of the app directory (in this case `apps/whk-recipe-configuration`) run the following command to start the dotenv vault:
+
+`npx dotenv-vault@latest pull`
+
+### Staging
+
+From the root of the app directory (in this case `apps/whk-recipe-configuration`) run the following command to start the dotenv vault:
+`npx dotenv-vault@latest pull staging .env`
+
+### Production
+
+From the root of the app directory (in this case `apps/whk-recipe-configuration`) run the following command to start the dotenv vault:
+`npx dotenv-vault@latest pull production .env`
+
+Please see their documentation for more information.
+
+## Step 3.1: Scripts - pre-requisites
 
 After configuration of the server the next step would be to run the application. Before running the server side of the component, make sure that the different pre-requisites are met - i.e., node.js [^16.x], npm, docker. After the setup of the pre-requisites the server component can be started.
 
@@ -42,7 +64,7 @@ $ npm install
 $ npm run prisma:generate
 ```
 
-## Step 2.2: Scripts - local development
+## Step 3.2: Scripts - local development
 
 ```sh
 # start the database where the server component will connect to
@@ -56,9 +78,24 @@ $ npm run start
 ```
 By default, your app comes with one user with the username "admin" and password "admin".
 
-## Step 2.2: Scripts - container based development
+## Step 3.3: Scripts - container based development
 
 ```shell
 # start the server component as a docker container
 $ npm run compose:up
+```
+
+
+## 4 - Database Restoration for Local Development
+
+If you are developing locally and need to restore the database, you can use the following command:
+
+Note you must have the `psql` command installed on your machine.
+- [Guide](https://www.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/)
+
+Commands:
+```sh
+dropdb -h localhost -p 5432 -U admin whk-mes # drop if exists
+createdb -h localhost -p 5432 -U admin whk-mes # create new db
+psql -h localhost -p 5432 -d whk-mes -U admin -f <pathToMy.sqlFileToRestore> # Restore from .sql file
 ```

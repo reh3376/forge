@@ -28,7 +28,6 @@ import { BatchCreateNestedManyWithoutRecipesInput } from "./BatchCreateNestedMan
 import { Type } from "class-transformer";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { Decimal } from "decimal.js";
 import { RecipeCreateNestedManyWithoutRecipesInput } from "./RecipeCreateNestedManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutRecipesInput } from "./LotCreateNestedManyWithoutRecipesInput";
@@ -138,7 +137,7 @@ class RecipeCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  estimatedAbv?: Decimal | null;
+  estimatedAbv?: number | null;
 
   @ApiProperty({
     required: false,
@@ -309,7 +308,7 @@ class RecipeCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  targetProof?: Decimal | null;
+  targetProof?: number | null;
 
   @ApiProperty({
     required: false,
