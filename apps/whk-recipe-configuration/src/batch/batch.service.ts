@@ -54,8 +54,8 @@ export class BatchService extends BatchServiceBase {
     }
   }
 
-  createRecipeBomItems(recipeName: string): void {
-    const recipe = this.prisma.recipe.findFirst({
+  async createRecipeBomItems(recipeName: string): Promise<void> {
+    const recipe = await this.prisma.recipe.findFirst({
       where: {
         Recipe: recipeName,
       },
@@ -76,7 +76,7 @@ export class BatchService extends BatchServiceBase {
         this.prisma.recipeBomItem.create({
           data: {
             batchId: recipeBomItem.batchId,
-            classId: recipeBomItem.classId,
+            classIdid: recipeBomItem.classIdid,
             createdBy: recipeBomItem.createdBy,
             globalId: recipeBomItem.globalId,
             id: recipeBomItem.id,
