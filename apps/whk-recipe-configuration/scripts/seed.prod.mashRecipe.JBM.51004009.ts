@@ -42,8 +42,8 @@ const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "Malt", qty: 289 },
-  { action: "Add Additive", additiveType: "Liquozyme", qty: 2.0 },
+  { action: "Add Grain", grainType: "Malt", qty: 188 },
+  { action: "Add Additive", additiveType: "Liquozyme", qty: 2.6 },
   { action: "Add Grain", grainType: "Corn", qty: 12281 },
   // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
   // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
@@ -54,12 +54,12 @@ const MASHING_PROTOCOL = [
   { action: "Add Grain", grainType: "Wheat", qty: 3132 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME", qty: 8.7},
-  { action: "Add Additive", additiveType: "Viscoferm", qty: 4.3 },
+  { action: "Add Additive", additiveType: "DIAZYME", qty: 3.2},
+  { action: "Add Additive", additiveType: "Viscoferm", qty: 0 },
   { action: "Hold", holdType: "Cool", temperature: 145 },
   { action: "Add Grain", grainType: "Malt", qty: 1700 },
   { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Malt", qty: 468 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt", qty: 279 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
