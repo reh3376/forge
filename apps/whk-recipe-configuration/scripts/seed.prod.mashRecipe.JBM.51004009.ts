@@ -43,7 +43,7 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
   { action: "Add Grain", grainType: "Malt", qty: 188 },
-  { action: "Add Additive", additiveType: "Liquozyme", qty: 2.6 },
+  { action: "Add Additive", additiveType: "Liquozyme", qty: 1.4 },
   { action: "Add Grain", grainType: "Corn", qty: 12281 },
   // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
   // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
@@ -54,8 +54,8 @@ const MASHING_PROTOCOL = [
   { action: "Add Grain", grainType: "Wheat", qty: 3132 }, // UNCOMMENT IF NEED SECONDARY DROP
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME", qty: 3.2},
-  { action: "Add Additive", additiveType: "Viscoferm", qty: 0 },
+  { action: "Add Additive", additiveType: "DIAZYME", qty: 6.6 },
+  { action: "Add Additive", additiveType: "Viscoferm", qty: 4.8 },
   { action: "Hold", holdType: "Cool", temperature: 145 },
   { action: "Add Grain", grainType: "Malt", qty: 1700 },
   { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
