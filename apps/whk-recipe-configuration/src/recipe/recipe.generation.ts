@@ -1,7 +1,10 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 
-export class RecipeGenerator 
-{
+export class RecipeGenerator {
+  private RECIPE = '';
+  private ITEM_NUMBER = '';
+  private BOM_REVISION = '';
+
   constructor(
     private readonly CUSTOMER_CODE = "JBM",
     private readonly MASH_BILL = '51-00-40-09',
@@ -57,24 +60,24 @@ export class RecipeGenerator
       { name: 'FermentationAge', setpointValue: 72 },
       { name: 'ControlTemperature', setpointValue: 92 },
       { name: 'CooksPerFerm', setpointValue: 3 },
-      { name: 'TopOffFrequency', setpointValue: 24 },
-      { name: 'TopOffQuantity', setpointValue: 100 },
-      { name: 'TopOffTemperature', setpointValue: 80 },
-      { name: 'MashpH', setpointValue: 5.1 },
-      { name: 'MashRatio', setpointValue: 3.0 },
-      { name: 'RatioByFerm', setpointValue: 2.8 },
-      { name: 'FermSetTemp', setpointValue: 80 },
-      { name: 'StarterSweetpH', setpointValue: 5.1 },
-      { name: 'TotalGrainWeight', setpointValue: 20500 },
-      { name: 'TotalLiquid', setpointValue: 70000 },
-      { name: 'NumberOfCooks', setpointValue: this.ORDER_QTY * 3 / this.BBLS_PER_FERM },
-      { name: 'AssumedFermABV', setpointValue: 12.5 }
-    ],
-    private readonly RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`,
-    private readonly ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`,
-    private readonly BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`
-  ) {}
-  
+        { name: 'TopOffFrequency', setpointValue: 24 },
+        { name: 'TopOffQuantity', setpointValue: 100 },
+        { name: 'TopOffTemperature', setpointValue: 80 },
+        { name: 'MashpH', setpointValue: 5.1 },
+        { name: 'MashRatio', setpointValue: 3.0 },
+        { name: 'RatioByFerm', setpointValue: 2.8 },
+        { name: 'FermSetTemp', setpointValue: 80 },
+        { name: 'StarterSweetpH', setpointValue: 5.1 },
+        { name: 'TotalGrainWeight', setpointValue: 20500 },
+        { name: 'TotalLiquid', setpointValue: 70000 },
+        { name: 'NumberOfCooks', setpointValue: 3},
+        { name: 'AssumedFermABV', setpointValue: 12.5 }
+      ]
+  ) {
+    this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+    this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+    this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+  }
   async createRecipeData(): Promise<void> {
       console.info("Seeding database with custom seed for Mashing Recipe...");
 
