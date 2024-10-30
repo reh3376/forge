@@ -93,7 +93,7 @@ const RECIPE_PARAMETERS = [
     
     console.info("Seeding database with custom seed for Mashing Recipe...");
 
-      // ------------------------------------ BOM CREATION ------------------------------------
+     // ------------------------------------ BOM CREATION ------------------------------------
   // Base BOM Items
   const waterItemId = 'clyd1ofw2009yfd4504c6wt1w'
   const backsetItemId = 'clyd1oftx006jfd4514hrak80'
@@ -102,6 +102,7 @@ const RECIPE_PARAMETERS = [
   const diazymeItemId = 'clzhhlsx30f09mbc9r5mj02z7'
   const termamylItemId = 'clzelxl5v005osuwb3rfax6ix'
   const saczymeItemId = 'clyd1ofot0022fd45d8j321v4'
+  const laminexItemId = 'clyd1ofoq001xfd45678b666b'
   const maltItemId = 'clyd1ofw0009ufd45hlzpnqa9'
   const ryeItemId = 'clyd1ofy600d9fd45p99px0c0'
   const cornItemId = 'clyd1ofw1009wfd45oghso7y5'
@@ -276,8 +277,8 @@ const RECIPE_PARAMETERS = [
             itemId = saczymeItemId;
             quantity = step.qty || 0;
             break;  
-          case "termamyl":
-            itemId = termamylItemId;
+          case "laminex":
+            itemId = laminexItemId;
             quantity = step.qty || 0;
             break;
         }
@@ -301,6 +302,7 @@ const RECIPE_PARAMETERS = [
 
   // ------------------------------------ END OF BOM CREATION ------------------------------------
 
+
   /*
   1. Seed instance of unit procedures, using the main procedure instance
   2. Seed instances of operations for each UP. Using the parameters to seed the number of operations per UP
@@ -312,7 +314,6 @@ const RECIPE_PARAMETERS = [
 
   */
 
-  // const client = new PrismaClient();
 
   // Find Unit Procedure class definitions
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
@@ -807,9 +808,9 @@ const RECIPE_PARAMETERS = [
         item: {
           connect: { id: (item as Item).id }
         },
-        parameters: {
-          connect: newParams.map(param => ({ id: param.id }))
-        },
+        // parameters: {
+        //   connect: newParams.map(param => ({ id: param.id }))
+        // },
         customerCode: CUSTOMER_CODE
       }
     });
@@ -942,9 +943,9 @@ const RECIPE_PARAMETERS = [
     }
   });
 
-  if (existingProductionOrder) {
-    console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
-  } else {
+  // if (existingProductionOrder) {
+  //   console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
+  // } else {
     // Get the most recent production order created today, if it exists
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -986,9 +987,9 @@ const RECIPE_PARAMETERS = [
         customer: {
           connect: { id: customer?.id }
         },
-        salesOrder: {
-          connect: { id: salesOrder?.id }
-        },
+        // salesOrder: {
+        //   connect: { id: salesOrder?.id }
+        // },
         createdBy: USER,
         status: EnumProductionOrderStatus.Initiated,
         customerCode: CUSTOMER_CODE,
@@ -1005,8 +1006,6 @@ const RECIPE_PARAMETERS = [
     });
 
     // Create a sample schedule order
-
-
     console.log("Creating sample schedule order...");
     const scheduleOrderName = `SHO${dayOfYear}`;
     const newScheduleOrder = await client.scheduleOrder.create({
@@ -1023,7 +1022,7 @@ const RECIPE_PARAMETERS = [
         recipeGroup: {
           connect: { id: recipeGroup.id }
         },
-        name: `${scheduleOrderName}02`,
+        name: `${scheduleOrderName}${newProductionOrderNumber}`,
       }
     });
 
@@ -1060,7 +1059,7 @@ const RECIPE_PARAMETERS = [
     console.log("Sample schedule order queue record created successfully:", newScheduleOrderQueue.id);
 
     console.log("Sample production order created successfully:", newProductionOrder.id);
-  }
+  // }
 
   // Close the Prisma client connection
   await client.$disconnect();
