@@ -20092,6 +20092,191 @@
         ]
       }
     },
+    "/api/itemReceipts/{id}/inventories": {
+      "get": {
+        "operationId": "ItemReceiptController_findInventories",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/InventoryWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "itemReceipts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ItemReceiptController_connectInventories",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "itemReceipts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "ItemReceiptController_updateInventories",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "itemReceipts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ItemReceiptController_disconnectInventories",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "itemReceipts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/itemReceipts/{id}/tests": {
       "get": {
         "operationId": "ItemReceiptController_findTests",
@@ -20269,6 +20454,472 @@
         },
         "tags": [
           "itemReceipts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventories/silo/add": {
+      "post": {
+        "operationId": "InventoryController_addLotToAsset",
+        "summary": "Add lot to asset (silo)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "lotId": {
+                    "type": "string"
+                  },
+                  "assetId": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "itemId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lotId",
+                  "assetId",
+                  "quantity",
+                  "itemId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventories/silo/deduct": {
+      "post": {
+        "operationId": "InventoryController_deductFromAsset",
+        "summary": "Deduct from asset (silo)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assetId": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "assetId",
+                  "quantity"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventories/silo/{assetId}": {
+      "get": {
+        "operationId": "InventoryController_getAssetInventory",
+        "summary": "Get asset (silo) inventory",
+        "parameters": [
+          {
+            "name": "assetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventories/silo/transfer": {
+      "post": {
+        "operationId": "InventoryController_transferBetweenAssets",
+        "summary": "Transfer between assets (silos)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sourceAssetId": {
+                    "type": "string"
+                  },
+                  "destAssetId": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "itemId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sourceAssetId",
+                  "destAssetId",
+                  "quantity",
+                  "itemId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventories": {
+      "post": {
+        "operationId": "InventoryController_createInventory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "InventoryController_inventories",
+        "parameters": [
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/InventoryWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Inventory"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventories/{id}": {
+      "get": {
+        "operationId": "InventoryController_inventory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "InventoryController_updateInventory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "inventories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "InventoryController_deleteInventory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "inventories"
         ],
         "security": [
           {
@@ -21036,6 +21687,191 @@
       },
       "delete": {
         "operationId": "LotController_disconnectInventoryTransfers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "lots"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/lots/{id}/item": {
+      "get": {
+        "operationId": "LotController_findItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/ItemWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "lots"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "LotController_connectItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "lots"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "LotController_updateItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "lots"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "LotController_disconnectItem",
         "parameters": [
           {
             "name": "id",
@@ -24277,301 +25113,6 @@
         },
         "tags": [
           "vendors"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/inventories": {
-      "post": {
-        "operationId": "InventoryController_createInventory",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InventoryCreateInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Inventory"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ForbiddenException"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "inventories"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "InventoryController_inventories",
-        "parameters": [
-          {
-            "name": "where",
-            "required": false,
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "$ref": "#/components/schemas/InventoryWhereInput"
-            }
-          },
-          {
-            "name": "orderBy",
-            "required": false,
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "$ref": "#/components/schemas/Array"
-            }
-          },
-          {
-            "name": "skip",
-            "required": false,
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": false,
-            "in": "query",
-            "style": "deepObject",
-            "explode": true,
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Inventory"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ForbiddenException"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "inventories"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/inventories/{id}": {
-      "get": {
-        "operationId": "InventoryController_inventory",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Inventory"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ForbiddenException"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundException"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "inventories"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "InventoryController_updateInventory",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InventoryUpdateInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Inventory"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ForbiddenException"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundException"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "inventories"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "InventoryController_deleteInventory",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Inventory"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ForbiddenException"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundException"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "inventories"
         ],
         "security": [
           {
@@ -32426,6 +32967,87 @@
           "updatedAt"
         ]
       },
+      "Inventory": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/Asset"
+          },
+          "correctedBy": {
+            "type": "string"
+          },
+          "correctionNote": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "currentQuantity": {
+            "type": "number"
+          },
+          "customers": {
+            "type": "object"
+          },
+          "fifoIndex": {
+            "type": "number"
+          },
+          "globalId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          },
+          "itemReceipt": {
+            "$ref": "#/components/schemas/ItemReceipt"
+          },
+          "lotNumber": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "originalQuantity": {
+            "type": "number"
+          },
+          "proof": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "schemaVersion": {
+            "type": "string"
+          },
+          "units": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset",
+          "createdAt",
+          "createdBy",
+          "id",
+          "item",
+          "updatedAt"
+        ]
+      },
       "TestParameter": {
         "type": "object",
         "properties": {
@@ -32558,6 +33180,12 @@
           },
           "id": {
             "type": "string"
+          },
+          "inventories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Inventory"
+            }
           },
           "item": {
             "$ref": "#/components/schemas/Item"
@@ -32849,6 +33477,9 @@
           "confirmed": {
             "type": "boolean"
           },
+          "continerItem": {
+            "$ref": "#/components/schemas/Item"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -32905,7 +33536,10 @@
             "type": "boolean"
           },
           "item": {
-            "$ref": "#/components/schemas/Item"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
           },
           "lotAlphaChar": {
             "type": "string"
@@ -34397,6 +35031,9 @@
           "customers": {
             "type": "object"
           },
+          "durationSplits": {
+            "type": "object"
+          },
           "fermentationChemistries": {
             "type": "array",
             "items": {
@@ -34452,6 +35089,9 @@
           "revision": {
             "type": "number"
           },
+          "totalDuration": {
+            "type": "number"
+          },
           "updatedAt": {
             "format": "date-time",
             "type": "string"
@@ -34461,84 +35101,6 @@
           "batchId",
           "createdAt",
           "id",
-          "updatedAt"
-        ]
-      },
-      "Inventory": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "type": "boolean"
-          },
-          "asset": {
-            "$ref": "#/components/schemas/Asset"
-          },
-          "correctedBy": {
-            "type": "string"
-          },
-          "correctionNote": {
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "createdBy": {
-            "type": "string"
-          },
-          "currentQuantity": {
-            "type": "number"
-          },
-          "customers": {
-            "type": "object"
-          },
-          "fifoIndex": {
-            "type": "number"
-          },
-          "globalId": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/Item"
-          },
-          "lotNumber": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "originalQuantity": {
-            "type": "number"
-          },
-          "proof": {
-            "type": "number"
-          },
-          "revision": {
-            "type": "number"
-          },
-          "schemaVersion": {
-            "type": "string"
-          },
-          "units": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedBy": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "asset",
-          "createdAt",
-          "createdBy",
-          "id",
-          "item",
           "updatedAt"
         ]
       },
@@ -34668,6 +35230,13 @@
           },
           "schemaVersion": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OOS",
+              "InService"
+            ]
           },
           "updatedAt": {
             "format": "date-time",
@@ -34899,6 +35468,9 @@
           },
           "itemType": {
             "type": "string"
+          },
+          "lotContinerItem": {
+            "$ref": "#/components/schemas/Lot"
           },
           "lots": {
             "type": "array",
@@ -37368,6 +37940,9 @@
           "customers": {
             "$ref": "#/components/schemas/JsonFilter"
           },
+          "durationSplits": {
+            "$ref": "#/components/schemas/JsonFilter"
+          },
           "fermentationChemistries": {
             "$ref": "#/components/schemas/FermentationChemistryListRelationFilter"
           },
@@ -37415,6 +37990,9 @@
             "$ref": "#/components/schemas/StringNullableFilter"
           },
           "revision": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "totalDuration": {
             "$ref": "#/components/schemas/IntNullableFilter"
           }
         }
@@ -37468,6 +38046,9 @@
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "itemReceipt": {
+            "$ref": "#/components/schemas/ItemReceiptWhereUniqueInput"
           },
           "lotNumber": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -37628,6 +38209,9 @@
           "id": {
             "$ref": "#/components/schemas/StringFilter"
           },
+          "inventories": {
+            "$ref": "#/components/schemas/InventoryListRelationFilter"
+          },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
           },
@@ -37768,6 +38352,9 @@
           },
           "itemType": {
             "$ref": "#/components/schemas/StringFilter"
+          },
+          "lotContinerItem": {
+            "$ref": "#/components/schemas/LotWhereUniqueInput"
           },
           "lots": {
             "$ref": "#/components/schemas/LotListRelationFilter"
@@ -38106,6 +38693,13 @@
           "schemaVersion": {
             "$ref": "#/components/schemas/StringFilter"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OOS",
+              "InService"
+            ]
+          },
           "updatedAt": {
             "$ref": "#/components/schemas/DateTimeFilter"
           },
@@ -38213,6 +38807,9 @@
           "confirmed": {
             "$ref": "#/components/schemas/BooleanNullableFilter"
           },
+          "continerItem": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
           "createdAt": {
             "$ref": "#/components/schemas/DateTimeFilter"
           },
@@ -38265,7 +38862,7 @@
             "$ref": "#/components/schemas/BooleanNullableFilter"
           },
           "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            "$ref": "#/components/schemas/ItemListRelationFilter"
           },
           "lotAlphaChar": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -42352,6 +42949,9 @@
           "itemType": {
             "type": "string"
           },
+          "lotContinerItem": {
+            "$ref": "#/components/schemas/LotWhereUniqueInput"
+          },
           "lots": {
             "$ref": "#/components/schemas/LotCreateNestedManyWithoutItemsInput"
           },
@@ -42743,6 +43343,9 @@
           },
           "itemType": {
             "type": "string"
+          },
+          "lotContinerItem": {
+            "$ref": "#/components/schemas/LotWhereUniqueInput"
           },
           "lots": {
             "$ref": "#/components/schemas/LotUpdateManyWithoutItemsInput"
@@ -43949,6 +44552,13 @@
           "schemaVersion": {
             "type": "string"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OOS",
+              "InService"
+            ]
+          },
           "updatedBy": {
             "type": "string"
           }
@@ -44296,8 +44906,26 @@
           "schemaVersion": {
             "type": "string"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OOS",
+              "InService"
+            ]
+          },
           "updatedBy": {
             "type": "string"
+          }
+        }
+      },
+      "InventoryCreateNestedManyWithoutItemReceiptsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryWhereUniqueInput"
+            }
           }
         }
       },
@@ -44323,6 +44951,9 @@
           },
           "globalId": {
             "type": "string"
+          },
+          "inventories": {
+            "$ref": "#/components/schemas/InventoryCreateNestedManyWithoutItemReceiptsInput"
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
@@ -44391,6 +45022,29 @@
           "asset"
         ]
       },
+      "InventoryUpdateManyWithoutItemReceiptsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryWhereUniqueInput"
+            }
+          }
+        }
+      },
       "TestParameterUpdateManyWithoutItemReceiptsInput": {
         "type": "object",
         "properties": {
@@ -44425,6 +45079,9 @@
           },
           "globalId": {
             "type": "string"
+          },
+          "inventories": {
+            "$ref": "#/components/schemas/InventoryUpdateManyWithoutItemReceiptsInput"
           },
           "item": {
             "$ref": "#/components/schemas/ItemWhereUniqueInput"
@@ -44482,6 +45139,135 @@
           },
           "asset": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          }
+        }
+      },
+      "InventoryCreateInput": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "correctedBy": {
+            "type": "string"
+          },
+          "correctionNote": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "currentQuantity": {
+            "type": "number"
+          },
+          "customers": {
+            "type": "object"
+          },
+          "fifoIndex": {
+            "type": "number"
+          },
+          "globalId": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "itemReceipt": {
+            "$ref": "#/components/schemas/ItemReceiptWhereUniqueInput"
+          },
+          "lotNumber": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "originalQuantity": {
+            "type": "number"
+          },
+          "proof": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "schemaVersion": {
+            "type": "string"
+          },
+          "units": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset",
+          "createdBy",
+          "item"
+        ]
+      },
+      "InventoryUpdateInput": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "correctedBy": {
+            "type": "string"
+          },
+          "correctionNote": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "currentQuantity": {
+            "type": "number"
+          },
+          "customers": {
+            "type": "object"
+          },
+          "fifoIndex": {
+            "type": "number"
+          },
+          "globalId": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "itemReceipt": {
+            "$ref": "#/components/schemas/ItemReceiptWhereUniqueInput"
+          },
+          "lotNumber": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "originalQuantity": {
+            "type": "number"
+          },
+          "proof": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "schemaVersion": {
+            "type": "string"
+          },
+          "units": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
           }
         }
       },
@@ -44551,6 +45337,9 @@
           "confirmed": {
             "type": "boolean"
           },
+          "continerItem": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
           "createdBy": {
             "type": "string"
           },
@@ -44597,7 +45386,7 @@
             "type": "boolean"
           },
           "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            "$ref": "#/components/schemas/ItemCreateNestedManyWithoutLotsInput"
           },
           "lotAlphaChar": {
             "type": "string"
@@ -44676,6 +45465,17 @@
           "lotNumber"
         ]
       },
+      "ItemCreateNestedManyWithoutLotsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          }
+        }
+      },
       "BatchUpdateManyWithoutLotsInput": {
         "type": "object",
         "properties": {
@@ -44745,6 +45545,29 @@
           }
         }
       },
+      "ItemUpdateManyWithoutLotsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          }
+        }
+      },
       "LotUpdateInput": {
         "type": "object",
         "properties": {
@@ -44777,6 +45600,9 @@
           },
           "confirmed": {
             "type": "boolean"
+          },
+          "continerItem": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
           },
           "createdBy": {
             "type": "string"
@@ -44824,7 +45650,7 @@
             "type": "boolean"
           },
           "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            "$ref": "#/components/schemas/ItemUpdateManyWithoutLotsInput"
           },
           "lotAlphaChar": {
             "type": "string"
@@ -45547,6 +46373,9 @@
           "customers": {
             "type": "object"
           },
+          "durationSplits": {
+            "type": "object"
+          },
           "fermentationChemistries": {
             "$ref": "#/components/schemas/FermentationChemistryCreateNestedManyWithoutBatchesInput"
           },
@@ -45591,6 +46420,9 @@
             "type": "string"
           },
           "revision": {
+            "type": "number"
+          },
+          "totalDuration": {
             "type": "number"
           }
         },
@@ -45694,6 +46526,9 @@
           "customers": {
             "type": "object"
           },
+          "durationSplits": {
+            "type": "object"
+          },
           "fermentationChemistries": {
             "$ref": "#/components/schemas/FermentationChemistryUpdateManyWithoutBatchesInput"
           },
@@ -45738,6 +46573,9 @@
             "type": "string"
           },
           "revision": {
+            "type": "number"
+          },
+          "totalDuration": {
             "type": "number"
           }
         }
@@ -45915,129 +46753,6 @@
           },
           "purchaseOrders": {
             "$ref": "#/components/schemas/PurchaseOrderUpdateManyWithoutVendorsInput"
-          },
-          "updatedBy": {
-            "type": "string"
-          }
-        }
-      },
-      "InventoryCreateInput": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "type": "boolean"
-          },
-          "asset": {
-            "$ref": "#/components/schemas/AssetWhereUniqueInput"
-          },
-          "correctedBy": {
-            "type": "string"
-          },
-          "correctionNote": {
-            "type": "string"
-          },
-          "createdBy": {
-            "type": "string"
-          },
-          "currentQuantity": {
-            "type": "number"
-          },
-          "customers": {
-            "type": "object"
-          },
-          "fifoIndex": {
-            "type": "number"
-          },
-          "globalId": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
-          },
-          "lotNumber": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "originalQuantity": {
-            "type": "number"
-          },
-          "proof": {
-            "type": "number"
-          },
-          "revision": {
-            "type": "number"
-          },
-          "schemaVersion": {
-            "type": "string"
-          },
-          "units": {
-            "type": "string"
-          },
-          "updatedBy": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "asset",
-          "createdBy",
-          "item"
-        ]
-      },
-      "InventoryUpdateInput": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "type": "boolean"
-          },
-          "asset": {
-            "$ref": "#/components/schemas/AssetWhereUniqueInput"
-          },
-          "correctedBy": {
-            "type": "string"
-          },
-          "correctionNote": {
-            "type": "string"
-          },
-          "createdBy": {
-            "type": "string"
-          },
-          "currentQuantity": {
-            "type": "number"
-          },
-          "customers": {
-            "type": "object"
-          },
-          "fifoIndex": {
-            "type": "number"
-          },
-          "globalId": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
-          },
-          "lotNumber": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "originalQuantity": {
-            "type": "number"
-          },
-          "proof": {
-            "type": "number"
-          },
-          "revision": {
-            "type": "number"
-          },
-          "schemaVersion": {
-            "type": "string"
-          },
-          "units": {
-            "type": "string"
           },
           "updatedBy": {
             "type": "string"
