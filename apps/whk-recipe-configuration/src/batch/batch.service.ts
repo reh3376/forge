@@ -54,6 +54,96 @@ export class BatchService extends BatchServiceBase {
     }
   }
 
+  async createRecipeBomItems(recipeName: string): Promise<void> {
+    const recipe = await this.prisma.recipe.findFirst({
+      where: {
+        Recipe: recipeName,
+      },
+      include: {
+        recipeBoms: {
+          include: {
+            recipeBomITem: true,
+          },
+        },
+      },
+    });
+
+    if (!recipe || !recipe.recipeBoms.length) {
+      throw new Error(`Recipe ${recipeName} not found or has no BOMs`);
+    }
+    for (const recipeBom of recipe.recipeBoms) {
+      for (const recipeBomItem of recipeBom.recipeBomITem) {
+        this.prisma.recipeBomItem.create({
+          data: {
+            batchId: recipeBomItem.batchId,
+            classIdid: recipeBomItem.classIdid,
+            createdBy: recipeBomItem.createdBy,
+            globalId: recipeBomItem.globalId,
+            id: recipeBomItem.id,
+            isClassDefinition: false,
+            itemId: recipeBomItem.itemId,
+            lot: recipeBomItem.lot,
+            operation: recipeBomItem.operation,
+            operationIndex: recipeBomItem.operationIndex,
+            quantity: recipeBomItem.quantity,
+            quantityActual: recipeBomItem.quantityActual,
+            units: recipeBomItem.units,
+            updatedBy: recipeBomItem.updatedBy,
+          },
+        });
+      }
+    }
+  }
+
+  async updateBatchRecipeBomItemQuantities(batchId: string, items: { [itemId: string]: number }): Promise<Batch> {
+    const batchData = await this.prisma.batch.findUnique({
+      where: {
+        id: batchId,
+      },
+      include: {
+        recipeBomItems: true,
+      },
+    });
+
+    if (!batchData) {
+      throw new Error(`Batch not found for batchId: ${batchId}`);
+    }
+
+    for (const itemId of Object.keys(items)) {
+      const recipeBomItem = await this.prisma.recipeBomItem.findFirst({
+        where: {
+          itemId: itemId,
+        },
+        include: {
+          batch: true,
+        },
+      });
+
+      if (!recipeBomItem) {
+        throw new Error(`RecipeBomItem not found for recipeBomItemId: ${itemId}`);
+      }
+
+      if (recipeBomItem.batchId !== batchId) {
+        throw new Error(`Item ${itemId} is not in batch ${batchId}`);
+      }
+
+      // Update the quantity
+      await this.prisma.recipeBomItem.update({
+        where: {
+          id: recipeBomItem.id,
+        },
+        data: {
+          quantity: items[itemId],
+        },
+      });
+    }
+
+    // find the batch and return
+    return batchData;
+  }
+
+      
+
   async createBatch <T extends Prisma.BatchCreateArgs>(args: Prisma.SelectSubset<T, Prisma.BatchCreateArgs>): Promise<Batch> {
     this.validateBatchId(args.data.batchId);
     const batch = await super.createBatch(args);
@@ -63,6 +153,10 @@ export class BatchService extends BatchServiceBase {
     });
 
     this.logger.verbose({ message: `Created Batch: ${batch.batchId} & pushed to topic` });
+    this.logger.verbose({ message: `Creating recipe bom items for recipe: ${args.data.recipeName}` });
+    if (args.data.recipeName) {
+      this.createRecipeBomItems(args.data.recipeName);
+    }
     return batch;
   }
 
