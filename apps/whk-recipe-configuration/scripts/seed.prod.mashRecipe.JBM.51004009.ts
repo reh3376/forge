@@ -1,5 +1,3 @@
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-
 const CUSTOMER_CODE = "JBM";
 const MASH_BILL = '51-00-40-09'; //  Match Item Record
 const FINAL_PROOF = 120;
@@ -87,23 +85,79 @@ const RECIPE_PARAMETERS = [
   const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
   const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
   const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-  
-  import { RecipeGenerator } from "../src/recipe/recipe.generation";
-  const recipeGenerator = new RecipeGenerator(
-    CUSTOMER_CODE,
-    MASH_BILL,
-    FINAL_PROOF,  // Changed from ITEM_NUMBER to FINAL_PROOF
-    BARREL_INFO,
-    CUSTOMER_NAME,
-    ORDER_QTY,
-    TOTAL_GRAIN_WEIGHT,
-    BBLS_PER_FERM,
-    USER,
-    WATER_QTY,
-    BACKSET_QTY,
-    BBL_ITEM_NUMBERS,
-    YEAST_ITEM_NUMBERS_QTYS,
-    MASHING_PROTOCOL,
-    RECIPE_PARAMETERS,
-  );
-  recipeGenerator.createRecipeData();
+
+  // const recipeGenerator = new RecipeGenerator(
+  //   rabbitMQProducer,
+  //   CUSTOMER_CODE,
+  //   MASH_BILL,
+  //   FINAL_PROOF,  // Changed from ITEM_NUMBER to FINAL_PROOF
+  //   BARREL_INFO,
+  //   CUSTOMER_NAME,
+  //   ORDER_QTY,
+  //   TOTAL_GRAIN_WEIGHT,
+  //   BBLS_PER_FERM,
+  //   USER,
+  //   WATER_QTY,
+  //   BACKSET_QTY,
+  //   BBL_ITEM_NUMBERS,
+  //   YEAST_ITEM_NUMBERS_QTYS,
+  //   MASHING_PROTOCOL,
+  //   RECIPE_PARAMETERS,
+  // );
+  // recipeGenerator.createRecipeData();
+
+  import axios from 'axios';
+  import * as dotenv from 'dotenv';
+
+  // Load the environment variables
+  dotenv.config();
+
+  async function generateRecipe() {
+    try {
+
+      // Login first to get JWT token
+      const host = 'localhost';
+      const url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api/login`;
+      console.log('Logging in to Mes...');
+      const loginResponse = await axios.post(url, {
+        username: process.env.MES_USER,
+        password: process.env.MES_PASSWORD
+      });
+
+      const token = loginResponse.data.accessToken;
+
+      // Set default auth header for subsequent requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      const response = await axios.post('http://localhost:3000/api/recipes/generate-recipe', {
+        customerCode: CUSTOMER_CODE,
+        mashBill: MASH_BILL,
+        finalProof: FINAL_PROOF,
+        barrelInfo: BARREL_INFO,
+        customerName: CUSTOMER_NAME,
+        orderQty: ORDER_QTY,
+        totalGrainWeight: TOTAL_GRAIN_WEIGHT,
+        bblsPerFerm: BBLS_PER_FERM,
+        username: USER,
+        waterQty: WATER_QTY,
+        backsetQty: BACKSET_QTY,
+        bblItemNumbers: BBL_ITEM_NUMBERS,
+        yeastItemNumbersQtys: YEAST_ITEM_NUMBERS_QTYS,
+        mashingProtocol: MASHING_PROTOCOL,
+        recipeParameters: RECIPE_PARAMETERS
+      });
+
+      console.log('Recipe generated successfully:', response.data);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error generating recipe:', error.message);
+      } else if (typeof error === 'object' && error !== null && 'response' in error) {
+        console.error('Error generating recipe:', (error as any).response?.data);
+      } else {
+        console.error('Error generating recipe:', error);
+      }
+      throw error;
+    }
+  }
+
+  generateRecipe();

@@ -5,6 +5,8 @@ import { RecipeService } from "./recipe.service";
 import { RecipeControllerBase } from "./base/recipe.controller.base";
 import { RecipeCreationService } from "./recipe.creation.service";
 import { RecipeCookCreationService } from "./recipe.cookcreation.service";
+import { RecipeGenerator } from "./recipe.generation";
+import { RabbitMQProducerService } from "src/rabbitmq/rabbitmq.producer.service";
 
 @swagger.ApiTags("recipes")
 @common.Controller("recipes")
@@ -14,7 +16,8 @@ export class RecipeController extends RecipeControllerBase {
     protected readonly recipeCreationService: RecipeCreationService,
     protected readonly cookCreationService: RecipeCookCreationService,
     @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder,
+    protected readonly rabbitMQProducer: RabbitMQProducerService
   ) {
     super(service, rolesBuilder);
   }
@@ -111,6 +114,66 @@ export class RecipeController extends RecipeControllerBase {
       throw new common.HttpException(
         errorMessage,
         common.HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @common.Post("/generate-recipe")
+  @swagger.ApiOperation({ summary: "Generate a new recipe" })
+  @swagger.ApiResponse({ status: 201, description: "Recipe generated successfully" })
+  @swagger.ApiResponse({ status: 400, description: "Bad Request" })
+  @nestAccessControl.UseRoles({
+    resource: "Recipe",
+    action: "create", 
+    possession: "any",
+  })
+  async generateRecipe(
+    @common.Body() generateRecipeDto: {
+      customerCode?: string;
+      mashBill?: string;
+      finalProof?: number;
+      barrelInfo?: string;
+      customerName?: string;
+      orderQty?: number;
+      totalGrainWeight?: number;
+      bblsPerFerm?: number;
+      username: string;
+      waterQty?: number;
+      backsetQty?: number;
+      bblItemNumbers?: string[];
+      yeastItemNumbersQtys?: { [key: string]: number };
+      mashingProtocol?: any[];
+      recipeParameters?: { name: string; setpointValue: number }[];
+    }
+  ) {
+    try {
+      const recipeGenerator = new RecipeGenerator(
+        this.rabbitMQProducer,
+        generateRecipeDto.customerCode,
+        generateRecipeDto.mashBill,
+        generateRecipeDto.finalProof,
+        generateRecipeDto.barrelInfo,
+        generateRecipeDto.customerName,
+        generateRecipeDto.orderQty,
+        generateRecipeDto.totalGrainWeight,
+        generateRecipeDto.bblsPerFerm,
+        generateRecipeDto.username,
+        generateRecipeDto.waterQty,
+        generateRecipeDto.backsetQty,
+        generateRecipeDto.bblItemNumbers,
+        generateRecipeDto.yeastItemNumbersQtys,
+        generateRecipeDto.mashingProtocol,
+        generateRecipeDto.recipeParameters
+      );
+
+      await recipeGenerator.createRecipeData();
+      return { message: "Recipe generated successfully" };
+      
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while generating the recipe';
+      throw new common.HttpException(
+        errorMessage,
+        common.HttpStatus.BAD_REQUEST
       );
     }
   }
