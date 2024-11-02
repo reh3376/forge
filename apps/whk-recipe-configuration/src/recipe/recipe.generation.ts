@@ -1,4 +1,6 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
+import { RabbitMQProducerService } from "src/rabbitmq/rabbitmq.producer.service";
+import { WhMessageBrokerTopics } from "src/rabbitmq/topics";
 
 export class RecipeGenerator {
   private RECIPE = '';
@@ -6,6 +8,7 @@ export class RecipeGenerator {
   private BOM_REVISION = '';
 
   constructor(
+    private readonly rabbitMQProducer: RabbitMQProducerService,
     private readonly CUSTOMER_CODE = "JBM",
     private readonly MASH_BILL = '51-00-40-09',
     private readonly FINAL_PROOF = 120,
@@ -805,6 +808,14 @@ export class RecipeGenerator {
       console.log("New Mashing Recipe created successfully:", recipe.id);
     }
 
+    console.log("Publishing Recipe to RabbitMQ...");
+    await this.rabbitMQProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Recipe, {
+      recordName: 'Recipe',
+      event_type: 'create',
+      data: recipe
+    });
+    console.log("Production order published successfully");
+
     // Create a recipe group and add the recipe to it
     console.log("Creating recipe group and adding recipe...");
     let recipeGroup: RecipeGroup;
@@ -992,6 +1003,15 @@ export class RecipeGenerator {
           executedFermenters: 0,
         }
       });
+      
+      // Push production order to RabbitMQ for processing
+      console.log("Publishing production order to RabbitMQ...");
+        await this.rabbitMQProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Productionorder, {
+          recordName: 'ProductionOrder',
+          event_type: 'create',
+          data: newProductionOrder
+        });
+        console.log("Production order published successfully");
 
       // Create a sample schedule order
       console.log("Creating sample schedule order...");
@@ -1015,6 +1035,14 @@ export class RecipeGenerator {
       });
 
       console.log("Sample schedule order created successfully:", newScheduleOrder.id);
+
+      console.log("Publishing schedule order to RabbitMQ...");
+        await this.rabbitMQProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder, {
+          recordName: 'ScheduleOrder',
+          event_type: 'create',
+          data: newScheduleOrder
+        });
+        console.log("Schedule order published successfully");
 
       // Create a sample schedule order queue record
       console.log("Creating sample schedule order queue record...");
