@@ -6,7 +6,7 @@ import { RecipeControllerBase } from "./base/recipe.controller.base";
 import { RecipeCreationService } from "./recipe.creation.service";
 import { RecipeCookCreationService } from "./recipe.cookcreation.service";
 import { RecipeGenerator } from "./recipe.generation";
-import { RabbitMQProducerService } from "src/rabbitmq/rabbitmq.producer.service";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 
 @swagger.ApiTags("recipes")
 @common.Controller("recipes")

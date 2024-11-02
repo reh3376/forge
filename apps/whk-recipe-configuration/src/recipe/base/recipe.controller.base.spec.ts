@@ -16,6 +16,7 @@ import { RecipeController } from "../recipe.controller";
 import { RecipeService } from "../recipe.service";
 import { RecipeCreationService } from "../recipe.creation.service";
 import { RecipeCookCreationService } from "../recipe.cookcreation.service";
+import { RabbitMQProducerService } from "../../rabbitmq/rabbitmq.producer.service";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -185,6 +186,12 @@ describe("Recipe", () => {
           provide: RecipeCookCreationService,
           useValue: recipeCookCreationService,
         },
+        {
+          provide: RabbitMQProducerService,
+          useValue: {
+            // Mock implementation of RabbitMQProducerService methods
+          },
+        }
       ],
       controllers: [RecipeController],
       imports: [ACLModule],
