@@ -1,6 +1,6 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
-import { RabbitMQProducerService } from "src/rabbitmq/rabbitmq.producer.service";
-import { WhMessageBrokerTopics } from "src/rabbitmq/topics";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 
 export class RecipeGenerator {
   private RECIPE = '';
