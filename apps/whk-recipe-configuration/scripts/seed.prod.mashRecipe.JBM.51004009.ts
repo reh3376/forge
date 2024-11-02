@@ -82,29 +82,6 @@ const RECIPE_PARAMETERS = [
     { name: 'NumberOfCooks', setpointValue: ORDER_QTY * 3/ BBLS_PER_FERM },
     { name: 'AssumedFermABV', setpointValue: 12.5 }
   ];
-  const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-  const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
-  const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-
-  // const recipeGenerator = new RecipeGenerator(
-  //   rabbitMQProducer,
-  //   CUSTOMER_CODE,
-  //   MASH_BILL,
-  //   FINAL_PROOF,  // Changed from ITEM_NUMBER to FINAL_PROOF
-  //   BARREL_INFO,
-  //   CUSTOMER_NAME,
-  //   ORDER_QTY,
-  //   TOTAL_GRAIN_WEIGHT,
-  //   BBLS_PER_FERM,
-  //   USER,
-  //   WATER_QTY,
-  //   BACKSET_QTY,
-  //   BBL_ITEM_NUMBERS,
-  //   YEAST_ITEM_NUMBERS_QTYS,
-  //   MASHING_PROTOCOL,
-  //   RECIPE_PARAMETERS,
-  // );
-  // recipeGenerator.createRecipeData();
 
   import axios from 'axios';
   import * as dotenv from 'dotenv';
