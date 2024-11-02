@@ -102,13 +102,19 @@ export class RecipeGenerator {
 
 
     const client = new PrismaClient();
-
+    console.log("Creating recipe...");
+    console.log("itemNumber:", `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`);
     // Create the base BOM and bom items
     const fgItem = await client.item.findFirst({
       where: {
         itemNumber: `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`
       }
     })
+
+    if (!fgItem) {
+      console.log(`Item ${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01 not found`);
+      throw new Error(`Item ${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01 not found`);
+    }
 
     // Check for existing BOM with the same revision
     const existingBom = await client.bom.findFirst({
@@ -120,6 +126,7 @@ export class RecipeGenerator {
     if (existingBom) {
       console.log(`BOM with revision ${this.BOM_REVISION} already exists. Skipping creation.`);
     } else {
+      console.log("Creating base BOM...");
       const baseBom = await client.bom.create({
         data: {
           bomRevision: this.BOM_REVISION,
