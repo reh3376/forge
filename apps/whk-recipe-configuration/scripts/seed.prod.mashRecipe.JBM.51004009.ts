@@ -94,7 +94,8 @@ const RECIPE_PARAMETERS = [
 
       // Login first to get JWT token
       const host = 'localhost';
-      const url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api/login`;
+      const base_url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api`;
+      const url = `${base_url}/login`;
       console.log('Logging in to Mes...');
       const loginResponse = await axios.post(url, {
         username: process.env.MES_USER,
@@ -102,11 +103,12 @@ const RECIPE_PARAMETERS = [
       });
 
       const token = loginResponse.data.accessToken;
+      console.log('Token:', token);
 
       // Set default auth header for subsequent requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      const response = await axios.post('http://localhost:3000/api/recipes/generate-recipe', {
+      const response = await axios.post(`${base_url}/recipes/generate-recipe`, {
         customerCode: CUSTOMER_CODE,
         mashBill: MASH_BILL,
         finalProof: FINAL_PROOF,
