@@ -16,6 +16,7 @@ import { RecipeController } from "./recipe.controller";
 import { RecipeService } from "./recipe.service";
 import { RecipeCreationService } from "./recipe.creation.service";
 import { RecipeCookCreationService } from "./recipe.cookcreation.service";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -202,6 +203,10 @@ const aclValidateRequestInterceptor = {
   },
 };
 
+const mockRabbitMQProducerService = {
+  emitMessage: jest.fn(), // Mock the emitMessage method
+};
+
 describe("Recipe - Custom", () => {
   let app: INestApplication;
 
@@ -219,6 +224,10 @@ describe("Recipe - Custom", () => {
         {
           provide: RecipeCookCreationService,
           useValue: recipeCookCreationService,
+        },
+        {
+          provide: RabbitMQProducerService,
+          useValue: mockRabbitMQProducerService
         },
       ],
       controllers: [RecipeController],
@@ -251,4 +260,97 @@ describe("Recipe - Custom", () => {
         },
       ]);
   });
+
+  test("POST /recipes/generate-recipe", async () => {
+    const CUSTOMER_CODE = "JBM";
+    const MASH_BILL = '51-00-40-09'; //  Match Item Record
+    const FINAL_PROOF = 120;
+    const BARREL_INFO = '53-06-4-0-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
+    const CUSTOMER_NAME = "JBM Liquid Assets, LLC"; // This needs to match ERP / MESDB customer reocrd
+    const ORDER_QTY = 100; // barrels
+    const TOTAL_GRAIN_WEIGHT = 24080;
+    const BBLS_PER_FERM = 100;
+    const USER = 'csummers@whiskeyhouse.com';
+
+    const WATER_QTY = 3900;
+    const BACKSET_QTY = 3600;
+
+    const BBL_ITEM_NUMBERS = [
+      'BBL-ISC02-53-06-4-0-0-Standard4',
+      'BBL-WVG02-53-06-4-0-0-Standard4'
+    ]
+
+    const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
+      'YEA-FER01-Yeast (USW6)': 10,
+    }
+
+    const MASHING_PROTOCOL = [
+      { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+      { action: "Hold", holdType: "Heat", temperature: 130 },
+      { action: "Add Additive", additiveType: "Citric", qty: 0 },
+      { action: "Add Grain", grainType: "Malt", qty: 188 },
+      { action: "Add Additive", additiveType: "Liquozyme", qty: 1.4 },
+      { action: "Add Grain", grainType: "Corn", qty: 12281 },
+      // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+      // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
+      { action: "Hold", holdType: "Heat", temperature: 180, time: 20 },
+      { action: "Hold", holdType: "Cool", temperature: 170 },
+      { action: "Add Grain", grainType: "Wheat", qty: 6500 },
+      { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+      { action: "Add Grain", grainType: "Wheat", qty: 3132 }, // UNCOMMENT IF NEED SECONDARY DROP
+      { action: "Hold", holdType: "Hold", time: 15 },
+      { action: "Hold", holdType: "Cool", temperature: 152 },
+      { action: "Add Additive", additiveType: "DIAZYME", qty: 6.6 },
+      { action: "Add Additive", additiveType: "Viscoferm", qty: 4.8 },
+      { action: "Hold", holdType: "Cool", temperature: 145 },
+      { action: "Add Grain", grainType: "Malt", qty: 1700 },
+      { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
+      { action: "Add Grain", grainType: "Malt", qty: 279 }, // UNCOMMENT IF NEED SECONDARY DROP
+      { action: "Hold", holdType: "Hold", time: 10 },
+    ];
+    const RECIPE_PARAMETERS = [
+      { name: 'HighWineProof', setpointValue: 140 },
+      { name: 'LowWineProof', setpointValue: 130 },
+      { name: 'FinalProof', setpointValue: 120 },
+      { name: 'BaseLoss', setpointValue: 0.1 },
+      { name: 'BeerFeedTray', setpointValue: 15 },
+      { name: 'FermentationAge', setpointValue: 72 },
+      { name: 'ControlTemperature', setpointValue: 92 },
+      { name: 'CooksPerFerm', setpointValue: 3 },
+        { name: 'TopOffFrequency', setpointValue: 24 },
+        { name: 'TopOffQuantity', setpointValue: 100 },
+        { name: 'TopOffTemperature', setpointValue: 80 },
+        { name: 'MashpH', setpointValue: 5.1 },
+        { name: 'MashRatio', setpointValue: 3.0 },
+        { name: 'RatioByFerm', setpointValue: 2.8 },
+        { name: 'FermSetTemp', setpointValue: 80 },
+        { name: 'StarterSweetpH', setpointValue: 5.1 },
+        { name: 'TotalGrainWeight', setpointValue: 20500 },
+        { name: 'TotalLiquid', setpointValue: 70000 },
+        { name: 'NumberOfCooks', setpointValue: ORDER_QTY * 3/ BBLS_PER_FERM },
+        { name: 'AssumedFermABV', setpointValue: 12.5 }
+      ];
+    await request(app.getHttpServer())
+      .post("/recipes/generate-recipe")
+      .send({
+        customerCode: CUSTOMER_CODE,
+        mashBill: MASH_BILL,
+        finalProof: FINAL_PROOF,
+        barrelInfo: BARREL_INFO,
+        customerName: CUSTOMER_NAME,
+        orderQty: ORDER_QTY,
+        totalGrainWeight: TOTAL_GRAIN_WEIGHT,
+        bblsPerFerm: BBLS_PER_FERM,
+        username: USER,
+        waterQty: WATER_QTY,
+        backsetQty: BACKSET_QTY,
+        bblItemNumbers: BBL_ITEM_NUMBERS,
+        yeastItemNumbersQtys: YEAST_ITEM_NUMBERS_QTYS,
+        mashingProtocol: MASHING_PROTOCOL,
+        recipeParameters: RECIPE_PARAMETERS
+      })
+      .expect(HttpStatus.CREATED) // Expect a bad request response, the item number is not found
+  });
+
+  
 });
