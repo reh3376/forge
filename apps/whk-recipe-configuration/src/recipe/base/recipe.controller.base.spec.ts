@@ -14,9 +14,9 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { RecipeController } from "../recipe.controller";
 import { RecipeService } from "../recipe.service";
-import { RecipeCreationService } from "../recipe.creation.service";
 import { RecipeCookCreationService } from "../recipe.cookcreation.service";
 import { RabbitMQProducerService } from "../../rabbitmq/rabbitmq.producer.service";
+import { RecipeGenerator } from "../recipe.generation";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -168,6 +168,15 @@ const aclValidateRequestInterceptor = {
   },
 };
 
+const recipeGenerator = {
+  constructorParams: {}, // Store all constructor parameters
+  init(params: any) {
+    this.constructorParams = params;
+  },
+  createRecipeData() {
+  }
+};
+
 describe("Recipe", () => {
   let app: INestApplication;
 
@@ -179,10 +188,6 @@ describe("Recipe", () => {
           useValue: service,
         },
         {
-          provide: RecipeCreationService,
-          useValue: recipeCreationService,
-        },
-        {
           provide: RecipeCookCreationService,
           useValue: recipeCookCreationService,
         },
@@ -191,6 +196,10 @@ describe("Recipe", () => {
           useValue: {
             // Mock implementation of RabbitMQProducerService methods
           },
+        },
+        {
+          provide: RecipeGenerator,
+          useValue: recipeGenerator
         }
       ],
       controllers: [RecipeController],
