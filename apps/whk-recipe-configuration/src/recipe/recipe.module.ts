@@ -5,13 +5,13 @@ import { RecipeService } from "./recipe.service";
 import { RecipeController } from "./recipe.controller";
 import { RecipeResolver } from "./recipe.resolver";
 import { RecipeCookCreationService } from "./recipe.cookcreation.service";
-import { RecipeCreationService } from "./recipe.creation.service";
 import { RabbitMQModule } from "../rabbitmq/rabbitmq.module";
+import { RecipeGenerator } from "./recipe.generation";
 
 @Module({
   imports: [RecipeModuleBase, forwardRef(() => AuthModule), RabbitMQModule],
   controllers: [RecipeController],
-  providers: [RecipeService, RecipeResolver, RecipeCreationService, RecipeCookCreationService],
+  providers: [RecipeService, RecipeResolver, RecipeCookCreationService, RecipeGenerator],
   exports: [RecipeService],
 })
 export class RecipeModule {}

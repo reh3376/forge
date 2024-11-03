@@ -1,87 +1,73 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class RecipeGenerator {
   private RECIPE = '';
   private ITEM_NUMBER = '';
   private BOM_REVISION = '';
+  private CUSTOMER_CODE = '';
+  private MASH_BILL = '';
+  private FINAL_PROOF = 0;
+  private BARREL_INFO = '';
+  private CUSTOMER_NAME = '';
+  private ORDER_QTY = 0;
+  private TOTAL_GRAIN_WEIGHT = 0;
+  private BBLS_PER_FERM = 0;
+  private USER = '';
+  private WATER_QTY = 0;
+  private BACKSET_QTY = 0;
+  private BBL_ITEM_NUMBERS: string[] = [];  
+  private YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {};
+  private MASHING_PROTOCOL: any[] = [];  
+  private RECIPE_PARAMETERS: any[] = [];
 
   constructor(
-    private readonly rabbitMQProducer: RabbitMQProducerService,
-    private readonly CUSTOMER_CODE = "JBM",
-    private readonly MASH_BILL = '51-00-40-09',
-    private readonly FINAL_PROOF = 120,
-    private readonly BARREL_INFO = '53-06-4-0-0',
-    private readonly CUSTOMER_NAME = "JBM Liquid Assets, LLC",
-    private readonly ORDER_QTY = 100,
-    private readonly TOTAL_GRAIN_WEIGHT = 24080,
-    private readonly BBLS_PER_FERM = 100,
-    private readonly USER = 'csummers@whiskeyhouse.com',
-
-    private readonly WATER_QTY = 3900,
-    private readonly BACKSET_QTY = 3600,
-
-    private readonly BBL_ITEM_NUMBERS = [
-      'BBL-ISC02-53-06-4-0-0-Standard4',
-      'BBL-WVG02-53-06-4-0-0-Standard4'
-    ],
-
-    private readonly YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
-      'YEA-FER01-Yeast (USW6)': 10,
-    },
-
-    private readonly MASHING_PROTOCOL = [
-      { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
-      { action: "Hold", holdType: "Heat", temperature: 130 },
-      { action: "Add Additive", additiveType: "Citric", qty: 0 },
-      { action: "Add Grain", grainType: "Malt", qty: 188 },
-      { action: "Add Additive", additiveType: "Liquozyme", qty: 1.4 },
-      { action: "Add Grain", grainType: "Corn", qty: 12281 },
-      { action: "Hold", holdType: "Heat", temperature: 180, time: 20 },
-      { action: "Hold", holdType: "Cool", temperature: 170 },
-      { action: "Add Grain", grainType: "Wheat", qty: 6500 },
-      { action: "Hold", holdType: "Hold", time: 3 },
-      { action: "Add Grain", grainType: "Wheat", qty: 3132 },
-      { action: "Hold", holdType: "Hold", time: 15 },
-      { action: "Hold", holdType: "Cool", temperature: 152 },
-      { action: "Add Additive", additiveType: "DIAZYME", qty: 6.6 },
-      { action: "Add Additive", additiveType: "Viscoferm", qty: 4.8 },
-      { action: "Hold", holdType: "Cool", temperature: 145 },
-      { action: "Add Grain", grainType: "Malt", qty: 1700 },
-      { action: "Hold", holdType: "Hold", time: 3 },
-      { action: "Add Grain", grainType: "Malt", qty: 279 },
-      { action: "Hold", holdType: "Hold", time: 10 },
-    ],
-
-    private readonly RECIPE_PARAMETERS = [
-      { name: 'HighWineProof', setpointValue: 140 },
-      { name: 'LowWineProof', setpointValue: 130 },
-      { name: 'FinalProof', setpointValue: 120 },
-      { name: 'BaseLoss', setpointValue: 0.1 },
-      { name: 'BeerFeedTray', setpointValue: 15 },
-      { name: 'FermentationAge', setpointValue: 72 },
-      { name: 'ControlTemperature', setpointValue: 92 },
-      { name: 'CooksPerFerm', setpointValue: 3 },
-        { name: 'TopOffFrequency', setpointValue: 24 },
-        { name: 'TopOffQuantity', setpointValue: 100 },
-        { name: 'TopOffTemperature', setpointValue: 80 },
-        { name: 'MashpH', setpointValue: 5.1 },
-        { name: 'MashRatio', setpointValue: 3.0 },
-        { name: 'RatioByFerm', setpointValue: 2.8 },
-        { name: 'FermSetTemp', setpointValue: 80 },
-        { name: 'StarterSweetpH', setpointValue: 5.1 },
-        { name: 'TotalGrainWeight', setpointValue: 20500 },
-        { name: 'TotalLiquid', setpointValue: 70000 },
-        { name: 'NumberOfCooks', setpointValue: 3},
-        { name: 'AssumedFermABV', setpointValue: 12.5 }
-      ]
+    private rabbitMQProducer: RabbitMQProducerService,
   ) {
     this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
     this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
   }
-  async createRecipeData(): Promise<void> {
+  async createRecipeData(
+    customerCode: string,
+    mashBill: string,
+    finalProof: number,
+    barrelInfo: string,
+    customerName: string,
+    orderQty: number,
+    totalGrainWeight: number,
+    bblsPerFerm: number,
+    username: string,
+    waterQty: number,
+    backsetQty: number,
+    bblItemNumbers: string[],
+    yeastItemNumbersQtys: { [key: string]: number },
+    mashingProtocol: any[],
+    recipeParameters: any[]
+  ): Promise<void> {
+    // Set the attributes
+    this.CUSTOMER_CODE = customerCode;
+    this.MASH_BILL = mashBill;
+    this.FINAL_PROOF = finalProof;
+    this.BARREL_INFO = barrelInfo;
+    this.CUSTOMER_NAME = customerName;
+    this.ORDER_QTY = orderQty;
+    this.TOTAL_GRAIN_WEIGHT = totalGrainWeight;
+    this.BBLS_PER_FERM = bblsPerFerm;
+    this.USER = username;
+    this.WATER_QTY = waterQty;
+    this.BACKSET_QTY = backsetQty;
+    this.BBL_ITEM_NUMBERS = bblItemNumbers;
+    this.YEAST_ITEM_NUMBERS_QTYS = yeastItemNumbersQtys;
+    this.MASHING_PROTOCOL = mashingProtocol;
+    this.RECIPE_PARAMETERS = recipeParameters;
+    this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+    this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+    this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+
       console.info("Seeding database with custom seed for Mashing Recipe...");
 
       // ------------------------------------ BOM CREATION ------------------------------------
