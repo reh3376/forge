@@ -213,8 +213,6 @@ model Recipe {
   unitProcedures                 UnitProcedure[]
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
-
-  @@unique([itemId, customerId])
 }
 
 model Bom {
