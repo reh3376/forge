@@ -192,9 +192,9 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
         PipeInjector,
       ],
     }),
-    DevtoolsModule.register({
-      http: process.env.NODE_ENV !== 'production'
-    }),
+    // DevtoolsModule.register({
+    //   http: process.env.NODE_ENV !== 'production'
+    // }),
   ],
   providers: [],
 })
