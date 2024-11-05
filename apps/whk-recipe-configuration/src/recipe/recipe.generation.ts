@@ -125,6 +125,19 @@ export class RecipeGenerator {
           }
         }
       });
+      console.log(`Created base BOM: ${baseBom.id}`);
+      console.log(`Water id: ${waterItemId}`);
+      console.log(`Backset id: ${backsetItemId}`);
+      console.log(`Viscoferm id: ${viscofermItemId}`);
+      console.log(`Liquozyme id: ${liquozymeItemId}`);
+      console.log(`Diazyme id: ${diazymeItemId}`);
+      console.log(`Termamyl id: ${termamylItemId}`);
+      console.log(`Saczyme id: ${saczymeItemId}`);
+      console.log(`Malt id: ${maltItemId}`);
+      console.log(`Rye id: ${ryeItemId}`);
+      console.log(`Corn id: ${cornItemId}`);
+      console.log(`Wheat id: ${wheatItemId}`);
+      console.log(`Citric id: ${citricItemId}`);
       // add the base bom items
       await client.bomItem.createMany({
         data: [
@@ -796,6 +809,14 @@ export class RecipeGenerator {
           //   connect: newParams.map(param => ({ id: param.id }))
           // },
           customerCode: this.CUSTOMER_CODE
+        },
+        include: {
+          item: true,
+          customer: true,
+          recipeGroup: true,
+          recipeBoms: true,
+          unitProcedures: true,
+          productionOrders: true,
         }
       });
       console.log("New Mashing Recipe created successfully:", recipe.id);
