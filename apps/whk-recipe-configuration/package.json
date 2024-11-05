@@ -12,6 +12,8 @@
     "dev:seed": "ts-node scripts/seedDevelopment.ts",
     "prod:seed": "ts-node scripts/seedProduction.ts",
     "prod:seed:mash:jbm:51004009": "ts-node scripts/seed.prod.mashRecipe.JBM.51004009.ts",
+    "prod:seed:mash:abt:74180008": "ts-node scripts/seed.prod.mashRecipe.ABT.74180008.ts",
+    "prod:seed:mash:abt:70210009": "ts-node scripts/seed.prod.mashRecipe.ABT.70210009.ts",
     "prod:seed:tests": "ts-node scripts/seed.prod.tests.ts",
     "prod:seed:assets": "ts-node scripts/seed.prod.assets.ts",
     "prod:seed:unit": "ts-node scripts/seed.prod.unitLink.ts",
