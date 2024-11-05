@@ -1,14 +1,70 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { RecipeServiceBase } from "./base/recipe.service.base";
 import { Prisma } from "@prisma/client";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class RecipeService extends RecipeServiceBase {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(
+    protected readonly prisma: PrismaService,
+    private rabbitProducer: RabbitMQProducerService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+  ) {
     super(prisma);
   }
-  
+
+  async createRecipe<T extends Prisma.RecipeCreateArgs>(args: Prisma.SelectSubset<T, Prisma.RecipeCreateArgs>): Promise<import(".prisma/client").Recipe> {
+      const recipe = await super.createRecipe({
+          data: {
+              ...args.data,
+          },
+          include: {
+              ...args.include,
+              item: true,
+              customer: true,
+              recipeGroup: true,
+              recipeBoms: true,
+              unitProcedures: true,
+              productionOrders: true,
+          }
+      });
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Recipe, {
+      recordName: 'Recipe',
+      event_type: 'create',
+      data: recipe
+      });
+      this.logger.log(`Created Recipe: ${recipe.id} & pushed to topic`);
+      return recipe;
+  }
+ 
+  async updateRecipe<T extends Prisma.RecipeUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.RecipeUpdateArgs>): Promise<import(".prisma/client").Recipe> {
+      const recipe = await super.updateRecipe({
+          data: {
+              ...args.data,
+          },
+          include: {
+              ...args.include,
+              item: true,
+              customer: true,
+              recipeGroup: true,
+              recipeBoms: true,
+              unitProcedures: true,
+              productionOrders: true,
+          },
+          where: args.where,
+      });
+      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Recipe, {
+      recordName: 'Recipe',
+      event_type: 'update',
+      data: recipe
+      });
+      this.logger.log(`Updated Recipe: ${recipe.id} & pushed to topic`);
+      return recipe;
+  }
+
   /**
    * Retrieves active recipes from the database.
    * 
