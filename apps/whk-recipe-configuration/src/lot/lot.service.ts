@@ -115,8 +115,18 @@ export class LotService extends LotServiceBase {
     const year = date.getFullYear().toString().slice(-2);
     const month = String.fromCharCode(64 + date.getMonth() + 1);
     const day = date.getDate().toString().padStart(2, "0");
+    const barrelTypeMapping: { [key: string]: string } = {
+      "WVG": "01",
+      "ISC": "10",
+    };
+    const bblOem = args.data.bblOem;
+    if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
+      throw new Error("BBL OEM must be provided and must be one of the following: WVG, ISC");
+    }
+    const bblType = barrelTypeMapping[bblOem as string];
 
-    const lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}`;
+
+    const lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}.${bblType}`;
 
     const lastLot: Lot[] = await this.lots({
       where: {
@@ -129,19 +139,18 @@ export class LotService extends LotServiceBase {
       },
       take: 1,
     });
+    this.logger.log(`Last lot: ${lastLot}`);
+    this.logger.log(`lotNumberPrefix: ${lotNumberPrefix}`);
 
-    if (lastLot.length > 0) {
-      throw new Error(`Lot with character ${args.data.lotAlphaChar} has already been created today.`);
+    let fullLotNumber: string;
+    if (!args.data.lotNumber) {
+      if (lastLot.length > 0) {
+        throw new Error(`Lot with character ${args.data.lotAlphaChar} has already been created today.`);
+      }
+      fullLotNumber = `${lotNumberPrefix}.${barrelTypeMapping[args.data.bblOem]}`;
+    } else {
+      fullLotNumber = args.data.lotNumber;
     }
-
-    const barrelTypeMapping: { [key: string]: string } = {
-      "WVG": "01",
-      "ISC": "10",
-    };
-    if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
-      throw new Error("BBL OEM must be provided and must be one of the following: WVG, ISC");
-    }
-    const fullLotNumber = `${lotNumberPrefix}.${barrelTypeMapping[args.data.bblOem]}`;
 
     // Get the item from the recipe
     const recipe = await this.prisma.recipe.findUnique({
