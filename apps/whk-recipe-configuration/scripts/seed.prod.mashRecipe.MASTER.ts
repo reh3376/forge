@@ -11,6 +11,12 @@ const USER = 'csummers@whiskeyhouse.com';
 const WATER_QTY = 3900;
 const BACKSET_QTY = 3600;
 
+const BIN_ASSIGNMENTS = {
+  bin1: 'Malt',
+  bin2: 'Corn',
+  bin3: 'Rye',
+};
+
 const BBL_ITEM_NUMBERS = [
   'BBL-ISC02-53-06-4-0-0-Standard4',
   'BBL-WVG02-53-06-4-0-0-Standard4'
@@ -26,7 +32,7 @@ MAXIMUM GRAIN WEIGHTS IN BINS
 
 Current total grain weight: 24080
 
-Corn: 180000
+Corn: 18000
 Rye: 7000
 Wheat: 7000
 Malt: 1800
@@ -41,23 +47,17 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
   { action: "Add Grain", grainType: "Malt", qty: 188 },
-  { action: "Add Additive", additiveType: "Liquozyme", qty: 1.4 },
-  { action: "Add Grain", grainType: "Corn", qty: 12281 },
-  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Additive", additiveType: "Liquozyme" },
+  { action: "Add Grain", grainType: "Corn" },
   { action: "Hold", holdType: "Heat", temperature: 180, time: 20 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Wheat", qty: 6500 },
-  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Wheat", qty: 3132 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Wheat" },
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME", qty: 6.6 },
-  { action: "Add Additive", additiveType: "Viscoferm", qty: 4.8 },
+  { action: "Add Additive", additiveType: "DIAZYME" },
+  { action: "Add Additive", additiveType: "Viscoferm" },
   { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt", qty: 1700 },
-  { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Add Grain", grainType: "Malt", qty: 279 }, // UNCOMMENT IF NEED SECONDARY DROP
+  { action: "Add Grain", grainType: "Malt"},
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
@@ -123,7 +123,8 @@ const RECIPE_PARAMETERS = [
         bblItemNumbers: BBL_ITEM_NUMBERS,
         yeastItemNumbersQtys: YEAST_ITEM_NUMBERS_QTYS,
         mashingProtocol: MASHING_PROTOCOL,
-        recipeParameters: RECIPE_PARAMETERS
+        recipeParameters: RECIPE_PARAMETERS,
+        binAssignments: BIN_ASSIGNMENTS
       });
 
       console.log('Recipe generated successfully:', response.data);

@@ -2,6 +2,7 @@ import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, 
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Injectable } from "@nestjs/common";
+import EnzymeDosingService from "./enzyme.dosing";
 
 @Injectable()
 export class RecipeGenerator {
@@ -24,13 +25,109 @@ export class RecipeGenerator {
   private MASHING_PROTOCOL: any[] = [];  
   private RECIPE_PARAMETERS: any[] = [];
 
+  private MAX_QUANTITIES: { [key: string]: number } = {
+    bin1: 1700,
+    bin2: 18100,
+    bin3: 7000,
+  };
+
   constructor(
     private rabbitMQProducer: RabbitMQProducerService,
+    private enzymeDosingService: EnzymeDosingService,
   ) {
     this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
     this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
   }
+  
+  // Function to calculate grain quantities based on mash bill
+  private calculateGrainQuantities(mashBill: string, totalGrainWeight: number) {
+    const [cornPercent, ryePercent, wheatPercent, maltPercent] = mashBill
+      .split('-')
+      .map((percent) => parseFloat(percent) / 100);
+
+    return {
+      Corn: Math.round(totalGrainWeight * cornPercent),
+      Rye: Math.round(totalGrainWeight * ryePercent),
+      Wheat: Math.round(totalGrainWeight * wheatPercent),
+      Malt: Math.round(totalGrainWeight * maltPercent),
+    };
+  }
+  private splitGrainAdditions(grainType: string, qty: number, binAssignments: { [key: string]: string }) {
+    const numBins = Object.keys(binAssignments).length;
+    const splitQty = Math.ceil(qty / numBins);
+
+    const SPLITS_RATIO = 0.8;
+
+    let splits = [];
+    let remainingQty = qty;
+    
+    // Check each bin's max capacity
+    for (const [binNum, binGrainType] of Object.entries(binAssignments)) {
+      const maxBinQty = this.MAX_QUANTITIES[`${binNum}`];
+      
+      if (remainingQty > maxBinQty && grainType === binGrainType) {
+        // If this is the first split, do 70/30
+        if (splits.length === 0) {
+          const firstQty = Math.round(remainingQty * SPLITS_RATIO);
+          splits.push({
+            action: 'Add Grain',
+            grainType: grainType,
+            qty: firstQty,
+          });
+          remainingQty -= firstQty;
+          splits.push({
+            action: 'Hold',
+            holdType: 'Hold',
+            time: 2, // 2 minutes hold
+          });
+          remainingQty -= maxBinQty - firstQty;
+        } else {
+          // For subsequent splits, use 80% of bin max
+          const splitQty = Math.round(maxBinQty * SPLITS_RATIO);
+          splits.push({
+            action: 'Add Grain',
+            grainType: grainType,
+            qty: splitQty,
+          });
+          splits.push({
+            action: 'Hold',
+            holdType: 'Hold',
+            time: 2, // 2 minutes hold
+          });
+          remainingQty -= splitQty;
+        }
+      } else {
+        // If remaining qty fits in bin, add it all
+        splits.push({
+          action: 'Add Grain',
+          grainType: grainType,
+          qty: remainingQty,
+        });
+        remainingQty = 0;
+      }
+    }
+    return splits;
+  }
+
+  private getEnzymeDosing(enzymeName: string, totalGrainLoadLbs: number, mashBill: string) {
+    return this.enzymeDosingService.calculateEnzymeDosing(totalGrainLoadLbs, mashBill, enzymeName);
+  }
+
+  private setEnzymeDosing(mashingProtocol: any[])  {
+    // loop through the mashing protocol for an action of type "Add Additive" and get the dosing for the enzymes
+    const enzymeDosings = mashingProtocol.filter((step) => step.action === 'Add Additive').map((step) => {
+      const enzymeName = step.additiveType;
+      const dosing = this.getEnzymeDosing(enzymeName, this.TOTAL_GRAIN_WEIGHT, this.MASH_BILL);
+      return {
+        action: 'Add Additive',
+        additiveType: enzymeName,
+        dosing: dosing,
+      };
+    });
+    return enzymeDosings;
+  }
+
   async createRecipeData(
     customerCode: string,
     mashBill: string,
@@ -46,7 +143,8 @@ export class RecipeGenerator {
     bblItemNumbers: string[],
     yeastItemNumbersQtys: { [key: string]: number },
     mashingProtocol: any[],
-    recipeParameters: any[]
+    recipeParameters: any[],
+    binAssignments: { [key: string]: string }
   ): Promise<void> {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode;
@@ -85,6 +183,27 @@ export class RecipeGenerator {
     const cornItemId = 'clyd1ofw1009wfd45oghso7y5'
     const wheatItemId = 'cm0e1ocx0012xl6xv4i696cfh'
     const citricItemId = 'clyd1ofpw0032fd45omeixgvv'
+
+    // Process the mashing protocol to get the quantities of each grain type and to split the additions if necessary
+    const grainQuantities: any = this.calculateGrainQuantities(this.MASH_BILL, this.TOTAL_GRAIN_WEIGHT);
+    const grainAdditions = this.RECIPE_PARAMETERS.filter((param) => param.action === 'Add Grain');
+    const splitAdditions = grainAdditions.map((addition) => {
+      const grainType = addition.grainType;
+      const qty = grainQuantities[grainType];
+      return this.splitGrainAdditions(grainType, qty, binAssignments);
+    });
+
+    // Replace the add grain rows with their respective splits
+    const mashingProtocolWithSplits = this.MASHING_PROTOCOL.map((step) => {
+      if (step.action === 'Add Grain') {
+        return splitAdditions[step.grainType];
+      } else {
+        return step;
+      }
+    });
+
+    // Set the enzyme dosing
+    const finalizedMashingProtocol: any[] = this.setEnzymeDosing(mashingProtocolWithSplits);
 
 
     const client = new PrismaClient();
@@ -209,7 +328,7 @@ export class RecipeGenerator {
       
       // Add the bom items for the grains according to the mashingProtocol
       // Add the bom items for the grains according to the mashingProtocol
-      for (const step of this.MASHING_PROTOCOL) {
+      for (const step of finalizedMashingProtocol) {
         if (step.action === "Add Grain") {
           let itemId;
           let quantity: number;
@@ -489,12 +608,12 @@ export class RecipeGenerator {
       };
 
       // Update the MASHING_PROTOCOL with the mapped enum values
-      const mappedMASHING_PROTOCOL = this.MASHING_PROTOCOL.map(phase => ({
+      const mappedMASHING_PROTOCOL = finalizedMashingProtocol.map(phase => ({
         ...phase,
         action: phaseNameMap[phase.action] || phase.action
       }));
 
-      for (const [phaseIndex, phase] of this.MASHING_PROTOCOL.entries()) {
+      for (const [phaseIndex, phase] of finalizedMashingProtocol.entries()) {
         const existingPhase = await client.equipmentPhase.findFirst({
           where: {
             name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
