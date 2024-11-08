@@ -207,6 +207,12 @@ const RECIPE_PARAMETERS = [
   { name: 'AssumedFermABV', setpointValue: 12.5 }
 ];
 
+const BIN_ASSIGNMENTS = {
+  bin1: 'Corn',
+  bin2: 'Rye',
+  bin3: 'Wheat',
+};
+
 const recipeGenerator = {
   constructorParams: {}, // Store all constructor parameters
   init(params: any) {
@@ -342,7 +348,8 @@ describe("Recipe - Custom", () => {
         bblItemNumbers: BBL_ITEM_NUMBERS,
         yeastItemNumbersQtys: YEAST_ITEM_NUMBERS_QTYS,
         mashingProtocol: MASHING_PROTOCOL,
-        recipeParameters: RECIPE_PARAMETERS
+        recipeParameters: RECIPE_PARAMETERS,
+        binAssignments: BIN_ASSIGNMENTS
       })
       .expect(HttpStatus.CREATED)
       .expect({
