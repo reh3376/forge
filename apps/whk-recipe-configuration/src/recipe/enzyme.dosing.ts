@@ -27,6 +27,18 @@ class EnzymeDosingService {
     { category: 'Viscosity', name: 'Laminex C2K', dosePerMetricTon: 0.100, instructions: 'at 152 degrees F on crash' },
   ];
 
+  private enzymeMapping: { [key: string]: string } = {
+    'Termamyl': 'Termamyl SC DS',
+    'Liquozyme': 'Liquozyme PRO HP DI',
+    'Amylex': 'Amylex 6T',
+    'Alphalase': 'Alphalase THP',
+    'Saczyme': 'Saczyme Pro 1.5X',
+    'Diazyme': 'Diazyme SSF',
+    'Diazyme2': 'Diazyme SSF2',
+    'Viscoferm': 'Viscoferm',
+    'Laminex': 'Laminex C2K',
+  };
+
   /**
    * Calculates enzyme dosing based on total grain load and mash bill.
    * @param totalGrainLoadLbs Total grain load in pounds.

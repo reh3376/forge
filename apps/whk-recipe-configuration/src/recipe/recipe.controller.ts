@@ -104,7 +104,7 @@ export class RecipeController extends RecipeControllerBase {
       yeastItemNumbersQtys: { [key: string]: number };
       mashingProtocol: any[];
       recipeParameters: { name: string; setpointValue: number }[];
-      binAssignments: { [key: string]: number };
+      binAssignments: { [key: string]: string };
     }
   ) {
     try {
