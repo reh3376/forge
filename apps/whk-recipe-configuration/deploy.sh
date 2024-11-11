@@ -1,8 +1,5 @@
    #!/bin/bash
 
-   # Navigate to the project directory
-   cd apps/whk-recipe-configuration || { echo "Directory not found!"; exit 1; }
-
    # Install dependencies and build the project
    echo "Installing dependencies..."
    npm install
