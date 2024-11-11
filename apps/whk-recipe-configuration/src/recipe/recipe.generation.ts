@@ -1,8 +1,9 @@
 import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
-import { Injectable } from "@nestjs/common";
-import EnzymeDosingService from "./enzyme.dosing";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { EnzymeDosingService } from "./enzyme.dosing";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class RecipeGenerator {
@@ -26,14 +27,15 @@ export class RecipeGenerator {
   private RECIPE_PARAMETERS: any[] = [];
 
   private MAX_QUANTITIES: { [key: string]: number } = {
-    bin1: 1700,
+    bin1: 7000,
     bin2: 18100,
-    bin3: 7000,
+    bin3: 1700,
   };
 
   constructor(
     private rabbitMQProducer: RabbitMQProducerService,
     private enzymeDosingService: EnzymeDosingService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
     this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
@@ -53,60 +55,125 @@ export class RecipeGenerator {
       Malt: Math.round(totalGrainWeight * maltPercent),
     };
   }
-  private splitGrainAdditions(grainType: string, qty: number, binAssignments: { [key: string]: string }) {
-    const numBins = Object.keys(binAssignments).length;
-    const splitQty = Math.ceil(qty / numBins);
-
+  private splitGrainAdditions(
+    grainType: string,
+    qty: number,
+    binAssignments: { [key: string]: string },
+    grainQuantities: { [key: string]: number }
+  ) {
+    this.logger.log(`Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(binAssignments)}`);
     const SPLITS_RATIO = 0.8;
 
-    let splits = [];
-    let remainingQty = qty;
-    
-    // Check each bin's max capacity
+    let splits: any[] = [];
+    let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
+
     for (const [binNum, binGrainType] of Object.entries(binAssignments)) {
-      const maxBinQty = this.MAX_QUANTITIES[`${binNum}`];
-      
-      if (remainingQty > maxBinQty && grainType === binGrainType) {
-        // If this is the first split, do 70/30
-        if (splits.length === 0) {
-          const firstQty = Math.round(remainingQty * SPLITS_RATIO);
-          splits.push({
-            action: 'Add Grain',
-            grainType: grainType,
-            qty: firstQty,
-          });
-          remainingQty -= firstQty;
-          splits.push({
-            action: 'Hold',
-            holdType: 'Hold',
-            time: 2, // 2 minutes hold
-          });
-          remainingQty -= maxBinQty - firstQty;
+      this.logger.log(
+        `Checking bin ${binNum} for ${binGrainType} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
+      );
+      const maxBinQty = this.MAX_QUANTITIES[binNum];
+      this.logger.log(
+        `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
+      );
+
+      if (grainType === binGrainType || (grainType === 'PreMalt' && binGrainType === 'Malt')) {
+        if (remainingQty > maxBinQty) {
+          this.logger.log(
+            `Match found for bin ${binNum} and grain type ${grainType}. Remaining qty: ${remainingQty}`
+          );
+
+          // Handle PreMalt as 10% of total malt quantity with no splitting
+          if (grainType === 'PreMalt') {
+            const preMaltQty = Math.round(remainingQty * 0.1);
+            if (preMaltQty > 0) {
+              splits.push({
+                action: 'Add Grain',
+                grainType: 'Malt',
+                qty: preMaltQty,
+              });
+            }
+            return splits;
+          }
+
+          // For regular Malt, use 90% of the quantity for splitting
+          if (grainType === 'Malt') {
+            remainingQty = Math.round(qty * 0.9);
+          }
+
+          // If this is the first split, do 70/30
+          if (splits.length === 0) {
+            const firstQty = Math.round(remainingQty * SPLITS_RATIO);
+            if (firstQty > 0) {
+              splits.push({
+                action: 'Add Grain',
+                grainType: grainType,
+                qty: firstQty,
+              });
+              remainingQty -= firstQty;
+            }
+
+            const holdQty = maxBinQty - firstQty;
+            if (holdQty > 0) {
+              splits.push({
+                action: 'Hold',
+                holdType: 'Hold',
+                time: 2, // 2 minutes hold
+              });
+              remainingQty -= holdQty;
+            }
+          } else {
+            // For subsequent splits, use 80% of bin max
+            const splitQty = Math.round(maxBinQty * SPLITS_RATIO);
+            if (splitQty > 0) {
+              splits.push({
+                action: 'Add Grain',
+                grainType: grainType,
+                qty: splitQty,
+              });
+            }
+            splits.push({
+              action: 'Hold',
+              holdType: 'Hold',
+              time: 2, // 2 minutes hold
+            });
+            remainingQty -= splitQty;
+          }
         } else {
-          // For subsequent splits, use 80% of bin max
-          const splitQty = Math.round(maxBinQty * SPLITS_RATIO);
-          splits.push({
-            action: 'Add Grain',
-            grainType: grainType,
-            qty: splitQty,
-          });
-          splits.push({
-            action: 'Hold',
-            holdType: 'Hold',
-            time: 2, // 2 minutes hold
-          });
-          remainingQty -= splitQty;
+          if (grainType === 'PreMalt') {
+            const preMaltQty = Math.round(remainingQty * 0.1);
+            if (preMaltQty > 0) {
+              splits.push({
+                action: 'Add Grain',
+                grainType: 'Malt',
+                qty: preMaltQty,
+              });
+            }
+            return splits;
+          }
+
+          // For regular Malt, use 90% of the quantity for splitting. Only applies if this is the first go
+          if (grainType === 'Malt' && splits.length === 0) {
+            remainingQty = Math.round(qty * 0.9);
+          }
+
+          // If remaining qty fits in bin, add it all
+          if (remainingQty > 0) {
+            splits.push({
+              action: 'Add Grain',
+              grainType: grainType,
+              qty: remainingQty,
+            });
+            remainingQty = 0;
+          }
         }
       } else {
-        // If remaining qty fits in bin, add it all
-        splits.push({
-          action: 'Add Grain',
-          grainType: grainType,
-          qty: remainingQty,
-        });
-        remainingQty = 0;
+        // Skip bins that do not match the grain type
+        this.logger.log(
+          `Bin ${binNum} does not match grain type ${grainType}. Skipping.`
+        );
       }
     }
+
     return splits;
   }
 
@@ -115,8 +182,12 @@ export class RecipeGenerator {
   }
 
   private setEnzymeDosing(mashingProtocol: any[])  {
+    this.logger.log(`Mashing protocol: ${JSON.stringify(mashingProtocol)}`);
     // loop through the mashing protocol for an action of type "Add Additive" and get the dosing for the enzymes
-    const enzymeDosings = mashingProtocol.filter((step) => step.action === 'Add Additive').map((step) => {
+    const enzymeDosings = mashingProtocol.filter((step) => {
+      // Check if step and step.action exist before accessing
+      return step && step.action === 'Add Additive';
+    }).map((step) => {
       const enzymeName = step.additiveType;
       const dosing = this.getEnzymeDosing(enzymeName, this.TOTAL_GRAIN_WEIGHT, this.MASH_BILL);
       return {
@@ -186,24 +257,26 @@ export class RecipeGenerator {
 
     // Process the mashing protocol to get the quantities of each grain type and to split the additions if necessary
     const grainQuantities: any = this.calculateGrainQuantities(this.MASH_BILL, this.TOTAL_GRAIN_WEIGHT);
-    const grainAdditions = this.RECIPE_PARAMETERS.filter((param) => param.action === 'Add Grain');
-    const splitAdditions = grainAdditions.map((addition) => {
-      const grainType = addition.grainType;
-      const qty = grainQuantities[grainType];
-      return this.splitGrainAdditions(grainType, qty, binAssignments);
-    });
 
-    // Replace the add grain rows with their respective splits
-    const mashingProtocolWithSplits = this.MASHING_PROTOCOL.map((step) => {
+
+
+    this.logger.log(`Grain quantities: ${JSON.stringify(grainQuantities)}`);
+    const grainAdditions = mashingProtocol.filter((param) => param.action === 'Add Grain');
+    this.logger.log(`Grain additions: ${JSON.stringify(grainAdditions)}`);
+    const mashingProtocolWithSplits = this.MASHING_PROTOCOL.reduce((acc: any[], step) => {
       if (step.action === 'Add Grain') {
-        return splitAdditions[step.grainType];
-      } else {
-        return step;
+        const grainType = step.grainType;
+        const qty = grainQuantities[grainType];
+        const splitSteps = this.splitGrainAdditions(grainType, qty, binAssignments, grainQuantities);
+        return [...acc, ...splitSteps];
       }
-    });
+      return [...acc, step];
+    }, []);
+    this.logger.log(`Mashing protocol with splits: ${JSON.stringify(mashingProtocolWithSplits)}`);
 
     // Set the enzyme dosing
     const finalizedMashingProtocol: any[] = this.setEnzymeDosing(mashingProtocolWithSplits);
+    this.logger.log(`Finalized mashing protocol: ${JSON.stringify(finalizedMashingProtocol)}`);
 
 
     const client = new PrismaClient();

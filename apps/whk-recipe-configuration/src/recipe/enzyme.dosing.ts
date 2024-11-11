@@ -10,7 +10,7 @@ interface Enzyme {
 }
 
 @Injectable()
-class EnzymeDosingService {
+export class EnzymeDosingService {
   private static GRAM_PER_LB = 453.592;
   private static METRIC_TON_DIVISOR = 2205;
 
@@ -51,12 +51,18 @@ class EnzymeDosingService {
     mashBill: string,
     enzymeName: string
   ): { dose: number; instructions: string } | null {
+    // Check if the enzyme is Citric and skip processing if so
+    if (enzymeName.toLowerCase() === 'citric') {
+      console.log('Citric enzyme detected. Skipping dosing calculation.');
+      return null;
+    }
+
     const mashBillParts = mashBill.split('-').map(part => parseFloat(part));
     if (mashBillParts.length !== 4) {
       throw new Error('Mash bill must have four components separated by dashes.');
     }
     const [corn, rye, wheat, malt] = mashBillParts;
-    const totalGrainMetricTons = (totalGrainLoadLbs) / EnzymeDosingService.METRIC_TON_DIVISOR;
+    const totalGrainMetricTons = totalGrainLoadLbs / EnzymeDosingService.METRIC_TON_DIVISOR;
 
     // Optionally, handle individual grain calculations if needed
     // For simplicity, we're using total metric tons for dosing
@@ -74,5 +80,3 @@ class EnzymeDosingService {
     };
   }
 }
-
-export default EnzymeDosingService;
