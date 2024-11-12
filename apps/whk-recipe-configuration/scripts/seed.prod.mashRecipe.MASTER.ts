@@ -1,29 +1,28 @@
-const CUSTOMER_CODE = "JBM";
-const MASH_BILL = '51-00-40-09'; //  Match Item Record
+const CUSTOMER_CODE = "HNW";
+const MASH_BILL = '51-39-00-10'; //  Match Item Record
 const FINAL_PROOF = 120;
-const BARREL_INFO = '53-06-4-0-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
-const CUSTOMER_NAME = "JBM Liquid Assets, LLC"; // This needs to match ERP / MESDB customer reocrd
-const ORDER_QTY = 100; // barrels
-const TOTAL_GRAIN_WEIGHT = 24080;
-const BBLS_PER_FERM = 100;
-const USER = 'csummers@whiskeyhouse.com';
+const BARREL_INFO = '53-18-4-3-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
+const CUSTOMER_NAME = "High N Wicked LLC"; // This needs to match ERP / MESDB customer reocrd
+const ORDER_QTY = 500; // barrels
+const TOTAL_GRAIN_WEIGHT = 20500;
+const BBLS_PER_FERM = 92.39;
+const USER = 'pmannion@whiskeyhouse.com';
 
 const WATER_QTY = 3900;
 const BACKSET_QTY = 3600;
 
 const BIN_ASSIGNMENTS = {
-  bin1: 'Malt',
+  bin1: 'Rye',
   bin2: 'Corn',
-  bin3: 'Rye',
+  bin3: 'Malt',
 };
 
 const BBL_ITEM_NUMBERS = [
-  'BBL-ISC02-53-06-4-0-0-Standard4',
-  'BBL-WVG02-53-06-4-0-0-Standard4'
+  'BBL-ISC04-53-18-4-4-0',
 ]
 
 const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
-  'YEA-FER01-Yeast (USW6)': 10,
+  'YEA-FRM01-Yeast (FSI-048)': 10,
 }
 
 /* 
@@ -46,12 +45,12 @@ const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "Malt", qty: 188 },
+  { action: "Add Grain", grainType: "PreMalt"},
   { action: "Add Additive", additiveType: "Liquozyme" },
   { action: "Add Grain", grainType: "Corn" },
   { action: "Hold", holdType: "Heat", temperature: 180, time: 20 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Wheat" },
+  { action: "Add Grain", grainType: "Rye" },
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
   { action: "Add Additive", additiveType: "DIAZYME" },
