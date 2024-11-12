@@ -11,7 +11,6 @@ interface Enzyme {
 
 @Injectable()
 export class EnzymeDosingService {
-  private static GRAM_PER_LB = 453.592;
   private static METRIC_TON_DIVISOR = 2205;
 
   private enzymeList: Enzyme[] = [
@@ -34,7 +33,8 @@ export class EnzymeDosingService {
     'amylex': 'Amylex 6T',
     'alphalase': 'Alphalase THP',
     'saczyme': 'Saczyme Pro 1.5X',
-    'diazyme': 'Diazyme SSF',
+    // 'diazyme': 'Diazyme SSF',
+    'diazyme': 'Diazyme SSF2',
     'diazyme2': 'Diazyme SSF2',
     'viscoferm': 'Viscoferm',
     'laminex': 'Laminex C2K',
@@ -63,6 +63,10 @@ export class EnzymeDosingService {
       throw new Error('Mash bill must have four components separated by dashes.');
     }
     const [corn, rye, wheat, malt] = mashBillParts;
+    const cornQuantity = ( corn * totalGrainLoadLbs / 100 ) / EnzymeDosingService.METRIC_TON_DIVISOR;
+    const ryeQuantity = ( rye * totalGrainLoadLbs / 100 ) /EnzymeDosingService.METRIC_TON_DIVISOR;
+    const wheatQuantity = ( wheat * totalGrainLoadLbs / 100 ) /EnzymeDosingService.METRIC_TON_DIVISOR;
+    const maltQuantity = ( malt * totalGrainLoadLbs / 100 ) /EnzymeDosingService.METRIC_TON_DIVISOR;
     const totalGrainMetricTons = totalGrainLoadLbs / EnzymeDosingService.METRIC_TON_DIVISOR;
 
     // Optionally, handle individual grain calculations if needed
@@ -79,12 +83,20 @@ export class EnzymeDosingService {
     if (!enzyme) {
       throw new Error(`Enzyme "${fullEnzymeName}" not found.`);
     }
-
-    const dose = enzyme.dosePerMetricTon * totalGrainMetricTons;
-
-    return {
-      dose: parseFloat(dose.toFixed(3)),
-      instructions: enzyme.instructions,
-    };
+    let dose
+    if (enzyme.category === 'Liquifaction' || enzyme.category === 'Saccharification') {
+      dose = enzyme.dosePerMetricTon * totalGrainMetricTons;
+    } else if (enzyme.category === 'Viscosity') {
+      console.log(`Total grain load: ${totalGrainLoadLbs}, Corn: ${cornQuantity}, Rye: ${ryeQuantity}, Wheat: ${wheatQuantity}, Malt: ${maltQuantity}. Enzyme does per MT: ${enzyme.dosePerMetricTon}`);
+      dose = enzyme.dosePerMetricTon * totalGrainMetricTons * ryeQuantity || enzyme.dosePerMetricTon * totalGrainMetricTons * wheatQuantity;
+    }
+    if (dose) {
+      return {
+        dose: parseFloat(dose.toFixed(3)),
+        instructions: enzyme.instructions,
+      };
+    } else {
+      throw new Error('Failed to calculate enzyme dose');
+    }
   }
 }

@@ -197,20 +197,29 @@ export class RecipeGenerator {
 
   private setEnzymeDosing(mashingProtocol: any[])  {
     this.logger.log(`Mashing protocol: ${JSON.stringify(mashingProtocol)}`);
-    // loop through the mashing protocol for an action of type "Add Additive" and get the dosing for the enzymes
-    const enzymeDosings = mashingProtocol.filter((step) => {
-      // Check if step and step.action exist before accessing
-      return step && step.action === 'Add Additive';
-    }).map((step) => {
+    
+    // Create new protocol array to store modified steps
+    const newProtocol = [...mashingProtocol];
+
+    // Find indices of Add Additive steps
+    const additiveIndices = newProtocol
+      .map((step, index) => step?.action === 'Add Additive' ? index : -1)
+      .filter(index => index !== -1);
+
+    // Replace each Add Additive step with updated dosing
+    for (const index of additiveIndices) {
+      const step = newProtocol[index];
       const enzymeName = step.additiveType;
       const dosing = this.getEnzymeDosing(enzymeName, this.TOTAL_GRAIN_WEIGHT, this.MASH_BILL);
-      return {
+      
+      newProtocol[index] = {
         action: 'Add Additive',
         additiveType: enzymeName,
-        dosing: dosing,
+        qty: dosing?.dose || 0,
       };
-    });
-    return enzymeDosings;
+    }
+
+    return newProtocol;
   }
 
   async createRecipeData(
