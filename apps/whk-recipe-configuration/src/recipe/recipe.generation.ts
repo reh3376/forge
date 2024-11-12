@@ -61,116 +61,130 @@ export class RecipeGenerator {
     binAssignments: { [key: string]: string },
     grainQuantities: { [key: string]: number }
   ) {
-    this.logger.log(`Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(binAssignments)}`);
+    this.logger.log(
+      `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
+        binAssignments
+      )}`
+    );
     const SPLITS_RATIO = 0.8;
+    const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
 
     let splits: any[] = [];
     let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
 
-    for (const [binNum, binGrainType] of Object.entries(binAssignments)) {
-      this.logger.log(
-        `Checking bin ${binNum} for ${binGrainType} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
-      );
-      const maxBinQty = this.MAX_QUANTITIES[binNum];
-      this.logger.log(
-        `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
-      );
+    // Handle PreMalt separately
+    if (grainType === 'PreMalt') {
+      const preMaltQty = Math.round(remainingQty * 0.1);
+      if (preMaltQty > 0) {
+        splits.push({
+          action: 'Add Grain',
+          grainType: 'Malt',
+          qty: preMaltQty,
+        });
+        remainingQty -= preMaltQty;
+        this.logger.log(`Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`);
+      }
+    }
 
-      if (grainType === binGrainType || (grainType === 'PreMalt' && binGrainType === 'Malt')) {
-        if (remainingQty > maxBinQty) {
-          this.logger.log(
-            `Match found for bin ${binNum} and grain type ${grainType}. Remaining qty: ${remainingQty}`
-          );
+    // Handle big malt
+    if (grainType === 'Malt' && remainingQty > 0) {
+      remainingQty = Math.round(remainingQty * 0.9);
+      this.logger.log(`Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`);
+    }
 
-          // Handle PreMalt as 10% of total malt quantity with no splitting
-          if (grainType === 'PreMalt') {
-            const preMaltQty = Math.round(remainingQty * 0.1);
-            if (preMaltQty > 0) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: 'Malt',
-                qty: preMaltQty,
-              });
-            }
-            return splits;
-          }
+    while (remainingQty > 0) {
+      let splitOccurred = false;
 
-          // For regular Malt, use 90% of the quantity for splitting
-          if (grainType === 'Malt') {
-            remainingQty = Math.round(qty * 0.9);
-          }
+      for (const [binNum, binGrainType] of Object.entries(binAssignments)) {
+        this.logger.log(
+          `Checking bin ${binNum} for ${binGrainType} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
+        );
+        const maxBinQty = this.MAX_QUANTITIES[binNum];
+        this.logger.log(
+          `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
+        );
 
-          // If this is the first split, do 70/30
-          if (splits.length === 0) {
-            const firstQty = Math.round(remainingQty * SPLITS_RATIO);
-            if (firstQty > 0) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: grainType,
-                qty: firstQty,
-              });
-              remainingQty -= firstQty;
-            }
+        if (grainType === binGrainType) {
+          if (remainingQty > maxBinQty) {
+            this.logger.log(
+              `Match found for bin ${binNum} and grain type ${grainType}. Remaining qty: ${remainingQty}`
+            );
 
-            const holdQty = maxBinQty - firstQty;
-            if (holdQty > 0) {
+            // If this is the first split, do 70/30
+            if (splits.length === 0) {
+              const firstQty = Math.round(remainingQty * 0.7);
+              if (firstQty >= MIN_SPLIT_QTY) {
+                splits.push({
+                  action: 'Add Grain',
+                  grainType: grainType,
+                  qty: firstQty,
+                });
+                remainingQty -= firstQty;
+                this.logger.log(`First split: Added ${firstQty} of ${grainType}. Remaining Qty: ${remainingQty}`);
+                splitOccurred = true;
+              }
+
+              const holdQty = maxBinQty - firstQty;
+              if (holdQty > 0) {
+                splits.push({
+                  action: 'Hold',
+                  holdType: 'Hold',
+                  time: 2, // 2 minutes hold
+                });
+                this.logger.log(`Added Hold action for ${holdQty} qty.`);
+                // Hold does not reduce remainingQty
+                splitOccurred = true;
+              }
+            } else {
+              // For subsequent splits, use 80% of bin max
+              const splitQty = Math.round(maxBinQty * SPLITS_RATIO);
+              if (splitQty >= MIN_SPLIT_QTY && splitQty <= remainingQty) {
+                splits.push({
+                  action: 'Add Grain',
+                  grainType: grainType,
+                  qty: splitQty,
+                });
+                remainingQty -= splitQty;
+                this.logger.log(`Subsequent split: Added ${splitQty} of ${grainType}. Remaining Qty: ${remainingQty}`);
+                splitOccurred = true;
+              }
+
               splits.push({
                 action: 'Hold',
                 holdType: 'Hold',
                 time: 2, // 2 minutes hold
               });
-              remainingQty -= holdQty;
+              this.logger.log(`Added Hold action post split.`);
+              // Hold does not reduce remainingQty
+              splitOccurred = true;
             }
           } else {
-            // For subsequent splits, use 80% of bin max
-            const splitQty = Math.round(maxBinQty * SPLITS_RATIO);
-            if (splitQty > 0) {
+            if (remainingQty >= MIN_SPLIT_QTY) {
               splits.push({
                 action: 'Add Grain',
                 grainType: grainType,
-                qty: splitQty,
+                qty: remainingQty,
               });
+              this.logger.log(`Final split: Added ${remainingQty} of ${grainType}.`);
+              remainingQty = 0;
+              splitOccurred = true;
             }
-            splits.push({
-              action: 'Hold',
-              holdType: 'Hold',
-              time: 2, // 2 minutes hold
-            });
-            remainingQty -= splitQty;
           }
+          break; // Exit the loop after processing a matching bin
         } else {
-          if (grainType === 'PreMalt') {
-            const preMaltQty = Math.round(remainingQty * 0.1);
-            if (preMaltQty > 0) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: 'Malt',
-                qty: preMaltQty,
-              });
-            }
-            return splits;
-          }
-
-          // For regular Malt, use 90% of the quantity for splitting. Only applies if this is the first go
-          if (grainType === 'Malt' && splits.length === 0) {
-            remainingQty = Math.round(qty * 0.9);
-          }
-
-          // If remaining qty fits in bin, add it all
-          if (remainingQty > 0) {
-            splits.push({
-              action: 'Add Grain',
-              grainType: grainType,
-              qty: remainingQty,
-            });
-            remainingQty = 0;
-          }
+          // Skip bins that do not match the grain type
+          this.logger.log(
+            `Bin ${binNum} does not match grain type ${grainType}. Skipping.`
+          );
         }
-      } else {
-        // Skip bins that do not match the grain type
+      }
+
+      if (!splitOccurred) {
         this.logger.log(
-          `Bin ${binNum} does not match grain type ${grainType}. Skipping.`
+          `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
         );
+        // Optionally, handle the remaining quantity here or log a warning
+        break; // Prevent infinite loop if no split occurred
       }
     }
 

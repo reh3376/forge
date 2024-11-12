@@ -27,16 +27,17 @@ export class EnzymeDosingService {
     { category: 'Viscosity', name: 'Laminex C2K', dosePerMetricTon: 0.100, instructions: 'at 152 degrees F on crash' },
   ];
 
+  // Normalize the keys to lowercase for case-insensitive mapping
   private enzymeMapping: { [key: string]: string } = {
-    'Termamyl': 'Termamyl SC DS',
-    'Liquozyme': 'Liquozyme PRO HP DI',
-    'Amylex': 'Amylex 6T',
-    'Alphalase': 'Alphalase THP',
-    'Saczyme': 'Saczyme Pro 1.5X',
-    'Diazyme': 'Diazyme SSF',
-    'Diazyme2': 'Diazyme SSF2',
-    'Viscoferm': 'Viscoferm',
-    'Laminex': 'Laminex C2K',
+    'termamyl': 'Termamyl SC DS',
+    'liquozyme': 'Liquozyme PRO HP DI',
+    'amylex': 'Amylex 6T',
+    'alphalase': 'Alphalase THP',
+    'saczyme': 'Saczyme Pro 1.5X',
+    'diazyme': 'Diazyme SSF',
+    'diazyme2': 'Diazyme SSF2',
+    'viscoferm': 'Viscoferm',
+    'laminex': 'Laminex C2K',
   };
 
   /**
@@ -67,9 +68,16 @@ export class EnzymeDosingService {
     // Optionally, handle individual grain calculations if needed
     // For simplicity, we're using total metric tons for dosing
 
-    const enzyme = this.enzymeList.find(e => e.name.toLowerCase() === enzymeName.toLowerCase());
+    // Normalize the enzymeName to lowercase for case-insensitive mapping
+    const normalizedEnzymeName = enzymeName.toLowerCase();
+    const fullEnzymeName = this.enzymeMapping[normalizedEnzymeName];
+    if (!fullEnzymeName) {
+      throw new Error(`Enzyme "${enzymeName}" is not recognized in the mapping.`);
+    }
+
+    const enzyme = this.enzymeList.find(e => e.name.toLowerCase() === fullEnzymeName.toLowerCase());
     if (!enzyme) {
-      throw new Error(`Enzyme "${enzymeName}" not found.`);
+      throw new Error(`Enzyme "${fullEnzymeName}" not found.`);
     }
 
     const dose = enzyme.dosePerMetricTon * totalGrainMetricTons;
