@@ -1,5 +1,8 @@
+# Define the default Node.js version
+ARG NODE_VERSION=23.1.0
+
 # multi-stage: base (build)
-FROM node:23.1.0 AS base
+FROM node:${NODE_VERSION} AS base
 
 # Add New Relic Env Vars
 ENV NEW_RELIC_NO_CONFIG_FILE=true
@@ -29,7 +32,7 @@ COPY . .
 RUN npm run build
 
 # multi-stage: production (runtime)
-FROM node:23.1.0-slim AS production
+FROM node:${NODE_VERSION}-slim AS production
 
 # create arguments of builds time variables
 ARG user=amplication
@@ -69,5 +72,5 @@ USER ${user}
 ENV PORT=3000
 EXPOSE ${PORT}
 
-# start the server using the previously build application
+# start the server using the previously built application
 CMD [ "node", "./dist/main.js" ]
