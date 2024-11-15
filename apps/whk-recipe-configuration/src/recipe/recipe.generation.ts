@@ -59,7 +59,8 @@ export class RecipeGenerator {
     grainType: string,
     qty: number,
     binAssignments: { [key: string]: string },
-    grainQuantities: { [key: string]: number }
+    grainQuantities: { [key: string]: number },
+    hasPreMalt: boolean = false
   ) {
     this.logger.log(
       `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
@@ -87,15 +88,24 @@ export class RecipeGenerator {
     }
 
     // Handle big malt
-    if (grainType === 'Malt' && remainingQty > 0) {
+    if (grainType === 'Malt' && remainingQty > 0 && hasPreMalt) {
       remainingQty = Math.round(remainingQty * 0.9);
       this.logger.log(`Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`);
     }
 
+    // Convert binAssignments to an ordered array based on bin numbers
+    const orderedBins = Object.keys(binAssignments)
+      .sort((a, b) => {
+        const numA = parseInt(a.replace('bin', ''), 10);
+        const numB = parseInt(b.replace('bin', ''), 10);
+        return numA - numB;
+      })
+      .map(bin => [bin, binAssignments[bin]]);
+
     while (remainingQty > 0) {
       let splitOccurred = false;
 
-      for (const [binNum, binGrainType] of Object.entries(binAssignments)) {
+      for (const [binNum, binGrainType] of orderedBins) {
         this.logger.log(
           `Checking bin ${binNum} for ${binGrainType} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
         );
@@ -110,52 +120,28 @@ export class RecipeGenerator {
               `Match found for bin ${binNum} and grain type ${grainType}. Remaining qty: ${remainingQty}`
             );
 
-            // If this is the first split, do 70/30
-            if (splits.length === 0) {
-              const firstQty = Math.round(remainingQty * 0.7);
-              if (firstQty >= MIN_SPLIT_QTY) {
-                splits.push({
-                  action: 'Add Grain',
-                  grainType: grainType,
-                  qty: firstQty,
-                });
-                remainingQty -= firstQty;
-                this.logger.log(`First split: Added ${firstQty} of ${grainType}. Remaining Qty: ${remainingQty}`);
-                splitOccurred = true;
-              }
+            // Calculate the split quantity without exceeding the bin capacity
+            const splitQty = Math.min(Math.round(remainingQty * SPLITS_RATIO), maxBinQty);
 
-              const holdQty = maxBinQty - firstQty;
-              if (holdQty > 0) {
-                splits.push({
-                  action: 'Hold',
-                  holdType: 'Hold',
-                  time: 2, // 2 minutes hold
-                });
-                this.logger.log(`Added Hold action for ${holdQty} qty.`);
-                // Hold does not reduce remainingQty
-                splitOccurred = true;
-              }
-            } else {
-              // For subsequent splits, use 80% of bin max
-              const splitQty = Math.round(maxBinQty * SPLITS_RATIO);
-              if (splitQty >= MIN_SPLIT_QTY && splitQty <= remainingQty) {
-                splits.push({
-                  action: 'Add Grain',
-                  grainType: grainType,
-                  qty: splitQty,
-                });
-                remainingQty -= splitQty;
-                this.logger.log(`Subsequent split: Added ${splitQty} of ${grainType}. Remaining Qty: ${remainingQty}`);
-                splitOccurred = true;
-              }
+            if (splitQty >= MIN_SPLIT_QTY) {
+              splits.push({
+                action: 'Add Grain',
+                grainType: grainType,
+                qty: splitQty,
+              });
+              remainingQty -= splitQty;
+              this.logger.log(`Added ${splitQty} of ${grainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
+              splitOccurred = true;
+            }
 
+            // Add Hold action if necessary
+            if (splitQty < maxBinQty) {
               splits.push({
                 action: 'Hold',
                 holdType: 'Hold',
                 time: 2, // 2 minutes hold
               });
-              this.logger.log(`Added Hold action post split.`);
-              // Hold does not reduce remainingQty
+              this.logger.log(`Added Hold action for ${splitQty} qty.`);
               splitOccurred = true;
             }
           } else {
@@ -165,7 +151,7 @@ export class RecipeGenerator {
                 grainType: grainType,
                 qty: remainingQty,
               });
-              this.logger.log(`Final split: Added ${remainingQty} of ${grainType}.`);
+              this.logger.log(`Final split: Added ${remainingQty} of ${grainType} to bin ${binNum}.`);
               remainingQty = 0;
               splitOccurred = true;
             }
@@ -184,7 +170,8 @@ export class RecipeGenerator {
           `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
         );
         // Optionally, handle the remaining quantity here or log a warning
-        break; // Prevent infinite loop if no split occurred
+        // For example, throw an error if grain can't be fully allocated
+        throw new Error(`Unable to allocate all grains for ${grainType}. Remaining quantity: ${remainingQty}`);
       }
     }
 
