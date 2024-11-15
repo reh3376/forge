@@ -45,7 +45,7 @@ const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric" },
-  { action: "Add Grain", grainType: "PreMalt"},
+  { action: "Add Grain", grainType: "Malt"},
   { action: "Add Additive", additiveType: "Termamyl"},
   { action: "Add Grain", grainType: "Rye" },
   { action: "Hold", holdType: "Hold", time: 5 },

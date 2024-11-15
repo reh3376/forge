@@ -3,6 +3,7 @@ import * as swagger from "@nestjs/swagger";
 import * as nestAccessControl from "nest-access-control";
 import { LotService } from "./lot.service";
 import { LotControllerBase } from "./base/lot.controller.base";
+// import { LotCreateInput } from "./base/LotCreateInput";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 
 @swagger.ApiTags("lots")
@@ -28,11 +29,12 @@ export class LotController extends LotControllerBase {
     type: LotCreateInput,
   })
   async create(@common.Body() data: LotCreateInput): Promise<LotCreateInput> {
+    console.log(`LotNumber: ${data.lotNumber}`);
     
     return this.service.createLot({
       data: {
         ...data,
-        lotNumber: "temporaryLotNumber",
+        lotNumber: data.lotNumber || '',
         filledFrom: data.filledFrom
           ? {
               connect: data.filledFrom,
@@ -47,7 +49,7 @@ export class LotController extends LotControllerBase {
 
         item: data.item
           ? {
-              connect: data.item,
+              connect: data.item ,
             }
           : undefined,
 

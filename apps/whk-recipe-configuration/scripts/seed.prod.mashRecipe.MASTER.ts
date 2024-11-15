@@ -8,8 +8,8 @@ const TOTAL_GRAIN_WEIGHT = 20500;
 const BBLS_PER_FERM = 92.39;
 const USER = 'pmannion@whiskeyhouse.com';
 
-const WATER_QTY = 3900;
-const BACKSET_QTY = 3600;
+const WATER_QTY = 7500;
+const BACKSET_QTY = 0;
 
 const BIN_ASSIGNMENTS = {
   bin1: 'Rye',
@@ -42,23 +42,20 @@ But malt, 10% of the malt weight is the premalt, 90% is the big malt
 */
 
 const MASHING_PROTOCOL = [
-  { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
-  { action: "Hold", holdType: "Heat", temperature: 130 },
-  { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "PreMalt"},
-  { action: "Add Additive", additiveType: "Liquozyme" },
+  { action: "Add Liquid", liquidType01: "Water"},
+  { action: "Hold", holdType: "Heat", temperature: 192 },
+  { action: "Add Additive", additiveType: ""},
   { action: "Add Grain", grainType: "Corn" },
-  { action: "Hold", holdType: "Heat", temperature: 180, time: 20 },
-  { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Rye" },
-  { action: "Hold", holdType: "Hold", time: 15 },
-  { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME" },
+  { action: "Hold", holdType: "Hold", time: 45 },
+  { action: "Hold", holdType: "Cool", temperature: 155 },
+  { action: "Add Additive", additiveType: "DIAZYME"},
+  { action: "Add Grain", grainType: "Rye"},
   { action: "Add Additive", additiveType: "Viscoferm" },
-  { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt"},
-  { action: "Hold", holdType: "Hold", time: 10 },
+  { action: "Hold", holdType: "Cool", temperature: 142 },
+  { action: "Add Grain", grainType: "Malt" },
+  { action: "Hold", holdType: "Hold", time: 30 },
 ];
+
 const RECIPE_PARAMETERS = [
   { name: 'HighWineProof', setpointValue: 140 },
   { name: 'LowWineProof', setpointValue: 130 },

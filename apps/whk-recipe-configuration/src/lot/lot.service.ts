@@ -125,13 +125,14 @@ export class LotService extends LotServiceBase {
     }
     const bblType = barrelTypeMapping[bblOem as string];
 
-
     const lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}.${bblType}`;
+    this.logger.log(`lotNumber: ${args.data.lotNumber}`);
 
+    
     const lastLot: Lot[] = await this.lots({
       where: {
         lotNumber: {
-          startsWith: lotNumberPrefix,
+          startsWith: args.data.lotNumber === '' ? lotNumberPrefix : args.data.lotNumber,
         },
       },
       orderBy: {
@@ -139,18 +140,19 @@ export class LotService extends LotServiceBase {
       },
       take: 1,
     });
-    this.logger.log(`Last lot: ${lastLot}`);
+    this.logger.log(`Last lot: ${JSON.stringify(lastLot)}`);
     this.logger.log(`lotNumberPrefix: ${lotNumberPrefix}`);
 
     let fullLotNumber: string;
-    if (!args.data.lotNumber) {
+    if (args.data.lotNumber == '') {
       if (lastLot.length > 0) {
         throw new Error(`Lot with character ${args.data.lotAlphaChar} has already been created today.`);
       }
-      fullLotNumber = `${lotNumberPrefix}.${barrelTypeMapping[args.data.bblOem]}`;
+      fullLotNumber = `${lotNumberPrefix}`;
     } else {
       fullLotNumber = args.data.lotNumber;
     }
+    this.logger.log(`fullLotNumber: ${fullLotNumber}`);
 
     // Get the item from the recipe
     const recipe = await this.prisma.recipe.findUnique({
