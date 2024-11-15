@@ -135,7 +135,8 @@ export class RecipeGenerator {
             }
 
             // Add Hold action if necessary
-            if (splitQty < maxBinQty) {
+            // if (splitQty < maxBinQty) {
+            if (splitQty === maxBinQty) {
               splits.push({
                 action: 'Hold',
                 holdType: 'Hold',
