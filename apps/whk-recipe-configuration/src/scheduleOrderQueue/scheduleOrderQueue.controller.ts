@@ -47,14 +47,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
 
         nextUnitProcedure: data.nextUnitProcedure
           ? {
-              connect: data.nextUnitProcedure,
-            }
+            connect: data.nextUnitProcedure,
+          }
           : undefined,
 
         scheduleOrder: data.scheduleOrder
           ? {
-              connect: data.scheduleOrder,
-            }
+            connect: data.scheduleOrder,
+          }
           : undefined,
       },
       select: {
@@ -111,14 +111,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
 
           nextUnitProcedure: data.nextUnitProcedure
             ? {
-                connect: data.nextUnitProcedure,
-              }
+              connect: data.nextUnitProcedure,
+            }
             : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
-                connect: data.scheduleOrder,
-              }
+              connect: data.scheduleOrder,
+            }
             : undefined,
         },
         select: {
@@ -182,14 +182,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
           ...data,
           nextUnitProcedure: data.nextUnitProcedure
             ? {
-                connect: data.nextUnitProcedure,
-              }
+              connect: data.nextUnitProcedure,
+            }
             : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
-                connect: data.scheduleOrder,
-              }
+              connect: data.scheduleOrder,
+            }
             : undefined,
         },
         select: {
@@ -217,6 +217,156 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
           },
         },
       });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Post("/complete-schedule-order-queue/:id")
+  @swagger.ApiOperation({ summary: "Complete schedule order queue item" })
+  @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  async completeScheduleOrderQueue(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() data: ScheduleOrderQueueUpdateInput
+  ): Promise<ScheduleOrderQueue> {
+    try {
+      return await this.service.completeScheduleOrderQueue({
+        where: params,
+        data: {
+          ...data,
+          nextUnitProcedure: data.nextUnitProcedure
+            ? {
+              connect: data.nextUnitProcedure,
+            }
+            : undefined,
+
+          scheduleOrder: data.scheduleOrder
+            ? {
+              connect: data.scheduleOrder,
+            }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Post("/deactivate-schedule-order-queue/:id")
+  @swagger.ApiOperation({ summary: "Deactivate schedule order queue item" })
+  @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  async deactivateScheduleOrderQueue(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() data: ScheduleOrderQueueUpdateInput
+  ): Promise<ScheduleOrderQueue> {
+    try {
+      return await this.service.deactivateScheduleOrderQueue({
+        where: params,
+        data: {
+          ...data,
+          nextUnitProcedure: data.nextUnitProcedure
+            ? {
+              connect: data.nextUnitProcedure,
+            }
+            : undefined,
+
+          scheduleOrder: data.scheduleOrder
+            ? {
+              connect: data.scheduleOrder,
+            }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @common.Post("/update-schedule-order-queue-index/:id")
+  @swagger.ApiOperation({ summary: "Update schedule order queue index" })
+  @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @swagger.ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        newIndex: {
+          type: 'number',
+          description: 'New queue index position'
+        }
+      }
+    }
+  })
+  async updateScheduleOrderQueueIndex(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() body: { newIndex: number },
+    @common.Body() data: ScheduleOrderQueueUpdateInput
+  ): Promise<ScheduleOrderQueue> {
+    try {
+      return await this.service.updateScheduleOrderQueueIndex(
+        {
+          where: params,
+          data: {
+            ...data,
+            nextUnitProcedure: data.nextUnitProcedure
+              ? {
+                connect: data.nextUnitProcedure,
+              }
+              : undefined,
+
+            scheduleOrder: data.scheduleOrder
+              ? {
+                connect: data.scheduleOrder,
+              }
+              : undefined,
+          },
+        },
+        body.newIndex
+      );
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new errors.NotFoundException(
