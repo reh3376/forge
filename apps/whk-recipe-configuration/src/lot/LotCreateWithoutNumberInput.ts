@@ -569,6 +569,20 @@ class LotCreateInput {
     nullable: true,
   })
   lotAlphaChar?: string | null
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  lotNumber?: string | null;
+
+
 }
 
 export { LotCreateInput as LotCreateInput };
