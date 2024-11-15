@@ -38,8 +38,8 @@
      else
        echo "Failed to reload process ID $id."
      fi
-     echo "Waiting for 60 seconds before next reload..."
-     sleep 60 # Adjust delay as needed
+     echo "Waiting for 30 seconds before next reload..."
+     sleep 30 # Adjust delay as needed
    done
 
    echo "All instances reloaded successfully."
