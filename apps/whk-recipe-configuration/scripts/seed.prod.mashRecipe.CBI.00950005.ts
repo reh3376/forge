@@ -54,13 +54,13 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Heat", temperature: 145, time: 30 },
 ];
 const RECIPE_PARAMETERS = [
-  { name: 'HighWineProof', setpointValue: 138 },
+  { name: 'HighWineProof', setpointValue: 140 },
   { name: 'LowWineProof', setpointValue: 130 },
   { name: 'FinalProof', setpointValue: 120 },
   { name: 'BaseLoss', setpointValue: 0.1 },
   { name: 'BeerFeedTray', setpointValue: 15 },
   { name: 'FermentationAge', setpointValue: 72 },
-  { name: 'ControlTemperature', setpointValue: 92 },
+  { name: 'ControlTemperature', setpointValue: 85 },
   { name: 'CooksPerFerm', setpointValue: 3 },
     { name: 'TopOffFrequency', setpointValue: 24 },
     { name: 'TopOffQuantity', setpointValue: 100 },
@@ -68,10 +68,10 @@ const RECIPE_PARAMETERS = [
     { name: 'MashpH', setpointValue: 6.5 },
     { name: 'MashRatio', setpointValue: 3.0 },
     { name: 'RatioByFerm', setpointValue: 2.8 },
-    { name: 'FermSetTemp', setpointValue: 80 },
+    { name: 'FermSetTemp', setpointValue: 70 },
     { name: 'StarterSweetpH', setpointValue: 5.1 },
     { name: 'TotalGrainWeight', setpointValue: 20500 },
-    { name: 'TotalLiquid', setpointValue: 70000 },
+    { name: 'TotalLiquid', setpointValue: 7500 },
     { name: 'NumberOfCooks', setpointValue: ORDER_QTY * 3/ BBLS_PER_FERM },
     { name: 'AssumedFermABV', setpointValue: 12.5 }
   ];
