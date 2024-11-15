@@ -1,21 +1,21 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ScheduleOrderQueueServiceBase } from "./base/scheduleOrderQueue.service.base";
-import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {WhMessageBrokerTopics} from "../rabbitmq/topics";
-import {EnumScheduleOrderStatus, Prisma, ScheduleOrderQueue} from "@prisma/client";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
+import { EnumScheduleOrderStatus, Prisma, ScheduleOrderQueue } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { ScheduleOrderQueueUpdateInput } from "./base/ScheduleOrderQueueUpdateInput";
 
 @Injectable()
 export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
-  constructor(
-      protected readonly prisma: PrismaService,
-      protected readonly rabbitProducer: RabbitMQProducerService,
-      @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
-  ) {
-    super(prisma);
-  }
+    constructor(
+        protected readonly prisma: PrismaService,
+        protected readonly rabbitProducer: RabbitMQProducerService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+    ) {
+        super(prisma);
+    }
 
     async addToPendingScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueCreateArgs>): Promise<ScheduleOrderQueue> {
         /*
@@ -121,6 +121,79 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
         */
 
         return await super.updateScheduleOrderQueue(args);
+    }
+
+    async updateScheduleOrderQueueIndex<T extends Prisma.ScheduleOrderQueueUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>, newIndex: number): Promise<ScheduleOrderQueue> {
+        /*
+        This will update the queueIndex of a SchO and adjust other records accordingly
+        */
+        return await this.prisma.$transaction(async (prisma) => {
+            // Find the schedule order queue to be updated
+            const scheduleOrderQueue = await prisma.scheduleOrderQueue.findUnique({
+                where: { id: args.where.id }
+            });
+
+            if (!scheduleOrderQueue) {
+                throw new Error(`Schedule order queue with id ${args.where.id} not found`);
+            }
+
+            const currentIndex = scheduleOrderQueue.queueIndex;
+
+            if (currentIndex === null) {
+                throw new Error(`Schedule order queue with id ${args.where.id} has no queue index`);
+            }
+
+            if (currentIndex === newIndex) {
+                return scheduleOrderQueue;
+            }
+
+            // Get all schedule order queues
+            const allQueues = await prisma.scheduleOrderQueue.findMany({
+                orderBy: { queueIndex: 'asc' }
+            });
+
+            // If moving up in queue (lower index)
+            if (newIndex < currentIndex) {
+                // Increment indices of records between new and current position
+                await prisma.scheduleOrderQueue.updateMany({
+                    where: {
+                        AND: [
+                            { queueIndex: { gte: newIndex } },
+                            { queueIndex: { lt: currentIndex } }
+                        ]
+                    },
+                    data: {
+                        queueIndex: { increment: 1 }
+                    }
+                });
+            }
+            // If moving down in queue (higher index)
+            else {
+                // Decrement indices of records between current and new position
+                await prisma.scheduleOrderQueue.updateMany({
+                    where: {
+                        AND: [
+                            { queueIndex: { gt: currentIndex } },
+                            { queueIndex: { lte: newIndex } }
+                        ]
+                    },
+                    data: {
+                        queueIndex: { decrement: 1 }
+                    }
+                });
+            }
+
+            // Update the target record's index
+            const updatedQueue = await prisma.scheduleOrderQueue.update({
+                where: { id: args.where.id },
+                data: {
+                    queueIndex: newIndex
+                }
+            });
+
+            this.logger.log(`Updated queue index for schedule order ${args.where.id} from ${currentIndex} to ${newIndex}`);
+            return updatedQueue;
+        });
     }
 
     async completeScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>): Promise<ScheduleOrderQueue> {
