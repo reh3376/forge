@@ -27,7 +27,7 @@ export class RecipeGenerator {
   private RECIPE_PARAMETERS: any[] = [];
 
   private MAX_QUANTITIES: { [key: string]: number } = {
-    bin1: 7000,
+    bin1: 6500,
     bin2: 18100,
     bin3: 1700,
   };
