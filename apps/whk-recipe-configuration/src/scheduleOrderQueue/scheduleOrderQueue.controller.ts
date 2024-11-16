@@ -157,7 +157,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.Patch("/:id/activate-next-schedule-order-queue")
+  @common.Patch("/activate-next-schedule-order-queue/:id")
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
@@ -228,7 +228,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.Post("/complete-schedule-order-queue/:id")
+  @common.Patch("/complete-schedule-order-queue/:id")
   @swagger.ApiOperation({ summary: "Complete schedule order queue item" })
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @nestAccessControl.UseRoles({
@@ -273,7 +273,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.Post("/deactivate-schedule-order-queue/:id")
+  @common.Patch("/deactivate-schedule-order-queue/:id")
   @swagger.ApiOperation({ summary: "Deactivate schedule order queue item" })
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @nestAccessControl.UseRoles({
@@ -318,7 +318,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.Post("/update-schedule-order-queue-index/:id")
+  @common.Patch("/update-schedule-order-queue-index/:id")
   @swagger.ApiOperation({ summary: "Update schedule order queue index" })
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @nestAccessControl.UseRoles({
@@ -346,6 +346,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
     @common.Body() body: { newIndex: number },
     @common.Body() data: ScheduleOrderQueueUpdateInput
   ): Promise<ScheduleOrderQueue> {
+    console.log(body);
     try {
       return await this.service.updateScheduleOrderQueueIndex(
         {
@@ -365,12 +366,39 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
               : undefined,
           },
         },
-        body.newIndex
+        Number(body.newIndex)
       );
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new errors.NotFoundException(
           `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.Post('add-production-order-to-queue/:id')
+  @swagger.ApiOperation({
+    summary: 'Create schedule order and add to queue from production order',
+    description: 'Creates a new schedule order from a production order and adds it to the queue'
+  })
+  @swagger.ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Production order ID'
+  })
+  @swagger.ApiCreatedResponse({ type: ScheduleOrderQueue })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  async createAndQueueScheduleOrder(
+    @common.Param('id') id: string
+  ): Promise<ScheduleOrderQueue> {
+    try {
+      return await this.service.createAndQueueScheduleOrder(id);
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No production order was found with ID ${id}`
         );
       }
       throw error;
