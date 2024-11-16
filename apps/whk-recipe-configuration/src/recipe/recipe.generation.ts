@@ -135,7 +135,8 @@ export class RecipeGenerator {
             }
 
             // Add Hold action if necessary
-            if (splitQty < maxBinQty) {
+            // if (splitQty < maxBinQty) {
+            if (splitQty === maxBinQty) {
               splits.push({
                 action: 'Hold',
                 holdType: 'Hold',
@@ -786,6 +787,9 @@ export class RecipeGenerator {
               });
             }
 
+            // Initialize a flag to track if a BOM item has been linked for this phase
+            let bomItemLinked = false;
+
             // Link BOM components to their equipment phases - these will be the "class definitions"
             if (bom) {
               const bomComponents = await client.bomItem.findMany({
@@ -819,6 +823,7 @@ export class RecipeGenerator {
                         },
                       });
                       console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                      bomItemLinked = true;
                     } else {
                       console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
                     }
@@ -834,6 +839,7 @@ export class RecipeGenerator {
                         },
                       });
                       console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                      bomItemLinked = true;
                     } else {
                       console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
                     }
@@ -847,7 +853,7 @@ export class RecipeGenerator {
                       },
                     });
                     console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
-
+                    bomItemLinked = true;
                   }
                 } else if (phase.grainType == "Corn") {
                   console.log(`Corn: ${component.item.itemNumber}`);
@@ -865,6 +871,7 @@ export class RecipeGenerator {
                           },
                         });
                         console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                        bomItemLinked = true;
                       } else {
                         console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
                       }
@@ -878,6 +885,7 @@ export class RecipeGenerator {
                         },
                       });
                       console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                      bomItemLinked = true;
                     }
                   }
                 } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
@@ -894,8 +902,11 @@ export class RecipeGenerator {
                     },
                   });
                   console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                  bomItemLinked = true;
                 }
-
+                if (bomItemLinked) {
+                  break; // Exit the loop once a BOM item is linked
+                }
               }
             } else {
               console.log("BOM not found, skipping linking BOM components to Equipment Phases");
