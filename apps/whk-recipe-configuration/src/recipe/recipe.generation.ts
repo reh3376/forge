@@ -84,6 +84,7 @@ export class RecipeGenerator {
         });
         remainingQty -= preMaltQty;
         this.logger.log(`Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`);
+        return splits;
       }
     }
 
@@ -136,7 +137,7 @@ export class RecipeGenerator {
 
             // Add Hold action if necessary
             // if (splitQty < maxBinQty) {
-            if (splitQty === maxBinQty) {
+            // if (splitQty === maxBinQty) {
               splits.push({
                 action: 'Hold',
                 holdType: 'Hold',
@@ -144,7 +145,7 @@ export class RecipeGenerator {
               });
               this.logger.log(`Added Hold action for ${splitQty} qty.`);
               splitOccurred = true;
-            }
+            // }
           } else {
             if (remainingQty >= MIN_SPLIT_QTY) {
               splits.push({
@@ -269,6 +270,9 @@ export class RecipeGenerator {
     // Process the mashing protocol to get the quantities of each grain type and to split the additions if necessary
     const grainQuantities: any = this.calculateGrainQuantities(this.MASH_BILL, this.TOTAL_GRAIN_WEIGHT);
 
+    const hasPreMalt = this.MASHING_PROTOCOL.some(step => 
+      step.action === 'Add Grain' && step.grainType === 'PreMalt'
+    );
 
 
     this.logger.log(`Grain quantities: ${JSON.stringify(grainQuantities)}`);
@@ -278,7 +282,7 @@ export class RecipeGenerator {
       if (step.action === 'Add Grain') {
         const grainType = step.grainType;
         const qty = grainQuantities[grainType];
-        const splitSteps = this.splitGrainAdditions(grainType, qty, binAssignments, grainQuantities);
+        const splitSteps = this.splitGrainAdditions(grainType, qty, binAssignments, grainQuantities, hasPreMalt);
         return [...acc, ...splitSteps];
       }
       return [...acc, step];
