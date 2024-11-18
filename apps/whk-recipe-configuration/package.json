@@ -16,6 +16,8 @@
     "prod:seed:mash:abt:70210009": "ts-node scripts/seed.prod.mashRecipe.ABT.70210009.ts",
     "prod:seed:mash:hnw:51390010": "ts-node scripts/seed.prod.mashRecipe.HNW.51390010.ts",
     "prod:seed:mash:cbi:00950005": "ts-node scripts/seed.prod.mashRecipe.CBI.00950005.ts",
+    "prod:seed:mash:wts:60360004": "ts-node scripts/seed.prod.mashRecipe.WTS.60360004.ts",
+    "prod:seed:mash:wts:60003604": "ts-node scripts/seed.prod.mashRecipe.WTS.60003604.ts",
     "prod:seed:tests": "ts-node scripts/seed.prod.tests.ts",
     "prod:seed:assets": "ts-node scripts/seed.prod.assets.ts",
     "prod:seed:unit": "ts-node scripts/seed.prod.unitLink.ts",
