@@ -756,25 +756,6 @@ export class RecipeGenerator {
             if (phase.time) {
               parameterData.push({ name: "Time", value: phase.time, units: "minutes" });
             }
-            // if (phase.grainType) {
-            //   parameterData.push({ name: "GrainType", value: phase.grainType, units: "" });
-            // }
-            // if (phase.additiveType) {
-            //   parameterData.push({ name: "AdditiveType", value: phase.additiveType, units: "" });
-            // }
-            // if (phase.liquidType01) {
-            //   parameterData.push({ name: "LiquidType01", value: phase.liquidType01, units: "" });
-            // }
-            // if (phase.liquidType02) {
-            //   parameterData.push({ name: "LiquidType02", value: phase.liquidType02, units: "" });
-            // }
-            // if (phase.holdType) {
-            //   parameterData.push({ name: "HoldType", value: phase.holdType, units: "" });
-            // }
-            // if (phase.step) {
-            //   parameterData.push({ name: "Step", value: phase.step, units: "" });
-            // }
-
             for (const param of parameterData) {
               await client.phaseParameter.create({
                 data: {
@@ -810,8 +791,8 @@ export class RecipeGenerator {
                 if (
                   (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
                   (phase.action === "Add Liquid" && (
-                    (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
-                    // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
+                    (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) ||
+                    (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
                   ))
                 ) {
                   // Check if the quantity field is present in the phase object
@@ -908,7 +889,7 @@ export class RecipeGenerator {
                   console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
                   bomItemLinked = true;
                 }
-                if (bomItemLinked) {
+                if (bomItemLinked && phase.action !== 'Add Liquid') {
                   break; // Exit the loop once a BOM item is linked
                 }
               }
