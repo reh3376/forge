@@ -958,6 +958,72 @@ export class RecipeGenerator {
       console.log(`Customer '${this.CUSTOMER_NAME}' not found`);
     }
 
+    // //Reed attempt at 4 grain parameter trigger
+    // let isFourGrainMashBill: boolean = false;
+    // // Private method
+    // const evaluateMashBill = (parameter: string): boolean => {
+    //     // Split the string by dashes
+    //     const parts = parameter.split('-');
+
+    //     // Loop through the parts
+    //     for (let i = 0; i < parts.length; i++) {
+    //         const value = parseInt(parts[i], 10);
+
+    //         // Check if the value is greater than 0
+    //         if (value <= 0) {
+    //             return false; // Validation failed
+    //         }
+    //     }
+
+    //     return true; // Validation passed
+    // };
+
+    // isFourGrainMashBill = evaluateMashBill(mashBill)
+    // console.log(isFourGrainMashBill ? "It is a 4 Grain Mash Bill Recipe" : "It is a 3 Grain Mash Bill Recipe");
+
+    let mashBillType: string = "Invalid"; // Default to "Invalid"
+    let isFourGrainMashBill: boolean = false;
+
+    // Private method
+    const determineMashBill = (parameter: string): string => {
+        const parts = parameter.split('-');
+        let hasZero = false; // Tracks if there's a `0`
+        let allValid = true; // Tracks if all values are valid
+
+        for (let i = 0; i < parts.length; i++) {
+            const value = parseInt(parts[i], 10);
+
+            // Check if the value is zero
+            if (value === 0) {
+                hasZero = true;
+            }
+
+            // Check if the value is invalid
+            if (value <= 0) {
+                allValid = false;
+            }
+        }
+
+        // Determine the grain type
+        if (allValid) {
+            return "4-grain"; // All values > 0
+        } else if (hasZero && !allValid) {
+            return "3-grain"; // Contains a 0 but not all invalid
+        } else {
+            return "Invalid"; // Otherwise invalid
+        }
+    };
+
+    mashBillType = determineMashBill(mashBill);
+    console.log(`Grain type: ${mashBillType}`);
+
+    const isFourGrain = (parameter: string): boolean => {
+      console.log("4-grain Mash Bill detected");
+      return mashBillType === "4-grain";
+    };
+
+    isFourGrainMashBill = isFourGrain(mashBillType)
+    
     // Create or update the Recipe record and link it to the Mashing Unit Procedure
     const existingRecipe = await client.recipe.findFirst({
       where: {
@@ -982,6 +1048,15 @@ export class RecipeGenerator {
             recipeNumericalSetpoint: param.setpointValue,
             description: classParam.description,
             isClassDefinition: false,
+            recipeSetpointType: classParam.recipeSetpointType,
+            createdBy: this.USER,
+          }
+        }));
+        newParams.push(await client.recipeParameter.create({
+          data: {
+            className: classParam.className,
+            recipeParamName: mashBillType,
+            isClassDefinition: isFourGrainMashBill,
             recipeSetpointType: classParam.recipeSetpointType,
             createdBy: this.USER,
           }
