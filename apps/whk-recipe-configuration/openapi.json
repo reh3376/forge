@@ -17,7 +17,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -5133,6 +5140,16 @@
         "summary": "Create a new cook",
         "parameters": [],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Cook created successfully"
           },
@@ -5179,6 +5196,9 @@
         "summary": "Generate a new recipe",
         "parameters": [],
         "responses": {
+          "200": {
+            "description": ""
+          },
           "201": {
             "description": "Recipe generated successfully"
           },
@@ -8101,6 +8121,16 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleOrderQueue"
+                }
+              }
+            }
+          },
           "201": {
             "description": "",
             "content": {
@@ -20683,8 +20713,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -20725,7 +20762,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         },
@@ -20755,7 +20792,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -20804,7 +20851,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         },
@@ -23933,6 +23980,16 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Batch"
+                }
+              }
+            }
+          },
           "201": {
             "description": "The batch ID has been successfully generated.",
             "content": {
@@ -32626,6 +32683,10 @@
           "username",
           "password"
         ]
+      },
+      "UserInfo": {
+        "type": "object",
+        "properties": {}
       },
       "StringNullableFilter": {
         "type": "object",
