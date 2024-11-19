@@ -71,12 +71,13 @@ $ npm run prisma:generate
 $ npm run docker:dev
 
 # initialize the database
-$ npm run db:init
+$ npm run db:dev:init
 
 # start the server component
 $ npm run start
 ```
-By default, your app comes with one user with the username "admin" and password "admin".
+By default, your app comes with one user with the username and password configured in 
+`.env` file. See step 2 for more details.
 
 ## Step 3.3: Scripts - container based development
 
