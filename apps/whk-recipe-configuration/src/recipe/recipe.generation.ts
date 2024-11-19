@@ -1,4 +1,4 @@
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
+import { EnumRecipeParameterRecipeSetpointType, EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Inject, Injectable, Logger } from "@nestjs/common";
@@ -959,46 +959,56 @@ export class RecipeGenerator {
     }
 
     let mashBillType: string = "Invalid"; // Default to "Invalid"
-    let isFourGrainMashBill: boolean = false;
+    enum Bool {
+      False = 0,
+      True = 1
+    }
     
     const determineMashBill = (parameter: string): string => {
-      const parts = parameter.split('-');
-      let hasZero = false; // Tracks if there's a `0`
-      let allValid = true; // Tracks if all values are valid
+      const parts = parameter.split('-').map((part) => parseInt(part, 10));
+      
+      let validCount = 0; 
+      let hasNegative = false; 
 
       for (let i = 0; i < parts.length; i++) {
-          const value = parseInt(parts[i], 10);
+          const value = parts[i];
 
-          // Check if the value is zero
-          if (value === 0) {
-              hasZero = true;
-          }
-
-          // Check if the value is invalid
-          if (value <= 0) {
-              allValid = false;
+          if (value < 0) {
+              hasNegative = true;
+              break;
+          } else if (value > 0) {
+              validCount++
           }
       }
 
-      // Determine the grain type
-      if (allValid) {
-          return "4-grain"; // All values > 0
-      } else if (hasZero && !allValid) {
-          return "3-grain"; // Contains a 0 but not all invalid
-      } else {
-          return "Invalid"; // Otherwise invalid
+      if (hasNegative) {
+        return "Invalid";
+      }
+
+      switch (validCount) {
+        case 1:
+          return "1-grain";
+        case 2:
+          return "2-grain";
+        case 3:
+          return "3-grain";
+        case 4:
+          return "4-grain";
+        default:
+          return "Invalid";
       }
   };
 
   mashBillType = determineMashBill(mashBill);
   console.log(`Grain type: ${mashBillType}`);
 
-  const isFourGrain = (parameter: string): boolean => {
-    console.log("4-grain Mash Bill detected");
-    return mashBillType === "4-grain";
+  const isFourGrainMashBill = (parameter: string): Bool => {
+    // console.log("4-grain Mash Bill detected");
+    return determineMashBill(mashBill) === "4-grain" ? Bool.True : Bool.False;
   };
 
-  isFourGrainMashBill = isFourGrain(mashBillType)
+  const isFourGrain = isFourGrainMashBill(mashBillType)
+  console.log(`Grain type: ${determineMashBill(mashBillType)}`);
 
     // Create or update the Recipe record and link it to the Mashing Unit Procedure
     const existingRecipe = await client.recipe.findFirst({
@@ -1027,21 +1037,22 @@ export class RecipeGenerator {
             recipeSetpointType: classParam.recipeSetpointType,
             createdBy: this.USER,
           }
-        }));
-        // Primsa.create attempt with tall table to display boolean value of 4GrainResults
-        newParams.push(await client.recipeParameter.create({
-          data: {
-            className: classParam.className,
-            recipeParamName: mashBillType,
-            isClassDefinition: isFourGrainMashBill,
-            recipeSetpointType: classParam.recipeSetpointType,
-            createdBy: this.USER,
-          }
-        }));
+        }));        
       } else {
         console.log(`Phase parameter ${param.name} already exists, skipping.`);
       }
     }
+
+    newParams.push(await client.recipeParameter.create({
+      data: {
+        className: "Mashing/Parameter",
+        recipeParamName: "IsFourGrain",
+        recipeNumericalSetpoint: isFourGrain,
+        isClassDefinition: false,
+        recipeSetpointType: EnumRecipeParameterRecipeSetpointType.Boolean,
+        createdBy: this.USER,
+      }
+    }));
 
     let recipe: Recipe;
     if (existingRecipe) {
