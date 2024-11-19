@@ -983,9 +983,9 @@ export class RecipeGenerator {
   mashBillType = determineMashBill(mashBill);
   console.log(`Grain type: ${mashBillType}`);
 
-  const isFourGrainMashBill = (parameter: string): Bool => {
+  const isFourGrainMashBill = (parameter: string): boolean => {
     // console.log("4-grain Mash Bill detected");
-    return determineMashBill(mashBill) === "4-grain" ? Bool.True : Bool.False;
+    return determineMashBill(mashBill) === "4-grain" ? true : false;
   };
 
   const isFourGrain = isFourGrainMashBill(mashBillType)
@@ -1012,7 +1012,8 @@ export class RecipeGenerator {
           data: {
             className: classParam.className,
             recipeParamName: param.name,
-            recipeNumericalSetpoint: param.setpointValue,
+            recipeNumericalSetpoint: param.setpointValue, 
+            recipeSetpointBooleanValue: false,
             description: classParam.description,
             isClassDefinition: false,
             recipeSetpointType: classParam.recipeSetpointType,
@@ -1031,6 +1032,7 @@ export class RecipeGenerator {
         recipeNumericalSetpoint: isFourGrain,
         isClassDefinition: false,
         recipeSetpointType: EnumRecipeParameterRecipeSetpointType.Boolean,
+        recipeSetpointBooleanValue: isFourGrain as boolean,
         createdBy: this.USER,
       }
     }));

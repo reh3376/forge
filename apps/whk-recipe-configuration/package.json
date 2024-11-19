@@ -19,6 +19,7 @@
     "prod:seed:mash:wts:60360004": "ts-node scripts/seed.prod.mashRecipe.WTS.60360004.ts",
     "prod:seed:mash:wts:60003604": "ts-node scripts/seed.prod.mashRecipe.WTS.60003604.ts",
     "prod:seed:mash:dwl:60360004": "ts-node scripts/seed.prod.mashRecipe.DWL.60360004.ts",
+    "prod:seed:mash:dwl:75210004": "ts-node scripts/seed.prod.mashRecipe.DWL.75210004.ts",
     "prod:seed:mash:brl:73180009": "ts-node scripts/seed.prod.mashRecipe.BRL.73180009.ts",
     "prod:seed:tests": "ts-node scripts/seed.prod.tests.ts",
     "prod:seed:assets": "ts-node scripts/seed.prod.assets.ts",
