@@ -96,7 +96,7 @@
     "@nestjs/devtools-integration": "latest",
     "@types/cache-manager": "4.0.4",
     "@types/express": "^5.0.0",
-    "@types/graphql-type-json": "0.3.3",
+    "@types/graphql-type-json": "0.3.5",
     "@types/graphql-upload": "^8.0.12",
     "@types/jest": "^29.5.5",
     "@types/mime-types": "^2.1.4",
