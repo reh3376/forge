@@ -267,7 +267,7 @@ export class RecipeResolverBase {
     @graphql.Parent() parent: Recipe,
     @graphql.Args() args: RecipeParameterFindManyArgs
   ): Promise<RecipeParameter[]> {
-    const results = await this.service.findParameters(parent.id, args);
+    const results = await this.service.findRecipeParameters(parent.id, args);
 
     if (!results) {
       return [];

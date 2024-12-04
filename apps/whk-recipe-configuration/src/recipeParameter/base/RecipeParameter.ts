@@ -112,34 +112,6 @@ class RecipeParameter {
 
   @ApiProperty({
     required: false,
-    enum: EnumRecipeParameterOperation,
-  })
-  @IsEnum(EnumRecipeParameterOperation)
-  @IsOptional()
-  @Field(() => EnumRecipeParameterOperation, {
-    nullable: true,
-  })
-  operation?:
-    | "Mashing01"
-    | "Ferrmentation01"
-    | "Distillation01"
-    | "Processing01"
-    | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
-  @Max(9999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  operationIndex!: number | null;
-
-  @ApiProperty({
-    required: false,
     type: () => [Recipe],
   })
   @ValidateNested()
@@ -157,7 +129,7 @@ class RecipeParameter {
   @Field(() => Float, {
     nullable: true,
   })
-  recipeNumericalSetpoint!: Decimal | null;
+  recipeNumericalSetpoint!: number | null;
 
   @ApiProperty({
     required: false,

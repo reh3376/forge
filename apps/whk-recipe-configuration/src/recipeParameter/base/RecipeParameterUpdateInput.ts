@@ -152,7 +152,7 @@ class RecipeParameterUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  recipeNumericalSetpoint?: Decimal | null;
+  recipeNumericalSetpoint?: number | null;
 
   @ApiProperty({
     required: false,

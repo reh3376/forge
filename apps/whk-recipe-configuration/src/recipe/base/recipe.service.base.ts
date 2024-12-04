@@ -86,7 +86,7 @@ export class RecipeServiceBase {
       .lots(args);
   }
 
-  async findParameters(
+  async findRecipeParameters(
     parentId: string,
     args: Prisma.RecipeParameterFindManyArgs
   ): Promise<PrismaRecipeParameter[]> {
