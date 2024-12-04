@@ -24,7 +24,7 @@ import { OperationListRelationFilter } from "../../operation/base/OperationListR
 import { ProcedureWhereUniqueInput } from "../../procedure/base/ProcedureWhereUniqueInput";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
+import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
 
 @InputType()
 class UnitProcedureWhereInput {
@@ -229,15 +229,15 @@ class UnitProcedureWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueueWhereUniqueInput,
+    type: () => ScheduleOrderQueueListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderQueueWhereUniqueInput)
+  @Type(() => ScheduleOrderQueueListRelationFilter)
   @IsOptional()
-  @Field(() => ScheduleOrderQueueWhereUniqueInput, {
+  @Field(() => ScheduleOrderQueueListRelationFilter, {
     nullable: true,
   })
-  scheduleOrderQueues?: ScheduleOrderQueueWhereUniqueInput;
+  scheduleOrderQueues?: ScheduleOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,
