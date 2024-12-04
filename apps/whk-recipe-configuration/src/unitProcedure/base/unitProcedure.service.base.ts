@@ -16,9 +16,9 @@ import {
   UnitProcedure as PrismaUnitProcedure,
   Operation as PrismaOperation,
   Recipe as PrismaRecipe,
+  ScheduleOrderQueue as PrismaScheduleOrderQueue,
   Bom as PrismaBom,
   Procedure as PrismaProcedure,
-  ScheduleOrderQueue as PrismaScheduleOrderQueue,
 } from "@prisma/client";
 
 export class UnitProcedureServiceBase {
@@ -89,6 +89,17 @@ export class UnitProcedureServiceBase {
       .recipe(args);
   }
 
+  async findScheduleOrderQueues(
+    parentId: string,
+    args: Prisma.ScheduleOrderQueueFindManyArgs
+  ): Promise<PrismaScheduleOrderQueue[]> {
+    return this.prisma.unitProcedure
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .scheduleOrderQueues(args);
+  }
+
   async getBoms(parentId: string): Promise<PrismaBom | null> {
     return this.prisma.unitProcedure
       .findUnique({
@@ -119,15 +130,5 @@ export class UnitProcedureServiceBase {
         where: { id: parentId },
       })
       .procedure();
-  }
-
-  async getScheduleOrderQueues(
-    parentId: string
-  ): Promise<PrismaScheduleOrderQueue | null> {
-    return this.prisma.unitProcedure
-      .findUnique({
-        where: { id: parentId },
-      })
-      .scheduleOrderQueues();
   }
 }

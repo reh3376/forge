@@ -248,7 +248,7 @@ model ScheduleOrderQueue {
   id                    String                               @id @default(cuid())
   nextOperation         EnumScheduleOrderQueueNextOperation?
   nextUnitProcedure     UnitProcedure?                       @relation(fields: [nextUnitProcedureId], references: [id])
-  nextUnitProcedureId   String?                              @unique
+  nextUnitProcedureId   String?
   nextUnitProcedureName String?
   queueIndex            Int?                                 @unique
   scheduleOrder         ScheduleOrder?
@@ -282,7 +282,7 @@ model UnitProcedure {
   procedureId         String
   recipe              Recipe[]
   revision            Int?                  @default(0)
-  scheduleOrderQueues ScheduleOrderQueue?
+  scheduleOrderQueues ScheduleOrderQueue[]
   schemaVersion       String?               @default("0001-b")
   updatedAt           DateTime              @updatedAt
   updatedBy           String?
