@@ -32,6 +32,9 @@ import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUn
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -82,12 +85,6 @@ export class UnitProcedureControllerBase {
         procedure: {
           connect: data.procedure,
         },
-
-        scheduleOrderQueues: data.scheduleOrderQueues
-          ? {
-              connect: data.scheduleOrderQueues,
-            }
-          : undefined,
       },
       select: {
         abbreviation: true,
@@ -127,13 +124,6 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -197,13 +187,6 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -266,13 +249,6 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -332,12 +308,6 @@ export class UnitProcedureControllerBase {
           procedure: {
             connect: data.procedure,
           },
-
-          scheduleOrderQueues: data.scheduleOrderQueues
-            ? {
-                connect: data.scheduleOrderQueues,
-              }
-            : undefined,
         },
         select: {
           abbreviation: true,
@@ -377,13 +347,6 @@ export class UnitProcedureControllerBase {
           },
 
           revision: true,
-
-          scheduleOrderQueues: {
-            select: {
-              id: true,
-            },
-          },
-
           schemaVersion: true,
           updatedAt: true,
           updatedBy: true,
@@ -452,13 +415,6 @@ export class UnitProcedureControllerBase {
         },
 
         revision: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
@@ -791,6 +747,122 @@ export class UnitProcedureControllerBase {
   ): Promise<void> {
     const data = {
       recipe: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUnitProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/scheduleOrderQueues")
+  @ApiNestedQuery(ScheduleOrderQueueFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrderQueues(
+    @common.Req() request: Request,
+    @common.Param() params: UnitProcedureWhereUniqueInput
+  ): Promise<ScheduleOrderQueue[]> {
+    const query = plainToClass(ScheduleOrderQueueFindManyArgs, request.query);
+    const results = await this.service.findScheduleOrderQueues(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        nextOperation: true,
+
+        nextUnitProcedure: {
+          select: {
+            id: true,
+          },
+        },
+
+        nextUnitProcedureName: true,
+        queueIndex: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/scheduleOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "update",
+    possession: "any",
+  })
+  async connectScheduleOrderQueues(
+    @common.Param() params: UnitProcedureWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
+        connect: body,
+      },
+    };
+    await this.service.updateUnitProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/scheduleOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "update",
+    possession: "any",
+  })
+  async updateScheduleOrderQueues(
+    @common.Param() params: UnitProcedureWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
+        set: body,
+      },
+    };
+    await this.service.updateUnitProcedure({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/scheduleOrderQueues")
+  @nestAccessControl.UseRoles({
+    resource: "UnitProcedure",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectScheduleOrderQueues(
+    @common.Param() params: UnitProcedureWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
         disconnect: body,
       },
     };

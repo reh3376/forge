@@ -220,12 +220,12 @@ class UnitProcedure {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderQueue,
+    type: () => [ScheduleOrderQueue],
   })
   @ValidateNested()
   @Type(() => ScheduleOrderQueue)
   @IsOptional()
-  scheduleOrderQueues?: ScheduleOrderQueue | null;
+  scheduleOrderQueues?: Array<ScheduleOrderQueue>;
 
   @ApiProperty({
     required: false,
