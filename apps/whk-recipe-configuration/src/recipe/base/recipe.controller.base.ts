@@ -1462,13 +1462,6 @@ export class RecipeControllerBase {
         },
 
         revision: true,
-
-        scheduleOrderQueues: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
