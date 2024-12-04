@@ -229,7 +229,7 @@ class RecipeWhereInput {
   @Field(() => RecipeParameterListRelationFilter, {
     nullable: true,
   })
-  parameters?: RecipeParameterListRelationFilter;
+  RecipeParameters?: RecipeParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

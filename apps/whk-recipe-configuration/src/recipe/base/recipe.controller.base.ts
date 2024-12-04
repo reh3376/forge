@@ -901,7 +901,7 @@ export class RecipeControllerBase {
     @common.Param() params: RecipeWhereUniqueInput
   ): Promise<RecipeParameter[]> {
     const query = plainToClass(RecipeParameterFindManyArgs, request.query);
-    const results = await this.service.findParameters(params.id, {
+    const results = await this.service.findRecipeParameters(params.id, {
       ...query,
       select: {
         active: true,
@@ -912,8 +912,6 @@ export class RecipeControllerBase {
         globalId: true,
         id: true,
         isClassDefinition: true,
-        operation: true,
-        operationIndex: true,
         recipeNumericalSetpoint: true,
         recipeParamDescription: true,
         recipeParamName: true,
