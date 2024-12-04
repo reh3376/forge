@@ -230,6 +230,7 @@ model Recipe {
   lots                           Lot[]
   mashingProtocol                MashingProtocol?                @relation(fields: [mashingProtocolId], references: [id])
   mashingProtocolId              String?
+  parameters                     RecipeParameter[]
   productionOrderRecipeInstances ProductionOrderRecipeInstance[]
   productionOrders               ProductionOrder[]
   recipeBoms                     RecipeBom[]
@@ -244,8 +245,6 @@ model Recipe {
   unitProcedures                 UnitProcedure[]
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
-  RecipeParameter                RecipeParameter?                @relation(fields: [recipeParameterId], references: [id])
-  recipeParameterId              String?
 
   @@unique([itemId, customerId])
 }
@@ -1120,6 +1119,19 @@ enum EnumTestParameterTestSetpointType {
   Numerical
 }
 
+enum EnumRecipeParameterOperation {
+  Mashing01
+  Ferrmentation01
+  Distillation01
+  Processing01
+}
+
+enum EnumRecipeParameterRecipeSetpointType {
+  Boolean
+  Numeric
+  Text
+}
+
 enum EnumEquipmentPhaseName {
   Steam
   Hold
@@ -1307,10 +1319,4 @@ enum EnumMashingProtocolStepStepType {
   Malt
   Prompt
   AdditiveAdd
-}
-
-enum EnumRecipeParameterRecipeSetpointType {
-  Boolean
-  Numeric
-  String
 }
