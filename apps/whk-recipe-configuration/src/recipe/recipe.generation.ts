@@ -1029,10 +1029,10 @@ export class RecipeGenerator {
       data: {
         className: "Mashing/Parameter",
         recipeParamName: "IsFourGrain",
-        recipeNumericalSetpoint: isFourGrain,
+        recipeNumericalSetpoint: isFourGrain ? 1 : 0,
         isClassDefinition: false,
         recipeSetpointType: EnumRecipeParameterRecipeSetpointType.Boolean,
-        recipeSetpointBooleanValue: isFourGrain as boolean,
+        recipeSetpointBooleanValue: isFourGrain,
         createdBy: this.USER,
       }
     }));
