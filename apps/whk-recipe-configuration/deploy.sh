@@ -7,6 +7,13 @@
      echo "npm install failed!"
      exit 1
    fi
+   
+   echo "Compilng Prisma Client..."
+   npx prisma generate
+   if [ $? -ne 0 ]; then
+     echo "prisma generate failed!"
+     exit 1
+   fi
 
    echo "Building the project..."
    npm run build
