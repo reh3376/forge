@@ -32,6 +32,7 @@ import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRe
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
+import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { RecipeBomUpdateManyWithoutRecipesInput } from "./RecipeBomUpdateManyWithoutRecipesInput";
@@ -218,6 +219,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   mashingProtocol?: MashingProtocolWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeParameterUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  parameters?: RecipeParameterUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,

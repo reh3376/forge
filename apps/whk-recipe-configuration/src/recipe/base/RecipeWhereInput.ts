@@ -26,6 +26,7 @@ import { RecipeListRelationFilter } from "./RecipeListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
+import { RecipeParameterListRelationFilter } from "../../recipeParameter/base/RecipeParameterListRelationFilter";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
@@ -217,6 +218,18 @@ class RecipeWhereInput {
     nullable: true,
   })
   mashingProtocol?: MashingProtocolWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeParameterListRelationFilter, {
+    nullable: true,
+  })
+  parameters?: RecipeParameterListRelationFilter;
 
   @ApiProperty({
     required: false,
