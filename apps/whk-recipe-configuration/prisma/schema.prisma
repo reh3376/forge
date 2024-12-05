@@ -373,7 +373,7 @@ model ScheduleOrder {
   recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                String
   recipeName                   String
-  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  scheduleOrderQueues          ScheduleOrderQueue?
   scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
   scheduleOrderRecipeId        String?
   status                       EnumScheduleOrderStatus? @default(Created)
@@ -381,7 +381,6 @@ model ScheduleOrder {
   totalProofGallons            Int?
   updatedAt                    DateTime                 @updatedAt
   updatedBy                    String?
-  scheduleOrderQueueId         String?
 }
 
 model Item {
@@ -1189,8 +1188,9 @@ enum EnumItemReceiptStatus {
 }
 
 enum EnumLotStatus {
-  Created
-  PendingBarrelCount
+  Started
+  PendingValidation
+  Submitted
   Complete
 }
 

@@ -12,8 +12,9 @@ https://docs.amplication.com/how-to/custom-code
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum EnumLotStatus {
-  Created = "Created",
-  PendingBarrelCount = "PendingBarrelCount",
+  Started = "Started",
+  PendingValidation = "PendingValidation",
+  Submitted = "Submitted",
   Complete = "Complete",
 }
 
