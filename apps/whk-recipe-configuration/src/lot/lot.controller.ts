@@ -29,7 +29,8 @@ export class LotController extends LotControllerBase {
     type: LotCreateInput,
   })
   async create(@common.Body() data: LotCreateInput): Promise<LotCreateInput> {
-    console.log(`LotNumber: ${data.lotNumber}`);
+    const sanitizedLotNumber = data.lotNumber.replace(/\n|\r/g, "");
+    console.log(`LotNumber: ${sanitizedLotNumber}`);
     
     return this.service.createLot({
       data: {
