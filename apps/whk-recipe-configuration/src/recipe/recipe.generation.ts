@@ -230,10 +230,10 @@ export class RecipeGenerator {
     binAssignments: { [key: string]: string }
   ): Promise<void> {
     // Set the attributes
-    this.CUSTOMER_CODE = customerCode;
-    this.MASH_BILL = mashBill;
-    this.FINAL_PROOF = finalProof;
-    this.BARREL_INFO = barrelInfo;
+    this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
+    this.MASH_BILL = mashBill.replace(/\n|\r/g, "");
+    this.FINAL_PROOF = finalProof.toString().replace(/\n|\r/g, "");
+    this.BARREL_INFO = barrelInfo.replace(/\n|\r/g, "");
     this.CUSTOMER_NAME = customerName;
     this.ORDER_QTY = orderQty;
     this.TOTAL_GRAIN_WEIGHT = totalGrainWeight;
