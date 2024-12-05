@@ -1096,7 +1096,7 @@ export class RecipeGenerator {
     // Create a recipe group and add the recipe to it
     console.log("Creating recipe group and adding recipe...");
     let recipeGroup: RecipeGroup;
-    const recipeGroupName = this.RECIPE.split('-').slice(1, -1).join('-');
+    const recipeGroupName = this.RECIPE.split('-').slice(1, -1).join('-').replace(/\n|\r/g, "");
     console.log(`Extracted recipe group name: ${recipeGroupName}`);
     const existingRecipeGroup = await client.recipeGroup.findFirst({
       where: {
