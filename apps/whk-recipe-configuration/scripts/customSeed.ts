@@ -26,6 +26,7 @@ import {faker} from "@faker-js/faker";
 import { hash } from "bcrypt";
 import {EnumScheduleOrderStatus} from "../src/scheduleOrder/base/EnumScheduleOrderStatus";
 import {connect} from "amqp-connection-manager";
+import { randomInt } from "crypto";
 
 // Function to get a random element from an array
 // function getRandomElement<T>(arr: Array<T>): T | null {
@@ -38,10 +39,9 @@ import {connect} from "amqp-connection-manager";
 // Define the function using a generic type parameter <T>
 function getRandomArrayElement<T>(arr: Array<T>): T | undefined {
   if (arr.length === 0) return undefined; // Handle empty array case
-  const randomIndex = Math.floor(Math.random() * arr.length);
+  const randomIndex = randomInt(arr.length);
   return arr[randomIndex];
 }
-
 
 export async function customSeed() {
   const client = new PrismaClient();
