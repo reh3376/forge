@@ -87,7 +87,8 @@ export class EnzymeDosingService {
     if (enzyme.category === 'Liquifaction' || enzyme.category === 'Saccharification') {
       dose = Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * 100) / 100;
     } else if (enzyme.category === 'Viscosity') {
-      console.log(`Total grain load: ${totalGrainLoadLbs}, Corn: ${cornQuantity}, Rye: ${ryeQuantity}, Wheat: ${wheatQuantity}, Malt: ${maltQuantity}. Enzyme does per MT: ${enzyme.dosePerMetricTon}`);
+      const sanitizedTotalGrainLoadLbs = totalGrainLoadLbs.toString().replace(/\n|\r/g, "");
+      console.log(`Total grain load: ${sanitizedTotalGrainLoadLbs}, Corn: ${cornQuantity}, Rye: ${ryeQuantity}, Wheat: ${wheatQuantity}, Malt: ${maltQuantity}. Enzyme does per MT: ${enzyme.dosePerMetricTon}`);
       dose = Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * ryeQuantity * 100) / 100 || Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * wheatQuantity * 100) / 100;
     }
     if (dose) {
