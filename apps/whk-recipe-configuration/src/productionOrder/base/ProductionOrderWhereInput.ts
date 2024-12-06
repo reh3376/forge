@@ -22,6 +22,7 @@ import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
@@ -158,6 +159,39 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   endDate?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DecimalNullableFilter,
+  })
+  @Type(() => DecimalNullableFilter)
+  @IsOptional()
+  @Field(() => DecimalNullableFilter, {
+    nullable: true,
+  })
+  estimatedBarrelsPerFermenter?: DecimalNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  estimatedPGsPerBbl?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  estimatedPGsPerBushel?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
