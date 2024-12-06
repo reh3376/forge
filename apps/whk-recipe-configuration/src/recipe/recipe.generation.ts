@@ -232,7 +232,7 @@ export class RecipeGenerator {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
     this.MASH_BILL = mashBill.replace(/\n|\r/g, "");
-    this.FINAL_PROOF = finalProof.toString().replace(/\n|\r/g, "");
+    this.FINAL_PROOF = finalProof;
     this.BARREL_INFO = barrelInfo.replace(/\n|\r/g, "");
     this.CUSTOMER_NAME = customerName;
     this.ORDER_QTY = orderQty;

@@ -88,9 +88,9 @@ export class LotService extends LotServiceBase {
       if (mergedLot.bblTotal) {
         mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
         mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
-        mergedLot.status = EnumLotStatus.Complete;
+        mergedLot.status = EnumLotStatus.PendingValidation;
       } else {
-        mergedLot.status = EnumLotStatus.PendingBarrelCount;
+        mergedLot.status = EnumLotStatus.Started;
       }
     }
 
