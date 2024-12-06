@@ -482,7 +482,7 @@ class LotWhereInput {
   @Field(() => EnumLotStatus, {
     nullable: true,
   })
-  status?: "Created" | "PendingBarrelCount" | "Complete";
+  status?: "Started" | "PendingValidation" | "Submitted" | "Complete";
 
   @ApiProperty({
     required: false,

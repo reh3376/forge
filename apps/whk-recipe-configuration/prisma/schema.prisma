@@ -670,7 +670,7 @@ model Lot {
   recipeId                    String?
   schemaVersion               String?             @default("0001-b")
   standardYield               Float?
-  status                      EnumLotStatus?      @default(Created)
+  status                      EnumLotStatus?      @default(Started)
   totalFermenters             Float?
   totalPGs                    Float?
   totalPGsByRecipe            Float?
@@ -1264,8 +1264,9 @@ enum EnumItemReceiptStatus {
 }
 
 enum EnumLotStatus {
-  Created
-  PendingBarrelCount
+  Started
+  PendingValidation
+  Submitted
   Complete
 }
 
