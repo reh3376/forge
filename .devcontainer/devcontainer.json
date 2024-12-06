@@ -4,12 +4,19 @@
   "service": "devcontainer",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-      "version": "latest",
-      "enableNonRootDocker": "true",
-      "moby": "true"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/nix:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/python:1": {},
+    "ghcr.io/dhoeric/features/k6:1": {},
+    "ghcr.io/frntn/devcontainers-features/postman:1": {},
+    "ghcr.io/jckimble/devcontainer-features/ngrok:3": {},
+    "ghcr.io/devcontainers-community/npm-features/prettier:1": {},
+    "ghcr.io/itsmechlark/features/act:1": {},
+    "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {},
+    "ghcr.io/prulloac/devcontainer-features/pre-commit:1": {}
   },
   "forwardPorts": [
     3000

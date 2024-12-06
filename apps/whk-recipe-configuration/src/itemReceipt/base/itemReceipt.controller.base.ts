@@ -116,6 +116,12 @@ export class ItemReceiptControllerBase {
         updatedBy: true,
         weighIn: true,
         weighOut: true,
+        siloNumber: true,
+        // asset: {
+        //   select: {
+        //     id: true,
+        //   },
+        // },
       },
     });
   }
@@ -175,6 +181,12 @@ export class ItemReceiptControllerBase {
         updatedBy: true,
         weighIn: true,
         weighOut: true,
+        siloNumber: true,
+        // asset: {
+        //   select: {
+        //     id: true,
+        //   },
+        // },
       },
     });
   }
@@ -235,6 +247,12 @@ export class ItemReceiptControllerBase {
         updatedBy: true,
         weighIn: true,
         weighOut: true,
+        siloNumber: true,
+        // asset: {
+        //   select: {
+        //     id: true,
+        //   },
+        // },
       },
     });
     if (result === null) {
@@ -325,6 +343,12 @@ export class ItemReceiptControllerBase {
           updatedBy: true,
           weighIn: true,
           weighOut: true,
+          siloNumber: true,
+          // asset: {
+          //   select: {
+          //     id: true,
+          //   },
+          // },
         },
       });
     } catch (error) {
