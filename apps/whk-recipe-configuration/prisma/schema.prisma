@@ -320,6 +320,9 @@ model ProductionOrder {
   customerId                     String
   customerCode                   String?
   endDate                        DateTime?
+  estimatedBarrelsPerFermenter   Decimal?
+  estimatedPGsPerBbl             Float?
+  estimatedPGsPerBushel          Float?
   fermentationChemistries        FermentationChemistry[]
   fermentationDayData            FermentationDayDatum[]
   globalId                       String?                         @default(cuid())
