@@ -5,6 +5,9 @@
       {
         "include": "swagger/**/*"
       }
+    ],
+    "plugins": [
+      "@nestjs/swagger"
     ]
   }
 }

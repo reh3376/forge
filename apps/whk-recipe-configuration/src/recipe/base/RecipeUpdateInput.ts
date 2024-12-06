@@ -28,11 +28,11 @@ import { BatchUpdateManyWithoutRecipesInput } from "./BatchUpdateManyWithoutReci
 import { Type } from "class-transformer";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { Decimal } from "decimal.js";
 import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
+import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput";
 import { ProductionOrderUpdateManyWithoutRecipesInput } from "./ProductionOrderUpdateManyWithoutRecipesInput";
 import { RecipeBomUpdateManyWithoutRecipesInput } from "./RecipeBomUpdateManyWithoutRecipesInput";
@@ -147,7 +147,7 @@ class RecipeUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  estimatedAbv?: Decimal | null;
+  estimatedAbv?: number | null;
 
   @ApiProperty({
     required: false,
@@ -219,6 +219,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   mashingProtocol?: MashingProtocolWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => RecipeParameterUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  parameters?: RecipeParameterUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
@@ -314,7 +326,7 @@ class RecipeUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  targetProof?: Decimal | null;
+  targetProof?: number | null;
 
   @ApiProperty({
     required: false,
