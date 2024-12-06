@@ -406,7 +406,7 @@ model ScheduleOrder {
   recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                String
   recipeName                   String
-  scheduleOrderQueues          ScheduleOrderQueue?
+  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
   scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
   scheduleOrderRecipeId        String?
   status                       EnumScheduleOrderStatus? @default(Created)
@@ -670,7 +670,7 @@ model Lot {
   recipeId                    String?
   schemaVersion               String?             @default("0001-b")
   standardYield               Float?
-  status                      EnumLotStatus?      @default(Created)
+  status                      EnumLotStatus?      @default(Started)
   totalFermenters             Float?
   totalPGs                    Float?
   totalPGsByRecipe            Float?
