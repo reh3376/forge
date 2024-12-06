@@ -4,6 +4,7 @@ import { PurchaseOrderModuleBase } from "./base/purchaseOrder.module.base";
 import { PurchaseOrderService } from "./purchaseOrder.service";
 import { PurchaseOrderController } from "./purchaseOrder.controller";
 import { PurchaseOrderResolver } from "./purchaseOrder.resolver";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Module({
   imports: [PurchaseOrderModuleBase, forwardRef(() => AuthModule)],

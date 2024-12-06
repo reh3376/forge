@@ -1,0 +1,14 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "10.4.8.16",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "VPGVM02-mes",
+      "group": "PRD",
+      "database": "whk-mes",
+      "username": "mes"
+    }
+  ]
+}
