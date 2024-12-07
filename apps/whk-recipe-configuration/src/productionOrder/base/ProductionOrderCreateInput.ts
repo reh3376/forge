@@ -172,10 +172,10 @@ class ProductionOrderCreateInput {
   @IsNumber()
   @Max(200)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  estimatedBarrelsPerFermenter?: Decimal | null;
+  estimatedBarrelsPerFermenter?: number | null;
 
   @ApiProperty({
     required: false,
