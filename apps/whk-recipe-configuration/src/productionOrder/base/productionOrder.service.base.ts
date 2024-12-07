@@ -158,14 +158,6 @@ export class ProductionOrderServiceBase {
       .recipeGroup();
   }
 
-  async getSalesOrder(parentId: string): Promise<PrismaSalesOrder | null> {
-    return this.prisma.productionOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .salesOrder();
-  }
-
   async getScheduleOrder(
     parentId: string
   ): Promise<PrismaScheduleOrder | null> {
