@@ -384,9 +384,6 @@ export class ScheduleOrderControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -412,8 +409,6 @@ export class ScheduleOrderControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -423,12 +418,6 @@ export class ScheduleOrderControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
@@ -444,6 +433,10 @@ export class ScheduleOrderControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
+        totalCooks: true,
+        totalFermenters: true, 
+        executedCooks: true,
+        executedFermenters: true,
         units: true,
         updatedAt: true,
         updatedBy: true,
