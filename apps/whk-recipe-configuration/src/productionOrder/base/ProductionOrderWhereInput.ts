@@ -162,14 +162,14 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  estimatedBarrelsPerFermenter?: DecimalNullableFilter;
+  estimatedBarrelsPerFermenter?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

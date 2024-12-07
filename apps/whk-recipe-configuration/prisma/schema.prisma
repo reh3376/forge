@@ -320,7 +320,7 @@ model ProductionOrder {
   customerId                     String
   customerCode                   String?
   endDate                        DateTime?
-  estimatedBarrelsPerFermenter   Decimal?
+  estimatedBarrelsPerFermenter   Float?
   estimatedPGsPerBbl             Float?
   estimatedPGsPerBushel          Float?
   fermentationChemistries        FermentationChemistry[]
