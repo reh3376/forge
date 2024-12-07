@@ -347,6 +347,9 @@ model ProductionOrder {
   className                      String?
   complete                       Boolean?                        @default(false)
   createdBy                      String
+  estimatedBarrelsPerFermenter   Float?
+  estimatedPGsPerBbl             Float?
+  estimatedPGsPerBushel          Float?
   inProcess                      Boolean?                        @default(false)
   updatedBy                      DateTime?
   item                           Item                            @relation(fields: [fgItemId], references: [id])

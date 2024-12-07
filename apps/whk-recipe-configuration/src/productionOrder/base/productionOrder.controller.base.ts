@@ -120,6 +120,9 @@ export class ProductionOrderControllerBase {
 
         customerCode: true,
         endDate: true,
+        estimatedBarrelsPerFermenter: true,
+        estimatedPGsPerBbl: true,
+        estimatedPGsPerBushel: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -204,6 +207,9 @@ export class ProductionOrderControllerBase {
 
         customerCode: true,
         endDate: true,
+        estimatedBarrelsPerFermenter: true,
+        estimatedPGsPerBbl: true,
+        estimatedPGsPerBushel: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -287,6 +293,9 @@ export class ProductionOrderControllerBase {
 
         customerCode: true,
         endDate: true,
+        estimatedBarrelsPerFermenter: true,
+        estimatedPGsPerBbl: true,
+        estimatedPGsPerBushel: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -414,6 +423,9 @@ export class ProductionOrderControllerBase {
 
           customerCode: true,
           endDate: true,
+          estimatedBarrelsPerFermenter: true,
+          estimatedPGsPerBbl: true,
+          estimatedPGsPerBushel: true,
           globalId: true,
           id: true,
           inProcess: true,

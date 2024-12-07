@@ -133,6 +133,42 @@ class ProductionOrder {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedBarrelsPerFermenter!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedPGsPerBbl!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(50)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  estimatedPGsPerBushel!: number | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [FermentationChemistry],
   })
   @ValidateNested()
