@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          # Disable automatic conversion to CRLF on the Windows runner
+          git_config: |
+            core.autocrlf=false
 
       - name: Disable autocrlf
         run: git config core.autocrlf false
