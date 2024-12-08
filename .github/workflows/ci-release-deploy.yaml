@@ -31,13 +31,13 @@ jobs:
             core.autocrlf=false
 
       - name: Convert deploy.sh to Unix Line Endings
-        shell: powershell
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
         run: |
           $deployScriptPath = 'deploy.sh' # Update the path as necessary
           (Get-Content $deployScriptPath) | 
           ForEach-Object { $_ -replace "`r`n", "`n" } | 
-          Set-Content $deployScriptPath -NoByteOrderMark -Encoding UTF8
+          Set-Content $deployScriptPath -Encoding UTF8
 
       - name: Set up environment variables
         run: |
