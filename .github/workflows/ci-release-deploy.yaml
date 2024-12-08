@@ -79,7 +79,7 @@ jobs:
       - name: Copy code to remote server
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         run: |
-          scp -i ~/.ssh/ldkrvm01 -r .\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          scp -i ~/.ssh/ldkrvm01 -r . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
 
       - name: Run deploy script
         run: |
