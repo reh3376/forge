@@ -90,7 +90,7 @@ jobs:
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         shell: powershell
         run: |
-          scp -i ~\.ssh\ldkrvm01 deploy.zip ${{ secrets.SERVER_USERNAME }}${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          scp -i ~\.ssh\ldkrvm01 deploy.zip ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
