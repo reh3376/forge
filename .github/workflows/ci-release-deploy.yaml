@@ -30,6 +30,14 @@ jobs:
           git_config: |
             core.autocrlf=false
 
+      - name: Convert deploy.sh to Unix Line Endings
+        shell: pwsh
+        run: |
+          $deployScriptPath = './apps/whk-mes-deploy/deploy.sh' # Update the path as necessary
+          (Get-Content $deployScriptPath) | 
+          ForEach-Object { $_ -replace "`r`n", "`n" } | 
+          Set-Content $deployScriptPath -NoByteOrderMark -Encoding UTF8
+
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
