@@ -56,16 +56,16 @@ jobs:
 
       - name: Copy code to remote server
         run: |
-          scp -r .\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          scp -i ~/.ssh/ldkrvm01 -r .\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
 
       - name: SSH and set up remote server
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
             cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && npm install && npm run build"
 
       - name: Run deploy script
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
             cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes &&
             chmod +x deploy.sh &&
             ./deploy.sh
