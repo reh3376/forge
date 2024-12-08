@@ -1,7 +1,5 @@
-#
 name: Deploy to Production
 
-# Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   push:
     tags:
@@ -10,23 +8,20 @@ on:
     branches:
       - main
 
-# Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   HOME: C:\Windows\ServiceProfiles\NetworkService
 
-# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
   deploy:
-    runs-on: [self-hosted, windows] # This should point to the self-hosted runner on Server A
+    runs-on: [self-hosted, windows]
     environment: Production
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          # Disable automatic conversion to CRLF on the Windows runner
           git_config: |
             core.autocrlf=false
 
@@ -34,19 +29,10 @@ jobs:
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         shell: powershell
         run: |
-          # Define the path to deploy.sh
-          $deployScriptPath = 'deploy.sh' # Update the path if different
-
-          # Read the entire content of deploy.sh
+          $deployScriptPath = 'deploy.sh'
           $content = Get-Content $deployScriptPath -Raw
-
-          # Replace Windows-style CRLF with Unix-style LF
           $content = $content -replace "`r`n", "`n"
-
-          # Create UTF8 encoding without BOM
           $utf8NoBom = New-Object System.Text.UTF8Encoding($False)
-
-          # Write the content back to deploy.sh with Unix line endings and no BOM
           [System.IO.File]::WriteAllText($deployScriptPath, $content, $utf8NoBom)
 
       - name: Set up environment variables
@@ -61,7 +47,6 @@ jobs:
         run: |
           echo "Decrypting .env file"
           npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
-        # working-directory: ./apps/whk-mes
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         env:
           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
@@ -76,10 +61,21 @@ jobs:
         run: |
           ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "mkdir -p /usr/local/src/repos/whk-mes-deploy"
 
-      - name: Copy code to remote server
+      - name: Archive project files
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
         run: |
-          scp -i ~/.ssh/ldkrvm01 -r * ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          Compress-Archive -Path * -Path .[^.]* -DestinationPath deploy.zip -Force
+
+      - name: Copy archive to remote server
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: bash
+        run: |
+          scp -i ~/.ssh/ldkrvm01 deploy.zip ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+
+      - name: Unzip archive on remote server
+        run: |
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip deploy.zip && rm deploy.zip"
 
       - name: Run deploy script
         run: |
@@ -94,15 +90,3 @@ jobs:
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-
-      # - name: Deploy using PM2
-      #   # run: |
-      #   #   ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && pm2 deploy ecosystem.config.js production"
-      #   run: |
-      #     ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-      #       cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes &&
-      #       pm2 reload ecosystem.config.js --env production
-      #     "
-      #   env:
-      #     SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
