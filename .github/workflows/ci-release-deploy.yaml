@@ -93,6 +93,13 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
+      - name: Run Prisma migrations on remote server
+        run: |
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && npx prisma migrate deploy"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
       # - name: Deploy using PM2
       #   # run: |
       #   #   ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && pm2 deploy ecosystem.config.js production"
@@ -105,27 +112,27 @@ jobs:
       #     SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
       #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-  deploy-db:
-    runs-on: [self-hosted, windows]
-    environment: Production
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
-      - name: Install dependencies
-        run: npm install
-        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-      - name: Decrypt the .env file from dotenv-vault
-        run: |
-          echo "Decrypting .env file"
-          npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
-        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        env:
-          # TODO: Change this to the production key
-          DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
-      - name: Apply all pending migrations to the database
-        run: npx prisma migrate deploy
-        working-directory: ./apps/whk-mes
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  # deploy-db:
+  #   runs-on: [self-hosted, windows]
+  #   environment: Production
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v3
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v3
+  #     - name: Install dependencies
+  #       run: npm install
+  #       working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+  #     - name: Decrypt the .env file from dotenv-vault
+  #       run: |
+  #         echo "Decrypting .env file"
+  #         npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
+  #       working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+  #       env:
+  #         # TODO: Change this to the production key
+  #         DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+  #     - name: Apply all pending migrations to the database
+  #       run: npx prisma migrate deploy
+  #       working-directory: ./apps/whk-mes
+  #       env:
+  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
