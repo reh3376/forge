@@ -51,31 +51,50 @@ jobs:
         env:
           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
-      - name: Print .env file
-        run: cat C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\.env
-
-      - name: Test SSH Connection
-        run: ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "echo Connected"
-
-      - name: Create directory on remote server
-        run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "mkdir -p /usr/local/src/repos/whk-mes-deploy"
-
-      - name: Archive project files
+      - name: Verify .env File Exists
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         shell: powershell
         run: |
-          Compress-Archive -Path * -Path .[^.]* -DestinationPath deploy.zip -Force
+          if (Test-Path .env) {
+            Write-Output ".env file exists."
+          } else {
+            Write-Error ".env file is missing."
+            exit 1
+          }
 
-      - name: Copy archive to remote server
+      - name: Archive Project Files Including .env
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
+        run: |
+          # Compress all regular and hidden files into deploy.zip
+          Compress-Archive -Path *,'.[^.]*' -DestinationPath deploy.zip -Force
+
+          # Optional: Verify that the .env file is included in the archive
+          try {
+            Expand-Archive -Path deploy.zip -DestinationPath temp_extract -Force
+            if (Test-Path temp_extract\.env) {
+              Write-Output ".env is included in the archive."
+            } else {
+              Throw ".env is NOT included in the archive."
+            }
+          } catch {
+            Write-Error "Failed to verify .env in the archive: $_"
+            Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
+            exit 1
+          }
+
+          # Clean up the temporary extraction directory
+          Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
+
+      - name: Copy Archive to Remote Server
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         shell: bash
         run: |
           scp -i ~/.ssh/ldkrvm01 deploy.zip ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
 
-      - name: Unzip archive on remote server
+      - name: Unzip Archive on Remote Server
         run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip deploy.zip && rm deploy.zip"
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip -o deploy.zip && rm deploy.zip && ls -la"
 
       - name: Run deploy script
         run: |
