@@ -88,9 +88,12 @@ jobs:
 
       - name: Copy Archive to Remote Server
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: bash
+        shell: powershell
         run: |
-          scp -i ~/.ssh/ldkrvm01 deploy.zip ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          scp -i ~\.ssh\ldkrvm01 deploy.zip $env:SERVER_USERNAME@$env:SERVER_HOST:/usr/local/src/repos/whk-mes-deploy
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Unzip Archive on Remote Server
         run: |
