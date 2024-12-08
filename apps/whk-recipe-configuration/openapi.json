@@ -8227,7 +8227,7 @@
         ]
       }
     },
-    "/api/scheduleOrderQueues/{id}/activate-next-schedule-order-queue": {
+    "/api/scheduleOrderQueues/activate-next-schedule-order-queue/{id}": {
       "patch": {
         "operationId": "ScheduleOrderQueueController_activateNextScheduleOrderQueue",
         "parameters": [
@@ -8267,6 +8267,268 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "scheduleOrderQueues"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/scheduleOrderQueues/complete-schedule-order-queue/{id}": {
+      "patch": {
+        "operationId": "ScheduleOrderQueueController_completeScheduleOrderQueue",
+        "summary": "Complete schedule order queue item",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleOrderQueueUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleOrderQueue"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "scheduleOrderQueues"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/scheduleOrderQueues/deactivate-schedule-order-queue/{id}": {
+      "patch": {
+        "operationId": "ScheduleOrderQueueController_deactivateScheduleOrderQueue",
+        "summary": "Deactivate schedule order queue item",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleOrderQueueUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleOrderQueue"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "scheduleOrderQueues"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/scheduleOrderQueues/update-schedule-order-queue-index/{id}": {
+      "patch": {
+        "operationId": "ScheduleOrderQueueController_updateScheduleOrderQueueIndex",
+        "summary": "Update schedule order queue index",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newIndex": {
+                    "type": "number",
+                    "description": "New queue index position"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleOrderQueue"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "scheduleOrderQueues"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/scheduleOrderQueues/add-production-order-to-queue/{id}": {
+      "post": {
+        "operationId": "ScheduleOrderQueueController_createAndQueueScheduleOrder",
+        "summary": "Create schedule order and add to queue from production order",
+        "description": "Creates a new schedule order from a production order and adds it to the queue",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Production order ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleOrderQueue"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleOrderQueue"
                 }
               }
             }
