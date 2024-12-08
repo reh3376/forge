@@ -48,7 +48,7 @@ jobs:
         run: cat C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\.env
 
       - name: Test SSH Connection
-        run: ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "echo Connected"
+        run: ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "echo Connected"
 
       - name: Create directory on remote server
         run: |
