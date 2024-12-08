@@ -31,7 +31,7 @@ jobs:
             core.autocrlf=false
 
       - name: Convert deploy.sh to Unix Line Endings
-        shell: pwsh
+        shell: powershell
         run: |
           $deployScriptPath = './apps/whk-mes-deploy/deploy.sh' # Update the path as necessary
           (Get-Content $deployScriptPath) | 
