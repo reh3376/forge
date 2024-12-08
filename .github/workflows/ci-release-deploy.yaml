@@ -30,14 +30,24 @@ jobs:
           git_config: |
             core.autocrlf=false
 
-      - name: Convert deploy.sh to Unix Line Endings
+      - name: Convert deploy.sh to Unix Line Endings Without BOM
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         shell: powershell
         run: |
-          $deployScriptPath = 'deploy.sh' # Update the path as necessary
-          (Get-Content $deployScriptPath) | 
-          ForEach-Object { $_ -replace "`r`n", "`n" } | 
-          Set-Content $deployScriptPath -Encoding UTF8
+          # Define the path to deploy.sh
+          $deployScriptPath = 'deploy.sh' # Update the path if different
+
+          # Read the entire content of deploy.sh
+          $content = Get-Content $deployScriptPath -Raw
+
+          # Replace Windows-style CRLF with Unix-style LF
+          $content = $content -replace "`r`n", "`n"
+
+          # Create UTF8 encoding without BOM
+          $utf8NoBom = New-Object System.Text.UTF8Encoding($False)
+
+          # Write the content back to deploy.sh with Unix line endings and no BOM
+          [System.IO.File]::WriteAllText($deployScriptPath, $content, $utf8NoBom)
 
       - name: Set up environment variables
         run: |
@@ -105,12 +115,12 @@ jobs:
         uses: actions/setup-node@v3
       - name: Install dependencies
         run: npm install
-        working-directory: ./apps/whk-mes
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
       - name: Decrypt the .env file from dotenv-vault
         run: |
           echo "Decrypting .env file"
           npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
-        working-directory: ./apps/whk-mes
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         env:
           # TODO: Change this to the production key
           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
