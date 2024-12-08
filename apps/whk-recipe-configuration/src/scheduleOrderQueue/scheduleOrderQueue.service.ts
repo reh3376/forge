@@ -293,7 +293,7 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
         });
     }
 
-    async createAndQueueScheduleOrder(productionOrderId: string): Promise<ScheduleOrderQueue> {
+    async createAndQueueScheduleOrder(productionOrderId: string, startDate: Date, endDate: Date, bblPerFerm: number, yieldPgPerBsh: number, pgsPerBbl: number): Promise<ScheduleOrderQueue> {
         return await this.prisma.$transaction(async (prisma) => {
             // Find the production order
             const productionOrder = await prisma.productionOrder.findUnique({
@@ -307,6 +307,22 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
                 throw new Error(`Production order with id ${productionOrderId} not found`);
             }
 
+            try {
+                await prisma.productionOrder.update({
+                    where: { id: productionOrderId },
+                    data: {
+                        startDate: startDate,
+                        endDate: endDate,
+                        bblPerFerm: bblPerFerm,
+                        yieldPgPerBsh: yieldPgPerBsh,
+                        pgsPerBbl: pgsPerBbl,
+                    }
+                });
+            } catch (error) {
+                this.logger.error(`Failed to update production order ${productionOrderId}: ${error}`);
+                throw new Error(`Failed to update production order: ${error}`);
+            }
+
             // Create a new schedule order
             const scheduleOrder = await prisma.scheduleOrder.create({
                 data: {
@@ -317,6 +333,8 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
                     recipeGroup: {
                         connect: { id: productionOrder.recipe?.recipeGroup?.id ?? '' }
                     }, // Adding required field with null check
+                    estimatedStart: startDate,
+                    estimatedEnd: endDate,
                 }
             });
 

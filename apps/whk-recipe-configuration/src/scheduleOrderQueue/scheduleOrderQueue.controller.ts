@@ -391,10 +391,15 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @swagger.ApiCreatedResponse({ type: ScheduleOrderQueue })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   async createAndQueueScheduleOrder(
-    @common.Param('id') id: string
+    @common.Param('id') id: string,
+    @common.Body('startDate') startDate: Date,
+    @common.Body('endDate') endDate: Date,
+    @common.Body('bblPerFerm') bblPerFerm: number,
+    @common.Body('yieldPgPerBsh') yieldPgPerBsh: number,
+    @common.Body('pgsPerBbl') pgsPerBbl: number
   ): Promise<ScheduleOrderQueue> {
     try {
-      return await this.service.createAndQueueScheduleOrder(id);
+      return await this.service.createAndQueueScheduleOrder(id, startDate, endDate, bblPerFerm, yieldPgPerBsh, pgsPerBbl);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new errors.NotFoundException(
