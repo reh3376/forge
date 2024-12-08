@@ -44,7 +44,7 @@ jobs:
           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
       - name: Print .env file
-        run: cat C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        run: cat C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\.env
 
       - name: Create directory on remote server
         run: |
