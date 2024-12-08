@@ -65,7 +65,7 @@ jobs:
 
       - name: Run deploy script
         run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && chmod +x deploy.sh && ./deploy.sh"
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && chmod +x deploy.sh && ./deploy.sh"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
