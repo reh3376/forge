@@ -32,8 +32,9 @@ jobs:
 
       - name: Convert deploy.sh to Unix Line Endings
         shell: powershell
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         run: |
-          $deployScriptPath = './apps/whk-mes-deploy/deploy.sh' # Update the path as necessary
+          $deployScriptPath = 'deploy.sh' # Update the path as necessary
           (Get-Content $deployScriptPath) | 
           ForEach-Object { $_ -replace "`r`n", "`n" } | 
           Set-Content $deployScriptPath -NoByteOrderMark -Encoding UTF8
