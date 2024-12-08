@@ -1,21 +1,21 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ScheduleOrderQueueServiceBase } from "./base/scheduleOrderQueue.service.base";
-import {RabbitMQProducerService} from "../rabbitmq/rabbitmq.producer.service";
-import {WhMessageBrokerTopics} from "../rabbitmq/topics";
-import {EnumScheduleOrderStatus, Prisma, ScheduleOrderQueue} from "@prisma/client";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
+import { EnumScheduleOrderStatus, EnumUnitProcedureName, Prisma, ScheduleOrderQueue } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { ScheduleOrderQueueUpdateInput } from "./base/ScheduleOrderQueueUpdateInput";
 
 @Injectable()
 export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
-  constructor(
-      protected readonly prisma: PrismaService,
-      protected readonly rabbitProducer: RabbitMQProducerService,
-      @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
-  ) {
-    super(prisma);
-  }
+    constructor(
+        protected readonly prisma: PrismaService,
+        protected readonly rabbitProducer: RabbitMQProducerService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+    ) {
+        super(prisma);
+    }
 
     async addToPendingScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueCreateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueCreateArgs>): Promise<ScheduleOrderQueue> {
         /*
@@ -123,6 +123,108 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
         return await super.updateScheduleOrderQueue(args);
     }
 
+    async updateScheduleOrderQueueIndex<T extends Prisma.ScheduleOrderQueueUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>, newIndex: number): Promise<ScheduleOrderQueue> {
+        /*
+        This will update the queueIndex of a SchO and adjust other records accordingly
+        */
+        this.logger.log(`Updating queue index for schedule order ${args.where.id} to ${newIndex}`);
+        if (newIndex < 0 || isNaN(newIndex) || newIndex === undefined) {
+            throw new Error(`Invalid queue index: ${newIndex}`);
+        }
+        return await this.prisma.$transaction(async (prisma) => {
+            // Find the schedule order queue to be updated
+            const scheduleOrderQueue = await prisma.scheduleOrderQueue.findUnique({
+                where: { id: args.where.id }
+            });
+
+            if (!scheduleOrderQueue) {
+                throw new Error(`Schedule order queue with id ${args.where.id} not found`);
+            }
+
+            const currentIndex = scheduleOrderQueue.queueIndex;
+
+            if (currentIndex === null) {
+                throw new Error(`Schedule order queue with id ${args.where.id} has no queue index`);
+            }
+
+            if (currentIndex === newIndex) {
+                this.logger.warn(`Queue index already set to ${newIndex}`);
+                return scheduleOrderQueue;
+            }
+            this.logger.log(`Updating queue index for schedule order ${args.where.id} from ${currentIndex} to ${newIndex}`);
+
+            // Set the queue index to null to indicate that it has been updated
+            await prisma.scheduleOrderQueue.update({
+                where: { id: args.where.id },
+                data: {
+                    queueIndex: null
+                }
+            });
+
+            // If moving up in queue (lower index)
+            if (newIndex < currentIndex) {
+                this.logger.log(`Moving up in queue`);
+                const scheduleOrderQueues = await prisma.scheduleOrderQueue.findMany({
+                    where: {
+                        queueIndex: {
+                            gte: newIndex,
+                            lt: currentIndex
+                        }
+                    },
+                    orderBy: {
+                        queueIndex: 'desc'
+                    }
+                });
+                this.logger.log(`Schedule order queues: ${JSON.stringify(scheduleOrderQueues)}`);
+                for (const schO of scheduleOrderQueues) {
+                    this.logger.log(`Updating queue index for schedule order ${schO.id} from ${schO.queueIndex} to ${schO.queueIndex as number + 1}`);
+                    await prisma.scheduleOrderQueue.update({
+                        where: { id: schO.id },
+                        data: {
+                            queueIndex: schO.queueIndex as number + 1
+                        }
+                    });
+                }
+            }
+            // If moving down in queue (higher index)
+            else {
+                this.logger.log(`Moving down in queue`);
+                const scheduleOrderQueues = await prisma.scheduleOrderQueue.findMany({
+                    where: {
+                        queueIndex: {
+                            lte: newIndex,
+                            gt: currentIndex
+                        }
+                    },
+                    orderBy: {
+                        queueIndex: 'asc'
+                    }
+                });
+                this.logger.log(`Updating queue index for schedule order ${args.where.id} from ${currentIndex} to ${newIndex}`);
+                for (const schO of scheduleOrderQueues) {
+                    this.logger.log(`Updating queue index for schedule order ${schO.id} from ${schO.queueIndex} to ${schO.queueIndex as number - 1}`);
+                    await prisma.scheduleOrderQueue.update({
+                        where: { id: schO.id },
+                        data: {
+                            queueIndex: schO.queueIndex as number - 1
+                        }
+                    });
+                }
+            }
+
+            // Update the target record's index
+            const updatedQueue = await prisma.scheduleOrderQueue.update({
+                where: { id: args.where.id },
+                data: {
+                    queueIndex: newIndex
+                }
+            });
+
+            this.logger.log(`Updated queue index for schedule order ${args.where.id} from ${currentIndex} to ${newIndex}`);
+            return updatedQueue;
+        });
+    }
+
     async completeScheduleOrderQueue<T extends Prisma.ScheduleOrderQueueUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.ScheduleOrderQueueUpdateArgs>): Promise<ScheduleOrderQueue> {
         /*
         This will remove the SchO from the queue and set the status to completed
@@ -187,6 +289,79 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
             this.logger.log(`Deactivated schedule order ${scheduleOrderQueue.scheduleOrder?.id} and removed from queue`);
 
             // Return the deactivated schedule order queue
+            return scheduleOrderQueue;
+        });
+    }
+
+    async createAndQueueScheduleOrder(productionOrderId: string, startDate: Date, endDate: Date, bblPerFerm: number, yieldPgPerBsh: number, pgsPerBbl: number): Promise<ScheduleOrderQueue> {
+        return await this.prisma.$transaction(async (prisma) => {
+            // Find the production order
+            const productionOrder = await prisma.productionOrder.findUnique({
+                where: { id: productionOrderId },
+                include: {
+                    recipe: { include: { recipeGroup: true } },
+                }
+            });
+
+            if (!productionOrder) {
+                throw new Error(`Production order with id ${productionOrderId} not found`);
+            }
+
+            try {
+                await prisma.productionOrder.update({
+                    where: { id: productionOrderId },
+                    data: {
+                        startDate: startDate,
+                        endDate: endDate,
+                        estimatedBarrelsPerFermenter: bblPerFerm,
+                        estimatedPGsPerBushel: yieldPgPerBsh,
+                        estimatedPGsPerBbl: pgsPerBbl,
+                    }
+                });
+            } catch (error) {
+                this.logger.error(`Failed to update production order ${productionOrderId}: ${error}`);
+                throw new Error(`Failed to update production order: ${error}`);
+            }
+
+            // Create a new schedule order
+            const scheduleOrder = await prisma.scheduleOrder.create({
+                data: {
+                    productionOrders: { connect: { id: productionOrder.id } },
+                    status: EnumScheduleOrderStatus.Created,
+                    productionOrderAllocation: 0, // Adding required field
+                    recipeName: productionOrder.recipe?.Recipe ?? '', // Adding required field with null check
+                    recipeGroup: {
+                        connect: { id: productionOrder.recipe?.recipeGroup?.id ?? '' }
+                    }, // Adding required field with null check
+                    estimatedStart: startDate,
+                    estimatedEnd: endDate,
+                }
+            });
+
+            // Get the last queue position
+            const lastQueueItem = await prisma.scheduleOrderQueue.findFirst({
+                orderBy: {
+                    queueIndex: 'desc'
+                }
+            });
+
+            const nextPosition = lastQueueItem?.queueIndex != null ? lastQueueItem.queueIndex + 1 : 0;
+
+            // Add to queue
+            const scheduleOrderQueue = await prisma.scheduleOrderQueue.create({
+                data: {
+                    createdBy: 'MES', // Adding required createdBy field
+                    scheduleOrder: { connect: { id: scheduleOrder.id } },
+                    queueIndex: nextPosition,
+                    nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
+                },
+                include: {
+                    scheduleOrder: true
+                }
+            });
+
+            this.logger.log(`Created schedule order ${scheduleOrder.id} and added to queue at position ${nextPosition}`);
+
             return scheduleOrderQueue;
         });
     }
