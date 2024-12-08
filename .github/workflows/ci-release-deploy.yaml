@@ -48,7 +48,7 @@ jobs:
 
       - name: Create directory on remote server
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "mkdir -p /usr/local/src/repos/whk-mes-deploy"
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "mkdir -p /usr/local/src/repos/whk-mes-deploy"
 
       - name: Copy code to remote server
         run: |
