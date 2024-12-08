@@ -55,12 +55,13 @@ jobs:
           ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "mkdir -p /usr/local/src/repos/whk-mes-deploy"
 
       - name: Copy code to remote server
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         run: |
           scp -i ~/.ssh/ldkrvm01 -r .\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
 
       - name: SSH and set up remote server
         run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && npm install && npm run build"
+          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && npm install && npm run build"
 
       - name: Run deploy script
         run: |
