@@ -37,13 +37,14 @@ jobs:
         run: |
           echo "Decrypting .env file"
           npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
-        working-directory: ./apps/whk-mes
+        # working-directory: ./apps/whk-mes
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration.\apps\whk-mes
         env:
           # TODO: Change this to the production key
           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
       - name: Print .env file
-        run: cat ./apps/whk-mes/.env
+        run: cat C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
 
       - name: Create directory on remote server
         run: |
