@@ -313,9 +313,9 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
                     data: {
                         startDate: startDate,
                         endDate: endDate,
-                        bblPerFerm: bblPerFerm,
-                        yieldPgPerBsh: yieldPgPerBsh,
-                        pgsPerBbl: pgsPerBbl,
+                        estimatedBarrelsPerFermenter: bblPerFerm,
+                        estimatedPGsPerBushel: yieldPgPerBsh,
+                        estimatedPGsPerBbl: pgsPerBbl,
                     }
                 });
             } catch (error) {
