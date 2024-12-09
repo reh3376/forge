@@ -62,29 +62,29 @@ jobs:
             exit 1
           }
 
-      - name: Archive Project Files Including .env
-        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: powershell
-        run: |
-          # Compress all regular and hidden files into deploy.zip
-          Compress-Archive -Path *,'.[^.]*' -DestinationPath deploy.zip -Force
+      # - name: Archive Project Files Including .env
+      #   working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+      #   shell: powershell
+      #   run: |
+      #     # Compress all regular and hidden files into deploy.zip
+      #     Compress-Archive -Path *,'.[^.]*' -DestinationPath deploy.zip -Force
 
-          # Optional: Verify that the .env file is included in the archive
-          try {
-            Expand-Archive -Path deploy.zip -DestinationPath temp_extract -Force
-            if (Test-Path temp_extract\.env) {
-              Write-Output ".env is included in the archive."
-            } else {
-              Throw ".env is NOT included in the archive."
-            }
-          } catch {
-            Write-Error "Failed to verify .env in the archive: $_"
-            Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
-            exit 1
-          }
+      #     # Optional: Verify that the .env file is included in the archive
+      #     try {
+      #       Expand-Archive -Path deploy.zip -DestinationPath temp_extract -Force
+      #       if (Test-Path temp_extract\.env) {
+      #         Write-Output ".env is included in the archive."
+      #       } else {
+      #         Throw ".env is NOT included in the archive."
+      #       }
+      #     } catch {
+      #       Write-Error "Failed to verify .env in the archive: $_"
+      #       Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
+      #       exit 1
+      #     }
 
-          # Clean up the temporary extraction directory
-          Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
+      #     # Clean up the temporary extraction directory
+      #     Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
 
       # - name: Install unzip on Remote Server
       #   run: |
@@ -166,7 +166,7 @@ jobs:
 
       - name: Run Prisma migrations on remote server
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-recipe-configuration && npx prisma migrate deploy"
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && npx prisma migrate deploy"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
