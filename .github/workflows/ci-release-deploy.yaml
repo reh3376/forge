@@ -116,12 +116,17 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-      - name: Unzip Archive on Remote Server with Detailed Logging
+      - name: List Archive Contents
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip -v -o deploy.zip -d ./deploy > unzip_output.log 2>&1 && cat unzip_output.log && ls -la ./deploy"
-        env:
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip -v deploy.zip"
+
+      - name: Unzip Archive on Remote Server
+        run: |
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
+            cd /usr/local/src/repos/whk-mes-deploy &&
+            unzip -o deploy.zip -d ./deploy &&
+            ls -la ./deploy
+          "
 
       - name: Run deploy script
         run: |
