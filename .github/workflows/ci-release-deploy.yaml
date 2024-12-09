@@ -27,7 +27,7 @@ jobs:
 
       - name: Convert deploy.sh to Unix Line Endings Without BOM
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: powershell
+        shell: pwsh
         run: |
           $deployScriptPath = 'deploy.sh'
           $content = Get-Content $deployScriptPath -Raw
@@ -53,7 +53,7 @@ jobs:
 
       - name: Verify .env File Exists
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: powershell
+        shell: pwsh
         run: |
           if (Test-Path .env) {
             Write-Output ".env file exists."
@@ -64,7 +64,7 @@ jobs:
 
       - name: Archive Project Files Including .env
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: powershell
+        shell: pwsh
         run: |
           # Compress all regular and hidden files into deploy.zip
           Compress-Archive -Path *,'.[^.]*' -DestinationPath deploy.zip -Force
@@ -86,29 +86,72 @@ jobs:
           # Clean up the temporary extraction directory
           Remove-Item -Recurse -Force temp_extract -ErrorAction SilentlyContinue
 
-      - name: Copy Archive to Remote Server
-        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: powershell
+      - name: Install unzip on Remote Server
         run: |
-          scp -i ~\.ssh\ldkrvm01 deploy.zip ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          ssh -i "$env:USERPROFILE\.ssh\ldkrvm01" ${SERVER_USERNAME}@${SERVER_HOST} "
+            if ! command -v unzip &> /dev/null
+            then
+              echo 'unzip could not be found, installing...'
+              sudo apt-get update && sudo apt-get install unzip -y
+            else
+              echo 'unzip is already installed.'
+            fi
+          "
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-      - name: Unzip Archive on Remote Server
+      - name: Copy Archive to Remote Server
+        shell: pwsh
         run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip -o deploy.zip && rm deploy.zip && ls -la"
+          scp -v -i "$env:USERPROFILE\.ssh\ldkrvm01" deploy.zip ${SERVER_USERNAME}@${SERVER_HOST}:/usr/local/src/repos/whk-mes-deploy
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Verify deploy.zip Exists on Remote Server
+        run: |
+          ssh -i "$env:USERPROFILE\.ssh\ldkrvm01" ${SERVER_USERNAME}@${SERVER_HOST} "ls -la /usr/local/src/repos/whk-mes-deploy | grep deploy.zip"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Test deploy.zip Integrity on Remote Server
+        run: |
+          ssh -i "$env:USERPROFILE\.ssh\ldkrvm01" ${SERVER_USERNAME}@${SERVER_HOST} "unzip -t /usr/local/src/repos/whk-mes-deploy/deploy.zip"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Unzip Archive on Remote Server with Detailed Logging
+        run: |
+          ssh -i "$env:USERPROFILE\.ssh\ldkrvm01" ${SERVER_USERNAME}@${SERVER_HOST} "
+            cd /usr/local/src/repos/whk-mes-deploy &&
+            unzip -v -o deploy.zip -d ./deploy > unzip_output.log 2>&1 &&
+            cat unzip_output.log &&
+            ls -la ./deploy
+          "
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Run deploy script
         run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && chmod +x deploy.sh && ./deploy.sh"
+          ssh -i "$env:USERPROFILE\.ssh\ldkrvm01" ${SERVER_USERNAME}@${SERVER_HOST} "
+            cd /usr/local/src/repos/whk-mes-deploy &&
+            chmod +x deploy.sh &&
+            ./deploy.sh
+          "
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Run Prisma migrations on remote server
         run: |
-          ssh -i ~/.ssh/ldkrvm01 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-recipe-configuration && npx prisma migrate deploy"
+          ssh -i "$env:USERPROFILE\.ssh\ldkrvm01" ${SERVER_USERNAME}@${SERVER_HOST} "
+            cd /usr/local/src/repos/whk-mes-deploy/apps/whk-recipe-configuration &&
+            npx prisma migrate deploy
+          "
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
