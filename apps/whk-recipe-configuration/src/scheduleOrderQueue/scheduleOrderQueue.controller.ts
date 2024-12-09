@@ -392,14 +392,36 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   async createAndQueueScheduleOrder(
     @common.Param('id') id: string,
-    @common.Body('startDate') startDate: Date,
-    @common.Body('endDate') endDate: Date,
-    @common.Body('bblPerFerm') bblPerFerm: number,
-    @common.Body('yieldPgPerBsh') yieldPgPerBsh: number,
-    @common.Body('pgsPerBbl') pgsPerBbl: number
+    @common.Body('startDate') startDate?: Date,
+    @common.Body('endDate') endDate?: Date,
+    @common.Body('bblPerFerm') bblPerFerm?: number,
+    @common.Body('yieldPgPerBsh') yieldPgPerBsh?: number,
+    @common.Body('pgsPerBbl') pgsPerBbl?: number
   ): Promise<ScheduleOrderQueue> {
     try {
-      return await this.service.createAndQueueScheduleOrder(id, startDate, endDate, bblPerFerm, yieldPgPerBsh, pgsPerBbl);
+      const params: {
+        id: string;
+        startDate?: Date;
+        endDate?: Date;
+        bblPerFerm?: number;
+        yieldPgPerBsh?: number;
+        pgsPerBbl?: number;
+      } = { id };
+
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      if (bblPerFerm) params.bblPerFerm = bblPerFerm;
+      if (yieldPgPerBsh) params.yieldPgPerBsh = yieldPgPerBsh;
+      if (pgsPerBbl) params.pgsPerBbl = pgsPerBbl;
+
+      return await this.service.createAndQueueScheduleOrder(
+        params.id,
+        params.startDate,
+        params.endDate,
+        params.bblPerFerm,
+        params.yieldPgPerBsh,
+        params.pgsPerBbl
+      );
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new errors.NotFoundException(

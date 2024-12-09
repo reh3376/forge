@@ -5,8 +5,6 @@
 
 */
 -- AlterEnum
-ALTER TYPE "EnumLotStatus" ADD VALUE IF NOT EXISTS 'Started';
-ALTER TYPE "EnumLotStatus" ADD VALUE IF NOT EXISTS 'PendingValidation';
 BEGIN;
 CREATE TYPE "EnumLotStatus_new" AS ENUM ('Started', 'PendingValidation', 'Submitted', 'Complete');
 
