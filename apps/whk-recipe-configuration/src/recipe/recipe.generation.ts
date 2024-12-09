@@ -1,4 +1,24 @@
-import { EnumRecipeParameterRecipeSetpointType, EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
+import { 
+  EnumRecipeParameterRecipeSetpointType, 
+  EnumEquipmentPhaseName, 
+  EnumEquipmentPhaseStepType, 
+  EnumOperationName, 
+  EnumPhaseParameterSetpointType, 
+  EnumPhaseParameterStaticName, 
+  EnumProductionOrderStatus, 
+  EnumScheduleOrderStatus, 
+  EnumUnitProcedureName, 
+  Item, 
+  Operation, 
+  PhaseParameter, 
+  PrismaClient, 
+  Procedure, 
+  Recipe, 
+  RecipeGroup, 
+  RecipeParameter, 
+  SalesOrder, 
+  UnitProcedure 
+} from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Inject, Injectable, Logger } from "@nestjs/common";
@@ -35,6 +55,7 @@ export class RecipeGenerator {
     bin1: 6500,
     bin2: 18100,
     bin3: 1700,
+    // bin4: 2000, // Add more bins if necessary
   };
 
   constructor(
@@ -60,130 +81,132 @@ export class RecipeGenerator {
       Malt: Math.round(totalGrainWeight * maltPercent),
     };
   }
+
   private splitGrainAdditions(
-  grainType: string,
-  qty: number,
-  binAssignments: BinAssignments,
-  grainQuantities: { [key: string]: number },
-  hasPreMalt: boolean = false
-) {
-  this.logger.log(
-    `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
-      binAssignments
-    )}`
-  );
-  const SPLITS_RATIO = 0.8;
-  const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
+    grainType: string,
+    qty: number,
+    binAssignments: BinAssignments,
+    grainQuantities: { [key: string]: number },
+    hasPreMalt: boolean = false
+  ): any[] {
+    this.logger.log(
+      `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
+        binAssignments
+      )}`
+    );
 
-  let splits: any[] = [];
-  let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
+    const SPLITS_RATIO = 0.8;
+    const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
 
-  // Handle PreMalt separately
-  if (grainType === 'PreMalt') {
-    const preMaltQty = Math.round(remainingQty * 0.1);
-    if (preMaltQty > 0) {
-      splits.push({
-        action: 'Add Grain',
-        grainType: 'Malt',
-        qty: preMaltQty,
-      });
-      remainingQty -= preMaltQty;
-      this.logger.log(`Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`);
-      return splits;
-    }
-  }
+    let splits: any[] = [];
+    let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
 
-  // Handle big malt
-  if (grainType === 'Malt' && remainingQty > 0 && hasPreMalt) {
-    remainingQty = Math.round(remainingQty * 0.9);
-    this.logger.log(`Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`);
-  }
-
-  // Convert binAssignments to an ordered array based on bin numbers
-  const orderedBins = Object.keys(binAssignments)
-    .sort((a, b) => {
-      const numA = parseInt(a.replace('bin', ''), 10);
-      const numB = parseInt(b.replace('bin', ''), 10);
-      return numA - numB;
-    })
-    .map(bin => [bin, binAssignments[bin]]);
-
-  while (remainingQty > 0) {
-    let splitOccurred = false;
-
-    for (const [binNum, binGrains] of orderedBins) {
-      const grains = Array.isArray(binGrains) ? binGrains : [binGrains];
-      this.logger.log(
-        `Checking bin ${binNum} for grains ${JSON.stringify(grains)} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
-      );
-      const maxBinQty = this.MAX_QUANTITIES[binNum];
-      this.logger.log(
-        `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
-      );
-
-      for (const binGrainType of grains) {
-        if (grainType === binGrainType) {
-          if (remainingQty > maxBinQty) {
-            this.logger.log(
-              `Match found for bin ${binNum} and grain type ${grainGrainType}. Remaining qty: ${remainingQty}`
-            );
-
-            // Calculate the split quantity without exceeding the bin capacity
-            const splitQty = Math.min(Math.round(remainingQty * SPLITS_RATIO), maxBinQty);
-
-            if (splitQty >= MIN_SPLIT_QTY) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: grainGrainType,
-                qty: splitQty,
-              });
-              remainingQty -= splitQty;
-              this.logger.log(`Added ${splitQty} of ${grainGrainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
-              splitOccurred = true;
-            }
-
-            // Add Hold action if necessary
-            splits.push({
-              action: 'Hold',
-              holdType: 'Hold',
-              time: 2, // 2 minutes hold
-            });
-            this.logger.log(`Added Hold action for ${splitQty} qty.`);
-            splitOccurred = true;
-          } else {
-            if (remainingQty >= MIN_SPLIT_QTY) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: grainGrainType,
-                qty: remainingQty,
-              });
-              this.logger.log(`Final split: Added ${remainingQty} of ${grainGrainType} to bin ${binNum}.`);
-              remainingQty = 0;
-              splitOccurred = true;
-            }
-          }
-          break; // Exit the loop after processing a matching bin grain
-        } else {
-          // Skip grains that do not match the grain type
-          this.logger.log(
-            `Grain type ${grainGrainType} in bin ${binNum} does not match grain type ${grainType}. Skipping.`
-          );
-        }
+    // Handle PreMalt separately
+    if (grainType === 'PreMalt') {
+      const preMaltQty = Math.round(remainingQty * 0.1);
+      if (preMaltQty > 0) {
+        splits.push({
+          action: 'Add Grain',
+          grainType: 'Malt',
+          qty: preMaltQty,
+        });
+        remainingQty -= preMaltQty;
+        this.logger.log(`Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`);
+        return splits;
       }
     }
 
-    if (!splitOccurred) {
-      this.logger.log(
-        `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
-      );
-      // Optionally, handle the remaining quantity here or log a warning
-      // For example, throw an error if grain can't be fully allocated
-      throw new Error(`Unable to allocate all grains for ${grainType}. Remaining quantity: ${remainingQty}`);
+    // Handle big malt
+    if (grainType === 'Malt' && remainingQty > 0 && hasPreMalt) {
+      remainingQty = Math.round(remainingQty * 0.9);
+      this.logger.log(`Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`);
     }
-  }
 
-  return splits;
-}
+    // Convert binAssignments to an ordered array based on bin numbers
+    const orderedBins = Object.keys(binAssignments)
+      .sort((a, b) => {
+        const numA = parseInt(a.replace('bin', ''), 10);
+        const numB = parseInt(b.replace('bin', ''), 10);
+        return numA - numB;
+      })
+      .map(bin => [bin, binAssignments[bin]] as [string, string | string[]]);
+
+    while (remainingQty > 0) {
+      let splitOccurred = false;
+
+      for (const [binNum, binGrains] of orderedBins) {
+        const grains = Array.isArray(binGrains) ? binGrains : [binGrains];
+        this.logger.log(
+          `Checking bin ${binNum} for grains ${JSON.stringify(grains)} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
+        );
+        const maxBinQty = this.MAX_QUANTITIES[binNum];
+        this.logger.log(
+          `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
+        );
+
+        for (const binGrainType of grains) {
+          if (grainType === binGrainType) {
+            if (remainingQty > maxBinQty) {
+              this.logger.log(
+                `Match found for bin ${binNum} and grain type ${binGrainType}. Remaining qty: ${remainingQty}`
+              );
+
+              // Calculate the split quantity without exceeding the bin capacity
+              const splitQty = Math.min(Math.round(remainingQty * SPLITS_RATIO), maxBinQty);
+
+              if (splitQty >= MIN_SPLIT_QTY) {
+                splits.push({
+                  action: 'Add Grain',
+                  grainType: binGrainType,
+                  qty: splitQty,
+                });
+                remainingQty -= splitQty;
+                this.logger.log(`Added ${splitQty} of ${binGrainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
+                splitOccurred = true;
+              }
+
+              // Add Hold action if necessary
+              splits.push({
+                action: 'Hold',
+                holdType: 'Hold',
+                time: 2, // 2 minutes hold
+              });
+              this.logger.log(`Added Hold action for ${splitQty} qty.`);
+              splitOccurred = true;
+            } else {
+              if (remainingQty >= MIN_SPLIT_QTY) {
+                splits.push({
+                  action: 'Add Grain',
+                  grainType: binGrainType,
+                  qty: remainingQty,
+                });
+                this.logger.log(`Final split: Added ${remainingQty} of ${binGrainType} to bin ${binNum}.`);
+                remainingQty = 0;
+                splitOccurred = true;
+              }
+            }
+            break; // Exit the loop after processing a matching bin grain
+          } else {
+            // Skip grains that do not match the grain type
+            this.logger.log(
+              `Grain type ${binGrainType} in bin ${binNum} does not match grain type ${grainType}. Skipping.`
+            );
+          }
+        }
+      }
+
+      if (!splitOccurred) {
+        this.logger.log(
+          `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
+        );
+        // Optionally, handle the remaining quantity here or log a warning
+        // For example, throw an error if grain can't be fully allocated
+        throw new Error(`Unable to allocate all grains for ${grainType}. Remaining quantity: ${remainingQty}`);
+      }
+    }
+
+    return splits;
+  }
 
   private getEnzymeDosing(enzymeName: string, totalGrainLoadLbs: number, mashBill: string) {
     return this.enzymeDosingService.calculateEnzymeDosing(totalGrainLoadLbs, mashBill, enzymeName);
@@ -232,7 +255,7 @@ export class RecipeGenerator {
     yeastItemNumbersQtys: { [key: string]: number },
     mashingProtocol: any[],
     recipeParameters: any[],
-    binAssignments: BinAssignments
+    binAssignments: BinAssignments // Updated type
   ): Promise<void> {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
@@ -254,7 +277,7 @@ export class RecipeGenerator {
     this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
 
-      console.info("Seeding database with custom seed for Mashing Recipe...");
+    console.info("Seeding database with custom seed for Mashing Recipe...");
 
       // ------------------------------------ BOM CREATION ------------------------------------
     // Base BOM Items
@@ -271,6 +294,12 @@ export class RecipeGenerator {
     const cornItemId = 'clyd1ofw1009wfd45oghso7y5'
     const wheatItemId = 'cm0e1ocx0012xl6xv4i696cfh'
     const citricItemId = 'clyd1ofpw0032fd45omeixgvv'
+
+   // --------------------------- Processing Bin Assignments ---------------------------
+    // Validate bin assignments
+    if (!this.validateBinAssignments(binAssignments)) {
+      throw new Error('Invalid bin assignments');
+    }
 
     // Process the mashing protocol to get the quantities of each grain type and to split the additions if necessary
     const grainQuantities: any = this.calculateGrainQuantities(this.MASH_BILL, this.TOTAL_GRAIN_WEIGHT);
@@ -292,11 +321,12 @@ export class RecipeGenerator {
       }
       return [...acc, step];
     }, []);
+    
+    this.logger.log(`Mashing protocol with splits: ${JSON.stringify(mashingProtocolWithSplits)}`);
 
     // Set the enzyme dosing
     const finalizedMashingProtocol: any[] = this.setEnzymeDosing(mashingProtocolWithSplits);
     this.logger.log(`Finalized mashing protocol: ${JSON.stringify(finalizedMashingProtocol)}`);
-
 
     const client = new PrismaClient();
     console.log("Creating recipe...");
@@ -1360,5 +1390,39 @@ export class RecipeGenerator {
 
     // Close the Prisma client connection
     await client.$disconnect();
+  }
+
+  private validateBinAssignments(binAssignments: BinAssignments): boolean {
+    const allowedBins = ['bin1', 'bin2', 'bin3']; // Update as needed
+    for (const [bin, grains] of Object.entries(binAssignments)) {
+      if (!allowedBins.includes(bin)) {
+        this.logger.error(`Invalid bin: ${bin}`);
+        return false;
+      }
+      if (typeof grains === 'string') {
+        // Single grain validation
+        if (!this.isValidGrain(grains)) {
+          this.logger.error(`Invalid grain: ${grains} in ${bin}`);
+          return false;
+        }
+      } else if (Array.isArray(grains)) {
+        // Multiple grains validation
+        for (const grain of grains) {
+          if (!this.isValidGrain(grain)) {
+            this.logger.error(`Invalid grain: ${grain} in ${bin}`);
+            return false;
+          }
+        }
+      } else {
+        this.logger.error(`Invalid grain type in ${bin}`);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private isValidGrain(grain: string): boolean {
+    const validGrains = ['Rye', 'Corn', 'Malt', 'Wheat', 'Barley', 'Oats']; // Extend as needed
+    return validGrains.includes(grain);
   }
 }
