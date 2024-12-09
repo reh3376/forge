@@ -5,6 +5,11 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { EnzymeDosingService } from "./enzyme.dosing";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
+// Define the BinAssignments interface to allow string or string[] values
+interface BinAssignments {
+  [bin: string]: string | string[];
+}
+
 @Injectable()
 export class RecipeGenerator {
   private RECIPE = '';
@@ -56,69 +61,71 @@ export class RecipeGenerator {
     };
   }
   private splitGrainAdditions(
-    grainType: string,
-    qty: number,
-    binAssignments: { [key: string]: string },
-    grainQuantities: { [key: string]: number },
-    hasPreMalt: boolean = false
-  ) {
-    this.logger.log(
-      `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
-        binAssignments
-      )}`
-    );
-    const SPLITS_RATIO = 0.8;
-    const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
+  grainType: string,
+  qty: number,
+  binAssignments: BinAssignments,
+  grainQuantities: { [key: string]: number },
+  hasPreMalt: boolean = false
+) {
+  this.logger.log(
+    `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
+      binAssignments
+    )}`
+  );
+  const SPLITS_RATIO = 0.8;
+  const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
 
-    let splits: any[] = [];
-    let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
+  let splits: any[] = [];
+  let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
 
-    // Handle PreMalt separately
-    if (grainType === 'PreMalt') {
-      const preMaltQty = Math.round(remainingQty * 0.1);
-      if (preMaltQty > 0) {
-        splits.push({
-          action: 'Add Grain',
-          grainType: 'Malt',
-          qty: preMaltQty,
-        });
-        remainingQty -= preMaltQty;
-        this.logger.log(`Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`);
-        return splits;
-      }
+  // Handle PreMalt separately
+  if (grainType === 'PreMalt') {
+    const preMaltQty = Math.round(remainingQty * 0.1);
+    if (preMaltQty > 0) {
+      splits.push({
+        action: 'Add Grain',
+        grainType: 'Malt',
+        qty: preMaltQty,
+      });
+      remainingQty -= preMaltQty;
+      this.logger.log(`Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`);
+      return splits;
     }
+  }
 
-    // Handle big malt
-    if (grainType === 'Malt' && remainingQty > 0 && hasPreMalt) {
-      remainingQty = Math.round(remainingQty * 0.9);
-      this.logger.log(`Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`);
-    }
+  // Handle big malt
+  if (grainType === 'Malt' && remainingQty > 0 && hasPreMalt) {
+    remainingQty = Math.round(remainingQty * 0.9);
+    this.logger.log(`Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`);
+  }
 
-    // Convert binAssignments to an ordered array based on bin numbers
-    const orderedBins = Object.keys(binAssignments)
-      .sort((a, b) => {
-        const numA = parseInt(a.replace('bin', ''), 10);
-        const numB = parseInt(b.replace('bin', ''), 10);
-        return numA - numB;
-      })
-      .map(bin => [bin, binAssignments[bin]]);
+  // Convert binAssignments to an ordered array based on bin numbers
+  const orderedBins = Object.keys(binAssignments)
+    .sort((a, b) => {
+      const numA = parseInt(a.replace('bin', ''), 10);
+      const numB = parseInt(b.replace('bin', ''), 10);
+      return numA - numB;
+    })
+    .map(bin => [bin, binAssignments[bin]]);
 
-    while (remainingQty > 0) {
-      let splitOccurred = false;
+  while (remainingQty > 0) {
+    let splitOccurred = false;
 
-      for (const [binNum, binGrainType] of orderedBins) {
-        this.logger.log(
-          `Checking bin ${binNum} for ${binGrainType} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
-        );
-        const maxBinQty = this.MAX_QUANTITIES[binNum];
-        this.logger.log(
-          `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
-        );
+    for (const [binNum, binGrains] of orderedBins) {
+      const grains = Array.isArray(binGrains) ? binGrains : [binGrains];
+      this.logger.log(
+        `Checking bin ${binNum} for grains ${JSON.stringify(grains)} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
+      );
+      const maxBinQty = this.MAX_QUANTITIES[binNum];
+      this.logger.log(
+        `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
+      );
 
+      for (const binGrainType of grains) {
         if (grainType === binGrainType) {
           if (remainingQty > maxBinQty) {
             this.logger.log(
-              `Match found for bin ${binNum} and grain type ${grainType}. Remaining qty: ${remainingQty}`
+              `Match found for bin ${binNum} and grain type ${grainGrainType}. Remaining qty: ${remainingQty}`
             );
 
             // Calculate the split quantity without exceeding the bin capacity
@@ -127,58 +134,56 @@ export class RecipeGenerator {
             if (splitQty >= MIN_SPLIT_QTY) {
               splits.push({
                 action: 'Add Grain',
-                grainType: grainType,
+                grainType: grainGrainType,
                 qty: splitQty,
               });
               remainingQty -= splitQty;
-              this.logger.log(`Added ${splitQty} of ${grainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
+              this.logger.log(`Added ${splitQty} of ${grainGrainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
               splitOccurred = true;
             }
 
             // Add Hold action if necessary
-            // if (splitQty < maxBinQty) {
-            // if (splitQty === maxBinQty) {
-              splits.push({
-                action: 'Hold',
-                holdType: 'Hold',
-                time: 2, // 2 minutes hold
-              });
-              this.logger.log(`Added Hold action for ${splitQty} qty.`);
-              splitOccurred = true;
-            // }
+            splits.push({
+              action: 'Hold',
+              holdType: 'Hold',
+              time: 2, // 2 minutes hold
+            });
+            this.logger.log(`Added Hold action for ${splitQty} qty.`);
+            splitOccurred = true;
           } else {
             if (remainingQty >= MIN_SPLIT_QTY) {
               splits.push({
                 action: 'Add Grain',
-                grainType: grainType,
+                grainType: grainGrainType,
                 qty: remainingQty,
               });
-              this.logger.log(`Final split: Added ${remainingQty} of ${grainType} to bin ${binNum}.`);
+              this.logger.log(`Final split: Added ${remainingQty} of ${grainGrainType} to bin ${binNum}.`);
               remainingQty = 0;
               splitOccurred = true;
             }
           }
-          break; // Exit the loop after processing a matching bin
+          break; // Exit the loop after processing a matching bin grain
         } else {
-          // Skip bins that do not match the grain type
+          // Skip grains that do not match the grain type
           this.logger.log(
-            `Bin ${binNum} does not match grain type ${grainType}. Skipping.`
+            `Grain type ${grainGrainType} in bin ${binNum} does not match grain type ${grainType}. Skipping.`
           );
         }
       }
-
-      if (!splitOccurred) {
-        this.logger.log(
-          `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
-        );
-        // Optionally, handle the remaining quantity here or log a warning
-        // For example, throw an error if grain can't be fully allocated
-        throw new Error(`Unable to allocate all grains for ${grainType}. Remaining quantity: ${remainingQty}`);
-      }
     }
 
-    return splits;
+    if (!splitOccurred) {
+      this.logger.log(
+        `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
+      );
+      // Optionally, handle the remaining quantity here or log a warning
+      // For example, throw an error if grain can't be fully allocated
+      throw new Error(`Unable to allocate all grains for ${grainType}. Remaining quantity: ${remainingQty}`);
+    }
   }
+
+  return splits;
+}
 
   private getEnzymeDosing(enzymeName: string, totalGrainLoadLbs: number, mashBill: string) {
     return this.enzymeDosingService.calculateEnzymeDosing(totalGrainLoadLbs, mashBill, enzymeName);
@@ -227,7 +232,7 @@ export class RecipeGenerator {
     yeastItemNumbersQtys: { [key: string]: number },
     mashingProtocol: any[],
     recipeParameters: any[],
-    binAssignments: { [key: string]: string }
+    binAssignments: BinAssignments
   ): Promise<void> {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
@@ -274,10 +279,10 @@ export class RecipeGenerator {
       step.action === 'Add Grain' && step.grainType === 'PreMalt'
     );
 
-
     this.logger.log(`Grain quantities: ${JSON.stringify(grainQuantities)}`);
     const grainAdditions = mashingProtocol.filter((param) => param.action === 'Add Grain');
     this.logger.log(`Grain additions: ${JSON.stringify(grainAdditions)}`);
+    
     const mashingProtocolWithSplits = this.MASHING_PROTOCOL.reduce((acc: any[], step) => {
       if (step.action === 'Add Grain') {
         const grainType = step.grainType;
@@ -287,7 +292,6 @@ export class RecipeGenerator {
       }
       return [...acc, step];
     }, []);
-    this.logger.log(`Mashing protocol with splits: ${JSON.stringify(mashingProtocolWithSplits)}`);
 
     // Set the enzyme dosing
     const finalizedMashingProtocol: any[] = this.setEnzymeDosing(mashingProtocolWithSplits);
