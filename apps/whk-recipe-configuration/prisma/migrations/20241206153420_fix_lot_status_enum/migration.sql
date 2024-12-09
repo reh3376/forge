@@ -8,7 +8,8 @@
 BEGIN;
 CREATE TYPE "EnumLotStatus_new" AS ENUM ('Started', 'PendingValidation', 'Submitted', 'Complete');
 ALTER TABLE "Lot" ALTER COLUMN "status" DROP DEFAULT;
-UPDATE "Lot" SET "status" = 'Started';
+UPDATE "Lot" SET "status" = 'Started' WHERE "status" = 'Created';
+UPDATE "Lot" SET "status" = 'PendingValidation' WHERE "status" = 'PendingBarrelCount';
 ALTER TABLE "Lot" ALTER COLUMN "status" TYPE "EnumLotStatus_new" USING ("status"::text::"EnumLotStatus_new");
 ALTER TYPE "EnumLotStatus" RENAME TO "EnumLotStatus_old";
 ALTER TYPE "EnumLotStatus_new" RENAME TO "EnumLotStatus";
