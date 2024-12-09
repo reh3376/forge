@@ -1,9 +1,34 @@
-import { EnumRecipeParameterRecipeSetpointType, EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
+import { 
+  EnumRecipeParameterRecipeSetpointType, 
+  EnumEquipmentPhaseName, 
+  EnumEquipmentPhaseStepType, 
+  EnumOperationName, 
+  EnumPhaseParameterSetpointType, 
+  EnumPhaseParameterStaticName, 
+  EnumProductionOrderStatus, 
+  EnumScheduleOrderStatus, 
+  EnumUnitProcedureName, 
+  Item, 
+  Operation, 
+  PhaseParameter, 
+  PrismaClient, 
+  Procedure, 
+  Recipe, 
+  RecipeGroup, 
+  RecipeParameter, 
+  SalesOrder, 
+  UnitProcedure 
+} from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { EnzymeDosingService } from "./enzyme.dosing";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+
+// Define the BinAssignments interface to allow string or string[] values
+interface BinAssignments {
+  [bin: string]: string | string[];
+}
 
 @Injectable()
 export class RecipeGenerator {
@@ -30,6 +55,7 @@ export class RecipeGenerator {
     bin1: 6500,
     bin2: 18100,
     bin3: 1700,
+    // bin4: 2000, // Add more bins if necessary
   };
 
   constructor(
@@ -55,18 +81,20 @@ export class RecipeGenerator {
       Malt: Math.round(totalGrainWeight * maltPercent),
     };
   }
+
   private splitGrainAdditions(
     grainType: string,
     qty: number,
-    binAssignments: { [key: string]: string },
+    binAssignments: BinAssignments,
     grainQuantities: { [key: string]: number },
     hasPreMalt: boolean = false
-  ) {
+  ): any[] {
     this.logger.log(
       `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
         binAssignments
       )}`
     );
+
     const SPLITS_RATIO = 0.8;
     const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
 
@@ -101,43 +129,43 @@ export class RecipeGenerator {
         const numB = parseInt(b.replace('bin', ''), 10);
         return numA - numB;
       })
-      .map(bin => [bin, binAssignments[bin]]);
+      .map(bin => [bin, binAssignments[bin]] as [string, string | string[]]);
 
     while (remainingQty > 0) {
       let splitOccurred = false;
 
-      for (const [binNum, binGrainType] of orderedBins) {
+      for (const [binNum, binGrains] of orderedBins) {
+        const grains = Array.isArray(binGrains) ? binGrains : [binGrains];
         this.logger.log(
-          `Checking bin ${binNum} for ${binGrainType} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
+          `Checking bin ${binNum} for grains ${JSON.stringify(grains)} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
         );
         const maxBinQty = this.MAX_QUANTITIES[binNum];
         this.logger.log(
           `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
         );
 
-        if (grainType === binGrainType) {
-          if (remainingQty > maxBinQty) {
-            this.logger.log(
-              `Match found for bin ${binNum} and grain type ${grainType}. Remaining qty: ${remainingQty}`
-            );
+        for (const binGrainType of grains) {
+          if (grainType === binGrainType) {
+            if (remainingQty > maxBinQty) {
+              this.logger.log(
+                `Match found for bin ${binNum} and grain type ${binGrainType}. Remaining qty: ${remainingQty}`
+              );
 
-            // Calculate the split quantity without exceeding the bin capacity
-            const splitQty = Math.min(Math.round(remainingQty * SPLITS_RATIO), maxBinQty);
+              // Calculate the split quantity without exceeding the bin capacity
+              const splitQty = Math.min(Math.round(remainingQty * SPLITS_RATIO), maxBinQty);
 
-            if (splitQty >= MIN_SPLIT_QTY) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: grainType,
-                qty: splitQty,
-              });
-              remainingQty -= splitQty;
-              this.logger.log(`Added ${splitQty} of ${grainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
-              splitOccurred = true;
-            }
+              if (splitQty >= MIN_SPLIT_QTY) {
+                splits.push({
+                  action: 'Add Grain',
+                  grainType: binGrainType,
+                  qty: splitQty,
+                });
+                remainingQty -= splitQty;
+                this.logger.log(`Added ${splitQty} of ${binGrainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`);
+                splitOccurred = true;
+              }
 
-            // Add Hold action if necessary
-            // if (splitQty < maxBinQty) {
-            // if (splitQty === maxBinQty) {
+              // Add Hold action if necessary
               splits.push({
                 action: 'Hold',
                 holdType: 'Hold',
@@ -145,25 +173,25 @@ export class RecipeGenerator {
               });
               this.logger.log(`Added Hold action for ${splitQty} qty.`);
               splitOccurred = true;
-            // }
-          } else {
-            if (remainingQty >= MIN_SPLIT_QTY) {
-              splits.push({
-                action: 'Add Grain',
-                grainType: grainType,
-                qty: remainingQty,
-              });
-              this.logger.log(`Final split: Added ${remainingQty} of ${grainType} to bin ${binNum}.`);
-              remainingQty = 0;
-              splitOccurred = true;
+            } else {
+              if (remainingQty >= MIN_SPLIT_QTY) {
+                splits.push({
+                  action: 'Add Grain',
+                  grainType: binGrainType,
+                  qty: remainingQty,
+                });
+                this.logger.log(`Final split: Added ${remainingQty} of ${binGrainType} to bin ${binNum}.`);
+                remainingQty = 0;
+                splitOccurred = true;
+              }
             }
+            break; // Exit the loop after processing a matching bin grain
+          } else {
+            // Skip grains that do not match the grain type
+            this.logger.log(
+              `Grain type ${binGrainType} in bin ${binNum} does not match grain type ${grainType}. Skipping.`
+            );
           }
-          break; // Exit the loop after processing a matching bin
-        } else {
-          // Skip bins that do not match the grain type
-          this.logger.log(
-            `Bin ${binNum} does not match grain type ${grainType}. Skipping.`
-          );
         }
       }
 
@@ -227,7 +255,7 @@ export class RecipeGenerator {
     yeastItemNumbersQtys: { [key: string]: number },
     mashingProtocol: any[],
     recipeParameters: any[],
-    binAssignments: { [key: string]: string }
+    binAssignments: BinAssignments // Updated type
   ): Promise<void> {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
@@ -249,7 +277,7 @@ export class RecipeGenerator {
     this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
 
-      console.info("Seeding database with custom seed for Mashing Recipe...");
+    console.info("Seeding database with custom seed for Mashing Recipe...");
 
       // ------------------------------------ BOM CREATION ------------------------------------
     // Base BOM Items
@@ -267,6 +295,12 @@ export class RecipeGenerator {
     const wheatItemId = 'cm0e1ocx0012xl6xv4i696cfh'
     const citricItemId = 'clyd1ofpw0032fd45omeixgvv'
 
+   // --------------------------- Processing Bin Assignments ---------------------------
+    // Validate bin assignments
+    if (!this.validateBinAssignments(binAssignments)) {
+      throw new Error('Invalid bin assignments');
+    }
+
     // Process the mashing protocol to get the quantities of each grain type and to split the additions if necessary
     const grainQuantities: any = this.calculateGrainQuantities(this.MASH_BILL, this.TOTAL_GRAIN_WEIGHT);
 
@@ -274,10 +308,10 @@ export class RecipeGenerator {
       step.action === 'Add Grain' && step.grainType === 'PreMalt'
     );
 
-
     this.logger.log(`Grain quantities: ${JSON.stringify(grainQuantities)}`);
     const grainAdditions = mashingProtocol.filter((param) => param.action === 'Add Grain');
     this.logger.log(`Grain additions: ${JSON.stringify(grainAdditions)}`);
+    
     const mashingProtocolWithSplits = this.MASHING_PROTOCOL.reduce((acc: any[], step) => {
       if (step.action === 'Add Grain') {
         const grainType = step.grainType;
@@ -287,12 +321,12 @@ export class RecipeGenerator {
       }
       return [...acc, step];
     }, []);
+    
     this.logger.log(`Mashing protocol with splits: ${JSON.stringify(mashingProtocolWithSplits)}`);
 
     // Set the enzyme dosing
     const finalizedMashingProtocol: any[] = this.setEnzymeDosing(mashingProtocolWithSplits);
     this.logger.log(`Finalized mashing protocol: ${JSON.stringify(finalizedMashingProtocol)}`);
-
 
     const client = new PrismaClient();
     console.log("Creating recipe...");
@@ -1356,5 +1390,39 @@ export class RecipeGenerator {
 
     // Close the Prisma client connection
     await client.$disconnect();
+  }
+
+  private validateBinAssignments(binAssignments: BinAssignments): boolean {
+    const allowedBins = ['bin1', 'bin2', 'bin3']; // Update as needed
+    for (const [bin, grains] of Object.entries(binAssignments)) {
+      if (!allowedBins.includes(bin)) {
+        this.logger.error(`Invalid bin: ${bin}`);
+        return false;
+      }
+      if (typeof grains === 'string') {
+        // Single grain validation
+        if (!this.isValidGrain(grains)) {
+          this.logger.error(`Invalid grain: ${grains} in ${bin}`);
+          return false;
+        }
+      } else if (Array.isArray(grains)) {
+        // Multiple grains validation
+        for (const grain of grains) {
+          if (!this.isValidGrain(grain)) {
+            this.logger.error(`Invalid grain: ${grain} in ${bin}`);
+            return false;
+          }
+        }
+      } else {
+        this.logger.error(`Invalid grain type in ${bin}`);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private isValidGrain(grain: string): boolean {
+    const validGrains = ['Rye', 'Corn', 'Malt', 'Wheat', 'Barley', 'Oats']; // Extend as needed
+    return validGrains.includes(grain);
   }
 }
