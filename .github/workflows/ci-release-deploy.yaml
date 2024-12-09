@@ -1,93 +1,104 @@
-# #
-# name: Deploy to Production
+name: Deploy to Production
 
-# # Configures this workflow to run every time a change is pushed to the branch called `release`.
-# on:
-#   push:
-#     tags:
-#       - "v**"
+on:
+  push:
+    tags:
+      - "v**"
 
-# # Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
-# env:
-#   REGISTRY: ghcr.io
-#   IMAGE_NAME: ${{ github.repository }}
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  HOME: C:\Windows\ServiceProfiles\NetworkService
 
-# # There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
-# jobs:
-#   deploy:
-#     runs-on: [self-hosted, windows] # This should point to the self-hosted runner on Server A
-#     environment: Production
+jobs:
+  deploy:
+    runs-on: [self-hosted, windows]
+    environment: Production
 
-#     steps:
-#       - name: Checkout Code
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          git_config: |
+            core.autocrlf=false
 
-#       - name: Set up environment variables
-#         run: |
-#           echo "Setting up environment variables"
-#         env:
-#           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-#           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
-#           SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      - name: Convert deploy.sh to Unix Line Endings Without BOM
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
+        run: |
+          $deployScriptPath = 'deploy.sh'
+          $content = Get-Content $deployScriptPath -Raw
+          $content = $content -replace "`r`n", "`n"
+          $utf8NoBom = New-Object System.Text.UTF8Encoding($False)
+          [System.IO.File]::WriteAllText($deployScriptPath, $content, $utf8NoBom)
 
-#       - name: Decrypt the .env file from dotenv-vault
-#         run: |
-#           echo "Decrypting .env file"
-#           npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
-#         working-directory: ./apps/whk-mes
-#         env:
-#           # TODO: Change this to the production key
-#           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+      - name: Set up environment variables
+        run: |
+          echo "Setting up environment variables"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-#       - name: Print .env file
-#         run: cat ./apps/whk-mes/.env
+      - name: Decrypt the .env file from dotenv-vault
+        run: |
+          echo "Decrypting .env file"
+          npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        env:
+          DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
-#       - name: Create directory on remote server
-#         run: |
-#           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "mkdir -p /usr/local/src/repos/whk-mes-deploy"
+      - name: Verify .env File Exists
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
+        run: |
+          if (Test-Path .env) {
+            Write-Output ".env file exists."
+          } else {
+            Write-Error ".env file is missing."
+            exit 1
+          }
 
-#       - name: Copy code to remote server
-#         run: |
-#           scp -r .\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+      - name: Copy Project Files to Remote Server
+        shell: powershell
+        run: |
+          scp -r -i "~\.ssh\ldkrvm01" C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-#       - name: SSH and set up remote server
-#         run: |
-#           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-#             cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && npm install && npm run build"
+      - name: Copy .env to Remote Server
+        shell: powershell
+        run: |
+          scp -v -i "~\.ssh\ldkrvm01" C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-#       - name: Deploy using PM2
-#         # run: |
-#         #   ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes && pm2 deploy ecosystem.config.js production"
-#         run: |
-#           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-#             cd /usr/local/src/repos/whk-mes-deploy/apps/whk-mes &&
-#             pm2 reload ecosystem.config.js --env production
-#           "
-#         env:
-#           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-#           SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      - name: Verify Files on Remote Server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "ls -la /usr/local/src/repos/whk-mes-deploy"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
-#   deploy-db:
-#     runs-on: [self-hosted, windows]
-#     environment: Production
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v3
-#       - name: Setup Node
-#         uses: actions/setup-node@v3
-#       - name: Install dependencies
-#         run: npm install
-#         working-directory: ./apps/whk-mes
-#       - name: Decrypt the .env file from dotenv-vault
-#         run: |
-#           echo "Decrypting .env file"
-#           npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
-#         working-directory: ./apps/whk-mes
-#         env:
-#           # TODO: Change this to the production key
-#           DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
-#       - name: Apply all pending migrations to the database
-#         run: npx prisma migrate deploy
-#         working-directory: ./apps/whk-mes
-#         env:
-#           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Set Permissions for .env
+        run: |
+          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "chmod 600 /usr/local/src/repos/whk-mes-deploy/.env"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Run deploy script
+        run: |
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && chmod +x deploy.sh && ./deploy.sh"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Run Prisma migrations on remote server
+        run: |
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && npx prisma migrate deploy"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
