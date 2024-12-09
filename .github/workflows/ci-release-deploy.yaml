@@ -27,7 +27,7 @@ jobs:
 
       - name: Convert deploy.sh to Unix Line Endings Without BOM
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: pwsh
+        shell: powershell
         run: |
           $deployScriptPath = 'deploy.sh'
           $content = Get-Content $deployScriptPath -Raw
@@ -53,7 +53,7 @@ jobs:
 
       - name: Verify .env File Exists
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: pwsh
+        shell: powershell
         run: |
           if (Test-Path .env) {
             Write-Output ".env file exists."
@@ -64,7 +64,7 @@ jobs:
 
       - name: Archive Project Files Including .env
         working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
-        shell: pwsh
+        shell: powershell
         run: |
           # Compress all regular and hidden files into deploy.zip
           Compress-Archive -Path *,'.[^.]*' -DestinationPath deploy.zip -Force
@@ -102,7 +102,7 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Copy Archive to Remote Server
-        shell: pwsh
+        shell: powershell
         run: |
           scp -v -i "$env:USERPROFILE\.ssh\ldkrvm01" deploy.zip ${SERVER_USERNAME}@${SERVER_HOST}:/usr/local/src/repos/whk-mes-deploy
         env:
