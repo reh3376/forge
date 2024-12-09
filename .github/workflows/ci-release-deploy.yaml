@@ -124,9 +124,7 @@ jobs:
         run: |
           ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
             cd /usr/local/src/repos/whk-mes-deploy &&
-            unzip -o deploy.zip -d ./deploy > unzip_output.log 2>&1 &&
-            cat unzip_output.log &&
-            ls -la ./deploy
+            unzip -o deploy.zip -d ./deploy > unzip_output.log 2>&1
           "
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
