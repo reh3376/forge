@@ -1057,7 +1057,7 @@ export class RecipeGenerator {
           }
         }));        
       } else {
-        console.log(`Phase parameter ${param.name} already exists, skipping.`);
+        console.log(`Recipe parameter ${param.name} already exists, skipping.`);
       }
     }
 
@@ -1104,9 +1104,9 @@ export class RecipeGenerator {
           item: {
             connect: { id: (item as Item).id }
           },
-          // parameters: {
-          //   connect: newParams.map(param => ({ id: param.id }))
-          // },
+          parameters: {
+            connect: newParams.map(param => ({ id: param.id }))
+          },
           customerCode: this.CUSTOMER_CODE
         },
         include: {
