@@ -293,7 +293,14 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
         });
     }
 
-    async createAndQueueScheduleOrder(productionOrderId: string, startDate: Date, endDate: Date, bblPerFerm: number, yieldPgPerBsh: number, pgsPerBbl: number): Promise<ScheduleOrderQueue> {
+    async createAndQueueScheduleOrder(
+        productionOrderId: string,
+        startDate?: Date,
+        endDate?: Date,
+        bblPerFerm?: number,
+        yieldPgPerBsh?: number,
+        pgsPerBbl?: number
+    ): Promise<ScheduleOrderQueue> {
         return await this.prisma.$transaction(async (prisma) => {
             // Find the production order
             const productionOrder = await prisma.productionOrder.findUnique({
@@ -308,15 +315,16 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
             }
 
             try {
+                const updateData: any = {};
+                if (startDate) updateData.startDate = startDate;
+                if (endDate) updateData.endDate = endDate;
+                if (bblPerFerm) updateData.estimatedBarrelsPerFermenter = bblPerFerm;
+                if (yieldPgPerBsh) updateData.estimatedPGsPerBushel = yieldPgPerBsh;
+                if (pgsPerBbl) updateData.estimatedPGsPerBbl = pgsPerBbl;
+
                 await prisma.productionOrder.update({
                     where: { id: productionOrderId },
-                    data: {
-                        startDate: startDate,
-                        endDate: endDate,
-                        estimatedBarrelsPerFermenter: bblPerFerm,
-                        estimatedPGsPerBushel: yieldPgPerBsh,
-                        estimatedPGsPerBbl: pgsPerBbl,
-                    }
+                    data: updateData
                 });
             } catch (error) {
                 this.logger.error(`Failed to update production order ${productionOrderId}: ${error}`);
