@@ -145,18 +145,14 @@ jobs:
 
       - name: Verify Files on Remote Server
         run: |
-          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            ls -la /usr/local/src/repos/whk-mes-deploy
-          "
+          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "ls -la /usr/local/src/repos/whk-mes-deploy"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Set Permissions for .env
         run: |
-          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            chmod 600 /usr/local/src/repos/whk-mes-deploy/.env
-          "
+          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "chmod 600 /usr/local/src/repos/whk-mes-deploy/.env"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
