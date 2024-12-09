@@ -7,6 +7,9 @@
      echo "npm install failed!"
      exit 1
    fi
+
+   # Load environment variables from .env
+   export $(grep -v '^#' .env | xargs)
    
    echo "Compilng Prisma Client..."
    npx prisma generate
@@ -48,5 +51,8 @@
      echo "Waiting for 30 seconds before next reload..."
      sleep 30 # Adjust delay as needed
    done
+
+   # Run Prisma Migrations
+   npm run db:prod:migrate-deploy
 
    echo "All instances reloaded successfully."
