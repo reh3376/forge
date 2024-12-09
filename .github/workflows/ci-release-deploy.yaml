@@ -94,6 +94,7 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Copy Archive to Remote Server
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
         shell: powershell
         run: |
           scp -v -i "~\.ssh\ldkrvm01" deploy.zip ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
