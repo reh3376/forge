@@ -1,10 +1,21 @@
    #!/bin/bash
 
+   # Exit immediately if a command exits with a non-zero status
+   set -e
+
    # Install dependencies and build the project
    echo "Installing dependencies..."
    npm install
    if [ $? -ne 0 ]; then
      echo "npm install failed!"
+     exit 1
+   fi
+
+   # Convert .env file to Unix line endings
+   echo "Converting .env to Unix line endings..."
+   dos2unix .env
+   if [ $? -ne 0 ]; then
+     echo "dos2unix conversion failed!"
      exit 1
    fi
 
