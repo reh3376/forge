@@ -88,15 +88,7 @@ jobs:
 
       - name: Install unzip on Remote Server
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            if ! command -v unzip &> /dev/null
-            then
-              echo 'unzip could not be found, installing...'
-              sudo apt-get update && sudo apt-get install unzip -y
-            else
-              echo 'unzip is already installed.'
-            fi
-          "
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "if ! command -v unzip &> /dev/null then echo 'unzip could not be found, installing...' && sudo apt-get update && sudo apt-get install unzip -y else echo 'unzip is already installed.' fi"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -125,12 +117,7 @@ jobs:
 
       - name: Unzip Archive on Remote Server with Detailed Logging
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            cd /usr/local/src/repos/whk-mes-deploy &&
-            unzip -v -o deploy.zip -d ./deploy > unzip_output.log 2>&1 &&
-            cat unzip_output.log &&
-            ls -la ./deploy
-          "
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip -v -o deploy.zip -d ./deploy > unzip_output.log 2>&1 && cat unzip_output.log && ls -la ./deploy"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
