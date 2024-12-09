@@ -122,31 +122,21 @@ jobs:
 
       - name: Unzip Archive on Remote Server with Detailed Logging
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            cd /usr/local/src/repos/whk-mes-deploy &&
-            unzip -o deploy.zip -d ./deploy > unzip_output.log 2>&1
-          "
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && unzip -o deploy.zip -d ./deploy > unzip_output.log 2>&1"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Run deploy script
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            cd /usr/local/src/repos/whk-mes-deploy &&
-            chmod +x deploy.sh &&
-            ./deploy.sh
-          "
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && chmod +x deploy.sh && ./deploy.sh"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Run Prisma migrations on remote server
         run: |
-          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
-            cd /usr/local/src/repos/whk-mes-deploy/apps/whk-recipe-configuration &&
-            npx prisma migrate deploy
-          "
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy/apps/whk-recipe-configuration && npx prisma migrate deploy"
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
