@@ -64,6 +64,7 @@ model TestParameter {
   itemReceiptId            String?
   name                     String
   purchaseOrder            PurchaseOrder[]
+  required                 Boolean?                           @default(true)
   schemaVersion            String?
   testDetails              String?
   testParamRevision        String?

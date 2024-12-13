@@ -138,6 +138,17 @@ class TestParameterOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  required?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   schemaVersion?: SortOrder;
 
   @ApiProperty({
