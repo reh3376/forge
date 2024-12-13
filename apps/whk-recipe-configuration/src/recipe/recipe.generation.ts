@@ -143,8 +143,10 @@ export class RecipeGenerator {
         this.logger.log(
           `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
         );
-
+        const numGrainsInBin = grains.length;
+        this.logger.log(`Number of grains in bin ${binNum}: ${numGrainsInBin}`);
         for (const binGrainType of grains) {
+          this.logger.log(`Grain type in bin ${binNum}: ${binGrainType}, grain type: ${grainType}`);
           if (grainType === binGrainType) {
             if (remainingQty > maxBinQty) {
               this.logger.log(
@@ -1102,9 +1104,9 @@ export class RecipeGenerator {
           item: {
             connect: { id: (item as Item).id }
           },
-          // parameters: {
-          //   connect: newParams.map(param => ({ id: param.id }))
-          // },
+          parameters: {
+            connect: newParams.map(param => ({ id: param.id }))
+          },
           customerCode: this.CUSTOMER_CODE
         },
         include: {
@@ -1422,7 +1424,7 @@ export class RecipeGenerator {
   }
 
   private isValidGrain(grain: string): boolean {
-    const validGrains = ['Rye', 'Corn', 'Malt', 'Wheat', 'Barley', 'Oats']; // Extend as needed
+    const validGrains = ['Rye', 'Corn', 'Malt', 'Wheat']; // Extend as needed
     return validGrains.includes(grain);
   }
 }

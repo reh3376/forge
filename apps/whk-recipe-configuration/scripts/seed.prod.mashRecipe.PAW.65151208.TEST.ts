@@ -12,8 +12,8 @@ const WATER_QTY = 3900;
 const BACKSET_QTY = 3600;
 
 const BIN_ASSIGNMENTS = {
-  bin1: 'Rye',
-  bin2: ['Corn','Wheat'],
+  bin1: ['Rye','Wheat'],
+  bin2: 'Corn',
   bin3: 'Malt',
 };
 
