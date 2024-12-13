@@ -17,4 +17,28 @@ export class ProductionOrderResolver extends ProductionOrderResolverBase {
   ) {
     super(service, rolesBuilder);
   }
+
+  @graphql.Query(() => [ProductionOrder])
+  async getUnlinkedPendingProductionOrders() {
+    return this.service.productionOrders({
+      where: {
+        AND: [
+          {
+            scheduleOrder: {
+              scheduleOrderQueues: null,
+              status: {
+                equals: "Scheduled"
+              }
+            }
+          },
+          {
+            status: { equals: "Initiated" }
+          }
+        ]
+      },
+      include: {
+        scheduleOrder: true
+      }
+    });
+  }
 }

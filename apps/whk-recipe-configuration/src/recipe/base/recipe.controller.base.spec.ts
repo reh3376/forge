@@ -14,6 +14,9 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { RecipeController } from "../recipe.controller";
 import { RecipeService } from "../recipe.service";
+import { RecipeCookCreationService } from "../recipe.cookcreation.service";
+import { RabbitMQProducerService } from "../../rabbitmq/rabbitmq.producer.service";
+import { RecipeGenerator } from "../recipe.generation";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -88,6 +91,36 @@ const FIND_ONE_RESULT = {
   updatedBy: "exampleUpdatedBy",
 };
 
+const recipeCreationService = {
+  createNewRecipe() {
+    return CREATE_RESULT;
+  },
+  recipes: () => FIND_MANY_RESULT,
+  recipe: ({ where }: { where: { id: string } }) => {
+    switch (where.id) {
+      case existingId:
+        return FIND_ONE_RESULT;
+      case nonExistingId:
+        return null;
+    }
+  },
+};
+
+const recipeCookCreationService = {
+  createNewCook() {
+    return CREATE_RESULT;
+  },
+  recipes: () => FIND_MANY_RESULT,
+  recipe: ({ where }: { where: { id: string } }) => {
+    switch (where.id) {
+      case existingId:
+        return FIND_ONE_RESULT;
+      case nonExistingId:
+        return null;
+    }
+  },
+};
+
 const service = {
   createRecipe() {
     return CREATE_RESULT;
@@ -135,6 +168,15 @@ const aclValidateRequestInterceptor = {
   },
 };
 
+const recipeGenerator = {
+  constructorParams: {}, // Store all constructor parameters
+  init(params: any) {
+    this.constructorParams = params;
+  },
+  createRecipeData() {
+  }
+};
+
 describe("Recipe", () => {
   let app: INestApplication;
 
@@ -145,6 +187,20 @@ describe("Recipe", () => {
           provide: RecipeService,
           useValue: service,
         },
+        {
+          provide: RecipeCookCreationService,
+          useValue: recipeCookCreationService,
+        },
+        {
+          provide: RabbitMQProducerService,
+          useValue: {
+            // Mock implementation of RabbitMQProducerService methods
+          },
+        },
+        {
+          provide: RecipeGenerator,
+          useValue: recipeGenerator
+        }
       ],
       controllers: [RecipeController],
       imports: [ACLModule],

@@ -1,0 +1,104 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - "v**"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  HOME: C:\Windows\ServiceProfiles\NetworkService
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, windows]
+    environment: Production
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          git_config: |
+            core.autocrlf=false
+
+      - name: Convert deploy.sh to Unix Line Endings Without BOM
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
+        run: |
+          $deployScriptPath = 'deploy.sh'
+          $content = Get-Content $deployScriptPath -Raw
+          $content = $content -replace "`r`n", "`n"
+          $utf8NoBom = New-Object System.Text.UTF8Encoding($False)
+          [System.IO.File]::WriteAllText($deployScriptPath, $content, $utf8NoBom)
+
+      - name: Set up environment variables
+        run: |
+          echo "Setting up environment variables"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Decrypt the .env file from dotenv-vault
+        run: |
+          echo "Decrypting .env file"
+          npx dotenv-vault@latest decrypt ${{ secrets.DOTENV_KEY }} > .env
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        env:
+          DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+
+      - name: Verify .env File Exists
+        working-directory: C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration
+        shell: powershell
+        run: |
+          if (Test-Path .env) {
+            Write-Output ".env file exists."
+          } else {
+            Write-Error ".env file is missing."
+            exit 1
+          }
+
+      - name: Copy Project Files to Remote Server
+        shell: powershell
+        run: |
+          scp -r -i "~\.ssh\ldkrvm01" C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Copy .env to Remote Server
+        shell: powershell
+        run: |
+          scp -v -i "~\.ssh\ldkrvm01" C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Verify Files on Remote Server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "ls -la /usr/local/src/repos/whk-mes-deploy"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Set Permissions for .env
+        run: |
+          ssh -o StrictHostKeyChecking=no -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "chmod 600 /usr/local/src/repos/whk-mes-deploy/.env"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Run deploy script
+        run: |
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && chmod +x deploy.sh && ./deploy.sh"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+
+      - name: Run Prisma migrations on remote server
+        run: |
+          ssh -i "~\.ssh\ldkrvm01" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cd /usr/local/src/repos/whk-mes-deploy && npx prisma migrate deploy"
+        env:
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}

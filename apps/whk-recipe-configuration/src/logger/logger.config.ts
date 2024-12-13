@@ -1,16 +1,17 @@
 import { ConfigService } from "@nestjs/config";
-import { Params } from "nestjs-pino";
+import { WinstonModuleOptions } from "nest-winston";
+import * as winston from "winston";
 
-const ADDITIONAL_LOG_PROPERTIES = {};;
+const ADDITIONAL_LOG_PROPERTIES = {};
 
-export const LoggerConfiguration = (configService: ConfigService): Params => {
+export const LoggerConfiguration = (configService: ConfigService): WinstonModuleOptions => {
   const logLevel = configService.getOrThrow("LOG_LEVEL");
   const serviceName = configService.getOrThrow("SERVICE_NAME") ?? "";
   const sensitiveKeys = configService.get("SENSITIVE_KEYS")?.split(",") ?? [];
   const logRequest = configService.get("LOG_REQUEST") === "true";
-  const pinoPretty = configService.get("PINO_PRETTY") === "true";
+  const prettyPrint = configService.get("PRETTY_PRINT") === "true";
 
-  const allowedLevels = ["fatal", "error", "warn", "info", "debug", "trace"];
+  const allowedLevels = ["error", "warn", "info", "http", "verbose", "debug", "silly"];
 
   if (!allowedLevels.includes(logLevel)) {
     throw new Error(
@@ -18,24 +19,23 @@ export const LoggerConfiguration = (configService: ConfigService): Params => {
     );
   }
 
+  const format = prettyPrint
+    ? winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    : winston.format.json();
+
   return {
-    pinoHttp: {
-      level: logLevel,
-      transport: pinoPretty
-        ? {
-            target: "pino-pretty",
-            options: {
-              colorize: true,
-              ignore: "pid,hostname",
-            },
-          }
-        : undefined,
-      redact: {
-        paths: logRequest ? sensitiveKeys : ["req", "res"],
-        remove: logRequest ? false : true,
-        censor: "********",
-      },
-      mixin: () => ({ ...ADDITIONAL_LOG_PROPERTIES, serviceName }),
-    },
+    level: logLevel,
+    format: winston.format.combine(
+      winston.format((info) => {
+        info.serviceName = serviceName;
+        return info;
+      })(),
+      format
+    ),
+    transports: [new winston.transports.Console()],
+    // Add custom Winston options here if needed for New Relic integration
   };
 };

@@ -23,49 +23,12 @@ import {
   IsDate,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { Type } from "class-transformer";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 
 @InputType()
 class FermentationSettingDatumUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  acid?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(100)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  balling?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(1000)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  dryInches?: Decimal | null;
-
   @ApiProperty({
     required: false,
     type: () => FermentationChemistryWhereUniqueInput,
@@ -128,18 +91,6 @@ class FermentationSettingDatumUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
   })
   @IsDate()
   @Type(() => Date)
@@ -159,7 +110,7 @@ class FermentationSettingDatumUpdateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  temperature?: Decimal;
+  temperature?: number;
 
   @ApiProperty({
     required: false,
@@ -170,7 +121,43 @@ class FermentationSettingDatumUpdateInput {
   @Field(() => Date, {
     nullable: true,
   })
-  yeastPitchTime?: Date;
+  dryInches?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(100)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  balling?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  acid?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  pH?: number | null;
 }
 
 export { FermentationSettingDatumUpdateInput as FermentationSettingDatumUpdateInput };

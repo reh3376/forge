@@ -50,37 +50,66 @@ model PhaseParameter {
 
 model TestParameter {
   active                   Boolean                            @default(true)
+  schemaVersion            String?
+  testSetpointValue        Float?
+  testParamUnits           String
+  testSetpointUpperLimit   Float?
+  testParamRevision        String?
+  testSetpointLowerLimit   Float?
+  testResult               Float?
+  testPass                 Boolean?                           @default(false)
+  testSetpointBooleanValue Boolean?
+  testedAt                 DateTime?
+  createdBy                String
+  testSetpointType         EnumTestParameterTestSetpointType?
+  testedBy                 String?
+  tooltip                  String?
+  name                     String
+  updatedAt                DateTime?                          @updatedAt
+  updatedBy                String?
+  testDetails              String?
+  equipmentPhases          EquipmentPhase[]
+  isClassDef               Boolean?                           @default(false)
   classId                  TestParameter?                     @relation(name: "TestParameterClassIdTestParameterInstances", fields: [classIdId], references: [id])
   classIdId                String?
   createdAt                DateTime                           @default(now())
-  createdBy                String
   description              String?
-  equipmentPhases          EquipmentPhase[]
   globalId                 String?                            @default(cuid())
   id                       String                             @id @default(cuid())
   instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
-  isClassDef               Boolean?                           @default(false)
   itemReceipt              ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
   itemReceiptId            String?
-  name                     String
+  // PurchaseOrder            PurchaseOrder?                     @relation(fields: [purchaseOrderId], references: [id])
+  // purchaseOrderId          String?
   purchaseOrder            PurchaseOrder[]
   required                 Boolean?                           @default(true)
-  schemaVersion            String?
-  testDetails              String?
-  testParamRevision        String?
-  testParamUnits           String
-  testPass                 Boolean?
-  testResult               Decimal?
-  testSetpointBooleanValue Boolean?                           @default(true)
-  testSetpointLowerLimit   Float?
-  testSetpointType         EnumTestParameterTestSetpointType?
-  testSetpointUpperLimit   Float?
-  testSetpointValue        Float?
-  testedAt                 DateTime?
-  testedBy                 String?
-  tooltip                  String?
-  updatedAt                DateTime?                          @updatedAt
-  updatedBy                String?
+}
+
+model RecipeParameter {
+  recipeSetpointType         EnumRecipeParameterRecipeSetpointType
+  revision                   Int?                                  @default(0)
+  recipeSetpointUpperLimit   Float?
+  recipeParamName            String
+  className                  String
+  active                     Boolean                               @default(true)
+  createdBy                  String
+  recipeSetpointLowerLimit   Float?
+  updatedAt                  DateTime?                             @updatedAt
+  id                         String                                @id @default(cuid())
+  recipeParamDescription     String?
+  updatedBy                  String?
+  recipeSetpointBooleanValue Boolean?                              @default(true)
+  createdAt                  DateTime                              @default(now())
+  recipeParamUnits           String?
+  schemaVersion              String?                               @default("0001-alpha")
+  isClassDefinition          Boolean?                              @default(false)
+  classId                    RecipeParameter?                      @relation(name: "RecipeParameterClassIdRecipeParameterInstances", fields: [classIdId], references: [id])
+  classIdId                  String?
+  instances                  RecipeParameter[]                     @relation(name: "RecipeParameterClassIdRecipeParameterInstances")
+  globalId                   String?                               @default(cuid())
+  recipeNumericalSetpoint    Float?
+  recipe                     Recipe[]
+  description                String?
 }
 
 model Instruction {
@@ -192,7 +221,7 @@ model Recipe {
   customer                       Customer                        @relation(fields: [customerId], references: [id])
   customerId                     String
   customerCode                   String?
-  estimatedAbv                   Decimal?
+  estimatedAbv                   Float?
   globalId                       String?                         @unique @default(cuid())
   id                             String                          @id @default(cuid())
   instances                      Recipe[]                        @relation(name: "RecipeClassIdRecipeInstances")
@@ -202,6 +231,7 @@ model Recipe {
   lots                           Lot[]
   mashingProtocol                MashingProtocol?                @relation(fields: [mashingProtocolId], references: [id])
   mashingProtocolId              String?
+  parameters                     RecipeParameter[]
   productionOrderRecipeInstances ProductionOrderRecipeInstance[]
   productionOrders               ProductionOrder[]
   recipeBoms                     RecipeBom[]
@@ -210,7 +240,9 @@ model Recipe {
   revision                       Int?                            @default(0)
   scheduleOrders                 ScheduleOrder[]
   schemaVersion                  String?                         @default("0001-b")
-  targetProof                    Decimal?
+  targetProof                    Float?
+  totalCooks                     Int?
+  totalFermenters                Int?
   unitProcedures                 UnitProcedure[]
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
@@ -308,50 +340,51 @@ model RecipeGroup {
 
 model ProductionOrder {
   batches                        Batch[]
+  id                             String                          @id @default(cuid())
+  createdAt                      DateTime                        @default(now())
+  updatedAt                      DateTime                        @updatedAt
   bom                            Bom                             @relation(fields: [bomId], references: [id])
   bomId                          String
   className                      String?
   complete                       Boolean?                        @default(false)
-  completedCooks                 Int?
-  completedFermenters            Int?
-  completedQuantity              Decimal?
-  createdAt                      DateTime                        @default(now())
   createdBy                      String
-  customer                       Customer                        @relation(fields: [customerId], references: [id])
-  customerId                     String
-  customerCode                   String?
-  endDate                        DateTime?
   estimatedBarrelsPerFermenter   Float?
   estimatedPGsPerBbl             Float?
   estimatedPGsPerBushel          Float?
-  fermentationChemistries        FermentationChemistry[]
-  fermentationDayData            FermentationDayDatum[]
-  globalId                       String?                         @default(cuid())
-  id                             String                          @id @default(cuid())
   inProcess                      Boolean?                        @default(false)
+  updatedBy                      DateTime?
   item                           Item                            @relation(fields: [fgItemId], references: [id])
   fgItemId                       String
-  lots                           Lot[]
-  name                           String?                         @unique
-  plannedCooks                   Int?
-  plannedFermenters              Int?
-  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
-  quantity                       Int?
   recipe                         Recipe?                         @relation(fields: [recipeId], references: [id])
   recipeId                       String?
   recipeGroup                    RecipeGroup?                    @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                  String?
-  salesOrder                     SalesOrder?                     @relation(fields: [salesOrderId], references: [id])
-  salesOrderId                   String?                         @unique
-  scheduleOrder                  ScheduleOrder?                  @relation(fields: [scheduleOrderId], references: [id])
-  scheduleOrderId                String?
+  customer                       Customer                        @relation(fields: [customerId], references: [id])
+  customerId                     String
   scheduled                      Boolean?                        @default(false)
   schemaVersion                  String?                         @default("0001-alpha")
   startDate                      DateTime?                       @default(now())
+  endDate                        DateTime?
   status                         EnumProductionOrderStatus?      @default(Initiated)
+  scheduleOrder                  ScheduleOrder?                  @relation(fields: [scheduleOrderId], references: [id])
+  scheduleOrderId                String?
+  // salesOrder                    SalesOrder                      @relation(fields: [salesOrderId], references: [id])
+  // salesOrderId                  String                          @unique
+  globalId                       String?                         @default(cuid())
+  // productionOrderUnitProcedures ProductionOrderUnitProcedure[]
+  fermentationChemistries        FermentationChemistry[]
+  fermentationDayData            FermentationDayDatum[]
+  lots                           Lot[]
+  customerCode                   String?
   units                          String?
-  updatedAt                      DateTime                        @updatedAt
-  updatedBy                      DateTime?
+  quantity                       Int?
+  name                           String?                         @unique
+  totalFermenters                Int?
+  totalCooks                     Int?
+  executedCooks                  Int?
+  executedFermenters             Int?
+  productionOrderRecipeInstances ProductionOrderRecipeInstance[]
+  SalesOrder                     SalesOrder[]
 }
 
 model ScheduleOrder {
@@ -360,7 +393,7 @@ model ScheduleOrder {
   createdAt                    DateTime                 @default(now())
   createdBy                    String?
   customers                    Json?
-  duration                     Decimal?
+  duration                     Float?
   durationUnits                String?                  @default("Hours")
   estimatedDistillationTime    Int?
   estimatedEnd                 DateTime?
@@ -377,7 +410,7 @@ model ScheduleOrder {
   recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
   recipeGroupId                String
   recipeName                   String
-  scheduleOrderQueues          ScheduleOrderQueue?
+  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
   scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
   scheduleOrderRecipeId        String?
   status                       EnumScheduleOrderStatus? @default(Created)
@@ -385,6 +418,7 @@ model ScheduleOrder {
   totalProofGallons            Int?
   updatedAt                    DateTime                 @updatedAt
   updatedBy                    String?
+  scheduleOrderQueueId         String?                  @unique
 }
 
 model Item {
@@ -504,13 +538,14 @@ model SalesOrder {
   lineItems         Json?
   name              String?          @unique
   orderType         String?
-  productionOrders  ProductionOrder?
+  productionOrders  ProductionOrder? @relation(fields: [productionOrderId], references: [id])
   quantity          Int
   requestedShipDate DateTime?
   revision          Int              @default(0)
   schemaVersion     String?          @default("0001-alpha")
   updatedAt         DateTime         @updatedAt
   updatedBy         String?
+  productionOrderId String?
 }
 
 model Test {
@@ -557,6 +592,7 @@ model Asset {
   status                  EnumAssetStatus?        @default(InService)
   updatedAt               DateTime                @updatedAt
   updatedBy               String?
+  MashDatum               MashDatum[]
 
   @@unique([name, revision])
 }
@@ -574,7 +610,7 @@ model ItemReceipt {
   lots            Json?
   purchaseOrder   PurchaseOrder?         @relation(fields: [purchaseOrderId], references: [id])
   purchaseOrderId String?
-  quantity        Decimal
+  quantity        Float
   schemaVersion   String?                @default("0001-b")
   status          EnumItemReceiptStatus? @default(InProgress)
   supplierLot     String?
@@ -585,8 +621,11 @@ model ItemReceipt {
   units           String
   updatedAt       DateTime               @updatedAt
   updatedBy       String?
-  weighIn         Decimal?
-  weighOut        Decimal?
+  weighIn         Float?
+  weighOut        Float?
+  siloNumber      Int?
+  // asset           Asset?                 @relation(fields: [assetId], references: [id])
+  // assetId         String?
 }
 
 model Lot {
@@ -635,7 +674,7 @@ model Lot {
   recipeId                    String?
   schemaVersion               String?             @default("0001-b")
   standardYield               Float?
-  status                      EnumLotStatus?      @default(Created)
+  status                      EnumLotStatus?      @default(Started)
   totalFermenters             Float?
   totalPGs                    Float?
   totalPGsByRecipe            Float?
@@ -698,13 +737,36 @@ model FermentationChemistry {
   settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
   settingDataId     String?                   @unique
   updatedAt         DateTime                  @updatedAt
+  MashDatum         MashDatum[]
+}
+
+model MashDatum {
+  id                      String                 @id @default(cuid())
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  lotId                   String
+  balling                 Float
+  pH                      Float
+  backSetPH               Float
+  backsetVolume           Float?
+  waterVolume             Float
+  cornLbs                 Float?
+  ryeLbs                  Float?
+  maltLbs                 Float?
+  wheatLbs                Float?
+  loggedBy                String
+  asset                   Asset?                 @relation(fields: [assetId], references: [id])
+  assetId                 String?
+  fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
+  fermentationChemistryId String?
+  fermenterNumber         Int
 }
 
 model FermentationSettingDatum {
-  acid                    Decimal?
-  balling                 Decimal?
+  acid                    Float?
+  balling                 Float?
   createdAt               DateTime               @default(now())
-  dryInches               Decimal?
+  dryInches               Float?
   fermentationChemistries FermentationChemistry?
   fermenterNumber         Int
   id                      String                 @id @default(cuid())
@@ -712,34 +774,34 @@ model FermentationSettingDatum {
   lotId                   String
   operation               Operation?             @relation(fields: [operationId], references: [id])
   operationId             String?
-  pH                      Decimal?
+  pH                      Float?
   setTime                 DateTime
-  temperature             Decimal
+  temperature             Float
   updatedAt               DateTime               @updatedAt
   yeastPitchTime          DateTime
 }
 
 model FermentationDayDatum {
-  acid                    Decimal
-  asset                   Asset?                       @relation(fields: [assetId], references: [id])
-  assetId                 String?
-  balling                 Decimal
-  createdAt               DateTime                     @default(now())
-  day                     EnumFermentationDayDatumDay? @default(First)
-  dryInches               Decimal?
-  fermentationChemistry   FermentationChemistry?       @relation(fields: [fermentationChemistryId], references: [id])
-  fermentationChemistryId String?
-  fermenterNumber         Int
   id                      String                       @id @default(cuid())
-  loggedBy                String
-  lotId                   String
-  operation               Operation                    @relation(fields: [operationId], references: [id])
-  operationId             String
-  pH                      Decimal
+  createdAt               DateTime                     @default(now())
+  updatedAt               DateTime                     @updatedAt
   productionOrder         ProductionOrder              @relation(fields: [productionOrderId], references: [id])
   productionOrderId       String
-  temperature             Decimal
-  updatedAt               DateTime                     @updatedAt
+  lotId                   String
+  loggedBy                String
+  day                     EnumFermentationDayDatumDay? @default(First)
+  temperature             Float
+  balling                 Float
+  acid                    Float
+  pH                      Float
+  dryInches               Float?
+  operation               Operation                    @relation(fields: [operationId], references: [id])
+  operationId             String
+  fermenterNumber         Int
+  asset                   Asset?                       @relation(fields: [assetId], references: [id])
+  assetId                 String?
+  fermentationChemistry   FermentationChemistry?       @relation(fields: [fermentationChemistryId], references: [id])
+  fermentationChemistryId String?
 }
 
 model Batch {
@@ -834,10 +896,10 @@ model InventoryLog {
   date                DateTime
   dateTime            DateTime
   id                  String     @id @default(cuid())
+  quantity            Float?
+  loggedBy            String
   item                Item       @relation(fields: [itemId], references: [id])
   itemId              String
-  loggedBy            String
-  quantity            Decimal?
   rawMeasurementUnits String?
   rawMeasurementValue String?
   revisedBy           String?
@@ -866,19 +928,19 @@ model InventoryTransfer {
 }
 
 model UnitLookup {
+  id                 String       @id @default(cuid())
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  conversionRate     Float?
+  name               String       @unique
+  typeName           String
   abbreviation       String       @unique
   baseRecord         UnitLookup?  @relation(name: "baseRecord", fields: [baseRecordId], references: [id])
   baseRecordId       String?
   baseUnit           Boolean?     @default(false)
-  conversionRate     Decimal?
-  createdAt          DateTime     @default(now())
-  id                 String       @id @default(cuid())
-  name               String       @unique
   pluralAbbreviation String       @unique
   pluralName         String       @unique
-  typeName           String
   unitLookupRecords  UnitLookup[] @relation(name: "baseRecord")
-  updatedAt          DateTime     @updatedAt
 }
 
 model ProductionOrderBomItem {
@@ -937,13 +999,13 @@ model MashingProtocol {
 
 model MashingProtocolStep {
   agitatorEnabled     Boolean?                         @default(false)
-  agitatorSpdSp       Decimal?
+  agitatorSpdSp       Float?
   coolEnabled         Boolean?                         @default(false)
-  coolTempSp          Decimal?
+  coolTempSp          Float?
   createdAt           DateTime                         @default(now())
   createdBy           String
   heatEnabled         Boolean?                         @default(false)
-  heatTempSp          Decimal?
+  heatTempSp          Float?
   holdType            EnumMashingProtocolStepHoldType?
   id                  String                           @id @default(cuid())
   index               Int?
@@ -954,8 +1016,8 @@ model MashingProtocolStep {
   recipeBomItem       RecipeBomItem[]
   stepTime            Int?
   stepType            EnumMashingProtocolStepStepType?
-  temperatureActual   Decimal?
-  temperatureSetpoint Decimal?
+  temperatureActual   Float?
+  temperatureSetpoint Float?
   updatedAt           DateTime                         @updatedAt
   updatedBy           String?
 }
@@ -1059,6 +1121,19 @@ enum EnumTestParameterTestSetpointType {
   Numerical
 }
 
+enum EnumRecipeParameterOperation {
+  Mashing01
+  Ferrmentation01
+  Distillation01
+  Processing01
+}
+
+enum EnumRecipeParameterRecipeSetpointType {
+  Boolean
+  Numeric
+  Text
+}
+
 enum EnumEquipmentPhaseName {
   Steam
   Hold
@@ -1069,6 +1144,7 @@ enum EnumEquipmentPhaseName {
   MaltAdd
   RyeAdd
   WheatAdd
+  // SpecialtyAdd
   Drop
   PhCapture
   Cooldown
@@ -1099,7 +1175,7 @@ enum EnumEquipmentPhaseStepType {
   Wheat
   Malt
   Premalt
-  Speciality
+  Specialty
   Enzyme
   Nutrient
   Yeast

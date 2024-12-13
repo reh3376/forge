@@ -4,9 +4,10 @@ import { ItemReceiptModuleBase } from "./base/itemReceipt.module.base";
 import { ItemReceiptService } from "./itemReceipt.service";
 import { ItemReceiptController } from "./itemReceipt.controller";
 import { ItemReceiptResolver } from "./itemReceipt.resolver";
+import { InventoryModule } from "../inventory/inventory.module";
 
 @Module({
-  imports: [ItemReceiptModuleBase, forwardRef(() => AuthModule)],
+  imports: [ItemReceiptModuleBase, forwardRef(() => AuthModule), InventoryModule],
   controllers: [ItemReceiptController],
   providers: [ItemReceiptService, ItemReceiptResolver],
   exports: [ItemReceiptService],
