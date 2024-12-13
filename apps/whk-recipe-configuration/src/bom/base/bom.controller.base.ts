@@ -545,9 +545,6 @@ export class BomControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -573,8 +570,8 @@ export class BomControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
+        // plannedCooks: true,
+        // plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -584,12 +581,6 @@ export class BomControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
@@ -608,6 +599,10 @@ export class BomControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        totalCooks: true,
+        totalFermenters: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
     if (results === null) {

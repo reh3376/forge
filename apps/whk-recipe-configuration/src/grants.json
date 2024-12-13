@@ -451,6 +451,156 @@
   },
   {
     "role": "admin",
+    "resource": "RecipeParameter",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeParameter",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeParameter",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeParameter",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeParameter",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeParameter",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeParameter",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeParameter",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeParameter",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeParameter",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeParameter",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeParameter",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeParameter",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeParameter",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeParameter",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeParameter",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeParameter",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeParameter",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeParameter",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeParameter",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "RecipeParameter",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "RecipeParameter",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "RecipeParameter",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "RecipeParameter",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "RecipeParameter",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
     "resource": "Instruction",
     "action": "read:own",
     "attributes": "*"

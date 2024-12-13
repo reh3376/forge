@@ -30,7 +30,7 @@ import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentP
 import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderUpdateManyWithoutTestParametersInput } from "./PurchaseOrderUpdateManyWithoutTestParametersInput";
-import { Decimal } from "decimal.js";
+
 import { EnumTestParameterTestSetpointType } from "./EnumTestParameterTestSetpointType";
 
 @InputType()
@@ -45,6 +45,136 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   active?: boolean;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointValue?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testParamUnits?: string;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointUpperLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  testParamRevision?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  testSetpointLowerLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  testResult?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumTestParameterTestSetpointType,
+  })
+  @IsEnum(EnumTestParameterTestSetpointType)
+  @IsOptional()
+  @Field(() => EnumTestParameterTestSetpointType, {
+    nullable: true,
+  })
+  testSetpointType?: "Boolean" | "Numerical" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EquipmentPhaseUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => EquipmentPhaseUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => EquipmentPhaseUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -63,36 +193,12 @@ class TestParameterUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  createdBy?: string;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   description?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => EquipmentPhaseUpdateManyWithoutTestParametersInput,
-  })
-  @ValidateNested()
-  @Type(() => EquipmentPhaseUpdateManyWithoutTestParametersInput)
-  @IsOptional()
-  @Field(() => EquipmentPhaseUpdateManyWithoutTestParametersInput, {
-    nullable: true,
-  })
-  equipmentPhases?: EquipmentPhaseUpdateManyWithoutTestParametersInput;
 
   @ApiProperty({
     required: false,
@@ -117,17 +223,6 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   instances?: TestParameterUpdateManyWithoutTestParametersInput;
-
-  @ApiProperty({
-    required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDef?: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -181,48 +276,12 @@ class TestParameterUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  schemaVersion?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
   @MaxLength(1000)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
   testDetails?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamRevision?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  testParamUnits?: string;
 
   @ApiProperty({
     required: false,
@@ -237,18 +296,6 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  testResult?: Decimal | null;
-
-  @ApiProperty({
-    required: false,
     type: Boolean,
   })
   @IsBoolean()
@@ -257,53 +304,6 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   testSetpointBooleanValue?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointLowerLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumTestParameterTestSetpointType,
-  })
-  @IsEnum(EnumTestParameterTestSetpointType)
-  @IsOptional()
-  @Field(() => EnumTestParameterTestSetpointType, {
-    nullable: true,
-  })
-  testSetpointType?: "Boolean" | "Numerical" | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointUpperLimit?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  testSetpointValue?: number | null;
 
   @ApiProperty({
     required: false,
