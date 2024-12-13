@@ -312,7 +312,7 @@ class EquipmentPhase {
     | "Wheat"
     | "Malt"
     | "Premalt"
-    | "Speciality"
+    | "Specialty"
     | "Enzyme"
     | "Nutrient"
     | "Yeast"

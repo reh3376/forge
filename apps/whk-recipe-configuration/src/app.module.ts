@@ -18,6 +18,7 @@ import { RabbitMQModule } from "./rabbitmq/rabbitmq.module";
 import { UserModule } from "./user/user.module";
 import { PhaseParameterModule } from "./phaseParameter/phaseParameter.module";
 import { TestParameterModule } from "./testParameter/testParameter.module";
+import { RecipeParameterModule } from "./recipeParameter/recipeParameter.module";
 import { InstructionModule } from "./instruction/instruction.module";
 import { EquipmentPhaseModule } from "./equipmentPhase/equipmentPhase.module";
 import { OperationModule } from "./operation/operation.module";
@@ -69,8 +70,11 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
+import {SyncModule} from "./sync/sync.module";
 
 import { LoggerModule } from "./logger/logger.module";
+
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 
 @Module({
   controllers: [],
@@ -83,6 +87,7 @@ import { LoggerModule } from "./logger/logger.module";
     UserModule,
     PhaseParameterModule,
     TestParameterModule,
+    RecipeParameterModule,
     InstructionModule,
     EquipmentPhaseModule,
     OperationModule,
@@ -125,6 +130,7 @@ import { LoggerModule } from "./logger/logger.module";
     HealthModule,
     PrismaModule,
     SecretsManagerModule,
+    SyncModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRootAsync({
       useClass: ServeStaticOptionsService,
@@ -188,6 +194,9 @@ import { LoggerModule } from "./logger/logger.module";
         PipeInjector,
       ],
     }),
+    // DevtoolsModule.register({
+    //   http: process.env.NODE_ENV !== 'production'
+    // }),
   ],
   providers: [],
 })
