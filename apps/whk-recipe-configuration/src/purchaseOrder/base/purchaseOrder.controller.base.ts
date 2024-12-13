@@ -939,6 +939,7 @@ export class PurchaseOrderControllerBase {
         },
 
         name: true,
+        required: true,
         schemaVersion: true,
         testDetails: true,
         testParamRevision: true,

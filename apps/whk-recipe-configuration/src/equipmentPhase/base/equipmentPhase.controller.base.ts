@@ -819,6 +819,7 @@ export class EquipmentPhaseControllerBase {
         },
 
         name: true,
+        required: true,
         schemaVersion: true,
         testDetails: true,
         testParamRevision: true,

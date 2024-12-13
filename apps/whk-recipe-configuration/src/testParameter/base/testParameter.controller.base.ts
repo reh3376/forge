@@ -96,6 +96,7 @@ export class TestParameterControllerBase {
         },
 
         name: true,
+        required: true,
         schemaVersion: true,
         testDetails: true,
         testParamRevision: true,
@@ -157,6 +158,7 @@ export class TestParameterControllerBase {
         },
 
         name: true,
+        required: true,
         schemaVersion: true,
         testDetails: true,
         testParamRevision: true,
@@ -217,6 +219,7 @@ export class TestParameterControllerBase {
         },
 
         name: true,
+        required: true,
         schemaVersion: true,
         testDetails: true,
         testParamRevision: true,
@@ -303,6 +306,7 @@ export class TestParameterControllerBase {
           },
 
           name: true,
+          required: true,
           schemaVersion: true,
           testDetails: true,
           testParamRevision: true,
@@ -492,6 +496,7 @@ export class TestParameterControllerBase {
         },
 
         name: true,
+        required: true,
         schemaVersion: true,
         testDetails: true,
         testParamRevision: true,
