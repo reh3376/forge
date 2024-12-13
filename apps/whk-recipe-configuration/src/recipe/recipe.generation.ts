@@ -1057,7 +1057,7 @@ export class RecipeGenerator {
           }
         }));        
       } else {
-        console.log(`Recipe parameter ${param.name} already exists, skipping.`);
+        console.log(`Phase parameter ${param.name} already exists, skipping.`);
       }
     }
 
