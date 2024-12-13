@@ -82,6 +82,7 @@ model TestParameter {
   // PurchaseOrder            PurchaseOrder?                     @relation(fields: [purchaseOrderId], references: [id])
   // purchaseOrderId          String?
   purchaseOrder            PurchaseOrder[]
+  required                 Boolean?                           @default(true)
 }
 
 model RecipeParameter {
