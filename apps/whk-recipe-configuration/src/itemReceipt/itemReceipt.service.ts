@@ -55,6 +55,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
             isClassDef: false,
             classId: { connect: { id: test.id } },
             itemReceipt: { connect: { id: createdItemReceipt.id } },
+            required: test.required,
           }
         });
       }
