@@ -12,7 +12,7 @@ const WATER_QTY = 3900;
 const BACKSET_QTY = 3600;
 
 const BIN_ASSIGNMENTS = {
-  bin1: 'Rye',
+  bin1: 'Wheat',
   bin2: 'Corn',
   bin3: 'Malt',
 };
@@ -92,7 +92,7 @@ const RECIPE_PARAMETERS = [
     try {
 
       // Login first to get JWT token
-      const host = 'localhost';
+      const host = '10.4.8.25';
       const base_url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api`;
       const url = `${base_url}/login`;
       console.log('Logging in to Mes...');
