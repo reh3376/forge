@@ -1,7 +1,7 @@
-const CUSTOMER_CODE = " SBL";
-const MASH_BILL = '64-00-24-12'; //  Match Item Record
+const CUSTOMER_CODE = "SBL";
+const MASH_BILL = '64-24-00-12'; //  Match Item Record
 const FINAL_PROOF = 120;
-const BARREL_INFO = '53-06-4-0-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
+const BARREL_INFO = '53-06-4-4-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
 const CUSTOMER_NAME = "Shortbarrel, LLC"; // This needs to match ERP / MESDB customer reocrd
 const ORDER_QTY = 300; // barrels
 const TOTAL_GRAIN_WEIGHT = 20500;
@@ -18,7 +18,7 @@ const BIN_ASSIGNMENTS = {
 };
 
 const BBL_ITEM_NUMBERS = [
-  'BBL-ISC02-53-06-4-0-0-Standard4',
+  'BBL-ISC12-53-06-4-4-0',
 ]
 
 const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
@@ -50,7 +50,7 @@ const MASHING_PROTOCOL = [
   { action: "Add Grain", grainType: "Corn"},
   { action: "Hold", holdType: "Heat", temperature: 200, time: 20 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Wheat" },
+  { action: "Add Grain", grainType: "Rye" },
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
   { action: "Add Additive", additiveType: "DIAZYME"},
@@ -92,7 +92,7 @@ const RECIPE_PARAMETERS = [
     try {
 
       // Login first to get JWT token
-      const host = 'localhost';
+      const host = '10.4.8.25';
       const base_url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api`;
       const url = `${base_url}/login`;
       console.log('Logging in to Mes...');
