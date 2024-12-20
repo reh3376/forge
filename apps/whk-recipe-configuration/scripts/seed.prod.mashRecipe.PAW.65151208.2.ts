@@ -95,7 +95,7 @@ const RECIPE_PARAMETERS = [
     try {
 
       // Login first to get JWT token
-      const host = 'localhost';
+      const host = '10.4.8.25';
       const base_url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api`;
       const url = `${base_url}/login`;
       console.log('Logging in to Mes...');
