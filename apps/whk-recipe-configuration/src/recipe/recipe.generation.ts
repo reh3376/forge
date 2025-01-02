@@ -1168,12 +1168,6 @@ export class RecipeGenerator {
     // Create a sample sales order
     console.log("Creating sample sales order...");
     let salesOrder: SalesOrder;
-    const existingSalesOrder = await client.salesOrder.findFirst({
-      where: {
-        customer: { id: customer?.id },
-        name: 'SO42'
-      }
-    });
 
     // Get the current date
     const currentDate = new Date();
@@ -1186,58 +1180,53 @@ export class RecipeGenerator {
     
     console.log(`Current day of the year: ${dayOfYear}`);
 
-    if (existingSalesOrder) {
-      console.log("Sample sales order already exists, skipping creation.");
-      salesOrder = existingSalesOrder;
-    } else {
-      // Get the most recent production order created today, if it exists
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    // Get the most recent production order created today, if it exists
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      const mostRecentSalesOrder = await client.salesOrder.findFirst({
-        where: {
-          createdAt: {
-            gte: today
-          },
-          name: {
-            startsWith: 'SO'
-          }
+    const mostRecentSalesOrder = await client.salesOrder.findFirst({
+      where: {
+        createdAt: {
+          gte: today
         },
-        orderBy: {
-          createdAt: 'desc'
+        name: {
+          startsWith: 'SO'
         }
-      });
-      const salesOrderNumber = mostRecentSalesOrder?.name?.split('SO')[1] ?? '01';
-      const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
-
-      if (mostRecentSalesOrder) {
-        console.log(`Most recent sales order created today: ${mostRecentSalesOrder.name ?? 'Unknown'}`);
-      } else {
-        console.log("No sales orders created today.");
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
+    });
+    const salesOrderNumber = mostRecentSalesOrder?.name?.split('SO')[1] ?? '01';
+    const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
 
-      const newSalesOrder = await client.salesOrder.create({
-        data: {
-          item: {
-            connect: { id: (item as Item).id }
-          },
-          customer: {
-            connect: { id: customer?.id }
-          },
-          createdBy: this.USER,
-          // orderDate: new Date(),
-          // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-          quantity: this.ORDER_QTY, // Adjust as needed
-          name: `SO${dayOfYear}${newSalesOrderNumber}`,
-          // units: "Barrels",
-        }
-      });
-
-      console.log("Sample sales order created successfully:", newSalesOrder.id);
-
-      // Update the salesOrder variable for use in production order creation
-      salesOrder = newSalesOrder;
+    if (mostRecentSalesOrder) {
+      console.log(`Most recent sales order created today: ${mostRecentSalesOrder.name ?? 'Unknown'}`);
+    } else {
+      console.log("No sales orders created today.");
     }
+
+    const newSalesOrder = await client.salesOrder.create({
+      data: {
+        item: {
+          connect: { id: (item as Item).id }
+        },
+        customer: {
+          connect: { id: customer?.id }
+        },
+        createdBy: this.USER,
+        // orderDate: new Date(),
+        // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+        quantity: this.ORDER_QTY, // Adjust as needed
+        name: `SO${dayOfYear}${newSalesOrderNumber}`,
+        // units: "Barrels",
+      }
+    });
+
+    console.log("Sample sales order created successfully:", newSalesOrder.id);
+
+    // Update the salesOrder variable for use in production order creation
+    salesOrder = newSalesOrder;
 
     // Create a sample production order
     console.log("Creating sample production order...");
@@ -1259,7 +1248,6 @@ export class RecipeGenerator {
     //   console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
     // } else {
       // Get the most recent production order created today, if it exists
-      const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const mostRecentProductionOrder = await client.productionOrder.findFirst({
