@@ -1218,7 +1218,20 @@ export class RecipeGenerator {
         // orderDate: new Date(),
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
         quantity: this.ORDER_QTY, // Adjust as needed
-        name: `SO${dayOfYear}${newSalesOrderNumber}`,
+        name: await (async () => {
+          let baseName = `SO${dayOfYear}${newSalesOrderNumber}`;
+          let suffix = 0;
+          let finalName = baseName;
+          
+          while (await client.salesOrder.findFirst({
+            where: { name: finalName }
+          })) {
+            suffix++;
+            finalName = `${baseName}-${suffix}`;
+          }
+          
+          return finalName;
+        })(),
         // units: "Barrels",
       }
     });
