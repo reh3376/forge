@@ -429,6 +429,18 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  proofingTank?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -483,6 +495,18 @@ class LotWhereInput {
     nullable: true,
   })
   status?: "Started" | "PendingValidation" | "Submitted" | "Complete";
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  tankOfOrigin?: AssetWhereUniqueInput;
 
   @ApiProperty({
     required: false,

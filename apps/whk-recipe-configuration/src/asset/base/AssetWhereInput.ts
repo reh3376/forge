@@ -28,6 +28,7 @@ import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceip
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { EnumAssetStatus } from "./EnumAssetStatus";
@@ -239,6 +240,30 @@ class AssetWhereInput {
   @Field(() => LotListRelationFilter, {
     nullable: true,
   })
+  lotProofingTank?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
+  @IsOptional()
+  @Field(() => LotListRelationFilter, {
+    nullable: true,
+  })
+  lotTankofOrigin?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
+  @IsOptional()
+  @Field(() => LotListRelationFilter, {
+    nullable: true,
+  })
   lots?: LotListRelationFilter;
 
   @ApiProperty({
@@ -287,6 +312,17 @@ class AssetWhereInput {
     nullable: true,
   })
   parent?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  proofInitial?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

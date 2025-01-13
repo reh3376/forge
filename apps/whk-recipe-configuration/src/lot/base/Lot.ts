@@ -423,6 +423,15 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  proofingTank?: Asset | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrder,
   })
   @ValidateNested()
@@ -473,6 +482,15 @@ class Lot {
     nullable: true,
   })
   status?: "Started" | "PendingValidation" | "Submitted" | "Complete" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  tankOfOrigin?: Asset | null;
 
   @ApiProperty({
     required: false,
