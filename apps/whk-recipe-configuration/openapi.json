@@ -17,14 +17,7 @@
         },
         "responses": {
           "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfo"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "tags": [
@@ -1568,6 +1561,433 @@
         },
         "tags": [
           "testParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/recipeParameters": {
+      "post": {
+        "operationId": "RecipeParameterController_createRecipeParameter",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeParameterCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeParameter"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "RecipeParameterController_recipeParameters",
+        "parameters": [
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/RecipeParameterWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecipeParameter"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/recipeParameters/{id}": {
+      "get": {
+        "operationId": "RecipeParameterController_recipeParameter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeParameter"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "RecipeParameterController_updateRecipeParameter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeParameterUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeParameter"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/recipeParameters/{id}/recipe": {
+      "get": {
+        "operationId": "RecipeParameterController_findRecipe",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/RecipeWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "RecipeParameterController_connectRecipe",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "RecipeParameterController_updateRecipe",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipeParameters"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "RecipeParameterController_disconnectRecipe",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipeParameters"
         ],
         "security": [
           {
@@ -6013,6 +6433,191 @@
         ]
       }
     },
+    "/api/recipes/{id}/parameters": {
+      "get": {
+        "operationId": "RecipeController_findParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/RecipeParameterWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipes"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "RecipeController_connectParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipes"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "RecipeController_updateParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipes"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "RecipeController_disconnectParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "recipes"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/recipes/{id}/productionOrderRecipeInstances": {
       "get": {
         "operationId": "RecipeController_findProductionOrderRecipeInstances",
@@ -9448,6 +10053,191 @@
       },
       "delete": {
         "operationId": "UnitProcedureController_disconnectRecipe",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "unitProcedures"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/unitProcedures/{id}/scheduleOrderQueues": {
+      "get": {
+        "operationId": "UnitProcedureController_findScheduleOrderQueues",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/ScheduleOrderQueueWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "unitProcedures"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UnitProcedureController_connectScheduleOrderQueues",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "unitProcedures"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UnitProcedureController_updateScheduleOrderQueues",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "unitProcedures"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UnitProcedureController_disconnectScheduleOrderQueues",
         "parameters": [
           {
             "name": "id",
@@ -32946,10 +33736,6 @@
           "password"
         ]
       },
-      "UserInfo": {
-        "type": "object",
-        "properties": {}
-      },
       "StringNullableFilter": {
         "type": "object",
         "properties": {
@@ -34139,8 +34925,9 @@
           "status": {
             "type": "string",
             "enum": [
-              "Created",
-              "PendingBarrelCount",
+              "Started",
+              "PendingValidation",
+              "Submitted",
               "Complete"
             ]
           },
@@ -34583,6 +35370,92 @@
           "updatedAt"
         ]
       },
+      "RecipeParameter": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "className": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "globalId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isClassDefinition": {
+            "type": "boolean"
+          },
+          "recipe": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recipe"
+            }
+          },
+          "recipeNumericalSetpoint": {
+            "type": "number"
+          },
+          "recipeParamDescription": {
+            "type": "string"
+          },
+          "recipeParamName": {
+            "type": "string"
+          },
+          "recipeParamUnits": {
+            "type": "string"
+          },
+          "recipeSetpointBooleanValue": {
+            "type": "boolean"
+          },
+          "recipeSetpointLowerLimit": {
+            "type": "number"
+          },
+          "recipeSetpointType": {
+            "type": "string",
+            "enum": [
+              "Boolean",
+              "Numeric",
+              "Text"
+            ]
+          },
+          "recipeSetpointUpperLimit": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "schemaVersion": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "object"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "active",
+          "className",
+          "createdAt",
+          "createdBy",
+          "id",
+          "recipeParamName",
+          "recipeSetpointType"
+        ]
+      },
       "ScheduleOrderQueue": {
         "type": "object",
         "properties": {
@@ -34871,6 +35744,12 @@
           "mashingProtocol": {
             "$ref": "#/components/schemas/MashingProtocol"
           },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeParameter"
+            }
+          },
           "productionOrderRecipeInstances": {
             "type": "array",
             "items": {
@@ -35005,7 +35884,10 @@
             "type": "number"
           },
           "scheduleOrderQueues": {
-            "$ref": "#/components/schemas/ScheduleOrderQueue"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderQueue"
+            }
           },
           "schemaVersion": {
             "type": "string"
@@ -35376,6 +36258,15 @@
           },
           "endDate": {
             "type": "object"
+          },
+          "estimatedBarrelsPerFermenter": {
+            "type": "number"
+          },
+          "estimatedPGsPerBbl": {
+            "type": "number"
+          },
+          "estimatedPGsPerBushel": {
+            "type": "number"
           },
           "fermentationChemistries": {
             "type": "array",
@@ -37741,6 +38632,105 @@
           "id"
         ]
       },
+      "RecipeParameterWhereInput": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "$ref": "#/components/schemas/BooleanFilter"
+          },
+          "className": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateTimeFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "description": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "globalId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "isClassDefinition": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "Mashing01",
+              "Ferrmentation01",
+              "Distillation01",
+              "Processing01"
+            ]
+          },
+          "operationIndex": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeListRelationFilter"
+          },
+          "recipeNumericalSetpoint": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "recipeParamDescription": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "recipeParamName": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "recipeParamUnits": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "recipeSetpointBooleanValue": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "recipeSetpointLowerLimit": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "recipeSetpointType": {
+            "type": "string",
+            "enum": [
+              "Boolean",
+              "Numeric",
+              "Text"
+            ]
+          },
+          "recipeSetpointUpperLimit": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "schemaVersion": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          }
+        }
+      },
+      "RecipeParameterListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/RecipeParameterWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/RecipeParameterWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/RecipeParameterWhereInput"
+          }
+        }
+      },
       "MashingDatumWhereUniqueInput": {
         "type": "object",
         "properties": {
@@ -38232,6 +39222,72 @@
           "id"
         ]
       },
+      "ScheduleOrderWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ScheduleOrderQueueWhereInput": {
+        "type": "object",
+        "properties": {
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "globalId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "nextOperation": {
+            "type": "string",
+            "enum": [
+              "Mashing01",
+              "Fermentation01",
+              "Distillation01",
+              "Processing01"
+            ]
+          },
+          "nextUnitProcedure": {
+            "$ref": "#/components/schemas/UnitProcedureWhereUniqueInput"
+          },
+          "nextUnitProcedureName": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "queueIndex": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "scheduleOrder": {
+            "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
+          },
+          "schemaVersion": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          }
+        }
+      },
+      "ScheduleOrderQueueListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/ScheduleOrderQueueWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/ScheduleOrderQueueWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/ScheduleOrderQueueWhereInput"
+          }
+        }
+      },
       "UnitProcedureWhereInput": {
         "type": "object",
         "properties": {
@@ -38294,7 +39350,7 @@
             "$ref": "#/components/schemas/IntNullableFilter"
           },
           "scheduleOrderQueues": {
-            "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
+            "$ref": "#/components/schemas/ScheduleOrderQueueListRelationFilter"
           },
           "schemaVersion": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -38368,6 +39424,9 @@
           },
           "mashingProtocol": {
             "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
+          },
+          "RecipeParameters": {
+            "$ref": "#/components/schemas/RecipeParameterListRelationFilter"
           },
           "productionOrderRecipeInstances": {
             "$ref": "#/components/schemas/ProductionOrderRecipeInstanceListRelationFilter"
@@ -38533,17 +39592,6 @@
           "id"
         ]
       },
-      "ScheduleOrderWhereUniqueInput": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
       "ProductionOrderWhereInput": {
         "type": "object",
         "properties": {
@@ -38579,6 +39627,15 @@
           },
           "endDate": {
             "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "estimatedBarrelsPerFermenter": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "estimatedPGsPerBbl": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "estimatedPGsPerBushel": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
           },
           "fermentationChemistries": {
             "$ref": "#/components/schemas/FermentationChemistryListRelationFilter"
@@ -39477,8 +40534,9 @@
           "status": {
             "type": "string",
             "enum": [
-              "Created",
-              "PendingBarrelCount",
+              "Started",
+              "PendingValidation",
+              "Submitted",
               "Complete"
             ]
           },
@@ -40294,6 +41352,199 @@
             "type": "string"
           },
           "tooltip": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "RecipeCreateNestedManyWithoutRecipeParametersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+            }
+          }
+        }
+      },
+      "RecipeParameterCreateInput": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "className": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "globalId": {
+            "type": "string"
+          },
+          "isClassDefinition": {
+            "type": "boolean"
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "Mashing01",
+              "Ferrmentation01",
+              "Distillation01",
+              "Processing01"
+            ]
+          },
+          "operationIndex": {
+            "type": "number"
+          },
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeCreateNestedManyWithoutRecipeParametersInput"
+          },
+          "recipeNumericalSetpoint": {
+            "type": "number"
+          },
+          "recipeParamDescription": {
+            "type": "string"
+          },
+          "recipeParamName": {
+            "type": "string"
+          },
+          "recipeParamUnits": {
+            "type": "string"
+          },
+          "recipeSetpointBooleanValue": {
+            "type": "boolean"
+          },
+          "recipeSetpointLowerLimit": {
+            "type": "number"
+          },
+          "recipeSetpointType": {
+            "type": "string",
+            "enum": [
+              "Boolean",
+              "Numeric",
+              "Text"
+            ]
+          },
+          "recipeSetpointUpperLimit": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "schemaVersion": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "active",
+          "className",
+          "createdBy",
+          "recipeParamName",
+          "recipeSetpointType"
+        ]
+      },
+      "RecipeUpdateManyWithoutRecipeParametersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+            }
+          }
+        }
+      },
+      "RecipeParameterUpdateInput": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "className": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "globalId": {
+            "type": "string"
+          },
+          "isClassDefinition": {
+            "type": "boolean"
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "Mashing01",
+              "Ferrmentation01",
+              "Distillation01",
+              "Processing01"
+            ]
+          },
+          "operationIndex": {
+            "type": "number"
+          },
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeUpdateManyWithoutRecipeParametersInput"
+          },
+          "recipeNumericalSetpoint": {
+            "type": "number"
+          },
+          "recipeParamDescription": {
+            "type": "string"
+          },
+          "recipeParamName": {
+            "type": "string"
+          },
+          "recipeParamUnits": {
+            "type": "string"
+          },
+          "recipeSetpointBooleanValue": {
+            "type": "boolean"
+          },
+          "recipeSetpointLowerLimit": {
+            "type": "number"
+          },
+          "recipeSetpointType": {
+            "type": "string",
+            "enum": [
+              "Boolean",
+              "Numeric",
+              "Text"
+            ]
+          },
+          "recipeSetpointUpperLimit": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "schemaVersion": {
             "type": "string"
           },
           "updatedBy": {
@@ -41466,6 +42717,28 @@
           }
         }
       },
+      "RecipeParameterWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "RecipeParameterCreateNestedManyWithoutRecipesInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeParameterWhereUniqueInput"
+            }
+          }
+        }
+      },
       "ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput": {
         "type": "object",
         "properties": {
@@ -41569,6 +42842,9 @@
           "mashingProtocol": {
             "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
           },
+          "parameters": {
+            "$ref": "#/components/schemas/RecipeParameterCreateNestedManyWithoutRecipesInput"
+          },
           "productionOrderRecipeInstances": {
             "$ref": "#/components/schemas/ProductionOrderRecipeInstanceCreateNestedManyWithoutRecipesInput"
           },
@@ -41671,6 +42947,29 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LotWhereUniqueInput"
+            }
+          }
+        }
+      },
+      "RecipeParameterUpdateManyWithoutRecipesInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeParameterWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeParameterWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeParameterWhereUniqueInput"
             }
           }
         }
@@ -41837,6 +43136,9 @@
           },
           "mashingProtocol": {
             "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/RecipeParameterUpdateManyWithoutRecipesInput"
           },
           "productionOrderRecipeInstances": {
             "$ref": "#/components/schemas/ProductionOrderRecipeInstanceUpdateManyWithoutRecipesInput"
@@ -42217,47 +43519,6 @@
           }
         }
       },
-      "ScheduleOrderQueueWhereInput": {
-        "type": "object",
-        "properties": {
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "globalId": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "nextOperation": {
-            "type": "string",
-            "enum": [
-              "Mashing01",
-              "Fermentation01",
-              "Distillation01",
-              "Processing01"
-            ]
-          },
-          "nextUnitProcedure": {
-            "$ref": "#/components/schemas/UnitProcedureWhereUniqueInput"
-          },
-          "nextUnitProcedureName": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "queueIndex": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "scheduleOrder": {
-            "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
-          },
-          "schemaVersion": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          }
-        }
-      },
       "UnitProcedureCreateNestedManyWithoutUnitProceduresInput": {
         "type": "object",
         "properties": {
@@ -42287,6 +43548,17 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+            }
+          }
+        }
+      },
+      "ScheduleOrderQueueCreateNestedManyWithoutUnitProceduresInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
             }
           }
         }
@@ -42350,7 +43622,7 @@
             "type": "number"
           },
           "scheduleOrderQueues": {
-            "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
+            "$ref": "#/components/schemas/ScheduleOrderQueueCreateNestedManyWithoutUnitProceduresInput"
           },
           "schemaVersion": {
             "type": "string"
@@ -42434,6 +43706,29 @@
           }
         }
       },
+      "ScheduleOrderQueueUpdateManyWithoutUnitProceduresInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
+            }
+          }
+        }
+      },
       "UnitProcedureUpdateInput": {
         "type": "object",
         "properties": {
@@ -42493,7 +43788,7 @@
             "type": "number"
           },
           "scheduleOrderQueues": {
-            "$ref": "#/components/schemas/ScheduleOrderQueueWhereUniqueInput"
+            "$ref": "#/components/schemas/ScheduleOrderQueueUpdateManyWithoutUnitProceduresInput"
           },
           "schemaVersion": {
             "type": "string"
@@ -42799,6 +44094,15 @@
           "endDate": {
             "type": "object"
           },
+          "estimatedBarrelsPerFermenter": {
+            "type": "number"
+          },
+          "estimatedPGsPerBbl": {
+            "type": "number"
+          },
+          "estimatedPGsPerBushel": {
+            "type": "number"
+          },
           "fermentationChemistries": {
             "$ref": "#/components/schemas/FermentationChemistryCreateNestedManyWithoutProductionOrdersInput"
           },
@@ -43039,6 +44343,15 @@
           },
           "endDate": {
             "type": "object"
+          },
+          "estimatedBarrelsPerFermenter": {
+            "type": "number"
+          },
+          "estimatedPGsPerBbl": {
+            "type": "number"
+          },
+          "estimatedPGsPerBushel": {
+            "type": "number"
           },
           "fermentationChemistries": {
             "$ref": "#/components/schemas/FermentationChemistryUpdateManyWithoutProductionOrdersInput"
@@ -46041,8 +47354,9 @@
           "status": {
             "type": "string",
             "enum": [
-              "Created",
-              "PendingBarrelCount",
+              "Started",
+              "PendingValidation",
+              "Submitted",
               "Complete"
             ]
           },
@@ -46305,8 +47619,9 @@
           "status": {
             "type": "string",
             "enum": [
-              "Created",
-              "PendingBarrelCount",
+              "Started",
+              "PendingValidation",
+              "Submitted",
               "Complete"
             ]
           },
