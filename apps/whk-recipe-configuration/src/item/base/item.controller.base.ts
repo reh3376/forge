@@ -1249,6 +1249,12 @@ export class ItemControllerBase {
           },
         },
 
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -1264,6 +1270,13 @@ export class ItemControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,

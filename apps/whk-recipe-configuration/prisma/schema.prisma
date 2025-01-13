@@ -545,12 +545,15 @@ model Asset {
   inventoryTransfersFrom  InventoryTransfer[]     @relation(name: "fromLocation")
   inventoryTransfersTo    InventoryTransfer[]     @relation(name: "inventoryTransfersTo")
   itemReceipts            ItemReceipt[]
+  lotProofingTank         Lot[]                   @relation(name: "lotProofingTank")
+  lotTankofOrigin         Lot[]                   @relation(name: "lotTankofOrigin")
   lots                    Lot[]                   @relation(name: "fromAsset")
   lotsFilledFrom          Lot[]                   @relation(name: "filledFrom")
   mashingData             MashingDatum[]
   name                    String
   parent                  Asset?                  @relation(name: "AssetChildrenAssetParent", fields: [parentId], references: [id])
   parentId                String?
+  proofInitial            Float?
   purchaseOrders          PurchaseOrder[]
   revision                Int?                    @default(0)
   schemaVersion           String                  @default("0001-alpha")
@@ -629,6 +632,8 @@ model Lot {
   pgLosses                    Float?
   productionOrder             ProductionOrder?    @relation(fields: [productionOrderId], references: [id])
   productionOrderId           String?
+  proofingTank                Asset?              @relation(name: "lotProofingTank", fields: [proofingTankId], references: [id])
+  proofingTankId              String?
   purchaseOrderAcceptedLots   PurchaseOrder?      @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])
   purchaseOrderAcceptedLotsId String?
   recipe                      Recipe?             @relation(fields: [recipeId], references: [id])
@@ -636,6 +641,8 @@ model Lot {
   schemaVersion               String?             @default("0001-b")
   standardYield               Float?
   status                      EnumLotStatus?      @default(Created)
+  tankOfOrigin                Asset?              @relation(name: "lotTankofOrigin", fields: [tankOfOriginId], references: [id])
+  tankOfOriginId              String?
   totalFermenters             Float?
   totalPGs                    Float?
   totalPGsByRecipe            Float?

@@ -105,6 +105,7 @@ export class AssetControllerBase {
           },
         },
 
+        proofInitial: true,
         revision: true,
         schemaVersion: true,
         status: true,
@@ -146,6 +147,7 @@ export class AssetControllerBase {
           },
         },
 
+        proofInitial: true,
         revision: true,
         schemaVersion: true,
         status: true,
@@ -188,6 +190,7 @@ export class AssetControllerBase {
           },
         },
 
+        proofInitial: true,
         revision: true,
         schemaVersion: true,
         status: true,
@@ -250,6 +253,7 @@ export class AssetControllerBase {
             },
           },
 
+          proofInitial: true,
           revision: true,
           schemaVersion: true,
           status: true,
@@ -458,6 +462,7 @@ export class AssetControllerBase {
           },
         },
 
+        proofInitial: true,
         revision: true,
         schemaVersion: true,
         status: true,
@@ -1424,6 +1429,374 @@ export class AssetControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lotProofingTank")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLotProofingTank(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLotProofingTank(params.id, {
+      ...query,
+      select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        densityFinal: true,
+        externalId: true,
+
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
+        id: true,
+        initialVolume: true,
+        initialWeight: true,
+        isRawMaterial: true,
+        lotAlphaChar: true,
+        lotCreatedAt: true,
+        lotNumber: true,
+        notes: true,
+        pgLosses: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        standardYield: true,
+        status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
+        updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lotProofingTank")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectLotProofingTank(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotProofingTank: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lotProofingTank")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateLotProofingTank(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotProofingTank: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lotProofingTank")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLotProofingTank(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotProofingTank: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/lotTankofOrigin")
+  @ApiNestedQuery(LotFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLotTankofOrigin(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findLotTankofOrigin(params.id, {
+      ...query,
+      select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        densityFinal: true,
+        externalId: true,
+
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
+        id: true,
+        initialVolume: true,
+        initialWeight: true,
+        isRawMaterial: true,
+        lotAlphaChar: true,
+        lotCreatedAt: true,
+        lotNumber: true,
+        notes: true,
+        pgLosses: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        standardYield: true,
+        status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
+        updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lotTankofOrigin")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectLotTankofOrigin(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotTankofOrigin: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lotTankofOrigin")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateLotTankofOrigin(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotTankofOrigin: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lotTankofOrigin")
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectLotTankofOrigin(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lotTankofOrigin: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/lots")
   @ApiNestedQuery(LotFindManyArgs)
   @nestAccessControl.UseRoles({
@@ -1494,6 +1867,12 @@ export class AssetControllerBase {
           },
         },
 
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -1509,6 +1888,13 @@ export class AssetControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -1665,6 +2051,12 @@ export class AssetControllerBase {
           },
         },
 
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -1680,6 +2072,13 @@ export class AssetControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,

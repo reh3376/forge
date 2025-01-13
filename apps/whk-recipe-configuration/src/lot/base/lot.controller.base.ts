@@ -89,6 +89,12 @@ export class LotControllerBase {
             }
           : undefined,
 
+        proofingTank: data.proofingTank
+          ? {
+              connect: data.proofingTank,
+            }
+          : undefined,
+
         purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
           ? {
               connect: data.purchaseOrderAcceptedLots,
@@ -98,6 +104,12 @@ export class LotControllerBase {
         recipe: data.recipe
           ? {
               connect: data.recipe,
+            }
+          : undefined,
+
+        tankOfOrigin: data.tankOfOrigin
+          ? {
+              connect: data.tankOfOrigin,
             }
           : undefined,
       },
@@ -157,6 +169,12 @@ export class LotControllerBase {
           },
         },
 
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -172,6 +190,13 @@ export class LotControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -257,6 +282,12 @@ export class LotControllerBase {
           },
         },
 
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -272,6 +303,13 @@ export class LotControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -356,6 +394,12 @@ export class LotControllerBase {
           },
         },
 
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -371,6 +415,13 @@ export class LotControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -439,6 +490,12 @@ export class LotControllerBase {
               }
             : undefined,
 
+          proofingTank: data.proofingTank
+            ? {
+                connect: data.proofingTank,
+              }
+            : undefined,
+
           purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
             ? {
                 connect: data.purchaseOrderAcceptedLots,
@@ -448,6 +505,12 @@ export class LotControllerBase {
           recipe: data.recipe
             ? {
                 connect: data.recipe,
+              }
+            : undefined,
+
+          tankOfOrigin: data.tankOfOrigin
+            ? {
+                connect: data.tankOfOrigin,
               }
             : undefined,
         },
@@ -507,6 +570,12 @@ export class LotControllerBase {
             },
           },
 
+          proofingTank: {
+            select: {
+              id: true,
+            },
+          },
+
           purchaseOrderAcceptedLots: {
             select: {
               id: true,
@@ -522,6 +591,13 @@ export class LotControllerBase {
           schemaVersion: true,
           standardYield: true,
           status: true,
+
+          tankOfOrigin: {
+            select: {
+              id: true,
+            },
+          },
+
           totalFermenters: true,
           totalPGs: true,
           totalPGsByRecipe: true,

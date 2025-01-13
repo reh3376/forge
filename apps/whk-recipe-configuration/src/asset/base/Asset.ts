@@ -19,8 +19,10 @@ import {
   ValidateNested,
   IsOptional,
   IsDate,
-  IsInt,
+  IsNumber,
+  Min,
   Max,
+  IsInt,
 } from "class-validator";
 
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
@@ -202,6 +204,24 @@ class Asset {
   @ValidateNested()
   @Type(() => Lot)
   @IsOptional()
+  lotProofingTank?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  lotTankofOrigin?: Array<Lot>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
   lots?: Array<Lot>;
 
   @ApiProperty({
@@ -239,6 +259,19 @@ class Asset {
   @Type(() => Asset)
   @IsOptional()
   parent?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(80)
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  proofInitial!: number | null;
 
   @ApiProperty({
     required: false,

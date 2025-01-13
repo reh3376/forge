@@ -124,6 +124,12 @@ export class LotResolverBase {
             }
           : undefined,
 
+        proofingTank: args.data.proofingTank
+          ? {
+              connect: args.data.proofingTank,
+            }
+          : undefined,
+
         purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
           ? {
               connect: args.data.purchaseOrderAcceptedLots,
@@ -133,6 +139,12 @@ export class LotResolverBase {
         recipe: args.data.recipe
           ? {
               connect: args.data.recipe,
+            }
+          : undefined,
+
+        tankOfOrigin: args.data.tankOfOrigin
+          ? {
+              connect: args.data.tankOfOrigin,
             }
           : undefined,
       },
@@ -177,6 +189,12 @@ export class LotResolverBase {
               }
             : undefined,
 
+          proofingTank: args.data.proofingTank
+            ? {
+                connect: args.data.proofingTank,
+              }
+            : undefined,
+
           purchaseOrderAcceptedLots: args.data.purchaseOrderAcceptedLots
             ? {
                 connect: args.data.purchaseOrderAcceptedLots,
@@ -186,6 +204,12 @@ export class LotResolverBase {
           recipe: args.data.recipe
             ? {
                 connect: args.data.recipe,
+              }
+            : undefined,
+
+          tankOfOrigin: args.data.tankOfOrigin
+            ? {
+                connect: args.data.tankOfOrigin,
               }
             : undefined,
         },
@@ -361,6 +385,25 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "proofingTank",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getProofingTank(@graphql.Parent() parent: Lot): Promise<Asset | null> {
+    const result = await this.service.getProofingTank(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => PurchaseOrder, {
     nullable: true,
     name: "purchaseOrderAcceptedLots",
@@ -393,6 +436,25 @@ export class LotResolverBase {
   })
   async getRecipe(@graphql.Parent() parent: Lot): Promise<Recipe | null> {
     const result = await this.service.getRecipe(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Asset, {
+    nullable: true,
+    name: "tankOfOrigin",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async getTankOfOrigin(@graphql.Parent() parent: Lot): Promise<Asset | null> {
+    const result = await this.service.getTankOfOrigin(parent.id);
 
     if (!result) {
       return null;
