@@ -64,7 +64,11 @@ export class RecipeGenerator {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
   ) {
     this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
-    this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+    if (this.BARREL_INFO !== '') {
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+    } else {
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-R01`;
+    }
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
   }
   
@@ -409,22 +413,24 @@ export class RecipeGenerator {
       })
       
       // add the barrel bom items
-      for (const itemNumber of this.BBL_ITEM_NUMBERS) {
-        const itemId = await client.item.findFirst({
-          where: {
-            itemNumber: itemNumber
-          },
-        });
-        if (itemId) {
-          await client.bomItem.create({
-            data: {
-              bomId: baseBom.id,
-              itemId: itemId?.id,
-              quantity: 1 / this.BBL_ITEM_NUMBERS.length,
-              createdBy: this.USER,
-              isClassDefinition: true
-            }
-          })
+      if (this.BBL_ITEM_NUMBERS.length > 0) {
+        for (const itemNumber of this.BBL_ITEM_NUMBERS) {
+          const itemId = await client.item.findFirst({
+            where: {
+              itemNumber: itemNumber
+            },
+          });
+          if (itemId) {
+            await client.bomItem.create({
+              data: {
+                bomId: baseBom.id,
+                itemId: itemId?.id,
+                quantity: 1 / this.BBL_ITEM_NUMBERS.length,
+                createdBy: this.USER,
+                isClassDefinition: true
+              }
+            })
+          }
         }
       }
       

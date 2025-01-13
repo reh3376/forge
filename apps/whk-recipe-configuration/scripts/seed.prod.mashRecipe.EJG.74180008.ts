@@ -11,7 +11,7 @@ const USER = 'pmannion@whiskeyhouse.com';
 const WATER_QTY = 3900;
 const BACKSET_QTY = 3600;
 
-const BBL_ITEM_NUMBERS = [
+const BBL_ITEM_NUMBERS: string[] = [
 ]
 
 const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
