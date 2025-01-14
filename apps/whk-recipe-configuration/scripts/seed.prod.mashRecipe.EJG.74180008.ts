@@ -1,6 +1,6 @@
 const CUSTOMER_CODE = "EJG";
 const MASH_BILL = '74-18-00-08'; //  Match Item Record
-const FINAL_PROOF = 120;
+const FINAL_PROOF = 125;
 const BARREL_INFO = ''; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
 const CUSTOMER_NAME = "E.J. Gallo, Inc."; // This needs to match ERP / MESDB customer reocrd
 const ORDER_QTY = 85; // barrels
