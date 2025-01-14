@@ -280,7 +280,11 @@ export class RecipeGenerator {
     this.MASHING_PROTOCOL = mashingProtocol;
     this.RECIPE_PARAMETERS = recipeParameters;
     this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
-    this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+    if (this.BARREL_INFO !== '') {
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+    } else {
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-R01`;
+    }
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
 
     console.info("Seeding database with custom seed for Mashing Recipe...");
@@ -336,17 +340,20 @@ export class RecipeGenerator {
 
     const client = new PrismaClient();
     console.log("Creating recipe...");
-    console.log("itemNumber:", `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`);
+    const itemNumber = this.BARREL_INFO !== '' 
+      ? `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`
+      : `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-R01`;
+    console.log("itemNumber:", itemNumber);
     // Create the base BOM and bom items
     const fgItem = await client.item.findFirst({
       where: {
-        itemNumber: `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`
+        itemNumber: itemNumber
       }
     })
 
     if (!fgItem) {
-      console.log(`Item ${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01 not found`);
-      throw new Error(`Item ${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01 not found`);
+      console.log(`Item ${itemNumber} not found`);
+      throw new Error(`Item ${itemNumber} not found`);
     }
 
     // Check for existing BOM with the same revision
