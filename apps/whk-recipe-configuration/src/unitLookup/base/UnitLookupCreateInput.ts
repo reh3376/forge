@@ -22,7 +22,6 @@ import {
 } from "class-validator";
 import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
 import { Type } from "class-transformer";
-import { Decimal } from "decimal.js";
 import { UnitLookupCreateNestedManyWithoutUnitLookupsInput } from "./UnitLookupCreateNestedManyWithoutUnitLookupsInput";
 
 @InputType()
@@ -69,7 +68,7 @@ class UnitLookupCreateInput {
   @Field(() => Float, {
     nullable: true,
   })
-  conversionRate?: Decimal | null;
+  conversionRate?: number | null;
 
   @ApiProperty({
     required: true,
