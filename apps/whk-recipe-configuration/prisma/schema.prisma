@@ -214,6 +214,7 @@ model Recipe {
   unitProcedures                 UnitProcedure[]
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
+  whiskeyType                    EnumRecipeWhiskeyType?          @default(RyeBourbon)
 }
 
 model Bom {
@@ -1133,6 +1134,16 @@ enum EnumOperationName {
 
 enum EnumProcedureName {
   Line1
+}
+
+enum EnumRecipeWhiskeyType {
+  RyeBourbon
+  WheatedBourbon
+  FourGrainBourbon
+  RyeWhiskey
+  WheatWhiskey
+  MaltWhiskey
+  FourGrainWhiskey
 }
 
 enum EnumScheduleOrderQueueNextOperation {
