@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   MaxLength,
   IsOptional,
   IsEnum,
   ValidateNested,
-  IsInt,
+  IsNumber,
+  Min,
   Max,
+  IsInt,
 } from "class-validator";
+
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
@@ -225,6 +229,30 @@ class AssetUpdateInput {
   @Field(() => LotUpdateManyWithoutAssetsInput, {
     nullable: true,
   })
+  lotProofingTank?: LotUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lotTankofOrigin?: LotUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
   lots?: LotUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
@@ -274,6 +302,19 @@ class AssetUpdateInput {
     nullable: true,
   })
   parent?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(80)
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  proofInitial?: number | null;
 
   @ApiProperty({
     required: false,
