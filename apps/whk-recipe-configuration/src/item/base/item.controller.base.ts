@@ -1249,6 +1249,8 @@ export class ItemControllerBase {
           },
         },
 
+        proofInitial: true,
+
         proofingTank: {
           select: {
             id: true,

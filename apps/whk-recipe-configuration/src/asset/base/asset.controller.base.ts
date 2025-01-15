@@ -1499,6 +1499,8 @@ export class AssetControllerBase {
           },
         },
 
+        proofInitial: true,
+
         proofingTank: {
           select: {
             id: true,
@@ -1682,6 +1684,8 @@ export class AssetControllerBase {
             id: true,
           },
         },
+
+        proofInitial: true,
 
         proofingTank: {
           select: {
@@ -1867,6 +1871,8 @@ export class AssetControllerBase {
           },
         },
 
+        proofInitial: true,
+
         proofingTank: {
           select: {
             id: true,
@@ -2050,6 +2056,8 @@ export class AssetControllerBase {
             id: true,
           },
         },
+
+        proofInitial: true,
 
         proofingTank: {
           select: {

@@ -785,6 +785,8 @@ export class RecipeControllerBase {
           },
         },
 
+        proofInitial: true,
+
         proofingTank: {
           select: {
             id: true,

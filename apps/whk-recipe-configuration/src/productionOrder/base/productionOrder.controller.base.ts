@@ -1015,6 +1015,8 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        proofInitial: true,
+
         proofingTank: {
           select: {
             id: true,

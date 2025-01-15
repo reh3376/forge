@@ -25,6 +25,7 @@ import { LotFindManyArgs } from "./LotFindManyArgs";
 import { LotFindUniqueArgs } from "./LotFindUniqueArgs";
 import { CreateLotArgs } from "./CreateLotArgs";
 import { UpdateLotArgs } from "./UpdateLotArgs";
+import { DeleteLotArgs } from "./DeleteLotArgs";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
@@ -214,6 +215,25 @@ export class LotResolverBase {
             : undefined,
         },
       });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Lot)
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "delete",
+    possession: "any",
+  })
+  async deleteLot(@graphql.Args() args: DeleteLotArgs): Promise<Lot | null> {
+    try {
+      return await this.service.deleteLot(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
