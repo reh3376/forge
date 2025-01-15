@@ -25,15 +25,15 @@ import {
   Max,
 } from "class-validator";
 
-import { Type } from "class-transformer";
 import { Asset } from "../../asset/base/Asset";
-import { Item } from "../../item/base/Item";
+import { Expose, Type } from "class-transformer";
+import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
+import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { TestParameter } from "../../testParameter/base/TestParameter";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
@@ -318,6 +318,7 @@ class PurchaseOrder {
   })
   @ValidateNested()
   @Type(() => Vendor)
+  @Expose()
   @IsOptional()
   vendor?: Vendor | null;
 }

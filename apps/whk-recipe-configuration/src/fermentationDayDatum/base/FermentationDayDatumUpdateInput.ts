@@ -23,7 +23,6 @@ import {
   MaxLength,
 } from "class-validator";
 
-import { Decimal } from "decimal.js";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EnumFermentationDayDatumDay } from "./EnumFermentationDayDatumDay";
@@ -35,18 +34,6 @@ import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/Prod
 class FermentationDayDatumUpdateInput {
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  acid?: Decimal;
-
-  @ApiProperty({
-    required: false,
     type: () => AssetWhereUniqueInput,
   })
   @ValidateNested()
@@ -56,18 +43,6 @@ class FermentationDayDatumUpdateInput {
     nullable: true,
   })
   asset?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  balling?: Decimal;
 
   @ApiProperty({
     required: false,
@@ -85,12 +60,60 @@ class FermentationDayDatumUpdateInput {
     type: Number,
   })
   @IsNumber()
+  @Max(212)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  temperature?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Float, {
     nullable: true,
   })
-  dryInches?: Decimal | null;
+  balling?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  acid?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(14)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  pH?: number;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Float, {
+    nullable: true,
+  })
+  dryInches?: number | null;
 
   @ApiProperty({
     required: false,
@@ -154,18 +177,6 @@ class FermentationDayDatumUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(14)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  pH?: Decimal;
-
-  @ApiProperty({
-    required: false,
     type: () => ProductionOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -175,18 +186,6 @@ class FermentationDayDatumUpdateInput {
     nullable: true,
   })
   productionOrder?: ProductionOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(212)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  temperature?: Decimal;
 }
 
 export { FermentationDayDatumUpdateInput as FermentationDayDatumUpdateInput };

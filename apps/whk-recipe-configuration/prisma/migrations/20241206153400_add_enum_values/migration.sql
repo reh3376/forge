@@ -1,0 +1,4 @@
+BEGIN;
+ALTER TYPE "EnumLotStatus" ADD VALUE IF NOT EXISTS 'Started';
+ALTER TYPE "EnumLotStatus" ADD VALUE IF NOT EXISTS 'PendingValidation';
+COMMIT;

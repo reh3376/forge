@@ -28,9 +28,9 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { Decimal } from "decimal.js";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
+
 import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { Recipe } from "../../recipe/base/Recipe";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
@@ -99,7 +99,7 @@ class ScheduleOrder {
   @Field(() => Float, {
     nullable: true,
   })
-  duration!: Decimal | null;
+  duration!: number | null;
 
   @ApiProperty({
     required: false,

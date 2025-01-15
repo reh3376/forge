@@ -832,7 +832,7 @@ export class RecipeBomControllerBase {
         `No resource was found for ${JSON.stringify(params)}`
       );
     }
-    return results;
+    return results as RecipeBomItem[];
   }
 
   @common.Post("/:id/recipeBomITem")

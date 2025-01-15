@@ -14,6 +14,7 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { InventoryController } from "../inventory.controller";
 import { InventoryService } from "../inventory.service";
+import { InventorySiloTrackingService } from "../inventory.silotracking.service";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -115,6 +116,21 @@ const service = {
   },
 };
 
+const siloTrackingService = {
+  createInventory() {
+    return CREATE_RESULT;
+  },
+  inventories: () => FIND_MANY_RESULT,
+  inventory: ({ where }: { where: { id: string } }) => {
+    switch (where.id) {
+      case existingId:
+        return FIND_ONE_RESULT;
+      case nonExistingId:
+        return null;
+    }
+  },
+};
+
 const basicAuthGuard = {
   canActivate: (context: ExecutionContext) => {
     const argumentHost = context.switchToHttp();
@@ -157,6 +173,10 @@ describe("Inventory", () => {
           provide: InventoryService,
           useValue: service,
         },
+        {
+          provide: InventorySiloTrackingService,
+          useValue: siloTrackingService,
+        }
       ],
       controllers: [InventoryController],
       imports: [ACLModule],

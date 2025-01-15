@@ -28,10 +28,10 @@ import {
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { Customer } from "../../customer/base/Customer";
-import { Decimal } from "decimal.js";
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
+import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
@@ -139,7 +139,7 @@ class Recipe {
   @Field(() => Float, {
     nullable: true,
   })
-  estimatedAbv!: Decimal | null;
+  estimatedAbv!: number | null;
 
   @ApiProperty({
     required: false,
@@ -207,6 +207,15 @@ class Recipe {
   @Type(() => MashingProtocol)
   @IsOptional()
   mashingProtocol?: MashingProtocol | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeParameter],
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameter)
+  @IsOptional()
+  parameters?: Array<RecipeParameter>;
 
   @ApiProperty({
     required: false,
@@ -287,7 +296,7 @@ class Recipe {
   @Field(() => Float, {
     nullable: true,
   })
-  targetProof!: Decimal | null;
+  targetProof!: number | null;
 
   @ApiProperty({
     required: false,
