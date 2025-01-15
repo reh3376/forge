@@ -1375,6 +1375,11 @@ export class RecipeGenerator {
       console.log("Creating sample schedule order queue record...");
 
       const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
+        where: {
+          queueIndex: {
+            not: null
+          }
+        },
         orderBy: {
           queueIndex: 'desc'
         },
@@ -1383,7 +1388,7 @@ export class RecipeGenerator {
         }
       });
 
-      const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
+      const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1; 
 
       const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
         data: {
