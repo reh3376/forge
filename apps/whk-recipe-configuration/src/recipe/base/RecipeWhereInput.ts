@@ -13,7 +13,7 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { Recipe } from "./Recipe";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
@@ -33,6 +33,7 @@ import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListR
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
+import { EnumRecipeWhiskeyType } from "./EnumRecipeWhiskeyType";
 
 @InputType()
 class RecipeWhereInput {
@@ -346,6 +347,24 @@ class RecipeWhereInput {
     nullable: true,
   })
   updatedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeWhiskeyType,
+  })
+  @IsEnum(EnumRecipeWhiskeyType)
+  @IsOptional()
+  @Field(() => EnumRecipeWhiskeyType, {
+    nullable: true,
+  })
+  whiskeyType?:
+    | "RyeBourbon"
+    | "WheatedBourbon"
+    | "FourGrainBourbon"
+    | "RyeWhiskey"
+    | "WheatWhiskey"
+    | "MaltWhiskey"
+    | "FourGrainWhiskey";
 }
 
 export { RecipeWhereInput as RecipeWhereInput };

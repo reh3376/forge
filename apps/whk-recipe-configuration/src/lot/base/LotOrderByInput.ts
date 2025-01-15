@@ -369,6 +369,28 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  proofInitial?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  proofingTankId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   purchaseOrderAcceptedLotsId?: SortOrder;
 
   @ApiProperty({
@@ -414,6 +436,17 @@ class LotOrderByInput {
     nullable: true,
   })
   status?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  tankOfOriginId?: SortOrder;
 
   @ApiProperty({
     required: false,
