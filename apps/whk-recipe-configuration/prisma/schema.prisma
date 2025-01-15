@@ -632,6 +632,7 @@ model Lot {
   pgLosses                    Float?
   productionOrder             ProductionOrder?    @relation(fields: [productionOrderId], references: [id])
   productionOrderId           String?
+  proofInitial                Float?
   proofingTank                Asset?              @relation(name: "lotProofingTank", fields: [proofingTankId], references: [id])
   proofingTankId              String?
   purchaseOrderAcceptedLots   PurchaseOrder?      @relation(fields: [purchaseOrderAcceptedLotsId], references: [id])

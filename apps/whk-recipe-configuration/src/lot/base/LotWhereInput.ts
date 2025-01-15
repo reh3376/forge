@@ -429,6 +429,17 @@ class LotWhereInput {
 
   @ApiProperty({
     required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  proofInitial?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => AssetWhereUniqueInput,
   })
   @ValidateNested()

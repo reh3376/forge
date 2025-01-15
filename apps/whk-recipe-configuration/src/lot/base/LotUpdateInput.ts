@@ -22,6 +22,7 @@ import {
   IsInt,
   IsBoolean,
   IsDate,
+  Min,
   IsEnum,
 } from "class-validator";
 
@@ -432,6 +433,19 @@ class LotUpdateInput {
     nullable: true,
   })
   productionOrder?: ProductionOrderWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(100)
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  proofInitial?: number | null;
 
   @ApiProperty({
     required: false,

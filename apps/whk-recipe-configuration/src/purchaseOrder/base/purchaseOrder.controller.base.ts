@@ -420,6 +420,8 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        proofInitial: true,
+
         proofingTank: {
           select: {
             id: true,
