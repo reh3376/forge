@@ -17,7 +17,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -20377,6 +20384,376 @@
         ]
       }
     },
+    "/api/assets/{id}/lotProofingTank": {
+      "get": {
+        "operationId": "AssetController_findLotProofingTank",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/LotWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AssetController_connectLotProofingTank",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "AssetController_updateLotProofingTank",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "AssetController_disconnectLotProofingTank",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/assets/{id}/lotTankofOrigin": {
+      "get": {
+        "operationId": "AssetController_findLotTankofOrigin",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/LotWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AssetController_connectLotTankofOrigin",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "AssetController_updateLotTankofOrigin",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "AssetController_disconnectLotTankofOrigin",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "assets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/assets/{id}/lots": {
       "get": {
         "operationId": "AssetController_findLots",
@@ -22412,6 +22789,59 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lot"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lots"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "LotController_deleteLot",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -33736,6 +34166,10 @@
           "password"
         ]
       },
+      "UserInfo": {
+        "type": "object",
+        "properties": {}
+      },
       "StringNullableFilter": {
         "type": "object",
         "properties": {
@@ -34478,6 +34912,9 @@
               "$ref": "#/components/schemas/PurchaseOrder"
             }
           },
+          "required": {
+            "type": "boolean"
+          },
           "testDetails": {
             "type": "string"
           },
@@ -34910,6 +35347,12 @@
           "productionOrder": {
             "$ref": "#/components/schemas/ProductionOrder"
           },
+          "proofInitial": {
+            "type": "number"
+          },
+          "proofingTank": {
+            "$ref": "#/components/schemas/Asset"
+          },
           "purchaseOrderAcceptedLots": {
             "$ref": "#/components/schemas/PurchaseOrder"
           },
@@ -34930,6 +35373,9 @@
               "Submitted",
               "Complete"
             ]
+          },
+          "tankOfOrigin": {
+            "$ref": "#/components/schemas/Asset"
           },
           "totalFermenters": {
             "type": "number"
@@ -35798,6 +36244,18 @@
           },
           "updatedBy": {
             "type": "string"
+          },
+          "whiskeyType": {
+            "type": "string",
+            "enum": [
+              "RyeBourbon",
+              "WheatedBourbon",
+              "FourGrainBourbon",
+              "RyeWhiskey",
+              "WheatWhiskey",
+              "MaltWhiskey",
+              "FourGrainWhiskey"
+            ]
           }
         },
         "required": [
@@ -36660,6 +37118,18 @@
               "$ref": "#/components/schemas/ItemReceipt"
             }
           },
+          "lotProofingTank": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lot"
+            }
+          },
+          "lotTankofOrigin": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lot"
+            }
+          },
           "lots": {
             "type": "array",
             "items": {
@@ -36683,6 +37153,9 @@
           },
           "parent": {
             "$ref": "#/components/schemas/Asset"
+          },
+          "proofInitial": {
+            "type": "number"
           },
           "purchaseOrders": {
             "type": "array",
@@ -39457,6 +39930,18 @@
           },
           "updatedBy": {
             "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "whiskeyType": {
+            "type": "string",
+            "enum": [
+              "RyeBourbon",
+              "WheatedBourbon",
+              "FourGrainBourbon",
+              "RyeWhiskey",
+              "WheatWhiskey",
+              "MaltWhiskey",
+              "FourGrainWhiskey"
+            ]
           }
         }
       },
@@ -40306,6 +40791,12 @@
           "itemReceipts": {
             "$ref": "#/components/schemas/ItemReceiptListRelationFilter"
           },
+          "lotProofingTank": {
+            "$ref": "#/components/schemas/LotListRelationFilter"
+          },
+          "lotTankofOrigin": {
+            "$ref": "#/components/schemas/LotListRelationFilter"
+          },
           "lots": {
             "$ref": "#/components/schemas/LotListRelationFilter"
           },
@@ -40320,6 +40811,9 @@
           },
           "parent": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "proofInitial": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
           },
           "purchaseOrders": {
             "$ref": "#/components/schemas/PurchaseOrderListRelationFilter"
@@ -40519,6 +41013,12 @@
           "productionOrder": {
             "$ref": "#/components/schemas/ProductionOrderWhereUniqueInput"
           },
+          "proofInitial": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "proofingTank": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
           "purchaseOrderAcceptedLots": {
             "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
           },
@@ -40539,6 +41039,9 @@
               "Submitted",
               "Complete"
             ]
+          },
+          "tankOfOrigin": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
           "totalFermenters": {
             "$ref": "#/components/schemas/FloatNullableFilter"
@@ -40759,6 +41262,9 @@
           },
           "purchaseOrder": {
             "$ref": "#/components/schemas/PurchaseOrderListRelationFilter"
+          },
+          "required": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
           },
           "testDetails": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -41164,6 +41670,9 @@
           "purchaseOrder": {
             "$ref": "#/components/schemas/PurchaseOrderCreateNestedManyWithoutTestParametersInput"
           },
+          "required": {
+            "type": "boolean"
+          },
           "schemaVersion": {
             "type": "string"
           },
@@ -41335,6 +41844,9 @@
           },
           "purchaseOrder": {
             "$ref": "#/components/schemas/PurchaseOrderUpdateManyWithoutTestParametersInput"
+          },
+          "required": {
+            "type": "boolean"
           },
           "testDetails": {
             "type": "string"
@@ -42874,6 +43386,18 @@
           },
           "updatedBy": {
             "type": "string"
+          },
+          "whiskeyType": {
+            "type": "string",
+            "enum": [
+              "RyeBourbon",
+              "WheatedBourbon",
+              "FourGrainBourbon",
+              "RyeWhiskey",
+              "WheatWhiskey",
+              "MaltWhiskey",
+              "FourGrainWhiskey"
+            ]
           }
         },
         "required": [
@@ -43169,6 +43693,18 @@
           },
           "updatedBy": {
             "type": "string"
+          },
+          "whiskeyType": {
+            "type": "string",
+            "enum": [
+              "RyeBourbon",
+              "WheatedBourbon",
+              "FourGrainBourbon",
+              "RyeWhiskey",
+              "WheatWhiskey",
+              "MaltWhiskey",
+              "FourGrainWhiskey"
+            ]
           }
         }
       },
@@ -46461,6 +46997,12 @@
           "itemReceipts": {
             "$ref": "#/components/schemas/ItemReceiptCreateNestedManyWithoutAssetsInput"
           },
+          "lotProofingTank": {
+            "$ref": "#/components/schemas/LotCreateNestedManyWithoutAssetsInput"
+          },
+          "lotTankofOrigin": {
+            "$ref": "#/components/schemas/LotCreateNestedManyWithoutAssetsInput"
+          },
           "lots": {
             "$ref": "#/components/schemas/LotCreateNestedManyWithoutAssetsInput"
           },
@@ -46475,6 +47017,9 @@
           },
           "parent": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "proofInitial": {
+            "type": "number"
           },
           "purchaseOrders": {
             "$ref": "#/components/schemas/PurchaseOrderCreateNestedManyWithoutAssetsInput"
@@ -46815,6 +47360,12 @@
           "itemReceipts": {
             "$ref": "#/components/schemas/ItemReceiptUpdateManyWithoutAssetsInput"
           },
+          "lotProofingTank": {
+            "$ref": "#/components/schemas/LotUpdateManyWithoutAssetsInput"
+          },
+          "lotTankofOrigin": {
+            "$ref": "#/components/schemas/LotUpdateManyWithoutAssetsInput"
+          },
           "lots": {
             "$ref": "#/components/schemas/LotUpdateManyWithoutAssetsInput"
           },
@@ -46829,6 +47380,9 @@
           },
           "parent": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "proofInitial": {
+            "type": "number"
           },
           "purchaseOrders": {
             "$ref": "#/components/schemas/PurchaseOrderUpdateManyWithoutAssetsInput"
@@ -47339,6 +47893,12 @@
           "productionOrder": {
             "$ref": "#/components/schemas/ProductionOrderWhereUniqueInput"
           },
+          "proofInitial": {
+            "type": "number"
+          },
+          "proofingTank": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
           "purchaseOrderAcceptedLots": {
             "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
           },
@@ -47359,6 +47919,9 @@
               "Submitted",
               "Complete"
             ]
+          },
+          "tankOfOrigin": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
           "totalFermenters": {
             "type": "number"
@@ -47604,6 +48167,12 @@
           "productionOrder": {
             "$ref": "#/components/schemas/ProductionOrderWhereUniqueInput"
           },
+          "proofInitial": {
+            "type": "number"
+          },
+          "proofingTank": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
           "purchaseOrderAcceptedLots": {
             "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
           },
@@ -47624,6 +48193,9 @@
               "Submitted",
               "Complete"
             ]
+          },
+          "tankOfOrigin": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
           },
           "totalFermenters": {
             "type": "number"
