@@ -94,12 +94,6 @@ export class ProductionOrderControllerBase {
             }
           : undefined,
 
-        salesOrder: data.salesOrder
-          ? {
-              connect: data.salesOrder,
-            }
-          : undefined,
-
         scheduleOrder: data.scheduleOrder
           ? {
               connect: data.scheduleOrder,
@@ -115,9 +109,6 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -143,8 +134,6 @@ export class ProductionOrderControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -154,12 +143,6 @@ export class ProductionOrderControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
@@ -178,6 +161,10 @@ export class ProductionOrderControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
   }
@@ -209,9 +196,6 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -237,8 +221,6 @@ export class ProductionOrderControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -248,12 +230,6 @@ export class ProductionOrderControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
@@ -272,6 +248,10 @@ export class ProductionOrderControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
   }
@@ -302,9 +282,6 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
-        completedCooks: true,
-        completedFermenters: true,
-        completedQuantity: true,
         createdAt: true,
         createdBy: true,
 
@@ -330,8 +307,6 @@ export class ProductionOrderControllerBase {
         },
 
         name: true,
-        plannedCooks: true,
-        plannedFermenters: true,
         quantity: true,
 
         recipe: {
@@ -341,12 +316,6 @@ export class ProductionOrderControllerBase {
         },
 
         recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        salesOrder: {
           select: {
             id: true,
           },
@@ -365,6 +334,10 @@ export class ProductionOrderControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
       },
     });
     if (result === null) {
@@ -424,12 +397,6 @@ export class ProductionOrderControllerBase {
               }
             : undefined,
 
-          salesOrder: data.salesOrder
-            ? {
-                connect: data.salesOrder,
-              }
-            : undefined,
-
           scheduleOrder: data.scheduleOrder
             ? {
                 connect: data.scheduleOrder,
@@ -445,9 +412,6 @@ export class ProductionOrderControllerBase {
 
           className: true,
           complete: true,
-          completedCooks: true,
-          completedFermenters: true,
-          completedQuantity: true,
           createdAt: true,
           createdBy: true,
 
@@ -473,8 +437,6 @@ export class ProductionOrderControllerBase {
           },
 
           name: true,
-          plannedCooks: true,
-          plannedFermenters: true,
           quantity: true,
 
           recipe: {
@@ -484,12 +446,6 @@ export class ProductionOrderControllerBase {
           },
 
           recipeGroup: {
-            select: {
-              id: true,
-            },
-          },
-
-          salesOrder: {
             select: {
               id: true,
             },
@@ -508,6 +464,10 @@ export class ProductionOrderControllerBase {
           units: true,
           updatedAt: true,
           updatedBy: true,
+        totalFermenters: true,
+        totalCooks: true,
+        executedCooks: true,
+        executedFermenters: true,
         },
       });
     } catch (error) {
