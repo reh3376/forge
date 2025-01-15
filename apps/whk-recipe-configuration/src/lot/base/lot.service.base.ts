@@ -125,6 +125,14 @@ export class LotServiceBase {
       .productionOrder();
   }
 
+  async getProofingTank(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .proofingTank();
+  }
+
   async getPurchaseOrderAcceptedLots(
     parentId: string
   ): Promise<PrismaPurchaseOrder | null> {
@@ -141,5 +149,13 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .recipe();
+  }
+
+  async getTankOfOrigin(parentId: string): Promise<PrismaAsset | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .tankOfOrigin();
   }
 }

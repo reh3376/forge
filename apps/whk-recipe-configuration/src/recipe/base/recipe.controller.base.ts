@@ -154,6 +154,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
   }
@@ -223,6 +224,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
   }
@@ -293,6 +295,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
     if (result === null) {
@@ -405,6 +408,7 @@ export class RecipeControllerBase {
           targetProof: true,
           updatedAt: true,
           updatedBy: true,
+          whiskeyType: true,
         },
       });
     } catch (error) {
@@ -641,6 +645,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
     if (results === null) {
@@ -788,6 +793,14 @@ export class RecipeControllerBase {
           },
         },
 
+        proofInitial: true,
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -803,6 +816,13 @@ export class RecipeControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
