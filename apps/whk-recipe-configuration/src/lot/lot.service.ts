@@ -231,8 +231,4 @@ export class LotService extends LotServiceBase {
     this.logger.log(`Updated Lot: ${Lot.lotNumber} & pushed to topic`);
     return Lot;
   }
-
-  async deleteLot<T extends Prisma.LotDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.LotDeleteArgs>): Promise<import(".prisma/client").Lot> {
-    throw new Error("Delete operations are not allowed for Lot.");
-  }
 }
