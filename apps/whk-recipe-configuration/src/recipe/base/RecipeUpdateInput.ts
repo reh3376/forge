@@ -21,6 +21,7 @@ import {
   IsInt,
   Max,
   IsNumber,
+  IsEnum,
 } from "class-validator";
 
 import { Recipe } from "./Recipe";
@@ -39,6 +40,7 @@ import { RecipeBomUpdateManyWithoutRecipesInput } from "./RecipeBomUpdateManyWit
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
+import { EnumRecipeWhiskeyType } from "./EnumRecipeWhiskeyType";
 
 @InputType()
 class RecipeUpdateInput {
@@ -339,6 +341,25 @@ class RecipeUpdateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeWhiskeyType,
+  })
+  @IsEnum(EnumRecipeWhiskeyType)
+  @IsOptional()
+  @Field(() => EnumRecipeWhiskeyType, {
+    nullable: true,
+  })
+  whiskeyType?:
+    | "RyeBourbon"
+    | "WheatedBourbon"
+    | "FourGrainBourbon"
+    | "RyeWhiskey"
+    | "WheatWhiskey"
+    | "MaltWhiskey"
+    | "FourGrainWhiskey"
+    | null;
 }
 
 export { RecipeUpdateInput as RecipeUpdateInput };

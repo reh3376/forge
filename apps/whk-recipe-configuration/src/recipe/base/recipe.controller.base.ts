@@ -151,6 +151,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
   }
@@ -220,6 +221,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
   }
@@ -290,6 +292,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
     if (result === null) {
@@ -402,6 +405,7 @@ export class RecipeControllerBase {
           targetProof: true,
           updatedAt: true,
           updatedBy: true,
+          whiskeyType: true,
         },
       });
     } catch (error) {
@@ -638,6 +642,7 @@ export class RecipeControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
     if (results === null) {
