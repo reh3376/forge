@@ -32,7 +32,7 @@
     "db:prod:usecaution:init": "run-s \"db:dev:migrate-save -- --name 'initial version'\"",
     "db:dev:init": "run-s \"db:dev:migrate-save -- --name 'initial version'\" db:prod:migrate-deploy dev:seed",
     "db:dev:migrate-save": "prisma migrate dev",
-    "db:prod:migrate-deploy": "prisma migrate deploy",
+    "db:prod:deploy": "prisma migrate deploy",
     "db:dev:clean": "prisma migrate reset",
     "prisma:generate": "prisma generate",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
