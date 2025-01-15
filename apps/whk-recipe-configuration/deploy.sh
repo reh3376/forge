@@ -64,6 +64,6 @@
    done
 
    # Run Prisma Migrations
-   npm run db:prod:migrate-deploy
+   npm run db:prod:deploy
 
    echo "All instances reloaded successfully."
