@@ -2,7 +2,7 @@ name: E2E CI Pipeline
 
 on:
   push:
-    branches: ['*']
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -24,12 +24,15 @@ jobs:
 
     - name: Install dependencies
       run: npm install
+      working-directory: ./apps/whk-recipe-configuration
 
     - name: Build Docker images
       run: docker-compose build
+      working-directory: ./apps/whk-recipe-configuration
 
     - name: Start Docker Compose services
       run: docker-compose up -d
+      working-directory: ./apps/whk-recipe-configuration
 
     - name: Wait for services to be ready
       run: |
@@ -50,5 +53,3 @@ jobs:
     - name: Stop Docker Compose services
       if: always()
       run: docker-compose down
-
-      # comment to trip GHA pipeline
