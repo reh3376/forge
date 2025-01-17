@@ -2,9 +2,9 @@ name: E2E CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: ["*"]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -14,59 +14,59 @@ jobs:
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
 
-    - name: Install dependencies
-      run: npm install
-      working-directory: ./apps/whk-recipe-configuration
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./apps/whk-recipe-configuration
 
-    - name: Decrypt the .env file from dotenv-vault
-      run: npx dotenv-vault@latest decrypt ${DOTENV_KEY} > .env
-      working-directory: ./apps/whk-recipe-configuration
-      env:
-        DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+      - name: Decrypt the .env file from dotenv-vault
+        run: npx dotenv-vault@latest decrypt ${DOTENV_KEY} > .env
+        working-directory: ./apps/whk-recipe-configuration
+        env:
+          DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
-    - name: Install Docker Compose
-      run: |
-        sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
 
-    - name: Add user to docker group
-      run: |
-        sudo usermod -aG docker $USER
-        newgrp docker
+      - name: Add user to docker group
+        run: |
+          sudo usermod -aG docker $USER
+          newgrp docker
 
-    - name: Build Docker images
-      run: docker-compose build
-      working-directory: ./apps/whk-recipe-configuration
+      - name: Build Docker images
+        run: docker-compose build
+        working-directory: ./apps/whk-recipe-configuration
 
-    - name: Start Docker Compose services
-      run: docker-compose up -d
-      working-directory: ./apps/whk-recipe-configuration
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+        working-directory: ./apps/whk-recipe-configuration
 
-    - name: Wait for services to be ready
-      run: |
-        retries=10
-        until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login || [ $retries -eq 0 ]; do
-          echo "Waiting for service..."
-          sleep 5
-          retries=$((retries - 1))
-        done
-        if [ $retries -eq 0 ]; then
-          echo "Service did not start in time."
-          exit 1
-        fi
+      - name: Wait for services to be ready
+        run: |
+          retries=10
+          until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login || [ $retries -eq 0 ]; do
+            echo "Waiting for service..."
+            sleep 5
+            retries=$((retries - 1))
+          done
+          if [ $retries -eq 0 ]; then
+            echo "Service did not start in time."
+            exit 1
+          fi
 
-    - name: Run tests
-      run: npm test
+      - name: Run tests
+        run: npm test
 
-    - name: Stop Docker Compose services
-      if: always()
-      run: docker-compose down
-      working-directory: ./apps/whk-recipe-configuration
+      - name: Stop Docker Compose services
+        if: always()
+        run: docker-compose down
+        working-directory: ./apps/whk-recipe-configuration
