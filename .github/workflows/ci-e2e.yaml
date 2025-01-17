@@ -28,7 +28,7 @@ jobs:
 
     - name: Decrypt the .env file from dotenv-vault
       run: npx dotenv-vault@latest decrypt ${DOTENV_KEY} > .env
-      working-directory: ./apps/whk-wms
+      working-directory: ./apps/whk-recipe-configuration
       env:
         DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
