@@ -102,6 +102,7 @@ jobs:
 
       - name: Run tests
         run: npm test
+        working-directory: ./apps/whk-recipe-configuration
 
       - name: Stop Docker Compose services
         if: always()
