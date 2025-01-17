@@ -30,43 +30,62 @@ jobs:
         run: npx dotenv-vault@latest decrypt ${DOTENV_KEY} > .env
         working-directory: ./apps/whk-recipe-configuration
         env:
-          DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+          DOTENV_KEY: ${{ secrets.DOTENV_KEY_CI }}
+
+      - name: List configuration directory contents
+        run: ls -la ./apps/whk-recipe-configuration
 
       - name: Install Docker Compose
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
 
+      - name: Verify Docker Compose Installation
+        run: docker-compose --version
+
       - name: Add user to docker group
         run: |
           sudo usermod -aG docker $USER
-          newgrp docker
 
       - name: Build Docker images
-        run: docker-compose build
+        run: sudo ocker-compose build
         working-directory: ./apps/whk-recipe-configuration
 
       - name: Start Docker Compose services
-        run: docker-compose up -d
+        run: sudo docker-compose up -d
         working-directory: ./apps/whk-recipe-configuration
 
       - name: Wait for services to be ready
         run: |
-          retries=500
-          until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login || [ $retries -eq 0 ]; do
-            echo "Waiting for service..."
-            sleep 5
+          retries=60
+          delay=30
+          until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login; do
+            echo "Waiting for service to be ready... Attempt $((61 - retries))/$60"
+            sleep $delay
             retries=$((retries - 1))
+            if [ $retries -le 0 ]; then
+              echo "Service did not start in time. Gathering logs..."
+              sudo docker-compose logs
+              exit 1
+            fi
           done
-          if [ $retries -eq 0 ]; then
-            echo "Service did not start in time."
-            exit 1
-          fi
+        working-directory: ./apps/whk-recipe-configuration
+        env:
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
+      - name: Check Docker services status
+        run: sudo docker-compose ps
+        working-directory: ./apps/whk-recipe-configuration
+
+      - name: View Docker Compose logs
+        run: sudo docker-compose logs
+        working-directory: ./apps/whk-recipe-configuration
 
       - name: Run tests
         run: npm test
 
       - name: Stop Docker Compose services
         if: always()
-        run: docker-compose down
+        run: sudo docker-compose down
         working-directory: ./apps/whk-recipe-configuration
