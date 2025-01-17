@@ -32,6 +32,10 @@ jobs:
         env:
           DOTENV_KEY: ${{ secrets.DOTENV_KEY_CI }}
 
+      - name: Display .env contents
+        run: cat .env
+        working-directory: ./apps/whk-recipe-configuration
+
       - name: List configuration directory contents
         run: ls -la ./apps/whk-recipe-configuration
 
