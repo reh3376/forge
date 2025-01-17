@@ -67,7 +67,7 @@ jobs:
         run: |
           retries=60
           delay=30
-          until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login; do
+          until curl -s -X POST -H "Content-Type: application/json" -d "{\"user\": \"$TEST_USERNAME\", \"password\": \"$TEST_PASSWORD\"}" http://localhost:3000/api/login; do
             echo "Waiting for service to be ready... Attempt $((61 - retries))/$60"
             echo "Current Docker container status:"
             server_id=$(sudo docker ps -qf "name=whk-mes-server-1")
@@ -89,8 +89,8 @@ jobs:
           done
         working-directory: ./apps/whk-recipe-configuration
         env:
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          TEST_USERNAME: ${MES_USER}
+          TEST_PASSWORD: ${MES_PASSWORD}
 
       - name: Check Docker services status
         run: sudo docker-compose ps
