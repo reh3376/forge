@@ -50,3 +50,5 @@ jobs:
     - name: Stop Docker Compose services
       if: always()
       run: docker-compose down
+
+      # comment to trip GHA pipeline
