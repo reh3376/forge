@@ -48,11 +48,15 @@ jobs:
           sudo usermod -aG docker $USER
 
       - name: Build Docker images
-        run: sudo docker-compose build
+        run: sudo ocker-compose build
         working-directory: ./apps/whk-recipe-configuration
 
       - name: Start Docker Compose services
         run: sudo docker-compose up -d
+        working-directory: ./apps/whk-recipe-configuration
+
+      - name: Check Docker services status
+        run: sudo docker-compose ps
         working-directory: ./apps/whk-recipe-configuration
 
       - name: Wait for services to be ready
