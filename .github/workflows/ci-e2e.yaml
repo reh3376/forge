@@ -34,6 +34,8 @@ jobs:
     - name: Build Docker images
       run: docker-compose build
       working-directory: ./apps/whk-recipe-configuration
+      env:
+        DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
     - name: Start Docker Compose services
       run: docker-compose up -d
