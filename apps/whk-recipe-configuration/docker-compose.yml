@@ -33,6 +33,10 @@ services:
       NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
       NEW_RELIC_SECURITY_ENABLED: ${NEW_RELIC_SECURITY_ENABLED}
       NEW_RELIC_SECURITY_AGENT_ENABLED: ${NEW_RELIC_SECURITY_AGENT_ENABLED}
+      AZURE_VAULT_NAME: ${AZURE_VAULT_NAME}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID}
     depends_on:
       - redis
     restart: on-failure
@@ -41,11 +45,14 @@ services:
       context: .
       args:
         NPM_LOG_LEVEL: notice
-    command: npm run db:init
+    command: >
+      /bin/sh -c "npm run db:prod:deploy && npm run prod:seed"
     working_dir: /app/server
     environment:
       BCRYPT_SALT: ${BCRYPT_SALT}
       DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      MES_USER: ${MES_USER}
+      MES_PASSWORD: ${MES_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
