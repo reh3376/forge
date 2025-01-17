@@ -64,3 +64,4 @@ jobs:
     - name: Stop Docker Compose services
       if: always()
       run: docker-compose down
+      working-directory: ./apps/whk-recipe-configuration
