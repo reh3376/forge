@@ -26,6 +26,12 @@ jobs:
       run: npm install
       working-directory: ./apps/whk-recipe-configuration
 
+    - name: Decrypt the .env file from dotenv-vault
+      run: npx dotenv-vault@latest decrypt ${DOTENV_KEY} > .env
+      working-directory: ./apps/whk-wms
+      env:
+        DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+
     - name: Install Docker Compose
       run: |
         sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -34,8 +40,6 @@ jobs:
     - name: Build Docker images
       run: docker-compose build
       working-directory: ./apps/whk-recipe-configuration
-      env:
-        DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
 
     - name: Start Docker Compose services
       run: docker-compose up -d
