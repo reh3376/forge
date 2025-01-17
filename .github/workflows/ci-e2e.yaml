@@ -1,0 +1,52 @@
+name: E2E CI Pipeline
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Docker images
+      run: docker-compose build
+
+    - name: Start Docker Compose services
+      run: docker-compose up -d
+
+    - name: Wait for services to be ready
+      run: |
+        retries=10
+        until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login || [ $retries -eq 0 ]; do
+          echo "Waiting for service..."
+          sleep 5
+          retries=$((retries - 1))
+        done
+        if [ $retries -eq 0 ]; then
+          echo "Service did not start in time."
+          exit 1
+        fi
+
+    - name: Run tests
+      run: npm test
+
+    - name: Stop Docker Compose services
+      if: always()
+      run: docker-compose down
