@@ -52,7 +52,7 @@ jobs:
 
       - name: Wait for services to be ready
         run: |
-          retries=10
+          retries=500
           until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login || [ $retries -eq 0 ]; do
             echo "Waiting for service..."
             sleep 5
