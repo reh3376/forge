@@ -65,11 +65,15 @@ jobs:
           delay=30
           until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login; do
             echo "Waiting for service to be ready... Attempt $((61 - retries))/$60"
+            echo "Current Docker container status:"
+            sudo docker ps
             sleep $delay
             retries=$((retries - 1))
             if [ $retries -le 0 ]; then
               echo "Service did not start in time. Gathering logs..."
               sudo docker-compose logs
+              echo "Final Docker container status:"
+              sudo docker ps
               exit 1
             fi
           done
