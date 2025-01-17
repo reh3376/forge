@@ -66,7 +66,7 @@ jobs:
           until curl -s -u "$TEST_USERNAME:$TEST_PASSWORD" http://localhost:3000/api/login; do
             echo "Waiting for service to be ready... Attempt $((61 - retries))/$60"
             echo "Current Docker container status:"
-            server_id=$(sudo docker ps -qf "name=whk-recipe-configuration-server")
+            server_id=$(sudo docker ps -qf "name=whk-mes-server-1")
             if [ -n "$server_id" ]; then
               echo "Server container logs:"
               sudo docker logs $server_id
