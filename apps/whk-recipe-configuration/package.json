@@ -25,6 +25,7 @@
     "prod:seed:mash:ejg:74180008": "ts-node scripts/seed.prod.mashRecipe.EJG.74180008.ts",
     "prod:seed:mash:wcl:75150010": "ts-node scripts/seed.prod.mashRecipe.WCL.75150010.ts",
     "prod:seed:mash:abt:70210009": "ts-node scripts/seed.prod.mashRecipe.ABT.70210009.ts",
+    "prod:seed:mash:bgl:70210009": "ts-node scripts/seed.prod.mashRecipe.BGL.70210009.ts",
     "prod:seed:tests": "ts-node scripts/seed.prod.tests.ts",
     "prod:seed:assets": "ts-node scripts/seed.prod.assets.ts",
     "prod:seed:unit": "ts-node scripts/seed.prod.unitLink.ts",
@@ -121,7 +122,7 @@
     "prisma": "^5.18.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
   },
   "jest": {
     "preset": "ts-jest",
