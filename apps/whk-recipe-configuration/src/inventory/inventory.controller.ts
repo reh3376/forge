@@ -74,7 +74,7 @@ export class InventoryController extends InventoryControllerBase {
     action: "read",
     possession: "any",
   })
-  async getAssetInventory(@common.Param("assetId") assetId: string): Promise<any[]> {
+  async getAssetInventory(@common.Param("assetId") assetId: string): Promise<{inventory: any[], totalInventory: number}> {
     return this.siloTrackingService.getAssetInventory(assetId);
   }
 
