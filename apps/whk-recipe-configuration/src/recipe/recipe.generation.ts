@@ -1157,7 +1157,15 @@ export class RecipeGenerator {
           unitProcedures: {
             connect: { id: mashingUnitProcedure.id }
           },
-        }
+        },
+        include: {
+          item: true,
+          customer: true,
+          recipeGroup: true,
+          recipeBoms: true,
+          unitProcedures: true,
+          productionOrders: true,
+        },
       });
       console.log("Mashing Recipe updated successfully");
     } else {
