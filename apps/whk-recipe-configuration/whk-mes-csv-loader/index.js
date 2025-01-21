@@ -8,6 +8,14 @@ const addPOSTFIX = (postfix, addToThis) => {
   return addToThis + postfix;
 };
 
+const spaceToDash = (spacedString) => {
+  return spacedString.replace(/ /g, "-");
+};
+
+const addPOSTFIXandSpaceToDash = (postfix, addToThis) => {
+  return spaceToDash(addPOSTFIX(postfix, addToThis));
+};
+
 if (process.env.NODE_ENV === "development") {
   const prisma = new PrismaClient();
   dotenv.config();
@@ -65,7 +73,7 @@ if (process.env.NODE_ENV === "development") {
     });
     // Add postfix to the mashbill field if it exists
     if (renamedRow.recipe) {
-      renamedRow.recipe = addPOSTFIX("-R01", renamedRow.recipe);
+      renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
     }
 
     return renamedRow;
