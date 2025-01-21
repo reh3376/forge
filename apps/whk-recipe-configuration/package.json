@@ -63,9 +63,9 @@
     "@nestjs/platform-express": "10.4.5",
     "@nestjs/serve-static": "4.0.2",
     "@nestjs/swagger": "7.4.0",
+    "@newrelic/apollo-server-plugin": "latest",
     "@prisma/client": "5.18.0",
     "@types/bcrypt": "5.0.2",
-    "@newrelic/apollo-server-plugin": "latest",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",
     "bcrypt": "5.1.1",
@@ -96,8 +96,8 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.5",
-    "@nestjs/testing": "^10.3.9",
     "@nestjs/devtools-integration": "latest",
+    "@nestjs/testing": "^10.3.9",
     "@types/cache-manager": "4.0.4",
     "@types/express": "^5.0.0",
     "@types/graphql-type-json": "0.3.5",
@@ -120,7 +120,8 @@
     "prisma": "^5.18.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
+    "xlsx": "^0.18.5"
   },
   "jest": {
     "preset": "ts-jest",

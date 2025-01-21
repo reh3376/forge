@@ -60,7 +60,7 @@ const renamedData = jsonData.map((row) => {
   });
   return renamedRow;
 });
-console.log("🚀 ~ renamedData:", renamedData);
+// console.log("🚀 ~ renamedData:", renamedData);
 
 // Save renamed data to a JSON file
 fs.writeFileSync(
@@ -68,13 +68,83 @@ fs.writeFileSync(
   JSON.stringify(renamedData, null, 2),
   "utf8"
 );
+const getOrCreateCustomer = async (
+  customerName = "Default Customer",
+  createdBy = "system"
+) => {
+  // Ensure a default value is always used if customerName is undefined or null
+  const customerToUse = customerName || "Default Customer";
 
+  // Find an existing customer by name
+  const existingCustomer = await prisma.customer.findFirst({
+    where: { name: customerToUse },
+  });
+
+  if (existingCustomer) {
+    return { connect: { id: existingCustomer.id } };
+  }
+
+  // Create a new customer if not found
+  const newCustomer = await prisma.customer.create({
+    data: {
+      name: customerToUse,
+      address: "Default Address", // Provide a default address
+      createdBy, // Use the provided or default value for createdBy
+    },
+  });
+
+  return { connect: { id: newCustomer.id } };
+};
+
+const getOrCreateRecipe = async (
+  recipeName,
+  customerName,
+  createdBy = "Micheal Palliparambil"
+) => {
+  if (!recipeName) return undefined;
+
+  const customerRelation = await getOrCreateCustomer(customerName);
+
+  const existingRecipe = await prisma.recipe.findFirst({
+    where: { Recipe: recipeName },
+  });
+
+  if (existingRecipe) {
+    return { connect: { id: existingRecipe.id } };
+  }
+
+  // If not found, create a new recipe and return its ID
+  const newRecipe = await prisma.recipe.create({
+    data: { Recipe: recipeName, createdBy, customer: customerRelation },
+  });
+
+  return { connect: { id: newRecipe.id } };
+};
+
+function adjustLotNumber(lotNumber, barrelType) {
+  // Check if the lot number already contains a dot and has the correct format
+  if (lotNumber && /\.\d{2}$/.test(lotNumber)) {
+    return lotNumber; // Return as is if already correct
+  }
+
+  // Determine the postfix based on the barrel type
+  const postfix =
+    barrelType === "WVBC" ? ".01" : barrelType === "ISC" ? ".10" : ".99"; // Default to .07 if neither WVBC nor ISC
+
+  // Append the postfix if the lot number doesn't already have it
+  return lotNumber && postfix ? `${lotNumber}${postfix}` : lotNumber;
+}
 // Seed the database
 async function seedDatabase() {
   console.info("Starting database seeding...");
 
   for (const data of renamedData) {
     try {
+      const recipeRelation = await getOrCreateRecipe(data.recipe);
+
+      // Adjust the lot number based on the rules
+      const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
+      // TODO: connect container item id
       const lotData = {
         avgBblFillByPg: data.avgBblFillByPg,
         avgBblFillByWg: data.avgBblFillByWg,
@@ -96,27 +166,26 @@ async function seedDatabase() {
         totalPGs: data.totalPGs,
         bblTotal: data.bblTotal,
         bblType: data.bblType,
-        lotNumber: data.lotNumber,
+        lotNumber: adjustedLotNumber,
         lotCreatedAt: data.lotCreatedAt
-          ? new Date((Number(data.lotCreatedAt) - 25569) * 86400 * 1000) // Ensure numeric and valid
-          : null, // Default to null if invalid, // Convert Excel date
+          ? new Date((Number(data.lotCreatedAt) - 25569) * 86400 * 1000) // Convert Excel date
+          : null,
         warehouseEntryNumber: parseInt(data.warehouseEntryNumber, 10) || null,
         totalWeight: data.totalWeight,
         lotAlphaChar: data.lotAlphaChar,
         status: data.status || "Started",
-        recipe: {
-          connect: {
-            id: data.recipe, // Assuming recipe ID is provided
-          },
-        },
-        productionOrder: data.productionOrder
-          ? {
-              connectOrCreate: {
-                where: { id: data.productionOrder },
-                create: { id: data.productionOrder, status: "Initiated" },
-              },
-            }
-          : undefined,
+        recipe: recipeRelation,
+        // productionOrder: data.productionOrder
+        //   ? {
+        //       connectOrCreate: {
+        //         where: { id: data.productionOrder },
+        //         create: {
+        //           id: data.productionOrder,
+        //           status: "Initiated",
+        //         },
+        //       },
+        //     }
+        //   : undefined,
       };
 
       await prisma.lot.upsert({
