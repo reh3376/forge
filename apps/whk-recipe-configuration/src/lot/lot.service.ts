@@ -129,8 +129,8 @@ export class LotService extends LotServiceBase {
     this.logger.log(`lotNumber: ${args.data.lotNumber}`);
 
     // If createdAt is provided, use that date instead of current date
-    if (args.data.createdAt) {
-      const createdDate = new Date(args.data.createdAt);
+    if (args.data.lotCreatedAt) {
+      const createdDate = new Date(args.data.lotCreatedAt);
       const createdYear = createdDate.getFullYear().toString().slice(-2);
       const createdMonth = String.fromCharCode(64 + createdDate.getMonth() + 1);
       const createdDay = createdDate.getDate().toString().padStart(2, "0");
