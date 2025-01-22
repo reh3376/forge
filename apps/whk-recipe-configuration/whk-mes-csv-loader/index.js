@@ -1,13 +1,13 @@
 // import modules
-const XLSX = require("xlsx");
-const fs = require("fs");
-const dotenv = require("dotenv");
-const { PrismaClient } = require("@prisma/client");
-const {
+import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
+import fs from "fs";
+import XLSX from "xlsx";
+import {
   addPOSTFIXandSpaceToDash,
-  getOrCreateRecipe,
   findRelatedIdsByRecipe,
-} = require("./functions/index");
+  getOrCreateRecipe,
+} from "./functions/index.js";
 
 if (process.env.NODE_ENV === "development") {
   const prisma = new PrismaClient();
@@ -58,26 +58,27 @@ if (process.env.NODE_ENV === "development") {
   };
 
   // Rename keys in each row
-  const renamedData = jsonData.map(async (row) => {
-    const renamedRow = {};
-    header.forEach((key, index) => {
-      const mappedKey = keyMappings[key] || key; // Map to the new key or keep the original
-      renamedRow[mappedKey] = row[index] || null; // Assign value to the new key
-    });
-    // Add postfix to the mashbill field if it exists
-    if (renamedRow.recipe) {
-      renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
-    }
-    // Find productionOrderId, containerId, and fgItemId
-    const { productionOrderId, containerId, fgItemId } =
-      await findRelatedIdsByRecipe(renamedRow.recipe);
+  const renamedData = await Promise.all(
+    jsonData.map(async (row) => {
+      const renamedRow = {};
+      header.forEach((key, index) => {
+        const mappedKey = keyMappings[key] || key;
+        renamedRow[mappedKey] = row[index] || null;
+      });
+      if (renamedRow.recipe) {
+        renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
+      }
+      const { productionOrderId, containerId, fgItemId } =
+        await findRelatedIdsByRecipe(renamedRow.recipe, prisma);
 
-    renamedRow.productionOrderId = productionOrderId;
-    renamedRow.containerId = containerId;
-    renamedRow.fgItemId = fgItemId;
+      renamedRow.productionOrderId = productionOrderId;
+      renamedRow.containerId = containerId;
+      renamedRow.fgItemId = fgItemId;
 
-    return renamedRow;
-  });
+      return renamedRow;
+    })
+  );
+
   console.log("🚀 ~ renamedData:", renamedData);
 
   // Save renamed data to a JSON file
