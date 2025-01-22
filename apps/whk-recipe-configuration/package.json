@@ -1,6 +1,7 @@
 {
   "name": "@whk-mes/server",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "nest start",
     "dev:start": "pm2 reload ecosystem.config.js --update-env",
@@ -89,7 +90,6 @@
     "passport-http": "0.3.0",
     "passport-jwt": "4.0.1",
     "reflect-metadata": "0.1.13",
-    "ts-node": "10.9.2",
     "type-fest": "2.19.0",
     "validator": "13.12.0",
     "winston": "^3.3.3"
@@ -120,7 +120,8 @@
     "prisma": "^5.18.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.4.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
     "xlsx": "^0.18.5"
   },
   "jest": {
