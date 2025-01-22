@@ -3,18 +3,11 @@ const XLSX = require("xlsx");
 const fs = require("fs");
 const dotenv = require("dotenv");
 const { PrismaClient } = require("@prisma/client");
-
-const addPOSTFIX = (postfix, addToThis) => {
-  return addToThis + postfix;
-};
-
-const spaceToDash = (spacedString) => {
-  return spacedString.replace(/ /g, "-");
-};
-
-const addPOSTFIXandSpaceToDash = (postfix, addToThis) => {
-  return spaceToDash(addPOSTFIX(postfix, addToThis));
-};
+const {
+  addPOSTFIXandSpaceToDash,
+  getOrCreateRecipe,
+  findRelatedIdsByRecipe,
+} = require("./functions/index");
 
 if (process.env.NODE_ENV === "development") {
   const prisma = new PrismaClient();
@@ -75,6 +68,13 @@ if (process.env.NODE_ENV === "development") {
     if (renamedRow.recipe) {
       renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
     }
+    // Find productionOrderId, containerId, and fgItemId
+    const { productionOrderId, containerId, fgItemId } =
+      await findRelatedIdsByRecipe(renamedRow.recipe);
+
+    renamedRow.productionOrderId = productionOrderId;
+    renamedRow.containerId = containerId;
+    renamedRow.fgItemId = fgItemId;
 
     return renamedRow;
   });
@@ -86,72 +86,6 @@ if (process.env.NODE_ENV === "development") {
     JSON.stringify(renamedData, null, 2),
     "utf8"
   );
-  const getOrCreateCustomer = async (
-    customerName = "Default Customer",
-    createdBy = "system"
-  ) => {
-    // Ensure a default value is always used if customerName is undefined or null
-    const customerToUse = customerName || "Default Customer";
-
-    // Find an existing customer by name
-    const existingCustomer = await prisma.customer.findFirst({
-      where: { name: customerToUse },
-    });
-
-    if (existingCustomer) {
-      return { connect: { id: existingCustomer.id } };
-    }
-
-    // Create a new customer if not found
-    const newCustomer = await prisma.customer.create({
-      data: {
-        name: customerToUse,
-        address: "Default Address", // Provide a default address
-        createdBy, // Use the provided or default value for createdBy
-      },
-    });
-
-    return { connect: { id: newCustomer.id } };
-  };
-
-  const getOrCreateRecipe = async (
-    recipeName,
-    customerName,
-    createdBy = "Micheal Palliparambil"
-  ) => {
-    if (!recipeName) return undefined;
-
-    const customerRelation = await getOrCreateCustomer(customerName);
-
-    const existingRecipe = await prisma.recipe.findFirst({
-      where: { Recipe: recipeName },
-    });
-
-    if (existingRecipe) {
-      return { connect: { id: existingRecipe.id } };
-    }
-
-    // If not found, create a new recipe and return its ID
-    const newRecipe = await prisma.recipe.create({
-      data: { Recipe: recipeName, createdBy, customer: customerRelation },
-    });
-
-    return { connect: { id: newRecipe.id } };
-  };
-
-  function adjustLotNumber(lotNumber, barrelType) {
-    // Check if the lot number already contains a dot and has the correct format
-    if (lotNumber && /\.\d{2}$/.test(lotNumber)) {
-      return lotNumber; // Return as is if already correct
-    }
-
-    // Determine the postfix based on the barrel type
-    const postfix =
-      barrelType === "WVBC" ? ".01" : barrelType === "ISC" ? ".10" : ".99"; // Default to .07 if neither WVBC nor ISC
-
-    // Append the postfix if the lot number doesn't already have it
-    return lotNumber && postfix ? `${lotNumber}${postfix}` : lotNumber;
-  }
 
   // TODO: connect container item id
   // TODO: connect fg item id
@@ -163,7 +97,7 @@ if (process.env.NODE_ENV === "development") {
 
     for (const data of renamedData) {
       try {
-        const recipeRelation = await getOrCreateRecipe(data.recipe);
+        const recipeRelation = await getOrCreateRecipe(data.recipe); //TODO: SETUP customer name
 
         // Adjust the lot number based on the rules
         const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
@@ -233,7 +167,5 @@ if (process.env.NODE_ENV === "development") {
     process.exit(1);
   });
 } else {
-  console.log(
-    "node env is not developement, please run the script in dev mode"
-  );
+  console.log("node env is not development, please run the script in dev mode");
 }
