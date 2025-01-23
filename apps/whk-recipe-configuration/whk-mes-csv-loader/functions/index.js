@@ -4,6 +4,20 @@ const addPOSTFIX = (postfix, addToThis) => {
   return addToThis + postfix;
 };
 
+function adjustLotNumber(lotNumber, barrelType) {
+  // Check if the lot number already contains a dot and has the correct format
+  if (lotNumber && /\.\d{2}$/.test(lotNumber)) {
+    return lotNumber; // Return as is if already correct
+  }
+
+  // Determine the postfix based on the barrel type
+  const postfix =
+    barrelType === "WVBC" ? ".01" : barrelType === "ISC" ? ".10" : ".99"; // Default to .07 if neither WVBC nor ISC
+
+  // Append the postfix if the lot number doesn't already have it
+  return lotNumber && postfix ? `${lotNumber}${postfix}` : lotNumber;
+}
+
 const spaceToDash = (spacedString) => {
   return spacedString.replace(/ /g, "-");
 };
@@ -42,20 +56,6 @@ const getOrCreateRecipe = async (
   return { connect: { id: newRecipe.id } };
 };
 
-function adjustLotNumber(lotNumber, barrelType) {
-  // Check if the lot number already contains a dot and has the correct format
-  if (lotNumber && /\.\d{2}$/.test(lotNumber)) {
-    return lotNumber; // Return as is if already correct
-  }
-
-  // Determine the postfix based on the barrel type
-  const postfix =
-    barrelType === "WVBC" ? ".01" : barrelType === "ISC" ? ".10" : ".99"; // Default to .07 if neither WVBC nor ISC
-
-  // Append the postfix if the lot number doesn't already have it
-  return lotNumber && postfix ? `${lotNumber}${postfix}` : lotNumber;
-}
-
 async function createItemID(createdBy = "system", prisma) {
   try {
     const newItem = await prisma.item.create({
@@ -80,35 +80,41 @@ async function createItemID(createdBy = "system", prisma) {
 
 const getOrCreateCustomer = async (
   customerName = "Default Customer",
-  createdBy = "system",
+  createdBy = "Test",
   prisma
 ) => {
-  const customerToUse = customerName || "Default Customer";
+  try {
+    const customerToUse = customerName || "Default Customer";
+    console.log("🚀 ~ customerToUse:", customerToUse);
 
-  // Find an existing customer by name
-  const existingCustomer = await prisma.customer.findFirst({
-    where: {
-      name: customerToUse,
-    },
-  });
+    // Find an existing customer by name
+    const existingCustomer = await prisma.customer.findFirst({
+      where: {
+        name: customerToUse,
+      },
+    });
+    console.log("🚀 ~ existingCustomer:", existingCustomer);
 
-  if (existingCustomer) {
-    return { id: existingCustomer.id }; // Return the ID directly
+    if (existingCustomer) {
+      return { id: existingCustomer.id };
+    }
+
+    // Create a new customer if not found
+    const newCustomer = await prisma.customer.create({
+      data: {
+        name: customerToUse,
+        address: "Default Address", // Provide a default address
+        createdBy,
+        revision: 1,
+      },
+    });
+
+    return { id: newCustomer.id }; // Return the ID directly
+  } catch (error) {
+    console.error("Error in getOrCreateCustomer:", error);
+    throw new Error("Failed to get or create customer.");
   }
-
-  // Create a new customer if not found
-  const newCustomer = await prisma.customer.create({
-    data: {
-      name: customerToUse,
-      address: "Default Address", // Provide a default address
-      createdBy,
-      revision: 1,
-    },
-  });
-
-  return { id: newCustomer.id }; // Return the ID directly
 };
-
 const findRelatedIdsByRecipe = async (
   recipeName,
   prisma,
@@ -116,6 +122,8 @@ const findRelatedIdsByRecipe = async (
   customerName = "Default Customer"
 ) => {
   if (!recipeName) return {};
+
+  console.log("🚀 ~ customerName:", customerName);
 
   // Step 1: Get or create the customer
   const customer = await getOrCreateCustomer(customerName, createdBy, prisma);
