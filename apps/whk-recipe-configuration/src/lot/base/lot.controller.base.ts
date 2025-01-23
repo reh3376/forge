@@ -89,6 +89,12 @@ export class LotControllerBase {
             }
           : undefined,
 
+        proofingTank: data.proofingTank
+          ? {
+              connect: data.proofingTank,
+            }
+          : undefined,
+
         purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
           ? {
               connect: data.purchaseOrderAcceptedLots,
@@ -98,6 +104,12 @@ export class LotControllerBase {
         recipe: data.recipe
           ? {
               connect: data.recipe,
+            }
+          : undefined,
+
+        tankOfOrigin: data.tankOfOrigin
+          ? {
+              connect: data.tankOfOrigin,
             }
           : undefined,
       },
@@ -157,6 +169,14 @@ export class LotControllerBase {
           },
         },
 
+        proofInitial: true,
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -172,6 +192,13 @@ export class LotControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -257,6 +284,14 @@ export class LotControllerBase {
           },
         },
 
+        proofInitial: true,
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -272,6 +307,13 @@ export class LotControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -356,6 +398,14 @@ export class LotControllerBase {
           },
         },
 
+        proofInitial: true,
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
         purchaseOrderAcceptedLots: {
           select: {
             id: true,
@@ -371,6 +421,13 @@ export class LotControllerBase {
         schemaVersion: true,
         standardYield: true,
         status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
         totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
@@ -439,6 +496,12 @@ export class LotControllerBase {
               }
             : undefined,
 
+          proofingTank: data.proofingTank
+            ? {
+                connect: data.proofingTank,
+              }
+            : undefined,
+
           purchaseOrderAcceptedLots: data.purchaseOrderAcceptedLots
             ? {
                 connect: data.purchaseOrderAcceptedLots,
@@ -448,6 +511,12 @@ export class LotControllerBase {
           recipe: data.recipe
             ? {
                 connect: data.recipe,
+              }
+            : undefined,
+
+          tankOfOrigin: data.tankOfOrigin
+            ? {
+                connect: data.tankOfOrigin,
               }
             : undefined,
         },
@@ -507,6 +576,14 @@ export class LotControllerBase {
             },
           },
 
+          proofInitial: true,
+
+          proofingTank: {
+            select: {
+              id: true,
+            },
+          },
+
           purchaseOrderAcceptedLots: {
             select: {
               id: true,
@@ -522,6 +599,137 @@ export class LotControllerBase {
           schemaVersion: true,
           standardYield: true,
           status: true,
+
+          tankOfOrigin: {
+            select: {
+              id: true,
+            },
+          },
+
+          totalFermenters: true,
+          totalPGs: true,
+          totalPGsByRecipe: true,
+          totalVolumeWg: true,
+          totalWGs: true,
+          totalWeight: true,
+          updatedAt: true,
+          warehouseEntryNumber: true,
+          whiskeyType: true,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.Delete("/:id")
+  @swagger.ApiOkResponse({ type: Lot })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async deleteLot(
+    @common.Param() params: LotWhereUniqueInput
+  ): Promise<Lot | null> {
+    try {
+      return await this.service.deleteLot({
+        where: params,
+        select: {
+          avgBblFillByPg: true,
+          avgBblFillByWg: true,
+          avgPGsFerm: true,
+          bblEntryProof: true,
+          bblOem: true,
+          bblTotal: true,
+          bblType: true,
+          confirmed: true,
+
+          continerItem: {
+            select: {
+              id: true,
+            },
+          },
+
+          createdAt: true,
+          createdBy: true,
+          densityFinal: true,
+          externalId: true,
+
+          filledFrom: {
+            select: {
+              id: true,
+            },
+          },
+
+          filledFromString: true,
+          finalVolume: true,
+          finalWeight: true,
+
+          fromAsset: {
+            select: {
+              id: true,
+            },
+          },
+
+          globalId: true,
+          grainLbsFerm: true,
+          grainLbsPg: true,
+          id: true,
+          initialVolume: true,
+          initialWeight: true,
+          isRawMaterial: true,
+          lotAlphaChar: true,
+          lotCreatedAt: true,
+          lotNumber: true,
+          notes: true,
+          pgLosses: true,
+
+          productionOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          proofInitial: true,
+
+          proofingTank: {
+            select: {
+              id: true,
+            },
+          },
+
+          purchaseOrderAcceptedLots: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          schemaVersion: true,
+          standardYield: true,
+          status: true,
+
+          tankOfOrigin: {
+            select: {
+              id: true,
+            },
+          },
+
           totalFermenters: true,
           totalPGs: true,
           totalPGsByRecipe: true,

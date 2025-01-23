@@ -17,7 +17,8 @@ import {
   RecipeGroup, 
   RecipeParameter, 
   SalesOrder, 
-  UnitProcedure 
+  UnitProcedure, 
+  EnumRecipeWhiskeyType
 } from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
@@ -243,6 +244,67 @@ export class RecipeGenerator {
     }
 
     return newProtocol;
+  }
+
+  private detectWhiskeyType(mashBill: string): EnumRecipeWhiskeyType {
+    // Convert to uppercase for consistent comparison
+    const upperMashBill = mashBill.toUpperCase();
+
+    const cornPercentage = this.calculateGrainPercentage('CORN', upperMashBill);
+    const ryePercentage = this.calculateGrainPercentage('RYE', upperMashBill);
+    const wheatPercentage = this.calculateGrainPercentage('WHEAT', upperMashBill);
+    const maltPercentage = this.calculateGrainPercentage('MALT', upperMashBill);
+
+    // Bourbon variations (corn > 51%)
+    if (cornPercentage > 51) {
+      if (ryePercentage > 0 && wheatPercentage === 0) {
+        return EnumRecipeWhiskeyType.RyeBourbon;
+      }
+      if (wheatPercentage > 0 && ryePercentage === 0) {
+        return EnumRecipeWhiskeyType.WheatedBourbon;
+      }
+      if (wheatPercentage > 0 && ryePercentage > 0) {
+        return EnumRecipeWhiskeyType.FourGrainBourbon;
+      }
+    }
+    
+    // Rye whiskey (rye > 51%)
+    if (ryePercentage > 51) {
+      return EnumRecipeWhiskeyType.RyeWhiskey;
+    }
+    
+    // Wheat whiskey (wheat > 51%)
+    if (wheatPercentage > 51) {
+      return EnumRecipeWhiskeyType.WheatWhiskey;
+    }
+    
+    // Malt whiskey (malt > 51%)
+    if (maltPercentage > 51) {
+      return EnumRecipeWhiskeyType.MaltWhiskey;
+    }
+    return EnumRecipeWhiskeyType.RyeBourbon;
+  }
+
+  private calculateGrainPercentage(grainType: string, mashBill: string): number {
+    // Split the mash bill into components
+    const components = mashBill.split('-');
+    let totalPercentage = 0;
+    let grainPercentage = 0;
+
+    // Calculate percentages
+    components.forEach(component => {
+      const match = component.match(/(\d+)/);
+      if (match) {
+        const percentage = parseInt(match[1], 10);
+        totalPercentage += percentage;
+        if (component.includes(grainType)) {
+          grainPercentage += percentage;
+        }
+      }
+    });
+
+    // Return percentage if total is valid, otherwise 0
+    return totalPercentage > 0 ? (grainPercentage / totalPercentage) * 100 : 0;
   }
 
   async createRecipeData(
@@ -1095,7 +1157,15 @@ export class RecipeGenerator {
           unitProcedures: {
             connect: { id: mashingUnitProcedure.id }
           },
-        }
+        },
+        include: {
+          item: true,
+          customer: true,
+          recipeGroup: true,
+          recipeBoms: true,
+          unitProcedures: true,
+          productionOrders: true,
+        },
       });
       console.log("Mashing Recipe updated successfully");
     } else {
@@ -1105,9 +1175,7 @@ export class RecipeGenerator {
           Recipe: this.RECIPE,
           revision: 1,
           createdBy: this.USER,
-          // parameters: {
-          //   connect: newParams.map(param => ({ id: param.id }))
-          // },
+          whiskeyType: EnumRecipeWhiskeyType[this.detectWhiskeyType(this.MASH_BILL)],
           unitProcedures: {
             connect: { id: mashingUnitProcedure.id }
           },
@@ -1375,6 +1443,11 @@ export class RecipeGenerator {
       console.log("Creating sample schedule order queue record...");
 
       const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
+        where: {
+          queueIndex: {
+            not: null
+          }
+        },
         orderBy: {
           queueIndex: 'desc'
         },
@@ -1383,7 +1456,7 @@ export class RecipeGenerator {
         }
       });
 
-      const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
+      const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1; 
 
       const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
         data: {

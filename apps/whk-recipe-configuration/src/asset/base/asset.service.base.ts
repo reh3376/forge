@@ -148,6 +148,28 @@ export class AssetServiceBase {
       .itemReceipts(args);
   }
 
+  async findLotProofingTank(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lotProofingTank(args);
+  }
+
+  async findLotTankofOrigin(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lotTankofOrigin(args);
+  }
+
   async findLots(
     parentId: string,
     args: Prisma.LotFindManyArgs

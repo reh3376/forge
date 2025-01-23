@@ -188,6 +188,13 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         if (asset) {
           // If asset is found, use its ID for inventory tracking
           try {
+            const currentInventory = await this.prisma.inventory.findFirst({
+              where: {
+                assetId: asset.id,
+                itemId: item.id
+              }
+            });
+            
             const inventory = await this.siloTrackingService.addLotToAsset(
               itemReceiptPayload.supplierLot as string,
               asset.id,
