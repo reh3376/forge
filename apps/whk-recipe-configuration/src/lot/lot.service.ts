@@ -125,9 +125,17 @@ export class LotService extends LotServiceBase {
     }
     const bblType = barrelTypeMapping[bblOem as string];
 
-    const lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}.${bblType}`;
+    let lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}.${bblType}`;
     this.logger.log(`lotNumber: ${args.data.lotNumber}`);
 
+    // If createdAt is provided, use that date instead of current date
+    if (args.data.lotCreatedAt) {
+      const createdDate = new Date(args.data.lotCreatedAt);
+      const createdYear = createdDate.getFullYear().toString().slice(-2);
+      const createdMonth = String.fromCharCode(64 + createdDate.getMonth() + 1);
+      const createdDay = createdDate.getDate().toString().padStart(2, "0");
+      lotNumberPrefix = `${createdYear}${createdMonth}${createdDay}${args.data.lotAlphaChar}.${bblType}`;
+    }
     
     const lastLot: Lot[] = await this.lots({
       where: {
@@ -230,9 +238,5 @@ export class LotService extends LotServiceBase {
     });
     this.logger.log(`Updated Lot: ${Lot.lotNumber} & pushed to topic`);
     return Lot;
-  }
-
-  async deleteLot<T extends Prisma.LotDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.LotDeleteArgs>): Promise<import(".prisma/client").Lot> {
-    throw new Error("Delete operations are not allowed for Lot.");
   }
 }

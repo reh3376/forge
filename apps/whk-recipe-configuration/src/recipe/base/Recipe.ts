@@ -22,6 +22,7 @@ import {
   Max,
   IsDate,
   IsNumber,
+  IsEnum,
 } from "class-validator";
 
 import { Batch } from "../../batch/base/Batch";
@@ -37,6 +38,7 @@ import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { EnumRecipeWhiskeyType } from "./EnumRecipeWhiskeyType";
 
 @ObjectType()
 class Recipe {
@@ -324,6 +326,25 @@ class Recipe {
     nullable: true,
   })
   updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeWhiskeyType,
+  })
+  @IsEnum(EnumRecipeWhiskeyType)
+  @IsOptional()
+  @Field(() => EnumRecipeWhiskeyType, {
+    nullable: true,
+  })
+  whiskeyType?:
+    | "RyeBourbon"
+    | "WheatedBourbon"
+    | "FourGrainBourbon"
+    | "RyeWhiskey"
+    | "WheatWhiskey"
+    | "MaltWhiskey"
+    | "FourGrainWhiskey"
+    | null;
 }
 
 export { Recipe as Recipe };

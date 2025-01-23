@@ -350,6 +350,46 @@ export class AssetResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Lot], { name: "lotProofingTank" })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLotProofingTank(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLotProofingTank(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Lot], { name: "lotTankofOrigin" })
+  @nestAccessControl.UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findLotTankofOrigin(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findLotTankofOrigin(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Lot], { name: "lots" })
   @nestAccessControl.UseRoles({
     resource: "Lot",
