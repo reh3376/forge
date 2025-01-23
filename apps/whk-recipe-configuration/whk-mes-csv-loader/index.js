@@ -94,10 +94,6 @@ if (process.env.NODE_ENV === "development") {
     "utf8"
   );
 
-  // TODO: connect container item id
-  // TODO: connect fg item id
-  // TODO: connect production order id
-
   // Seed the database
   async function seedDatabase() {
     console.info("Starting database seeding...");
@@ -144,17 +140,17 @@ if (process.env.NODE_ENV === "development") {
           lotAlphaChar: data.lotAlphaChar,
           status: data.status || "Started",
           recipe: recipeRelation,
-          // productionOrder: data.productionOrder
-          //   ? {
-          //       connectOrCreate: {
-          //         where: { id: data.productionOrder },
-          //         create: {
-          //           id: data.productionOrder,
-          //           status: "Initiated",
-          //         },
-          //       },
-          //     }
-          //   : undefined,
+          productionOrder: data.productionOrder
+            ? {
+                connectOrCreate: {
+                  where: { id: data.productionOrder },
+                  create: {
+                    id: data.productionOrder,
+                    status: "Initiated",
+                  },
+                },
+              }
+            : undefined,
         };
 
         await prisma.lot.upsert({
