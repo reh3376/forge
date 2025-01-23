@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === "development") {
 
   // File path
   const filePath =
-    "E:/Github/whk-mes/apps/whk-recipe-configuration/whk-mes-csv-loader/WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+    "./WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
 
   const workbook = XLSX.readFile(filePath);
 
