@@ -5,6 +5,7 @@ import fs from "fs";
 import XLSX from "xlsx";
 import {
   addPOSTFIXandSpaceToDash,
+  adjustLotNumber,
   findRelatedIdsByRecipe,
   getOrCreateRecipe,
 } from "./functions/index.js";
@@ -69,7 +70,12 @@ if (process.env.NODE_ENV === "development") {
         renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
       }
       const { productionOrderId, containerId, fgItemId } =
-        await findRelatedIdsByRecipe(renamedRow.recipe, prisma);
+        await findRelatedIdsByRecipe(
+          renamedRow.recipe,
+          prisma,
+          renamedRow.customer,
+          renamedRow.createdBy
+        );
 
       renamedRow.productionOrderId = productionOrderId;
       renamedRow.containerId = containerId;
@@ -98,7 +104,12 @@ if (process.env.NODE_ENV === "development") {
 
     for (const data of renamedData) {
       try {
-        const recipeRelation = await getOrCreateRecipe(data.recipe); //TODO: SETUP customer name
+        const recipeRelation = await getOrCreateRecipe(
+          data.recipe,
+          data.customer,
+          data.createdBy,
+          prisma
+        );
 
         // Adjust the lot number based on the rules
         const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
