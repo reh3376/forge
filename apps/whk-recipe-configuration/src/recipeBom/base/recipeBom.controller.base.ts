@@ -693,6 +693,7 @@ export class RecipeBomControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
     if (results === null) {

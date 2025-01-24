@@ -11,15 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
   IsString,
   MaxLength,
   IsEnum,
   ValidateNested,
   IsOptional,
-  IsInt,
+  IsNumber,
+  Min,
   Max,
+  IsInt,
 } from "class-validator";
+
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedManyWithoutAssetsInput";
 import { Type } from "class-transformer";
@@ -213,6 +217,30 @@ class AssetCreateInput {
   @Field(() => LotCreateNestedManyWithoutAssetsInput, {
     nullable: true,
   })
+  lotProofingTank?: LotCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  lotTankofOrigin?: LotCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
   lots?: LotCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
@@ -259,6 +287,19 @@ class AssetCreateInput {
     nullable: true,
   })
   parent?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(80)
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  proofInitial?: number | null;
 
   @ApiProperty({
     required: false,
