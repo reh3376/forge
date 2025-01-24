@@ -22,6 +22,7 @@ import {
   IsInt,
   IsBoolean,
   IsDate,
+  Min,
   IsEnum,
 } from "class-validator";
 
@@ -423,6 +424,28 @@ class Lot {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(100)
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  proofInitial!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  proofingTank?: Asset | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrder,
   })
   @ValidateNested()
@@ -473,6 +496,15 @@ class Lot {
     nullable: true,
   })
   status?: "Started" | "PendingValidation" | "Submitted" | "Complete" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Asset,
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  tankOfOrigin?: Asset | null;
 
   @ApiProperty({
     required: false,

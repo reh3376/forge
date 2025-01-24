@@ -22,6 +22,7 @@ import {
   IsInt,
   IsBoolean,
   IsDate,
+  Min,
   IsEnum,
 } from "class-validator";
 
@@ -432,6 +433,31 @@ class LotCreateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(100)
+  @Max(200)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  proofInitial?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  proofingTank?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
     type: () => PurchaseOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -488,6 +514,18 @@ class LotCreateInput {
     nullable: true,
   })
   status?: "Started" | "PendingValidation" | "Submitted" | "Complete" | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => AssetWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  tankOfOrigin?: AssetWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
