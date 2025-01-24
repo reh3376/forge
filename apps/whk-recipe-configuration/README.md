@@ -17,7 +17,7 @@ Configuration for the server component can be provided through the use of enviro
 | Variable             | Description                                  | Value                                                               |
 | -------------------- | -------------------------------------------- | ------------------------------------------------------------------- |
 | BCRYPT_SALT          | the string used for hashing                  | [random-string]                                                     |
-| COMPOSE_PROJECT_NAME | the identifier of the service plus prefix    | amp_[service-identifier]                                            |
+| COMPOSE_PROJECT_NAME | the identifier of the service plus prefix    | amp\_[service-identifier]                                           |
 | PORT                 | the port on which to run the server          | 3000                                                                |
 | DB_URL               | the connection url for the database          | [db-provider]://[username]:[password]@localhost:[db-port]/[db-name] |
 | DB_PORT              | the port used by the database instance       | [db-provider-port]                                                  |
@@ -28,7 +28,7 @@ Configuration for the server component can be provided through the use of enviro
 | JWT_EXPIRATION       | the expiration time for the json-web token   | 2d                                                                  |
 
 > **Note**
-> Amplication generates default values and stores them under the .env file. It is advised to use some form of secrets manager/vault solution when using in production. 
+> Amplication generates default values and stores them under the .env file. It is advised to use some form of secrets manager/vault solution when using in production.
 
 ## Step 2: DotEnv Vault (Environment variables)
 
@@ -76,7 +76,8 @@ $ npm run db:dev:init
 # start the server component
 $ npm run start
 ```
-By default, your app comes with one user with the username and password configured in 
+
+By default, your app comes with one user with the username and password configured in
 `.env` file. See step 2 for more details.
 
 ## Step 3.3: Scripts - container based development
@@ -86,17 +87,30 @@ By default, your app comes with one user with the username and password configur
 $ npm run compose:up
 ```
 
-
 ## 4 - Database Restoration for Local Development
 
 If you are developing locally and need to restore the database, you can use the following command:
 
 Note you must have the `psql` command installed on your machine.
+
 - [Guide](https://www.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/)
 
 Commands:
+
 ```sh
 dropdb -h localhost -p 5432 -U admin whk-mes # drop if exists
 createdb -h localhost -p 5432 -U admin whk-mes # create new db
 psql -h localhost -p 5432 -d whk-mes -U admin -f <pathToMy.sqlFileToRestore> # Restore from .sql file
+```
+
+# QuickStart application
+
+```bash
+npm install
+npm run prisma:generate
+npm run docker:dev
+npm run db:dev:uselotsofcautionclean
+npm run db:prod:deploy
+npm run seed
+npm run start
 ```
