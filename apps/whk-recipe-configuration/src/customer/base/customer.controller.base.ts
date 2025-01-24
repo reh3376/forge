@@ -635,6 +635,7 @@ export class CustomerControllerBase {
         targetProof: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
     });
     if (results === null) {

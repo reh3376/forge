@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === "development") {
 
   // File path
   const filePath =
-    "E:/Github/whk-mes/apps/whk-recipe-configuration/whk-mes-csv-loader/WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+    "./WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
 
   const workbook = XLSX.readFile(filePath);
 
@@ -33,21 +33,21 @@ if (process.env.NODE_ENV === "development") {
     "Avg PGs / Ferm": "avgPGsFerm",
     "Bbl OEM:": "bblOem",
     "Bbl Entry Proof: Pdi": "bblEntryProof",
+    "Proof (Initial): Pdi": "proofInitial",
     "Grain - lbs / Ferm": "grainLbsFerm",
     "Density (final): Df": "densityFinal",
     "Grain - lbs / PG": "grainLbsPg",
     "Standard Yield (PGs/56#)": "standardYield",
-    "PG Losses": "pgLosses",
+    "PG Losses:": "pgLosses",
     "Total Ferms": "totalFermenters",
     "Total Volume: WG": "totalVolumeWg",
     "Total PGs by Recipe": "totalPGsByRecipe",
     Confirmed: "confirmed",
-    "Whiskey Type": "whiskeyType",
     "Total WGs": "totalWGs",
     Notes: "notes",
     "Total PGs": "totalPGs",
-    "Bbl Total": "bblTotal",
-    "Bbl Type": "bblType",
+    "Bbl Total:": "bblTotal",
+    "Bbl Type:": "bblType",
     "LOT #": "lotNumber",
     Date: "lotCreatedAt",
     "WHK_WHSE#:": "warehouseEntryNumber",
@@ -56,6 +56,12 @@ if (process.env.NODE_ENV === "development") {
     "Production Order ID": "productionOrder",
     Complete: "status",
     "Custom Backend": "lotAlphaChar",
+    "PG Losses": "pgLosses",
+    "Whiskey Type:": "whiskeyType",
+    "Tank of Origin:": "tankOfOrigin",
+    "Date: ": "lotCreatedAt",
+    "Proofing Tank:": "filledFromString",
+    "Total  Weight: lbs - Wt": "totalWeight",
   };
 
   // Rename keys in each row
@@ -114,18 +120,18 @@ if (process.env.NODE_ENV === "development") {
           avgBblFillByPg: data.avgBblFillByPg,
           avgBblFillByWg: data.avgBblFillByWg,
           avgPGsFerm: data.avgPGsFerm,
-          bblOem: data.bblOem,
+          bblOem: data.bblOem === 'WVGBC' ? 'WVG' : data.bblOem,
           bblEntryProof: data.bblEntryProof,
           grainLbsFerm: data.grainLbsFerm,
           densityFinal: data.densityFinal,
           grainLbsPg: data.grainLbsPg,
           standardYield: data.standardYield,
-          pgLosses: data.pgLosses,
+          pgLosses: data.pgLosses || 0,
           totalFermenters: data.totalFermenters,
           totalVolumeWg: data.totalVolumeWg,
           totalPGsByRecipe: data.totalPGsByRecipe,
-          confirmed: data.confirmed === "X",
-          whiskeyType: data.whiskeyType,
+          confirmed: true,
+          whiskeyType: data.whiskeyType === 'Select Type' ? 'RyeBourbon' : data.whiskeyType?.replace(/\s+/g, ''),
           totalWGs: data.totalWGs,
           notes: data.notes,
           totalPGs: data.totalPGs,
@@ -138,14 +144,14 @@ if (process.env.NODE_ENV === "development") {
           warehouseEntryNumber: parseInt(data.warehouseEntryNumber, 10) || null,
           totalWeight: data.totalWeight,
           lotAlphaChar: data.lotAlphaChar,
-          status: data.status || "Started",
+          status: data.status || "Complete",
           recipe: recipeRelation,
           productionOrder: data.productionOrder
             ? {
                 connectOrCreate: {
-                  where: { id: data.productionOrder },
+                  where: { id: data.productionOrderId },
                   create: {
-                    id: data.productionOrder,
+                    id: data.productionOrderId,
                     status: "Initiated",
                   },
                 },

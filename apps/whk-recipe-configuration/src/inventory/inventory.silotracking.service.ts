@@ -106,11 +106,16 @@ export class InventorySiloTrackingService {
     }
   }
 
-  async getAssetInventory(assetId: string): Promise<Inventory[]> {
-    return this.prisma.inventory.findMany({
+  async getAssetInventory(assetId: string): Promise<{inventory:Inventory[],totalInventory:number}> {
+    const inventory= await this.prisma.inventory.findMany({
       where: { assetId: assetId },
       orderBy: { fifoIndex: 'asc' },
     });
+    const totalInventory = inventory.reduce((acc, item) => acc + (item.currentQuantity ?? 0), 0);
+    return {
+      "inventory":inventory,
+      "totalInventory":totalInventory,
+    };
   }
 
   async transferBetweenAssets(sourceAssetId: string, destAssetId: string, quantity: number, itemId: string): Promise<void> {

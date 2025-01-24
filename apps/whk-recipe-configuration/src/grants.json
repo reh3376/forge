@@ -3452,31 +3452,31 @@
   {
     "role": "admin",
     "resource": "Lot",
-    "action": "read:own",
+    "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "manager",
     "resource": "Lot",
-    "action": "read:own",
+    "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "operator",
     "resource": "Lot",
-    "action": "read:own",
+    "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "supervisor",
     "resource": "Lot",
-    "action": "read:own",
+    "action": "read:any",
     "attributes": "*"
   },
   {
     "role": "user",
     "resource": "Lot",
-    "action": "read:own",
+    "action": "read:any",
     "attributes": "*"
   },
   {
