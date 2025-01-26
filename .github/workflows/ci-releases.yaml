@@ -28,7 +28,7 @@ jobs:
 
       - name: Push OpenAPI spec to Compass
         run: |
-          curl -X PUT \
+          curl -X POST \
           -H "Content-Type: application/json" \
           --data-binary @./apps/whk-recipe-configuration/openapi.json \
           "https://whiskeyhouse.atlassian.net/gateway/api/compass/v1/webhooks/db4b006e-d310-40ac-bc59-f25c8ed5b5d9"
