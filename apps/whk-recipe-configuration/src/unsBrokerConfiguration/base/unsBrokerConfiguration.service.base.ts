@@ -47,7 +47,7 @@ export class UnsBrokerConfigurationServiceBase {
 
       data: {
         ...args.data,
-        password: await this.passwordService.hash(args.data.password),
+        password: await this.passwordService.hash(args.data.password as string),
       },
     });
   }
@@ -63,7 +63,7 @@ export class UnsBrokerConfigurationServiceBase {
         password:
           args.data.password &&
           (await transformStringFieldUpdateInput(
-            args.data.password,
+            args.data.password as string,
             (password) => this.passwordService.hash(password)
           )),
       },
