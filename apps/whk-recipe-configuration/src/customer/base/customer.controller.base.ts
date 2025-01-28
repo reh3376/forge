@@ -72,6 +72,12 @@ export class CustomerControllerBase {
               connect: data.inventoryLog,
             }
           : undefined,
+
+        scheduleOrders: data.scheduleOrders
+          ? {
+              connect: data.scheduleOrders,
+            }
+          : undefined,
       },
       select: {
         address: true,
@@ -93,6 +99,13 @@ export class CustomerControllerBase {
         name: true,
         phone: true,
         revision: true,
+
+        scheduleOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
       },
@@ -135,6 +148,13 @@ export class CustomerControllerBase {
         name: true,
         phone: true,
         revision: true,
+
+        scheduleOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
       },
@@ -178,6 +198,13 @@ export class CustomerControllerBase {
         name: true,
         phone: true,
         revision: true,
+
+        scheduleOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
       },
@@ -220,6 +247,12 @@ export class CustomerControllerBase {
                 connect: data.inventoryLog,
               }
             : undefined,
+
+          scheduleOrders: data.scheduleOrders
+            ? {
+                connect: data.scheduleOrders,
+              }
+            : undefined,
         },
         select: {
           address: true,
@@ -241,6 +274,13 @@ export class CustomerControllerBase {
           name: true,
           phone: true,
           revision: true,
+
+          scheduleOrders: {
+            select: {
+              id: true,
+            },
+          },
+
           schemaVersion: true,
           updatedAt: true,
         },

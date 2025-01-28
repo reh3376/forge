@@ -17,14 +17,16 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
   IsNumber,
   Max,
-  IsInt,
-  ValidateNested,
   IsEnum,
+  IsInt,
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { CustomerUpdateManyWithoutScheduleOrdersInput } from "./CustomerUpdateManyWithoutScheduleOrdersInput";
+import { Decimal } from "decimal.js";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -73,13 +75,15 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerUpdateManyWithoutScheduleOrdersInput,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => CustomerUpdateManyWithoutScheduleOrdersInput)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => CustomerUpdateManyWithoutScheduleOrdersInput, {
     nullable: true,
   })
-  customers?: InputJsonValue;
+  customers?: CustomerUpdateManyWithoutScheduleOrdersInput;
 
   @ApiProperty({
     required: false,
@@ -107,15 +111,37 @@ class ScheduleOrderUpdateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedBarrelingStartTime?: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedDistillationTime?: number | null;
+  estimatedDistillationDuration?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedDistillationStartTime?: Date | null;
 
   @ApiProperty({
     required: false,
@@ -132,37 +158,58 @@ class ScheduleOrderUpdateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedFermentationTime?: number | null;
+  estimatedFermentationDuration?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedFermentationStartTime?: Date | null;
 
   @ApiProperty({
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedMashingTime?: number | null;
+  estimatedMashingDuration?: number | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
   })
-  @IsInt()
-  @Max(99999999999)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Date, {
     nullable: true,
   })
-  estimatedProcessing?: number | null;
+  estimatedMashingStartTime?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedProcessingStartTime?: Date | null;
 
   @ApiProperty({
     required: false,
@@ -179,13 +226,13 @@ class ScheduleOrderUpdateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedTotalProductionTime?: number | null;
+  estimatedTotalProductionDuration?: number | null;
 
   @ApiProperty({
     required: false,
@@ -308,7 +355,7 @@ class ScheduleOrderUpdateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
