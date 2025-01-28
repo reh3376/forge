@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -26,7 +26,6 @@ import {
 
 import { Type } from "class-transformer";
 import { CustomerUpdateManyWithoutScheduleOrdersInput } from "./CustomerUpdateManyWithoutScheduleOrdersInput";
-import { Decimal } from "decimal.js";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -92,7 +91,7 @@ class ScheduleOrderUpdateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   duration?: number | null;
