@@ -72,17 +72,6 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  customers?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   duration?: SortOrder;
 
   @ApiProperty({
@@ -105,7 +94,29 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  estimatedDistillationTime?: SortOrder;
+  estimatedBarrelingStartTime?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  estimatedDistillationDuration?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  estimatedDistillationStartTime?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -127,7 +138,7 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  estimatedFermentationTime?: SortOrder;
+  estimatedFermentationDuration?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -138,7 +149,7 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  estimatedMashingTime?: SortOrder;
+  estimatedFermentationStartTime?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -149,7 +160,29 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  estimatedProcessing?: SortOrder;
+  estimatedMashingDuration?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  estimatedMashingStartTime?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  estimatedProcessingStartTime?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -171,7 +204,7 @@ class ScheduleOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  estimatedTotalProductionTime?: SortOrder;
+  estimatedTotalProductionDuration?: SortOrder;
 
   @ApiProperty({
     required: false,

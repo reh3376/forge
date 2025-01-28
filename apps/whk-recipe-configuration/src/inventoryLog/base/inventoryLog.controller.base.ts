@@ -356,6 +356,13 @@ export class InventoryLogControllerBase {
         name: true,
         phone: true,
         revision: true,
+
+        scheduleOrders: {
+          select: {
+            id: true,
+          },
+        },
+
         schemaVersion: true,
         updatedAt: true,
       },
