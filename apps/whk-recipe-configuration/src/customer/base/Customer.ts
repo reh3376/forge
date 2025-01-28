@@ -26,6 +26,7 @@ import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class Customer {
@@ -197,6 +198,15 @@ class Customer {
   @Type(() => SalesOrder)
   @IsOptional()
   salesOrders?: Array<SalesOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrder,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrder)
+  @IsOptional()
+  scheduleOrders?: ScheduleOrder | null;
 
   @ApiProperty({
     required: false,

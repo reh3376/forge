@@ -15,15 +15,16 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { JsonFilter } from "../../util/JsonFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { CustomerListRelationFilter } from "../../customer/base/CustomerListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
+import { JsonFilter } from "../../util/JsonFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumScheduleOrderStatus } from "./EnumScheduleOrderStatus";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
 class ScheduleOrderWhereInput {
@@ -62,14 +63,15 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: JsonFilter,
+    type: () => CustomerListRelationFilter,
   })
-  @Type(() => JsonFilter)
+  @ValidateNested()
+  @Type(() => CustomerListRelationFilter)
   @IsOptional()
-  @Field(() => JsonFilter, {
+  @Field(() => CustomerListRelationFilter, {
     nullable: true,
   })
-  customers?: JsonFilter;
+  customers?: CustomerListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -95,14 +97,36 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: DateTimeNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => DateTimeNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => DateTimeNullableFilter, {
     nullable: true,
   })
-  estimatedDistillationTime?: IntNullableFilter;
+  estimatedBarrelingStartTime?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  estimatedDistillationDuration?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  estimatedDistillationStartTime?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -117,36 +141,58 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  estimatedFermentationTime?: IntNullableFilter;
+  estimatedFermentationDuration?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: DateTimeNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => DateTimeNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => DateTimeNullableFilter, {
     nullable: true,
   })
-  estimatedMashingTime?: IntNullableFilter;
+  estimatedFermentationStartTime?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  estimatedProcessing?: IntNullableFilter;
+  estimatedMashingDuration?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  estimatedMashingStartTime?: DateTimeNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeNullableFilter,
+  })
+  @Type(() => DateTimeNullableFilter)
+  @IsOptional()
+  @Field(() => DateTimeNullableFilter, {
+    nullable: true,
+  })
+  estimatedProcessingStartTime?: DateTimeNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -161,14 +207,14 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  estimatedTotalProductionTime?: IntNullableFilter;
+  estimatedTotalProductionDuration?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -297,14 +343,14 @@ class ScheduleOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => IntNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => IntNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  totalProofGallons?: IntNullableFilter;
+  totalProofGallons?: FloatNullableFilter;
 }
 
 export { ScheduleOrderWhereInput as ScheduleOrderWhereInput };

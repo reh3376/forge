@@ -34,6 +34,7 @@ import { Recipe } from "../../recipe/base/Recipe";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { CustomerService } from "../customer.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Customer)
@@ -108,6 +109,12 @@ export class CustomerResolverBase {
               connect: args.data.inventoryLog,
             }
           : undefined,
+
+        scheduleOrders: args.data.scheduleOrders
+          ? {
+              connect: args.data.scheduleOrders,
+            }
+          : undefined,
       },
     });
   }
@@ -131,6 +138,12 @@ export class CustomerResolverBase {
           inventoryLog: args.data.inventoryLog
             ? {
                 connect: args.data.inventoryLog,
+              }
+            : undefined,
+
+          scheduleOrders: args.data.scheduleOrders
+            ? {
+                connect: args.data.scheduleOrders,
               }
             : undefined,
         },
@@ -239,6 +252,27 @@ export class CustomerResolverBase {
     @graphql.Parent() parent: Customer
   ): Promise<InventoryLog | null> {
     const result = await this.service.getInventoryLog(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ScheduleOrder, {
+    nullable: true,
+    name: "scheduleOrders",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async getScheduleOrders(
+    @graphql.Parent() parent: Customer
+  ): Promise<ScheduleOrder | null> {
+    const result = await this.service.getScheduleOrders(parent.id);
 
     if (!result) {
       return null;

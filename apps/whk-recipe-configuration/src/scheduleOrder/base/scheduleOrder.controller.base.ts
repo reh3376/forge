@@ -26,6 +26,9 @@ import { ScheduleOrder } from "./ScheduleOrder";
 import { ScheduleOrderFindManyArgs } from "./ScheduleOrderFindManyArgs";
 import { ScheduleOrderWhereUniqueInput } from "./ScheduleOrderWhereUniqueInput";
 import { ScheduleOrderUpdateInput } from "./ScheduleOrderUpdateInput";
+import { CustomerFindManyArgs } from "../../customer/base/CustomerFindManyArgs";
+import { Customer } from "../../customer/base/Customer";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -79,16 +82,19 @@ export class ScheduleOrderControllerBase {
         actualStart: true,
         createdAt: true,
         createdBy: true,
-        customers: true,
         duration: true,
         durationUnits: true,
-        estimatedDistillationTime: true,
+        estimatedBarrelingStartTime: true,
+        estimatedDistillationDuration: true,
+        estimatedDistillationStartTime: true,
         estimatedEnd: true,
-        estimatedFermentationTime: true,
-        estimatedMashingTime: true,
-        estimatedProcessing: true,
+        estimatedFermentationDuration: true,
+        estimatedFermentationStartTime: true,
+        estimatedMashingDuration: true,
+        estimatedMashingStartTime: true,
+        estimatedProcessingStartTime: true,
         estimatedStart: true,
-        estimatedTotalProductionTime: true,
+        estimatedTotalProductionDuration: true,
         globalId: true,
         id: true,
         name: true,
@@ -146,16 +152,19 @@ export class ScheduleOrderControllerBase {
         actualStart: true,
         createdAt: true,
         createdBy: true,
-        customers: true,
         duration: true,
         durationUnits: true,
-        estimatedDistillationTime: true,
+        estimatedBarrelingStartTime: true,
+        estimatedDistillationDuration: true,
+        estimatedDistillationStartTime: true,
         estimatedEnd: true,
-        estimatedFermentationTime: true,
-        estimatedMashingTime: true,
-        estimatedProcessing: true,
+        estimatedFermentationDuration: true,
+        estimatedFermentationStartTime: true,
+        estimatedMashingDuration: true,
+        estimatedMashingStartTime: true,
+        estimatedProcessingStartTime: true,
         estimatedStart: true,
-        estimatedTotalProductionTime: true,
+        estimatedTotalProductionDuration: true,
         globalId: true,
         id: true,
         name: true,
@@ -212,16 +221,19 @@ export class ScheduleOrderControllerBase {
         actualStart: true,
         createdAt: true,
         createdBy: true,
-        customers: true,
         duration: true,
         durationUnits: true,
-        estimatedDistillationTime: true,
+        estimatedBarrelingStartTime: true,
+        estimatedDistillationDuration: true,
+        estimatedDistillationStartTime: true,
         estimatedEnd: true,
-        estimatedFermentationTime: true,
-        estimatedMashingTime: true,
-        estimatedProcessing: true,
+        estimatedFermentationDuration: true,
+        estimatedFermentationStartTime: true,
+        estimatedMashingDuration: true,
+        estimatedMashingStartTime: true,
+        estimatedProcessingStartTime: true,
         estimatedStart: true,
-        estimatedTotalProductionTime: true,
+        estimatedTotalProductionDuration: true,
         globalId: true,
         id: true,
         name: true,
@@ -308,16 +320,19 @@ export class ScheduleOrderControllerBase {
           actualStart: true,
           createdAt: true,
           createdBy: true,
-          customers: true,
           duration: true,
           durationUnits: true,
-          estimatedDistillationTime: true,
+          estimatedBarrelingStartTime: true,
+          estimatedDistillationDuration: true,
+          estimatedDistillationStartTime: true,
           estimatedEnd: true,
-          estimatedFermentationTime: true,
-          estimatedMashingTime: true,
-          estimatedProcessing: true,
+          estimatedFermentationDuration: true,
+          estimatedFermentationStartTime: true,
+          estimatedMashingDuration: true,
+          estimatedMashingStartTime: true,
+          estimatedProcessingStartTime: true,
           estimatedStart: true,
-          estimatedTotalProductionTime: true,
+          estimatedTotalProductionDuration: true,
           globalId: true,
           id: true,
           name: true,
@@ -358,6 +373,126 @@ export class ScheduleOrderControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/customers")
+  @ApiNestedQuery(CustomerFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "read",
+    possession: "any",
+  })
+  async findCustomers(
+    @common.Req() request: Request,
+    @common.Param() params: ScheduleOrderWhereUniqueInput
+  ): Promise<Customer[]> {
+    const query = plainToClass(CustomerFindManyArgs, request.query);
+    const results = await this.service.findCustomers(params.id, {
+      ...query,
+      select: {
+        address: true,
+        createdAt: true,
+        createdBy: true,
+        customerCode: true,
+        description: true,
+        editedBy: true,
+        email: true,
+        globalId: true,
+        id: true,
+
+        inventoryLog: {
+          select: {
+            id: true,
+          },
+        },
+
+        name: true,
+        phone: true,
+        revision: true,
+
+        scheduleOrders: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/customers")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectCustomers(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: CustomerWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      customers: {
+        connect: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/customers")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateCustomers(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: CustomerWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      customers: {
+        set: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/customers")
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectCustomers(
+    @common.Param() params: ScheduleOrderWhereUniqueInput,
+    @common.Body() body: CustomerWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      customers: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateScheduleOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
