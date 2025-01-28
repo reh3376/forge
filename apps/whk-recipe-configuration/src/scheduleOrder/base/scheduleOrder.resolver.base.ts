@@ -25,6 +25,8 @@ import { ScheduleOrderFindManyArgs } from "./ScheduleOrderFindManyArgs";
 import { ScheduleOrderFindUniqueArgs } from "./ScheduleOrderFindUniqueArgs";
 import { CreateScheduleOrderArgs } from "./CreateScheduleOrderArgs";
 import { UpdateScheduleOrderArgs } from "./UpdateScheduleOrderArgs";
+import { CustomerFindManyArgs } from "../../customer/base/CustomerFindManyArgs";
+import { Customer } from "../../customer/base/Customer";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
@@ -159,6 +161,26 @@ export class ScheduleOrderResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Customer], { name: "customers" })
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "read",
+    possession: "any",
+  })
+  async findCustomers(
+    @graphql.Parent() parent: ScheduleOrder,
+    @graphql.Args() args: CustomerFindManyArgs
+  ): Promise<Customer[]> {
+    const results = await this.service.findCustomers(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
