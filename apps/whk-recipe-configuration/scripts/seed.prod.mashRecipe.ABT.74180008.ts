@@ -3,9 +3,9 @@ const MASH_BILL = '74-18-00-08'; //  Match Item Record
 const FINAL_PROOF = 120;
 const BARREL_INFO = '53-06-4-0-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
 const CUSTOMER_NAME = "American Barrel Trust, LLC"; // This needs to match ERP / MESDB customer reocrd
-const ORDER_QTY = 1250; // barrels
-const TOTAL_GRAIN_WEIGHT = 24080;
-const BBLS_PER_FERM = 109;
+const ORDER_QTY = 1500; // barrels
+const TOTAL_GRAIN_WEIGHT = 20500;
+const BBLS_PER_FERM = 91.52;
 const USER = 'pmannion@whiskeyhouse.com';
 
 const WATER_QTY = 3900;
@@ -20,13 +20,19 @@ const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
   'YEA-FER01-Yeast (USW6)': 10,
 }
 
+const BIN_ASSIGNMENTS = {
+  bin1: 'Rye',
+  bin2: 'Corn',
+  bin3: 'Malt',
+};
+
 /* 
 MAXIMUM GRAIN WEIGHTS IN BINS 
 (Normal bin assignment...)
 
 Current total grain weight: 24080
 
-Corn: 180000
+Corn: 18000
 Rye: 7000
 Wheat: 7000
 Malt: 1800
@@ -40,46 +46,44 @@ const MASHING_PROTOCOL = [
   { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
-  { action: "Add Grain", grainType: "Malt", qty: 192 },
-  { action: "Add Additive", additiveType: "Termamyl", qty: 1.4 },
-  { action: "Add Grain", grainType: "Corn", qty: 17819 },
-  // { action: "Hold", holdType: "Hold", time: 3 }, // UNCOMMENT IF NEED SECONDARY DROP
-  // { action: "Add Grain", grainType: "Corn", qty: 20001 }, // UNCOMMENT IF NEED SECONDARY DROP
-  { action: "Hold", holdType: "Heat", temperature: 190, time: 20 },
+  { action: "Add Grain", grainType: "PreMalt"},
+  { action: "Add Additive", additiveType: "Liquozyme"},
+  { action: "Add Grain", grainType: "Corn"},
+  { action: "Hold", holdType: "Heat", temperature: 200, time: 20 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
-  { action: "Add Grain", grainType: "Rye", qty: 4334 },
+  { action: "Add Grain", grainType: "Rye" },
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
-  { action: "Add Additive", additiveType: "DIAZYME", qty: 8.7 },
-  { action: "Add Additive", additiveType: "Laminex", qty: 2.1 },
+  { action: "Add Additive", additiveType: "DIAZYME"},
+  { action: "Add Additive", additiveType: "Laminex" },
   { action: "Hold", holdType: "Cool", temperature: 145 },
-  { action: "Add Grain", grainType: "Malt", qty: 1734 },
+  { action: "Add Grain", grainType: "Malt"},
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
   { name: 'HighWineProof', setpointValue: 140 },
   { name: 'LowWineProof', setpointValue: 130 },
-  { name: 'FinalProof', setpointValue: 120 },
+  { name: 'FinalProof', setpointValue: 125 },
   { name: 'BaseLoss', setpointValue: 0.1 },
   { name: 'BeerFeedTray', setpointValue: 15 },
   { name: 'FermentationAge', setpointValue: 72 },
-  { name: 'ControlTemperature', setpointValue: 92 },
+  { name: 'ControlTemperature', setpointValue: 85 },
   { name: 'CooksPerFerm', setpointValue: 3 },
     { name: 'TopOffFrequency', setpointValue: 24 },
     { name: 'TopOffQuantity', setpointValue: 100 },
     { name: 'TopOffTemperature', setpointValue: 80 },
-    { name: 'MashpH', setpointValue: 5.1 },
+    { name: 'MashpH', setpointValue: 6.5 },
     { name: 'MashRatio', setpointValue: 3.0 },
     { name: 'RatioByFerm', setpointValue: 2.8 },
-    { name: 'FermSetTemp', setpointValue: 80 },
+    { name: 'FermSetTemp', setpointValue: 70 },
     { name: 'StarterSweetpH', setpointValue: 5.1 },
     { name: 'TotalGrainWeight', setpointValue: 20500 },
-    { name: 'TotalLiquid', setpointValue: 70000 },
+    { name: 'TotalLiquid', setpointValue: 7500 },
     { name: 'NumberOfCooks', setpointValue: ORDER_QTY * 3/ BBLS_PER_FERM },
     { name: 'AssumedFermABV', setpointValue: 12.5 }
   ];
 
-  import axios from 'axios';
+   import axios from 'axios';
   import * as dotenv from 'dotenv';
 
   // Load the environment variables
@@ -89,7 +93,7 @@ const RECIPE_PARAMETERS = [
     try {
 
       // Login first to get JWT token
-      const host = 'localhost';
+      const host = '10.4.8.25';
       const base_url = `${process.env.APP_MODE}://${host}:${process.env.PORT}/api`;
       const url = `${base_url}/login`;
       console.log('Logging in to Mes...');
@@ -119,7 +123,8 @@ const RECIPE_PARAMETERS = [
         bblItemNumbers: BBL_ITEM_NUMBERS,
         yeastItemNumbersQtys: YEAST_ITEM_NUMBERS_QTYS,
         mashingProtocol: MASHING_PROTOCOL,
-        recipeParameters: RECIPE_PARAMETERS
+        recipeParameters: RECIPE_PARAMETERS,
+        binAssignments: BIN_ASSIGNMENTS
       });
 
       console.log('Recipe generated successfully:', response.data);
