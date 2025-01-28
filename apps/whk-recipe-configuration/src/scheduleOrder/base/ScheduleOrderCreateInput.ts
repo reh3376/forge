@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -17,14 +17,15 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
   IsNumber,
   Max,
-  IsInt,
-  ValidateNested,
   IsEnum,
+  IsInt,
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { CustomerCreateNestedManyWithoutScheduleOrdersInput } from "./CustomerCreateNestedManyWithoutScheduleOrdersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
@@ -73,13 +74,15 @@ class ScheduleOrderCreateInput {
 
   @ApiProperty({
     required: false,
+    type: () => CustomerCreateNestedManyWithoutScheduleOrdersInput,
   })
-  @IsJSONValue()
+  @ValidateNested()
+  @Type(() => CustomerCreateNestedManyWithoutScheduleOrdersInput)
   @IsOptional()
-  @Field(() => GraphQLJSON, {
+  @Field(() => CustomerCreateNestedManyWithoutScheduleOrdersInput, {
     nullable: true,
   })
-  customers?: InputJsonValue;
+  customers?: CustomerCreateNestedManyWithoutScheduleOrdersInput;
 
   @ApiProperty({
     required: false,
@@ -88,7 +91,7 @@ class ScheduleOrderCreateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   duration?: number | null;
@@ -107,15 +110,37 @@ class ScheduleOrderCreateInput {
 
   @ApiProperty({
     required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedBarrelingStartTime?: Date | null;
+
+  @ApiProperty({
+    required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedDistillationTime?: number | null;
+  estimatedDistillationDuration?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedDistillationStartTime?: Date | null;
 
   @ApiProperty({
     required: false,
@@ -132,37 +157,58 @@ class ScheduleOrderCreateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedFermentationTime?: number | null;
+  estimatedFermentationDuration?: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedFermentationStartTime?: Date | null;
 
   @ApiProperty({
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedMashingTime?: number | null;
+  estimatedMashingDuration?: number | null;
 
   @ApiProperty({
     required: false,
-    type: Number,
   })
-  @IsInt()
-  @Max(99999999999)
+  @IsDate()
+  @Type(() => Date)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => Date, {
     nullable: true,
   })
-  estimatedProcessing?: number | null;
+  estimatedMashingStartTime?: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  estimatedProcessingStartTime?: Date | null;
 
   @ApiProperty({
     required: false,
@@ -179,13 +225,13 @@ class ScheduleOrderCreateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  estimatedTotalProductionTime?: number | null;
+  estimatedTotalProductionDuration?: number | null;
 
   @ApiProperty({
     required: false,
@@ -299,7 +345,7 @@ class ScheduleOrderCreateInput {
     required: false,
     type: Number,
   })
-  @IsInt()
+  @IsNumber()
   @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
