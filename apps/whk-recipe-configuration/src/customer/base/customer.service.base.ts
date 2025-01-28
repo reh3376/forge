@@ -19,6 +19,7 @@ import {
   Recipe as PrismaRecipe,
   SalesOrder as PrismaSalesOrder,
   InventoryLog as PrismaInventoryLog,
+  ScheduleOrder as PrismaScheduleOrder,
 } from "@prisma/client";
 
 export class CustomerServiceBase {
@@ -104,5 +105,15 @@ export class CustomerServiceBase {
         where: { id: parentId },
       })
       .inventoryLog();
+  }
+
+  async getScheduleOrders(
+    parentId: string
+  ): Promise<PrismaScheduleOrder | null> {
+    return this.prisma.customer
+      .findUnique({
+        where: { id: parentId },
+      })
+      .scheduleOrders();
   }
 }

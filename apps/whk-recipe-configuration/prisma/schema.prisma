@@ -389,37 +389,41 @@ model ProductionOrder {
 }
 
 model ScheduleOrder {
-  actualEnd                    DateTime?
-  actualStart                  DateTime?
-  createdAt                    DateTime                 @default(now())
-  createdBy                    String?
-  customers                    Json?
-  duration                     Float?
-  durationUnits                String?                  @default("Hours")
-  estimatedDistillationTime    Int?
-  estimatedEnd                 DateTime?
-  estimatedFermentationTime    Int?
-  estimatedMashingTime         Int?
-  estimatedProcessing          Int?
-  estimatedStart               DateTime?
-  estimatedTotalProductionTime Int?
-  globalId                     String?                  @unique @default(cuid())
-  id                           String                   @id @default(cuid())
-  name                         String?                  @unique
-  productionOrderAllocation    Json
-  productionOrders             ProductionOrder[]
-  recipeGroup                  RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
-  recipeGroupId                String
-  recipeName                   String
-  scheduleOrderQueues          ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
-  scheduleOrderRecipe          Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
-  scheduleOrderRecipeId        String?
-  status                       EnumScheduleOrderStatus? @default(Created)
-  totalBarrels                 Int?
-  totalProofGallons            Int?
-  updatedAt                    DateTime                 @updatedAt
-  updatedBy                    String?
-  scheduleOrderQueueId         String?                  @unique
+  actualEnd                        DateTime?
+  actualStart                      DateTime?
+  createdAt                        DateTime                 @default(now())
+  createdBy                        String?
+  customers                        Customer[]
+  duration                         Float?
+  durationUnits                    String?                  @default("Hours")
+  estimatedBarrelingStartTime      DateTime?
+  estimatedDistillationDuration    Float?
+  estimatedDistillationStartTime   DateTime?
+  estimatedEnd                     DateTime?
+  estimatedFermentationDuration    Float?
+  estimatedFermentationStartTime   DateTime?
+  estimatedMashingDuration         Float?
+  estimatedMashingStartTime        DateTime?
+  estimatedProcessingStartTime     DateTime?
+  estimatedStart                   DateTime?
+  estimatedTotalProductionDuration Float?
+  globalId                         String?                  @unique @default(cuid())
+  id                               String                   @id @default(cuid())
+  name                             String?                  @unique
+  productionOrderAllocation        Json
+  productionOrders                 ProductionOrder[]
+  recipeGroup                      RecipeGroup              @relation(fields: [recipeGroupId], references: [id])
+  recipeGroupId                    String
+  recipeName                       String
+  scheduleOrderQueues              ScheduleOrderQueue?      @relation(fields: [scheduleOrderQueueId], references: [id])
+  scheduleOrderRecipe              Recipe?                  @relation(fields: [scheduleOrderRecipeId], references: [id])
+  scheduleOrderRecipeId            String?
+  status                           EnumScheduleOrderStatus? @default(Created)
+  totalBarrels                     Int?
+  totalProofGallons                Float?
+  updatedAt                        DateTime                 @updatedAt
+  updatedBy                        String?
+  scheduleOrderQueueId             String?                  @unique
 }
 
 model Item {
@@ -485,6 +489,8 @@ model Customer {
   recipes          Recipe[]
   revision         Int               @default(0)
   salesOrders      SalesOrder[]
+  scheduleOrders   ScheduleOrder?    @relation(fields: [scheduleOrdersId], references: [id])
+  scheduleOrdersId String?
   schemaVersion    String?           @default("0001-alpha")
   updatedAt        DateTime          @updatedAt
 
@@ -1109,6 +1115,37 @@ model AdditiveActual {
   updatedAt      DateTime      @updatedAt
 }
 
+model UnsConfiguration {
+  createdAt              DateTime                        @default(now())
+  createdBy              String
+  enabled                Boolean?                        @default(true)
+  entityName             String?
+  eventType              EnumUnsConfigurationEventType[]
+  filterCriteria         Json?
+  id                     String                          @id @default(cuid())
+  topic                  String?
+  transformationFunction String?
+  updatedAt              DateTime                        @updatedAt
+  updatedBy              String?
+}
+
+model UnsBrokerConfiguration {
+  baseTopicPath       String?  @default("#")
+  createdAt           DateTime @default(now())
+  createdBy           String
+  host                String
+  id                  String   @id @default(cuid())
+  password            String?
+  port                Int?     @default(1883)
+  protocol            String?  @default("mqtt://")
+  subscriptions       Json?
+  tls                 Boolean? @default(false)
+  updatedAt           DateTime @updatedAt
+  updatedBy           String?
+  username            String?
+  validateCertificate Boolean? @default(false)
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
@@ -1341,4 +1378,11 @@ enum EnumMashingProtocolStepStepType {
   Malt
   Prompt
   AdditiveAdd
+}
+
+enum EnumUnsConfigurationEventType {
+  Create
+  Read
+  Update
+  Delete
 }
