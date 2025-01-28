@@ -910,13 +910,16 @@ export class RecipeGenerator {
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
                     if (component.quantity == phase.qty) {
-                      await client.equipmentPhase.update({
+                      const updatedPhase =await client.equipmentPhase.update({
                         where: { id: newPhase.id },
                         data: {
                           bomItem: {
                             connect: { id: component.id },
                           },
                         },
+                        include: {
+                          bomItem: true
+                        }
                       });
                       console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
                       bomItemLinked = true;
