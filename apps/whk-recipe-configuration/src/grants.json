@@ -6448,5 +6448,305 @@
     "resource": "AdditiveActual",
     "action": "read:any",
     "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:own",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsBrokerConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsBrokerConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsBrokerConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsBrokerConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsBrokerConfiguration",
+    "action": "create:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsBrokerConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsBrokerConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsBrokerConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsBrokerConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsBrokerConfiguration",
+    "action": "update:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsBrokerConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsBrokerConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsBrokerConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsBrokerConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsBrokerConfiguration",
+    "action": "delete:any",
+    "attributes": "*"
+  },
+  {
+    "role": "admin",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "manager",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "operator",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "supervisor",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:any",
+    "attributes": "*"
+  },
+  {
+    "role": "user",
+    "resource": "UnsBrokerConfiguration",
+    "action": "read:any",
+    "attributes": "*"
   }
 ]

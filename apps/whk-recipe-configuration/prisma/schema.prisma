@@ -1109,6 +1109,37 @@ model AdditiveActual {
   updatedAt      DateTime      @updatedAt
 }
 
+model UnsConfiguration {
+  createdAt              DateTime                        @default(now())
+  createdBy              String
+  enabled                Boolean?                        @default(true)
+  entityName             String?
+  eventType              EnumUnsConfigurationEventType[]
+  filterCriteria         Json?
+  id                     String                          @id @default(cuid())
+  topic                  String?
+  transformationFunction String?
+  updatedAt              DateTime                        @updatedAt
+  updatedBy              String?
+}
+
+model UnsBrokerConfiguration {
+  baseTopicPath       String?  @default("#")
+  createdAt           DateTime @default(now())
+  createdBy           String
+  host                String
+  id                  String   @id @default(cuid())
+  password            String?
+  port                Int?     @default(1883)
+  protocol            String?  @default("mqtt://")
+  subscriptions       Json?
+  tls                 Boolean? @default(false)
+  updatedAt           DateTime @updatedAt
+  updatedBy           String?
+  username            String?
+  validateCertificate Boolean? @default(false)
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
@@ -1341,4 +1372,11 @@ enum EnumMashingProtocolStepStepType {
   Malt
   Prompt
   AdditiveAdd
+}
+
+enum EnumUnsConfigurationEventType {
+  Create
+  Read
+  Update
+  Delete
 }
