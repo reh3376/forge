@@ -3,7 +3,7 @@ const MASH_BILL = '74-18-00-08'; //  Match Item Record
 const FINAL_PROOF = 125;
 const BARREL_INFO = '53-06-4-0-0'; // Match Item Record - rated capactiy-months of seasoning-char-toast-top/side fill
 const CUSTOMER_NAME = "Western Spirits Beverage Company, LLC"; // This needs to match ERP / MESDB customer reocrd
-const ORDER_QTY = 3500; // barrels
+const ORDER_QTY = 90; // barrels
 const TOTAL_GRAIN_WEIGHT = 20500;
 const BBLS_PER_FERM = 90.37;
 const USER = 'pmannion@whiskeyhouse.com';
@@ -47,7 +47,7 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
   { action: "Add Grain", grainType: "PreMalt"},
-  { action: "Add Additive", additiveType: "Termamyl"},
+  { action: "Add Additive", additiveType: "Liquozyme"},
   { action: "Add Grain", grainType: "Corn"},
   { action: "Hold", holdType: "Heat", temperature: 200, time: 20 },
   { action: "Hold", holdType: "Cool", temperature: 170 },
@@ -55,7 +55,7 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Hold", time: 15 },
   { action: "Hold", holdType: "Cool", temperature: 152 },
   { action: "Add Additive", additiveType: "DIAZYME"},
-  { action: "Add Additive", additiveType: "Viscoferm" },
+  { action: "Add Additive", additiveType: "Laminex" },
   { action: "Hold", holdType: "Cool", temperature: 145 },
   { action: "Add Grain", grainType: "Malt"},
   { action: "Hold", holdType: "Hold", time: 10 },
