@@ -22,7 +22,7 @@ import { ProductionOrderListRelationFilter } from "../../productionOrder/base/Pr
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { IntFilter } from "../../util/IntFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
-import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
+import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 
 @InputType()
 class CustomerWhereInput {
@@ -220,15 +220,15 @@ class CustomerWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderWhereUniqueInput,
+    type: () => ScheduleOrderListRelationFilter,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderWhereUniqueInput)
+  @Type(() => ScheduleOrderListRelationFilter)
   @IsOptional()
-  @Field(() => ScheduleOrderWhereUniqueInput, {
+  @Field(() => ScheduleOrderListRelationFilter, {
     nullable: true,
   })
-  scheduleOrders?: ScheduleOrderWhereUniqueInput;
+  scheduleOrders?: ScheduleOrderListRelationFilter;
 
   @ApiProperty({
     required: false,

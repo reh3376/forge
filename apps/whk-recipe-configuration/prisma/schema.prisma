@@ -489,8 +489,7 @@ model Customer {
   recipes          Recipe[]
   revision         Int               @default(0)
   salesOrders      SalesOrder[]
-  scheduleOrders   ScheduleOrder?    @relation(fields: [scheduleOrdersId], references: [id])
-  scheduleOrdersId String?
+  scheduleOrders   ScheduleOrder[]
   schemaVersion    String?           @default("0001-alpha")
   updatedAt        DateTime          @updatedAt
 
