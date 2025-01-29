@@ -25,7 +25,7 @@ import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryL
 import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
 import { RecipeUpdateManyWithoutCustomersInput } from "./RecipeUpdateManyWithoutCustomersInput";
 import { SalesOrderUpdateManyWithoutCustomersInput } from "./SalesOrderUpdateManyWithoutCustomersInput";
-import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
+import { ScheduleOrderUpdateManyWithoutCustomersInput } from "./ScheduleOrderUpdateManyWithoutCustomersInput";
 
 @InputType()
 class CustomerUpdateInput {
@@ -211,15 +211,15 @@ class CustomerUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrderWhereUniqueInput,
+    type: () => ScheduleOrderUpdateManyWithoutCustomersInput,
   })
   @ValidateNested()
-  @Type(() => ScheduleOrderWhereUniqueInput)
+  @Type(() => ScheduleOrderUpdateManyWithoutCustomersInput)
   @IsOptional()
-  @Field(() => ScheduleOrderWhereUniqueInput, {
+  @Field(() => ScheduleOrderUpdateManyWithoutCustomersInput, {
     nullable: true,
   })
-  scheduleOrders?: ScheduleOrderWhereUniqueInput | null;
+  scheduleOrders?: ScheduleOrderUpdateManyWithoutCustomersInput;
 
   @ApiProperty({
     required: false,
