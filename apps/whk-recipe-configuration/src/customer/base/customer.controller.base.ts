@@ -38,6 +38,9 @@ import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
+import { ScheduleOrderFindManyArgs } from "../../scheduleOrder/base/ScheduleOrderFindManyArgs";
+import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -72,12 +75,6 @@ export class CustomerControllerBase {
               connect: data.inventoryLog,
             }
           : undefined,
-
-        scheduleOrders: data.scheduleOrders
-          ? {
-              connect: data.scheduleOrders,
-            }
-          : undefined,
       },
       select: {
         address: true,
@@ -99,13 +96,6 @@ export class CustomerControllerBase {
         name: true,
         phone: true,
         revision: true,
-
-        scheduleOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
       },
@@ -148,13 +138,6 @@ export class CustomerControllerBase {
         name: true,
         phone: true,
         revision: true,
-
-        scheduleOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
       },
@@ -198,13 +181,6 @@ export class CustomerControllerBase {
         name: true,
         phone: true,
         revision: true,
-
-        scheduleOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
       },
@@ -247,12 +223,6 @@ export class CustomerControllerBase {
                 connect: data.inventoryLog,
               }
             : undefined,
-
-          scheduleOrders: data.scheduleOrders
-            ? {
-                connect: data.scheduleOrders,
-              }
-            : undefined,
         },
         select: {
           address: true,
@@ -274,13 +244,6 @@ export class CustomerControllerBase {
           name: true,
           phone: true,
           revision: true,
-
-          scheduleOrders: {
-            select: {
-              id: true,
-            },
-          },
-
           schemaVersion: true,
           updatedAt: true,
         },
@@ -863,6 +826,145 @@ export class CustomerControllerBase {
   ): Promise<void> {
     const data = {
       salesOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/scheduleOrders")
+  @ApiNestedQuery(ScheduleOrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ScheduleOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrders(
+    @common.Req() request: Request,
+    @common.Param() params: CustomerWhereUniqueInput
+  ): Promise<ScheduleOrder[]> {
+    const query = plainToClass(ScheduleOrderFindManyArgs, request.query);
+    const results = await this.service.findScheduleOrders(params.id, {
+      ...query,
+      select: {
+        actualEnd: true,
+        actualStart: true,
+        createdAt: true,
+        createdBy: true,
+        duration: true,
+        durationUnits: true,
+        estimatedBarrelingStartTime: true,
+        estimatedDistillationDuration: true,
+        estimatedDistillationStartTime: true,
+        estimatedEnd: true,
+        estimatedFermentationDuration: true,
+        estimatedFermentationStartTime: true,
+        estimatedMashingDuration: true,
+        estimatedMashingStartTime: true,
+        estimatedProcessingStartTime: true,
+        estimatedStart: true,
+        estimatedTotalProductionDuration: true,
+        globalId: true,
+        id: true,
+        name: true,
+        productionOrderAllocation: true,
+
+        recipeGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeName: true,
+
+        scheduleOrderQueues: {
+          select: {
+            id: true,
+          },
+        },
+
+        scheduleOrderRecipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        status: true,
+        totalBarrels: true,
+        totalProofGallons: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/scheduleOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async connectScheduleOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrders: {
+        connect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/scheduleOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async updateScheduleOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrders: {
+        set: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/scheduleOrders")
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectScheduleOrders(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: ScheduleOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrders: {
         disconnect: body,
       },
     };
