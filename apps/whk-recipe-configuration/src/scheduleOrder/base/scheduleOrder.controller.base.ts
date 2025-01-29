@@ -410,13 +410,6 @@ export class ScheduleOrderControllerBase {
         name: true,
         phone: true,
         revision: true,
-
-        scheduleOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         schemaVersion: true,
         updatedAt: true,
       },
