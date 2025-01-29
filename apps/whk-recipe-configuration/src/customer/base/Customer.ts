@@ -201,12 +201,12 @@ class Customer {
 
   @ApiProperty({
     required: false,
-    type: () => ScheduleOrder,
+    type: () => [ScheduleOrder],
   })
   @ValidateNested()
   @Type(() => ScheduleOrder)
   @IsOptional()
-  scheduleOrders?: ScheduleOrder | null;
+  scheduleOrders?: Array<ScheduleOrder>;
 
   @ApiProperty({
     required: false,
