@@ -275,6 +275,10 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
                 throw new Error(`Schedule order queue with id ${args.where.id} not found`);
             }
 
+            if (scheduleOrderQueue.queueIndex === null || scheduleOrderQueue.queueIndex <= 1) {
+                throw new Error(`Cannot deactivate schedule order queue with index ${scheduleOrderQueue.queueIndex}. Index must be greater than 1`);
+            }
+
             // Remove the schedule order from the queue
             await prisma.scheduleOrderQueue.delete({
                 where: { id: args.where.id }
@@ -287,6 +291,20 @@ export class ScheduleOrderQueueService extends ScheduleOrderQueueServiceBase {
             });
 
             this.logger.log(`Deactivated schedule order ${scheduleOrderQueue.scheduleOrder?.id} and removed from queue`);
+
+            // Shift down the indices of all schedule order queues with higher indices
+            await prisma.scheduleOrderQueue.updateMany({
+                where: {
+                    queueIndex: {
+                        gt: scheduleOrderQueue.queueIndex
+                    }
+                },
+                data: {
+                    queueIndex: {
+                        decrement: 1
+                    }
+                }
+            });
 
             // Return the deactivated schedule order queue
             return scheduleOrderQueue;
