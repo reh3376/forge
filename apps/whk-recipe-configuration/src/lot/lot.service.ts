@@ -125,7 +125,13 @@ export class LotService extends LotServiceBase {
     }
     const bblType = barrelTypeMapping[bblOem as string];
 
-    let lotNumberPrefix = `${year}${month}${day}${args.data.lotAlphaChar}.${bblType}`;
+    // Validate and normalize lotAlphaChar
+    if (!args.data.lotAlphaChar || !/^[a-zA-Z]$/.test(args.data.lotAlphaChar)) {
+      throw new Error("Lot alpha character must be a single letter");
+    }
+    const lotAlphaChar = args.data.lotAlphaChar.toUpperCase();
+
+    let lotNumberPrefix = `${year}${month}${day}${lotAlphaChar}.${bblType}`;
     this.logger.log(`lotNumber: ${args.data.lotNumber}`);
 
     // If createdAt is provided, use that date instead of current date
