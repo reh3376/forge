@@ -1,5 +1,44 @@
 import { start } from "repl";
 
+import amqp from 'amqplib';
+
+const RABBITMQ_URL = process.env.RABBITMQ_URLS || 'amqp://localhost:5672';
+const RECIPE_EXCHANGE_NAME = 'wh.whk01.distillery01.recipe';
+
+async function sendToRabbitMQ(data) {
+  try {
+    const connection = await amqp.connect(RABBITMQ_URL);
+    const channel = await connection.createChannel();
+    
+    await channel.assertExchange(RECIPE_EXCHANGE_NAME, 'fanout', { durable: true });
+    
+    const message = {
+      pattern: RECIPE_EXCHANGE_NAME,
+      data: {
+        recordName: 'Recipe',
+        event_type: data.action,
+        data: {
+          data: data.recipe
+        }
+      }
+    };
+
+    await channel.publish(
+      RECIPE_EXCHANGE_NAME,
+      '',  // routing key is empty for fanout exchanges
+      Buffer.from(JSON.stringify(message)),
+      { persistent: true }
+    );
+    
+    console.log(`Recipe message sent to RabbitMQ: ${JSON.stringify(message)}`);
+    
+    await channel.close();
+    await connection.close();
+  } catch (error) {
+    console.error('Error sending recipe message to RabbitMQ:', error);
+  }
+}
+
 const addPOSTFIX = (postfix, addToThis) => {
   return addToThis + postfix;
 };
@@ -12,7 +51,7 @@ function adjustLotNumber(lotNumber, barrelType) {
 
   // Determine the postfix based on the barrel type
   const postfix =
-    barrelType === "WVBC" ? ".01" : barrelType === "ISC" ? ".10" : ".99"; // Default to .07 if neither WVBC nor ISC
+    (barrelType.includes("WVBC") || barrelType.includes("WVGBC")) ? ".01" : barrelType.includes("ISC") ? ".10" : ".99"; // Default to .99 if neither WVBC nor ISC
 
   // Append the postfix if the lot number doesn't already have it
   return lotNumber && postfix ? `${lotNumber}${postfix}` : lotNumber;
@@ -132,7 +171,7 @@ const findRelatedIdsByRecipe = async (
     include: { customer: true, item: true },
   });
   if (!recipeWithCustomer) {
-    if (recipeName.startsWith('WHK')) {
+    if (recipeName.startsWith('WHK') || recipeName.startsWith('ABT-60-36-00-04-R01')) {
         console.log(`Recipe not found: ${recipeName}, WHK recipe detected, creating...`);
         // Get base recipe name without -R01
         const baseRecipeName = recipeName.replace(/-R01$/, '');
@@ -200,7 +239,7 @@ const findRelatedIdsByRecipe = async (
   
         // Create new recipe record
         try {
-          const existingRecipe = await prisma.recipe.findUnique({
+          const existingRecipe = await prisma.recipe.findFirst({
             where: { Recipe: recipeName },
             include: {
               customer: true,
@@ -211,7 +250,7 @@ const findRelatedIdsByRecipe = async (
 
           if (existingRecipe) {
             recipeWithCustomer = await prisma.recipe.update({
-              where: { Recipe: recipeName },
+              where: { id: existingRecipe.id },
               data: {
                 createdBy: createdBy,
                 item: {
@@ -238,6 +277,7 @@ const findRelatedIdsByRecipe = async (
                 item: true
               }
             });
+            await sendToRabbitMQ({ action: 'update', recipe: recipeWithCustomer });
           } else {
             recipeWithCustomer = await prisma.recipe.create({
               data: {
@@ -267,7 +307,9 @@ const findRelatedIdsByRecipe = async (
                 item: true
               }
             });
+            await sendToRabbitMQ({ action: 'create', recipe: recipeWithCustomer });
           }
+          
           // console.log(`New recipe created: ${JSON.stringify(recipeWithCustomer)}`);
           // console.log(`New recipe created: ${recipeName}`);
           // return { connect: { id: recipeName } };

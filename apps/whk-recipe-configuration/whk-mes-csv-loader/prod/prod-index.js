@@ -43,7 +43,11 @@ async function sendToRabbitMQ(data) {
       data: {
         recordName: 'Lot',
         event_type: data.action,
-        data: data.lot
+        data: {
+          recordName: 'Lot',
+          event_type: data.action,
+          data: data.lot
+        }
       }
     };
 
@@ -226,12 +230,12 @@ if (process.env.NODE_ENV === "production") {
         renamedRow[mappedKey] = row[index] || null;
       });
 
-      console.log("🚀 ~ renamedRow 1:", JSON.stringify(renamedRow));
+      // console.log("🚀 ~ renamedRow 1:", JSON.stringify(renamedRow));
 
       if (renamedRow.recipe) {
         renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
       }
-      console.log("🚀 ~ renamedRow 2:", renamedRow);
+      // console.log("🚀 ~ renamedRow 2:", renamedRow);
 
       // const { productionOrderId, containerId, fgItemId } =
       const { recipeId, customerID, productionOrderId, itemId } =
@@ -254,7 +258,7 @@ if (process.env.NODE_ENV === "production") {
     })
   )
     .then((renamedData) => {
-      // console.log("🚀 ~ renamedData:", renamedData);
+      console.log("🚀 ~ renamedData:", renamedData);
 
       // Save renamed data to a JSON file
       fs.writeFileSync(
