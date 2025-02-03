@@ -12,6 +12,7 @@ import {
   getCustomerIdByRecipe,
   getRecipeIfExists,
 } from "./functions/prod-functions.js";
+import amqp from 'amqplib';
 
 // Get the directory path for the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -25,6 +26,42 @@ const prisma = new PrismaClient();
 
 // setup the file path manually on every run
 const FILEPATH = "./Production-WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+
+// Add RabbitMQ connection setup
+const RABBITMQ_URL = process.env.RABBITMQ_URLS || 'amqp://localhost:5672';
+const EXCHANGE_NAME = 'wh.whk01.distillery01.lot';
+
+async function sendToRabbitMQ(data) {
+  try {
+    const connection = await amqp.connect(RABBITMQ_URL);
+    const channel = await connection.createChannel();
+    
+    await channel.assertExchange(EXCHANGE_NAME, 'fanout', { durable: true });
+    
+    const message = {
+      pattern: EXCHANGE_NAME,
+      data: {
+        recordName: 'Lot',
+        event_type: data.action,
+        data: data.lot
+      }
+    };
+
+    await channel.publish(
+      EXCHANGE_NAME,
+      '',  // routing key is empty for fanout exchanges
+      Buffer.from(JSON.stringify(message)),
+      { persistent: true }
+    );
+    
+    console.log(`Message sent to RabbitMQ: ${JSON.stringify(message)}`);
+    
+    await channel.close();
+    await connection.close();
+  } catch (error) {
+    console.error('Error sending message to RabbitMQ:', error);
+  }
+}
 
 // Seed the database
 async function seedDatabase(renamedData) {
@@ -40,53 +77,56 @@ async function seedDatabase(renamedData) {
       console.log(`Data: ${JSON.stringify(data)}`);
 
       // Adjust the lot number based on the rules
-      const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
+      const adjustedLotNumber = adjustLotNumber(data['LOT #'], data.bblType);
       console.log("🚀 ~ adjustedLotNumber:", adjustedLotNumber);
 
       const lotData = {
-        avgBblFillByPg: data.avgBblFillByPg,
-        avgBblFillByWg: data.avgBblFillByWg,
+        avgBblFillByPg: data["Avg. Bbl Fill: by PG"],
+        avgBblFillByWg: data["Avg. Bbl Fill: by WG"],
         avgPGsFerm: data.avgPGsFerm,
-        bblOem: data.bblOem === "WVGBC" ? "WVG" : data.bblOem,
-        bblEntryProof: data.bblEntryProof,
+        bblOem: data.bblOem === "WVGBC" ? "WVG" : data['Bbl OEM:'],
+        bblEntryProof: data['Bbl Entry Proof: Pdi'],
         grainLbsFerm: data.grainLbsFerm,
-        densityFinal: data.densityFinal,
+        densityFinal: data['Density (final): Df'],
         grainLbsPg: data.grainLbsPg,
+        filledFromString: data['Tank of Origin:'],
         standardYield: data.standardYield,
-        pgLosses: data.pgLosses || 0,
+        pgLosses: data['PG Losses:'] || 0,
         totalFermenters: data.totalFermenters,
-        totalVolumeWg: data.totalVolumeWg,
-        totalPGsByRecipe: data.totalPGsByRecipe,
+        totalVolumeWg: data['Total WGs'],
+        totalPGsByRecipe: data['Total PGs'],
         confirmed: true,
         whiskeyType:
-          data.whiskeyType === "Select Type"
+          data['Whiskey Type:'] === "Select Type"
             ? "RyeBourbon"
-            : data.whiskeyType?.replace(/\s+/g, ""),
-        totalWGs: data.totalWGs,
-        notes: data.notes,
-        totalPGs: data.totalPGs,
-        bblTotal: data.bblTotal,
-        bblType: data.bblType,
+            : data['Whiskey Type:']?.replace(/\s+/g, ""),
+        totalWGs: data['Total WGs'],
+        notes: typeof data['Notes: '] === 'string' ? data['Notes: '] : null,
+        totalPGs: data['Total PGs'],
+        bblTotal: data['Bbl Total:'],
+        bblType: data['Bbl Type:'],
         lotNumber: adjustedLotNumber,
-        lotCreatedAt: data.lotCreatedAt
-          ? new Date((Number(data.lotCreatedAt) - 25569) * 86400 * 1000) // Convert Excel date
-          : null,
-        warehouseEntryNumber: parseInt(data.warehouseEntryNumber, 10) || null,
-        totalWeight: data.totalWeight,
-        lotAlphaChar: data.lotAlphaChar,
+        proofInitial: data['Proof (Initial): Pdi'],
+        createdBy: 'pmannion@whiskeyhouse.com',
+        lotCreatedAt: (() => {
+          const year = `20${adjustedLotNumber.substring(0, 2)}`;
+          const monthChar = adjustedLotNumber.charAt(2);
+          const day = adjustedLotNumber.substring(3, 5);
+          const month = "ABCDEFGHIJKL".indexOf(monthChar) + 1;
+          return new Date(`${year}-${month}-${day}`);
+        })(),
+        warehouseEntryNumber: parseInt(data['WHK_WHSE#:'], 10) || null,
+        totalWeight: data['Total  Weight: lbs - Wt'],
+        lotAlphaChar: adjustedLotNumber.charAt(5) || null,
         status: data.status || "Complete",
         recipe: recipeRelation,
-        productionOrder: data.productionOrder
+        productionOrder: data.productionOrderId
           ? {
-              connectOrCreate: {
-                where: { id: data.productionOrderId },
-                create: {
-                  id: data.productionOrderId,
-                  status: "Initiated",
-                },
-              },
+              connect: {
+                id: data.productionOrderId
+              }
             }
-          : undefined,
+          : undefined
       };
 
       console.log("🚀 ~ lotData:", lotData);
@@ -101,11 +141,13 @@ async function seedDatabase(renamedData) {
           where: { id: existingLot.id },
           data: lotData,
         });
+        await sendToRabbitMQ({ action: 'update', lot });
       } else {
         // Create new lot
         lot = await prisma.lot.create({
           data: lotData,
         });
+        await sendToRabbitMQ({ action: 'create', lot });
       }
 
       console.info(`Successfully seeded lot: ${lot.lotNumber}`);
