@@ -15,7 +15,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 // setup the file path manually on every run
-const FILEPATH = "./WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+const FILEPATH = "./Production-WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
 
 // Seed the database
 async function seedDatabase(renamedData) {
@@ -25,7 +25,6 @@ async function seedDatabase(renamedData) {
     try {
       const recipeRelation = await getRecipeIfExists(
         data.recipe,
-        data.customer,
         data.createdBy,
         prisma
       );
@@ -125,17 +124,12 @@ if (process.env.NODE_ENV === "production") {
 
       if (renamedRow.recipe) {
         renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
-        renamedRow.customer = await getCustomerIdByRecipe(
-          renamedRow.recipe,
-          prisma
-        );
       }
 
       const { productionOrderId, containerId, fgItemId } =
         await findRelatedIdsByRecipe(
           renamedRow.recipe,
           prisma,
-          renamedRow.customer,
           renamedRow.createdBy
         );
 
