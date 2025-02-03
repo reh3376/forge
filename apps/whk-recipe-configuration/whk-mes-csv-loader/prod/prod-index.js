@@ -1,4 +1,4 @@
-// import modules
+// Import modules
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import fs from "fs";
@@ -7,8 +7,88 @@ import {
   addPOSTFIXandSpaceToDash,
   adjustLotNumber,
   findRelatedIdsByRecipe,
+  getRecipeIfExists,
 } from "./functions/prod-functions.js";
 
+// Seed the database
+async function seedDatabase(renamedData, prisma) {
+  console.info("Starting database seeding...");
+
+  for (const data of renamedData) {
+    try {
+      const recipeRelation = await getRecipeIfExists(
+        data.recipe,
+        data.customer,
+        data.createdBy,
+        prisma
+      );
+
+      // Adjust the lot number based on the rules
+      const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
+
+      const lotData = {
+        avgBblFillByPg: data.avgBblFillByPg,
+        avgBblFillByWg: data.avgBblFillByWg,
+        avgPGsFerm: data.avgPGsFerm,
+        bblOem: data.bblOem === "WVGBC" ? "WVG" : data.bblOem,
+        bblEntryProof: data.bblEntryProof,
+        grainLbsFerm: data.grainLbsFerm,
+        densityFinal: data.densityFinal,
+        grainLbsPg: data.grainLbsPg,
+        standardYield: data.standardYield,
+        pgLosses: data.pgLosses || 0,
+        totalFermenters: data.totalFermenters,
+        totalVolumeWg: data.totalVolumeWg,
+        totalPGsByRecipe: data.totalPGsByRecipe,
+        confirmed: true,
+        whiskeyType:
+          data.whiskeyType === "Select Type"
+            ? "RyeBourbon"
+            : data.whiskeyType?.replace(/\s+/g, ""),
+        totalWGs: data.totalWGs,
+        notes: data.notes,
+        totalPGs: data.totalPGs,
+        bblTotal: data.bblTotal,
+        bblType: data.bblType,
+        lotNumber: adjustedLotNumber,
+        lotCreatedAt: data.lotCreatedAt
+          ? new Date((Number(data.lotCreatedAt) - 25569) * 86400 * 1000) // Convert Excel date
+          : null,
+        warehouseEntryNumber: parseInt(data.warehouseEntryNumber, 10) || null,
+        totalWeight: data.totalWeight,
+        lotAlphaChar: data.lotAlphaChar,
+        status: data.status || "Complete",
+        recipe: recipeRelation,
+        productionOrder: data.productionOrder
+          ? {
+              connectOrCreate: {
+                where: { id: data.productionOrderId },
+                create: {
+                  id: data.productionOrderId,
+                  status: "Initiated",
+                },
+              },
+            }
+          : undefined,
+      };
+
+      await prisma.lot.upsert({
+        where: { lotNumber: lotData.lotNumber },
+        update: lotData,
+        create: lotData,
+      });
+
+      console.info(`Successfully seeded lot: ${lotData.lotNumber}`);
+    } catch (error) {
+      console.error(`Error seeding lot: ${data.lotNumber}`, error);
+    }
+  }
+
+  console.info("Database seeding completed!");
+  await prisma.$disconnect();
+}
+
+// Main execution block
 if (process.env.NODE_ENV === "production") {
   const prisma = new PrismaClient();
   dotenv.config();
@@ -63,7 +143,7 @@ if (process.env.NODE_ENV === "production") {
   };
 
   // Rename keys in each row
-  const renamedData = await Promise.all(
+  Promise.all(
     jsonData.map(async (row) => {
       const renamedRow = {};
       header.forEach((key, index) => {
@@ -87,100 +167,26 @@ if (process.env.NODE_ENV === "production") {
 
       return renamedRow;
     })
-  );
+  )
+    .then((renamedData) => {
+      console.log("🚀 ~ renamedData:", renamedData);
 
-  console.log("🚀 ~ renamedData:", renamedData);
+      // Save renamed data to a JSON file
+      fs.writeFileSync(
+        "renamedData.json",
+        JSON.stringify(renamedData, null, 2),
+        "utf8"
+      );
 
-  // Save renamed data to a JSON file
-  fs.writeFileSync(
-    "renamedData.json",
-    JSON.stringify(renamedData, null, 2),
-    "utf8"
-  );
-
-  // Seed the database
-  async function seedDatabase() {
-    console.info("Starting database seeding...");
-
-    for (const data of renamedData) {
-      try {
-        const recipeRelation = await getOrCreateRecipe(
-          data.recipe,
-          data.customer,
-          data.createdBy,
-          prisma
-        );
-
-        // Adjust the lot number based on the rules
-        const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
-
-        const lotData = {
-          avgBblFillByPg: data.avgBblFillByPg,
-          avgBblFillByWg: data.avgBblFillByWg,
-          avgPGsFerm: data.avgPGsFerm,
-          bblOem: data.bblOem === "WVGBC" ? "WVG" : data.bblOem,
-          bblEntryProof: data.bblEntryProof,
-          grainLbsFerm: data.grainLbsFerm,
-          densityFinal: data.densityFinal,
-          grainLbsPg: data.grainLbsPg,
-          standardYield: data.standardYield,
-          pgLosses: data.pgLosses || 0,
-          totalFermenters: data.totalFermenters,
-          totalVolumeWg: data.totalVolumeWg,
-          totalPGsByRecipe: data.totalPGsByRecipe,
-          confirmed: true,
-          whiskeyType:
-            data.whiskeyType === "Select Type"
-              ? "RyeBourbon"
-              : data.whiskeyType?.replace(/\s+/g, ""),
-          totalWGs: data.totalWGs,
-          notes: data.notes,
-          totalPGs: data.totalPGs,
-          bblTotal: data.bblTotal,
-          bblType: data.bblType,
-          lotNumber: adjustedLotNumber,
-          lotCreatedAt: data.lotCreatedAt
-            ? new Date((Number(data.lotCreatedAt) - 25569) * 86400 * 1000) // Convert Excel date
-            : null,
-          warehouseEntryNumber: parseInt(data.warehouseEntryNumber, 10) || null,
-          totalWeight: data.totalWeight,
-          lotAlphaChar: data.lotAlphaChar,
-          status: data.status || "Complete",
-          recipe: recipeRelation,
-          productionOrder: data.productionOrder
-            ? {
-                connectOrCreate: {
-                  where: { id: data.productionOrderId },
-                  create: {
-                    id: data.productionOrderId,
-                    status: "Initiated",
-                  },
-                },
-              }
-            : undefined,
-        };
-
-        await prisma.lot.upsert({
-          where: { lotNumber: lotData.lotNumber },
-          update: lotData,
-          create: lotData,
-        });
-
-        console.info(`Successfully seeded lot: ${lotData.lotNumber}`);
-      } catch (error) {
-        console.error(`Error seeding lot: ${data.lotNumber}`, error);
-      }
-    }
-
-    console.info("Database seeding completed!");
-    await prisma.$disconnect();
-  }
-
-  // Execute seeding
-  seedDatabase().catch((error) => {
-    console.error("Seeding failed:", error);
-    process.exit(1);
-  });
+      // Execute seeding
+      seedDatabase(renamedData, prisma).catch((error) => {
+        console.error("Seeding failed:", error);
+        process.exit(1);
+      });
+    })
+    .catch((error) => console.error("Data processing failed:", error));
 } else {
-  console.log("node env is not development, please run the script in dev mode");
+  console.log(
+    "node env is not production, please run the script in production mode"
+  );
 }
