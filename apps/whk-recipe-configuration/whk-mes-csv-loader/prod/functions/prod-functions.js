@@ -200,55 +200,74 @@ const findRelatedIdsByRecipe = async (
   
         // Create new recipe record
         try {
-          recipeWithCustomer = await prisma.recipe.upsert({
+          const existingRecipe = await prisma.recipe.findUnique({
             where: { Recipe: recipeName },
-            update: {
-              createdBy: createdBy,
-              item: {
-                connect: {
-                  id: matchingItem.id
-                }
-              },
-              customer: {
-                connect: {
-                  id: customer.id
-                }
-              },
-              customerCode: customerCode,
-              revision: 1,
-              recipeGroup: {
-                connect: {
-                  id: recipeGroup.id
-                }
-              }
-            },
-            create: {
-              Recipe: recipeName,
-              createdBy: createdBy,
-              item: {
-                connect: {
-                  id: matchingItem.id
-                }
-              },
-              customer: {
-                connect: {
-                  id: customer.id
-                }
-              },
-              customerCode: customerCode,
-              revision: 1,
-              recipeGroup: {
-                connect: {
-                  id: recipeGroup.id
-                }
-              }
-            },
             include: {
               customer: true,
               recipeGroup: true,
               item: true
             }
           });
+
+          if (existingRecipe) {
+            recipeWithCustomer = await prisma.recipe.update({
+              where: { Recipe: recipeName },
+              data: {
+                createdBy: createdBy,
+                item: {
+                  connect: {
+                    id: matchingItem.id
+                  }
+                },
+                customer: {
+                  connect: {
+                    id: customer.id
+                  }
+                },
+                customerCode: customerCode,
+                revision: 1,
+                recipeGroup: {
+                  connect: {
+                    id: recipeGroup.id
+                  }
+                }
+              },
+              include: {
+                customer: true,
+                recipeGroup: true,
+                item: true
+              }
+            });
+          } else {
+            recipeWithCustomer = await prisma.recipe.create({
+              data: {
+                Recipe: recipeName,
+                createdBy: createdBy,
+                item: {
+                  connect: {
+                    id: matchingItem.id
+                  }
+                },
+                customer: {
+                  connect: {
+                    id: customer.id
+                  }
+                },
+                customerCode: customerCode,
+                revision: 1,
+                recipeGroup: {
+                  connect: {
+                    id: recipeGroup.id
+                  }
+                }
+              },
+              include: {
+                customer: true,
+                recipeGroup: true,
+                item: true
+              }
+            });
+          }
           // console.log(`New recipe created: ${JSON.stringify(recipeWithCustomer)}`);
           // console.log(`New recipe created: ${recipeName}`);
           // return { connect: { id: recipeName } };
