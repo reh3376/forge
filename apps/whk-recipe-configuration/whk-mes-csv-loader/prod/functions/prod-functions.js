@@ -119,7 +119,7 @@ const findRelatedIdsByRecipe = async (
   prisma,
   createdBy = "pmannion@whiskeyhouse.com"
 ) => {
-  console.log(`In the findRelatedIdsByRecipe function for recipeName: ${recipeName}`);
+  // console.log(`In the findRelatedIdsByRecipe function for recipeName: ${recipeName}`);
   console.log("🚀 ~ recipeName:", recipeName);
   if (!recipeName) throw new Error("recipeName is undefined");
 
@@ -127,9 +127,9 @@ const findRelatedIdsByRecipe = async (
   if (!createdBy) throw new Error("createdBy is undefined");
 
   // Step 1: Find the recipe and include customer
-  const recipeWithCustomer = await prisma.recipe.findFirst({
+  let recipeWithCustomer = await prisma.recipe.findFirst({
     where: { Recipe: recipeName },
-    include: { customer: true },
+    include: { customer: true, item: true },
   });
   if (!recipeWithCustomer) {
     if (recipeName.startsWith('WHK')) {
@@ -153,11 +153,11 @@ const findRelatedIdsByRecipe = async (
         if (!matchingItem) {
           throw new Error(`No matching item found for recipe: ${recipeName}`);
         }
-        console.log(`Matching item found: ${matchingItem.id}`);
+        // console.log(`Matching item found: ${matchingItem.id}`);
 
         // Get customer code from first 3 chars of recipe
         const customerCode = baseRecipeName.substring(0, 3);
-        console.log(`Customer code: ${customerCode}`);
+        // console.log(`Customer code: ${customerCode}`);
         
         // Find customer by code
         let customer = {};
@@ -192,7 +192,7 @@ const findRelatedIdsByRecipe = async (
           if (!recipeGroup) {
             throw new Error(`No recipe group found for mashbill: ${mashbill}`);
           }
-          console.log(`Recipe group found: ${recipeGroup.id}`);
+          // console.log(`Recipe group found: ${recipeGroup.id}`);
         } catch (error) {
           console.error(`Error finding recipe group: ${mashbill}`, error);
           throw new Error(`Error finding recipe group: ${mashbill}, error: ${error}`);
@@ -200,8 +200,29 @@ const findRelatedIdsByRecipe = async (
   
         // Create new recipe record
         try {
-          await prisma.recipe.create({
-            data: {
+          recipeWithCustomer = await prisma.recipe.upsert({
+            where: { Recipe: recipeName },
+            update: {
+              createdBy: createdBy,
+              item: {
+                connect: {
+                  id: matchingItem.id
+                }
+              },
+              customer: {
+                connect: {
+                  id: customer.id
+                }
+              },
+              customerCode: customerCode,
+              revision: 1,
+              recipeGroup: {
+                connect: {
+                  id: recipeGroup.id
+                }
+              }
+            },
+            create: {
               Recipe: recipeName,
               createdBy: createdBy,
               item: {
@@ -221,10 +242,16 @@ const findRelatedIdsByRecipe = async (
                   id: recipeGroup.id
                 }
               }
+            },
+            include: {
+              customer: true,
+              recipeGroup: true,
+              item: true
             }
           });
-          console.log(`New recipe created: ${recipeName}`);
-          return { connect: { id: recipeName } };
+          // console.log(`New recipe created: ${JSON.stringify(recipeWithCustomer)}`);
+          // console.log(`New recipe created: ${recipeName}`);
+          // return { connect: { id: recipeName } };
         } catch (error) {
           console.error(`Error creating recipe: ${recipeName}`, error);
           throw new Error(`Error creating recipe: ${recipeName}`);
@@ -243,12 +270,28 @@ const findRelatedIdsByRecipe = async (
     return {};
   }
 
-  console.log("🚀 ~ customerID:", customerID);
+  // console.log("🚀 ~ customerID:", customerID);
 
   // Step 2: Find the production order
-  let productionOrder = await prisma.productionOrder.findFirst({
-    where: { recipeId },
-  });
+  let productionOrder;
+  if (recipeName.startsWith("WHK")) {
+    const recipeGroup = await prisma.recipeGroup.findFirst({
+      where: { recipes: { some: { id: recipeId } } },
+      include: { recipes: true },
+    });
+
+    if (recipeGroup) {
+      productionOrder = await prisma.productionOrder.findFirst({
+        where: { recipeId: { in: recipeGroup.recipes.map(r => r.id) } },
+      });
+    }
+  } else {
+    productionOrder = await prisma.productionOrder.findFirst({
+      where: { recipeId },
+    });
+  }
+
+  // console.log(`Item: ${JSON.stringify(recipeWithCustomer.item)}`);
 
   if (!productionOrder) {
     console.warn(`Production order not found for recipe ID: ${recipeId}.`);
@@ -260,7 +303,7 @@ const findRelatedIdsByRecipe = async (
     };
   }
 
-  console.log("🚀 ~ productionOrder:", productionOrder);
+  // console.log("🚀 ~ productionOrder:", productionOrder);
 
   // Return the related IDs
   return {
