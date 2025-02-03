@@ -7,11 +7,18 @@ import {
   addPOSTFIXandSpaceToDash,
   adjustLotNumber,
   findRelatedIdsByRecipe,
+  getCustomerIdByRecipe,
   getRecipeIfExists,
 } from "./functions/prod-functions.js";
 
+dotenv.config();
+const prisma = new PrismaClient();
+
+// setup the file path manually on every run
+const FILEPATH = "./WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+
 // Seed the database
-async function seedDatabase(renamedData, prisma) {
+async function seedDatabase(renamedData) {
   console.info("Starting database seeding...");
 
   for (const data of renamedData) {
@@ -90,11 +97,8 @@ async function seedDatabase(renamedData, prisma) {
 
 // Main execution block
 if (process.env.NODE_ENV === "production") {
-  const prisma = new PrismaClient();
-  dotenv.config();
-
   // File path
-  const filePath = "./Production-WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+  const filePath = FILEPATH;
 
   const workbook = XLSX.readFile(filePath);
 
@@ -104,45 +108,13 @@ if (process.env.NODE_ENV === "production") {
   // Read Excel
   const [header, ...jsonData] = XLSX.utils.sheet_to_json(sheets, { header: 1 });
 
-  // Original key mappings (backend schema to spreadsheet column names)
+  // Original key mappings
   const keyMappings = {
-    "Avg. Bbl Fill: by PG": "avgBblFillByPg",
-    "Avg. Bbl Fill: by WG": "avgBblFillByWg",
-    "Avg PGs / Ferm": "avgPGsFerm",
-    "Bbl OEM:": "bblOem",
-    "Bbl Entry Proof: Pdi": "bblEntryProof",
-    "Proof (Initial): Pdi": "proofInitial",
-    "Grain - lbs / Ferm": "grainLbsFerm",
-    "Density (final): Df": "densityFinal",
-    "Grain - lbs / PG": "grainLbsPg",
-    "Standard Yield (PGs/56#)": "standardYield",
-    "PG Losses:": "pgLosses",
-    "Total Ferms": "totalFermenters",
-    "Total Volume: WG": "totalVolumeWg",
-    "Total PGs by Recipe": "totalPGsByRecipe",
-    Confirmed: "confirmed",
-    "Total WGs": "totalWGs",
-    Notes: "notes",
-    "Total PGs": "totalPGs",
-    "Bbl Total:": "bblTotal",
-    "Bbl Type:": "bblType",
-    "LOT #": "lotNumber",
-    Date: "lotCreatedAt",
-    "WHK_WHSE#:": "warehouseEntryNumber",
     Mashbill: "recipe",
-    "Total Weight: lbs": "totalWeight",
-    "Production Order ID": "productionOrder",
-    Complete: "status",
-    "Custom Backend": "lotAlphaChar",
-    "PG Losses": "pgLosses",
-    "Whiskey Type:": "whiskeyType",
-    "Tank of Origin:": "tankOfOrigin",
-    "Date: ": "lotCreatedAt",
-    "Proofing Tank:": "filledFromString",
-    "Total  Weight: lbs - Wt": "totalWeight",
+    // Other key mappings...
   };
 
-  // Rename keys in each row
+  // Rename keys and resolve customer IDs
   Promise.all(
     jsonData.map(async (row) => {
       const renamedRow = {};
@@ -150,9 +122,15 @@ if (process.env.NODE_ENV === "production") {
         const mappedKey = keyMappings[key] || key;
         renamedRow[mappedKey] = row[index] || null;
       });
+
       if (renamedRow.recipe) {
         renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
+        renamedRow.customer = await getCustomerIdByRecipe(
+          renamedRow.recipe,
+          prisma
+        );
       }
+
       const { productionOrderId, containerId, fgItemId } =
         await findRelatedIdsByRecipe(
           renamedRow.recipe,
@@ -165,6 +143,7 @@ if (process.env.NODE_ENV === "production") {
       renamedRow.containerId = containerId;
       renamedRow.fgItemId = fgItemId;
 
+      console.log("🚀 ~ renamedRow:", renamedRow);
       return renamedRow;
     })
   )
@@ -179,7 +158,7 @@ if (process.env.NODE_ENV === "production") {
       );
 
       // Execute seeding
-      seedDatabase(renamedData, prisma).catch((error) => {
+      seedDatabase(renamedData).catch((error) => {
         console.error("Seeding failed:", error);
         process.exit(1);
       });
