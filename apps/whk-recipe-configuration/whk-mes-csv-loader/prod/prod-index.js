@@ -25,7 +25,8 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const prisma = new PrismaClient();
 
 // setup the file path manually on every run
-const FILEPATH = "./Production-WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+// const FILEPATH = "./Production-WHK WHSE TTB.upload-for-backend1.CLEAN.xlsx";
+const FILEPATH = "./2025.xlsx";
 
 // Add RabbitMQ connection setup
 const RABBITMQ_URL = process.env.RABBITMQ_URLS || 'amqp://localhost:5672';
@@ -81,7 +82,7 @@ async function seedDatabase(renamedData) {
       console.log(`Data: ${JSON.stringify(data)}`);
 
       // Adjust the lot number based on the rules
-      const adjustedLotNumber = adjustLotNumber(data['LOT #'], data.bblType);
+      const adjustedLotNumber = adjustLotNumber(data['LOT #'], data['Bbl OEM:']);
       console.log("🚀 ~ adjustedLotNumber:", adjustedLotNumber);
 
       const lotData = {
