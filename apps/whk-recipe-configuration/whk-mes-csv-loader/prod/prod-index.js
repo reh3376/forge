@@ -146,7 +146,7 @@ if (process.env.NODE_ENV === "production") {
 
       // Save renamed data to a JSON file
       fs.writeFileSync(
-        "renamedData.json",
+        "prod-renamedData.json",
         JSON.stringify(renamedData, null, 2),
         "utf8"
       );
