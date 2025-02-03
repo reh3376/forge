@@ -114,3 +114,15 @@ npm run db:prod:deploy
 npm run seed
 npm run start
 ```
+
+# Start up guide for csv loader
+
+```bash
+# navigate to the whk-mes-csv-loader directory  for 'development' and navigate to the 'prod' directory for 'production' within the whk-mes-csv-loader directory
+
+# for development
+node index.js
+
+# for production once you are in the prod directory
+node  prod-index.js
+```
