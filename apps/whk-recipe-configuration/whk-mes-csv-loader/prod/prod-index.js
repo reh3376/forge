@@ -148,12 +148,12 @@ if (process.env.NODE_ENV === "production") {
       renamedRow.containerId = containerId;
       renamedRow.fgItemId = fgItemId;
 
-      console.log("🚀 ~ renamedRow:", renamedRow);
+      // console.log("🚀 ~ renamedRow:", renamedRow);
       return renamedRow;
     })
   )
     .then((renamedData) => {
-      console.log("🚀 ~ renamedData:", renamedData);
+      // console.log("🚀 ~ renamedData:", renamedData);
 
       // Save renamed data to a JSON file
       fs.writeFileSync(

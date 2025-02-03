@@ -1,3 +1,5 @@
+import { start } from "repl";
+
 const addPOSTFIX = (postfix, addToThis) => {
   return addToThis + postfix;
 };
@@ -17,7 +19,8 @@ function adjustLotNumber(lotNumber, barrelType) {
 }
 
 const spaceToDash = (spacedString) => {
-  return spacedString.replace(/ /g, "-");
+  
+  return spacedString.replace(/(?!^) /g, "-").replace(/^ /, "");
 };
 
 const addPOSTFIXandSpaceToDash = (postfix, addToThis) => {
@@ -26,7 +29,7 @@ const addPOSTFIXandSpaceToDash = (postfix, addToThis) => {
 
 const getRecipeIfExists = async (
   recipeName,
-  createdBy = "Default Production Name",
+  createdBy = "pmannion@whiskeyhouse.com",
   prisma
 ) => {
   if (!recipeName) throw new Error("recipeName is undefined");
@@ -42,6 +45,7 @@ const getRecipeIfExists = async (
 
   if (!recipeWithCustomer) {
     throw new Error(`Recipe not found for recipeName: ${recipeName}`);
+
   }
 
   if (!recipeWithCustomer.customer) {
@@ -113,8 +117,9 @@ const getCustomerIfExists = async (customerID, createdBy, prisma) => {
 const findRelatedIdsByRecipe = async (
   recipeName,
   prisma,
-  createdBy = "Default Production RUN User"
+  createdBy = "pmannion@whiskeyhouse.com"
 ) => {
+  console.log(`In the findRelatedIdsByRecipe function for recipeName: ${recipeName}`);
   console.log("🚀 ~ recipeName:", recipeName);
   if (!recipeName) throw new Error("recipeName is undefined");
 
@@ -126,10 +131,108 @@ const findRelatedIdsByRecipe = async (
     where: { Recipe: recipeName },
     include: { customer: true },
   });
-
   if (!recipeWithCustomer) {
-    console.warn(`Recipe not found: ${recipeName}.`);
-    return {};
+    if (recipeName.startsWith('WHK')) {
+        console.log(`Recipe not found: ${recipeName}, WHK recipe detected, creating...`);
+        // Get base recipe name without -R01
+        const baseRecipeName = recipeName.replace(/-R01$/, '');
+        
+        // Find item that starts with the base recipe name and matches proof
+        const matchingItem = await prisma.item.findFirst({
+          where: {
+            AND: [
+              {
+                itemNumber: {
+                  startsWith: baseRecipeName
+                }
+              },
+            ]
+          }
+        });
+  
+        if (!matchingItem) {
+          throw new Error(`No matching item found for recipe: ${recipeName}`);
+        }
+        console.log(`Matching item found: ${matchingItem.id}`);
+
+        // Get customer code from first 3 chars of recipe
+        const customerCode = baseRecipeName.substring(0, 3);
+        console.log(`Customer code: ${customerCode}`);
+        
+        // Find customer by code
+        let customer = {};
+        try {
+          customer = await prisma.customer.findFirst({
+            where: {
+              customerCode: {contains: customerCode}
+            }
+          });
+  
+          if (!customer) {
+            throw new Error(`No customer found with code: ${customerCode}`);
+          }
+          console.log(`Customer found: ${customer.id}`);
+        } catch (error) {
+          console.error(`Error finding customer: ${customerCode}`, error);
+          throw new Error(`Error finding customer: ${customerCode}`);
+        }
+
+        // Extract mashbill by removing customer code and replacing the first dash
+        const mashbill = baseRecipeName.substring(3).replace(/-/, '').replace(/-$/, '');
+        console.log(`Looking for recipe group with mashbill: ${mashbill}`);
+
+        // Find recipe group by mashbill
+        let recipeGroup = {};
+        try {
+          recipeGroup = await prisma.recipeGroup.findFirst({
+            where: {
+              recipe: mashbill
+            }
+          });
+          if (!recipeGroup) {
+            throw new Error(`No recipe group found for mashbill: ${mashbill}`);
+          }
+          console.log(`Recipe group found: ${recipeGroup.id}`);
+        } catch (error) {
+          console.error(`Error finding recipe group: ${mashbill}`, error);
+          throw new Error(`Error finding recipe group: ${mashbill}, error: ${error}`);
+        }
+  
+        // Create new recipe record
+        try {
+          await prisma.recipe.create({
+            data: {
+              Recipe: recipeName,
+              createdBy: createdBy,
+              item: {
+                connect: {
+                  id: matchingItem.id
+                }
+              },
+              customer: {
+                connect: {
+                  id: customer.id
+                }
+              },
+              customerCode: customerCode,
+              revision: 1,
+              recipeGroup: {
+                connect: {
+                  id: recipeGroup.id
+                }
+              }
+            }
+          });
+          console.log(`New recipe created: ${recipeName}`);
+          return { connect: { id: recipeName } };
+        } catch (error) {
+          console.error(`Error creating recipe: ${recipeName}`, error);
+          throw new Error(`Error creating recipe: ${recipeName}`);
+        }
+  
+      } else {
+        throw new Error(`Recipe not found for recipeName: ${recipeName}`);
+      }
   }
 
   const recipeId = recipeWithCustomer.id;
