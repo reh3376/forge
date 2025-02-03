@@ -37,9 +37,11 @@ async function seedDatabase(renamedData) {
         data.createdBy,
         prisma
       );
+      console.log(`Data: ${JSON.stringify(data)}`);
 
       // Adjust the lot number based on the rules
       const adjustedLotNumber = adjustLotNumber(data.lotNumber, data.bblType);
+      console.log("🚀 ~ adjustedLotNumber:", adjustedLotNumber);
 
       const lotData = {
         avgBblFillByPg: data.avgBblFillByPg,
@@ -89,13 +91,24 @@ async function seedDatabase(renamedData) {
 
       console.log("🚀 ~ lotData:", lotData);
 
-      await prisma.lot.upsert({
+      const existingLot = await prisma.lot.findFirst({
         where: { lotNumber: lotData.lotNumber },
-        update: lotData,
-        create: lotData,
       });
+      let lot = existingLot;
+      if (existingLot) {
+        // Update existing lot
+        lot = await prisma.lot.update({
+          where: { id: existingLot.id },
+          data: lotData,
+        });
+      } else {
+        // Create new lot
+        lot = await prisma.lot.create({
+          data: lotData,
+        });
+      }
 
-      console.info(`Successfully seeded lot: ${lotData.lotNumber}`);
+      console.info(`Successfully seeded lot: ${lot.lotNumber}`);
     // } catch (error) {
     //   console.error(`Error seeding lot: ${data.lotNumber}`, error);
     // }
