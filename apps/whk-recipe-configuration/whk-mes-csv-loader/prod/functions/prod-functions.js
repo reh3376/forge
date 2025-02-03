@@ -1,5 +1,3 @@
-import { faker } from "@faker-js/faker";
-
 const addPOSTFIX = (postfix, addToThis) => {
   return addToThis + postfix;
 };
@@ -29,10 +27,13 @@ const addPOSTFIXandSpaceToDash = (postfix, addToThis) => {
 const getRecipeIfExists = async (
   recipeName,
   customerName,
-  createdBy = "Micheal Palliparambil",
+  createdBy = "Default Production Name",
   prisma
 ) => {
-  if (!recipeName) return undefined;
+  if (!recipeName) throw new Error("recipeName is undefined");
+
+  console.log("🚀 ~ createdBy:", createdBy);
+  if (!createdBy) throw new Error("createdBy is undefined");
 
   const customerRelation = await getCustomerIfExists(
     customerName,
@@ -75,13 +76,10 @@ async function getItemIdIfExists(createdBy = "system", prisma) {
   }
 }
 
-const getCustomerIfExists = async (
-  customerName = "Default Customer",
-  createdBy = "Test",
-  prisma
-) => {
+const getCustomerIfExists = async (customerName, createdBy, prisma) => {
   try {
-    const customerToUse = customerName || "Default Customer";
+    const customerToUse = customerName;
+    if (!customerToUse) throw new Error("Customer is undefined");
     console.log("🚀 ~ customerToUse:", customerToUse);
 
     // Find an existing customer by name
@@ -106,12 +104,17 @@ const getCustomerIfExists = async (
 const findRelatedIdsByRecipe = async (
   recipeName,
   prisma,
-  createdBy = "system",
-  customerName = "Default Customer"
+  createdBy,
+  customerName
 ) => {
-  if (!recipeName) return {};
+  console.log("🚀 ~ recipeName:", recipeName);
+  if (!recipeName) throw new Error("recipeName is undefined");
 
   console.log("🚀 ~ customerName:", customerName);
+  if (!customerName) throw new Error("customerName is undefined");
+
+  console.log("🚀 ~ createdBy:", createdBy);
+  if (!createdBy) throw new Error("createdBy is undefined");
 
   // Step 1: Get the customer
   const customer = await getCustomerIfExists(customerName, createdBy, prisma);
@@ -132,18 +135,6 @@ const findRelatedIdsByRecipe = async (
 
   console.log("🚀 ~ recipe:", recipe);
   const recipeId = recipe.id;
-
-  // TODO: setup default Bom, production Order ID queying.
-
-  // Step 3: Find the associated BOM (Bill of Materials)
-  let bom = await prisma.bom.findFirst({
-    where: { bomName: "Default BOM" },
-  });
-
-  if (!bom) {
-    console.warn("Default BOM not found.");
-    return {};
-  }
 
   // Step 4: Find the production order
   let productionOrder = await prisma.productionOrder.findFirst({

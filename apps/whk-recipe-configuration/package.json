@@ -1,6 +1,7 @@
 {
   "name": "@whk-mes/server",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "nest start",
     "dev:start": "pm2 reload ecosystem.config.js --update-env",
