@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import fs from "fs";
 import XLSX from "xlsx";
+import path from "path";
+import { fileURLToPath } from "url";
 import {
   addPOSTFIXandSpaceToDash,
   adjustLotNumber,
@@ -11,7 +13,14 @@ import {
   getRecipeIfExists,
 } from "./functions/prod-functions.js";
 
-dotenv.config();
+// Get the directory path for the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Configure dotenv with the correct path
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+
 const prisma = new PrismaClient();
 
 // setup the file path manually on every run
@@ -95,6 +104,8 @@ async function seedDatabase(renamedData) {
 }
 
 // Main execution block
+console.log("🚀 ~ process.env.NODE_ENV:", process.env.NODE_ENV);
+console.log(`DB Name: ${process.env.DB_NAME}`);
 if (process.env.NODE_ENV === "production") {
   // File path
   const filePath = FILEPATH;
