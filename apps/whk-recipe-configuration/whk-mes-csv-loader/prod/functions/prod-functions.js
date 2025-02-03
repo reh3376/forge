@@ -26,7 +26,6 @@ const addPOSTFIXandSpaceToDash = (postfix, addToThis) => {
 
 const getRecipeIfExists = async (
   recipeName,
-  customerName,
   createdBy = "Default Production Name",
   prisma
 ) => {
@@ -35,13 +34,23 @@ const getRecipeIfExists = async (
   console.log("🚀 ~ createdBy:", createdBy);
   if (!createdBy) throw new Error("createdBy is undefined");
 
-  const customerRelation = await getCustomerIfExists(
-    customerName,
-    createdBy,
-    prisma
-  );
+  // Find the recipe to get its associated customer
+  const recipeWithCustomer = await prisma.recipe.findFirst({
+    where: { Recipe: recipeName },
+    include: { customer: true }, // Include the customer relation
+  });
 
-  // Find the existing recipe
+  if (!recipeWithCustomer) {
+    throw new Error(`Recipe not found for recipeName: ${recipeName}`);
+  }
+
+  if (!recipeWithCustomer.customer) {
+    throw new Error(`Customer not associated with recipe: ${recipeName}`);
+  }
+
+  const customerId = recipeWithCustomer.customer.id;
+
+  // Check if the recipe already exists
   const existingRecipe = await prisma.recipe.findFirst({
     where: { Recipe: recipeName },
   });
@@ -50,7 +59,7 @@ const getRecipeIfExists = async (
     return { connect: { id: existingRecipe.id } };
   }
 
-  // If not found, return undefined since we assume the data is already present
+  // If recipe doesn't exist, return undefined (assuming data should already exist)
   return undefined;
 };
 
@@ -104,52 +113,58 @@ const getCustomerIfExists = async (customerID, createdBy, prisma) => {
 const findRelatedIdsByRecipe = async (
   recipeName,
   prisma,
-  createdBy,
-  customerID
+  createdBy = "Default Production RUN User"
 ) => {
   console.log("🚀 ~ recipeName:", recipeName);
   if (!recipeName) throw new Error("recipeName is undefined");
 
-  console.log("🚀 ~ customerID:", customerID);
-  if (!customerID) throw new Error("customerID is undefined");
-
   console.log("🚀 ~ createdBy:", createdBy);
   if (!createdBy) throw new Error("createdBy is undefined");
 
-  // Step 1: Get the customer
-  const customer = await getCustomerIfExists(customerID, createdBy, prisma);
-  if (!customer) {
-    console.warn("No customer found.");
-    return {};
-  }
-
-  // Step 2: Find the recipe using the recipe name
-  let recipe = await prisma.recipe.findFirst({
+  // Step 1: Find the recipe and include customer
+  const recipeWithCustomer = await prisma.recipe.findFirst({
     where: { Recipe: recipeName },
+    include: { customer: true },
   });
 
-  if (!recipe) {
+  if (!recipeWithCustomer) {
     console.warn(`Recipe not found: ${recipeName}.`);
     return {};
   }
 
-  console.log("🚀 ~ recipe:", recipe);
-  const recipeId = recipe.id;
+  const recipeId = recipeWithCustomer.id;
+  const customerID = recipeWithCustomer.customer?.id;
 
-  // Step 4: Find the production order
+  if (!customerID) {
+    console.warn(`No customer associated with recipe: ${recipeName}.`);
+    return {};
+  }
+
+  console.log("🚀 ~ customerID:", customerID);
+
+  // Step 2: Find the production order
   let productionOrder = await prisma.productionOrder.findFirst({
     where: { recipeId },
   });
 
   if (!productionOrder) {
     console.warn(`Production order not found for recipe ID: ${recipeId}.`);
-    return {};
+    return {
+      recipeId,
+      customerID,
+      productionOrderId: null,
+      itemId: null,
+    };
   }
 
+  console.log("🚀 ~ productionOrder:", productionOrder);
+
+  // Return the related IDs
   return {
     recipeId,
-    itemId: recipe.item?.id || null, // Retrieve the connected item ID
+    customerID,
     productionOrderId: productionOrder.id || null,
+    itemId: recipeWithCustomer.item?.id || null, // Retrieve the connected item ID
   };
 };
 
