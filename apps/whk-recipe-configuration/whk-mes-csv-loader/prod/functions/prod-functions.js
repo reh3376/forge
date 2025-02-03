@@ -76,16 +76,16 @@ async function getItemIdIfExists(createdBy = "system", prisma) {
   }
 }
 
-const getCustomerIfExists = async (customerName, createdBy, prisma) => {
+const getCustomerIfExists = async (customerID, createdBy, prisma) => {
   try {
-    const customerToUse = customerName;
+    const customerToUse = customerID;
     if (!customerToUse) throw new Error("Customer is undefined");
     console.log("🚀 ~ customerToUse:", customerToUse);
 
     // Find an existing customer by name
     const existingCustomer = await prisma.customer.findFirst({
       where: {
-        name: customerToUse,
+        id: customerToUse,
       },
     });
 
@@ -105,19 +105,19 @@ const findRelatedIdsByRecipe = async (
   recipeName,
   prisma,
   createdBy,
-  customerName
+  customerID
 ) => {
   console.log("🚀 ~ recipeName:", recipeName);
   if (!recipeName) throw new Error("recipeName is undefined");
 
-  console.log("🚀 ~ customerName:", customerName);
-  if (!customerName) throw new Error("customerName is undefined");
+  console.log("🚀 ~ customerID:", customerID);
+  if (!customerID) throw new Error("customerID is undefined");
 
   console.log("🚀 ~ createdBy:", createdBy);
   if (!createdBy) throw new Error("createdBy is undefined");
 
   // Step 1: Get the customer
-  const customer = await getCustomerIfExists(customerName, createdBy, prisma);
+  const customer = await getCustomerIfExists(customerID, createdBy, prisma);
   if (!customer) {
     console.warn("No customer found.");
     return {};
@@ -153,10 +153,28 @@ const findRelatedIdsByRecipe = async (
   };
 };
 
+/**
+ * Query customer ID by recipe name
+ * @param {string} recipeName
+ * @param {object} prisma - Prisma client instance
+ * @returns {Promise<string>} Customer ID
+ */
+async function getCustomerIdByRecipe(recipeName, prisma) {
+  const recipe = await prisma.recipe.findUnique({
+    where: { Recipe: recipeName },
+    include: { customer: true },
+  });
+
+  if (!recipe || !recipe.customer) {
+    throw new Error(`Customer not found for recipe: ${recipeName}`);
+  }
+  return recipe.customer.id;
+}
 export {
   addPOSTFIXandSpaceToDash,
   adjustLotNumber,
   findRelatedIdsByRecipe,
+  getCustomerIdByRecipe,
   getCustomerIfExists,
   getRecipeIfExists,
 };
