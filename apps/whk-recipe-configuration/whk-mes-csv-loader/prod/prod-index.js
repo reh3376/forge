@@ -1,7 +1,7 @@
 // Import modules
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import fs from "fs";
+import fs, { rename } from "fs";
 import XLSX from "xlsx";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -31,7 +31,7 @@ async function seedDatabase(renamedData) {
   console.info("Starting database seeding...");
 
   for (const data of renamedData) {
-    try {
+    // try {
       const recipeRelation = await getRecipeIfExists(
         data.recipe,
         data.createdBy,
@@ -87,6 +87,8 @@ async function seedDatabase(renamedData) {
           : undefined,
       };
 
+      console.log("🚀 ~ lotData:", lotData);
+
       await prisma.lot.upsert({
         where: { lotNumber: lotData.lotNumber },
         update: lotData,
@@ -94,9 +96,9 @@ async function seedDatabase(renamedData) {
       });
 
       console.info(`Successfully seeded lot: ${lotData.lotNumber}`);
-    } catch (error) {
-      console.error(`Error seeding lot: ${data.lotNumber}`, error);
-    }
+    // } catch (error) {
+    //   console.error(`Error seeding lot: ${data.lotNumber}`, error);
+    // }
   }
 
   console.info("Database seeding completed!");
@@ -107,16 +109,52 @@ async function seedDatabase(renamedData) {
 console.log("🚀 ~ process.env.NODE_ENV:", process.env.NODE_ENV);
 console.log(`DB Name: ${process.env.DB_NAME}`);
 if (process.env.NODE_ENV === "production") {
-  // File path
+  // // File path
+  // const filePath = FILEPATH;
+
+  // const workbook = XLSX.readFile(filePath);
+
+  // const sheetName = workbook.SheetNames[0];
+  // const sheets = workbook.Sheets[sheetName];
+
+  // // Read Excel
+  // const [header, ...jsonData] = XLSX.utils.sheet_to_json(sheets, { header: 1 });
+
   const filePath = FILEPATH;
-
   const workbook = XLSX.readFile(filePath);
-
   const sheetName = workbook.SheetNames[0];
-  const sheets = workbook.Sheets[sheetName];
+  const sheet = workbook.Sheets[sheetName];
 
-  // Read Excel
-  const [header, ...jsonData] = XLSX.utils.sheet_to_json(sheets, { header: 1 });
+  // Get the range of cells that contain data
+  const range = XLSX.utils.decode_range(sheet['!ref']);
+  const header = [];
+  const jsonData = [];
+
+  // Read header row
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+    const cellAddress = XLSX.utils.encode_cell({r: range.s.r, c: C});
+    const cell = sheet[cellAddress];
+    header.push(cell ? cell.v : null);
+  }
+
+  // Read data rows
+  for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+    const row = [];
+    let hasData = false;
+    
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellAddress = XLSX.utils.encode_cell({r: R, c: C});
+      const cell = sheet[cellAddress];
+      const value = cell ? cell.v : null;
+      row.push(value);
+      if (value !== null) hasData = true;
+    }
+
+    // Only add rows that contain data
+    if (hasData) {
+      jsonData.push(row);
+    }
+  }
 
   // Original key mappings
   const keyMappings = {
@@ -133,20 +171,28 @@ if (process.env.NODE_ENV === "production") {
         renamedRow[mappedKey] = row[index] || null;
       });
 
+      console.log("🚀 ~ renamedRow 1:", JSON.stringify(renamedRow));
+
       if (renamedRow.recipe) {
         renamedRow.recipe = addPOSTFIXandSpaceToDash("-R01", renamedRow.recipe);
       }
+      console.log("🚀 ~ renamedRow 2:", renamedRow);
 
-      const { productionOrderId, containerId, fgItemId } =
+      // const { productionOrderId, containerId, fgItemId } =
+      const { recipeId, customerID, productionOrderId, itemId } =
         await findRelatedIdsByRecipe(
           renamedRow.recipe,
           prisma,
           renamedRow.createdBy
         );
 
-      renamedRow.productionOrderId = productionOrderId;
-      renamedRow.containerId = containerId;
-      renamedRow.fgItemId = fgItemId;
+      // renamedRow.productionOrderId = productionOrderId;
+      // renamedRow.containerId = containerId;
+      // renamedRow.fgItemId = fgItemId;
+      renamedRow.recipeId = recipeId;
+      renamedRow.customerID = customerID;
+      renamedRow.fgItemId = itemId;
+      renamedRow.productionOrderId = productionOrderId || null;
 
       // console.log("🚀 ~ renamedRow:", renamedRow);
       return renamedRow;
