@@ -3,13 +3,16 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CustomerServiceBase } from "./base/customer.service.base";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhMessageBrokerTopics } from "src/rabbitmq/topics";
+import { Prisma } from ".prisma/client";
+import { Logger } from "winston";
 
 @Injectable()
 export class CustomerService extends CustomerServiceBase {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logge
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {
     super(prisma);
   }
@@ -21,7 +24,6 @@ export class CustomerService extends CustomerServiceBase {
       },
       include: {
         ...args.include,
-        contact: true,
       },
       where: args.where,
     });
