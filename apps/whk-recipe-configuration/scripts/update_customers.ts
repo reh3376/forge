@@ -10,7 +10,8 @@ const getAllCustomers = async () => {
     }
   `;
 
-  const response = await fetch('http://your-graphql-endpoint.com/graphql', {
+  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : 'http://localhost/graphql';
+  const response = await fetch(graphqlEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -35,7 +36,8 @@ const updateCustomer = async (customerId: string, customerCode: string) => {
     }
   `;
 
-  const response = await fetch('http://your-graphql-endpoint.com/graphql', {
+  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : 'http://localhost/graphql';
+  const response = await fetch(graphqlEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
