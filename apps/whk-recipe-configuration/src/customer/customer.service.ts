@@ -28,7 +28,7 @@ export class CustomerService extends CustomerServiceBase {
       where: args.where,
     });
 
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
+    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Customer, {
       event_type: 'update',
       data: customer,
       recordName: 'Customer',
