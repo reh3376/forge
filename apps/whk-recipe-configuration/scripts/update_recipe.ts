@@ -15,7 +15,7 @@ if (missingEnvVars.length > 0) {
 
 
 const login = async (username: string, password: string) => {
-  const apiEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/api/auth/login' : 'http://localhost:3000/api/login';
+  const apiEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/api/auth/login' :  `http://localhost:${process.env.PORT}/api/login`;
   const response = await fetch(apiEndpoint, {
     method: 'POST',
     headers: {
@@ -58,7 +58,7 @@ const getAllRecipes = async () => {
   const jwtToken = loginResult;
   console.log(jwtToken);
 
-  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : `http://localhost:3000/graphql`;
+  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : `http://localhost:${process.env.PORT}/graphql`;
   const response = await fetch(graphqlEndpoint, {
     method: 'POST',
     headers: {
@@ -107,7 +107,7 @@ const updateRecipe = async (recipeId: string) => {
   const jwtToken = loginResult;
   console.log(jwtToken);
   
-  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : 'http://localhost:3000/graphql';
+  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : `http://localhost:${process.env.PORT}/graphql`;
   const response = await fetch(graphqlEndpoint, {
     method: 'POST',
     headers: {
