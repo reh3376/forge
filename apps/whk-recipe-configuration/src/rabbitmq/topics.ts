@@ -29,5 +29,6 @@ export enum WhMessageBrokerTopics {
   WhWhk01Distillery01Testparameter = "wh.whk01.distillery01.testparameter",
   WhWhk01Distillery01Batch = "wh.whk01.distillery01.batch",
   WhWhk01Distillery01Vendor = "wh.whk01.distillery01.vendor",
+  WhWhk01Distillery01Customer = "wh.whk01.distillery01.customer",
 }
 export type AllMessageBrokerTopics = WhMessageBrokerTopics;
