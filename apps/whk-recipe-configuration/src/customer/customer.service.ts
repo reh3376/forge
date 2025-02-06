@@ -3,7 +3,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CustomerServiceBase } from "./base/customer.service.base";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
-import { WhMessageBrokerTopics } from "src/rabbitmq/topics";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Prisma } from ".prisma/client";
 import { Logger } from "winston";
 
