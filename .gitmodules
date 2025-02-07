@@ -1,0 +1,3 @@
+[submodule "apps/whk-recipe-configuration/submodules/whk-script-library"]
+	path = apps/whk-recipe-configuration/submodules/whk-script-library
+	url = https://github.com/WhiskeyHouse/whk-script-library
