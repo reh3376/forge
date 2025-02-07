@@ -8,11 +8,13 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/apps/whk-recipe-configuration/" # Location of package manifests
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    open-pull-requests-limit: 10
   # Enable version updates for Docker
   - package-ecosystem: "docker"
     # Look for a `Dockerfile` in the `root` directory
     directory: "/apps/whk-recipe-configuration/"
     # Check for updates once a week
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    open-pull-requests-limit: 10
