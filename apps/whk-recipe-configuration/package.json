@@ -39,6 +39,7 @@
     "@azure/identity": "^4.4.1",
     "@azure/keyvault-secrets": "^4.9.0",
     "@faker-js/faker": "^8.4.1",
+    "express": "^4.18.2",
     "@nestjs/apollo": "12.2.1",
     "@nestjs/cache-manager": "^2.1.0",
     "@nestjs/common": "10.3.7",
