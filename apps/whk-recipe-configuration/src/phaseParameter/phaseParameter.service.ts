@@ -11,8 +11,47 @@ import { PhaseParameter, Prisma } from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 
+type PhaseParameterOperation = "create" | "update" | "delete";
+type EquipmentPhaseParameters = { [key: string]: string[] };
+
 @Injectable()
 export class PhaseParameterService extends PhaseParameterServiceBase {
+  private readonly equipmentPhaseToPhaseParameterMap: EquipmentPhaseParameters =
+    {
+      CornAdd: ["Quantity"],
+      MaltAdd: ["Quantity"],
+      RyeAdd: ["Quantity"],
+      WheatAdd: ["Quantity"],
+      AdditiveAdd: ["Quantity"],
+      GrainAdd: ["Quantity"],
+      Prompt: [],
+      Hold: ["Time", "Temperature"],
+      Steam: ["Temperature", "Time"],
+      Cooldown: ["Time", "Temperature"],
+      Drop: ["FlowRate", "SprayballTime", "Time"],
+      Rinse: ["Time", "Temperature"],
+      DropTubToMashCooler: [
+        "MashPumpSetpoint",
+        "MidTemperatureSP",
+        "OutTemperatureSP",
+        "MashCoolerEnable",
+      ],
+      Fill: ["Level", "Speed", "Temperature"],
+      FermDrop: ["Level"],
+      FermSteam: ["Temperature", "Time"],
+      DropLineSteam: ["Temperature", "Time"],
+      DropTubSteam: ["Temperature", "Time"],
+      CoolerSteam: ["Temperature", "Time"],
+      StillRun: [
+        "TowerWaterTemperatureSetpoint",
+        "TowerWaterFlowSetpoint",
+        "HighWineCondenserTowerWaterTemperatureSetpoint",
+        "LowWineProof",
+        "HighWineProof",
+      ],
+      LiquidAdd: ["Quantity", "Speed"],
+    };
+
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
@@ -21,46 +60,6 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
     super(prisma);
   }
 
-  private readonly equipmentPhaseToPhaseParameterMap: {
-    [key: string]: string[];
-  } = {
-    CornAdd: ["Quantity"],
-    MaltAdd: ["Quantity"],
-    RyeAdd: ["Quantity"],
-    WheatAdd: ["Quantity"],
-    AdditiveAdd: ["Quantity"],
-    Prompt: [],
-    Hold: ["Time", "Temperature"],
-    Steam: ["Temperature", "Time"],
-    Cooldown: ["Time", "Temperature"],
-    Drop: ["FlowRate", "SprayballTime", "Time"],
-    Rinse: ["Time", "Temperature"],
-    DropTubToMashCooler: [
-      "MashPumpSetpoint",
-      "MidTemperatureSP",
-      "OutTemperatureSP",
-      "MashCoolerEnable",
-    ],
-    Fill: ["Level", "Speed", "Temperature"],
-    FermDrop: ["Level"],
-    FermSteam: ["Temperature", "Time"],
-    DropLineSteam: ["Temperature", "Time"],
-    DropTubSteam: ["Temperature", "Time"],
-    CoolerSteam: ["Temperature", "Time"],
-    StillRun: [
-      "TowerWaterTemperatureSetpoint",
-      "TowerWaterFlowSetpoint",
-      "HighWineCondenserTowerWaterTemperatureSetpoint",
-      "LowWineProof",
-      "HighWineProof",
-    ],
-    GrainAdd: ["Quantity"],
-    LiquidAdd: [
-      "Quantity",
-      "Speed", // Agitator speed
-    ],
-  };
-
   private async validateEquipmentPhase(
     equipmentPhaseId: string,
     name: string
@@ -68,33 +67,45 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
     const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({
       where: { id: equipmentPhaseId },
     });
-    this.logger.log(`equipmentPhase: ${equipmentPhaseId}`);
 
-    // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
-    const acceptableEquipmentPhases =
+    const acceptableParameters =
       this.equipmentPhaseToPhaseParameterMap[equipmentPhase.name];
-    this.logger.log(
-      `Acceptable Parameters for Equipment Phase: ${acceptableEquipmentPhases}`
-    );
 
-    if (!acceptableEquipmentPhases) {
+    if (!acceptableParameters) {
       throw new BadRequestException(
         `No Equipment Phase mapping found for Phase Parameter: ${name}`
       );
     }
 
-    this.logger.log(
-      `Result of includes: ${acceptableEquipmentPhases.includes(name)}`
-    );
-    if (!acceptableEquipmentPhases.includes(name)) {
+    if (!acceptableParameters.includes(name)) {
       throw new BadRequestException(
-        `Provided Equipment Phase Id does not match the acceptable list for Phase Parameter: ${name}`
+        `Parameter '${name}' is not valid for Equipment Phase '${equipmentPhase.name}'`
       );
     }
   }
 
-  private async validateAndEmitEvent<T>(
-    operation: "create" | "update" | "delete",
+  private async emitPhaseParameterEvent(
+    eventType: PhaseParameterOperation,
+    phaseParameter: PhaseParameter
+  ): Promise<void> {
+    const event = {
+      event_type: eventType,
+      data: phaseParameter,
+      recordName: "PhaseParameter",
+    };
+
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter,
+      event
+    );
+
+    this.logger.log(
+      `${eventType}d phaseParameter & pushed to topic: ${phaseParameter.name}`
+    );
+  }
+
+  private async handlePhaseParameterOperation<T>(
+    operation: PhaseParameterOperation,
     args: T,
     handler: (args: T) => Promise<PhaseParameter>
   ): Promise<PhaseParameter> {
@@ -103,27 +114,10 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
     return result;
   }
 
-  private async emitPhaseParameterEvent(
-    eventType: "create" | "update" | "delete",
-    phaseParameter: PhaseParameter
-  ) {
-    await this.rabbitProducer.emitMessage(
-      WhMessageBrokerTopics.WhWhk01Distillery01Phaseparameter,
-      {
-        event_type: eventType,
-        data: phaseParameter,
-        recordName: "PhaseParameter",
-      }
-    );
-    this.logger.log(
-      `${eventType}d phaseParameter & pushed to topic: ${phaseParameter.name}`
-    );
-  }
-
   async createPhaseParameter<T extends Prisma.PhaseParameterCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.PhaseParameterCreateArgs>
   ): Promise<PhaseParameter> {
-    return this.validateAndEmitEvent(
+    return this.handlePhaseParameterOperation(
       "create",
       args,
       super.createPhaseParameter.bind(this)
@@ -133,7 +127,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
   async updatePhaseParameter<T extends Prisma.PhaseParameterUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.PhaseParameterUpdateArgs>
   ): Promise<PhaseParameter> {
-    return this.validateAndEmitEvent(
+    return this.handlePhaseParameterOperation(
       "update",
       args,
       super.updatePhaseParameter.bind(this)
@@ -143,7 +137,7 @@ export class PhaseParameterService extends PhaseParameterServiceBase {
   async deletePhaseParameter<T extends Prisma.PhaseParameterDeleteArgs>(
     args: Prisma.SelectSubset<T, Prisma.PhaseParameterDeleteArgs>
   ): Promise<PhaseParameter> {
-    return this.validateAndEmitEvent(
+    return this.handlePhaseParameterOperation(
       "delete",
       args,
       super.deletePhaseParameter.bind(this)
