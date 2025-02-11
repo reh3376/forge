@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { LotService } from "./lot.service";
 import { LotControllerBase } from "./base/lot.controller.base";
 // import { LotCreateInput } from "./base/LotCreateInput";
@@ -11,8 +16,8 @@ import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 export class LotController extends LotControllerBase {
   constructor(
     protected readonly service: LotService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }
@@ -20,7 +25,7 @@ export class LotController extends LotControllerBase {
   @common.Post()
   @swagger.ApiCreatedResponse({ type: LotCreateInput })
   @swagger.ApiForbiddenResponse({ type: common.ForbiddenException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "create",
     possession: "any",
@@ -31,11 +36,11 @@ export class LotController extends LotControllerBase {
   async create(@common.Body() data: LotCreateInput): Promise<LotCreateInput> {
     const sanitizedLotNumber = data.lotNumber?.replace(/\n|\r/g, "") ?? "";
     console.log(`LotNumber: ${sanitizedLotNumber}`);
-    
+
     return this.service.createLot({
       data: {
         ...data,
-        lotNumber: data.lotNumber || '',
+        lotNumber: data.lotNumber || "",
         filledFrom: data.filledFrom
           ? {
               connect: data.filledFrom,
@@ -50,7 +55,7 @@ export class LotController extends LotControllerBase {
 
         item: data.item
           ? {
-              connect: data.item ,
+              connect: data.item,
             }
           : undefined,
 

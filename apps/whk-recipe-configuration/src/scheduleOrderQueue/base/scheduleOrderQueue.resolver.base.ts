@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -30,11 +30,11 @@ import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 export class ScheduleOrderQueueResolverBase {
   constructor(
     protected readonly service: ScheduleOrderQueueService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "read",
     possession: "any",
@@ -50,7 +50,7 @@ export class ScheduleOrderQueueResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ScheduleOrderQueue])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "read",
     possession: "any",
@@ -63,7 +63,7 @@ export class ScheduleOrderQueueResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ScheduleOrderQueue, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "read",
     possession: "own",
@@ -83,7 +83,7 @@ export class ScheduleOrderQueueResolverBase {
     nullable: true,
     name: "nextUnitProcedure",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -104,7 +104,7 @@ export class ScheduleOrderQueueResolverBase {
     nullable: true,
     name: "scheduleOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "any",

@@ -14,30 +14,80 @@ export class EnzymeDosingService {
   private static METRIC_TON_DIVISOR = 2205;
 
   private enzymeList: Enzyme[] = [
-    { category: 'Liquifaction', name: 'Termamyl SC DS', dosePerMetricTon: 0.130, instructions: 'with water/backset before grain' },
-    { category: 'Liquifaction', name: 'Liquozyme PRO HP DI', dosePerMetricTon: 0.185, instructions: 'with water/backset before grain' },
-    { category: 'Liquifaction', name: 'Amylex 6T', dosePerMetricTon: 0.250, instructions: 'with water/backset before grain' },
-    { category: 'Liquifaction', name: 'Alphalase THP', dosePerMetricTon: 1.000, instructions: 'with water/backset before grain' },
-    { category: 'Saccharification', name: 'Saczyme Pro 1.5X', dosePerMetricTon: 0.600, instructions: 'at 152 degrees F on crash' },
-    { category: 'Saccharification', name: 'Saczyme Yield', dosePerMetricTon: 0.300, instructions: 'at 152 degrees F on crash' },
-    { category: 'Saccharification', name: 'Diazyme SSF', dosePerMetricTon: 0.300, instructions: 'at 152 degrees F on crash' },
-    { category: 'Saccharification', name: 'Diazyme SSF2', dosePerMetricTon: 0.800, instructions: 'at 152 degrees F on crash' },
-    { category: 'Viscosity', name: 'Viscoferm', dosePerMetricTon: 0.100, instructions: 'at 152 degrees F on crash' },
-    { category: 'Viscosity', name: 'Laminex C2K', dosePerMetricTon: 0.100, instructions: 'at 152 degrees F on crash' },
+    {
+      category: "Liquifaction",
+      name: "Termamyl SC DS",
+      dosePerMetricTon: 0.13,
+      instructions: "with water/backset before grain",
+    },
+    {
+      category: "Liquifaction",
+      name: "Liquozyme PRO HP DI",
+      dosePerMetricTon: 0.185,
+      instructions: "with water/backset before grain",
+    },
+    {
+      category: "Liquifaction",
+      name: "Amylex 6T",
+      dosePerMetricTon: 0.25,
+      instructions: "with water/backset before grain",
+    },
+    {
+      category: "Liquifaction",
+      name: "Alphalase THP",
+      dosePerMetricTon: 1.0,
+      instructions: "with water/backset before grain",
+    },
+    {
+      category: "Saccharification",
+      name: "Saczyme Pro 1.5X",
+      dosePerMetricTon: 0.6,
+      instructions: "at 152 degrees F on crash",
+    },
+    {
+      category: "Saccharification",
+      name: "Saczyme Yield",
+      dosePerMetricTon: 0.3,
+      instructions: "at 152 degrees F on crash",
+    },
+    {
+      category: "Saccharification",
+      name: "Diazyme SSF",
+      dosePerMetricTon: 0.3,
+      instructions: "at 152 degrees F on crash",
+    },
+    {
+      category: "Saccharification",
+      name: "Diazyme SSF2",
+      dosePerMetricTon: 0.8,
+      instructions: "at 152 degrees F on crash",
+    },
+    {
+      category: "Viscosity",
+      name: "Viscoferm",
+      dosePerMetricTon: 0.1,
+      instructions: "at 152 degrees F on crash",
+    },
+    {
+      category: "Viscosity",
+      name: "Laminex C2K",
+      dosePerMetricTon: 0.1,
+      instructions: "at 152 degrees F on crash",
+    },
   ];
 
   // Normalize the keys to lowercase for case-insensitive mapping
   private enzymeMapping: { [key: string]: string } = {
-    'termamyl': 'Termamyl SC DS',
-    'liquozyme': 'Liquozyme PRO HP DI',
-    'amylex': 'Amylex 6T',
-    'alphalase': 'Alphalase THP',
-    'saczyme': 'Saczyme Pro 1.5X',
+    termamyl: "Termamyl SC DS",
+    liquozyme: "Liquozyme PRO HP DI",
+    amylex: "Amylex 6T",
+    alphalase: "Alphalase THP",
+    saczyme: "Saczyme Pro 1.5X",
     // 'diazyme': 'Diazyme SSF',
-    'diazyme': 'Diazyme SSF2',
-    'diazyme2': 'Diazyme SSF2',
-    'viscoferm': 'Viscoferm',
-    'laminex': 'Laminex C2K',
+    diazyme: "Diazyme SSF2",
+    diazyme2: "Diazyme SSF2",
+    viscoferm: "Viscoferm",
+    laminex: "Laminex C2K",
   };
 
   /**
@@ -53,21 +103,30 @@ export class EnzymeDosingService {
     enzymeName: string
   ): { dose: number; instructions: string } | null {
     // Check if the enzyme is Citric and skip processing if so
-    if (enzymeName.toLowerCase() === 'citric') {
-      console.log('Citric enzyme detected. Skipping dosing calculation.');
+    if (enzymeName.toLowerCase() === "citric") {
+      console.log("Citric enzyme detected. Skipping dosing calculation.");
       return null;
     }
 
-    const mashBillParts = mashBill.split('-').map(part => parseFloat(part));
+    const mashBillParts = mashBill.split("-").map((part) => parseFloat(part));
     if (mashBillParts.length !== 4) {
-      throw new Error('Mash bill must have four components separated by dashes.');
+      throw new Error(
+        "Mash bill must have four components separated by dashes."
+      );
     }
     const [corn, rye, wheat, malt] = mashBillParts;
-    const cornQuantity = ( corn * totalGrainLoadLbs / 100 ) / EnzymeDosingService.METRIC_TON_DIVISOR;
-    const ryeQuantity = ( rye * totalGrainLoadLbs / 100 ) /EnzymeDosingService.METRIC_TON_DIVISOR;
-    const wheatQuantity = ( wheat * totalGrainLoadLbs / 100 ) /EnzymeDosingService.METRIC_TON_DIVISOR;
-    const maltQuantity = ( malt * totalGrainLoadLbs / 100 ) /EnzymeDosingService.METRIC_TON_DIVISOR;
-    const totalGrainMetricTons = totalGrainLoadLbs / EnzymeDosingService.METRIC_TON_DIVISOR;
+    const cornQuantity =
+      (corn * totalGrainLoadLbs) / 100 / EnzymeDosingService.METRIC_TON_DIVISOR;
+    const ryeQuantity =
+      (rye * totalGrainLoadLbs) / 100 / EnzymeDosingService.METRIC_TON_DIVISOR;
+    const wheatQuantity =
+      (wheat * totalGrainLoadLbs) /
+      100 /
+      EnzymeDosingService.METRIC_TON_DIVISOR;
+    const maltQuantity =
+      (malt * totalGrainLoadLbs) / 100 / EnzymeDosingService.METRIC_TON_DIVISOR;
+    const totalGrainMetricTons =
+      totalGrainLoadLbs / EnzymeDosingService.METRIC_TON_DIVISOR;
 
     // Optionally, handle individual grain calculations if needed
     // For simplicity, we're using total metric tons for dosing
@@ -76,20 +135,38 @@ export class EnzymeDosingService {
     const normalizedEnzymeName = enzymeName.toLowerCase();
     const fullEnzymeName = this.enzymeMapping[normalizedEnzymeName];
     if (!fullEnzymeName) {
-      throw new Error(`Enzyme "${enzymeName}" is not recognized in the mapping.`);
+      throw new Error(
+        `Enzyme "${enzymeName}" is not recognized in the mapping.`
+      );
     }
 
-    const enzyme = this.enzymeList.find(e => e.name.toLowerCase() === fullEnzymeName.toLowerCase());
+    const enzyme = this.enzymeList.find(
+      (e) => e.name.toLowerCase() === fullEnzymeName.toLowerCase()
+    );
     if (!enzyme) {
       throw new Error(`Enzyme "${fullEnzymeName}" not found.`);
     }
-    let dose
-    if (enzyme.category === 'Liquifaction' || enzyme.category === 'Saccharification') {
-      dose = Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * 100) / 100;
-    } else if (enzyme.category === 'Viscosity') {
-      const sanitizedTotalGrainLoadLbs = totalGrainLoadLbs.toString().replace(/\n|\r/g, "");
-      console.log(`Total grain load: ${sanitizedTotalGrainLoadLbs}, Corn: ${cornQuantity}, Rye: ${ryeQuantity}, Wheat: ${wheatQuantity}, Malt: ${maltQuantity}. Enzyme does per MT: ${enzyme.dosePerMetricTon}`);
-      dose = Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * ryeQuantity * 100) / 100 || Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * wheatQuantity * 100) / 100;
+    let dose;
+    if (
+      enzyme.category === "Liquifaction" ||
+      enzyme.category === "Saccharification"
+    ) {
+      dose =
+        Math.round(enzyme.dosePerMetricTon * totalGrainMetricTons * 100) / 100;
+    } else if (enzyme.category === "Viscosity") {
+      const sanitizedTotalGrainLoadLbs = totalGrainLoadLbs
+        .toString()
+        .replace(/\n|\r/g, "");
+      console.log(
+        `Total grain load: ${sanitizedTotalGrainLoadLbs}, Corn: ${cornQuantity}, Rye: ${ryeQuantity}, Wheat: ${wheatQuantity}, Malt: ${maltQuantity}. Enzyme does per MT: ${enzyme.dosePerMetricTon}`
+      );
+      dose =
+        Math.round(
+          enzyme.dosePerMetricTon * totalGrainMetricTons * ryeQuantity * 100
+        ) / 100 ||
+        Math.round(
+          enzyme.dosePerMetricTon * totalGrainMetricTons * wheatQuantity * 100
+        ) / 100;
     }
     if (dose) {
       return {
@@ -97,7 +174,7 @@ export class EnzymeDosingService {
         instructions: enzyme.instructions,
       };
     } else {
-      throw new Error('Failed to calculate enzyme dose');
+      throw new Error("Failed to calculate enzyme dose");
     }
   }
 }

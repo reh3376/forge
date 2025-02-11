@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ProductionOrderBomItemService } from "../productionOrderBomItem.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { ProductionOrderBomItemWhereUniqueInput } from "./ProductionOrderBomItem
 import { ProductionOrderBomItemUpdateInput } from "./ProductionOrderBomItemUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ProductionOrderBomItemControllerBase {
   constructor(
     protected readonly service: ProductionOrderBomItemService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: ProductionOrderBomItem })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "create",
     possession: "any",
@@ -65,7 +65,7 @@ export class ProductionOrderBomItemControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [ProductionOrderBomItem] })
   @ApiNestedQuery(ProductionOrderBomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "read",
     possession: "any",
@@ -94,7 +94,7 @@ export class ProductionOrderBomItemControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ProductionOrderBomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "read",
     possession: "own",
@@ -125,7 +125,7 @@ export class ProductionOrderBomItemControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: ProductionOrderBomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "update",
     possession: "any",
@@ -163,7 +163,7 @@ export class ProductionOrderBomItemControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: ProductionOrderBomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "delete",
     possession: "any",

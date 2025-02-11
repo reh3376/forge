@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -35,11 +35,11 @@ import { InventoryService } from "../inventory.service";
 export class InventoryResolverBase {
   constructor(
     protected readonly service: InventoryService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -55,7 +55,7 @@ export class InventoryResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Inventory])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -68,7 +68,7 @@ export class InventoryResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Inventory, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "own",
@@ -85,7 +85,7 @@ export class InventoryResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Inventory)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "create",
     possession: "any",
@@ -117,7 +117,7 @@ export class InventoryResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Inventory)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "update",
     possession: "any",
@@ -157,7 +157,7 @@ export class InventoryResolverBase {
   }
 
   @graphql.Mutation(() => Inventory)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "delete",
     possession: "any",
@@ -182,7 +182,7 @@ export class InventoryResolverBase {
     nullable: true,
     name: "asset",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -201,7 +201,7 @@ export class InventoryResolverBase {
     nullable: true,
     name: "item",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -220,7 +220,7 @@ export class InventoryResolverBase {
     nullable: true,
     name: "itemReceipt",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "any",

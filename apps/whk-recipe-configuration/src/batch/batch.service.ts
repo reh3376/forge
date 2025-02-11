@@ -11,19 +11,19 @@ import { BatchCreateInput } from "./base/BatchCreateInput";
 @Injectable()
 export class BatchService extends BatchServiceBase {
   constructor(
-      protected readonly prisma: PrismaService,
-      protected readonly rabbitProducer: RabbitMQProducerService,
-      @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    protected readonly prisma: PrismaService,
+    protected readonly rabbitProducer: RabbitMQProducerService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {
     super(prisma);
   }
 
   private operationsMapping: { [key: string]: string } = {
-    "Mashing01": "MAS",
-    "Fermentation01": "FER",
-    "Distillation01": "DIS",
-    "Processing01": "DPR",
-    "Granary01": "GRN",
+    Mashing01: "MAS",
+    Fermentation01: "FER",
+    Distillation01: "DIS",
+    Processing01: "DPR",
+    Granary01: "GRN",
   };
 
   private validateBatchId(batchId: string): void {
@@ -40,7 +40,9 @@ export class BatchService extends BatchServiceBase {
       throw new Error(`Invalid operation acronym in batchId: ${batchId}`);
     }
     const operationAcronym = operationAcronymMatch[1];
-    const operation = Object.values(this.operationsMapping).includes(operationAcronym);
+    const operation = Object.values(this.operationsMapping).includes(
+      operationAcronym
+    );
     if (!operation) {
       throw new Error(`Invalid operation in batchId: ${batchId}`);
     }
@@ -95,7 +97,10 @@ export class BatchService extends BatchServiceBase {
     }
   }
 
-  async updateBatchRecipeBomItemQuantities(batchId: string, items: { [itemId: string]: number }): Promise<Batch> {
+  async updateBatchRecipeBomItemQuantities(
+    batchId: string,
+    items: { [itemId: string]: number }
+  ): Promise<Batch> {
     const batchData = await this.prisma.batch.findUnique({
       where: {
         id: batchId,
@@ -120,7 +125,9 @@ export class BatchService extends BatchServiceBase {
       });
 
       if (!recipeBomItem) {
-        throw new Error(`RecipeBomItem not found for recipeBomItemId: ${itemId}`);
+        throw new Error(
+          `RecipeBomItem not found for recipeBomItemId: ${itemId}`
+        );
       }
 
       if (recipeBomItem.batchId !== batchId) {
@@ -142,46 +149,65 @@ export class BatchService extends BatchServiceBase {
     return batchData;
   }
 
-      
-
-  async createBatch <T extends Prisma.BatchCreateArgs>(args: Prisma.SelectSubset<T, Prisma.BatchCreateArgs>): Promise<Batch> {
+  async createBatch<T extends Prisma.BatchCreateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.BatchCreateArgs>
+  ): Promise<Batch> {
     this.validateBatchId(args.data.batchId);
     const batch = await super.createBatch(args);
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Batch, {
-      event_type: 'create',
-      data: batch
-    });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Batch,
+      {
+        event_type: "create",
+        data: batch,
+      }
+    );
 
-    this.logger.verbose({ message: `Created Batch: ${batch.batchId} & pushed to topic` });
-    this.logger.verbose({ message: `Creating recipe bom items for recipe: ${args.data.recipeName}` });
+    this.logger.verbose({
+      message: `Created Batch: ${batch.batchId} & pushed to topic`,
+    });
+    this.logger.verbose({
+      message: `Creating recipe bom items for recipe: ${args.data.recipeName}`,
+    });
     if (args.data.recipeName) {
       this.createRecipeBomItems(args.data.recipeName);
     }
     return batch;
   }
 
-  async updateBatch <T extends Prisma.BatchUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.BatchUpdateArgs>): Promise<Batch> {
-    if (args.data && typeof args.data.batchId === 'string') {
+  async updateBatch<T extends Prisma.BatchUpdateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.BatchUpdateArgs>
+  ): Promise<Batch> {
+    if (args.data && typeof args.data.batchId === "string") {
       this.validateBatchId(args.data.batchId);
     }
     const batch = await super.updateBatch(args);
 
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Batch, {
-      event_type: 'update',
-      data: batch
-    });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Batch,
+      {
+        event_type: "update",
+        data: batch,
+      }
+    );
 
-    this.logger.verbose(`Updated Batch: ${args.data.batchId} & pushed to topic`);
+    this.logger.verbose(
+      `Updated Batch: ${args.data.batchId} & pushed to topic`
+    );
 
     return batch;
   }
-  async deleteBatch<T extends Prisma.BatchDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.BatchDeleteArgs>): Promise<Batch> {
+  async deleteBatch<T extends Prisma.BatchDeleteArgs>(
+    args: Prisma.SelectSubset<T, Prisma.BatchDeleteArgs>
+  ): Promise<Batch> {
     const batch = await super.deleteBatch(args);
 
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Batch, {
-      event_type: 'delete',
-      data: batch
-    });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Batch,
+      {
+        event_type: "delete",
+        data: batch,
+      }
+    );
 
     this.logger.verbose(`Deleted Batch: ${batch} & pushed to topic`);
     return batch;
@@ -219,7 +245,10 @@ export class BatchService extends BatchServiceBase {
       },
       take: 1,
     });
-    const lastBatchIdIndex = lastBatch.length > 0 ? parseInt(lastBatch[0].batchId.split(".").pop()?.slice(-3) || "0") : -1;
+    const lastBatchIdIndex =
+      lastBatch.length > 0
+        ? parseInt(lastBatch[0].batchId.split(".").pop()?.slice(-3) || "0")
+        : -1;
     const newIndex = `${lastBatchIdIndex + 1}`.padStart(3, "0");
     const writeBatchData: BatchCreateInput = {
       batchId: `${batchIdPrefix}${newIndex}`,
@@ -228,17 +257,19 @@ export class BatchService extends BatchServiceBase {
       parameterData: args.parameterData,
       asset: args.asset,
       assetPath: args.assetPath,
-    }
+    };
     return await this.createBatch({
       data: {
         ...writeBatchData,
-        ...(args.asset ? {
-          asset: {
-            connect: {
-              id: args.asset.id,
+        ...(args.asset
+          ? {
+              asset: {
+                connect: {
+                  id: args.asset.id,
+                },
+              },
             }
-          }
-        } : {asset: undefined}),
+          : { asset: undefined }),
         customer: undefined,
         mashingProtocol: undefined,
         productionOrderRecipeInstance: undefined,

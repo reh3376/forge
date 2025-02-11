@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -38,11 +38,11 @@ import { MashingDatumService } from "../mashingDatum.service";
 export class MashingDatumResolverBase {
   constructor(
     protected readonly service: MashingDatumService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -58,7 +58,7 @@ export class MashingDatumResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [MashingDatum])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -71,7 +71,7 @@ export class MashingDatumResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => MashingDatum, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "own",
@@ -88,7 +88,7 @@ export class MashingDatumResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => MashingDatum)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "create",
     possession: "any",
@@ -130,7 +130,7 @@ export class MashingDatumResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => MashingDatum)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "update",
     possession: "any",
@@ -180,7 +180,7 @@ export class MashingDatumResolverBase {
   }
 
   @graphql.Mutation(() => MashingDatum)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "delete",
     possession: "any",
@@ -202,7 +202,7 @@ export class MashingDatumResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [AdditiveActual], { name: "additiveActuals" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "read",
     possession: "any",
@@ -225,7 +225,7 @@ export class MashingDatumResolverBase {
     nullable: true,
     name: "asset",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -246,7 +246,7 @@ export class MashingDatumResolverBase {
     nullable: true,
     name: "bom",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
@@ -265,7 +265,7 @@ export class MashingDatumResolverBase {
     nullable: true,
     name: "operation",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
@@ -286,7 +286,7 @@ export class MashingDatumResolverBase {
     nullable: true,
     name: "recipeBom",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",

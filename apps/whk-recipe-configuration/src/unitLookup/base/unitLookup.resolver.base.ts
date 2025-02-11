@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -32,11 +32,11 @@ import { UnitLookupService } from "../unitLookup.service";
 export class UnitLookupResolverBase {
   constructor(
     protected readonly service: UnitLookupService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "any",
@@ -52,7 +52,7 @@ export class UnitLookupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [UnitLookup])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "any",
@@ -65,7 +65,7 @@ export class UnitLookupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => UnitLookup, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "own",
@@ -82,7 +82,7 @@ export class UnitLookupResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => UnitLookup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "create",
     possession: "any",
@@ -106,7 +106,7 @@ export class UnitLookupResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => UnitLookup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "update",
     possession: "any",
@@ -138,7 +138,7 @@ export class UnitLookupResolverBase {
   }
 
   @graphql.Mutation(() => UnitLookup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "delete",
     possession: "any",
@@ -160,7 +160,7 @@ export class UnitLookupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [UnitLookup], { name: "unitLookupRecords" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "any",
@@ -183,7 +183,7 @@ export class UnitLookupResolverBase {
     nullable: true,
     name: "baseRecord",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "any",

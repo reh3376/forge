@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { OperationService } from "../operation.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -43,16 +43,16 @@ import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class OperationControllerBase {
   constructor(
     protected readonly service: OperationService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Operation })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "create",
     possession: "any",
@@ -122,7 +122,7 @@ export class OperationControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Operation] })
   @ApiNestedQuery(OperationFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
@@ -174,7 +174,7 @@ export class OperationControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Operation })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "own",
@@ -233,7 +233,7 @@ export class OperationControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Operation })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -313,7 +313,7 @@ export class OperationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/equipmentPhases")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -368,7 +368,7 @@ export class OperationControllerBase {
   }
 
   @common.Post("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -390,7 +390,7 @@ export class OperationControllerBase {
   }
 
   @common.Patch("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -412,7 +412,7 @@ export class OperationControllerBase {
   }
 
   @common.Delete("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -436,7 +436,7 @@ export class OperationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationChemistries")
   @ApiNestedQuery(FermentationChemistryFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -500,7 +500,7 @@ export class OperationControllerBase {
   }
 
   @common.Post("/:id/fermentationChemistries")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -522,7 +522,7 @@ export class OperationControllerBase {
   }
 
   @common.Patch("/:id/fermentationChemistries")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -544,7 +544,7 @@ export class OperationControllerBase {
   }
 
   @common.Delete("/:id/fermentationChemistries")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -568,7 +568,7 @@ export class OperationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationDayData")
   @ApiNestedQuery(FermentationDayDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "read",
     possession: "any",
@@ -632,7 +632,7 @@ export class OperationControllerBase {
   }
 
   @common.Post("/:id/fermentationDayData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -654,7 +654,7 @@ export class OperationControllerBase {
   }
 
   @common.Patch("/:id/fermentationDayData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -676,7 +676,7 @@ export class OperationControllerBase {
   }
 
   @common.Delete("/:id/fermentationDayData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -700,7 +700,7 @@ export class OperationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationSettingData")
   @ApiNestedQuery(FermentationSettingDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "any",
@@ -754,7 +754,7 @@ export class OperationControllerBase {
   }
 
   @common.Post("/:id/fermentationSettingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -776,7 +776,7 @@ export class OperationControllerBase {
   }
 
   @common.Patch("/:id/fermentationSettingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -798,7 +798,7 @@ export class OperationControllerBase {
   }
 
   @common.Delete("/:id/fermentationSettingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -822,7 +822,7 @@ export class OperationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(OperationFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
@@ -877,7 +877,7 @@ export class OperationControllerBase {
   }
 
   @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -899,7 +899,7 @@ export class OperationControllerBase {
   }
 
   @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -921,7 +921,7 @@ export class OperationControllerBase {
   }
 
   @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -945,7 +945,7 @@ export class OperationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/mashingData")
   @ApiNestedQuery(MashingDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -1015,7 +1015,7 @@ export class OperationControllerBase {
   }
 
   @common.Post("/:id/mashingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -1037,7 +1037,7 @@ export class OperationControllerBase {
   }
 
   @common.Patch("/:id/mashingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",
@@ -1059,7 +1059,7 @@ export class OperationControllerBase {
   }
 
   @common.Delete("/:id/mashingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "update",
     possession: "any",

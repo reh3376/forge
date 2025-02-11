@@ -97,18 +97,18 @@
 //   describe('getRecipeAndMashingUnitProcedure', () => {
 //     it('should return recipe and mashing unit procedure', async () => {
 //       const mockScheduleOrderQueueId = 'mock-queue-id';
-//       const mockRecipe = { 
-//         id: 'recipe-id', 
+//       const mockRecipe = {
+//         id: 'recipe-id',
 //         unitProcedures: [{ id: 'up-id', name: EnumUnitProcedureName.Mashing01 }],
 //         parameters: []
 //       };
-//       const mockScheduleOrderQueue = { 
-//         id: mockScheduleOrderQueueId, 
-//         scheduleOrder: { id: 'schedule-order-id' } 
+//       const mockScheduleOrderQueue = {
+//         id: mockScheduleOrderQueueId,
+//         scheduleOrder: { id: 'schedule-order-id' }
 //       };
-//       const mockScheduleOrder = { 
-//         id: 'schedule-order-id', 
-//         scheduleOrderRecipe: { id: 'recipe-id' } 
+//       const mockScheduleOrder = {
+//         id: 'schedule-order-id',
+//         scheduleOrderRecipe: { id: 'recipe-id' }
 //       };
 
 //       jest.spyOn(service['prisma'].scheduleOrderQueue, 'findFirst').mockResolvedValue(mockScheduleOrderQueue as any);
@@ -137,9 +137,9 @@
 
 //     it('should throw an error when schedule order not found', async () => {
 //       const mockScheduleOrderQueueId = 'mock-queue-id';
-//       const mockScheduleOrderQueue = { 
-//         id: mockScheduleOrderQueueId, 
-//         scheduleOrder: { id: 'schedule-order-id' } 
+//       const mockScheduleOrderQueue = {
+//         id: mockScheduleOrderQueueId,
+//         scheduleOrder: { id: 'schedule-order-id' }
 //       };
 
 //       jest.spyOn(service['prisma'].scheduleOrderQueue, 'findFirst').mockResolvedValue(mockScheduleOrderQueue as any);
@@ -302,8 +302,8 @@
 //   });
 // });
 
-describe('dummy test', () => {
-  it('should pass this dummy test', () => {
+describe("dummy test", () => {
+  it("should pass this dummy test", () => {
     expect(true).toBe(true);
   });
 });

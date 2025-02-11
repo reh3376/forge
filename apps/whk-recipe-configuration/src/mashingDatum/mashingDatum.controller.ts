@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { MashingDatumService } from "./mashingDatum.service";
 import { MashingDatumControllerBase } from "./base/mashingDatum.controller.base";
 
@@ -9,8 +14,8 @@ import { MashingDatumControllerBase } from "./base/mashingDatum.controller.base"
 export class MashingDatumController extends MashingDatumControllerBase {
   constructor(
     protected readonly service: MashingDatumService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

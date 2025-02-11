@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -33,11 +33,11 @@ import { PhaseParameterService } from "../phaseParameter.service";
 export class PhaseParameterResolverBase {
   constructor(
     protected readonly service: PhaseParameterService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
@@ -53,7 +53,7 @@ export class PhaseParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [PhaseParameter])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
@@ -66,7 +66,7 @@ export class PhaseParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => PhaseParameter, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "own",
@@ -83,7 +83,7 @@ export class PhaseParameterResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => PhaseParameter)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "create",
     possession: "any",
@@ -107,7 +107,7 @@ export class PhaseParameterResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => PhaseParameter)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "update",
     possession: "any",
@@ -140,7 +140,7 @@ export class PhaseParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [EquipmentPhase], { name: "equipmentPhases" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -160,7 +160,7 @@ export class PhaseParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [PhaseParameter], { name: "instances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
@@ -183,7 +183,7 @@ export class PhaseParameterResolverBase {
     nullable: true,
     name: "classId",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",

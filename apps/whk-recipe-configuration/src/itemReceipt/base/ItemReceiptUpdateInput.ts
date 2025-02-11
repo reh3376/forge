@@ -285,7 +285,6 @@ class ItemReceiptUpdateInput {
     nullable: true,
   })
   asset?: AssetWhereUniqueInput | null;
-
 }
 
 export { ItemReceiptUpdateInput as ItemReceiptUpdateInput };

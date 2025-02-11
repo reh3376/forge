@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ItemService } from "../item.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -67,16 +67,16 @@ import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ItemControllerBase {
   constructor(
     protected readonly service: ItemService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Item })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "create",
     possession: "any",
@@ -142,7 +142,7 @@ export class ItemControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Item] })
   @ApiNestedQuery(ItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -192,7 +192,7 @@ export class ItemControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Item })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "own",
@@ -249,7 +249,7 @@ export class ItemControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Item })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -327,7 +327,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/additiveActuals")
   @ApiNestedQuery(AdditiveActualFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "read",
     possession: "any",
@@ -371,7 +371,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/additiveActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -393,7 +393,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/additiveActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -415,7 +415,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/additiveActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -439,7 +439,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomItems")
   @ApiNestedQuery(BomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -499,7 +499,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/bomItems")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -521,7 +521,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/bomItems")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -543,7 +543,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/bomItems")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -567,7 +567,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomsWipItem")
   @ApiNestedQuery(BomFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
@@ -614,7 +614,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/bomsWipItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -636,7 +636,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/bomsWipItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -658,7 +658,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/bomsWipItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -682,7 +682,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/inventories")
   @ApiNestedQuery(InventoryFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -745,7 +745,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/inventories")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -767,7 +767,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/inventories")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -789,7 +789,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/inventories")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -813,7 +813,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/inventoryLogs")
   @ApiNestedQuery(InventoryLogFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "read",
     possession: "any",
@@ -862,7 +862,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/inventoryLogs")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -884,7 +884,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/inventoryLogs")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -906,7 +906,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/inventoryLogs")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -930,7 +930,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/inventoryTransfers")
   @ApiNestedQuery(InventoryTransferFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "any",
@@ -983,7 +983,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/inventoryTransfers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1005,7 +1005,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/inventoryTransfers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1027,7 +1027,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/inventoryTransfers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1051,7 +1051,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/itemReceipts")
   @ApiNestedQuery(ItemReceiptFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "any",
@@ -1113,7 +1113,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1135,7 +1135,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1157,7 +1157,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1181,7 +1181,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/lots")
   @ApiNestedQuery(LotFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -1299,7 +1299,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/lots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1321,7 +1321,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/lots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1343,7 +1343,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/lots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1367,7 +1367,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -1455,7 +1455,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1477,7 +1477,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1499,7 +1499,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1523,7 +1523,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/purchaseOrders")
   @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -1585,7 +1585,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1607,7 +1607,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1629,7 +1629,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1653,7 +1653,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBoms")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
@@ -1716,7 +1716,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/recipeBoms")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1738,7 +1738,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/recipeBoms")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1760,7 +1760,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/recipeBoms")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1784,7 +1784,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipes")
   @ApiNestedQuery(RecipeFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -1857,7 +1857,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/recipes")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1879,7 +1879,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/recipes")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1901,7 +1901,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/recipes")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -1925,7 +1925,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/salesOrders")
   @ApiNestedQuery(SalesOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "read",
     possession: "any",
@@ -1978,7 +1978,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/salesOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -2000,7 +2000,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/salesOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -2022,7 +2022,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/salesOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",

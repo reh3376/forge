@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ScheduleOrderService } from "../scheduleOrder.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -34,16 +34,16 @@ import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ScheduleOrderControllerBase {
   constructor(
     protected readonly service: ScheduleOrderService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: ScheduleOrder })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "create",
     possession: "any",
@@ -133,7 +133,7 @@ export class ScheduleOrderControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [ScheduleOrder] })
   @ApiNestedQuery(ScheduleOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "any",
@@ -203,7 +203,7 @@ export class ScheduleOrderControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ScheduleOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "own",
@@ -278,7 +278,7 @@ export class ScheduleOrderControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: ScheduleOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -378,7 +378,7 @@ export class ScheduleOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/customers")
   @ApiNestedQuery(CustomerFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "read",
     possession: "any",
@@ -423,7 +423,7 @@ export class ScheduleOrderControllerBase {
   }
 
   @common.Post("/:id/customers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -445,7 +445,7 @@ export class ScheduleOrderControllerBase {
   }
 
   @common.Patch("/:id/customers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -467,7 +467,7 @@ export class ScheduleOrderControllerBase {
   }
 
   @common.Delete("/:id/customers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -491,7 +491,7 @@ export class ScheduleOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -562,7 +562,7 @@ export class ScheduleOrderControllerBase {
         startDate: true,
         status: true,
         totalCooks: true,
-        totalFermenters: true, 
+        totalFermenters: true,
         executedCooks: true,
         executedFermenters: true,
         units: true,
@@ -579,7 +579,7 @@ export class ScheduleOrderControllerBase {
   }
 
   @common.Post("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -601,7 +601,7 @@ export class ScheduleOrderControllerBase {
   }
 
   @common.Patch("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -623,7 +623,7 @@ export class ScheduleOrderControllerBase {
   }
 
   @common.Delete("/:id/productionOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",

@@ -1,11 +1,27 @@
 import * as dotenv from "dotenv";
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumTestParameterTestSetpointType, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, SalesOrder } from "@prisma/client";
+import {
+  EnumEquipmentPhaseName,
+  EnumEquipmentPhaseStepType,
+  EnumOperationName,
+  EnumPhaseParameterSetpointType,
+  EnumPhaseParameterStaticName,
+  EnumProductionOrderStatus,
+  EnumScheduleOrderStatus,
+  EnumTestParameterTestSetpointType,
+  EnumUnitProcedureName,
+  Item,
+  Operation,
+  PhaseParameter,
+  PrismaClient,
+  Procedure,
+  Recipe,
+  RecipeGroup,
+  SalesOrder,
+} from "@prisma/client";
 import { Salt, parseSalt } from "../src/auth/password.service";
 import { hash } from "bcrypt";
 
 async function seed() {
-
-
   console.info("Seeding database with custom seed for Mashing Recipe...");
 
   const client = new PrismaClient();
@@ -112,17 +128,16 @@ async function seed() {
       testSetpointUpperLimit: 50,
       testSetpointLowerLimit: 0,
       testParamRevision: "0",
-    }
+    },
   ];
 
   console.log("Seeding TestParameters...");
   for (const param of testParameters) {
     await client.testParameter.create({
-      data: param
+      data: param,
     });
   }
   console.log("TestParameter classes seeded successfully.");
-
 }
 
 seed();

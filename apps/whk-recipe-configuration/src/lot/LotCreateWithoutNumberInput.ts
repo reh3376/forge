@@ -568,7 +568,7 @@ class LotCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  lotAlphaChar?: string | null
+  lotAlphaChar?: string | null;
 
   @ApiProperty({
     required: false,
@@ -581,8 +581,6 @@ class LotCreateInput {
     nullable: true,
   })
   lotNumber?: string | null;
-
-
 }
 
 export { LotCreateInput as LotCreateInput };
