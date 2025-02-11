@@ -173,8 +173,6 @@ const recipeGenerator = {
   init(params: any) {
     this.constructorParams = params;
   },
-  // createRecipeData() {
-  // }
 };
 
 describe("Recipe", () => {
