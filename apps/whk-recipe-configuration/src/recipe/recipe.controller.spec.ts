@@ -219,6 +219,11 @@ const recipeGenerator = {
     this.constructorParams = params;
   },
   createRecipeData() {
+  return {
+    recipe: CREATE_RESULT,
+    parameters: RECIPE_PARAMETERS,
+    binAssignments: BIN_ASSIGNMENTS,
+  };
   }
 };
 

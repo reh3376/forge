@@ -752,31 +752,26 @@ export class RecipeGenerator {
           procedureSequenceIndex: cookIndex
         }
       });
-      // if (!existingInstance) {
-      if (true) {
-        const cookClassDef = operationClassDefs.find(def => def.name === EnumOperationName.Cook);
+      const cookClassDef = operationClassDefs.find(def => def.name === EnumOperationName.Cook);
 
-        if (cookClassDef) {
-          newCookInstances[cookIndex] = await client.operation.create({
-            data: {
-              name: EnumOperationName.Cook,
-              path: `${cookClassDef.path}/Cook${cookIndex + 1}`,
-              isClassDefinition: false,
-              classId: { connect: { id: cookClassDef.id } },
-              revision: 0,
-              description: `Instance of Cook for Cook ${cookIndex + 1}`,
-              createdBy: "seed",
-              unitProcedure: { connect: { id: mashingUnitProcedure.id } },
-              procedureSequenceIndex: cookIndex,
-              abbreviation: 'MAS'
-            }
-          });
-          console.log(`Created new Operation instance: ${newCookInstances[cookIndex].name} for Cook ${cookIndex + 1}`);
-        } else {
-          console.log(`Cook class definition not found, skipping Cook ${cookIndex + 1}`);
-        }
+      if (cookClassDef) {
+        newCookInstances[cookIndex] = await client.operation.create({
+          data: {
+            name: EnumOperationName.Cook,
+            path: `${cookClassDef.path}/Cook${cookIndex + 1}`,
+            isClassDefinition: false,
+            classId: { connect: { id: cookClassDef.id } },
+            revision: 0,
+            description: `Instance of Cook for Cook ${cookIndex + 1}`,
+            createdBy: "seed",
+            unitProcedure: { connect: { id: mashingUnitProcedure.id } },
+            procedureSequenceIndex: cookIndex,
+            abbreviation: 'MAS'
+          }
+        });
+        console.log(`Created new Operation instance: ${newCookInstances[cookIndex].name} for Cook ${cookIndex + 1}`);
       } else {
-        console.log(`Instance of Cook for Cook ${cookIndex + 1} already exists, skipping.`);
+        console.log(`Cook class definition not found, skipping Cook ${cookIndex + 1}`);
       }
     }
 
@@ -1251,7 +1246,6 @@ export class RecipeGenerator {
 
     // Create a sample sales order
     console.log("Creating sample sales order...");
-    let salesOrder: SalesOrder;
 
     // Get the current date
     const currentDate = new Date();
@@ -1323,7 +1317,7 @@ export class RecipeGenerator {
     console.log("Sample sales order created successfully:", newSalesOrder.id);
 
     // Update the salesOrder variable for use in production order creation
-    salesOrder = newSalesOrder;
+    const salesOrder = newSalesOrder;
 
     // Create a sample production order
     console.log("Creating sample production order...");

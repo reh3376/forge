@@ -1,7 +1,8 @@
 import { ServerRMQ, CustomTransportStrategy } from "@nestjs/microservices";
 
 export class RabbitMQ extends ServerRMQ implements CustomTransportStrategy {
-  async setupChannel(channel: any, callback: Function): Promise<void> {
+  // Change Function to a specific callback type
+  async setupChannel(channel: any, callback: () => void): Promise<void> {
     const exchange = this.queue;
     const groupId =
       this.getOptionsProp(this.options?.queueOptions, "consumerGroupId" as never) ||
