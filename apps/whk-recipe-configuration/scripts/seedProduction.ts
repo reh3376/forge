@@ -90,13 +90,13 @@ async function createEntityIfNotExists<T extends BaseEntity>(
   entityType: string
 ) {
   const existing = await client[entityType].findFirst({ where: findWhere });
-  
+
   if (!existing) {
     await client[entityType].create({ data: createData });
     console.log(`Created ${entityType}: ${entity.name}`);
     return true;
   }
-  
+
   console.log(`${entityType} ${entity.name} already exists, skipping.`);
   return false;
 }
@@ -114,8 +114,8 @@ async function seed(bcryptSalt: Salt) {
   console.info("Seeding database...");
   const client = new PrismaClient();
 
-  validateEnvironmentVariables('MES_USER', 'MES_PASSWORD');
-  
+  validateEnvironmentVariables("MES_USER", "MES_PASSWORD");
+
   try {
     await seedUser(client, bcryptSalt);
     await seedPhaseParameters(client);
