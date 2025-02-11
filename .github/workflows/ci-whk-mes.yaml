@@ -45,8 +45,39 @@ jobs:
       #   working-directory: ./apps/whk-recipe-configuration
 
       - name: Run ESLint
-        run: npm run lint
+        run: |
+          npm run lint > eslint_report.txt || (cat eslint_report.txt && exit 1)
         working-directory: ./apps/whk-recipe-configuration
+
+      - name: Upload ESLint Report
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-report
+          path: ./apps/whk-recipe-configuration/eslint_report.txt
+
+      - name: Comment PR with ESLint Results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const eslintReport = fs.readFileSync('./apps/whk-recipe-configuration/eslint_report.txt', 'utf8');
+            const comment = `
+            ❌ ESLint found some issues:
+
+            \`\`\`
+            ${eslintReport}
+            \`\`\`
+
+            Please fix these issues before merging.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
 
       - name: build
         run: npm run build
