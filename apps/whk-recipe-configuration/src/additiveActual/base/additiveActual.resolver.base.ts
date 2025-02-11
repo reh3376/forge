@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -34,11 +34,11 @@ import { AdditiveActualService } from "../additiveActual.service";
 export class AdditiveActualResolverBase {
   constructor(
     protected readonly service: AdditiveActualService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "read",
     possession: "any",
@@ -54,7 +54,7 @@ export class AdditiveActualResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [AdditiveActual])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "read",
     possession: "any",
@@ -67,7 +67,7 @@ export class AdditiveActualResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => AdditiveActual, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "read",
     possession: "own",
@@ -84,7 +84,7 @@ export class AdditiveActualResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => AdditiveActual)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "create",
     possession: "any",
@@ -114,7 +114,7 @@ export class AdditiveActualResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => AdditiveActual)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "update",
     possession: "any",
@@ -152,7 +152,7 @@ export class AdditiveActualResolverBase {
   }
 
   @graphql.Mutation(() => AdditiveActual)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "delete",
     possession: "any",
@@ -177,7 +177,7 @@ export class AdditiveActualResolverBase {
     nullable: true,
     name: "item",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -198,7 +198,7 @@ export class AdditiveActualResolverBase {
     nullable: true,
     name: "mashingDatum",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",

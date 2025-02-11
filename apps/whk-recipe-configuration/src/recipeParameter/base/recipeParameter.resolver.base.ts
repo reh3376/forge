@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -33,11 +33,11 @@ import { RecipeParameterService } from "../recipeParameter.service";
 export class RecipeParameterResolverBase {
   constructor(
     protected readonly service: RecipeParameterService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "any",
@@ -53,7 +53,7 @@ export class RecipeParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [RecipeParameter])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "any",
@@ -66,7 +66,7 @@ export class RecipeParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => RecipeParameter, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "own",
@@ -83,7 +83,7 @@ export class RecipeParameterResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeParameter)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "create",
     possession: "any",
@@ -99,7 +99,7 @@ export class RecipeParameterResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeParameter)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
@@ -124,7 +124,7 @@ export class RecipeParameterResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Recipe], { name: "recipe" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",

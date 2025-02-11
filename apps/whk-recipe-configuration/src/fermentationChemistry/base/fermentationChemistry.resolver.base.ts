@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -38,11 +38,11 @@ import { FermentationChemistryService } from "../fermentationChemistry.service";
 export class FermentationChemistryResolverBase {
   constructor(
     protected readonly service: FermentationChemistryService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -58,7 +58,7 @@ export class FermentationChemistryResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [FermentationChemistry])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -71,7 +71,7 @@ export class FermentationChemistryResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => FermentationChemistry, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "own",
@@ -88,7 +88,7 @@ export class FermentationChemistryResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => FermentationChemistry)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "create",
     possession: "any",
@@ -130,7 +130,7 @@ export class FermentationChemistryResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => FermentationChemistry)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "update",
     possession: "any",
@@ -181,7 +181,7 @@ export class FermentationChemistryResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [FermentationDayDatum], { name: "dailyData" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "read",
     possession: "any",
@@ -204,7 +204,7 @@ export class FermentationChemistryResolverBase {
     nullable: true,
     name: "asset",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -225,7 +225,7 @@ export class FermentationChemistryResolverBase {
     nullable: true,
     name: "batch",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -246,7 +246,7 @@ export class FermentationChemistryResolverBase {
     nullable: true,
     name: "operation",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",
@@ -267,7 +267,7 @@ export class FermentationChemistryResolverBase {
     nullable: true,
     name: "productionOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -288,7 +288,7 @@ export class FermentationChemistryResolverBase {
     nullable: true,
     name: "settingData",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "any",

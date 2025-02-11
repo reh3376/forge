@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { EquipmentPhaseService } from "../equipmentPhase.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -40,16 +40,16 @@ import { TestParameter } from "../../testParameter/base/TestParameter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class EquipmentPhaseControllerBase {
   constructor(
     protected readonly service: EquipmentPhaseService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: EquipmentPhase })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "create",
     possession: "any",
@@ -117,7 +117,7 @@ export class EquipmentPhaseControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [EquipmentPhase] })
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -171,7 +171,7 @@ export class EquipmentPhaseControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: EquipmentPhase })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "own",
@@ -230,7 +230,7 @@ export class EquipmentPhaseControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: EquipmentPhase })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -308,7 +308,7 @@ export class EquipmentPhaseControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomItem")
   @ApiNestedQuery(BomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -368,7 +368,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Post("/:id/bomItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -390,7 +390,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Patch("/:id/bomItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -412,7 +412,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Delete("/:id/bomItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -436,7 +436,7 @@ export class EquipmentPhaseControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -491,7 +491,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -513,7 +513,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -535,7 +535,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -559,7 +559,7 @@ export class EquipmentPhaseControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instructions")
   @ApiNestedQuery(InstructionFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Instruction",
     action: "read",
     possession: "any",
@@ -594,7 +594,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Post("/:id/instructions")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -616,7 +616,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Patch("/:id/instructions")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -638,7 +638,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Delete("/:id/instructions")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -662,7 +662,7 @@ export class EquipmentPhaseControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/phaseParameters")
   @ApiNestedQuery(PhaseParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
@@ -716,7 +716,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Post("/:id/phaseParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -738,7 +738,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Patch("/:id/phaseParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -760,7 +760,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Delete("/:id/phaseParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -784,7 +784,7 @@ export class EquipmentPhaseControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/testParameters")
   @ApiNestedQuery(TestParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -847,7 +847,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Post("/:id/testParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -869,7 +869,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Patch("/:id/testParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -891,7 +891,7 @@ export class EquipmentPhaseControllerBase {
   }
 
   @common.Delete("/:id/testParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",

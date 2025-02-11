@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -31,11 +31,11 @@ import { ItemGroupService } from "../itemGroup.service";
 export class ItemGroupResolverBase {
   constructor(
     protected readonly service: ItemGroupService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "read",
     possession: "any",
@@ -51,7 +51,7 @@ export class ItemGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ItemGroup])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "read",
     possession: "any",
@@ -64,7 +64,7 @@ export class ItemGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ItemGroup, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "read",
     possession: "own",
@@ -81,7 +81,7 @@ export class ItemGroupResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ItemGroup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "create",
     possession: "any",
@@ -97,7 +97,7 @@ export class ItemGroupResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ItemGroup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "update",
     possession: "any",

@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import { UnitLookupService } from "./unitLookup.service";
 import { UnitLookupControllerBase } from "./base/unitLookup.controller.base";
 
@@ -9,8 +9,8 @@ import { UnitLookupControllerBase } from "./base/unitLookup.controller.base";
 export class UnitLookupController extends UnitLookupControllerBase {
   constructor(
     protected readonly service: UnitLookupService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

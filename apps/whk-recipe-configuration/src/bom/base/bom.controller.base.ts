@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { BomService } from "../bom.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -40,16 +40,16 @@ import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class BomControllerBase {
   constructor(
     protected readonly service: BomService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Bom })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "create",
     possession: "any",
@@ -101,7 +101,7 @@ export class BomControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Bom] })
   @ApiNestedQuery(BomFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
@@ -145,7 +145,7 @@ export class BomControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Bom })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "own",
@@ -194,7 +194,7 @@ export class BomControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Bom })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -258,7 +258,7 @@ export class BomControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/bomItem")
   @ApiNestedQuery(BomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -318,7 +318,7 @@ export class BomControllerBase {
   }
 
   @common.Post("/:id/bomItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -340,7 +340,7 @@ export class BomControllerBase {
   }
 
   @common.Patch("/:id/bomItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -362,7 +362,7 @@ export class BomControllerBase {
   }
 
   @common.Delete("/:id/bomItem")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -386,7 +386,7 @@ export class BomControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/mashingData")
   @ApiNestedQuery(MashingDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -456,7 +456,7 @@ export class BomControllerBase {
   }
 
   @common.Post("/:id/mashingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -478,7 +478,7 @@ export class BomControllerBase {
   }
 
   @common.Patch("/:id/mashingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -500,7 +500,7 @@ export class BomControllerBase {
   }
 
   @common.Delete("/:id/mashingData")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -524,7 +524,7 @@ export class BomControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrder")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -614,7 +614,7 @@ export class BomControllerBase {
   }
 
   @common.Post("/:id/productionOrder")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -636,7 +636,7 @@ export class BomControllerBase {
   }
 
   @common.Patch("/:id/productionOrder")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -658,7 +658,7 @@ export class BomControllerBase {
   }
 
   @common.Delete("/:id/productionOrder")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -682,7 +682,7 @@ export class BomControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/unitProcedure")
   @ApiNestedQuery(UnitProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -746,7 +746,7 @@ export class BomControllerBase {
   }
 
   @common.Post("/:id/unitProcedure")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -768,7 +768,7 @@ export class BomControllerBase {
   }
 
   @common.Patch("/:id/unitProcedure")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -790,7 +790,7 @@ export class BomControllerBase {
   }
 
   @common.Delete("/:id/unitProcedure")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -814,7 +814,7 @@ export class BomControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/unitProceduresPrimary")
   @ApiNestedQuery(UnitProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -878,7 +878,7 @@ export class BomControllerBase {
   }
 
   @common.Post("/:id/unitProceduresPrimary")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -900,7 +900,7 @@ export class BomControllerBase {
   }
 
   @common.Patch("/:id/unitProceduresPrimary")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -922,7 +922,7 @@ export class BomControllerBase {
   }
 
   @common.Delete("/:id/unitProceduresPrimary")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",

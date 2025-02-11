@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { RecipeBomItemService } from "../recipeBomItem.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProto
 import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class RecipeBomItemControllerBase {
   constructor(
     protected readonly service: RecipeBomItemService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: RecipeBomItem })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "create",
     possession: "any",
@@ -130,7 +130,7 @@ export class RecipeBomItemControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [RecipeBomItem] })
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
@@ -192,7 +192,7 @@ export class RecipeBomItemControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: RecipeBomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "own",
@@ -259,7 +259,7 @@ export class RecipeBomItemControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: RecipeBomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",
@@ -359,7 +359,7 @@ export class RecipeBomItemControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: RecipeBomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "delete",
     possession: "any",
@@ -428,7 +428,7 @@ export class RecipeBomItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
@@ -491,7 +491,7 @@ export class RecipeBomItemControllerBase {
   }
 
   @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",
@@ -513,7 +513,7 @@ export class RecipeBomItemControllerBase {
   }
 
   @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",
@@ -535,7 +535,7 @@ export class RecipeBomItemControllerBase {
   }
 
   @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",
@@ -559,7 +559,7 @@ export class RecipeBomItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/mashingProtocolSteps")
   @ApiNestedQuery(MashingProtocolStepFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStep",
     action: "read",
     possession: "any",
@@ -609,7 +609,7 @@ export class RecipeBomItemControllerBase {
   }
 
   @common.Post("/:id/mashingProtocolSteps")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",
@@ -631,7 +631,7 @@ export class RecipeBomItemControllerBase {
   }
 
   @common.Patch("/:id/mashingProtocolSteps")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",
@@ -653,7 +653,7 @@ export class RecipeBomItemControllerBase {
   }
 
   @common.Delete("/:id/mashingProtocolSteps")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "update",
     possession: "any",

@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -37,11 +37,11 @@ import { RecipeGroupService } from "../recipeGroup.service";
 export class RecipeGroupResolverBase {
   constructor(
     protected readonly service: RecipeGroupService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "read",
     possession: "any",
@@ -57,7 +57,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [RecipeGroup])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "read",
     possession: "any",
@@ -70,7 +70,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => RecipeGroup, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "read",
     possession: "own",
@@ -87,7 +87,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeGroup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "create",
     possession: "any",
@@ -103,7 +103,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeGroup)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "update",
     possession: "any",
@@ -128,7 +128,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -148,7 +148,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Recipe], { name: "recipes" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -168,7 +168,7 @@ export class RecipeGroupResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ScheduleOrder], { name: "scheduleOrders" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "any",

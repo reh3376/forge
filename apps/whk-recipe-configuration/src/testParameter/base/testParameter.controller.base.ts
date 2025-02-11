@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { TestParameterService } from "../testParameter.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -34,16 +34,16 @@ import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class TestParameterControllerBase {
   constructor(
     protected readonly service: TestParameterService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: TestParameter })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "create",
     possession: "any",
@@ -121,7 +121,7 @@ export class TestParameterControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [TestParameter] })
   @ApiNestedQuery(TestParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -183,7 +183,7 @@ export class TestParameterControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: TestParameter })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "own",
@@ -250,7 +250,7 @@ export class TestParameterControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: TestParameter })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -338,7 +338,7 @@ export class TestParameterControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/equipmentPhases")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -393,7 +393,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Post("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -415,7 +415,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Patch("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -437,7 +437,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Delete("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -461,7 +461,7 @@ export class TestParameterControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(TestParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -524,7 +524,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -546,7 +546,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -568,7 +568,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -592,7 +592,7 @@ export class TestParameterControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/purchaseOrder")
   @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -654,7 +654,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Post("/:id/purchaseOrder")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -676,7 +676,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Patch("/:id/purchaseOrder")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",
@@ -698,7 +698,7 @@ export class TestParameterControllerBase {
   }
 
   @common.Delete("/:id/purchaseOrder")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "update",
     possession: "any",

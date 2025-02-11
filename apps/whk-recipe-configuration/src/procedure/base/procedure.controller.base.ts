@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ProcedureService } from "../procedure.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ProcedureControllerBase {
   constructor(
     protected readonly service: ProcedureService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Procedure })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "create",
     possession: "any",
@@ -92,7 +92,7 @@ export class ProcedureControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Procedure] })
   @ApiNestedQuery(ProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",
@@ -132,7 +132,7 @@ export class ProcedureControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Procedure })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "own",
@@ -179,7 +179,7 @@ export class ProcedureControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Procedure })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -241,7 +241,7 @@ export class ProcedureControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(ProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",
@@ -284,7 +284,7 @@ export class ProcedureControllerBase {
   }
 
   @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -306,7 +306,7 @@ export class ProcedureControllerBase {
   }
 
   @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -328,7 +328,7 @@ export class ProcedureControllerBase {
   }
 
   @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -352,7 +352,7 @@ export class ProcedureControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/unitProcedures")
   @ApiNestedQuery(UnitProcedureFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -416,7 +416,7 @@ export class ProcedureControllerBase {
   }
 
   @common.Post("/:id/unitProcedures")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -438,7 +438,7 @@ export class ProcedureControllerBase {
   }
 
   @common.Patch("/:id/unitProcedures")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -460,7 +460,7 @@ export class ProcedureControllerBase {
   }
 
   @common.Delete("/:id/unitProcedures")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",

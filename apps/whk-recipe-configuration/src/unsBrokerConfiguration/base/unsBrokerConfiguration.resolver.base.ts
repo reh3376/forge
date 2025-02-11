@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -32,11 +32,11 @@ import { UnsBrokerConfigurationService } from "../unsBrokerConfiguration.service
 export class UnsBrokerConfigurationResolverBase {
   constructor(
     protected readonly service: UnsBrokerConfigurationService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "read",
     possession: "any",
@@ -52,7 +52,7 @@ export class UnsBrokerConfigurationResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [UnsBrokerConfiguration])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "read",
     possession: "any",
@@ -65,7 +65,7 @@ export class UnsBrokerConfigurationResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => UnsBrokerConfiguration, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "read",
     possession: "own",
@@ -82,7 +82,7 @@ export class UnsBrokerConfigurationResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => UnsBrokerConfiguration)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "create",
     possession: "any",
@@ -98,7 +98,7 @@ export class UnsBrokerConfigurationResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => UnsBrokerConfiguration)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "update",
     possession: "any",
@@ -122,7 +122,7 @@ export class UnsBrokerConfigurationResolverBase {
   }
 
   @graphql.Mutation(() => UnsBrokerConfiguration)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "delete",
     possession: "any",

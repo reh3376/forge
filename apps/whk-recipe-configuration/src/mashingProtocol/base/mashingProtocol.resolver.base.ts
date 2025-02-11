@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -39,11 +39,11 @@ import { MashingProtocolService } from "../mashingProtocol.service";
 export class MashingProtocolResolverBase {
   constructor(
     protected readonly service: MashingProtocolService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -59,7 +59,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [MashingProtocol])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -72,7 +72,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => MashingProtocol, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "own",
@@ -89,7 +89,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => MashingProtocol)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "create",
     possession: "any",
@@ -119,7 +119,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => MashingProtocol)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -158,7 +158,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -178,7 +178,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingProtocol], { name: "masterInstances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -200,7 +200,7 @@ export class MashingProtocolResolverBase {
   @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
     name: "productionOrderRecipeInstances",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -223,7 +223,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Recipe], { name: "recipes" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -243,7 +243,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingProtocol], { name: "runningInstances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -263,7 +263,7 @@ export class MashingProtocolResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingProtocolStep], { name: "steps" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStep",
     action: "read",
     possession: "any",
@@ -286,7 +286,7 @@ export class MashingProtocolResolverBase {
     nullable: true,
     name: "masterMashingProtocol",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -307,7 +307,7 @@ export class MashingProtocolResolverBase {
     nullable: true,
     name: "runningMashingProtocol",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",

@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -44,11 +44,11 @@ import { LotService } from "../lot.service";
 export class LotResolverBase {
   constructor(
     protected readonly service: LotService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -64,7 +64,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Lot])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -75,7 +75,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Lot, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "own",
@@ -90,7 +90,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Lot)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "create",
     possession: "any",
@@ -154,7 +154,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Lot)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "update",
     possession: "any",
@@ -226,7 +226,7 @@ export class LotResolverBase {
   }
 
   @graphql.Mutation(() => Lot)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "delete",
     possession: "any",
@@ -246,7 +246,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -266,7 +266,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [BomItem], { name: "bomItems" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -288,7 +288,7 @@ export class LotResolverBase {
   @graphql.ResolveField(() => [InventoryTransfer], {
     name: "inventoryTransfers",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "any",
@@ -308,7 +308,7 @@ export class LotResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Item], { name: "item" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -331,7 +331,7 @@ export class LotResolverBase {
     nullable: true,
     name: "continerItem",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -350,7 +350,7 @@ export class LotResolverBase {
     nullable: true,
     name: "filledFrom",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -369,7 +369,7 @@ export class LotResolverBase {
     nullable: true,
     name: "fromAsset",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -388,7 +388,7 @@ export class LotResolverBase {
     nullable: true,
     name: "productionOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -409,7 +409,7 @@ export class LotResolverBase {
     nullable: true,
     name: "proofingTank",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -428,7 +428,7 @@ export class LotResolverBase {
     nullable: true,
     name: "purchaseOrderAcceptedLots",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -449,7 +449,7 @@ export class LotResolverBase {
     nullable: true,
     name: "recipe",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -468,7 +468,7 @@ export class LotResolverBase {
     nullable: true,
     name: "tankOfOrigin",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",

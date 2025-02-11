@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { UnsConfigurationService } from "../unsConfiguration.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { UnsConfigurationWhereUniqueInput } from "./UnsConfigurationWhereUniqueI
 import { UnsConfigurationUpdateInput } from "./UnsConfigurationUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class UnsConfigurationControllerBase {
   constructor(
     protected readonly service: UnsConfigurationService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: UnsConfiguration })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsConfiguration",
     action: "create",
     possession: "any",
@@ -73,7 +73,7 @@ export class UnsConfigurationControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [UnsConfiguration] })
   @ApiNestedQuery(UnsConfigurationFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsConfiguration",
     action: "read",
     possession: "any",
@@ -107,7 +107,7 @@ export class UnsConfigurationControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: UnsConfiguration })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsConfiguration",
     action: "read",
     possession: "own",
@@ -146,7 +146,7 @@ export class UnsConfigurationControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: UnsConfiguration })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsConfiguration",
     action: "update",
     possession: "any",
@@ -192,7 +192,7 @@ export class UnsConfigurationControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: UnsConfiguration })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsConfiguration",
     action: "delete",
     possession: "any",
