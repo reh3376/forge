@@ -26,7 +26,7 @@ import { VendorUpdateInput } from '../vendor/base/VendorUpdateInput';
 import { VendorCreateInput } from '../vendor/base/VendorCreateInput';
 
 @Injectable()
-export class SyncService implements OnModuleInit {
+export class SyncService {
     private readonly token: string;
     private prismaEntityMap: Record<string, any>;
     private entityCreateInputMap: Record<string, any>;
@@ -73,8 +73,6 @@ export class SyncService implements OnModuleInit {
             bomitem: BomItemCreateInput,
         }
     }
-
-    onModuleInit() { }
 
     private parseModelRelations(schemaPath: string, modelName: string) {
         const schema = fs.readFileSync(schemaPath, { encoding: 'utf-8' });
