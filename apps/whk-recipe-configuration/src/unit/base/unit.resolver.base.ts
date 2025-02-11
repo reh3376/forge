@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -31,11 +31,11 @@ import { UnitService } from "../unit.service";
 export class UnitResolverBase {
   constructor(
     protected readonly service: UnitService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "read",
     possession: "any",
@@ -51,7 +51,7 @@ export class UnitResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Unit])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "read",
     possession: "any",
@@ -62,7 +62,7 @@ export class UnitResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Unit, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "read",
     possession: "own",
@@ -77,7 +77,7 @@ export class UnitResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Unit)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "create",
     possession: "any",
@@ -91,7 +91,7 @@ export class UnitResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Unit)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "update",
     possession: "any",

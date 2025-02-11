@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -38,11 +38,11 @@ import { ScheduleOrderService } from "../scheduleOrder.service";
 export class ScheduleOrderResolverBase {
   constructor(
     protected readonly service: ScheduleOrderService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "any",
@@ -58,7 +58,7 @@ export class ScheduleOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ScheduleOrder])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "any",
@@ -71,7 +71,7 @@ export class ScheduleOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ScheduleOrder, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "own",
@@ -88,7 +88,7 @@ export class ScheduleOrderResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ScheduleOrder)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "create",
     possession: "any",
@@ -122,7 +122,7 @@ export class ScheduleOrderResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ScheduleOrder)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "update",
     possession: "any",
@@ -165,7 +165,7 @@ export class ScheduleOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Customer], { name: "customers" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "read",
     possession: "any",
@@ -185,7 +185,7 @@ export class ScheduleOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -208,7 +208,7 @@ export class ScheduleOrderResolverBase {
     nullable: true,
     name: "recipeGroup",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "read",
     possession: "any",
@@ -229,7 +229,7 @@ export class ScheduleOrderResolverBase {
     nullable: true,
     name: "scheduleOrderQueues",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "read",
     possession: "any",
@@ -250,7 +250,7 @@ export class ScheduleOrderResolverBase {
     nullable: true,
     name: "scheduleOrderRecipe",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",

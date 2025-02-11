@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { BatchService } from "../batch.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -34,16 +34,16 @@ import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class BatchControllerBase {
   constructor(
     protected readonly service: BatchService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Batch })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "create",
     possession: "any",
@@ -184,7 +184,7 @@ export class BatchControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Batch] })
   @ApiNestedQuery(BatchFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -273,7 +273,7 @@ export class BatchControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Batch })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "own",
@@ -369,7 +369,7 @@ export class BatchControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Batch })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -522,7 +522,7 @@ export class BatchControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/children")
   @ApiNestedQuery(BatchFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -614,7 +614,7 @@ export class BatchControllerBase {
   }
 
   @common.Post("/:id/children")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -636,7 +636,7 @@ export class BatchControllerBase {
   }
 
   @common.Patch("/:id/children")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -658,7 +658,7 @@ export class BatchControllerBase {
   }
 
   @common.Delete("/:id/children")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -682,7 +682,7 @@ export class BatchControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationChemistries")
   @ApiNestedQuery(FermentationChemistryFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -746,7 +746,7 @@ export class BatchControllerBase {
   }
 
   @common.Post("/:id/fermentationChemistries")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -768,7 +768,7 @@ export class BatchControllerBase {
   }
 
   @common.Patch("/:id/fermentationChemistries")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -790,7 +790,7 @@ export class BatchControllerBase {
   }
 
   @common.Delete("/:id/fermentationChemistries")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -814,7 +814,7 @@ export class BatchControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBomItems")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
@@ -877,7 +877,7 @@ export class BatchControllerBase {
   }
 
   @common.Post("/:id/recipeBomItems")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -899,7 +899,7 @@ export class BatchControllerBase {
   }
 
   @common.Patch("/:id/recipeBomItems")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -921,7 +921,7 @@ export class BatchControllerBase {
   }
 
   @common.Delete("/:id/recipeBomItems")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",

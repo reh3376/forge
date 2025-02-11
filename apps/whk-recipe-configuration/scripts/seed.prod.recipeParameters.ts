@@ -1,4 +1,9 @@
-import { PrismaClient, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumRecipeParameterRecipeSetpointType } from "@prisma/client";
+import {
+  PrismaClient,
+  EnumPhaseParameterSetpointType,
+  EnumPhaseParameterStaticName,
+  EnumRecipeParameterRecipeSetpointType,
+} from "@prisma/client";
 
 async function seedRecipeParameters() {
   const prisma = new PrismaClient();
@@ -100,7 +105,8 @@ async function seedRecipeParameters() {
       createdAt: new Date(),
       createdBy: "pmannion@whiskeyhouse.com",
       recipeParamName: "RatioByFerm",
-      description: "(Total Liquid + (Top Off Volume * Top Off Freq)) / (Total Grain Weight)",
+      description:
+        "(Total Liquid + (Top Off Volume * Top Off Freq)) / (Total Grain Weight)",
       recipeParamUnits: "BGs",
       recipeSetpointUpperLimit: 2.42,
       recipeSetpointLowerLimit: 2.42,
@@ -243,9 +249,9 @@ async function seedRecipeParameters() {
   const recipes = await prisma.recipe.findMany({
     where: {
       Recipe: {
-        in: ['WHK-74-18-00-08-ISC-53-06-04-0-0-00-125'] // Add other recipe names if needed
-      }
-    }
+        in: ["WHK-74-18-00-08-ISC-53-06-04-0-0-00-125"], // Add other recipe names if needed
+      },
+    },
   });
 
   for (const recipe of recipes) {
@@ -253,14 +259,16 @@ async function seedRecipeParameters() {
       const instanceParam = {
         ...classDefParam,
         isClassDefinition: false,
-        recipe: { connect: { id: recipe.id } }
+        recipe: { connect: { id: recipe.id } },
       };
 
       await prisma.recipeParameter.create({
         data: instanceParam,
       });
     }
-    console.log(`Instance recipe parameters created and linked for recipe: ${recipe.Recipe}`);
+    console.log(
+      `Instance recipe parameters created and linked for recipe: ${recipe.Recipe}`
+    );
   }
 
   console.log("Recipe parameter instances created and linked successfully");

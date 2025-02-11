@@ -1,4 +1,3 @@
-
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { AssetWhereUniqueInput } from "../asset/base/AssetWhereUniqueInput";
@@ -311,4 +310,3 @@ class PurchaseOrderCreateInput {
 }
 
 export { PurchaseOrderCreateInput as PurchaseOrderCreateInput };
-  

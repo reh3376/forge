@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ItemGroupService } from "../itemGroup.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { ItemGroupWhereUniqueInput } from "./ItemGroupWhereUniqueInput";
 import { ItemGroupUpdateInput } from "./ItemGroupUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ItemGroupControllerBase {
   constructor(
     protected readonly service: ItemGroupService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: ItemGroup })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "create",
     possession: "any",
@@ -68,7 +68,7 @@ export class ItemGroupControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [ItemGroup] })
   @ApiNestedQuery(ItemGroupFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "read",
     possession: "any",
@@ -95,7 +95,7 @@ export class ItemGroupControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ItemGroup })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "read",
     possession: "own",
@@ -129,7 +129,7 @@ export class ItemGroupControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: ItemGroup })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemGroup",
     action: "update",
     possession: "any",

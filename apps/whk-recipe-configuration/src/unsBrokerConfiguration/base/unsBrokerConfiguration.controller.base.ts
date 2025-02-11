@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { UnsBrokerConfigurationService } from "../unsBrokerConfiguration.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { UnsBrokerConfigurationWhereUniqueInput } from "./UnsBrokerConfiguration
 import { UnsBrokerConfigurationUpdateInput } from "./UnsBrokerConfigurationUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class UnsBrokerConfigurationControllerBase {
   constructor(
     protected readonly service: UnsBrokerConfigurationService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: UnsBrokerConfiguration })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "create",
     possession: "any",
@@ -75,7 +75,7 @@ export class UnsBrokerConfigurationControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [UnsBrokerConfiguration] })
   @ApiNestedQuery(UnsBrokerConfigurationFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "read",
     possession: "any",
@@ -114,7 +114,7 @@ export class UnsBrokerConfigurationControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: UnsBrokerConfiguration })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "read",
     possession: "own",
@@ -155,7 +155,7 @@ export class UnsBrokerConfigurationControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: UnsBrokerConfiguration })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "update",
     possession: "any",
@@ -203,7 +203,7 @@ export class UnsBrokerConfigurationControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: UnsBrokerConfiguration })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "delete",
     possession: "any",

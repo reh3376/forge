@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { FermentationSettingDatumService } from "../fermentationSettingDatum.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { FermentationSettingDatumWhereUniqueInput } from "./FermentationSettingD
 import { FermentationSettingDatumUpdateInput } from "./FermentationSettingDatumUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class FermentationSettingDatumControllerBase {
   constructor(
     protected readonly service: FermentationSettingDatumService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: FermentationSettingDatum })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "create",
     possession: "any",
@@ -103,7 +103,7 @@ export class FermentationSettingDatumControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [FermentationSettingDatum] })
   @ApiNestedQuery(FermentationSettingDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "any",
@@ -156,7 +156,7 @@ export class FermentationSettingDatumControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: FermentationSettingDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "own",
@@ -211,7 +211,7 @@ export class FermentationSettingDatumControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: FermentationSettingDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "update",
     possession: "any",

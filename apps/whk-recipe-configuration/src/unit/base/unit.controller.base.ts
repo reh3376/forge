@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { UnitService } from "../unit.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { UnitWhereUniqueInput } from "./UnitWhereUniqueInput";
 import { UnitUpdateInput } from "./UnitUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class UnitControllerBase {
   constructor(
     protected readonly service: UnitService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Unit })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "create",
     possession: "any",
@@ -67,7 +67,7 @@ export class UnitControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Unit] })
   @ApiNestedQuery(UnitFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "read",
     possession: "any",
@@ -95,7 +95,7 @@ export class UnitControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Unit })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "read",
     possession: "own",
@@ -130,7 +130,7 @@ export class UnitControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Unit })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Unit",
     action: "update",
     possession: "any",

@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { RecipeService } from "./recipe.service";
 import { RecipeControllerBase } from "./base/recipe.controller.base";
 import { RecipeCookCreationService } from "./recipe.cookcreation.service";
@@ -13,27 +18,29 @@ export class RecipeController extends RecipeControllerBase {
   constructor(
     protected readonly service: RecipeService,
     protected readonly cookCreationService: RecipeCookCreationService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder,
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder,
     protected readonly rabbitMQProducer: RabbitMQProducerService,
     protected readonly recipeGenerator: RecipeGenerator
   ) {
     super(service, rolesBuilder);
   }
 
-
   @common.Post("/create-cook")
   @swagger.ApiOperation({ summary: "Create a new cook" })
-  @swagger.ApiResponse({ status: 201, description: "Cook created successfully" })
+  @swagger.ApiResponse({
+    status: 201,
+    description: "Cook created successfully",
+  })
   @swagger.ApiResponse({ status: 400, description: "Bad Request" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "create",
     possession: "any",
   })
-  
   async createNewCook(
-    @common.Body() createCookDto: {
+    @common.Body()
+    createCookDto: {
       scheduleOrderQueueId: string;
       username: string;
       mashingProtocolData: any;
@@ -41,14 +48,26 @@ export class RecipeController extends RecipeControllerBase {
   ) {
     try {
       if (createCookDto.mashingProtocolData) {
-        const result = await this.cookCreationService.createCook(createCookDto.scheduleOrderQueueId, createCookDto.username, 3, createCookDto.mashingProtocolData);
+        const result = await this.cookCreationService.createCook(
+          createCookDto.scheduleOrderQueueId,
+          createCookDto.username,
+          3,
+          createCookDto.mashingProtocolData
+        );
         return result;
       } else {
-        const result = await this.cookCreationService.createCook(createCookDto.scheduleOrderQueueId, createCookDto.username, 3);
+        const result = await this.cookCreationService.createCook(
+          createCookDto.scheduleOrderQueueId,
+          createCookDto.username,
+          3
+        );
         return result;
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred while creating the cook';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred while creating the cook";
       throw new common.HttpException(
         errorMessage,
         common.HttpStatus.BAD_REQUEST
@@ -58,9 +77,12 @@ export class RecipeController extends RecipeControllerBase {
 
   @common.Get("/active-recipes")
   @swagger.ApiOperation({ summary: "Get recipes for active production orders" })
-  @swagger.ApiResponse({ status: 200, description: "Active recipes retrieved successfully" })
+  @swagger.ApiResponse({
+    status: 200,
+    description: "Active recipes retrieved successfully",
+  })
   @swagger.ApiResponse({ status: 500, description: "Internal Server Error" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -70,7 +92,10 @@ export class RecipeController extends RecipeControllerBase {
       const activeRecipes = await this.service.getActiveRecipes();
       return activeRecipes;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred while retrieving active recipes';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred while retrieving active recipes";
       throw new common.HttpException(
         errorMessage,
         common.HttpStatus.INTERNAL_SERVER_ERROR
@@ -80,15 +105,19 @@ export class RecipeController extends RecipeControllerBase {
 
   @common.Post("/generate-recipe")
   @swagger.ApiOperation({ summary: "Generate a new recipe" })
-  @swagger.ApiResponse({ status: 201, description: "Recipe generated successfully" })
+  @swagger.ApiResponse({
+    status: 201,
+    description: "Recipe generated successfully",
+  })
   @swagger.ApiResponse({ status: 400, description: "Bad Request" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
-    action: "create", 
+    action: "create",
     possession: "any",
   })
   async generateRecipe(
-    @common.Body() generateRecipeDto: {
+    @common.Body()
+    generateRecipeDto: {
       customerCode: string;
       mashBill: string;
       finalProof: number;
@@ -127,9 +156,11 @@ export class RecipeController extends RecipeControllerBase {
         generateRecipeDto.binAssignments
       );
       return { message: "Recipe generated successfully" };
-      
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred while generating the recipe';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred while generating the recipe";
       throw new common.HttpException(
         errorMessage,
         common.HttpStatus.BAD_REQUEST

@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -29,11 +29,11 @@ import { ProductionOrderBomItemService } from "../productionOrderBomItem.service
 export class ProductionOrderBomItemResolverBase {
   constructor(
     protected readonly service: ProductionOrderBomItemService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "read",
     possession: "any",
@@ -49,7 +49,7 @@ export class ProductionOrderBomItemResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ProductionOrderBomItem])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "read",
     possession: "any",
@@ -62,7 +62,7 @@ export class ProductionOrderBomItemResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ProductionOrderBomItem, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "read",
     possession: "own",
@@ -78,7 +78,7 @@ export class ProductionOrderBomItemResolverBase {
   }
 
   @graphql.Mutation(() => ProductionOrderBomItem)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderBomItem",
     action: "delete",
     possession: "any",

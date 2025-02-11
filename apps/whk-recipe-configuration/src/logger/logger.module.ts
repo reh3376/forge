@@ -7,8 +7,8 @@ import { LoggerConfiguration } from "./logger.config";
   imports: [
     WinstonModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => LoggerConfiguration(config)
-    })
-  ]
+      useFactory: (config: ConfigService) => LoggerConfiguration(config),
+    }),
+  ],
 })
 export class LoggerModule {}

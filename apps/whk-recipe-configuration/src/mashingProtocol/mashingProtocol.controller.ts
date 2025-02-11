@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { MashingProtocolService } from "./mashingProtocol.service";
 import { MashingProtocolControllerBase } from "./base/mashingProtocol.controller.base";
 
@@ -9,8 +14,8 @@ import { MashingProtocolControllerBase } from "./base/mashingProtocol.controller
 export class MashingProtocolController extends MashingProtocolControllerBase {
   constructor(
     protected readonly service: MashingProtocolService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

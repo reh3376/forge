@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -33,11 +33,11 @@ import { FermentationSettingDatumService } from "../fermentationSettingDatum.ser
 export class FermentationSettingDatumResolverBase {
   constructor(
     protected readonly service: FermentationSettingDatumService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "any",
@@ -53,7 +53,7 @@ export class FermentationSettingDatumResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [FermentationSettingDatum])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "any",
@@ -66,7 +66,7 @@ export class FermentationSettingDatumResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => FermentationSettingDatum, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "read",
     possession: "own",
@@ -83,7 +83,7 @@ export class FermentationSettingDatumResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => FermentationSettingDatum)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "create",
     possession: "any",
@@ -113,7 +113,7 @@ export class FermentationSettingDatumResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => FermentationSettingDatum)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationSettingDatum",
     action: "update",
     possession: "any",
@@ -155,7 +155,7 @@ export class FermentationSettingDatumResolverBase {
     nullable: true,
     name: "fermentationChemistries",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -176,7 +176,7 @@ export class FermentationSettingDatumResolverBase {
     nullable: true,
     name: "operation",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",

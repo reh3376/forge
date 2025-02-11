@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -40,11 +40,11 @@ import { EquipmentPhaseService } from "../equipmentPhase.service";
 export class EquipmentPhaseResolverBase {
   constructor(
     protected readonly service: EquipmentPhaseService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -60,7 +60,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [EquipmentPhase])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -73,7 +73,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => EquipmentPhase, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "own",
@@ -90,7 +90,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => EquipmentPhase)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "create",
     possession: "any",
@@ -118,7 +118,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => EquipmentPhase)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "update",
     possession: "any",
@@ -155,7 +155,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [BomItem], { name: "bomItem" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -175,7 +175,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [EquipmentPhase], { name: "instances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -195,7 +195,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Instruction], { name: "instructions" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Instruction",
     action: "read",
     possession: "any",
@@ -215,7 +215,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [PhaseParameter], { name: "phaseParameters" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PhaseParameter",
     action: "read",
     possession: "any",
@@ -235,7 +235,7 @@ export class EquipmentPhaseResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -258,7 +258,7 @@ export class EquipmentPhaseResolverBase {
     nullable: true,
     name: "classId",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -279,7 +279,7 @@ export class EquipmentPhaseResolverBase {
     nullable: true,
     name: "operation",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Operation",
     action: "read",
     possession: "any",

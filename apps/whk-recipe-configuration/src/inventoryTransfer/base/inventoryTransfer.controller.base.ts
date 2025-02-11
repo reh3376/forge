@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { InventoryTransferService } from "../inventoryTransfer.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { Asset } from "../../asset/base/Asset";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class InventoryTransferControllerBase {
   constructor(
     protected readonly service: InventoryTransferService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: InventoryTransfer })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "create",
     possession: "any",
@@ -114,7 +114,7 @@ export class InventoryTransferControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [InventoryTransfer] })
   @ApiNestedQuery(InventoryTransferFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "any",
@@ -166,7 +166,7 @@ export class InventoryTransferControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: InventoryTransfer })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "own",
@@ -223,7 +223,7 @@ export class InventoryTransferControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: InventoryTransfer })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "update",
     possession: "any",
@@ -307,7 +307,7 @@ export class InventoryTransferControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: InventoryTransfer })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "delete",
     possession: "any",
@@ -366,7 +366,7 @@ export class InventoryTransferControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/toLocation")
   @ApiNestedQuery(AssetFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -411,7 +411,7 @@ export class InventoryTransferControllerBase {
   }
 
   @common.Post("/:id/toLocation")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "update",
     possession: "any",
@@ -433,7 +433,7 @@ export class InventoryTransferControllerBase {
   }
 
   @common.Patch("/:id/toLocation")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "update",
     possession: "any",
@@ -455,7 +455,7 @@ export class InventoryTransferControllerBase {
   }
 
   @common.Delete("/:id/toLocation")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "update",
     possession: "any",

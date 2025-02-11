@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { VendorService } from "../vendor.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -34,16 +34,16 @@ import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class VendorControllerBase {
   constructor(
     protected readonly service: VendorService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Vendor })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "create",
     possession: "any",
@@ -77,7 +77,7 @@ export class VendorControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Vendor] })
   @ApiNestedQuery(VendorFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "read",
     possession: "any",
@@ -109,7 +109,7 @@ export class VendorControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Vendor })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "read",
     possession: "own",
@@ -148,7 +148,7 @@ export class VendorControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Vendor })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -194,7 +194,7 @@ export class VendorControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/items")
   @ApiNestedQuery(ItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -247,7 +247,7 @@ export class VendorControllerBase {
   }
 
   @common.Post("/:id/items")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -269,7 +269,7 @@ export class VendorControllerBase {
   }
 
   @common.Patch("/:id/items")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -291,7 +291,7 @@ export class VendorControllerBase {
   }
 
   @common.Delete("/:id/items")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -315,7 +315,7 @@ export class VendorControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/purchaseOrders")
   @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -377,7 +377,7 @@ export class VendorControllerBase {
   }
 
   @common.Post("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -399,7 +399,7 @@ export class VendorControllerBase {
   }
 
   @common.Patch("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -421,7 +421,7 @@ export class VendorControllerBase {
   }
 
   @common.Delete("/:id/purchaseOrders")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
