@@ -21,7 +21,7 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
   ) {
     super(prisma);
   }
-  private unitProcedureOperationsMap: { [key: string]: string[] } = {
+  private readonly unitProcedureOperationsMap: { [key: string]: string[] } = {
     Mashing01: ["Cook", "Clean"],
     Fermentation01: ["FermenterSet", "Fermenter", "Clean"],
     Distillation01: ["StillRun", "Clean"],
@@ -95,9 +95,9 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
   async updateUnitProcedure<T extends Prisma.UnitProcedureUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureUpdateArgs>
   ): Promise<UnitProcedure> {
-    const unitProcedure = (await this.prisma.unitProcedure.findFirstOrThrow({
+    const unitProcedure = await this.prisma.unitProcedure.findFirstOrThrow({
       where: { id: args.where.id },
-    })) as UnitProcedure;
+    });
     this.logger.log(`Updating Operation: ${unitProcedure.name}`);
     const name = unitProcedure.name as string;
     const operations = args.data.operations
