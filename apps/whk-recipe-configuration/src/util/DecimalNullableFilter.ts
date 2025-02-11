@@ -4,7 +4,6 @@ import { IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
 
-
 @InputType({
   isAbstract: true,
   description: undefined,

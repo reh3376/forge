@@ -9,56 +9,82 @@ export async function connectMicroservices(app: INestApplication) {
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.asset").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.asset"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.customer").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.customer"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.item").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.item"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.bom").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.bom"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.bomitem").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.bomitem"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.customer").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.customer"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.vendor").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.vendor"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.purchaseorder").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.purchaseorder"
+      ).options
+    ),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     strategy: new RabbitMQ(
-      generateRabbitMQClientOptions(configService, "wh.whk01.distillery01.salesorder").options
-    )
+      generateRabbitMQClientOptions(
+        configService,
+        "wh.whk01.distillery01.salesorder"
+      ).options
+    ),
   });
-
 }

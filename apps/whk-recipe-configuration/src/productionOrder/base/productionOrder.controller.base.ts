@@ -464,10 +464,10 @@ export class ProductionOrderControllerBase {
           units: true,
           updatedAt: true,
           updatedBy: true,
-        totalFermenters: true,
-        totalCooks: true,
-        executedCooks: true,
-        executedFermenters: true,
+          totalFermenters: true,
+          totalCooks: true,
+          executedCooks: true,
+          executedFermenters: true,
         },
       });
     } catch (error) {

@@ -4,7 +4,7 @@ import { generateRabbitMQClientOptions } from "./generateRabbitMQClientOptions";
 import { RabbitMQProducerService } from "./rabbitmq.producer.service";
 import { RabbitMQController } from "./rabbitmq.controller";
 import { ConfigService } from "@nestjs/config";
-import {SyncService} from "../sync/sync.service";
+import { SyncService } from "../sync/sync.service";
 
 @Global()
 @Module({

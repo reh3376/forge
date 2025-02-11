@@ -1,3 +1,3 @@
 export enum EnumSecretsNameKey {
-    JwtSecretKey = "JwtSecretKey"
+  JwtSecretKey = "JwtSecretKey",
 }

@@ -199,8 +199,8 @@ describe("Recipe", () => {
         },
         {
           provide: RecipeGenerator,
-          useValue: recipeGenerator
-        }
+          useValue: recipeGenerator,
+        },
       ],
       controllers: [RecipeController],
       imports: [ACLModule],

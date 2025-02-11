@@ -9,14 +9,18 @@ export class RabbitMQProducerService {
   constructor(@Inject("RABBITMQ_CLIENT") private rabbitMQClient: ClientRMQ) {}
 
   private isnumber(value: any) {
-    return Object.prototype.toString.call(value) === '[object number]' ||
-        (value != null && value.constructor && value.constructor.name === 'number');
+    return (
+      Object.prototype.toString.call(value) === "[object number]" ||
+      (value != null &&
+        value.constructor &&
+        value.constructor.name === "number")
+    );
   }
 
   public recursivenumberReplacer(key: string, value: any): any {
     // Handle arrays: apply replacer to each element
     if (Array.isArray(value)) {
-      return value.map(item => this.recursivenumberReplacer('', item));
+      return value.map((item) => this.recursivenumberReplacer("", item));
     }
 
     // Convert number instances to numbers
@@ -25,14 +29,13 @@ export class RabbitMQProducerService {
     }
 
     // Handle objects: apply replacer to each property
-    if (value !== null && typeof value === 'object') {
+    if (value !== null && typeof value === "object") {
       const replacement: any = {};
       for (const [k, v] of Object.entries(value)) {
         replacement[k] = this.recursivenumberReplacer(k, v);
       }
       return replacement;
     }
-
 
     // Return all other values unchanged
     return value;
@@ -57,11 +60,21 @@ export class RabbitMQProducerService {
     await channel.waitForConnect();
 
     await channel.assertExchange(topic, "fanout", { durable: true });
-    console.log(JSON.stringify({ pattern: topic, data: record }, this.recursivenumberReplacer.bind(this)))
+    console.log(
+      JSON.stringify(
+        { pattern: topic, data: record },
+        this.recursivenumberReplacer.bind(this)
+      )
+    );
     await channel.publish(
       topic,
       "",
-      Buffer.from(JSON.stringify({ pattern: topic, data: record }, this.recursivenumberReplacer.bind(this))),
+      Buffer.from(
+        JSON.stringify(
+          { pattern: topic, data: record },
+          this.recursivenumberReplacer.bind(this)
+        )
+      ),
       {
         persistent: true,
       }

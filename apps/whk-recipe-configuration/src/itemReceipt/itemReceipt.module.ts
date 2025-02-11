@@ -7,7 +7,11 @@ import { ItemReceiptResolver } from "./itemReceipt.resolver";
 import { InventoryModule } from "../inventory/inventory.module";
 
 @Module({
-  imports: [ItemReceiptModuleBase, forwardRef(() => AuthModule), InventoryModule],
+  imports: [
+    ItemReceiptModuleBase,
+    forwardRef(() => AuthModule),
+    InventoryModule,
+  ],
   controllers: [ItemReceiptController],
   providers: [ItemReceiptService, ItemReceiptResolver],
   exports: [ItemReceiptService],

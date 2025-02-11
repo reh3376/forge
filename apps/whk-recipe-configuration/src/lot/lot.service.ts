@@ -19,8 +19,12 @@ export class LotService extends LotServiceBase {
   }
 
   async calculateLotAnalytics(
-    lot: LotCreateInput | (LotUpdateInput & { where: Prisma.LotWhereUniqueInput } & { data: Prisma.LotUpdateInput }),
-    type='create'
+    lot:
+      | LotCreateInput
+      | (LotUpdateInput & { where: Prisma.LotWhereUniqueInput } & {
+          data: Prisma.LotUpdateInput;
+        }),
+    type = "create"
   ): Promise<any> {
     /* CALCULATION DEFINITIONS
 
@@ -39,15 +43,15 @@ export class LotService extends LotServiceBase {
     */
     let mergedLot: any = {};
 
-    if (type === 'create') {
+    if (type === "create") {
       mergedLot = { ...lot };
-    } else if (type === 'update' && 'where' in lot && 'data' in lot) {
+    } else if (type === "update" && "where" in lot && "data" in lot) {
       const existingLot = await this.prisma.lot.findUnique({
         where: { id: lot.where.id },
       });
 
       if (!existingLot) {
-        throw new Error('Lot not found');
+        throw new Error("Lot not found");
       }
 
       mergedLot = {
@@ -57,7 +61,7 @@ export class LotService extends LotServiceBase {
         ),
       };
     } else {
-      throw new Error('Invalid input for lot calculation');
+      throw new Error("Invalid input for lot calculation");
     }
 
     // Perform calculations
@@ -67,18 +71,29 @@ export class LotService extends LotServiceBase {
 
     if (mergedLot.totalWeight && mergedLot.densityFinal) {
       mergedLot.totalVolumeWg = mergedLot.totalWeight / mergedLot.densityFinal;
-    } else if (mergedLot.initialWeight && mergedLot.finalWeight && mergedLot.densityFinal) {
+    } else if (
+      mergedLot.initialWeight &&
+      mergedLot.finalWeight &&
+      mergedLot.densityFinal
+    ) {
       mergedLot.totalWeight = mergedLot.initialWeight - mergedLot.finalWeight;
       mergedLot.totalVolumeWg = mergedLot.totalWeight / mergedLot.densityFinal;
-    } else if (mergedLot.initialVolume && mergedLot.finalVolume && mergedLot.densityFinal) {
+    } else if (
+      mergedLot.initialVolume &&
+      mergedLot.finalVolume &&
+      mergedLot.densityFinal
+    ) {
       mergedLot.initialVolume *= 301.38;
       mergedLot.finalVolume *= 301.38;
-      mergedLot.totalWeight = (mergedLot.initialVolume - mergedLot.finalVolume) * mergedLot.densityFinal;
+      mergedLot.totalWeight =
+        (mergedLot.initialVolume - mergedLot.finalVolume) *
+        mergedLot.densityFinal;
       mergedLot.totalVolumeWg = mergedLot.initialVolume - mergedLot.finalVolume;
     }
 
     if (mergedLot.totalVolumeWg) {
-      mergedLot.totalPGs = mergedLot.totalVolumeWg * (mergedLot.bblEntryProof || 0) / 100;
+      mergedLot.totalPGs =
+        (mergedLot.totalVolumeWg * (mergedLot.bblEntryProof || 0)) / 100;
       mergedLot.totalWGs = mergedLot.totalVolumeWg;
 
       if (mergedLot.totalFermenters) {
@@ -116,12 +131,14 @@ export class LotService extends LotServiceBase {
     const month = String.fromCharCode(64 + date.getMonth() + 1);
     const day = date.getDate().toString().padStart(2, "0");
     const barrelTypeMapping: { [key: string]: string } = {
-      "WVG": "01",
-      "ISC": "10",
+      WVG: "01",
+      ISC: "10",
     };
     const bblOem = args.data.bblOem;
     if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
-      throw new Error("BBL OEM must be provided and must be one of the following: WVG, ISC");
+      throw new Error(
+        "BBL OEM must be provided and must be one of the following: WVG, ISC"
+      );
     }
     const bblType = barrelTypeMapping[bblOem as string];
 
@@ -142,11 +159,12 @@ export class LotService extends LotServiceBase {
       const createdDay = createdDate.getDate().toString().padStart(2, "0");
       lotNumberPrefix = `${createdYear}${createdMonth}${createdDay}${args.data.lotAlphaChar}.${bblType}`;
     }
-    
+
     const lastLot: Lot[] = await this.lots({
       where: {
         lotNumber: {
-          startsWith: args.data.lotNumber === '' ? lotNumberPrefix : args.data.lotNumber,
+          startsWith:
+            args.data.lotNumber === "" ? lotNumberPrefix : args.data.lotNumber,
         },
       },
       orderBy: {
@@ -158,9 +176,11 @@ export class LotService extends LotServiceBase {
     this.logger.log(`lotNumberPrefix: ${lotNumberPrefix}`);
 
     let fullLotNumber: string;
-    if (args.data.lotNumber == '') {
+    if (args.data.lotNumber == "") {
       if (lastLot.length > 0) {
-        throw new Error(`Lot with character ${args.data.lotAlphaChar} has already been created today.`);
+        throw new Error(
+          `Lot with character ${args.data.lotAlphaChar} has already been created today.`
+        );
       }
       fullLotNumber = `${lotNumberPrefix}`;
     } else {
@@ -175,7 +195,7 @@ export class LotService extends LotServiceBase {
     });
     if (!recipe) {
       throw new Error("Recipe not found");
-    } 
+    }
 
     // Update the args.data with the item from the recipe
     if (!recipe.item) {
@@ -184,8 +204,10 @@ export class LotService extends LotServiceBase {
     args.data.item = { connect: { id: recipe.item.id } };
 
     // Calculate the lot analytics
-    const calculatedData = await this.calculateLotAnalytics(args.data as LotCreateInput);
-    
+    const calculatedData = await this.calculateLotAnalytics(
+      args.data as LotCreateInput
+    );
+
     const lot = await super.createLot({
       data: {
         ...args.data,
@@ -200,48 +222,58 @@ export class LotService extends LotServiceBase {
       },
     });
 
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
-      event_type: 'create',
-      data: lot,
-      recordName: 'Lot',
-    });
-    
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Lot,
+      {
+        event_type: "create",
+        data: lot,
+        recordName: "Lot",
+      }
+    );
+
     this.logger.log(`Created Lot: ${lot.lotNumber} & pushed to topic`);
     return lot;
   }
 
-  async updateLot<T extends Prisma.LotUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>): Promise<import(".prisma/client").Lot> {
-    const calculatedData = await this.calculateLotAnalytics({
-      where: args.where,
-      data: {
-        ...args.data,
-        filledFrom: args.data.filledFrom
-          ? { connect: { id: args.data.filledFrom.connect?.id } }
-          : undefined
-      }
-    }, 'update');
+  async updateLot<T extends Prisma.LotUpdateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>
+  ): Promise<import(".prisma/client").Lot> {
+    const calculatedData = await this.calculateLotAnalytics(
+      {
+        where: args.where,
+        data: {
+          ...args.data,
+          filledFrom: args.data.filledFrom
+            ? { connect: { id: args.data.filledFrom.connect?.id } }
+            : undefined,
+        },
+      },
+      "update"
+    );
     args.data = {
       ...args.data,
-      ...calculatedData
+      ...calculatedData,
     };
     const Lot = await super.updateLot({
       data: {
-          ...args.data,
+        ...args.data,
       },
       include: {
-          ...args.include,
-          productionOrder: true,
-          item: true,
-          recipe: true,
+        ...args.include,
+        productionOrder: true,
+        item: true,
+        recipe: true,
       },
       where: args.where,
-  });
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Lot, {
-      event_type: 'update',
-      data: Lot,
-      recordName: 'Lot',
-
     });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Lot,
+      {
+        event_type: "update",
+        data: Lot,
+        recordName: "Lot",
+      }
+    );
     this.logger.log(`Updated Lot: ${Lot.lotNumber} & pushed to topic`);
     return Lot;
   }

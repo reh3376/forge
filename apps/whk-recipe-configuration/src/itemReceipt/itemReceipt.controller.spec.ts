@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ItemReceiptController } from './itemReceipt.controller';
-import { ItemReceiptService } from './itemReceipt.service';
-import { RolesBuilder , ACGuard } from 'nest-access-control';
-import { EnumItemReceiptStatus, Prisma } from '@prisma/client';
-import { ItemReceiptCreateInput } from './base/ItemReceiptCreateInput';
-import { ItemReceiptUpdateInput } from './base/ItemReceiptUpdateInput';
-import { Reflector } from '@nestjs/core';
-import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ItemReceiptController } from "./itemReceipt.controller";
+import { ItemReceiptService } from "./itemReceipt.service";
+import { RolesBuilder, ACGuard } from "nest-access-control";
+import { EnumItemReceiptStatus, Prisma } from "@prisma/client";
+import { ItemReceiptCreateInput } from "./base/ItemReceiptCreateInput";
+import { ItemReceiptUpdateInput } from "./base/ItemReceiptUpdateInput";
+import { Reflector } from "@nestjs/core";
+import { NotFoundException } from "@nestjs/common";
 
 // Mock the ACGuard
 const mockACGuard = { canActivate: jest.fn(() => true) };
@@ -15,13 +15,12 @@ const mockACGuard = { canActivate: jest.fn(() => true) };
 const mockReflector = { get: jest.fn(), getAllAndOverride: jest.fn() };
 
 // Mock the __roles_builder__
-const mockRolesBuilder = { 
+const mockRolesBuilder = {
   getRoles: jest.fn(),
   getGrants: jest.fn(),
 };
 
-
-describe('ItemReceiptController', () => {
+describe("ItemReceiptController", () => {
   let controller: ItemReceiptController;
   let service: ItemReceiptService;
 
@@ -48,7 +47,7 @@ describe('ItemReceiptController', () => {
           useValue: {
             can: jest.fn().mockReturnValue({
               granted: true,
-              attributes: ['*'],
+              attributes: ["*"],
             }),
           },
         },
@@ -61,9 +60,9 @@ describe('ItemReceiptController', () => {
           useValue: mockReflector,
         },
         {
-          provide: '__roles_builder__',
+          provide: "__roles_builder__",
           useValue: mockRolesBuilder,
-        }
+        },
       ],
     }).compile();
 
@@ -71,65 +70,95 @@ describe('ItemReceiptController', () => {
     service = module.get<ItemReceiptService>(ItemReceiptService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create an item receipt', async () => {
+  describe("create", () => {
+    it("should create an item receipt", async () => {
       const createArgs: Prisma.ItemReceiptCreateArgs = {
         data: {
           quantity: 10,
-          itemId: 'item-123',
+          itemId: "item-123",
           loadId: 1,
-          createdBy: 'user-123',
-          driver: 'driver-123',
-          units: 'kg',
+          createdBy: "user-123",
+          driver: "driver-123",
+          units: "kg",
         },
       };
-      const mockItemReceipt = { id: 'test-id', ...createArgs.data, createdAt: new Date(), globalId: null, loadId: null, lots: {}, purchaseOrderId: null, siloNumber: null, schemaVersion: null, status: 'InProgress' as EnumItemReceiptStatus, supplierLot: null, testsPassed: false, toAssetId: null, updatedBy: null, updatedAt: new Date(), weighIn: null, weighOut: null , itemId: 'item-123', createdBy: 'user-123', driver: 'driver-123', units: 'kg' };
-      jest.spyOn(service, 'createItemReceipt').mockResolvedValue(mockItemReceipt);
+      const mockItemReceipt = {
+        id: "test-id",
+        ...createArgs.data,
+        createdAt: new Date(),
+        globalId: null,
+        loadId: null,
+        lots: {},
+        purchaseOrderId: null,
+        siloNumber: null,
+        schemaVersion: null,
+        status: "InProgress" as EnumItemReceiptStatus,
+        supplierLot: null,
+        testsPassed: false,
+        toAssetId: null,
+        updatedBy: null,
+        updatedAt: new Date(),
+        weighIn: null,
+        weighOut: null,
+        itemId: "item-123",
+        createdBy: "user-123",
+        driver: "driver-123",
+        units: "kg",
+      };
+      jest
+        .spyOn(service, "createItemReceipt")
+        .mockResolvedValue(mockItemReceipt);
 
-      const result = await controller.createItemReceipt(createArgs.data as ItemReceiptCreateInput);
+      const result = await controller.createItemReceipt(
+        createArgs.data as ItemReceiptCreateInput
+      );
       expect(result).toEqual(mockItemReceipt);
       expect(service.createItemReceipt).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining(createArgs.data),
-          select: expect.any(Object)
+          select: expect.any(Object),
         })
       );
     });
 
-    it('should throw an error if creation fails', async () => {
+    it("should throw an error if creation fails", async () => {
       const createArgs: Prisma.ItemReceiptCreateArgs = {
         data: {
           quantity: 10,
-          itemId: 'item-123',
+          itemId: "item-123",
           loadId: 1,
-          createdBy: 'user-123',
-          driver: 'driver-123',
-          units: 'kg',
+          createdBy: "user-123",
+          driver: "driver-123",
+          units: "kg",
         },
       };
-      jest.spyOn(service, 'createItemReceipt').mockRejectedValue(new Error('Creation failed'));
+      jest
+        .spyOn(service, "createItemReceipt")
+        .mockRejectedValue(new Error("Creation failed"));
 
-      await expect(controller.createItemReceipt(createArgs.data as ItemReceiptCreateInput)).rejects.toThrow('Creation failed');
+      await expect(
+        controller.createItemReceipt(createArgs.data as ItemReceiptCreateInput)
+      ).rejects.toThrow("Creation failed");
     });
 
-    it('should find many item receipts with filters', async () => {
+    it("should find many item receipts with filters", async () => {
       const findManyArgs: Prisma.ItemReceiptFindManyArgs = {
-        where: { itemId: 'item-123' },
-        orderBy: { createdAt: 'desc' },
+        where: { itemId: "item-123" },
+        orderBy: { createdAt: "desc" },
         take: 10,
         skip: 0,
       };
       const mockItemReceipts = [
         {
-          id: 'test-id-1',
-          itemId: 'item-123',
+          id: "test-id-1",
+          itemId: "item-123",
           createdAt: new Date(),
-          createdBy: 'user-123',
-          driver: 'driver-123',
+          createdBy: "user-123",
+          driver: "driver-123",
           globalId: null,
           loadId: null,
           lots: {},
@@ -137,7 +166,7 @@ describe('ItemReceiptController', () => {
           quantity: 10,
           schemaVersion: null,
           siloNumber: null,
-          status: 'InProgress' as EnumItemReceiptStatus,
+          status: "InProgress" as EnumItemReceiptStatus,
           supplierLot: null,
           testsPassed: false,
           toAssetId: null,
@@ -145,14 +174,14 @@ describe('ItemReceiptController', () => {
           updatedAt: new Date(),
           weighIn: null,
           weighOut: null,
-          units: 'kg'
+          units: "kg",
         },
         {
-          id: 'test-id-2',
-          itemId: 'item-123',
+          id: "test-id-2",
+          itemId: "item-123",
           createdAt: new Date(),
-          createdBy: 'user-456',
-          driver: 'driver-456',
+          createdBy: "user-456",
+          driver: "driver-456",
           globalId: null,
           loadId: null,
           lots: {},
@@ -160,7 +189,7 @@ describe('ItemReceiptController', () => {
           quantity: 15,
           schemaVersion: null,
           siloNumber: null,
-          status: 'InProgress' as EnumItemReceiptStatus,
+          status: "InProgress" as EnumItemReceiptStatus,
           supplierLot: null,
           testsPassed: false,
           toAssetId: null,
@@ -168,10 +197,10 @@ describe('ItemReceiptController', () => {
           updatedAt: new Date(),
           weighIn: null,
           weighOut: null,
-          units: 'kg'
-        }
+          units: "kg",
+        },
       ];
-      jest.spyOn(service, 'itemReceipts').mockResolvedValue(mockItemReceipts);
+      jest.spyOn(service, "itemReceipts").mockResolvedValue(mockItemReceipts);
 
       const result = await controller.itemReceipts(findManyArgs as any);
       expect(result).toEqual(mockItemReceipts);
@@ -186,49 +215,63 @@ describe('ItemReceiptController', () => {
       // );
     });
 
-    it('should return an empty array if no item receipts are found', async () => {
+    it("should return an empty array if no item receipts are found", async () => {
       const findManyArgs: Prisma.ItemReceiptFindManyArgs = {};
-      jest.spyOn(service, 'itemReceipts').mockResolvedValue([]);
+      jest.spyOn(service, "itemReceipts").mockResolvedValue([]);
 
       const result = await controller.itemReceipts(findManyArgs as any);
       expect(result).toEqual([]);
     });
 
-    it('should throw an error if item receipt is not found', async () => {
-      const id = 'non-existent-id';
-      jest.spyOn(service, 'itemReceipt').mockResolvedValue(null);
+    it("should throw an error if item receipt is not found", async () => {
+      const id = "non-existent-id";
+      jest.spyOn(service, "itemReceipt").mockResolvedValue(null);
 
-      await expect(controller.itemReceipt({ id })).rejects.toThrow(NotFoundException);
+      await expect(controller.itemReceipt({ id })).rejects.toThrow(
+        NotFoundException
+      );
     });
 
-    it('should update an item receipt', async () => {
+    it("should update an item receipt", async () => {
       const updateArgs: Prisma.ItemReceiptUpdateArgs = {
-        where: { id: 'test-id' },
+        where: { id: "test-id" },
         data: {
           quantity: 15,
         },
       };
-      const mockUpdatedItemReceipt = { id: 'test-id', ...updateArgs.data };
-      jest.spyOn(service, 'updateItemReceipt').mockResolvedValue(mockUpdatedItemReceipt as any);
+      const mockUpdatedItemReceipt = { id: "test-id", ...updateArgs.data };
+      jest
+        .spyOn(service, "updateItemReceipt")
+        .mockResolvedValue(mockUpdatedItemReceipt as any);
 
-      const result = await controller.updateItemReceipt({ id: updateArgs.where.id as string}, updateArgs.data as ItemReceiptUpdateInput);
+      const result = await controller.updateItemReceipt(
+        { id: updateArgs.where.id as string },
+        updateArgs.data as ItemReceiptUpdateInput
+      );
       expect(service.updateItemReceipt).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: updateArgs.where.id },
           data: expect.objectContaining(updateArgs.data),
-          select: expect.any(Object)
+          select: expect.any(Object),
         })
       );
     });
 
-    it('should throw an error if update fails', async () => {
+    it("should throw an error if update fails", async () => {
       const updateArgs: Prisma.ItemReceiptUpdateArgs = {
-        where: { id: 'test-id' },
+        where: { id: "test-id" },
         data: { quantity: 15 },
       };
-      jest.spyOn(service, 'updateItemReceipt').mockRejectedValue(new Error('Update failed'));
+      jest
+        .spyOn(service, "updateItemReceipt")
+        .mockRejectedValue(new Error("Update failed"));
 
-      await expect(controller.updateItemReceipt({ id: updateArgs.where.id as string }, updateArgs.data as ItemReceiptUpdateInput)).rejects.toThrow('Update failed');
+      await expect(
+        controller.updateItemReceipt(
+          { id: updateArgs.where.id as string },
+          updateArgs.data as ItemReceiptUpdateInput
+        )
+      ).rejects.toThrow("Update failed");
     });
-  })
+  });
 });
