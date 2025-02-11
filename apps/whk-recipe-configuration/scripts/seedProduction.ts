@@ -4,12 +4,29 @@ import {
   EnumEquipmentPhaseStepType,
   EnumOperationName,
   EnumPhaseParameterStaticName,
+  EnumProcedureName,
   EnumUnitProcedureName,
   PrismaClient,
   Procedure,
 } from "@prisma/client";
 import { Salt, parseSalt } from "../src/auth/password.service";
 import { hash } from "bcrypt";
+
+const equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
+  CornAdd: ["Quantity"],
+  MaltAdd: ["Quantity"],
+  RyeAdd: ["Quantity"],
+  WheatAdd: ["Quantity"],
+  AdditiveAdd: ["Quantity"],
+  Prompt: [],
+  Hold: ["Time", "Temperature"],
+  Steam: ["Temperature", "Time"],
+  Cooldown: ["Time", "Temperature"],
+  Drop: ["FlowRate", "SprayballTime", "Time"],
+  Rinse: ["Time", "Temperature"],
+  GrainAdd: ["Quantity"],
+  LiquidAdd: ["Quantity", "Speed"],
+};
 
 if (require.main === module) {
   dotenv.config();
@@ -27,36 +44,48 @@ if (require.main === module) {
   });
 }
 
+const staticNameMapping: { [key: string]: EnumPhaseParameterStaticName } = {
+  Quantity: EnumPhaseParameterStaticName.Quantity,
+  Time: EnumPhaseParameterStaticName.Time,
+  Temperature: EnumPhaseParameterStaticName.Temperature,
+  Level: EnumPhaseParameterStaticName.Level,
+};
+
 async function seed(bcryptSalt: Salt) {
   console.info("Seeding database...");
-
   const client = new PrismaClient();
 
-  const { MES_USER, MES_PASSWORD } = process.env;
+  await seedUser(client, bcryptSalt);
+  await seedPhaseParameters(client);
+  const procedure = await seedProcedure(client);
+  await seedUnitProcedures(client, procedure);
+  await seedOperations(client);
+  await seedEquipmentPhases(client);
 
+  console.info("Seeded database successfully");
+  await client.$disconnect();
+}
+
+async function seedUser(client: PrismaClient, bcryptSalt: Salt) {
+  const { MES_USER, MES_PASSWORD } = process.env;
   if (!MES_USER || !MES_PASSWORD) {
     throw new Error(
       "MES_USER and MES_PASSWORD environment variables must be defined"
     );
   }
 
-  const data = {
-    username: MES_USER,
-    password: await hash(MES_PASSWORD, bcryptSalt),
-    roles: ["user"],
-  };
-
   await client.user.upsert({
-    where: {
-      username: data.username,
-    },
-
+    where: { username: MES_USER },
     update: {},
-    create: data,
+    create: {
+      username: MES_USER,
+      password: await hash(MES_PASSWORD, bcryptSalt),
+      roles: ["user"],
+    },
   });
+}
 
-  console.info("Seeding database with custom seed...");
-
+async function seedPhaseParameters(client: PrismaClient) {
   // Custom seed for PhaseParameters
   const phaseParameters = [
     {
@@ -228,19 +257,6 @@ async function seed(bcryptSalt: Salt) {
       isStaticParameter: false,
     },
   ];
-  const staticNameMapping: { [key: string]: EnumPhaseParameterStaticName } = {
-    Quantity: EnumPhaseParameterStaticName.Quantity,
-    Time: EnumPhaseParameterStaticName.Time,
-    Temperature: EnumPhaseParameterStaticName.Temperature,
-    Level: EnumPhaseParameterStaticName.Level,
-  };
-
-  // const staticNameMapping = {
-  //   Quantity: EnumPhaseParameterStaticName.Quantity,
-  //   Time: EnumPhaseParameterStaticName.Time,
-  //   Temperature: EnumPhaseParameterStaticName.Temperature,
-  //   Level: EnumPhaseParameterStaticName.Level,
-  // };
 
   for (const param of phaseParameters) {
     const existingParam = await client.phaseParameter.findFirst({
@@ -248,75 +264,19 @@ async function seed(bcryptSalt: Salt) {
     });
 
     if (!existingParam) {
-      await client.phaseParameter.create({
-        data: {
-          active: true,
-          createdBy: "MES",
-          description: param.description,
-          name: param.name,
-          staticName: param.staticName
-            ? staticNameMapping[param.staticName]
-            : null,
-          units: param.units,
-          revision: 0,
-          isStaticParameter: param.isStaticParameter ?? true,
-          isClassDef: param.isClassDef ?? false,
-          setpointType: "Numeric",
-        },
-      });
-      console.log(`Created PhaseParameter: ${param.name}`);
-    } else {
-      console.log(`PhaseParameter ${param.name} already exists, skipping.`);
+      await createPhaseParameter(client, param);
     }
   }
+}
 
-  // Seed Procedure for Whiskey House of Kentucky Distillation Line 1
-  const procedureName = "Line1";
-  const existingProcedure = await client.procedure.findFirst({
-    where: { name: procedureName, isClassDefinition: true },
-  });
+async function seedProcedure(client: PrismaClient): Promise<Procedure> {
+  const procedureName = EnumProcedureName.Line1;
+  const procedure = await createOrGetProcedure(client, procedureName);
+  await createProcedureInstance(client, procedure);
+  return procedure;
+}
 
-  let createdProcedure: Procedure;
-  if (!existingProcedure) {
-    createdProcedure = await client.procedure.create({
-      data: {
-        active: true,
-        createdBy: "pmannion@whiskeyhouse.com",
-        description: "Whiskey House of Kentucky Distillation Line 1",
-        isClassDefinition: true,
-        name: procedureName,
-        revision: 0,
-      },
-    });
-  } else {
-    createdProcedure = existingProcedure;
-    console.log(`Procedure ${procedureName} already exists, skipping.`);
-  }
-
-  const existingProcedureInstance = await client.procedure.findFirst({
-    where: { name: procedureName, isClassDefinition: false },
-  });
-
-  if (!existingProcedureInstance) {
-    await client.procedure.create({
-      data: {
-        active: true,
-        createdBy: "pmannion@whiskeyhouse.com",
-        description: "Whiskey House of Kentucky Distillation Line 1",
-        isClassDefinition: false,
-        name: procedureName,
-        revision: 0,
-        classId: { connect: { id: createdProcedure.id } },
-      },
-    });
-
-    console.log(`Created Procedure Instance: ${procedureName}`);
-  } else {
-    console.log(
-      `Procedure Instance ${procedureName} already exists, skipping.`
-    );
-  }
-
+async function seedUnitProcedures(client: PrismaClient, procedure: Procedure) {
   // Seed Unit Procedures for Whiskey House of Kentucky Distillation Line 1
   const unitProcedures = [
     { name: "Granary01", path: "WH/WHK01/Distillery01/Granary01" },
@@ -343,7 +303,7 @@ async function seed(bcryptSalt: Salt) {
           isClassDef: true,
           name: unitProc.name as EnumUnitProcedureName,
           path: unitProc.path,
-          procedure: { connect: { id: createdProcedure.id } },
+          procedure: { connect: { id: procedure.id } },
           revision: 0,
         },
       });
@@ -353,7 +313,9 @@ async function seed(bcryptSalt: Salt) {
       console.log(`Unit Procedure ${unitProc.name} already exists, skipping.`);
     }
   }
+}
 
+async function seedOperations(client: PrismaClient) {
   // Seed Operations for Whiskey House of Kentucky Distillation Line 1
   const operations = [
     {
@@ -441,8 +403,18 @@ async function seed(bcryptSalt: Salt) {
       console.log(`Operation ${op.name} already exists, skipping.`);
     }
   }
+}
 
-  const equipmentPhases = [
+async function seedEquipmentPhases(client: PrismaClient) {
+  const equipmentPhases = getEquipmentPhasesConfig();
+
+  for (const phase of equipmentPhases) {
+    await processEquipmentPhase(client, phase);
+  }
+}
+
+function getEquipmentPhasesConfig() {
+  return [
     {
       name: "LiquidAdd",
       description: "LiquidAdd",
@@ -514,202 +486,204 @@ async function seed(bcryptSalt: Salt) {
       stepType: "NotRequired",
     },
   ];
+}
 
-  const operationEquipmentPhasesMap: { [key: string]: string[] } = {
-    Cook: [
-      "Steam",
-      "Hold",
-      "BacksetAdd",
-      "WaterAdd",
-      "AdditiveAdd",
-      "CornAdd",
-      "MaltAdd",
-      "RyeAdd",
-      "WheatAdd",
-      "Drop",
-      "PhCapture",
-      "Prompt",
-      "Rinse",
-      "Cooldown",
-      "HotFlush",
-      "CIP",
-      "GrainAdd",
-      "LiquidAdd",
-    ],
-    FermenterSet: ["DropToMashCooler", "Fill", "Prompt"],
-    Fermenter: ["Run", "Prompt"],
-    Clean: ["FermenterSteam", "CoolerSteam", "DropTubSteam", "DropLineSteam"],
-    StillRun: ["StillStartup", "StillRun", "StillShutdown"],
-    CisternTank: ["Cut", "Hold", "Gauge"],
-    BlendingTank: ["Cut", "Hold", "Gauge"],
-    Barreling: ["BarrelFill"],
-    Mill: ["Mill"],
-  };
+async function processEquipmentPhase(client: PrismaClient, phase: any) {
+  const operationName = phase.path.split("/").slice(-2)[0];
+  const existingPhase = await findExistingPhase(client, phase, operationName);
 
-  const equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
-    CornAdd: ["Quantity"],
-    MaltAdd: ["Quantity"],
-    RyeAdd: ["Quantity"],
-    WheatAdd: ["Quantity"],
-    AdditiveAdd: ["Quantity"],
-    Prompt: [],
-    Hold: ["Time", "Temperature"],
-    Steam: ["Temperature", "Time"],
-    Cooldown: ["Time", "Temperature"],
-    Drop: ["FlowRate", "SprayballTime", "Time"],
-    Rinse: ["Time", "Temperature"],
-    DropTubToMashCooler: [
-      "MashPumpSetpoint",
-      "MidTemperatureSP",
-      "OutTemperatureSP",
-      "MashCoolerEnable",
-    ],
-    Fill: ["Level", "Speed", "Temperature"],
-    FermDrop: ["Level"],
-    FermSteam: ["Temperature", "Time"],
-    DropLineSteam: ["Temperature", "Time"],
-    DropTubSteam: ["Temperature", "Time"],
-    CoolerSteam: ["Temperature", "Time"],
-    StillRun: [
-      "TowerWaterTemperatureSetpoint",
-      "TowerWaterFlowSetpoint",
-      "HighWineCondenserTowerWaterTemperatureSetpoint",
-      "LowWineProof",
-      "HighWineProof",
-    ],
-    GrainAdd: ["Quantity"],
-    LiquidAdd: [
-      "Quantity",
-      "Speed", // Agitator speed
-    ],
-  };
+  if (!existingPhase) {
+    await createNewPhase(client, phase);
+  } else {
+    console.log(
+      `Equipment Phase ${phase.name} (${phase.stepType}) already exists, skipping.`
+    );
+  }
+}
 
-  for (const phase of equipmentPhases) {
-    const operationName = phase.path.split("/").slice(-2)[0];
-    const existingPhase = await client.equipmentPhase.findFirst({
+async function findExistingPhase(
+  client: PrismaClient,
+  phase: any,
+  operationName: string
+) {
+  return await client.equipmentPhase.findFirst({
+    where: {
+      name: phase.name as EnumEquipmentPhaseName,
+      stepType: phase.stepType as EnumEquipmentPhaseStepType,
+      isClassDefinition: true,
+      operation: {
+        name: operationName as EnumOperationName,
+        isClassDefinition: true,
+      },
+    },
+    include: { operation: true },
+  });
+}
+
+async function createNewPhase(client: PrismaClient, phase: any) {
+  const operation = await client.operation.findFirst({
+    where: { name: "Cook", isClassDefinition: true },
+  });
+
+  if (!operation) {
+    console.log(
+      `Operation Cook not found, skipping equipment phase ${phase.name}`
+    );
+    return;
+  }
+
+  // Define the phase parameters for Cook equipment phases
+  const cookPhaseParameters = ["Quantity", "Time", "Temperature", "Level"];
+
+  // Create the phase parameter connections
+  const phaseParameterConnections = await Promise.all(
+    cookPhaseParameters.map(async (paramName) => {
+      const parameter = await client.phaseParameter.findFirst({
+        where: {
+          name: paramName,
+          isClassDef: true,
+        },
+      });
+
+      if (!parameter) {
+        console.log(
+          `Phase parameter ${paramName} not found, skipping for equipment phase ${phase.name}`
+        );
+        return null;
+      }
+
+      return { id: parameter.id, name: parameter.name };
+    })
+  );
+
+  // Filter out any null values from the connections array
+  const validPhaseParameterConnections = phaseParameterConnections.filter(
+    (connection) => connection !== null
+  );
+
+  await client.equipmentPhase.create({
+    data: {
+      active: true,
+      createdBy: "pmannion@whiskeyhouse.com",
+      description: phase.description,
+      name: phase.name as EnumEquipmentPhaseName,
+      isClassDefinition: true,
+      operationSequenceIndex: phase.operationSequenceIndex,
+      path: phase.path,
+      operation: { connect: { id: operation.id } },
+      revision: 0,
+      stepType: phase.stepType as EnumEquipmentPhaseStepType,
+    },
+  });
+
+  console.log(`Created Equipment Phase: ${phase.name} (${phase.stepType})`);
+
+  // Connect the valid phase parameters to the equipment phase
+  if (
+    ["Cook"].includes(phase.name) &&
+    phase.name in equipmentPhaseToPhaseParameterMap &&
+    validPhaseParameterConnections.length > 0
+  ) {
+    const existingEquipmentPhase = await client.equipmentPhase.findFirst({
       where: {
         name: phase.name as EnumEquipmentPhaseName,
-        stepType: phase.stepType as EnumEquipmentPhaseStepType,
-        isClassDefinition: true,
-        operation: {
-          name: operationName as EnumOperationName,
-          isClassDefinition: true,
-        },
-      },
-      include: {
-        operation: true,
+        operation: { name: "Cook" },
       },
     });
 
-    if (!existingPhase) {
-      const operation = await client.operation.findFirst({
-        where: { name: "Cook", isClassDefinition: true },
-      });
-
-      if (!operation) {
-        console.log(
-          `Operation Cook not found, skipping equipment phase ${phase.name}`
-        );
-        continue;
-      }
-
-      // Define the phase parameters for Cook equipment phases
-      const cookPhaseParameters = ["Quantity", "Time", "Temperature", "Level"];
-
-      // Create the phase parameter connections
-      const phaseParameterConnections = await Promise.all(
-        cookPhaseParameters.map(async (paramName) => {
-          const parameter = await client.phaseParameter.findFirst({
-            where: {
-              name: paramName,
-              isClassDef: true,
-            },
-          });
-
-          if (!parameter) {
-            console.log(
-              `Phase parameter ${paramName} not found, skipping for equipment phase ${phase.name}`
-            );
-            return null;
-          }
-
-          // return { id: parameter.id };
-          return { id: parameter.id, name: parameter.name };
-        })
-      );
-
-      // Filter out any null values from the connections array
-      const validPhaseParameterConnections = phaseParameterConnections.filter(
-        (connection) => connection !== null
-      );
-
-      await client.equipmentPhase.create({
-        data: {
-          active: true,
-          createdBy: "pmannion@whiskeyhouse.com",
-          description: phase.description,
-          name: phase.name as EnumEquipmentPhaseName,
-          isClassDefinition: true,
-          operationSequenceIndex: phase.operationSequenceIndex,
-          path: phase.path,
-          operation: { connect: { id: operation.id } },
-          revision: 0,
-          stepType: phase.stepType as EnumEquipmentPhaseStepType,
-        },
-      });
-
-      console.log(`Created Equipment Phase: ${phase.name} (${phase.stepType})`);
-
-      // Connect the valid phase parameters to the equipment phase
-      if (
-        operationEquipmentPhasesMap["Cook"].includes(phase.name) &&
-        phase.name in equipmentPhaseToPhaseParameterMap &&
-        validPhaseParameterConnections.length > 0
-      ) {
-        const existingEquipmentPhase = await client.equipmentPhase.findFirst({
-          where: {
-            name: phase.name as EnumEquipmentPhaseName,
-            operation: { name: "Cook" },
-          },
-        });
-
-        if (!existingEquipmentPhase) {
-          console.log(
-            `Equipment Phase ${phase.name} not found for Cook operation, skipping phase parameter connections.`
-          );
-          continue;
-        }
-
-        const allowedParameters = equipmentPhaseToPhaseParameterMap[phase.name];
-        const filteredConnections = validPhaseParameterConnections.filter(
-          (connection): connection is { id: string; name: string } =>
-            connection !== null && allowedParameters.includes(connection.name)
-        );
-
-        await client.equipmentPhase.update({
-          where: { id: existingEquipmentPhase.id },
-          data: {
-            phaseParameters: {
-              connect: filteredConnections as { id: string }[],
-            },
-          },
-        });
-        console.log(
-          `Connected ${filteredConnections.length} phase parameters to Equipment Phase: ${phase.name} for Cook operation`
-        );
-      } else {
-        console.log(
-          `Skipping phase parameter connections for ${phase.name}: not applicable to Cook operation or no valid connections`
-        );
-      }
-    } else {
+    if (!existingEquipmentPhase) {
       console.log(
-        `Equipment Phase ${phase.name} (${phase.stepType}) already exists, skipping.`
+        `Equipment Phase ${phase.name} not found for Cook operation, skipping phase parameter connections.`
       );
+      return;
     }
+
+    const allowedParameters = equipmentPhaseToPhaseParameterMap[phase.name];
+    const filteredConnections = validPhaseParameterConnections.filter(
+      (connection): connection is { id: string; name: string } =>
+        connection !== null && allowedParameters.includes(connection.name)
+    );
+
+    await client.equipmentPhase.update({
+      where: { id: existingEquipmentPhase.id },
+      data: {
+        phaseParameters: {
+          connect: filteredConnections as { id: string }[],
+        },
+      },
+    });
+    console.log(
+      `Connected ${filteredConnections.length} phase parameters to Equipment Phase: ${phase.name} for Cook operation`
+    );
+  } else {
+    console.log(
+      `Skipping phase parameter connections for ${phase.name}: not applicable to Cook operation or no valid connections`
+    );
+  }
+}
+
+async function createPhaseParameter(client: PrismaClient, param: any) {
+  await client.phaseParameter.create({
+    data: {
+      active: true,
+      createdBy: "MES",
+      description: param.description,
+      name: param.name,
+      staticName: param.staticName ? staticNameMapping[param.staticName] : null,
+      units: param.units,
+      revision: 0,
+      isStaticParameter: param.isStaticParameter ?? true,
+      isClassDef: param.isClassDef ?? false,
+      setpointType: "Numeric",
+    },
+  });
+  console.log(`Created PhaseParameter: ${param.name}`);
+}
+
+async function createOrGetProcedure(
+  client: PrismaClient,
+  procedureName: EnumProcedureName
+): Promise<Procedure> {
+  const existingProcedure = await client.procedure.findFirst({
+    where: { name: procedureName, isClassDefinition: true },
+  });
+
+  if (!existingProcedure) {
+    return await client.procedure.create({
+      data: {
+        active: true,
+        createdBy: "pmannion@whiskeyhouse.com",
+        description: "Whiskey House of Kentucky Distillation Line 1",
+        isClassDefinition: true,
+        name: procedureName,
+        revision: 0,
+      },
+    });
   }
 
-  console.info("Seeded database successfully");
+  return existingProcedure;
+}
 
-  void client.$disconnect();
+async function createProcedureInstance(
+  client: PrismaClient,
+  procedure: Procedure
+) {
+  const existingInstance = await client.procedure.findFirst({
+    where: { name: procedure.name, isClassDefinition: false },
+  });
+
+  if (!existingInstance) {
+    await client.procedure.create({
+      data: {
+        active: true,
+        createdBy: "pmannion@whiskeyhouse.com",
+        description: "Whiskey House of Kentucky Distillation Line 1",
+        isClassDefinition: false,
+        name: procedure.name,
+        revision: 0,
+        classId: { connect: { id: procedure.id } },
+      },
+    });
+    console.log(`Created Procedure Instance: ${procedure.name}`);
+  }
 }
