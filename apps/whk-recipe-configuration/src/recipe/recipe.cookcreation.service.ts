@@ -176,7 +176,10 @@ export class RecipeCookCreationService {
     return bom;
   }
 
-  private async createEquipmentPhases(newCook: Operation, mashingProtocolData: any) {
+  private async createEquipmentPhases(
+    newCook: Operation,
+    mashingProtocolData: any
+  ) {
     const bom = await this.getBom(this.scheduleOrderQueueId);
     const mashingProtocol = mashingProtocolData;
 
@@ -190,14 +193,30 @@ export class RecipeCookCreationService {
     }
   }
 
-  private async processPhase(phase: any, phaseIndex: number, newCook: Operation, bom: any) {
+  private async processPhase(
+    phase: any,
+    phaseIndex: number,
+    newCook: Operation,
+    bom: any
+  ) {
     const phaseNameMap = this.getPhaseNameMap();
-    const existingPhase = await this.findExistingPhase(phase, phaseIndex, newCook, phaseNameMap);
+    const existingPhase = await this.findExistingPhase(
+      phase,
+      phaseIndex,
+      newCook,
+      phaseNameMap
+    );
 
     if (!existingPhase) {
       const cookOperation = await this.findCookOperation();
       if (cookOperation) {
-        await this.createNewPhase(phase, phaseIndex, cookOperation, phaseNameMap, bom);
+        await this.createNewPhase(
+          phase,
+          phaseIndex,
+          cookOperation,
+          phaseNameMap,
+          bom
+        );
       }
     }
   }
@@ -211,10 +230,17 @@ export class RecipeCookCreationService {
     };
   }
 
-  private async findExistingPhase(phase: any, phaseIndex: number, newCook: Operation, phaseNameMap: any) {
+  private async findExistingPhase(
+    phase: any,
+    phaseIndex: number,
+    newCook: Operation,
+    phaseNameMap: any
+  ) {
     return await this.prisma.equipmentPhase.findFirst({
       where: {
-        name: phaseNameMap[phase.action] || (phase.action as EnumEquipmentPhaseName),
+        name:
+          phaseNameMap[phase.action] ||
+          (phase.action as EnumEquipmentPhaseName),
         operation: { id: newCook.id },
         operationSequenceIndex: phaseIndex,
       },
@@ -222,17 +248,31 @@ export class RecipeCookCreationService {
     });
   }
 
-  private determineStepType(phase: any): EnumEquipmentPhaseStepType | undefined {
+  private determineStepType(
+    phase: any
+  ): EnumEquipmentPhaseStepType | undefined {
     if (phase.action === "Hold") return phase.holdType;
     if (phase.action === "Add Grain") return phase.grainType;
     if (phase.action === "Add Liquid") return phase.liquidType01;
     return undefined;
   }
 
-  private async createNewPhase(phase: any, phaseIndex: number, cookOperation: Operation, phaseNameMap: any, bom: any) {
+  private async createNewPhase(
+    phase: any,
+    phaseIndex: number,
+    cookOperation: Operation,
+    phaseNameMap: any,
+    bom: any
+  ) {
     const stepType = this.determineStepType(phase);
-    const newPhase = await this.createPhaseRecord(phase, phaseIndex, cookOperation, stepType, phaseNameMap);
-    
+    const newPhase = await this.createPhaseRecord(
+      phase,
+      phaseIndex,
+      cookOperation,
+      stepType,
+      phaseNameMap
+    );
+
     await this.createPhaseParameters(phase, newPhase);
     if (bom) {
       await this.linkBomComponents(phase, newPhase, bom);
@@ -247,9 +287,17 @@ export class RecipeCookCreationService {
   }
 
   private buildParameterData(phase: any) {
-    const parameterData: Array<{name: string, value: number | string, units: string}> = [];
+    const parameterData: Array<{
+      name: string;
+      value: number | string;
+      units: string;
+    }> = [];
     if (phase.temperature) {
-      parameterData.push({ name: "Temperature", value: phase.temperature, units: "°F" });
+      parameterData.push({
+        name: "Temperature",
+        value: phase.temperature,
+        units: "°F",
+      });
     }
     if (phase.time) {
       parameterData.push({ name: "Time", value: phase.time, units: "minutes" });
@@ -517,22 +565,22 @@ export class RecipeCookCreationService {
 
   private shouldLinkComponent(phase: any, component: any): boolean {
     const itemNumber = component.item.itemNumber.toLowerCase();
-    
+
     if (phase.action === "Add Grain" && phase.grainType) {
       if (phase.grainType === "Corn") {
         return itemNumber === "cor-dlf02-us #2 yellow dent gmo";
       }
       return itemNumber.includes(phase.grainType.toLowerCase());
     }
-    
+
     if (phase.action === "Add Liquid" && phase.liquidType01) {
       return itemNumber.includes(phase.liquidType01.toLowerCase());
     }
-    
+
     if (phase.action === "Add Additive" && phase.additiveType) {
       return itemNumber.includes(phase.additiveType.toLowerCase());
     }
-    
+
     return false;
   }
 
@@ -545,8 +593,12 @@ export class RecipeCookCreationService {
   ) {
     return await this.prisma.equipmentPhase.create({
       data: {
-        name: phaseNameMap[phase.action] || (phase.action as EnumEquipmentPhaseName),
-        path: `${this.mashingUnitProcedure?.path}/Cook${this.executedCooks + 2}/${phase.action}`,
+        name:
+          phaseNameMap[phase.action] ||
+          (phase.action as EnumEquipmentPhaseName),
+        path: `${this.mashingUnitProcedure?.path}/Cook${
+          this.executedCooks + 2
+        }/${phase.action}`,
         isClassDefinition: false,
         revision: 0,
         description: `Cook ${this.executedCooks + 2}`,
