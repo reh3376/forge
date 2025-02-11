@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload ESLint Report
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: eslint-report
           path: ./apps/whk-recipe-configuration/eslint_report.txt
