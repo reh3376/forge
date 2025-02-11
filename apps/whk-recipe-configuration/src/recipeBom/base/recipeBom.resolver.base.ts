@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -39,11 +39,11 @@ import { RecipeBomService } from "../recipeBom.service";
 export class RecipeBomResolverBase {
   constructor(
     protected readonly service: RecipeBomService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -59,7 +59,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [RecipeBom])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -72,7 +72,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => RecipeBom, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "own",
@@ -89,7 +89,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeBom)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "create",
     possession: "any",
@@ -119,7 +119,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeBom)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "update",
     possession: "any",
@@ -158,7 +158,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -178,7 +178,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBom], { name: "masterInstances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -200,7 +200,7 @@ export class RecipeBomResolverBase {
   @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
     name: "productionOrderRecipeInstances",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -223,7 +223,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Recipe], { name: "recipe" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -243,7 +243,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBomITem" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
@@ -263,7 +263,7 @@ export class RecipeBomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBom], { name: "runningInstances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -286,7 +286,7 @@ export class RecipeBomResolverBase {
     nullable: true,
     name: "masterRecipeBom",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -307,7 +307,7 @@ export class RecipeBomResolverBase {
     nullable: true,
     name: "runningRecipeBom",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",

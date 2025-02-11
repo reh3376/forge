@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import { RecipeService } from "./recipe.service";
 import { RecipeControllerBase } from "./base/recipe.controller.base";
 import { RecipeCookCreationService } from "./recipe.cookcreation.service";
@@ -13,8 +13,8 @@ export class RecipeController extends RecipeControllerBase {
   constructor(
     protected readonly service: RecipeService,
     protected readonly cookCreationService: RecipeCookCreationService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder,
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder,
     protected readonly rabbitMQProducer: RabbitMQProducerService,
     protected readonly recipeGenerator: RecipeGenerator
   ) {
@@ -26,7 +26,7 @@ export class RecipeController extends RecipeControllerBase {
   @swagger.ApiOperation({ summary: "Create a new cook" })
   @swagger.ApiResponse({ status: 201, description: "Cook created successfully" })
   @swagger.ApiResponse({ status: 400, description: "Bad Request" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "create",
     possession: "any",
@@ -60,7 +60,7 @@ export class RecipeController extends RecipeControllerBase {
   @swagger.ApiOperation({ summary: "Get recipes for active production orders" })
   @swagger.ApiResponse({ status: 200, description: "Active recipes retrieved successfully" })
   @swagger.ApiResponse({ status: 500, description: "Internal Server Error" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -82,7 +82,7 @@ export class RecipeController extends RecipeControllerBase {
   @swagger.ApiOperation({ summary: "Generate a new recipe" })
   @swagger.ApiResponse({ status: 201, description: "Recipe generated successfully" })
   @swagger.ApiResponse({ status: 400, description: "Bad Request" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "create", 
     possession: "any",

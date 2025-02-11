@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -35,11 +35,11 @@ import { VendorService } from "../vendor.service";
 export class VendorResolverBase {
   constructor(
     protected readonly service: VendorService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "read",
     possession: "any",
@@ -55,7 +55,7 @@ export class VendorResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Vendor])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "read",
     possession: "any",
@@ -66,7 +66,7 @@ export class VendorResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Vendor, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "read",
     possession: "own",
@@ -83,7 +83,7 @@ export class VendorResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Vendor)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "create",
     possession: "any",
@@ -97,7 +97,7 @@ export class VendorResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Vendor)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Vendor",
     action: "update",
     possession: "any",
@@ -122,7 +122,7 @@ export class VendorResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Item], { name: "items" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -142,7 +142,7 @@ export class VendorResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",

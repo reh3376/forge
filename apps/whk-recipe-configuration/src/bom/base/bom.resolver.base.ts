@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -40,11 +40,11 @@ import { BomService } from "../bom.service";
 export class BomResolverBase {
   constructor(
     protected readonly service: BomService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
@@ -60,7 +60,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Bom])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
@@ -71,7 +71,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Bom, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "own",
@@ -86,7 +86,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Bom)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "create",
     possession: "any",
@@ -106,7 +106,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Bom)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "update",
     possession: "any",
@@ -135,7 +135,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [BomItem], { name: "bomItem" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -155,7 +155,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -175,7 +175,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrder" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -195,7 +195,7 @@ export class BomResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedure" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -217,7 +217,7 @@ export class BomResolverBase {
   @graphql.ResolveField(() => [UnitProcedure], {
     name: "unitProceduresPrimary",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -243,7 +243,7 @@ export class BomResolverBase {
     nullable: true,
     name: "item",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",

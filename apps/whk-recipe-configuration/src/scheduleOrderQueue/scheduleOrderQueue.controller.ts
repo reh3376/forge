@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import * as errors from "../errors";
 
 import { ScheduleOrderQueueService } from "./scheduleOrderQueue.service";
@@ -17,8 +17,8 @@ import { ScheduleOrderQueueUpdateInput } from "./base/ScheduleOrderQueueUpdateIn
 export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBase {
   constructor(
     protected readonly service: ScheduleOrderQueueService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }
@@ -27,7 +27,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @common.Post("/add-to-pending-schedule-order-queue")
   @swagger.ApiOperation({ summary: "Add SO to pending schedule order queue" })
   @swagger.ApiCreatedResponse({ type: ScheduleOrderQueue })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "create",
     possession: "any",
@@ -88,7 +88,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @common.Patch("/:id/update-schedule-order-queue-unit-procedure")
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "update",
     possession: "any",
@@ -160,7 +160,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @common.Patch("/activate-next-schedule-order-queue/:id")
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "update",
     possession: "any",
@@ -231,7 +231,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @common.Patch("/complete-schedule-order-queue/:id")
   @swagger.ApiOperation({ summary: "Complete schedule order queue item" })
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "update",
     possession: "any",
@@ -276,7 +276,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @common.Patch("/deactivate-schedule-order-queue/:id")
   @swagger.ApiOperation({ summary: "Deactivate schedule order queue item" })
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "update",
     possession: "any",
@@ -321,7 +321,7 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @common.Patch("/update-schedule-order-queue-index/:id")
   @swagger.ApiOperation({ summary: "Update schedule order queue index" })
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "update",
     possession: "any",

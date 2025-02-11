@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import { RecipeParameterService } from "./recipeParameter.service";
 import { RecipeParameterControllerBase } from "./base/recipeParameter.controller.base";
 
@@ -9,8 +9,8 @@ import { RecipeParameterControllerBase } from "./base/recipeParameter.controller
 export class RecipeParameterController extends RecipeParameterControllerBase {
   constructor(
     protected readonly service: RecipeParameterService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

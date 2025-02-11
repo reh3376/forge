@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -38,11 +38,11 @@ import { ItemReceiptService } from "../itemReceipt.service";
 export class ItemReceiptResolverBase {
   constructor(
     protected readonly service: ItemReceiptService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "any",
@@ -58,7 +58,7 @@ export class ItemReceiptResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ItemReceipt])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "any",
@@ -71,7 +71,7 @@ export class ItemReceiptResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ItemReceipt, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "own",
@@ -88,7 +88,7 @@ export class ItemReceiptResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ItemReceipt)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "create",
     possession: "any",
@@ -128,7 +128,7 @@ export class ItemReceiptResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ItemReceipt)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -177,7 +177,7 @@ export class ItemReceiptResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Inventory], { name: "inventories" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -197,7 +197,7 @@ export class ItemReceiptResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [TestParameter], { name: "tests" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -220,7 +220,7 @@ export class ItemReceiptResolverBase {
     nullable: true,
     name: "item",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -239,7 +239,7 @@ export class ItemReceiptResolverBase {
     nullable: true,
     name: "purchaseOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -260,7 +260,7 @@ export class ItemReceiptResolverBase {
     nullable: true,
     name: "toAsset",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",

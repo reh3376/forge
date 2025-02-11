@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { InventoryService } from "../inventory.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { InventoryWhereUniqueInput } from "./InventoryWhereUniqueInput";
 import { InventoryUpdateInput } from "./InventoryUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class InventoryControllerBase {
   constructor(
     protected readonly service: InventoryService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Inventory })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "create",
     possession: "any",
@@ -117,7 +117,7 @@ export class InventoryControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Inventory] })
   @ApiNestedQuery(InventoryFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -177,7 +177,7 @@ export class InventoryControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Inventory })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "own",
@@ -244,7 +244,7 @@ export class InventoryControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Inventory })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "update",
     possession: "any",
@@ -334,7 +334,7 @@ export class InventoryControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Inventory })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "delete",
     possession: "any",

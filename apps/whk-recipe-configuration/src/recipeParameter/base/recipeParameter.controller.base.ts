@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { RecipeParameterService } from "../recipeParameter.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class RecipeParameterControllerBase {
   constructor(
     protected readonly service: RecipeParameterService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: RecipeParameter })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "create",
     possession: "any",
@@ -85,7 +85,7 @@ export class RecipeParameterControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [RecipeParameter] })
   @ApiNestedQuery(RecipeParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "any",
@@ -128,7 +128,7 @@ export class RecipeParameterControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: RecipeParameter })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "read",
     possession: "own",
@@ -176,7 +176,7 @@ export class RecipeParameterControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: RecipeParameter })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
@@ -231,7 +231,7 @@ export class RecipeParameterControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipe")
   @ApiNestedQuery(RecipeFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -305,7 +305,7 @@ export class RecipeParameterControllerBase {
   }
 
   @common.Post("/:id/recipe")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
@@ -327,7 +327,7 @@ export class RecipeParameterControllerBase {
   }
 
   @common.Patch("/:id/recipe")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",
@@ -349,7 +349,7 @@ export class RecipeParameterControllerBase {
   }
 
   @common.Delete("/:id/recipe")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeParameter",
     action: "update",
     possession: "any",

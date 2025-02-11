@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import * as errors from "../errors";
 
 import { PurchaseOrderService } from "./purchaseOrder.service";
@@ -14,8 +14,8 @@ import { PurchaseOrderWhereUniqueInput } from "./base/PurchaseOrderWhereUniqueIn
 export class PurchaseOrderController extends PurchaseOrderControllerBase {
   constructor(
     protected readonly service: PurchaseOrderService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder,
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder,
 
   ) {
     super(service, rolesBuilder);
@@ -24,7 +24,7 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/with-line-items")
   @swagger.ApiOkResponse({ type: [PurchaseOrder] })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -42,7 +42,7 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/with-line-items")
   @swagger.ApiOkResponse({ type: [PurchaseOrder] })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",

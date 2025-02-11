@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs";
@@ -25,18 +25,18 @@ import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
 import { ScheduleOrderQueueWhereUniqueInput } from "./ScheduleOrderQueueWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ScheduleOrderQueueControllerBase {
   constructor(
     protected readonly service: ScheduleOrderQueueService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [ScheduleOrderQueue] })
   @ApiNestedQuery(ScheduleOrderQueueFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "read",
     possession: "any",
@@ -83,7 +83,7 @@ export class ScheduleOrderQueueControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ScheduleOrderQueue })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrderQueue",
     action: "read",
     possession: "own",

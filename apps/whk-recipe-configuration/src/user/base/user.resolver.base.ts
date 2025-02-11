@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -28,11 +28,11 @@ import { UserService } from "../user.service";
 export class UserResolverBase {
   constructor(
     protected readonly service: UserService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "User",
     action: "read",
     possession: "any",
@@ -48,7 +48,7 @@ export class UserResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [User])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "User",
     action: "read",
     possession: "any",
@@ -59,7 +59,7 @@ export class UserResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => User, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "User",
     action: "read",
     possession: "own",
