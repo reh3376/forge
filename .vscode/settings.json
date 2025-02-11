@@ -10,5 +10,9 @@
       "database": "whk-mes",
       "username": "mes"
     }
-  ]
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "whiskeyhouse",
+    "projectKey": "WhiskeyHouse_whk-mes"
+  }
 }
