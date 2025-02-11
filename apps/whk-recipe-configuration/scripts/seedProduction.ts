@@ -150,14 +150,15 @@ async function seedUser(client: PrismaClient, bcryptSalt: Salt) {
 }
 
 async function seedPhaseParameters(client: PrismaClient) {
-  // Custom seed for PhaseParameters
-  const phaseParameters = [
+  const phaseParameters: PhaseParameterConfig[] = [
     {
       name: "Quantity",
       staticName: "Quantity",
       units: "lbs",
       description: "Quantity",
       isClassDef: true,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "Time",
@@ -165,6 +166,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       units: "hours",
       description: "Time",
       isClassDef: true,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "Temperature",
@@ -172,6 +175,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       units: "°F",
       description: "Temperature",
       isClassDef: true,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "Level",
@@ -179,6 +184,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       units: "%",
       description: "Level",
       isClassDef: true,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "HighWineProof",
@@ -186,6 +193,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "HighWineProof",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "LowWineProof",
@@ -193,6 +202,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "LowWineProof",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "FinalProof",
@@ -200,6 +211,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "FinalProof",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "BaseLoss",
@@ -207,6 +220,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "BaseLoss",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "BeerFeedTray",
@@ -214,6 +229,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "BeerFeedTray",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "FermentationAge",
@@ -221,6 +238,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "FermentationAge",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "ControlTemperature",
@@ -228,6 +247,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "ControlTemperature",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "CooksPerFerm",
@@ -235,6 +256,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "CooksPerFerm",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "TopOffFrequency",
@@ -242,6 +265,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "TopOffFrequency",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "TopOffQuantity",
@@ -249,6 +274,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "TopOffQuantity",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "TopOffTemperature",
@@ -256,6 +283,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "TopOffTemperature",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "MashpH",
@@ -263,6 +292,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "MashpH",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "MashRatio",
@@ -270,6 +301,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "MashRatio",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "RatioByFerm",
@@ -277,6 +310,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "RatioByFerm",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "FermSetTemp",
@@ -284,6 +319,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "FermSetTemp",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "StarterSweetpH",
@@ -291,6 +328,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "StarterSweetpH",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "TotalGrainWeight",
@@ -298,6 +337,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "TotalGrainWeight",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "TotalLiquid",
@@ -305,6 +346,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "TotalLiquid",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "NumberOfCooks",
@@ -312,6 +355,8 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "NumberOfCooks",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
     {
       name: "AssumbedFermABV",
@@ -319,18 +364,35 @@ async function seedPhaseParameters(client: PrismaClient) {
       description: "AssumbedFermABV",
       isClassDef: true,
       isStaticParameter: false,
+      createdBy: "MES",
+      revision: 0,
     },
   ];
 
-  for (const param of phaseParameters) {
-    const existingParam = await client.phaseParameter.findFirst({
-      where: { name: param.name },
-    });
-
-    if (!existingParam) {
-      await createPhaseParameter(client, param);
-    }
-  }
+  await Promise.all(
+    phaseParameters.map((param) =>
+      createEntityIfNotExists(
+        client,
+        param,
+        { name: param.name },
+        {
+          active: true,
+          createdBy: param.createdBy,
+          description: param.description,
+          name: param.name,
+          staticName: param.staticName
+            ? staticNameMapping[param.staticName]
+            : null,
+          units: param.units,
+          revision: param.revision,
+          isStaticParameter: param.isStaticParameter ?? true,
+          isClassDef: param.isClassDef ?? false,
+          setpointType: "Numeric",
+        },
+        "phaseParameter"
+      )
+    )
+  );
 }
 
 async function seedProcedure(client: PrismaClient): Promise<Procedure> {
@@ -380,8 +442,7 @@ async function seedUnitProcedures(client: PrismaClient, procedure: Procedure) {
 }
 
 async function seedOperations(client: PrismaClient) {
-  // Seed Operations for Whiskey House of Kentucky Distillation Line 1
-  const operations = [
+  const operations: OperationConfig[] = [
     {
       abbreviation: "MAS",
       description: "Cook",
@@ -389,6 +450,9 @@ async function seedOperations(client: PrismaClient) {
       path: "WH/WHK01/Distillery01/Mashing01/Cook",
       name: "Cook",
       procedureSequenceIndex: 0,
+      createdBy: "pmannion@whiskeyhouse.com",
+      revision: 0,
+      isClassDefinition: true,
     },
     {
       abbreviation: "FER",
@@ -397,6 +461,9 @@ async function seedOperations(client: PrismaClient) {
       path: "WH/WHK01/Distillery01/Fermentation01/Fermenter",
       name: "Fermenter",
       procedureSequenceIndex: 0,
+      createdBy: "pmannion@whiskeyhouse.com",
+      revision: 0,
+      isClassDefinition: true,
     },
     {
       abbreviation: "DSP",
@@ -405,6 +472,9 @@ async function seedOperations(client: PrismaClient) {
       path: "WH/WHK01/Distillery01/Processing01/BlendingTank",
       name: "BlendingTank",
       procedureSequenceIndex: 0,
+      createdBy: "pmannion@whiskeyhouse.com",
+      revision: 0,
+      isClassDefinition: true,
     },
     {
       abbreviation: "DSP",
@@ -413,6 +483,9 @@ async function seedOperations(client: PrismaClient) {
       path: "WH/WHK01/Distillery01/Processing01/CisternTank",
       name: "CisternTank",
       procedureSequenceIndex: 1,
+      createdBy: "pmannion@whiskeyhouse.com",
+      revision: 0,
+      isClassDefinition: true,
     },
     {
       abbreviation: "DSP",
@@ -421,18 +494,14 @@ async function seedOperations(client: PrismaClient) {
       path: "WH/WHK01/Distillery01/Processing01/Barreling",
       name: "Barreling",
       procedureSequenceIndex: 2,
+      createdBy: "pmannion@whiskeyhouse.com",
+      revision: 0,
+      isClassDefinition: true,
     },
   ];
 
-  for (const op of operations) {
-    const existingOperation = await client.operation.findFirst({
-      where: {
-        name: op.name as EnumOperationName,
-        isClassDefinition: true,
-      },
-    });
-
-    if (!existingOperation) {
+  await Promise.all(
+    operations.map(async (op) => {
       const unitProcedure = await client.unitProcedure.findFirst({
         where: {
           name: op.unitProcedureName as EnumUnitProcedureName,
@@ -444,29 +513,32 @@ async function seedOperations(client: PrismaClient) {
         console.log(
           `Unit Procedure ${op.unitProcedureName} not found, skipping operation ${op.name}`
         );
-        continue;
+        return;
       }
 
-      await client.operation.create({
-        data: {
+      await createEntityIfNotExists(
+        client,
+        op,
+        {
+          name: op.name as EnumOperationName,
+          isClassDefinition: true,
+        },
+        {
           abbreviation: op.abbreviation,
           active: true,
-          createdBy: "pmannion@whiskeyhouse.com",
+          createdBy: op.createdBy,
           description: op.description,
           unitProcedure: { connect: { id: unitProcedure.id } },
-          revision: 0,
+          revision: op.revision,
           path: op.path,
           name: op.name as EnumOperationName,
           procedureSequenceIndex: op.procedureSequenceIndex,
-          isClassDefinition: true,
+          isClassDefinition: op.isClassDefinition,
         },
-      });
-
-      console.log(`Created Operation: ${op.name}`);
-    } else {
-      console.log(`Operation ${op.name} already exists, skipping.`);
-    }
-  }
+        "operation"
+      );
+    })
+  );
 }
 
 async function seedEquipmentPhases(client: PrismaClient) {
@@ -685,24 +757,6 @@ async function createNewPhase(client: PrismaClient, phase: any) {
       `Skipping phase parameter connections for ${phase.name}: not applicable to Cook operation or no valid connections`
     );
   }
-}
-
-async function createPhaseParameter(client: PrismaClient, param: any) {
-  await client.phaseParameter.create({
-    data: {
-      active: true,
-      createdBy: "MES",
-      description: param.description,
-      name: param.name,
-      staticName: param.staticName ? staticNameMapping[param.staticName] : null,
-      units: param.units,
-      revision: 0,
-      isStaticParameter: param.isStaticParameter ?? true,
-      isClassDef: param.isClassDef ?? false,
-      setpointType: "Numeric",
-    },
-  });
-  console.log(`Created PhaseParameter: ${param.name}`);
 }
 
 async function createOrGetProcedure(
