@@ -57,7 +57,7 @@ export class RecipeCookCreationService {
       this.mashingProtocolData = mashingProtocolData;
 
       this.numberOfCooksPerFerm = numberOfCooksPerFerm;
-      const { recipe, mashingUnitProcedure } =
+      const { mashingUnitProcedure } =
         await this.getRecipeAndMashingUnitProcedure(scheduleOrderQueueId);
       this.mashingUnitProcedure = mashingUnitProcedure;
       const productionOrder = await this.getProductionOrder(
@@ -137,8 +137,6 @@ export class RecipeCookCreationService {
 
     console.log("Operation Class Definition:", operationClassDef);
 
-    const cookOperations: Operation[] = [];
-
     const newCook = await this.prisma.operation.create({
       data: {
         name: EnumOperationName.Cook,
@@ -157,7 +155,6 @@ export class RecipeCookCreationService {
     });
 
     console.log(`Created new Operation instance: ${newCook.name}`);
-    cookOperations.push(newCook);
 
     return newCook;
   }
@@ -179,13 +176,8 @@ export class RecipeCookCreationService {
     return bom;
   }
 
-  private async createEquipmentPhases(
-    newCook: Operation,
-    mashingProtocolData: any
-  ) {
+  private async createEquipmentPhases(newCook: Operation, mashingProtocolData: any) {
     const bom = await this.getBom(this.scheduleOrderQueueId);
-    const totalNumberOfCooks = this.totalNumberOfCooks;
-
     const mashingProtocol = mashingProtocolData;
 
     if (!newCook) {
@@ -193,266 +185,92 @@ export class RecipeCookCreationService {
       return;
     }
 
-    // Map the provided phase names to the actual enum values
-    const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
+    for (const [phaseIndex, phase] of mashingProtocol.entries()) {
+      await this.processPhase(phase, phaseIndex, newCook, bom);
+    }
+  }
+
+  private async processPhase(phase: any, phaseIndex: number, newCook: Operation, bom: any) {
+    const phaseNameMap = this.getPhaseNameMap();
+    const existingPhase = await this.findExistingPhase(phase, phaseIndex, newCook, phaseNameMap);
+
+    if (!existingPhase) {
+      const cookOperation = await this.findCookOperation();
+      if (cookOperation) {
+        await this.createNewPhase(phase, phaseIndex, cookOperation, phaseNameMap, bom);
+      }
+    }
+  }
+
+  private getPhaseNameMap(): { [key: string]: EnumEquipmentPhaseName } {
+    return {
       "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
       Hold: EnumEquipmentPhaseName.Hold,
       "Add Grain": EnumEquipmentPhaseName.GrainAdd,
       "Add Additive": EnumEquipmentPhaseName.AdditiveAdd,
     };
+  }
 
-    for (const [phaseIndex, phase] of mashingProtocol.entries()) {
-      const existingPhase = await this.prisma.equipmentPhase.findFirst({
-        where: {
-          name:
-            phaseNameMap[phase.action] ||
-            (phase.action as EnumEquipmentPhaseName),
-          operation: {
-            id: newCook.id,
-          },
-          operationSequenceIndex: phaseIndex,
-        },
-        include: {
-          operation: true,
-        },
-      });
+  private async findExistingPhase(phase: any, phaseIndex: number, newCook: Operation, phaseNameMap: any) {
+    return await this.prisma.equipmentPhase.findFirst({
+      where: {
+        name: phaseNameMap[phase.action] || (phase.action as EnumEquipmentPhaseName),
+        operation: { id: newCook.id },
+        operationSequenceIndex: phaseIndex,
+      },
+      include: { operation: true },
+    });
+  }
 
-      if (!existingPhase) {
-        const cookOperation: Operation | null =
-          await this.prisma.operation.findFirst({
-            where: {
-              name: EnumOperationName.Cook,
-              isClassDefinition: false,
-              unitProcedure: { id: this.mashingUnitProcedure?.id },
-              procedureSequenceIndex: this.executedCooks + 1,
-            },
-            orderBy: { createdAt: "desc" },
-          });
+  private determineStepType(phase: any): EnumEquipmentPhaseStepType | undefined {
+    if (phase.action === "Hold") return phase.holdType;
+    if (phase.action === "Add Grain") return phase.grainType;
+    if (phase.action === "Add Liquid") return phase.liquidType01;
+    return undefined;
+  }
 
-        if (cookOperation) {
-          const stepType =
-            phase.action === "Hold"
-              ? phase.holdType
-              : phase.action === "Add Grain"
-              ? phase.grainType
-              : phase.action === "Add Liquid"
-              ? phase.liquidType01
-              : undefined;
-          const newPhase = await this.prisma.equipmentPhase.create({
-            data: {
-              name:
-                phaseNameMap[phase.action] ||
-                (phase.action as EnumEquipmentPhaseName),
-              path: `${this.mashingUnitProcedure?.path}/Cook${
-                this.executedCooks + 2
-              }/${phase.action}`,
-              isClassDefinition: false,
-              revision: 0,
-              description: `Cook ${this.executedCooks + 2}`,
-              createdBy: this.username,
-              operation: {
-                connect: {
-                  id: (cookOperation).id,
-                },
-              },
-              stepType: stepType as EnumEquipmentPhaseStepType,
-              operationSequenceIndex: phaseIndex,
-            },
-          });
-          console.log(
-            `Created new Equipment Phase: ${newPhase.name} for Cook ${
-              this.executedCooks + 2
-            }`
-          );
-
-          // Add phase parameters based on the action
-          const parameterData: {
-            name: string;
-            value: number | string;
-            units: string;
-          }[] = [];
-          if (phase.temperature) {
-            parameterData.push({
-              name: "Temperature",
-              value: phase.temperature,
-              units: "°F",
-            });
-          }
-          if (phase.time) {
-            parameterData.push({
-              name: "Time",
-              value: phase.time,
-              units: "minutes",
-            });
-          }
-
-          for (const param of parameterData) {
-            await this.prisma.phaseParameter.create({
-              data: {
-                name: param.name,
-                staticName: param.name as EnumPhaseParameterStaticName,
-                setpointNumericalValue: param.value as number,
-                units: param.units,
-                description: param.name,
-                isClassDef: false,
-                equipmentPhases: { connect: { id: newPhase.id } },
-                createdBy: this.username,
-                setpointType: EnumPhaseParameterSetpointType.Numeric,
-              },
-            });
-          }
-
-          // Link BOM components to their equipment phases - these will be the "class definitions"
-          if (bom) {
-            const bomComponents = await this.prisma.bomItem.findMany({
-              where: {
-                bom: { id: bom.id },
-                isClassDefinition: true,
-              },
-              include: {
-                item: true,
-              },
-            });
-
-            for (const component of bomComponents) {
-              if (
-                (phase.action === "Add Grain" &&
-                  phase.grainType &&
-                  component.item.itemNumber
-                    .toLowerCase()
-                    .includes(phase.grainType.toLowerCase()) &&
-                  phase.grainType != "Corn") ||
-                (phase.action === "Add Liquid" &&
-                  phase.liquidType01 &&
-                  component.item.itemNumber
-                    .toLowerCase()
-                    .includes(phase.liquidType01.toLowerCase())) //||
-                // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
-              ) {
-                // Check if the quantity field is present in the phase object
-                if (phase.qty !== undefined) {
-                  // Only match if the bomItem quantity equals the phase quantity
-                  if (component.quantity === phase.qty) {
-                    await this.prisma.equipmentPhase.update({
-                      where: { id: newPhase.id },
-                      data: {
-                        bomItem: {
-                          connect: { id: component.id },
-                        },
-                      },
-                    });
-                    console.log(
-                      `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
-                    );
-                  } else {
-                    console.log(
-                      `Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`
-                    );
-                  }
-                } else if (phase.notQty !== undefined) {
-                  // Only match if the bomItem quantity does not equal the phase notQty
-                  if (!component.quantity === phase.notQty) {
-                    await this.prisma.equipmentPhase.update({
-                      where: { id: newPhase.id },
-                      data: {
-                        bomItem: {
-                          connect: { id: component.id },
-                        },
-                      },
-                    });
-                    console.log(
-                      `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
-                    );
-                  } else {
-                    console.log(
-                      `Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`
-                    );
-                  }
-                } else {
-                  await this.prisma.equipmentPhase.update({
-                    where: { id: newPhase.id },
-                    data: {
-                      bomItem: {
-                        connect: { id: component.id },
-                      },
-                    },
-                  });
-                  console.log(
-                    `Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
-                  );
-                }
-              } else if (phase.grainType == "Corn") {
-                console.log(`Corn: ${component.item.itemNumber}`);
-                if (
-                  component.item.itemNumber ===
-                  "COR-DLF02-US #2 Yellow Dent GMO"
-                ) {
-                  if (phase.qty !== undefined) {
-                    // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity === phase.qty) {
-                      await this.prisma.equipmentPhase.update({
-                        where: { id: newPhase.id },
-                        data: {
-                          bomItem: {
-                            connect: { id: component.id },
-                          },
-                        },
-                      });
-                      console.log(
-                        `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
-                      );
-                    } else {
-                      console.log(
-                        `Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`
-                      );
-                    }
-                  } else {
-                    await this.prisma.equipmentPhase.update({
-                      where: { id: newPhase.id },
-                      data: {
-                        bomItem: {
-                          connect: { id: component.id },
-                        },
-                      },
-                    });
-                    console.log(
-                      `Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
-                    );
-                  }
-                }
-              } else if (
-                phase.action === "Add Additive" &&
-                phase.additiveType &&
-                component.item.itemNumber
-                  .toLowerCase()
-                  .includes(phase.additiveType.toLowerCase())
-              ) {
-                console.log(`Add Additive: ${component.item.itemNumber}`);
-                await this.prisma.equipmentPhase.update({
-                  where: { id: newPhase.id },
-                  data: {
-                    bomItem: {
-                      connect: { id: component.id },
-                    },
-                  },
-                });
-                console.log(
-                  `Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
-                );
-              }
-            }
-          } else {
-            console.log(
-              "BOM not found, skipping linking BOM components to Equipment Phases"
-            );
-          }
-        }
-      } else {
-        console.log(
-          `Equipment Phase ${phase.action} already exists, skipping.`
-        );
-      }
+  private async createNewPhase(phase: any, phaseIndex: number, cookOperation: Operation, phaseNameMap: any, bom: any) {
+    const stepType = this.determineStepType(phase);
+    const newPhase = await this.createPhaseRecord(phase, phaseIndex, cookOperation, stepType, phaseNameMap);
+    
+    await this.createPhaseParameters(phase, newPhase);
+    if (bom) {
+      await this.linkBomComponents(phase, newPhase, bom);
     }
+  }
+
+  private async createPhaseParameters(phase: any, newPhase: any) {
+    const parameterData = this.buildParameterData(phase);
+    for (const param of parameterData) {
+      await this.createParameter(param, newPhase);
+    }
+  }
+
+  private buildParameterData(phase: any) {
+    const parameterData: Array<{name: string, value: number | string, units: string}> = [];
+    if (phase.temperature) {
+      parameterData.push({ name: "Temperature", value: phase.temperature, units: "°F" });
+    }
+    if (phase.time) {
+      parameterData.push({ name: "Time", value: phase.time, units: "minutes" });
+    }
+    return parameterData;
+  }
+
+  private async createParameter(param: any, newPhase: any) {
+    await this.prisma.phaseParameter.create({
+      data: {
+        name: param.name,
+        staticName: param.name as EnumPhaseParameterStaticName,
+        setpointNumericalValue: param.value as number,
+        units: param.units,
+        description: param.name,
+        isClassDef: false,
+        equipmentPhases: { connect: { id: newPhase.id } },
+        createdBy: this.username,
+        setpointType: EnumPhaseParameterSetpointType.Numeric,
+      },
+    });
   }
 
   private validateInputParameters(
@@ -513,7 +331,7 @@ export class RecipeCookCreationService {
       (up) => up.name === EnumUnitProcedureName.Mashing01
     );
 
-    return { recipe, mashingUnitProcedure };
+    return { mashingUnitProcedure };
   }
 
   private async getLastCook(unitProcedureId: string | undefined) {
@@ -662,5 +480,81 @@ export class RecipeCookCreationService {
         });
       }
     }
+  }
+
+  private async findCookOperation(): Promise<Operation | null> {
+    return await this.prisma.operation.findFirst({
+      where: {
+        name: EnumOperationName.Cook,
+        isClassDefinition: false,
+        unitProcedure: { id: this.mashingUnitProcedure?.id },
+        procedureSequenceIndex: this.executedCooks + 1,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  private async linkBomComponents(phase: any, newPhase: any, bom: any) {
+    const bomComponents = await this.prisma.bomItem.findMany({
+      where: {
+        bom: { id: bom.id },
+        isClassDefinition: true,
+      },
+      include: { item: true },
+    });
+
+    for (const component of bomComponents) {
+      if (this.shouldLinkComponent(phase, component)) {
+        await this.prisma.equipmentPhase.update({
+          where: { id: newPhase.id },
+          data: {
+            bomItem: { connect: { id: component.id } },
+          },
+        });
+      }
+    }
+  }
+
+  private shouldLinkComponent(phase: any, component: any): boolean {
+    const itemNumber = component.item.itemNumber.toLowerCase();
+    
+    if (phase.action === "Add Grain" && phase.grainType) {
+      if (phase.grainType === "Corn") {
+        return itemNumber === "cor-dlf02-us #2 yellow dent gmo";
+      }
+      return itemNumber.includes(phase.grainType.toLowerCase());
+    }
+    
+    if (phase.action === "Add Liquid" && phase.liquidType01) {
+      return itemNumber.includes(phase.liquidType01.toLowerCase());
+    }
+    
+    if (phase.action === "Add Additive" && phase.additiveType) {
+      return itemNumber.includes(phase.additiveType.toLowerCase());
+    }
+    
+    return false;
+  }
+
+  private async createPhaseRecord(
+    phase: any,
+    phaseIndex: number,
+    cookOperation: Operation,
+    stepType: EnumEquipmentPhaseStepType | undefined,
+    phaseNameMap: { [key: string]: EnumEquipmentPhaseName }
+  ) {
+    return await this.prisma.equipmentPhase.create({
+      data: {
+        name: phaseNameMap[phase.action] || (phase.action as EnumEquipmentPhaseName),
+        path: `${this.mashingUnitProcedure?.path}/Cook${this.executedCooks + 2}/${phase.action}`,
+        isClassDefinition: false,
+        revision: 0,
+        description: `Cook ${this.executedCooks + 2}`,
+        createdBy: this.username,
+        operation: { connect: { id: cookOperation.id } },
+        stepType,
+        operationSequenceIndex: phaseIndex,
+      },
+    });
   }
 }
