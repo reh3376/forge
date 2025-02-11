@@ -22,7 +22,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     super(prisma);
   }
 
-  private operationEquipmentPhasesMap: { [key: string]: string[] } = {
+  private readonly operationEquipmentPhasesMap: { [key: string]: string[] } = {
     Cook: [
       "Steam",
       "Hold",
@@ -53,7 +53,9 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     Mill: ["Mill"],
   };
 
-  private equipmentPhaseToPhaseParameterMap: { [key: string]: string[] } = {
+  private readonly equipmentPhaseToPhaseParameterMap: {
+    [key: string]: string[];
+  } = {
     CornAdd: ["Quantity"],
     MaltAdd: ["Quantity"],
     RyeAdd: ["Quantity"],
@@ -91,40 +93,14 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     ],
   };
 
-  private equipmentPhaseTypeMap: { [key: string]: string | string[] } = {
-    // Steam: 'Steam',
-    // BacksetAdd: 'BacksetAdd',
-    // WaterAdd: 'WaterAdd',
-    // CornAdd: 'CornAdd',
-    // MaltAdd: 'MaltAdd',
-    // RyeAdd: 'RyeAdd',
-    // WheatAdd: 'WheatAdd',
-    // Drop: 'Drop',
-    // PhCapture: 'PhCapture',
-    // Prompt: 'Prompt',
-    // Cooldown: 'Cooldown',
-    // HotFlush: 'HotFlush',
-    // CIP: 'CIP',
-    // DropToMashCooler: 'DropToMashCooler',
-    // Fill: 'Fill',
-    // Run: 'Run',
-    // FermenterSteam: 'FermenterSteam',
-    // CoolerSteam: 'CoolerSteam',
-    // DropTubSteam: 'DropTubSteam',
-    // DropLineSteam: 'DropLineSteam',
-    // StillStartup: 'StillStartup',
-    // StillRun: 'StillRun',
-    // StillShutdown: 'StillShutdown',
-    // Cut: 'Cut',
-    // Gauge: 'Gauge',
-    // BarrelFill: 'BarrelFill',
-    // Mill: 'Mill',
-    GrainAdd: ["Corn", "Rye", "Malt", "Wheat", "Premalt", "Specialty"],
-    LiquidAdd: ["Water", "Backset"],
-    AdditiveAdd: ["Nutrient", "Enzyme", "Yeast", "Citric"],
-    Hold: ["Hold", "Cool", "Heat"],
-    Rinse: ["Vessel", "Pipe"],
-  };
+  private readonly equipmentPhaseTypeMap: { [key: string]: string | string[] } =
+    {
+      GrainAdd: ["Corn", "Rye", "Malt", "Wheat", "Premalt", "Specialty"],
+      LiquidAdd: ["Water", "Backset"],
+      AdditiveAdd: ["Nutrient", "Enzyme", "Yeast", "Citric"],
+      Hold: ["Hold", "Cool", "Heat"],
+      Rinse: ["Vessel", "Pipe"],
+    };
 
   async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCreateArgs>
@@ -148,7 +124,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     if (args.data.operation?.connect?.id) {
       const operationId = args.data.operation?.connect?.id;
       const operation = await this.prisma.operation.findFirstOrThrow({
-        where: { id: operationId as string },
+        where: { id: operationId },
       });
       this.logger.log(`Operation: ${operationId}`);
 
@@ -236,16 +212,16 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
   async updateEquipmentPhase<T extends Prisma.EquipmentPhaseUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseUpdateArgs>
   ): Promise<EquipmentPhase> {
-    const equipmentPhase = (await this.prisma.equipmentPhase.findFirstOrThrow({
+    const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({
       where: { id: args.where.id },
-    })) as EquipmentPhase;
+    });
     this.logger.log(`Updating equipmentPhase: ${equipmentPhase.name}`);
-    const name = equipmentPhase.name as string;
+    const name = equipmentPhase.name;
 
     if (args.data.operation?.connect?.id) {
       const operationId = args.data.operation?.connect?.id;
       const operation = await this.prisma.operation.findFirstOrThrow({
-        where: { id: operationId as string },
+        where: { id: operationId },
       });
       this.logger.log(`Operation: ${operationId}`);
 
