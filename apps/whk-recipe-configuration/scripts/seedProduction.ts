@@ -51,19 +51,83 @@ const staticNameMapping: { [key: string]: EnumPhaseParameterStaticName } = {
   Level: EnumPhaseParameterStaticName.Level,
 };
 
+// Common interfaces
+interface BaseEntity {
+  active?: boolean;
+  createdBy: string;
+  description: string;
+  isClassDefinition?: boolean;
+  name: string;
+  revision: number;
+}
+
+interface PhaseParameterConfig extends BaseEntity {
+  staticName?: string;
+  units: string;
+  isStaticParameter?: boolean;
+  isClassDef?: boolean;
+}
+
+interface OperationConfig extends BaseEntity {
+  abbreviation: string;
+  unitProcedureName: string;
+  path: string;
+  procedureSequenceIndex: number;
+}
+
+interface EquipmentPhaseConfig extends BaseEntity {
+  path: string;
+  operationSequenceIndex: number;
+  stepType: string;
+}
+
+// Common create functions
+async function createEntityIfNotExists<T extends BaseEntity>(
+  client: PrismaClient,
+  entity: T,
+  findWhere: any,
+  createData: any,
+  entityType: string
+) {
+  const existing = await client[entityType].findFirst({ where: findWhere });
+  
+  if (!existing) {
+    await client[entityType].create({ data: createData });
+    console.log(`Created ${entityType}: ${entity.name}`);
+    return true;
+  }
+  
+  console.log(`${entityType} ${entity.name} already exists, skipping.`);
+  return false;
+}
+
+// Common validation function
+function validateEnvironmentVariables(...vars: string[]) {
+  for (const v of vars) {
+    if (!process.env[v]) {
+      throw new Error(`${v} environment variable must be defined`);
+    }
+  }
+}
+
 async function seed(bcryptSalt: Salt) {
   console.info("Seeding database...");
   const client = new PrismaClient();
 
-  await seedUser(client, bcryptSalt);
-  await seedPhaseParameters(client);
-  const procedure = await seedProcedure(client);
-  await seedUnitProcedures(client, procedure);
-  await seedOperations(client);
-  await seedEquipmentPhases(client);
+  validateEnvironmentVariables('MES_USER', 'MES_PASSWORD');
+  
+  try {
+    await seedUser(client, bcryptSalt);
+    await seedPhaseParameters(client);
+    const procedure = await seedProcedure(client);
+    await seedUnitProcedures(client, procedure);
+    await seedOperations(client);
+    await seedEquipmentPhases(client);
 
-  console.info("Seeded database successfully");
-  await client.$disconnect();
+    console.info("Seeded database successfully");
+  } finally {
+    await client.$disconnect();
+  }
 }
 
 async function seedUser(client: PrismaClient, bcryptSalt: Salt) {
@@ -558,7 +622,8 @@ async function createNewPhase(client: PrismaClient, phase: any) {
 
   // Filter out any null values from the connections array
   const validPhaseParameterConnections = phaseParameterConnections.filter(
-    (connection) => connection !== null
+    (connection): connection is { id: string; name: string } =>
+      connection !== null
   );
 
   await client.equipmentPhase.create({
