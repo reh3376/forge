@@ -6,7 +6,6 @@ async function seedUnitLinks() {
 
   const client = new PrismaClient();
 
-
   const unitLinks = [
     {
       name: "Pound",
@@ -88,23 +87,23 @@ async function seedUnitLinks() {
       pluralAbbreviation: "US ton",
       conversionRate: 2000,
       baseUnit: false,
-    }
+    },
   ];
 
   for (const link of unitLinks) {
     await client.unitLookup.upsert({
       where: {
-        name: link.name
+        name: link.name,
       },
       update: link,
-      create: link
+      create: link,
     });
   }
   console.log("UnitLink data seeded successfully.");
 
   // Find the base unit and its ID
   const baseUnit = await client.unitLookup.findFirst({
-    where: { baseUnit: true }
+    where: { baseUnit: true },
   });
 
   if (!baseUnit) {
@@ -116,13 +115,13 @@ async function seedUnitLinks() {
     if (!link.baseUnit) {
       await client.unitLookup.update({
         where: {
-          name: link.name
+          name: link.name,
         },
         data: {
           baseRecord: {
-            connect: { id: baseUnit.id }
-          }
-        }
+            connect: { id: baseUnit.id },
+          },
+        },
       });
     }
   }

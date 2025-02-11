@@ -8,7 +8,7 @@ import { OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./filters/HttpExceptions.filter";
 import { AppModule } from "./app.module";
 import { connectMicroservices } from "./connectMicroservices";
-import { NewrelicInterceptor } from './newrelic.interceptor';
+import { NewrelicInterceptor } from "./newrelic.interceptor";
 
 import {
   swaggerPath,
@@ -57,16 +57,13 @@ function getHttpsServer(
 async function main() {
   const server = express();
   let app = null;
-  if (process.env.DEV_TOOLS_ENABLE === 'false') {
+  if (process.env.DEV_TOOLS_ENABLE === "false") {
     app = await NestFactory.create(
       AppModule,
       getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
     );
   } else {
-    app = await NestFactory.create(
-      AppModule,
-      { snapshot: true }
-    );
+    app = await NestFactory.create(AppModule, { snapshot: true });
   }
   // const app = await NestFactory.create(AppModule, {
   //   cors: true,
@@ -91,9 +88,9 @@ async function main() {
   };
 
   const document = SwaggerModule.createDocument(app, swaggerDocumentOptions);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup("api", app, document);
   // Write the OpenAPI document to a file
-  fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+  fs.writeFileSync("./openapi.json", JSON.stringify(document, null, 2));
 
   /** check if there is Public decorator for each path (action) and its method (findMany / findOne) on each controller */
   Object.values((document as OpenAPIObject).paths).forEach((path: any) => {

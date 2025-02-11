@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { SalesOrderService } from "../salesOrder.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { Item } from "../../item/base/Item";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class SalesOrderControllerBase {
   constructor(
     protected readonly service: SalesOrderService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: SalesOrder })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "create",
     possession: "any",
@@ -108,7 +108,7 @@ export class SalesOrderControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [SalesOrder] })
   @ApiNestedQuery(SalesOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "read",
     possession: "any",
@@ -158,7 +158,7 @@ export class SalesOrderControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: SalesOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "read",
     possession: "own",
@@ -215,7 +215,7 @@ export class SalesOrderControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: SalesOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "update",
     possession: "any",
@@ -293,7 +293,7 @@ export class SalesOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/item")
   @ApiNestedQuery(ItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -346,7 +346,7 @@ export class SalesOrderControllerBase {
   }
 
   @common.Post("/:id/item")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "update",
     possession: "any",
@@ -368,7 +368,7 @@ export class SalesOrderControllerBase {
   }
 
   @common.Patch("/:id/item")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "update",
     possession: "any",
@@ -390,7 +390,7 @@ export class SalesOrderControllerBase {
   }
 
   @common.Delete("/:id/item")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "SalesOrder",
     action: "update",
     possession: "any",

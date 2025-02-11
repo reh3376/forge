@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -31,11 +31,11 @@ import { TestService } from "../test.service";
 export class TestResolverBase {
   constructor(
     protected readonly service: TestService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Test",
     action: "read",
     possession: "any",
@@ -51,7 +51,7 @@ export class TestResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Test])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Test",
     action: "read",
     possession: "any",
@@ -62,7 +62,7 @@ export class TestResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Test, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Test",
     action: "read",
     possession: "own",
@@ -77,7 +77,7 @@ export class TestResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Test)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Test",
     action: "create",
     possession: "any",
@@ -91,7 +91,7 @@ export class TestResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Test)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Test",
     action: "update",
     possession: "any",

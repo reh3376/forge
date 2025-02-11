@@ -173,8 +173,6 @@ const recipeGenerator = {
   init(params: any) {
     this.constructorParams = params;
   },
-  createRecipeData() {
-  }
 };
 
 describe("Recipe", () => {
@@ -199,8 +197,8 @@ describe("Recipe", () => {
         },
         {
           provide: RecipeGenerator,
-          useValue: recipeGenerator
-        }
+          useValue: recipeGenerator,
+        },
       ],
       controllers: [RecipeController],
       imports: [ACLModule],

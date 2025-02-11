@@ -25,7 +25,6 @@ import {
 
 import { Type } from "class-transformer";
 
-
 @ObjectType()
 class UnitLookup {
   @ApiProperty({

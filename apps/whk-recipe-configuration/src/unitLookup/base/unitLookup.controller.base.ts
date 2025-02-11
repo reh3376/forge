@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { UnitLookupService } from "../unitLookup.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { UnitLookupWhereUniqueInput } from "./UnitLookupWhereUniqueInput";
 import { UnitLookupUpdateInput } from "./UnitLookupUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class UnitLookupControllerBase {
   constructor(
     protected readonly service: UnitLookupService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: UnitLookup })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "create",
     possession: "any",
@@ -87,7 +87,7 @@ export class UnitLookupControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [UnitLookup] })
   @ApiNestedQuery(UnitLookupFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "any",
@@ -125,7 +125,7 @@ export class UnitLookupControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: UnitLookup })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "own",
@@ -170,7 +170,7 @@ export class UnitLookupControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: UnitLookup })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "update",
     possession: "any",
@@ -230,7 +230,7 @@ export class UnitLookupControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: UnitLookup })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "delete",
     possession: "any",
@@ -277,7 +277,7 @@ export class UnitLookupControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/unitLookupRecords")
   @ApiNestedQuery(UnitLookupFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "read",
     possession: "any",
@@ -318,7 +318,7 @@ export class UnitLookupControllerBase {
   }
 
   @common.Post("/:id/unitLookupRecords")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "update",
     possession: "any",
@@ -340,7 +340,7 @@ export class UnitLookupControllerBase {
   }
 
   @common.Patch("/:id/unitLookupRecords")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "update",
     possession: "any",
@@ -362,7 +362,7 @@ export class UnitLookupControllerBase {
   }
 
   @common.Delete("/:id/unitLookupRecords")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitLookup",
     action: "update",
     possession: "any",

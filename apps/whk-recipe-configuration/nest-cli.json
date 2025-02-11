@@ -6,8 +6,6 @@
         "include": "swagger/**/*"
       }
     ],
-    "plugins": [
-      "@nestjs/swagger"
-    ]
+    "plugins": ["@nestjs/swagger"]
   }
 }

@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { InventoryTransferService } from "./inventoryTransfer.service";
 import { InventoryTransferControllerBase } from "./base/inventoryTransfer.controller.base";
 
@@ -9,8 +14,8 @@ import { InventoryTransferControllerBase } from "./base/inventoryTransfer.contro
 export class InventoryTransferController extends InventoryTransferControllerBase {
   constructor(
     protected readonly service: InventoryTransferService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

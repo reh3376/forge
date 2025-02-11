@@ -9,7 +9,7 @@ image:
   tag: latest
 
 variables:
-  configmap: 
+  configmap:
     BCRYPT_SALT: "10"
     COMPOSE_PROJECT_NAME: "amp_${resourceId}"
     PORT: "3000"

@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { BomItemService } from "../bomItem.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class BomItemControllerBase {
   constructor(
     protected readonly service: BomItemService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: BomItem })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "create",
     possession: "any",
@@ -125,7 +125,7 @@ export class BomItemControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [BomItem] })
   @ApiNestedQuery(BomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -182,7 +182,7 @@ export class BomItemControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: BomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "own",
@@ -246,7 +246,7 @@ export class BomItemControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: BomItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",
@@ -341,7 +341,7 @@ export class BomItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/equipmentPhases")
   @ApiNestedQuery(EquipmentPhaseFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "EquipmentPhase",
     action: "read",
     possession: "any",
@@ -396,7 +396,7 @@ export class BomItemControllerBase {
   }
 
   @common.Post("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",
@@ -418,7 +418,7 @@ export class BomItemControllerBase {
   }
 
   @common.Patch("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",
@@ -440,7 +440,7 @@ export class BomItemControllerBase {
   }
 
   @common.Delete("/:id/equipmentPhases")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",
@@ -464,7 +464,7 @@ export class BomItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/instances")
   @ApiNestedQuery(BomItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "read",
     possession: "any",
@@ -524,7 +524,7 @@ export class BomItemControllerBase {
   }
 
   @common.Post("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",
@@ -546,7 +546,7 @@ export class BomItemControllerBase {
   }
 
   @common.Patch("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",
@@ -568,7 +568,7 @@ export class BomItemControllerBase {
   }
 
   @common.Delete("/:id/instances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "BomItem",
     action: "update",
     possession: "any",

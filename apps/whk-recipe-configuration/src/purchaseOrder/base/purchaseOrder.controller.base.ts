@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { PurchaseOrderService } from "../purchaseOrder.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -40,16 +40,16 @@ import { TestParameter } from "../../testParameter/base/TestParameter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class PurchaseOrderControllerBase {
   constructor(
     protected readonly service: PurchaseOrderService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: PurchaseOrder })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "create",
     possession: "any",
@@ -132,7 +132,7 @@ export class PurchaseOrderControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [PurchaseOrder] })
   @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -193,7 +193,7 @@ export class PurchaseOrderControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: PurchaseOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "own",
@@ -259,7 +259,7 @@ export class PurchaseOrderControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: PurchaseOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -352,7 +352,7 @@ export class PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/acceptedLots")
   @ApiNestedQuery(LotFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -470,7 +470,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Post("/:id/acceptedLots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -492,7 +492,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Patch("/:id/acceptedLots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -514,7 +514,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Delete("/:id/acceptedLots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -538,7 +538,7 @@ export class PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/item")
   @ApiNestedQuery(ItemFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -591,7 +591,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Post("/:id/item")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -613,7 +613,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Patch("/:id/item")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -635,7 +635,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Delete("/:id/item")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -659,7 +659,7 @@ export class PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/itemReceipts")
   @ApiNestedQuery(ItemReceiptFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "any",
@@ -721,7 +721,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Post("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -743,7 +743,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Patch("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -765,7 +765,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Delete("/:id/itemReceipts")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -789,7 +789,7 @@ export class PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/lotsRejected")
   @ApiNestedQuery(PurchaseOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "read",
     possession: "any",
@@ -851,7 +851,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Post("/:id/lotsRejected")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -873,7 +873,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Patch("/:id/lotsRejected")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -895,7 +895,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Delete("/:id/lotsRejected")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -919,7 +919,7 @@ export class PurchaseOrderControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/qualityTests")
   @ApiNestedQuery(TestParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -982,7 +982,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Post("/:id/qualityTests")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -1004,7 +1004,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Patch("/:id/qualityTests")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",
@@ -1026,7 +1026,7 @@ export class PurchaseOrderControllerBase {
   }
 
   @common.Delete("/:id/qualityTests")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "PurchaseOrder",
     action: "update",
     possession: "any",

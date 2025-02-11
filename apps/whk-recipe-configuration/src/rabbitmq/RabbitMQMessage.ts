@@ -1,1 +1,1 @@
-export type RabbitMQMessage = string | Buffer | object | any;
+export type RabbitMQMessage = string | Buffer | Record<string, unknown> | any;

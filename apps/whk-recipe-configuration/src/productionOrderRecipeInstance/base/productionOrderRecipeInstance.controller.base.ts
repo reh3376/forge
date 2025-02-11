@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ProductionOrderRecipeInstanceService } from "../productionOrderRecipeInstance.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -37,16 +37,16 @@ import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ProductionOrderRecipeInstanceControllerBase {
   constructor(
     protected readonly service: ProductionOrderRecipeInstanceService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: ProductionOrderRecipeInstance })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "create",
     possession: "any",
@@ -99,7 +99,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [ProductionOrderRecipeInstance] })
   @ApiNestedQuery(ProductionOrderRecipeInstanceFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -143,7 +143,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ProductionOrderRecipeInstance })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "own",
@@ -189,7 +189,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: ProductionOrderRecipeInstance })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -252,7 +252,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: ProductionOrderRecipeInstance })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "delete",
     possession: "any",
@@ -300,7 +300,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/batches")
   @ApiNestedQuery(BatchFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -392,7 +392,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Post("/:id/batches")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -414,7 +414,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Patch("/:id/batches")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -436,7 +436,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Delete("/:id/batches")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -460,7 +460,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/mashingProtocol")
   @ApiNestedQuery(MashingProtocolFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -507,7 +507,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Post("/:id/mashingProtocol")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -529,7 +529,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Patch("/:id/mashingProtocol")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -551,7 +551,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Delete("/:id/mashingProtocol")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -575,7 +575,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBom")
   @ApiNestedQuery(RecipeBomFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -619,7 +619,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Post("/:id/recipeBom")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -641,7 +641,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Patch("/:id/recipeBom")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -663,7 +663,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
   }
 
   @common.Delete("/:id/recipeBom")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",

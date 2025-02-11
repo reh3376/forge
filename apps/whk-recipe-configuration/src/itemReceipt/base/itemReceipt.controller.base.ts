@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { ItemReceiptService } from "../itemReceipt.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -34,16 +34,16 @@ import { TestParameter } from "../../testParameter/base/TestParameter";
 import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class ItemReceiptControllerBase {
   constructor(
     protected readonly service: ItemReceiptService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: ItemReceipt })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "create",
     possession: "any",
@@ -130,7 +130,7 @@ export class ItemReceiptControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [ItemReceipt] })
   @ApiNestedQuery(ItemReceiptFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "any",
@@ -195,7 +195,7 @@ export class ItemReceiptControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ItemReceipt })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "read",
     possession: "own",
@@ -267,7 +267,7 @@ export class ItemReceiptControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: ItemReceipt })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -364,7 +364,7 @@ export class ItemReceiptControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/inventories")
   @ApiNestedQuery(InventoryFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -427,7 +427,7 @@ export class ItemReceiptControllerBase {
   }
 
   @common.Post("/:id/inventories")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -449,7 +449,7 @@ export class ItemReceiptControllerBase {
   }
 
   @common.Patch("/:id/inventories")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -471,7 +471,7 @@ export class ItemReceiptControllerBase {
   }
 
   @common.Delete("/:id/inventories")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -495,7 +495,7 @@ export class ItemReceiptControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/tests")
   @ApiNestedQuery(TestParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -558,7 +558,7 @@ export class ItemReceiptControllerBase {
   }
 
   @common.Post("/:id/tests")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -580,7 +580,7 @@ export class ItemReceiptControllerBase {
   }
 
   @common.Patch("/:id/tests")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",
@@ -602,7 +602,7 @@ export class ItemReceiptControllerBase {
   }
 
   @common.Delete("/:id/tests")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ItemReceipt",
     action: "update",
     possession: "any",

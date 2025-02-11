@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -36,11 +36,11 @@ import { InventoryTransferService } from "../inventoryTransfer.service";
 export class InventoryTransferResolverBase {
   constructor(
     protected readonly service: InventoryTransferService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "any",
@@ -56,7 +56,7 @@ export class InventoryTransferResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [InventoryTransfer])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "any",
@@ -69,7 +69,7 @@ export class InventoryTransferResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => InventoryTransfer, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "read",
     possession: "own",
@@ -86,7 +86,7 @@ export class InventoryTransferResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => InventoryTransfer)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "create",
     possession: "any",
@@ -122,7 +122,7 @@ export class InventoryTransferResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => InventoryTransfer)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "update",
     possession: "any",
@@ -166,7 +166,7 @@ export class InventoryTransferResolverBase {
   }
 
   @graphql.Mutation(() => InventoryTransfer)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryTransfer",
     action: "delete",
     possession: "any",
@@ -188,7 +188,7 @@ export class InventoryTransferResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Asset], { name: "toLocation" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -211,7 +211,7 @@ export class InventoryTransferResolverBase {
     nullable: true,
     name: "fromLocation",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -232,7 +232,7 @@ export class InventoryTransferResolverBase {
     nullable: true,
     name: "item",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -253,7 +253,7 @@ export class InventoryTransferResolverBase {
     nullable: true,
     name: "lot",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",

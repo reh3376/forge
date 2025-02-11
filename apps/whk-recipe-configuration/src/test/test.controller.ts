@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { TestService } from "./test.service";
 import { TestControllerBase } from "./base/test.controller.base";
 
@@ -9,8 +14,8 @@ import { TestControllerBase } from "./base/test.controller.base";
 export class TestController extends TestControllerBase {
   constructor(
     protected readonly service: TestService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

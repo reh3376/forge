@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -48,11 +48,11 @@ import { ProductionOrderService } from "../productionOrder.service";
 export class ProductionOrderResolverBase {
   constructor(
     protected readonly service: ProductionOrderService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -68,7 +68,7 @@ export class ProductionOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ProductionOrder])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -81,7 +81,7 @@ export class ProductionOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ProductionOrder, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "own",
@@ -98,7 +98,7 @@ export class ProductionOrderResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ProductionOrder)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "create",
     possession: "any",
@@ -146,7 +146,7 @@ export class ProductionOrderResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ProductionOrder)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "update",
     possession: "any",
@@ -203,7 +203,7 @@ export class ProductionOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -225,7 +225,7 @@ export class ProductionOrderResolverBase {
   @graphql.ResolveField(() => [FermentationChemistry], {
     name: "fermentationChemistries",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -250,7 +250,7 @@ export class ProductionOrderResolverBase {
   @graphql.ResolveField(() => [FermentationDayDatum], {
     name: "fermentationDayData",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "read",
     possession: "any",
@@ -270,7 +270,7 @@ export class ProductionOrderResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Lot], { name: "lots" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -292,7 +292,7 @@ export class ProductionOrderResolverBase {
   @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
     name: "productionOrderRecipeInstances",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -318,7 +318,7 @@ export class ProductionOrderResolverBase {
     nullable: true,
     name: "bom",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Bom",
     action: "read",
     possession: "any",
@@ -337,7 +337,7 @@ export class ProductionOrderResolverBase {
     nullable: true,
     name: "customer",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "read",
     possession: "any",
@@ -358,7 +358,7 @@ export class ProductionOrderResolverBase {
     nullable: true,
     name: "item",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "read",
     possession: "any",
@@ -379,7 +379,7 @@ export class ProductionOrderResolverBase {
     nullable: true,
     name: "recipe",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -400,7 +400,7 @@ export class ProductionOrderResolverBase {
     nullable: true,
     name: "recipeGroup",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeGroup",
     action: "read",
     possession: "any",
@@ -421,7 +421,7 @@ export class ProductionOrderResolverBase {
     nullable: true,
     name: "scheduleOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ScheduleOrder",
     action: "read",
     possession: "any",
