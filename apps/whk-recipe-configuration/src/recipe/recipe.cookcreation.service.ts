@@ -4,19 +4,9 @@ import {
   EnumOperationName,
   EnumPhaseParameterSetpointType,
   EnumPhaseParameterStaticName,
-  EnumProductionOrderStatus,
-  EnumScheduleOrderStatus,
   EnumUnitProcedureName,
-  Item,
   Operation,
-  PhaseParameter,
-  PrismaClient,
-  Procedure,
   ProductionOrder,
-  Recipe,
-  RecipeGroup,
-  RecipeParameter,
-  SalesOrder,
   UnitProcedure,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -31,7 +21,6 @@ export class RecipeCookCreationService {
   private scheduleOrderQueueId = "";
   private totalNumberOfCooks = 0;
   private executedCooks = 0;
-  private cookOperations: Operation[] = [];
   private mashingUnitProcedure: UnitProcedure | undefined;
 
   constructor(
@@ -148,7 +137,6 @@ export class RecipeCookCreationService {
 
     console.log("Operation Class Definition:", operationClassDef);
 
-    const totalNumberOfCooks = this.totalNumberOfCooks;
     const cookOperations: Operation[] = [];
 
     const newCook = await this.prisma.operation.create({
@@ -264,7 +252,7 @@ export class RecipeCookCreationService {
               createdBy: this.username,
               operation: {
                 connect: {
-                  id: (cookOperation as Operation).id as string,
+                  id: (cookOperation).id,
                 },
               },
               stepType: stepType as EnumEquipmentPhaseStepType,
