@@ -37,7 +37,7 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
     type: errors.ForbiddenException,
   })
   async purchaseOrdersWithLineItems(
-    @common.Query("purchaseOrderType") purchaseOrderType: string = ""
+    @common.Query("purchaseOrderType") purchaseOrderType = ""
   ): Promise<PurchaseOrder[]> {
     const purchaseOrders =
       await this.service.getPurchaseOrdersWithLineItemsByType(
