@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
-import Decimal from "decimal.js";
+import { Decimal } from "decimal.js";
 import { InventorySiloTrackingService } from "../inventory/inventory.silotracking.service";
 
 @Injectable()
