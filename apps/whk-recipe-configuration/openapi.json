@@ -12489,6 +12489,191 @@
         ]
       }
     },
+    "/api/scheduleOrders/{id}/customers": {
+      "get": {
+        "operationId": "ScheduleOrderController_findCustomers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/CustomerWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "scheduleOrders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ScheduleOrderController_connectCustomers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "scheduleOrders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "ScheduleOrderController_updateCustomers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "scheduleOrders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ScheduleOrderController_disconnectCustomers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "scheduleOrders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/scheduleOrders/{id}/productionOrders": {
       "get": {
         "operationId": "ScheduleOrderController_findProductionOrders",
@@ -16507,6 +16692,191 @@
       },
       "delete": {
         "operationId": "CustomerController_disconnectSalesOrders",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "customers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{id}/scheduleOrders": {
+      "get": {
+        "operationId": "CustomerController_findScheduleOrders",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/ScheduleOrderWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "customers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "CustomerController_connectScheduleOrders",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "customers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "CustomerController_updateScheduleOrders",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "customers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CustomerController_disconnectScheduleOrders",
         "parameters": [
           {
             "name": "id",
@@ -34101,6 +34471,596 @@
         ]
       }
     },
+    "/api/unsConfigurations": {
+      "post": {
+        "operationId": "UnsConfigurationController_createUnsConfiguration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsConfigurationCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "UnsConfigurationController_unsConfigurations",
+        "parameters": [
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnsConfigurationWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UnsConfiguration"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/unsConfigurations/{id}": {
+      "get": {
+        "operationId": "UnsConfigurationController_unsConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UnsConfigurationController_updateUnsConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsConfigurationUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UnsConfigurationController_deleteUnsConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/unsBrokerConfigurations": {
+      "post": {
+        "operationId": "UnsBrokerConfigurationController_createUnsBrokerConfiguration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsBrokerConfigurationCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsBrokerConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsBrokerConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "UnsBrokerConfigurationController_unsBrokerConfigurations",
+        "parameters": [
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnsBrokerConfigurationWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UnsBrokerConfiguration"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsBrokerConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/unsBrokerConfigurations/{id}": {
+      "get": {
+        "operationId": "UnsBrokerConfigurationController_unsBrokerConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsBrokerConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsBrokerConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UnsBrokerConfigurationController_updateUnsBrokerConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsBrokerConfigurationUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsBrokerConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsBrokerConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UnsBrokerConfigurationController_deleteUnsBrokerConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsBrokerConfiguration"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenException"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundException"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "unsBrokerConfigurations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/_health/live": {
       "get": {
         "operationId": "HealthController_healthLive",
@@ -35965,7 +36925,10 @@
             "type": "string"
           },
           "customers": {
-            "type": "object"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Customer"
+            }
           },
           "duration": {
             "type": "number"
@@ -35973,25 +36936,37 @@
           "durationUnits": {
             "type": "string"
           },
-          "estimatedDistillationTime": {
+          "estimatedBarrelingStartTime": {
+            "type": "object"
+          },
+          "estimatedDistillationDuration": {
             "type": "number"
+          },
+          "estimatedDistillationStartTime": {
+            "type": "object"
           },
           "estimatedEnd": {
             "type": "object"
           },
-          "estimatedFermentationTime": {
+          "estimatedFermentationDuration": {
             "type": "number"
           },
-          "estimatedMashingTime": {
+          "estimatedFermentationStartTime": {
+            "type": "object"
+          },
+          "estimatedMashingDuration": {
             "type": "number"
           },
-          "estimatedProcessing": {
-            "type": "number"
+          "estimatedMashingStartTime": {
+            "type": "object"
+          },
+          "estimatedProcessingStartTime": {
+            "type": "object"
           },
           "estimatedStart": {
             "type": "object"
           },
-          "estimatedTotalProductionTime": {
+          "estimatedTotalProductionDuration": {
             "type": "number"
           },
           "globalId": {
@@ -36887,6 +37862,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SalesOrder"
+            }
+          },
+          "scheduleOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrder"
             }
           },
           "schemaVersion": {
@@ -39417,7 +40398,7 @@
             "$ref": "#/components/schemas/StringNullableFilter"
           },
           "customers": {
-            "$ref": "#/components/schemas/JsonFilter"
+            "$ref": "#/components/schemas/CustomerListRelationFilter"
           },
           "duration": {
             "$ref": "#/components/schemas/FloatNullableFilter"
@@ -39425,26 +40406,38 @@
           "durationUnits": {
             "$ref": "#/components/schemas/StringNullableFilter"
           },
-          "estimatedDistillationTime": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "estimatedBarrelingStartTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "estimatedDistillationDuration": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "estimatedDistillationStartTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
           },
           "estimatedEnd": {
             "$ref": "#/components/schemas/DateTimeNullableFilter"
           },
-          "estimatedFermentationTime": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "estimatedFermentationDuration": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
           },
-          "estimatedMashingTime": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "estimatedFermentationStartTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
           },
-          "estimatedProcessing": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "estimatedMashingDuration": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "estimatedMashingStartTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "estimatedProcessingStartTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
           },
           "estimatedStart": {
             "$ref": "#/components/schemas/DateTimeNullableFilter"
           },
-          "estimatedTotalProductionTime": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "estimatedTotalProductionDuration": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
           },
           "globalId": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -39486,7 +40479,7 @@
             "$ref": "#/components/schemas/IntNullableFilter"
           },
           "totalProofGallons": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+            "$ref": "#/components/schemas/FloatNullableFilter"
           }
         }
       },
@@ -40637,6 +41630,9 @@
           },
           "salesOrders": {
             "$ref": "#/components/schemas/SalesOrderListRelationFilter"
+          },
+          "scheduleOrders": {
+            "$ref": "#/components/schemas/ScheduleOrderListRelationFilter"
           },
           "schemaVersion": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -44963,6 +45959,17 @@
           }
         }
       },
+      "CustomerCreateNestedManyWithoutScheduleOrdersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerWhereUniqueInput"
+            }
+          }
+        }
+      },
       "ProductionOrderCreateNestedManyWithoutScheduleOrdersInput": {
         "type": "object",
         "properties": {
@@ -44987,7 +45994,7 @@
             "type": "string"
           },
           "customers": {
-            "type": "object"
+            "$ref": "#/components/schemas/CustomerCreateNestedManyWithoutScheduleOrdersInput"
           },
           "duration": {
             "type": "number"
@@ -44995,25 +46002,37 @@
           "durationUnits": {
             "type": "string"
           },
-          "estimatedDistillationTime": {
+          "estimatedBarrelingStartTime": {
+            "type": "object"
+          },
+          "estimatedDistillationDuration": {
             "type": "number"
+          },
+          "estimatedDistillationStartTime": {
+            "type": "object"
           },
           "estimatedEnd": {
             "type": "object"
           },
-          "estimatedFermentationTime": {
+          "estimatedFermentationDuration": {
             "type": "number"
           },
-          "estimatedMashingTime": {
+          "estimatedFermentationStartTime": {
+            "type": "object"
+          },
+          "estimatedMashingDuration": {
             "type": "number"
           },
-          "estimatedProcessing": {
-            "type": "number"
+          "estimatedMashingStartTime": {
+            "type": "object"
+          },
+          "estimatedProcessingStartTime": {
+            "type": "object"
           },
           "estimatedStart": {
             "type": "object"
           },
-          "estimatedTotalProductionTime": {
+          "estimatedTotalProductionDuration": {
             "type": "number"
           },
           "globalId": {
@@ -45066,6 +46085,29 @@
           "recipeName"
         ]
       },
+      "CustomerUpdateManyWithoutScheduleOrdersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerWhereUniqueInput"
+            }
+          }
+        }
+      },
       "ProductionOrderUpdateManyWithoutScheduleOrdersInput": {
         "type": "object",
         "properties": {
@@ -45102,7 +46144,7 @@
             "type": "string"
           },
           "customers": {
-            "type": "object"
+            "$ref": "#/components/schemas/CustomerUpdateManyWithoutScheduleOrdersInput"
           },
           "duration": {
             "type": "number"
@@ -45110,25 +46152,37 @@
           "durationUnits": {
             "type": "string"
           },
-          "estimatedDistillationTime": {
+          "estimatedBarrelingStartTime": {
+            "type": "object"
+          },
+          "estimatedDistillationDuration": {
             "type": "number"
+          },
+          "estimatedDistillationStartTime": {
+            "type": "object"
           },
           "estimatedEnd": {
             "type": "object"
           },
-          "estimatedFermentationTime": {
+          "estimatedFermentationDuration": {
             "type": "number"
           },
-          "estimatedMashingTime": {
+          "estimatedFermentationStartTime": {
+            "type": "object"
+          },
+          "estimatedMashingDuration": {
             "type": "number"
           },
-          "estimatedProcessing": {
-            "type": "number"
+          "estimatedMashingStartTime": {
+            "type": "object"
+          },
+          "estimatedProcessingStartTime": {
+            "type": "object"
           },
           "estimatedStart": {
             "type": "object"
           },
-          "estimatedTotalProductionTime": {
+          "estimatedTotalProductionDuration": {
             "type": "number"
           },
           "globalId": {
@@ -45958,6 +47012,17 @@
           }
         }
       },
+      "ScheduleOrderCreateNestedManyWithoutCustomersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
+            }
+          }
+        }
+      },
       "CustomerCreateInput": {
         "type": "object",
         "properties": {
@@ -46005,6 +47070,9 @@
           },
           "salesOrders": {
             "$ref": "#/components/schemas/SalesOrderCreateNestedManyWithoutCustomersInput"
+          },
+          "scheduleOrders": {
+            "$ref": "#/components/schemas/ScheduleOrderCreateNestedManyWithoutCustomersInput"
           },
           "schemaVersion": {
             "type": "string"
@@ -46109,6 +47177,29 @@
           }
         }
       },
+      "ScheduleOrderUpdateManyWithoutCustomersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
+            }
+          }
+        }
+      },
       "CustomerUpdateInput": {
         "type": "object",
         "properties": {
@@ -46156,6 +47247,9 @@
           },
           "salesOrders": {
             "$ref": "#/components/schemas/SalesOrderUpdateManyWithoutCustomersInput"
+          },
+          "scheduleOrders": {
+            "$ref": "#/components/schemas/ScheduleOrderUpdateManyWithoutCustomersInput"
           },
           "schemaVersion": {
             "type": "string"
@@ -51036,6 +52130,340 @@
           },
           "quantity": {
             "type": "number"
+          }
+        }
+      },
+      "UnsConfigurationCreateInput": {
+        "type": "object",
+        "properties": {
+          "createdBy": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Create",
+                "Read",
+                "Update",
+                "Delete"
+              ]
+            }
+          },
+          "filterCriteria": {
+            "type": "object"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "transformationFunction": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "createdBy"
+        ]
+      },
+      "UnsConfiguration": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Create",
+                "Read",
+                "Update",
+                "Delete"
+              ]
+            }
+          },
+          "filterCriteria": {
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "transformationFunction": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "createdAt",
+          "createdBy",
+          "id",
+          "updatedAt"
+        ]
+      },
+      "UnsConfigurationWhereInput": {
+        "type": "object",
+        "properties": {
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "enabled": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "entityName": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "filterCriteria": {
+            "$ref": "#/components/schemas/JsonFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "topic": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "transformationFunction": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          }
+        }
+      },
+      "UnsConfigurationUpdateInput": {
+        "type": "object",
+        "properties": {
+          "createdBy": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Create",
+                "Read",
+                "Update",
+                "Delete"
+              ]
+            }
+          },
+          "filterCriteria": {
+            "type": "object"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "transformationFunction": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "UnsBrokerConfigurationCreateInput": {
+        "type": "object",
+        "properties": {
+          "baseTopicPath": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subscriptions": {
+            "type": "object"
+          },
+          "tls": {
+            "type": "boolean"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "validateCertificate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "createdBy",
+          "host"
+        ]
+      },
+      "UnsBrokerConfiguration": {
+        "type": "object",
+        "properties": {
+          "baseTopicPath": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subscriptions": {
+            "type": "object"
+          },
+          "tls": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "validateCertificate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "createdAt",
+          "createdBy",
+          "host",
+          "id",
+          "updatedAt"
+        ]
+      },
+      "UnsBrokerConfigurationWhereInput": {
+        "type": "object",
+        "properties": {
+          "baseTopicPath": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "host": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "port": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "protocol": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "subscriptions": {
+            "$ref": "#/components/schemas/JsonFilter"
+          },
+          "tls": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "username": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "validateCertificate": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          }
+        }
+      },
+      "UnsBrokerConfigurationUpdateInput": {
+        "type": "object",
+        "properties": {
+          "baseTopicPath": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subscriptions": {
+            "type": "object"
+          },
+          "tls": {
+            "type": "boolean"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "validateCertificate": {
+            "type": "boolean"
           }
         }
       }
