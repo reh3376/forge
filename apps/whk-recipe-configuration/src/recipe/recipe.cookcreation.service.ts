@@ -5,12 +5,12 @@ import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class RecipeCookCreationService {
-  private username: string = ''
+  private username = ''
   private mashingProtocolData: any = {}
-  private numberOfCooksPerFerm: number = 3
-  private scheduleOrderQueueId: string = ''
-  private totalNumberOfCooks: number = 0
-  private executedCooks: number = 0
+  private numberOfCooksPerFerm = 3
+  private scheduleOrderQueueId = ''
+  private totalNumberOfCooks = 0
+  private executedCooks = 0
   private cookOperations: Operation[] = []
   private mashingUnitProcedure: UnitProcedure | undefined
 

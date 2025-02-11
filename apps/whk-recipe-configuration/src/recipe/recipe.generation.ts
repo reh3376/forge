@@ -92,7 +92,7 @@ export class RecipeGenerator {
     qty: number,
     binAssignments: BinAssignments,
     grainQuantities: { [key: string]: number },
-    hasPreMalt: boolean = false
+    hasPreMalt = false
   ): any[] {
     this.logger.log(
       `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
@@ -103,7 +103,7 @@ export class RecipeGenerator {
     const SPLITS_RATIO = 0.8;
     const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
 
-    let splits: any[] = [];
+    const splits: any[] = [];
     let remainingQty = grainQuantities[grainType === 'PreMalt' ? 'Malt' : grainType];
 
     // Handle PreMalt separately
@@ -741,7 +741,7 @@ export class RecipeGenerator {
       console.error("Mashing Unit Procedure instance not found");
       return;
     }
-    let newCookInstances: Operation[] = [];
+    const newCookInstances: Operation[] = [];
     for (let cookIndex = startCook; cookIndex < totalNumberOfCooks; cookIndex++) {
       const existingInstance = await client.operation.findFirst({
         where: {
@@ -1053,7 +1053,7 @@ export class RecipeGenerator {
       console.log(`Customer '${this.CUSTOMER_NAME}' not found`);
     }
 
-    let mashBillType: string = "Invalid"; // Default to "Invalid"
+    let mashBillType = "Invalid"; // Default to "Invalid"
     enum Bool {
       False = 0,
       True = 1
@@ -1112,7 +1112,7 @@ export class RecipeGenerator {
       }
     });
 
-    let newParams: RecipeParameter[] = [];
+    const newParams: RecipeParameter[] = [];
     for (const param of this.RECIPE_PARAMETERS) {
       const classParam = await client.recipeParameter.findFirst({
         where: {
@@ -1303,7 +1303,7 @@ export class RecipeGenerator {
         // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
         quantity: this.ORDER_QTY, // Adjust as needed
         name: await (async () => {
-          let baseName = `SO${dayOfYear}${newSalesOrderNumber}`;
+          const baseName = `SO${dayOfYear}${newSalesOrderNumber}`;
           let suffix = 0;
           let finalName = baseName;
           
