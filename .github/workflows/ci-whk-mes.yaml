@@ -40,9 +40,9 @@ jobs:
         run: npm ci
         working-directory: ./apps/whk-recipe-configuration
 
-      # - name: install dependencies
-      #   run: npm install
-      #   working-directory: ./apps/whk-recipe-configuration
+      - name: Check code formatting
+        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+        working-directory: ./apps/whk-recipe-configuration
 
       - name: Run ESLint
         run: |
