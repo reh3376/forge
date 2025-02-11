@@ -339,7 +339,7 @@ export class RecipeCookCreationService {
                   component.item.itemNumber
                     .toLowerCase()
                     .includes(phase.liquidType01.toLowerCase())) //||
-                  // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
+                // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
               ) {
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
