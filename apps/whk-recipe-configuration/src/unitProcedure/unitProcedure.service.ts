@@ -29,7 +29,10 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     Milling01: ["Mill"],
   };
 
-  private async validateOperations(name: string, operations: Array<OperationWhereUniqueInput> | undefined) {
+  private async validateOperations(
+    name: string,
+    operations: Array<OperationWhereUniqueInput> | undefined
+  ) {
     if (!operations?.length) return;
 
     const operationsData = await Promise.all(
@@ -54,7 +57,11 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
       );
     }
 
-    if (!operationsData.every(operation => acceptableOperations.includes(operation.name))) {
+    if (
+      !operationsData.every((operation) =>
+        acceptableOperations.includes(operation.name)
+      )
+    ) {
       throw new BadRequestException(
         `Provided operations do not match acceptable list for unitProcedure: ${name}`
       );
@@ -65,20 +72,23 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     args: Prisma.SelectSubset<T, Prisma.UnitProcedureCreateArgs>
   ): Promise<UnitProcedure> {
     const name = args.data.name;
-    const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
+    const operations = args.data.operations
+      ?.connect as Array<OperationWhereUniqueInput>;
 
     try {
       await this.validateOperations(name, operations);
     } catch (error) {
       if (error instanceof TypeError) {
-        this.logger.log(`UnitProcedure being created without operations: ${error}`);
+        this.logger.log(
+          `UnitProcedure being created without operations: ${error}`
+        );
       } else {
         throw error;
       }
     }
 
     const createdUnitProcedure = await this.prisma.unitProcedure.create(args);
-    await this.emitUnitProcedureEvent('create', createdUnitProcedure);
+    await this.emitUnitProcedureEvent("create", createdUnitProcedure);
     return createdUnitProcedure;
   }
 
@@ -90,16 +100,17 @@ export class UnitProcedureService extends UnitProcedureServiceBase {
     });
     this.logger.log(`Updating Operation: ${unitProcedure.name}`);
 
-    const operations = args.data.operations?.connect as Array<OperationWhereUniqueInput>;
+    const operations = args.data.operations
+      ?.connect as Array<OperationWhereUniqueInput>;
     await this.validateOperations(unitProcedure.name, operations);
 
     const updatedUnitProcedure = await super.updateUnitProcedure(args);
-    await this.emitUnitProcedureEvent('update', updatedUnitProcedure);
+    await this.emitUnitProcedureEvent("update", updatedUnitProcedure);
     return updatedUnitProcedure;
   }
 
   private async emitUnitProcedureEvent(
-    eventType: 'create' | 'update',
+    eventType: "create" | "update",
     unitProcedure: UnitProcedure
   ) {
     await this.rabbitProducer.emitMessage(
