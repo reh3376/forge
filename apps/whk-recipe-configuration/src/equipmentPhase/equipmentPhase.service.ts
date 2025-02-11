@@ -102,33 +102,17 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       Rinse: ["Vessel", "Pipe"],
     };
 
-  async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCreateArgs>
-  ): Promise<EquipmentPhase> {
-    const name = args.data.name as string;
-
-    // check type parameter for compliance with the equipment phase type map
-    const type = args.data.stepType as string;
-    const equipmentPhaseType = this.equipmentPhaseTypeMap[name];
-    // check if type is in the type map
-    if (
-      equipmentPhaseType &&
-      Array.isArray(equipmentPhaseType) &&
-      !equipmentPhaseType.includes(type)
-    ) {
-      throw new BadRequestException(
-        `Equipment Phase Type: ${type} is not supported for entity ${this.constructor.name}`
-      );
-    }
-
-    if (args.data.operation?.connect?.id) {
-      const operationId = args.data.operation?.connect?.id;
+  private async validateOperationAndPhaseParameters(
+    name: string,
+    operationId: string | undefined,
+    phaseParameters: Array<PhaseParameterWhereUniqueInput> | undefined
+  ) {
+    if (operationId) {
       const operation = await this.prisma.operation.findFirstOrThrow({
         where: { id: operationId },
       });
       this.logger.log(`Operation: ${operationId}`);
 
-      // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
       const acceptableUnitProcedures =
         this.operationEquipmentPhasesMap[operation.name];
       this.logger.log(
@@ -142,7 +126,7 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       }
       if (
         !acceptableUnitProcedures.every((unitProcedure) =>
-          acceptableUnitProcedures.includes(args.data.name)
+          acceptableUnitProcedures.includes(name)
         )
       ) {
         throw new BadRequestException(
@@ -151,31 +135,23 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       }
     }
 
-    const phaseParameters = args.data.phaseParameters
-      ?.connect as Array<PhaseParameterWhereUniqueInput>;
-    this.logger.log(`Phase Parameters: ${phaseParameters}`);
-
     if (phaseParameters) {
-      this.logger.log(`Provided phase parameters: ${phaseParameters}`);
       const phaseParametersData = await Promise.all(
         phaseParameters.map(async (phaseParameter) => {
-          const phaseParameterRecord =
-            (await this.prisma.phaseParameter.findUnique({
-              where: { id: phaseParameter.id },
-            })) as any;
-          return {
-            name: phaseParameterRecord.name,
-            id: phaseParameterRecord.id,
-          };
+          const record = await this.prisma.phaseParameter.findUnique({
+            where: { id: phaseParameter.id },
+          });
+          if (!record) {
+            throw new BadRequestException(
+              `Phase parameter not found: ${phaseParameter.id}`
+            );
+          }
+          return { name: record.name, id: record.id };
         })
       );
 
-      this.logger.log(`Provided phase parameters: ${phaseParametersData}`);
       const acceptablePhaseParameters =
         this.equipmentPhaseToPhaseParameterMap[name];
-      this.logger.log(
-        `Acceptable phase parameters: ${acceptablePhaseParameters}`
-      );
       if (!acceptablePhaseParameters) {
         throw new BadRequestException(
           `No phase parameter mapping found for equipment phase: ${name}`
@@ -183,8 +159,8 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
       }
 
       if (
-        !phaseParametersData.every((phaseParameter) =>
-          acceptablePhaseParameters.includes(phaseParameter.name)
+        !phaseParametersData.every((param) =>
+          acceptablePhaseParameters.includes(param.name)
         )
       ) {
         throw new BadRequestException(
@@ -192,20 +168,24 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
         );
       }
     }
+  }
+
+  async createEquipmentPhase<T extends Prisma.EquipmentPhaseCreateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.EquipmentPhaseCreateArgs>
+  ): Promise<EquipmentPhase> {
+    const name = args.data.name;
+    const type = args.data.stepType;
+
+    this.validatePhaseType(name, type);
+    await this.validateOperationAndPhaseParameters(
+      name,
+      args.data.operation?.connect?.id,
+      args.data.phaseParameters
+        ?.connect as Array<PhaseParameterWhereUniqueInput>
+    );
 
     const equipmentPhase = await super.createEquipmentPhase(args);
-
-    await this.rabbitProducer.emitMessage(
-      WhMessageBrokerTopics.WhWhk01Distillery01Equipmentphase,
-      {
-        event_type: "create",
-        data: equipmentPhase,
-        recordName: "EquipmentPhase",
-      }
-    );
-    this.logger.log(
-      `Created equipmentPhase & pushed to topic: ${equipmentPhase.name}`
-    );
+    await this.emitEquipmentPhaseEvent("create", equipmentPhase);
     return equipmentPhase;
   }
 
@@ -215,97 +195,48 @@ export class EquipmentPhaseService extends EquipmentPhaseServiceBase {
     const equipmentPhase = await this.prisma.equipmentPhase.findFirstOrThrow({
       where: { id: args.where.id },
     });
-    this.logger.log(`Updating equipmentPhase: ${equipmentPhase.name}`);
-    const name = equipmentPhase.name;
 
-    if (args.data.operation?.connect?.id) {
-      const operationId = args.data.operation?.connect?.id;
-      const operation = await this.prisma.operation.findFirstOrThrow({
-        where: { id: operationId },
-      });
-      this.logger.log(`Operation: ${operationId}`);
-
-      // check unit procedure against the mapping. The unit procedure name is the key and this operation name should be in the array of acceptable operations
-      const acceptableUnitProcedures =
-        this.operationEquipmentPhasesMap[operation.name];
-      this.logger.log(
-        `Acceptable Unit Procedures: ${acceptableUnitProcedures}`
-      );
-
-      if (!acceptableUnitProcedures) {
-        throw new BadRequestException(
-          `No Unit Procedure mapping found for Operation: ${name}`
-        );
-      }
-
-      if (
-        !acceptableUnitProcedures.every((unitProcedure) =>
-          acceptableUnitProcedures.includes(operation.name)
-        )
-      ) {
-        throw new BadRequestException(
-          `Provided UnitProcedure Id does not match the acceptable list for Operation: ${name}`
-        );
-      }
-    }
-
-    const phaseParameters = args.data.phaseParameters
-      ?.connect as Array<PhaseParameterWhereUniqueInput>;
-    this.logger.log(`Phase Parameters: ${phaseParameters}`);
-
-    if (phaseParameters) {
-      this.logger.log(`Provided phase parameters: ${phaseParameters}`);
-      const phaseParametersData = await Promise.all(
-        phaseParameters.map(async (phaseParameter) => {
-          const phaseParameterRecord =
-            (await this.prisma.phaseParameter.findUnique({
-              where: { id: phaseParameter.id },
-            })) as any;
-          return {
-            name: phaseParameterRecord.name,
-            id: phaseParameterRecord.id,
-          };
-        })
-      );
-
-      this.logger.log(`Provided phase parameters: ${phaseParametersData}`);
-      const acceptablePhaseParameters =
-        this.equipmentPhaseToPhaseParameterMap[name];
-      this.logger.log(
-        `Acceptable phase parameters: ${acceptablePhaseParameters}`
-      );
-      if (!acceptablePhaseParameters) {
-        throw new BadRequestException(
-          `No phase parameter mapping found for equipment phase: ${name}`
-        );
-      }
-
-      if (
-        !phaseParametersData.every((phaseParameter) =>
-          acceptablePhaseParameters.includes(phaseParameter.name)
-        )
-      ) {
-        throw new BadRequestException(
-          `Provided phase parameters do not match acceptable list for equipmentPhase: ${name}`
-        );
-      }
-    }
+    await this.validateOperationAndPhaseParameters(
+      equipmentPhase.name,
+      args.data.operation?.connect?.id,
+      args.data.phaseParameters
+        ?.connect as Array<PhaseParameterWhereUniqueInput>
+    );
 
     const newEquipmentPhase = await super.updateEquipmentPhase(args);
+    await this.emitEquipmentPhaseEvent("update", newEquipmentPhase);
+    return newEquipmentPhase;
+  }
 
+  private async emitEquipmentPhaseEvent(
+    eventType: "create" | "update" | "delete",
+    equipmentPhase: EquipmentPhase
+  ) {
     await this.rabbitProducer.emitMessage(
       WhMessageBrokerTopics.WhWhk01Distillery01Equipmentphase,
       {
-        event_type: "update",
-        data: newEquipmentPhase,
+        event_type: eventType,
+        data: equipmentPhase,
         recordName: "EquipmentPhase",
       }
     );
     this.logger.log(
-      `Updated equipmentPhase & pushed to topic: ${newEquipmentPhase.name}`
+      `${eventType}d equipmentPhase & pushed to topic: ${equipmentPhase.name}`
     );
+  }
 
-    return newEquipmentPhase;
+  private validatePhaseType(name: string, type: string | undefined) {
+    const equipmentPhaseType = this.equipmentPhaseTypeMap[name];
+    if (
+      type &&
+      equipmentPhaseType &&
+      Array.isArray(equipmentPhaseType) &&
+      !equipmentPhaseType.includes(type)
+    ) {
+      throw new BadRequestException(
+        `Equipment Phase Type: ${type} is not supported for entity ${this.constructor.name}`
+      );
+    }
   }
 
   async deleteEquipmentPhase<T extends Prisma.EquipmentPhaseDeleteArgs>(
