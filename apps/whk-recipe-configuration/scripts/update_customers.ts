@@ -1,24 +1,31 @@
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 import * as dotenv from "dotenv";
-import path from 'path';
+import path from "path";
 
 // Update the path to be relative to the current file
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 // Add validation for required environment variables
-const requiredEnvVars = ['MES_USER', 'MES_PASSWORD', 'NODE_ENV'];
-const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const requiredEnvVars = ["MES_USER", "MES_PASSWORD", "NODE_ENV"];
+const missingEnvVars = requiredEnvVars.filter(
+  (varName) => !process.env[varName]
+);
 
 if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  throw new Error(
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`
+  );
 }
 
 const login = async (username: string, password: string) => {
-  const apiEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/api/auth/login' :  `http://localhost:${process.env.PORT}/api/login`;
+  const apiEndpoint =
+    process.env.NODE_ENV === "production"
+      ? "http://10.4.8.25/api/auth/login"
+      : `http://localhost:${process.env.PORT}/api/login`;
   const response = await fetch(apiEndpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ username, password }),
   });
@@ -28,9 +35,9 @@ const login = async (username: string, password: string) => {
   }
 
   const result = await response.json();
-  
+
   console.log(result);
-  return result['accessToken'];
+  return result["accessToken"];
 };
 
 const getAllCustomers = async () => {
@@ -46,19 +53,24 @@ const getAllCustomers = async () => {
   const { MES_USER, MES_PASSWORD } = process.env;
 
   if (!MES_USER || !MES_PASSWORD) {
-    throw new Error("MES_USER and MES_PASSWORD environment variables must be defined");
+    throw new Error(
+      "MES_USER and MES_PASSWORD environment variables must be defined"
+    );
   }
 
   const loginResult = await login(MES_USER, MES_PASSWORD);
   const jwtToken = loginResult;
   console.log(jwtToken);
 
-  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : `http://localhost:${process.env.PORT}/graphql`;
+  const graphqlEndpoint =
+    process.env.NODE_ENV === "production"
+      ? "http://10.4.8.25/graphql"
+      : `http://localhost:${process.env.PORT}/graphql`;
   const response = await fetch(graphqlEndpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${jwtToken}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwtToken}`,
     },
     body: JSON.stringify({ query }),
   });
@@ -85,19 +97,24 @@ const updateCustomer = async (customerId: string, customerCode: string) => {
   const { MES_USER, MES_PASSWORD } = process.env;
 
   if (!MES_USER || !MES_PASSWORD) {
-    throw new Error("MES_USER and MES_PASSWORD environment variables must be defined");
+    throw new Error(
+      "MES_USER and MES_PASSWORD environment variables must be defined"
+    );
   }
 
   const loginResult = await login(MES_USER, MES_PASSWORD);
   const jwtToken = loginResult;
   console.log(jwtToken);
 
-  const graphqlEndpoint = process.env.NODE_ENV === 'production' ? 'http://10.4.8.25/graphql' : `http://localhost:${process.env.PORT}/graphql`;
+  const graphqlEndpoint =
+    process.env.NODE_ENV === "production"
+      ? "http://10.4.8.25/graphql"
+      : `http://localhost:${process.env.PORT}/graphql`;
   const response = await fetch(graphqlEndpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${jwtToken}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwtToken}`,
     },
     body: JSON.stringify({ query }),
   });
@@ -113,13 +130,15 @@ const processAllCustomers = async () => {
     console.log(`Found ${customers.length} customers to update`);
 
     for (const customer of customers) {
-      console.log(`Updating customer ${customer.customerCode} (${customer.id})`);
+      console.log(
+        `Updating customer ${customer.customerCode} (${customer.id})`
+      );
       await updateCustomer(customer.id, customer.customerCode);
     }
 
-    console.log('All customers updated successfully');
+    console.log("All customers updated successfully");
   } catch (error) {
-    console.error('Error processing customers:', error);
+    console.error("Error processing customers:", error);
   }
 };
 

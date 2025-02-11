@@ -16,67 +16,77 @@ export class RecipeService extends RecipeServiceBase {
     super(prisma);
   }
 
-  async createRecipe<T extends Prisma.RecipeCreateArgs>(args: Prisma.SelectSubset<T, Prisma.RecipeCreateArgs>): Promise<import(".prisma/client").Recipe> {
-      const recipe = await super.createRecipe({
-          data: {
-              ...args.data,
-          },
-          include: {
-              ...args.include,
-              item: true,
-              customer: true,
-              recipeGroup: true,
-              recipeBoms: true,
-              unitProcedures: true,
-              productionOrders: true,
-          }
-      });
-      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Recipe, {
-      recordName: 'Recipe',
-      event_type: 'create',
-      data: recipe
-      });
-      this.logger.log(`Created Recipe: ${recipe.id} & pushed to topic`);
-      return recipe;
+  async createRecipe<T extends Prisma.RecipeCreateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.RecipeCreateArgs>
+  ): Promise<import(".prisma/client").Recipe> {
+    const recipe = await super.createRecipe({
+      data: {
+        ...args.data,
+      },
+      include: {
+        ...args.include,
+        item: true,
+        customer: true,
+        recipeGroup: true,
+        recipeBoms: true,
+        unitProcedures: true,
+        productionOrders: true,
+      },
+    });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Recipe,
+      {
+        recordName: "Recipe",
+        event_type: "create",
+        data: recipe,
+      }
+    );
+    this.logger.log(`Created Recipe: ${recipe.id} & pushed to topic`);
+    return recipe;
   }
- 
-  async updateRecipe<T extends Prisma.RecipeUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.RecipeUpdateArgs>): Promise<import(".prisma/client").Recipe> {
-      const recipe = await super.updateRecipe({
-          data: {
-              ...args.data,
-          },
-          include: {
-              ...args.include,
-              item: true,
-              customer: true,
-              recipeGroup: true,
-              recipeBoms: true,
-              unitProcedures: true,
-              productionOrders: true,
-          },
-          where: args.where,
-      });
-      await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Recipe, {
-      recordName: 'Recipe',
-      event_type: 'update',
-      data: recipe
-      });
-      this.logger.log(`Updated Recipe: ${recipe.id} & pushed to topic`);
-      return recipe;
+
+  async updateRecipe<T extends Prisma.RecipeUpdateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.RecipeUpdateArgs>
+  ): Promise<import(".prisma/client").Recipe> {
+    const recipe = await super.updateRecipe({
+      data: {
+        ...args.data,
+      },
+      include: {
+        ...args.include,
+        item: true,
+        customer: true,
+        recipeGroup: true,
+        recipeBoms: true,
+        unitProcedures: true,
+        productionOrders: true,
+      },
+      where: args.where,
+    });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Recipe,
+      {
+        recordName: "Recipe",
+        event_type: "update",
+        data: recipe,
+      }
+    );
+    this.logger.log(`Updated Recipe: ${recipe.id} & pushed to topic`);
+    return recipe;
   }
 
   /**
    * Retrieves active recipes from the database.
-   * 
+   *
    * This method fetches recipes that are associated with active production orders.
    * It joins the Recipe table with ProductionOrder, ScheduleOrder, and ScheduleOrderQueue tables
    * to get the relevant information.
-   * 
+   *
    * @author: Patrick Mannion
    * @date: 2024-10-07
    * @returns {Promise<any[]>} A promise that resolves to an array of active recipe objects.
    * Each object contains recipe details along with the creation date from ScheduleOrderQueue.
-   * 
+   *
    * @throws {Error} If there's an issue with the database query or connection.
    */
   async getActiveRecipes() {

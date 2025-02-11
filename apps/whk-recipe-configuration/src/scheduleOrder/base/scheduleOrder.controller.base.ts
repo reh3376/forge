@@ -562,7 +562,7 @@ export class ScheduleOrderControllerBase {
         startDate: true,
         status: true,
         totalCooks: true,
-        totalFermenters: true, 
+        totalFermenters: true,
         executedCooks: true,
         executedFermenters: true,
         units: true,

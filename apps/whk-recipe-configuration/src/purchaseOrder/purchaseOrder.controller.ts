@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import * as errors from "../errors";
 
 import { PurchaseOrderService } from "./purchaseOrder.service";
@@ -15,8 +20,7 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
   constructor(
     protected readonly service: PurchaseOrderService,
     @InjectRolesBuilder()
-    protected readonly rolesBuilder: RolesBuilder,
-
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }
@@ -33,9 +37,12 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
     type: errors.ForbiddenException,
   })
   async purchaseOrdersWithLineItems(
-    @common.Query('purchaseOrderType') purchaseOrderType: string = ''
+    @common.Query("purchaseOrderType") purchaseOrderType: string = ""
   ): Promise<PurchaseOrder[]> {
-    const purchaseOrders = await this.service.getPurchaseOrdersWithLineItemsByType(purchaseOrderType);
+    const purchaseOrders =
+      await this.service.getPurchaseOrdersWithLineItemsByType(
+        purchaseOrderType
+      );
     return purchaseOrders;
   }
 
@@ -52,9 +59,10 @@ export class PurchaseOrderController extends PurchaseOrderControllerBase {
   })
   async purchaseOrderWithLineItems(
     @common.Param() params: PurchaseOrderWhereUniqueInput
-
   ): Promise<PurchaseOrder | null> {
-    const purchaseOrder = await this.service.getPurchaseOrderWithLineItemsById(params.id);
+    const purchaseOrder = await this.service.getPurchaseOrderWithLineItemsById(
+      params.id
+    );
     return purchaseOrder;
   }
 }

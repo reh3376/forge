@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { InventoryService } from "./inventory.service";
 import { InventoryControllerBase } from "./base/inventory.controller.base";
 import { InventorySiloTrackingService } from "./inventory.silotracking.service";
@@ -38,9 +43,22 @@ export class InventoryController extends InventoryControllerBase {
     possession: "any",
   })
   async addLotToAsset(
-    @common.Body() body: { lotId: string; assetId: string; quantity: number; itemId: string, itemReceiptId: string }
+    @common.Body()
+    body: {
+      lotId: string;
+      assetId: string;
+      quantity: number;
+      itemId: string;
+      itemReceiptId: string;
+    }
   ): Promise<Inventory | undefined> {
-    return this.siloTrackingService.addLotToAsset(body.lotId, body.assetId, body.quantity, body.itemId, body.itemReceiptId);
+    return this.siloTrackingService.addLotToAsset(
+      body.lotId,
+      body.assetId,
+      body.quantity,
+      body.itemId,
+      body.itemReceiptId
+    );
   }
 
   @common.Post("silo/deduct")
@@ -63,7 +81,10 @@ export class InventoryController extends InventoryControllerBase {
   async deductFromAsset(
     @common.Body() body: { assetId: string; quantity: number }
   ): Promise<void> {
-    return this.siloTrackingService.deductFromAsset(body.assetId, body.quantity);
+    return this.siloTrackingService.deductFromAsset(
+      body.assetId,
+      body.quantity
+    );
   }
 
   @common.Get("silo/:assetId")
@@ -74,7 +95,9 @@ export class InventoryController extends InventoryControllerBase {
     action: "read",
     possession: "any",
   })
-  async getAssetInventory(@common.Param("assetId") assetId: string): Promise<{inventory: any[], totalInventory: number}> {
+  async getAssetInventory(
+    @common.Param("assetId") assetId: string
+  ): Promise<{ inventory: any[]; totalInventory: number }> {
     return this.siloTrackingService.getAssetInventory(assetId);
   }
 
@@ -98,8 +121,19 @@ export class InventoryController extends InventoryControllerBase {
     possession: "any",
   })
   async transferBetweenAssets(
-    @common.Body() body: { sourceAssetId: string; destAssetId: string; quantity: number; itemId: string }
+    @common.Body()
+    body: {
+      sourceAssetId: string;
+      destAssetId: string;
+      quantity: number;
+      itemId: string;
+    }
   ): Promise<void> {
-    return this.siloTrackingService.transferBetweenAssets(body.sourceAssetId, body.destAssetId, body.quantity, body.itemId);
+    return this.siloTrackingService.transferBetweenAssets(
+      body.sourceAssetId,
+      body.destAssetId,
+      body.quantity,
+      body.itemId
+    );
   }
 }

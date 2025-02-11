@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import * as errors from "../errors";
 
 import { ScheduleOrderQueueService } from "./scheduleOrderQueue.service";
@@ -47,14 +52,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
 
         nextUnitProcedure: data.nextUnitProcedure
           ? {
-            connect: data.nextUnitProcedure,
-          }
+              connect: data.nextUnitProcedure,
+            }
           : undefined,
 
         scheduleOrder: data.scheduleOrder
           ? {
-            connect: data.scheduleOrder,
-          }
+              connect: data.scheduleOrder,
+            }
           : undefined,
       },
       select: {
@@ -111,14 +116,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
 
           nextUnitProcedure: data.nextUnitProcedure
             ? {
-              connect: data.nextUnitProcedure,
-            }
+                connect: data.nextUnitProcedure,
+              }
             : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
-              connect: data.scheduleOrder,
-            }
+                connect: data.scheduleOrder,
+              }
             : undefined,
         },
         select: {
@@ -182,14 +187,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
           ...data,
           nextUnitProcedure: data.nextUnitProcedure
             ? {
-              connect: data.nextUnitProcedure,
-            }
+                connect: data.nextUnitProcedure,
+              }
             : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
-              connect: data.scheduleOrder,
-            }
+                connect: data.scheduleOrder,
+              }
             : undefined,
         },
         select: {
@@ -251,14 +256,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
           ...data,
           nextUnitProcedure: data.nextUnitProcedure
             ? {
-              connect: data.nextUnitProcedure,
-            }
+                connect: data.nextUnitProcedure,
+              }
             : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
-              connect: data.scheduleOrder,
-            }
+                connect: data.scheduleOrder,
+              }
             : undefined,
         },
       });
@@ -296,14 +301,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
           ...data,
           nextUnitProcedure: data.nextUnitProcedure
             ? {
-              connect: data.nextUnitProcedure,
-            }
+                connect: data.nextUnitProcedure,
+              }
             : undefined,
 
           scheduleOrder: data.scheduleOrder
             ? {
-              connect: data.scheduleOrder,
-            }
+                connect: data.scheduleOrder,
+              }
             : undefined,
         },
       });
@@ -332,14 +337,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @swagger.ApiBody({
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
         newIndex: {
-          type: 'number',
-          description: 'New queue index position'
-        }
-      }
-    }
+          type: "number",
+          description: "New queue index position",
+        },
+      },
+    },
   })
   async updateScheduleOrderQueueIndex(
     @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
@@ -355,14 +360,14 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
             ...data,
             nextUnitProcedure: data.nextUnitProcedure
               ? {
-                connect: data.nextUnitProcedure,
-              }
+                  connect: data.nextUnitProcedure,
+                }
               : undefined,
 
             scheduleOrder: data.scheduleOrder
               ? {
-                connect: data.scheduleOrder,
-              }
+                  connect: data.scheduleOrder,
+                }
               : undefined,
           },
         },
@@ -378,25 +383,26 @@ export class ScheduleOrderQueueController extends ScheduleOrderQueueControllerBa
     }
   }
 
-  @common.Post('add-production-order-to-queue/:id')
+  @common.Post("add-production-order-to-queue/:id")
   @swagger.ApiOperation({
-    summary: 'Create schedule order and add to queue from production order',
-    description: 'Creates a new schedule order from a production order and adds it to the queue'
+    summary: "Create schedule order and add to queue from production order",
+    description:
+      "Creates a new schedule order from a production order and adds it to the queue",
   })
   @swagger.ApiParam({
-    name: 'id',
-    type: 'string',
-    description: 'Production order ID'
+    name: "id",
+    type: "string",
+    description: "Production order ID",
   })
   @swagger.ApiCreatedResponse({ type: ScheduleOrderQueue })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   async createAndQueueScheduleOrder(
-    @common.Param('id') id: string,
-    @common.Body('startDate') startDate?: Date,
-    @common.Body('endDate') endDate?: Date,
-    @common.Body('bblPerFerm') bblPerFerm?: number,
-    @common.Body('yieldPgPerBsh') yieldPgPerBsh?: number,
-    @common.Body('pgsPerBbl') pgsPerBbl?: number
+    @common.Param("id") id: string,
+    @common.Body("startDate") startDate?: Date,
+    @common.Body("endDate") endDate?: Date,
+    @common.Body("bblPerFerm") bblPerFerm?: number,
+    @common.Body("yieldPgPerBsh") yieldPgPerBsh?: number,
+    @common.Body("pgsPerBbl") pgsPerBbl?: number
   ): Promise<ScheduleOrderQueue> {
     try {
       const params: {

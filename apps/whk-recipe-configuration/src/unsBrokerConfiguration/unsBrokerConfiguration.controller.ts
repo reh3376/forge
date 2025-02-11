@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { UnsBrokerConfigurationService } from "./unsBrokerConfiguration.service";
 import { UnsBrokerConfigurationControllerBase } from "./base/unsBrokerConfiguration.controller.base";
 

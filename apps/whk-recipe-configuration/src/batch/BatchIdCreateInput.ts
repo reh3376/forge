@@ -9,91 +9,91 @@ import { IsJSONValue } from "../validators";
 
 @ArgsType()
 class BatchIdCreateInput {
-    @Field(() => String)
-    @ApiProperty({
-        required: true,
-        type: () => String
-    })
-    @Type(() => String)
-    operation!: string;
+  @Field(() => String)
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @Type(() => String)
+  operation!: string;
 
-    @ApiProperty({
-        required: false,
-    })
-    @IsJSONValue()
-    @IsOptional()
-    @Field(() => GraphQLJSON, {
-        nullable: true,
-    })
-    batchData?: InputJsonValue;
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  batchData?: InputJsonValue;
 
-    @ApiProperty({
-        required: false,
-    })
-    @IsJSONValue()
-    @IsOptional()
-    @Field(() => GraphQLJSON, {
-        nullable: true,
-    })
-    parameterData?: InputJsonValue;
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  parameterData?: InputJsonValue;
 
-    @ApiProperty({
-        required: false,
-    })
-    @IsJSONValue()
-    @IsOptional()
-    @Field(() => GraphQLJSON, {
-        nullable: true,
-    })
-    initialData?: InputJsonValue;
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  initialData?: InputJsonValue;
 
-    @ApiProperty({
-        required: false,
-    })
-    @Type(() => AssetWhereUniqueInput)
-    @IsOptional()
-    @Field(() => AssetWhereUniqueInput, {
-        nullable: true,
-    })
-    asset?: AssetWhereUniqueInput;
+  @ApiProperty({
+    required: false,
+  })
+  @Type(() => AssetWhereUniqueInput)
+  @IsOptional()
+  @Field(() => AssetWhereUniqueInput, {
+    nullable: true,
+  })
+  asset?: AssetWhereUniqueInput;
 
-    @ApiProperty({
-        required: false,
-    })
-    @Type(() => String)
-    @IsOptional()
-    @Field(() => String, {
-        nullable: true,
-    })
-    assetPath?: string;
+  @ApiProperty({
+    required: false,
+  })
+  @Type(() => String)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  assetPath?: string;
 
-    @ApiProperty({
-        required: false,
-    })
-    @Type(() => String)
-    @IsOptional()
-    @Field(() => String, {
-        nullable: true,
-    })
-    recipeId?: string;
+  @ApiProperty({
+    required: false,
+  })
+  @Type(() => String)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeId?: string;
 
-    @ApiProperty({
-        required: false,
-    })
-    @Type(() => Number)
-    @IsOptional()
-    @Field(() => Number, {
-        nullable: true,
-    })
-    quantity?: number;
+  @ApiProperty({
+    required: false,
+  })
+  @Type(() => Number)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  quantity?: number;
 
-    @Field(() => String)
-    @ApiProperty({
-        required: true,
-        type: () => String
-    })
-    @Type(() => String)
-    createdBy!: string;
+  @Field(() => String)
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @Type(() => String)
+  createdBy!: string;
 }
 
 export { BatchIdCreateInput as BatchIdCreateInput };

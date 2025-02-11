@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { LotService } from "./lot.service";
 import { LotControllerBase } from "./base/lot.controller.base";
 // import { LotCreateInput } from "./base/LotCreateInput";
@@ -31,11 +36,11 @@ export class LotController extends LotControllerBase {
   async create(@common.Body() data: LotCreateInput): Promise<LotCreateInput> {
     const sanitizedLotNumber = data.lotNumber?.replace(/\n|\r/g, "") ?? "";
     console.log(`LotNumber: ${sanitizedLotNumber}`);
-    
+
     return this.service.createLot({
       data: {
         ...data,
-        lotNumber: data.lotNumber || '',
+        lotNumber: data.lotNumber || "",
         filledFrom: data.filledFrom
           ? {
               connect: data.filledFrom,
@@ -50,7 +55,7 @@ export class LotController extends LotControllerBase {
 
         item: data.item
           ? {
-              connect: data.item ,
+              connect: data.item,
             }
           : undefined,
 

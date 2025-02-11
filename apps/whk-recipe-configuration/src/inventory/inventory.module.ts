@@ -9,7 +9,11 @@ import { InventorySiloTrackingService } from "./inventory.silotracking.service";
 @Module({
   imports: [InventoryModuleBase, forwardRef(() => AuthModule)],
   controllers: [InventoryController],
-  providers: [InventoryService, InventoryResolver, InventorySiloTrackingService], // Add SiloTrackingService here
+  providers: [
+    InventoryService,
+    InventoryResolver,
+    InventorySiloTrackingService,
+  ], // Add SiloTrackingService here
   exports: [InventoryService, InventorySiloTrackingService], // Add SiloTrackingService to exports
 })
 export class InventoryModule {}

@@ -29,7 +29,7 @@ export class LocalStorageService extends StorageServiceBase {
     file: FileUpload,
     extensions: string[],
     maxSize?: number,
-    containerPath?: string,
+    containerPath?: string
   ): Promise<LocalStorageFile> {
     try {
       await this.verifyFile(file, extensions, maxSize);
@@ -57,7 +57,7 @@ export class LocalStorageService extends StorageServiceBase {
           createReadStream()
             .pipe(createWriteStream(path))
             .on("finish", resolve)
-            .on("error", reject),
+            .on("error", reject)
         );
       } else if (buffer) {
         await new Promise((resolve, reject) =>
@@ -67,7 +67,7 @@ export class LocalStorageService extends StorageServiceBase {
             } else {
               resolve(true);
             }
-          }),
+          })
         );
       } else {
         throw new Error("Neither createReadStream nor buffer provided");
@@ -102,7 +102,7 @@ export class LocalStorageService extends StorageServiceBase {
         } else {
           resolve(true);
         }
-      }),
+      })
     );
   }
 }

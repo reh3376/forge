@@ -17,7 +17,9 @@ export class CustomerService extends CustomerServiceBase {
     super(prisma);
   }
 
-  async updateCustomer<T extends Prisma.CustomerUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.CustomerUpdateArgs>): Promise<import(".prisma/client").Customer> {
+  async updateCustomer<T extends Prisma.CustomerUpdateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.CustomerUpdateArgs>
+  ): Promise<import(".prisma/client").Customer> {
     const customer = await super.updateCustomer({
       data: {
         ...args.data,
@@ -28,11 +30,14 @@ export class CustomerService extends CustomerServiceBase {
       where: args.where,
     });
 
-    await this.rabbitProducer.emitMessage(WhMessageBrokerTopics.WhWhk01Distillery01Customer, {
-      event_type: 'update',
-      data: customer,
-      recordName: 'Customer',
-    });
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Customer,
+      {
+        event_type: "update",
+        data: customer,
+        recordName: "Customer",
+      }
+    );
 
     return customer;
   }

@@ -12,7 +12,13 @@ import { EnzymeDosingService } from "./enzyme.dosing";
 @Module({
   imports: [RecipeModuleBase, forwardRef(() => AuthModule), RabbitMQModule],
   controllers: [RecipeController],
-  providers: [RecipeService, RecipeResolver, RecipeCookCreationService, RecipeGenerator, EnzymeDosingService],
+  providers: [
+    RecipeService,
+    RecipeResolver,
+    RecipeCookCreationService,
+    RecipeGenerator,
+    EnzymeDosingService,
+  ],
   exports: [RecipeService],
 })
 export class RecipeModule {}
