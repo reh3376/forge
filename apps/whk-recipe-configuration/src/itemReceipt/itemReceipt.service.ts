@@ -83,7 +83,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         item: true,
       }
     });
-    let quantityInPounds = args.data.quantity;
+    const quantityInPounds = args.data.quantity;
     this.logger.debug(`Quantity in the args: ${quantityInPounds}`);
     // Check if quantity is in the args and over 10k
     if (quantityInPounds && typeof quantityInPounds === 'number' && quantityInPounds > 10000) {

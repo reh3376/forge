@@ -20,7 +20,7 @@ export class LotService extends LotServiceBase {
 
   async calculateLotAnalytics(
     lot: LotCreateInput | (LotUpdateInput & { where: Prisma.LotWhereUniqueInput } & { data: Prisma.LotUpdateInput }),
-    type: string='create'
+    type='create'
   ): Promise<any> {
     /* CALCULATION DEFINITIONS
 

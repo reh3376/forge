@@ -16,7 +16,7 @@ export const SecretsManagerFactory = {
 
     const client = new SecretClient(url, credential)
 
-    var secrets: SecretsList = {};
+    let secrets: SecretsList = {};
 
     for (const path of Object.values(EnumSecretsNameKey)) {
       const [name, version] = path.split(":")

@@ -113,7 +113,7 @@ export class SyncService implements OnModuleInit {
                     const relationLine: string = line.trim() || '';
                     const fieldName: string = relationLine.split(' ')[0];
                     const match: RegExpMatchArray | null = relationLine.match(/ (\S+)\[\]/);
-                    let relation: string = '';
+                    let relation = '';
                     if (match) {
                         relation = match[1];
                     }
@@ -222,7 +222,7 @@ export class SyncService implements OnModuleInit {
     }
 
 
-    async upsertEntity(entityName: string, data: any, type: string = 'create'): Promise<void> {
+    async upsertEntity(entityName: string, data: any, type = 'create'): Promise<void> {
         // Convert the entityName to lowercase to match the Prisma model name
         this.logger.debug(`Upserting ${entityName} with data: ${JSON.stringify(data)}`);
         const entity = entityName.toLowerCase();
@@ -331,7 +331,7 @@ export class SyncService implements OnModuleInit {
 
     private async convertToConnectPrismaFormat(nestedEntityName: string, nestedEntities: Record<string, unknown>): Promise<Record<string, unknown> | undefined> {
       // loop through the nested plural entity
-      let inst = [];
+      const inst = [];
       if (nestedEntities !== undefined) {
         if (Array.isArray(nestedEntities)) {
             for (const nestedEntity of nestedEntities) {
