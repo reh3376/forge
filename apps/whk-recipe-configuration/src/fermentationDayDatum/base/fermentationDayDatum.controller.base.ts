@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { FermentationDayDatumService } from "../fermentationDayDatum.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -28,16 +28,16 @@ import { FermentationDayDatumWhereUniqueInput } from "./FermentationDayDatumWher
 import { FermentationDayDatumUpdateInput } from "./FermentationDayDatumUpdateInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class FermentationDayDatumControllerBase {
   constructor(
     protected readonly service: FermentationDayDatumService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: FermentationDayDatum })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "create",
     possession: "any",
@@ -124,7 +124,7 @@ export class FermentationDayDatumControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [FermentationDayDatum] })
   @ApiNestedQuery(FermentationDayDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "read",
     possession: "any",
@@ -187,7 +187,7 @@ export class FermentationDayDatumControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: FermentationDayDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "read",
     possession: "own",
@@ -255,7 +255,7 @@ export class FermentationDayDatumControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: FermentationDayDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationDayDatum",
     action: "update",
     possession: "any",

@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { MashingProtocolService } from "../mashingProtocol.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -40,16 +40,16 @@ import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProto
 import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class MashingProtocolControllerBase {
   constructor(
     protected readonly service: MashingProtocolService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: MashingProtocol })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "create",
     possession: "any",
@@ -111,7 +111,7 @@ export class MashingProtocolControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [MashingProtocol] })
   @ApiNestedQuery(MashingProtocolFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -157,7 +157,7 @@ export class MashingProtocolControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: MashingProtocol })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "own",
@@ -208,7 +208,7 @@ export class MashingProtocolControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: MashingProtocol })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -280,7 +280,7 @@ export class MashingProtocolControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/batches")
   @ApiNestedQuery(BatchFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -372,7 +372,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Post("/:id/batches")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -394,7 +394,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Patch("/:id/batches")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -416,7 +416,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Delete("/:id/batches")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -440,7 +440,7 @@ export class MashingProtocolControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/masterInstances")
   @ApiNestedQuery(MashingProtocolFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -487,7 +487,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Post("/:id/masterInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -509,7 +509,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Patch("/:id/masterInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -531,7 +531,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Delete("/:id/masterInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -555,7 +555,7 @@ export class MashingProtocolControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrderRecipeInstances")
   @ApiNestedQuery(ProductionOrderRecipeInstanceFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -603,7 +603,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Post("/:id/productionOrderRecipeInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -625,7 +625,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Patch("/:id/productionOrderRecipeInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -647,7 +647,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Delete("/:id/productionOrderRecipeInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -671,7 +671,7 @@ export class MashingProtocolControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipes")
   @ApiNestedQuery(RecipeFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",
@@ -744,7 +744,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Post("/:id/recipes")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -766,7 +766,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Patch("/:id/recipes")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -788,7 +788,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Delete("/:id/recipes")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -812,7 +812,7 @@ export class MashingProtocolControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/runningInstances")
   @ApiNestedQuery(MashingProtocolFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -859,7 +859,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Post("/:id/runningInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -881,7 +881,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Patch("/:id/runningInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -903,7 +903,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Delete("/:id/runningInstances")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -927,7 +927,7 @@ export class MashingProtocolControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/steps")
   @ApiNestedQuery(MashingProtocolStepFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStep",
     action: "read",
     possession: "any",
@@ -977,7 +977,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Post("/:id/steps")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -999,7 +999,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Patch("/:id/steps")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",
@@ -1021,7 +1021,7 @@ export class MashingProtocolControllerBase {
   }
 
   @common.Delete("/:id/steps")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "update",
     possession: "any",

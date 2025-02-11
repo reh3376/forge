@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { MashingDatumService } from "../mashingDatum.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
 import { AdditiveActualWhereUniqueInput } from "../../additiveActual/base/AdditiveActualWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class MashingDatumControllerBase {
   constructor(
     protected readonly service: MashingDatumService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: MashingDatum })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "create",
     possession: "any",
@@ -137,7 +137,7 @@ export class MashingDatumControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [MashingDatum] })
   @ApiNestedQuery(MashingDatumFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "any",
@@ -204,7 +204,7 @@ export class MashingDatumControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: MashingDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "read",
     possession: "own",
@@ -278,7 +278,7 @@ export class MashingDatumControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: MashingDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "update",
     possession: "any",
@@ -385,7 +385,7 @@ export class MashingDatumControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: MashingDatum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "delete",
     possession: "any",
@@ -461,7 +461,7 @@ export class MashingDatumControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/additiveActuals")
   @ApiNestedQuery(AdditiveActualFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "AdditiveActual",
     action: "read",
     possession: "any",
@@ -505,7 +505,7 @@ export class MashingDatumControllerBase {
   }
 
   @common.Post("/:id/additiveActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "update",
     possession: "any",
@@ -527,7 +527,7 @@ export class MashingDatumControllerBase {
   }
 
   @common.Patch("/:id/additiveActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "update",
     possession: "any",
@@ -549,7 +549,7 @@ export class MashingDatumControllerBase {
   }
 
   @common.Delete("/:id/additiveActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingDatum",
     action: "update",
     possession: "any",

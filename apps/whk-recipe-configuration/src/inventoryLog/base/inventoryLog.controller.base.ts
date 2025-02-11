@@ -16,8 +16,8 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
+import { DefaultAuthGuard } from "../../auth/defaultAuth.guard";
 import { InventoryLogService } from "../inventoryLog.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
@@ -31,16 +31,16 @@ import { Customer } from "../../customer/base/Customer";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
+@common.UseGuards(DefaultAuthGuard, ACGuard)
 export class InventoryLogControllerBase {
   constructor(
     protected readonly service: InventoryLogService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: InventoryLog })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "create",
     possession: "any",
@@ -100,7 +100,7 @@ export class InventoryLogControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [InventoryLog] })
   @ApiNestedQuery(InventoryLogFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "read",
     possession: "any",
@@ -146,7 +146,7 @@ export class InventoryLogControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: InventoryLog })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "read",
     possession: "own",
@@ -199,7 +199,7 @@ export class InventoryLogControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: InventoryLog })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "update",
     possession: "any",
@@ -269,7 +269,7 @@ export class InventoryLogControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: InventoryLog })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "delete",
     possession: "any",
@@ -324,7 +324,7 @@ export class InventoryLogControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/customers")
   @ApiNestedQuery(CustomerFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "read",
     possession: "any",
@@ -369,7 +369,7 @@ export class InventoryLogControllerBase {
   }
 
   @common.Post("/:id/customers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "update",
     possession: "any",
@@ -391,7 +391,7 @@ export class InventoryLogControllerBase {
   }
 
   @common.Patch("/:id/customers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "update",
     possession: "any",
@@ -413,7 +413,7 @@ export class InventoryLogControllerBase {
   }
 
   @common.Delete("/:id/customers")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "InventoryLog",
     action: "update",
     possession: "any",

@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import { BatchService } from "./batch.service";
 import { BatchControllerBase } from "./base/batch.controller.base";
 import { BatchIdCreateInput } from "./BatchIdCreateInput";
@@ -11,8 +11,8 @@ import { Batch } from "./base/Batch";
 export class BatchController extends BatchControllerBase {
   constructor(
     protected readonly service: BatchService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }

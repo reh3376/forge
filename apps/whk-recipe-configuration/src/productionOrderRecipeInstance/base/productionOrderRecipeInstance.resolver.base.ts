@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -40,11 +40,11 @@ import { ProductionOrderRecipeInstanceService } from "../productionOrderRecipeIn
 export class ProductionOrderRecipeInstanceResolverBase {
   constructor(
     protected readonly service: ProductionOrderRecipeInstanceService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -60,7 +60,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ProductionOrderRecipeInstance])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -73,7 +73,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ProductionOrderRecipeInstance, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "own",
@@ -90,7 +90,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ProductionOrderRecipeInstance)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "create",
     possession: "any",
@@ -116,7 +116,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => ProductionOrderRecipeInstance)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "update",
     possession: "any",
@@ -150,7 +150,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
   }
 
   @graphql.Mutation(() => ProductionOrderRecipeInstance)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "delete",
     possession: "any",
@@ -172,7 +172,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -192,7 +192,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingProtocol], { name: "mashingProtocol" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -212,7 +212,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBom], { name: "recipeBom" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBom",
     action: "read",
     possession: "any",
@@ -235,7 +235,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
     nullable: true,
     name: "productionOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -256,7 +256,7 @@ export class ProductionOrderRecipeInstanceResolverBase {
     nullable: true,
     name: "recipe",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",

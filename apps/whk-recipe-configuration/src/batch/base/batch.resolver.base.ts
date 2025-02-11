@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -42,11 +42,11 @@ import { BatchService } from "../batch.service";
 export class BatchResolverBase {
   constructor(
     protected readonly service: BatchService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -62,7 +62,7 @@ export class BatchResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Batch])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -73,7 +73,7 @@ export class BatchResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Batch, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "own",
@@ -90,7 +90,7 @@ export class BatchResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Batch)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "create",
     possession: "any",
@@ -154,7 +154,7 @@ export class BatchResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Batch)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "update",
     possession: "any",
@@ -229,7 +229,7 @@ export class BatchResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "children" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -251,7 +251,7 @@ export class BatchResolverBase {
   @graphql.ResolveField(() => [FermentationChemistry], {
     name: "fermentationChemistries",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "FermentationChemistry",
     action: "read",
     possession: "any",
@@ -274,7 +274,7 @@ export class BatchResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBomItems" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",
@@ -297,7 +297,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "asset",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Asset",
     action: "read",
     possession: "any",
@@ -316,7 +316,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "customer",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "read",
     possession: "any",
@@ -335,7 +335,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "lot",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -354,7 +354,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "mashingProtocol",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocol",
     action: "read",
     possession: "any",
@@ -375,7 +375,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "parent",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Batch",
     action: "read",
     possession: "any",
@@ -394,7 +394,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "productionOrder",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrder",
     action: "read",
     possession: "any",
@@ -415,7 +415,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "productionOrderRecipeInstance",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "ProductionOrderRecipeInstance",
     action: "read",
     possession: "any",
@@ -438,7 +438,7 @@ export class BatchResolverBase {
     nullable: true,
     name: "recipe",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Recipe",
     action: "read",
     possession: "any",

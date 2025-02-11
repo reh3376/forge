@@ -13,7 +13,7 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, RolesBuilder, UseRoles } from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
@@ -33,11 +33,11 @@ import { ProcedureService } from "../procedure.service";
 export class ProcedureResolverBase {
   constructor(
     protected readonly service: ProcedureService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    protected readonly rolesBuilder: RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",
@@ -53,7 +53,7 @@ export class ProcedureResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Procedure])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",
@@ -66,7 +66,7 @@ export class ProcedureResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Procedure, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "own",
@@ -83,7 +83,7 @@ export class ProcedureResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Procedure)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "create",
     possession: "any",
@@ -107,7 +107,7 @@ export class ProcedureResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Procedure)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "update",
     possession: "any",
@@ -140,7 +140,7 @@ export class ProcedureResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Procedure], { name: "instances" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",
@@ -160,7 +160,7 @@ export class ProcedureResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [UnitProcedure], { name: "unitProcedures" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnitProcedure",
     action: "read",
     possession: "any",
@@ -183,7 +183,7 @@ export class ProcedureResolverBase {
     nullable: true,
     name: "classId",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Procedure",
     action: "read",
     possession: "any",

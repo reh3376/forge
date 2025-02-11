@@ -1,6 +1,6 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestAccessControl from "nest-access-control";
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
 import { InventoryService } from "./inventory.service";
 import { InventoryControllerBase } from "./base/inventory.controller.base";
 import { InventorySiloTrackingService } from "./inventory.silotracking.service";
@@ -12,8 +12,8 @@ export class InventoryController extends InventoryControllerBase {
   constructor(
     protected readonly service: InventoryService,
     protected readonly siloTrackingService: InventorySiloTrackingService,
-    @nestAccessControl.InjectRolesBuilder()
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+    @InjectRolesBuilder()
+    protected readonly rolesBuilder: RolesBuilder
   ) {
     super(service, rolesBuilder);
   }
@@ -32,7 +32,7 @@ export class InventoryController extends InventoryControllerBase {
       required: ["lotId", "assetId", "quantity", "itemId"],
     },
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "create",
     possession: "any",
@@ -55,7 +55,7 @@ export class InventoryController extends InventoryControllerBase {
       required: ["assetId", "quantity"],
     },
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "update",
     possession: "any",
@@ -69,7 +69,7 @@ export class InventoryController extends InventoryControllerBase {
   @common.Get("silo/:assetId")
   @swagger.ApiOperation({ summary: "Get asset (silo) inventory" })
   @swagger.ApiParam({ name: "assetId", type: "string" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "read",
     possession: "any",
@@ -92,7 +92,7 @@ export class InventoryController extends InventoryControllerBase {
       required: ["sourceAssetId", "destAssetId", "quantity", "itemId"],
     },
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Inventory",
     action: "update",
     possession: "any",
