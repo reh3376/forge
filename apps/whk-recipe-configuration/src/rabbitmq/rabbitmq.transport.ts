@@ -5,8 +5,10 @@ export class RabbitMQ extends ServerRMQ implements CustomTransportStrategy {
   async setupChannel(channel: any, callback: () => void): Promise<void> {
     const exchange = this.queue;
     const groupId =
-      this.getOptionsProp(this.options?.queueOptions, "consumerGroupId" as never) ||
-      "whk-mes";
+      this.getOptionsProp(
+        this.options?.queueOptions,
+        "consumerGroupId" as never
+      ) || "whk-mes";
 
     await channel.assertExchange(exchange, "fanout", { durable: true });
 

@@ -10,7 +10,6 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
   }
 
   async getPurchaseOrdersWithLineItemsByType(purchaseOrderType: string) {
-    
     // NOTE - "ItemName" is incorrect in the LineItem JSON from PO. It's really the ItemNumber, hence the join
     const query = Prisma.sql`
     SELECT DISTINCT
@@ -76,7 +75,9 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
     LEFT JOIN "Item" i on i."itemNumber" = li."itemName"
     LEFT JOIN "Vendor" v on i."vendorId" = v.id
       WHERE po.id = $1`;
-    const purchaseOrder = await this.prisma.$queryRaw<PurchaseOrder>(Prisma.sql([query, id]));
+    const purchaseOrder = await this.prisma.$queryRaw<PurchaseOrder>(
+      Prisma.sql([query, id])
+    );
     return purchaseOrder;
   }
 }

@@ -293,7 +293,7 @@ describe("Lot", () => {
 
   test("calculateLotMetrics calculates metrics correctly", async () => {
     // const lotService = app.get<LotService>(LotService);
-        const module = await Test.createTestingModule({
+    const module = await Test.createTestingModule({
       imports: [PrismaModule, WinstonModule],
       providers: [
         LotService,
@@ -313,7 +313,7 @@ describe("Lot", () => {
           provide: ConfigService,
           useValue: {
             // Mock implementation of ConfigService
-            get: jest.fn().mockReturnValue('mocked-value'),
+            get: jest.fn().mockReturnValue("mocked-value"),
           },
         },
       ],
@@ -350,7 +350,7 @@ describe("Lot", () => {
       densityFinal: 1,
       initialVolume: 1000,
       initialWeight: 2000,
-      finalVolume: 950, 
+      finalVolume: 950,
       finalWeight: 1900,
       bblEntryProof: 10,
       bblTotal: 100,
@@ -372,17 +372,17 @@ describe("Lot", () => {
     });
 
     // Check for the presence of calculated metrics
-    expect(result).toHaveProperty('densityFinal');
-    expect(result).toHaveProperty('avgPGsFerm');
-    expect(result).toHaveProperty('avgBblFillByPg');
-    expect(result).toHaveProperty('avgBblFillByWg');
-    expect(result).toHaveProperty('totalWeight');
-    expect(result).toHaveProperty('totalVolumeWg');
-    expect(result).toHaveProperty('totalPGs');
-    expect(result).toHaveProperty('totalWGs');
+    expect(result).toHaveProperty("densityFinal");
+    expect(result).toHaveProperty("avgPGsFerm");
+    expect(result).toHaveProperty("avgBblFillByPg");
+    expect(result).toHaveProperty("avgBblFillByWg");
+    expect(result).toHaveProperty("totalWeight");
+    expect(result).toHaveProperty("totalVolumeWg");
+    expect(result).toHaveProperty("totalPGs");
+    expect(result).toHaveProperty("totalWGs");
 
     // Add specific checks for each calculated metric
-    expect(result.densityFinal).toBeCloseTo(1*8.3454, 1);
+    expect(result.densityFinal).toBeCloseTo(1 * 8.3454, 1);
     expect(result.avgPGsFerm).toBeGreaterThan(0);
     expect(result.avgBblFillByPg).toBeGreaterThan(0);
     expect(result.avgBblFillByWg).toBeGreaterThan(0);

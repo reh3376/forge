@@ -176,7 +176,7 @@ describe("Inventory", () => {
         {
           provide: InventorySiloTrackingService,
           useValue: siloTrackingService,
-        }
+        },
       ],
       controllers: [InventoryController],
       imports: [ACLModule],

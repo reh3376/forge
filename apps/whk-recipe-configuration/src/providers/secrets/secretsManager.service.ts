@@ -16,6 +16,6 @@ export class SecretsManagerService extends SecretsManagerServiceBase {
   }
 
   async getSecret<T>(key: EnumSecretsNameKey): Promise<T | null> {
-    return this.secrets[key] as any
+    return this.secrets[key] as any;
   }
 }

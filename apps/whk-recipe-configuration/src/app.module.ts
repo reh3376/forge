@@ -72,11 +72,11 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
-import {SyncModule} from "./sync/sync.module";
+import { SyncModule } from "./sync/sync.module";
 
 import { LoggerModule } from "./logger/logger.module";
 
-import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { DevtoolsModule } from "@nestjs/devtools-integration";
 
 @Module({
   controllers: [],

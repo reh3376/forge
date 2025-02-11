@@ -293,7 +293,6 @@ class TestParameter {
   })
   testPass!: boolean | null;
 
-  
   @ApiProperty({
     required: false,
     enum: EnumTestParameterTestSetpointType,

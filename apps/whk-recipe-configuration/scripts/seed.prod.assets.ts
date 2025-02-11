@@ -1,16 +1,40 @@
-import { EnumEquipmentPhaseName, EnumEquipmentPhaseStepType, EnumOperationName, EnumPhaseParameterSetpointType, EnumPhaseParameterStaticName, EnumProductionOrderStatus, EnumScheduleOrderStatus, EnumUnitProcedureName, Item, Operation, PhaseParameter, PrismaClient, Procedure, Recipe, RecipeGroup, RecipeParameter, SalesOrder, UnitProcedure } from "@prisma/client";
+import {
+  EnumEquipmentPhaseName,
+  EnumEquipmentPhaseStepType,
+  EnumOperationName,
+  EnumPhaseParameterSetpointType,
+  EnumPhaseParameterStaticName,
+  EnumProductionOrderStatus,
+  EnumScheduleOrderStatus,
+  EnumUnitProcedureName,
+  Item,
+  Operation,
+  PhaseParameter,
+  PrismaClient,
+  Procedure,
+  Recipe,
+  RecipeGroup,
+  RecipeParameter,
+  SalesOrder,
+  UnitProcedure,
+} from "@prisma/client";
 
 const CUSTOMER_CODE = "WGS";
-const MASH_BILL = '60-36-00-04';
+const MASH_BILL = "60-36-00-04";
 const FINAL_PROOF = 120;
-const BARREL_INFO = '53-06-3-0-0';
+const BARREL_INFO = "53-06-3-0-0";
 const CUSTOMER_NAME = "William Grant & Sons, Inc."; // This needs to match ERP / MESDB
 const ORDER_QTY = 500;
 const TOTAL_GRAIN_WEIGHT = 24080;
-const USER = 'pmannion@whiskeyhouse.com';
+const USER = "pmannion@whiskeyhouse.com";
 
 const MASHING_PROTOCOL = [
-  { action: "Add Liquid", liquidType01: "Water", liquidType02: "Backset", notQty: 0 },
+  {
+    action: "Add Liquid",
+    liquidType01: "Water",
+    liquidType02: "Backset",
+    notQty: 0,
+  },
   { action: "Hold", holdType: "Heat", temperature: 130 },
   { action: "Add Additive", additiveType: "Citric", qty: 0 },
   { action: "Add Grain", grainType: "Malt", qty: 96 },
@@ -34,35 +58,33 @@ const MASHING_PROTOCOL = [
   { action: "Hold", holdType: "Hold", time: 10 },
 ];
 const RECIPE_PARAMETERS = [
-  { name: 'HighWineProof', setpointValue: 140 },
-  { name: 'LowWineProof', setpointValue: 100 },
-  { name: 'FinalProof', setpointValue: 125 },
-  { name: 'BaseLoss', setpointValue: 0.5 },
-  { name: 'BeerFeedTray', setpointValue: 15 },
-  { name: 'FermentationAge', setpointValue: 72 },
-  { name: 'ControlTemperature', setpointValue: 80 },
-  { name: 'CooksPerFerm', setpointValue: 3 },
-    { name: 'TopOffFrequency', setpointValue: 24 },
-    { name: 'TopOffQuantity', setpointValue: 100 },
-    { name: 'TopOffTemperature', setpointValue: 80 },
-    { name: 'MashpH', setpointValue: 5.1 },
-    { name: 'MashRatio', setpointValue: 3.5 },
-    { name: 'RatioByFerm', setpointValue: 2.8 },
-    { name: 'FermSetTemp', setpointValue: 80 },
-    { name: 'StarterSweetpH', setpointValue: 5.1 },
-    { name: 'TotalGrainWeight', setpointValue: 20500 },
-    { name: 'TotalLiquid', setpointValue: 70000 },
-    { name: 'NumberOfCooks', setpointValue: 9 },
-    { name: 'AssumedFermABV', setpointValue: 12.5 }
-  ];
-  const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-  const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
-  const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
-  
-  async function seed() {
-    
-    
-    console.info("Seeding database with custom seed for Mashing Recipe...");
+  { name: "HighWineProof", setpointValue: 140 },
+  { name: "LowWineProof", setpointValue: 100 },
+  { name: "FinalProof", setpointValue: 125 },
+  { name: "BaseLoss", setpointValue: 0.5 },
+  { name: "BeerFeedTray", setpointValue: 15 },
+  { name: "FermentationAge", setpointValue: 72 },
+  { name: "ControlTemperature", setpointValue: 80 },
+  { name: "CooksPerFerm", setpointValue: 3 },
+  { name: "TopOffFrequency", setpointValue: 24 },
+  { name: "TopOffQuantity", setpointValue: 100 },
+  { name: "TopOffTemperature", setpointValue: 80 },
+  { name: "MashpH", setpointValue: 5.1 },
+  { name: "MashRatio", setpointValue: 3.5 },
+  { name: "RatioByFerm", setpointValue: 2.8 },
+  { name: "FermSetTemp", setpointValue: 80 },
+  { name: "StarterSweetpH", setpointValue: 5.1 },
+  { name: "TotalGrainWeight", setpointValue: 20500 },
+  { name: "TotalLiquid", setpointValue: 70000 },
+  { name: "NumberOfCooks", setpointValue: 9 },
+  { name: "AssumedFermABV", setpointValue: 12.5 },
+];
+const RECIPE = `${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+const ITEM_NUMBER = `${CUSTOMER_CODE}-${MASH_BILL}-${BARREL_INFO}-${FINAL_PROOF}-R01`;
+const BOM_REVISION = `BOM-${CUSTOMER_CODE}-${MASH_BILL}-R01`;
+
+async function seed() {
+  console.info("Seeding database with custom seed for Mashing Recipe...");
 
   /*
   1. Seed instance of unit procedures, using the main procedure instance
@@ -81,8 +103,8 @@ const RECIPE_PARAMETERS = [
   const unitProcedureClassDefs = await client.unitProcedure.findMany({
     where: {
       isClassDef: true,
-      name: 'Mashing01'
-    }
+      name: "Mashing01",
+    },
   });
 
   console.log("Unit Procedure Class Definitions:", unitProcedureClassDefs);
@@ -91,8 +113,8 @@ const RECIPE_PARAMETERS = [
   const mashingRecipeProcedure = await client.procedure.findFirst({
     where: {
       name: "Line1",
-      isClassDefinition: false
-    }
+      isClassDefinition: false,
+    },
   });
 
   if (!mashingRecipeProcedure) {
@@ -100,7 +122,10 @@ const RECIPE_PARAMETERS = [
     return;
   }
 
-  console.log("Found Mashing Recipe procedure instance:", mashingRecipeProcedure.id);
+  console.log(
+    "Found Mashing Recipe procedure instance:",
+    mashingRecipeProcedure.id
+  );
 
   let mashInstance: UnitProcedure | null = null;
   // Create instances of Unit Procedures
@@ -111,17 +136,17 @@ const RECIPE_PARAMETERS = [
         isClassDef: false,
         recipe: {
           some: {
-            Recipe: RECIPE
-          }
-        }
+            Recipe: RECIPE,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
     mashInstance = existingInstance;
     if (!existingInstance) {
-    // if (true) {
+      // if (true) {
       const newInstance = await client.unitProcedure.create({
         data: {
           name: classDef.name,
@@ -131,8 +156,8 @@ const RECIPE_PARAMETERS = [
           revision: 0,
           description: `Instance of ${classDef.name}`,
           createdBy: "seed",
-          procedure: { connect: { id: mashingRecipeProcedure.id } }
-        }
+          procedure: { connect: { id: mashingRecipeProcedure.id } },
+        },
       });
       console.log(`Created new Unit Procedure instance: ${newInstance.name}`);
       if (newInstance.name.includes("Mashing01")) {
@@ -152,7 +177,7 @@ const RECIPE_PARAMETERS = [
   const bom = await client.bom.findFirst({
     where: {
       bomRevision: BOM_REVISION,
-    }
+    },
   });
 
   // Seed operations based on number of cooks per ferm and number of cooks
@@ -162,8 +187,8 @@ const RECIPE_PARAMETERS = [
 
   const operationClassDefs = await client.operation.findMany({
     where: {
-      isClassDefinition: true
-    }
+      isClassDefinition: true,
+    },
   });
 
   console.log("Operation Class Definitions:", operationClassDefs);
@@ -180,8 +205,8 @@ const RECIPE_PARAMETERS = [
       // procedure: { id: mashingRecipeProcedure.id }
     },
     orderBy: {
-      createdAt: 'desc'
-    }
+      createdAt: "desc",
+    },
   });
 
   if (!mashingUnitProcedure) {
@@ -196,12 +221,14 @@ const RECIPE_PARAMETERS = [
         isClassDefinition: false,
         // unitProcedure: { id: mashingUnitProcedure.id },
         unitProcedureId: mashInstance.id,
-        procedureSequenceIndex: cookIndex
-      }
+        procedureSequenceIndex: cookIndex,
+      },
     });
     // if (!existingInstance) {
     if (true) {
-      const cookClassDef = operationClassDefs.find(def => def.name === EnumOperationName.Cook);
+      const cookClassDef = operationClassDefs.find(
+        (def) => def.name === EnumOperationName.Cook
+      );
 
       if (cookClassDef) {
         newCookInstances[cookIndex] = await client.operation.create({
@@ -215,15 +242,23 @@ const RECIPE_PARAMETERS = [
             createdBy: "seed",
             unitProcedure: { connect: { id: mashingUnitProcedure.id } },
             procedureSequenceIndex: cookIndex,
-            abbreviation: 'MAS'
-          }
+            abbreviation: "MAS",
+          },
         });
-        console.log(`Created new Operation instance: ${newCookInstances[cookIndex].name} for Cook ${cookIndex + 1}`);
+        console.log(
+          `Created new Operation instance: ${
+            newCookInstances[cookIndex].name
+          } for Cook ${cookIndex + 1}`
+        );
       } else {
-        console.log(`Cook class definition not found, skipping Cook ${cookIndex + 1}`);
+        console.log(
+          `Cook class definition not found, skipping Cook ${cookIndex + 1}`
+        );
       }
     } else {
-      console.log(`Instance of Cook for Cook ${cookIndex + 1} already exists, skipping.`);
+      console.log(
+        `Instance of Cook for Cook ${cookIndex + 1} already exists, skipping.`
+      );
     }
   }
 
@@ -236,83 +271,116 @@ const RECIPE_PARAMETERS = [
         // isClassDefinition: false,
         // unitProcedure: { id: mashingUnitProcedure.id },
         // procedureSequenceIndex: cookIndex
-        id: newCookInstances[cookIndex].id
-      }
+        id: newCookInstances[cookIndex].id,
+      },
     });
 
     if (!cookOperation) {
-      console.log(`Cook operation not found for Cook ${cookIndex + 1}, skipping phase creation.`);
+      console.log(
+        `Cook operation not found for Cook ${
+          cookIndex + 1
+        }, skipping phase creation.`
+      );
       continue;
     }
 
     // Map the provided phase names to the actual enum values
     const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
       "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
-      "Hold": EnumEquipmentPhaseName.Hold,
+      Hold: EnumEquipmentPhaseName.Hold,
       "Add Grain": EnumEquipmentPhaseName.GrainAdd,
-      "Add Additive": EnumEquipmentPhaseName.AdditiveAdd
+      "Add Additive": EnumEquipmentPhaseName.AdditiveAdd,
     };
 
     // Update the MASHING_PROTOCOL with the mapped enum values
-    const mappedMASHING_PROTOCOL = MASHING_PROTOCOL.map(phase => ({
+    const mappedMASHING_PROTOCOL = MASHING_PROTOCOL.map((phase) => ({
       ...phase,
-      action: phaseNameMap[phase.action] || phase.action
+      action: phaseNameMap[phase.action] || phase.action,
     }));
 
     for (const [phaseIndex, phase] of MASHING_PROTOCOL.entries()) {
       const existingPhase = await client.equipmentPhase.findFirst({
         where: {
-          name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
+          name:
+            phaseNameMap[phase.action] ||
+            (phase.action as EnumEquipmentPhaseName),
           operation: {
-            id: newCookInstances[cookIndex].id
+            id: newCookInstances[cookIndex].id,
           },
           operationSequenceIndex: phaseIndex,
         },
         include: {
-          operation: true
-        }
+          operation: true,
+        },
       });
 
       if (!existingPhase) {
-        const cookOperation: Operation | null = await client.operation.findFirst({
-          where: {
-            name: EnumOperationName.Cook,
-            isClassDefinition: false,
-            unitProcedure: { id: mashingUnitProcedure.id },
-            procedureSequenceIndex: cookIndex
-          },
-          orderBy: { createdAt: 'desc' }
-        });
+        const cookOperation: Operation | null =
+          await client.operation.findFirst({
+            where: {
+              name: EnumOperationName.Cook,
+              isClassDefinition: false,
+              unitProcedure: { id: mashingUnitProcedure.id },
+              procedureSequenceIndex: cookIndex,
+            },
+            orderBy: { createdAt: "desc" },
+          });
 
         if (cookOperation) {
-
-          const stepType = (phase.action === "Hold") ? phase.holdType : (phase.action === "Add Grain") ? phase.grainType : (phase.action === "Add Liquid") ? phase.liquidType01 : undefined;
+          const stepType =
+            phase.action === "Hold"
+              ? phase.holdType
+              : phase.action === "Add Grain"
+              ? phase.grainType
+              : phase.action === "Add Liquid"
+              ? phase.liquidType01
+              : undefined;
           const newPhase = await client.equipmentPhase.create({
             data: {
-              name: phaseNameMap[phase.action] || phase.action as EnumEquipmentPhaseName,
-              path: `${mashingUnitProcedure.path}/Cook${cookIndex + 1}/${phase.action}`,
+              name:
+                phaseNameMap[phase.action] ||
+                (phase.action as EnumEquipmentPhaseName),
+              path: `${mashingUnitProcedure.path}/Cook${cookIndex + 1}/${
+                phase.action
+              }`,
               isClassDefinition: false,
               revision: 0,
               description: `Cook ${cookIndex + 1}`,
               createdBy: "seed",
               operation: {
                 connect: {
-                  id: (cookOperation as Operation).id as string
-                }
+                  id: (cookOperation as Operation).id as string,
+                },
               },
               stepType: stepType as EnumEquipmentPhaseStepType,
-              operationSequenceIndex: phaseIndex
-            }
+              operationSequenceIndex: phaseIndex,
+            },
           });
-          console.log(`Created new Equipment Phase: ${newPhase.name} for Cook ${cookIndex + 1}`);
+          console.log(
+            `Created new Equipment Phase: ${newPhase.name} for Cook ${
+              cookIndex + 1
+            }`
+          );
 
           // Add phase parameters based on the action
-          const parameterData: { name: string; value: number | string; units: string }[] = [];
+          const parameterData: {
+            name: string;
+            value: number | string;
+            units: string;
+          }[] = [];
           if (phase.temperature) {
-            parameterData.push({ name: "Temperature", value: phase.temperature, units: "°F" });
+            parameterData.push({
+              name: "Temperature",
+              value: phase.temperature,
+              units: "°F",
+            });
           }
           if (phase.time) {
-            parameterData.push({ name: "Time", value: phase.time, units: "minutes" });
+            parameterData.push({
+              name: "Time",
+              value: phase.time,
+              units: "minutes",
+            });
           }
           // if (phase.grainType) {
           //   parameterData.push({ name: "GrainType", value: phase.grainType, units: "" });
@@ -345,7 +413,7 @@ const RECIPE_PARAMETERS = [
                 equipmentPhases: { connect: { id: newPhase.id } },
                 createdBy: "seed",
                 setpointType: EnumPhaseParameterSetpointType.Numeric,
-              }
+              },
             });
           }
 
@@ -357,17 +425,24 @@ const RECIPE_PARAMETERS = [
                 isClassDefinition: true,
               },
               include: {
-                item: true
-              }
+                item: true,
+              },
             });
 
             for (const component of bomComponents) {
               if (
-                (phase.action === "Add Grain" && phase.grainType && component.item.itemNumber.toLowerCase().includes(phase.grainType.toLowerCase()) && phase.grainType != "Corn") ||
-                (phase.action === "Add Liquid" && (
-                  (phase.liquidType01 && component.item.itemNumber.toLowerCase().includes(phase.liquidType01.toLowerCase())) //||
+                (phase.action === "Add Grain" &&
+                  phase.grainType &&
+                  component.item.itemNumber
+                    .toLowerCase()
+                    .includes(phase.grainType.toLowerCase()) &&
+                  phase.grainType != "Corn") ||
+                (phase.action === "Add Liquid" &&
+                  phase.liquidType01 &&
+                  component.item.itemNumber
+                    .toLowerCase()
+                    .includes(phase.liquidType01.toLowerCase())) //||
                   // (phase.liquidType02 && component.item.itemNumber.toLowerCase().includes(phase.liquidType02.toLowerCase()))
-                ))
               ) {
                 // Check if the quantity field is present in the phase object
                 if (phase.qty !== undefined) {
@@ -381,9 +456,13 @@ const RECIPE_PARAMETERS = [
                         },
                       },
                     });
-                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                    console.log(
+                      `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
+                    );
                   } else {
-                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                    console.log(
+                      `Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`
+                    );
                   }
                 } else if (phase.notQty !== undefined) {
                   // Only match if the bomItem quantity does not equal the phase notQty
@@ -396,9 +475,13 @@ const RECIPE_PARAMETERS = [
                         },
                       },
                     });
-                    console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                    console.log(
+                      `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
+                    );
                   } else {
-                    console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`);
+                    console.log(
+                      `Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`
+                    );
                   }
                 } else {
                   await client.equipmentPhase.update({
@@ -409,12 +492,16 @@ const RECIPE_PARAMETERS = [
                       },
                     },
                   });
-                  console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
-
+                  console.log(
+                    `Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
+                  );
                 }
               } else if (phase.grainType == "Corn") {
                 console.log(`Corn: ${component.item.itemNumber}`);
-                if (component.item.itemNumber === "COR-DLF02-US #2 Yellow Dent GMO") {
+                if (
+                  component.item.itemNumber ===
+                  "COR-DLF02-US #2 Yellow Dent GMO"
+                ) {
                   // Check if the quantity field is present in the phase object
                   if (phase.qty !== undefined) {
                     // Only match if the bomItem quantity equals the phase quantity
@@ -427,9 +514,13 @@ const RECIPE_PARAMETERS = [
                           },
                         },
                       });
-                      console.log(`Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`);
+                      console.log(
+                        `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
+                      );
                     } else {
-                      console.log(`Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`);
+                      console.log(
+                        `Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`
+                      );
                     }
                   } else {
                     await client.equipmentPhase.update({
@@ -440,10 +531,18 @@ const RECIPE_PARAMETERS = [
                         },
                       },
                     });
-                    console.log(`Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                    console.log(
+                      `Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
+                    );
                   }
                 }
-              } else if (phase.action === "Add Additive" && phase.additiveType && component.item.itemNumber.toLowerCase().includes(phase.additiveType.toLowerCase())) {
+              } else if (
+                phase.action === "Add Additive" &&
+                phase.additiveType &&
+                component.item.itemNumber
+                  .toLowerCase()
+                  .includes(phase.additiveType.toLowerCase())
+              ) {
                 console.log(`Add Additive: ${component.item.itemNumber}`);
                 // if (phase.additiveType == "Teramyl") {
                 //   console.log(`Teramyl: ${component.item.itemNumber}`);
@@ -456,16 +555,21 @@ const RECIPE_PARAMETERS = [
                     },
                   },
                 });
-                console.log(`Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`);
+                console.log(
+                  `Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
+                );
               }
-
             }
           } else {
-            console.log("BOM not found, skipping linking BOM components to Equipment Phases");
+            console.log(
+              "BOM not found, skipping linking BOM components to Equipment Phases"
+            );
           }
         }
       } else {
-        console.log(`Equipment Phase ${phase.action} already exists, skipping.`);
+        console.log(
+          `Equipment Phase ${phase.action} already exists, skipping.`
+        );
       }
     }
   }
@@ -476,9 +580,9 @@ const RECIPE_PARAMETERS = [
       where: {
         itemNumber: {
           equals: itemNumber,
-          mode: 'insensitive'
-        }
-      }
+          mode: "insensitive",
+        },
+      },
     });
 
     if (!item) {
@@ -496,8 +600,8 @@ const RECIPE_PARAMETERS = [
 
   const customer = await client.customer.findFirst({
     where: {
-      name: CUSTOMER_NAME
-    }
+      name: CUSTOMER_NAME,
+    },
   });
 
   if (customer) {
@@ -510,7 +614,7 @@ const RECIPE_PARAMETERS = [
   const existingRecipe = await client.recipe.findFirst({
     where: {
       Recipe: RECIPE,
-    }
+    },
   });
 
   let newParams: RecipeParameter[] = [];
@@ -518,22 +622,24 @@ const RECIPE_PARAMETERS = [
     const classParam = await client.recipeParameter.findFirst({
       where: {
         recipeParamName: param.name,
-        isClassDefinition: true
-      }
+        isClassDefinition: true,
+      },
     });
     if (classParam) {
       console.log(`Updating existing recipe parameter: ${param.name}`);
-      newParams.push(await client.recipeParameter.create({
-        data: {
-          className: classParam.className,
-          recipeParamName: param.name,
-          recipeNumericalSetpoint: param.setpointValue,
-          description: classParam.description,
-          isClassDefinition: false,
-          recipeSetpointType: classParam.recipeSetpointType,
-          createdBy: USER,
-        }
-      }));
+      newParams.push(
+        await client.recipeParameter.create({
+          data: {
+            className: classParam.className,
+            recipeParamName: param.name,
+            recipeNumericalSetpoint: param.setpointValue,
+            description: classParam.description,
+            isClassDefinition: false,
+            recipeSetpointType: classParam.recipeSetpointType,
+            createdBy: USER,
+          },
+        })
+      );
     } else {
       console.log(`Phase parameter ${param.name} already exists, skipping.`);
     }
@@ -546,9 +652,9 @@ const RECIPE_PARAMETERS = [
       where: { id: existingRecipe.id },
       data: {
         unitProcedures: {
-          connect: { id: mashingUnitProcedure.id }
+          connect: { id: mashingUnitProcedure.id },
         },
-      }
+      },
     });
     console.log("Mashing Recipe updated successfully");
   } else {
@@ -562,19 +668,19 @@ const RECIPE_PARAMETERS = [
         //   connect: newParams.map(param => ({ id: param.id }))
         // },
         unitProcedures: {
-          connect: { id: mashingUnitProcedure.id }
+          connect: { id: mashingUnitProcedure.id },
         },
         customer: {
-          connect: { id: customer?.id }
+          connect: { id: customer?.id },
         },
         item: {
-          connect: { id: (item as Item).id }
+          connect: { id: (item as Item).id },
         },
         parameters: {
-          connect: newParams.map(param => ({ id: param.id }))
+          connect: newParams.map((param) => ({ id: param.id })),
         },
-        customerCode: CUSTOMER_CODE
-      }
+        customerCode: CUSTOMER_CODE,
+      },
     });
     console.log("New Mashing Recipe created successfully:", recipe.id);
   }
@@ -582,12 +688,12 @@ const RECIPE_PARAMETERS = [
   // Create a recipe group and add the recipe to it
   console.log("Creating recipe group and adding recipe...");
   let recipeGroup: RecipeGroup;
-  const recipeGroupName = RECIPE.split('-').slice(1, -1).join('-');
+  const recipeGroupName = RECIPE.split("-").slice(1, -1).join("-");
   console.log(`Extracted recipe group name: ${recipeGroupName}`);
   const existingRecipeGroup = await client.recipeGroup.findFirst({
     where: {
-      recipe: { equals: recipeGroupName }
-    }
+      recipe: { equals: recipeGroupName },
+    },
   });
 
   if (existingRecipeGroup) {
@@ -596,9 +702,9 @@ const RECIPE_PARAMETERS = [
       where: { id: existingRecipeGroup.id },
       data: {
         recipes: {
-          connect: { id: recipe.id }
-        }
-      }
+          connect: { id: recipe.id },
+        },
+      },
     });
     console.log("Recipe added to existing group successfully");
   } else {
@@ -608,11 +714,14 @@ const RECIPE_PARAMETERS = [
         recipe: recipeGroupName,
         createdBy: USER,
         recipes: {
-          connect: { id: recipe.id }
-        }
-      }
+          connect: { id: recipe.id },
+        },
+      },
     });
-    console.log("New recipe group created and recipe added successfully:", recipeGroup.id);
+    console.log(
+      "New recipe group created and recipe added successfully:",
+      recipeGroup.id
+    );
   }
 
   // Create a sample sales order
@@ -621,19 +730,19 @@ const RECIPE_PARAMETERS = [
   const existingSalesOrder = await client.salesOrder.findFirst({
     where: {
       customer: { id: customer?.id },
-      name: 'SO42'
-    }
+      name: "SO42",
+    },
   });
 
   // Get the current date
   const currentDate = new Date();
-  
+
   // Calculate the day of the year
   const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
   const diff = currentDate.getTime() - startOfYear.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  
+
   console.log(`Current day of the year: ${dayOfYear}`);
 
   if (existingSalesOrder) {
@@ -647,21 +756,25 @@ const RECIPE_PARAMETERS = [
     const mostRecentSalesOrder = await client.salesOrder.findFirst({
       where: {
         createdAt: {
-          gte: today
+          gte: today,
         },
         name: {
-          startsWith: 'SO'
-        }
+          startsWith: "SO",
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
-    const salesOrderNumber = mostRecentSalesOrder?.name?.split('SO')[1] ?? '01';
+    const salesOrderNumber = mostRecentSalesOrder?.name?.split("SO")[1] ?? "01";
     const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
 
     if (mostRecentSalesOrder) {
-      console.log(`Most recent sales order created today: ${mostRecentSalesOrder.name ?? 'Unknown'}`);
+      console.log(
+        `Most recent sales order created today: ${
+          mostRecentSalesOrder.name ?? "Unknown"
+        }`
+      );
     } else {
       console.log("No sales orders created today.");
     }
@@ -669,10 +782,10 @@ const RECIPE_PARAMETERS = [
     const newSalesOrder = await client.salesOrder.create({
       data: {
         item: {
-          connect: { id: (item as Item).id }
+          connect: { id: (item as Item).id },
         },
         customer: {
-          connect: { id: customer?.id }
+          connect: { id: customer?.id },
         },
         createdBy: USER,
         // orderDate: new Date(),
@@ -680,7 +793,7 @@ const RECIPE_PARAMETERS = [
         quantity: ORDER_QTY, // Adjust as needed
         name: `SO${dayOfYear}${newSalesOrderNumber}`,
         // units: "Barrels",
-      }
+      },
     });
 
     console.log("Sample sales order created successfully:", newSalesOrder.id);
@@ -697,16 +810,18 @@ const RECIPE_PARAMETERS = [
     where: {
       name: {
         contains: productionOrderName,
-        mode: 'insensitive'
+        mode: "insensitive",
       },
       bom: {
-        id: bom?.id
-      }
-    }
+        id: bom?.id,
+      },
+    },
   });
 
   if (existingProductionOrder) {
-    console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
+    console.log(
+      `Production order ${productionOrderName} already exists, skipping creation.`
+    );
   } else {
     // Get the most recent production order created today, if it exists
     const today = new Date();
@@ -715,47 +830,52 @@ const RECIPE_PARAMETERS = [
     const mostRecentProductionOrder = await client.productionOrder.findFirst({
       where: {
         createdAt: {
-          gte: today
+          gte: today,
         },
         name: {
-          startsWith: 'PRO'
-        }
+          startsWith: "PRO",
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
-    const productionOrderNumber = mostRecentProductionOrder?.name?.split('PRO')[1] ?? '01';
+    const productionOrderNumber =
+      mostRecentProductionOrder?.name?.split("PRO")[1] ?? "01";
     const newProductionOrderNumber = parseInt(productionOrderNumber, 10) + 1;
 
     if (mostRecentProductionOrder) {
-      console.log(`Most recent production order created today: ${mostRecentProductionOrder.name ?? 'Unknown'}`);
+      console.log(
+        `Most recent production order created today: ${
+          mostRecentProductionOrder.name ?? "Unknown"
+        }`
+      );
     } else {
       console.log("No production orders created today.");
     }
-    
+
     console.log("Creating new production order...");
     const newProductionOrder = await client.productionOrder.create({
       data: {
         recipe: {
-          connect: { id: recipe.id }
+          connect: { id: recipe.id },
         },
         item: {
-          connect: { id: (item as Item).id }
+          connect: { id: (item as Item).id },
         },
         bom: {
-          connect: { id: bom?.id }
+          connect: { id: bom?.id },
         },
         customer: {
-          connect: { id: customer?.id }
+          connect: { id: customer?.id },
         },
         salesOrder: {
-          connect: { id: salesOrder?.id }
+          connect: { id: salesOrder?.id },
         },
         createdBy: USER,
         status: EnumProductionOrderStatus.Initiated,
         customerCode: CUSTOMER_CODE,
-        units: 'Barrels',
+        units: "Barrels",
         quantity: ORDER_QTY,
         name: `${productionOrderName}${newProductionOrderNumber}`,
         startDate: new Date(),
@@ -764,7 +884,7 @@ const RECIPE_PARAMETERS = [
         totalFermenters: Math.ceil(ORDER_QTY / 85),
         executedCooks: 0,
         executedFermenters: 0,
-      }
+      },
     });
 
     // Create a sample schedule order
@@ -773,7 +893,7 @@ const RECIPE_PARAMETERS = [
     const newScheduleOrder = await client.scheduleOrder.create({
       data: {
         productionOrders: {
-          connect: { id: newProductionOrder.id }
+          connect: { id: newProductionOrder.id },
         },
         status: EnumScheduleOrderStatus.Scheduled,
         createdBy: USER,
@@ -782,24 +902,27 @@ const RECIPE_PARAMETERS = [
         recipeName: RECIPE,
         productionOrderAllocation: ORDER_QTY,
         recipeGroup: {
-          connect: { id: recipeGroup.id }
+          connect: { id: recipeGroup.id },
         },
         name: `${scheduleOrderName}01`,
-      }
+      },
     });
 
-    console.log("Sample schedule order created successfully:", newScheduleOrder.id);
+    console.log(
+      "Sample schedule order created successfully:",
+      newScheduleOrder.id
+    );
 
     // Create a sample schedule order queue record
     console.log("Creating sample schedule order queue record...");
 
     const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
       orderBy: {
-        queueIndex: 'desc'
+        queueIndex: "desc",
       },
       select: {
-        queueIndex: true
-      }
+        queueIndex: true,
+      },
     });
 
     const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
@@ -807,24 +930,30 @@ const RECIPE_PARAMETERS = [
     const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
       data: {
         scheduleOrder: {
-          connect: { id: newScheduleOrder.id }
+          connect: { id: newScheduleOrder.id },
         },
         queueIndex: newQueueIndex,
         createdBy: USER,
         nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
         nextUnitProcedure: {
-          connect: { id: mashingUnitProcedure.id }
-        }
-      }
+          connect: { id: mashingUnitProcedure.id },
+        },
+      },
     });
 
-    console.log("Sample schedule order queue record created successfully:", newScheduleOrderQueue.id);
+    console.log(
+      "Sample schedule order queue record created successfully:",
+      newScheduleOrderQueue.id
+    );
 
-    console.log("Sample production order created successfully:", newProductionOrder.id);
+    console.log(
+      "Sample production order created successfully:",
+      newProductionOrder.id
+    );
   }
 
   // Close the Prisma client connection
   await client.$disconnect();
 }
 
-seed()
+seed();

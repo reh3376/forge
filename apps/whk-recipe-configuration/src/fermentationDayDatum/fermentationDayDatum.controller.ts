@@ -1,6 +1,11 @@
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from "nest-access-control";
+import {
+  ACGuard,
+  InjectRolesBuilder,
+  RolesBuilder,
+  UseRoles,
+} from "nest-access-control";
 import { FermentationDayDatumService } from "./fermentationDayDatum.service";
 import { FermentationDayDatumControllerBase } from "./base/fermentationDayDatum.controller.base";
 
