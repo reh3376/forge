@@ -11,15 +11,28 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { UnsBrokerConfigurationListRelationFilter } from "../../unsBrokerConfiguration/base/UnsBrokerConfigurationListRelationFilter";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 
 @InputType()
 class UnsConfigurationWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => UnsBrokerConfigurationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnsBrokerConfigurationListRelationFilter)
+  @IsOptional()
+  @Field(() => UnsBrokerConfigurationListRelationFilter, {
+    nullable: true,
+  })
+  brokers?: UnsBrokerConfigurationListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,

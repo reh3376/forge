@@ -10,10 +10,13 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   UnsBrokerConfiguration as PrismaUnsBrokerConfiguration,
+  UnsConfiguration as PrismaUnsConfiguration,
 } from "@prisma/client";
+
 import { PasswordService } from "../../auth/password.service";
 import { transformStringFieldUpdateInput } from "../../prisma.util";
 
@@ -73,5 +76,16 @@ export class UnsBrokerConfigurationServiceBase {
     args: Prisma.UnsBrokerConfigurationDeleteArgs
   ): Promise<PrismaUnsBrokerConfiguration> {
     return this.prisma.unsBrokerConfiguration.delete(args);
+  }
+
+  async findUnsConfigurations(
+    parentId: string,
+    args: Prisma.UnsConfigurationFindManyArgs
+  ): Promise<PrismaUnsConfiguration[]> {
+    return this.prisma.unsBrokerConfiguration
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .unsConfigurations(args);
   }
 }

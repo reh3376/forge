@@ -10,9 +10,11 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   UnsConfiguration as PrismaUnsConfiguration,
+  UnsBrokerConfiguration as PrismaUnsBrokerConfiguration,
 } from "@prisma/client";
 
 export class UnsConfigurationServiceBase {
@@ -48,5 +50,16 @@ export class UnsConfigurationServiceBase {
     args: Prisma.UnsConfigurationDeleteArgs
   ): Promise<PrismaUnsConfiguration> {
     return this.prisma.unsConfiguration.delete(args);
+  }
+
+  async findBrokers(
+    parentId: string,
+    args: Prisma.UnsBrokerConfigurationFindManyArgs
+  ): Promise<PrismaUnsBrokerConfiguration[]> {
+    return this.prisma.unsConfiguration
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .brokers(args);
   }
 }

@@ -1115,6 +1115,7 @@ model AdditiveActual {
 }
 
 model UnsConfiguration {
+  brokers                UnsBrokerConfiguration[]
   createdAt              DateTime                        @default(now())
   createdBy              String
   enabled                Boolean?                        @default(true)
@@ -1129,20 +1130,21 @@ model UnsConfiguration {
 }
 
 model UnsBrokerConfiguration {
-  baseTopicPath       String?  @default("#")
-  createdAt           DateTime @default(now())
+  baseTopicPath       String?            @default("#")
+  createdAt           DateTime           @default(now())
   createdBy           String
   host                String
-  id                  String   @id @default(cuid())
+  id                  String             @id @default(cuid())
   password            String?
-  port                Int?     @default(1883)
-  protocol            String?  @default("mqtt://")
+  port                Int?               @default(1883)
+  protocol            String?            @default("mqtt://")
   subscriptions       Json?
-  tls                 Boolean? @default(false)
-  updatedAt           DateTime @updatedAt
+  tls                 Boolean?           @default(false)
+  unsConfigurations   UnsConfiguration[]
+  updatedAt           DateTime           @updatedAt
   updatedBy           String?
   username            String?
-  validateCertificate Boolean? @default(false)
+  validateCertificate Boolean?           @default(false)
 }
 
 enum EnumPhaseParameterSetpointType {
