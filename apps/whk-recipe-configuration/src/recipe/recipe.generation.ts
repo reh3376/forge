@@ -230,8 +230,6 @@ export class RecipeGenerator {
     return splits;
   }
 
-  
-
   private getEnzymeDosing(
     enzymeName: string,
     totalGrainLoadLbs: number,
@@ -346,27 +344,27 @@ export class RecipeGenerator {
     mashingProtocol: any[],
     mashBill: string
   ): boolean {
-    this.logger.log('Validating mashing protocol against mash bill...');
+    this.logger.log("Validating mashing protocol against mash bill...");
 
     // Extract grains from mash bill
-    const [corn, rye, wheat, malt] = mashBill.split('-').map(Number);
+    const [corn, rye, wheat, malt] = mashBill.split("-").map(Number);
     const mashBillGrains = new Set<string>();
-    
+
     // Only add grains that have non-zero percentages
-    if (corn > 0) mashBillGrains.add('Corn');
-    if (rye > 0) mashBillGrains.add('Rye');
-    if (wheat > 0) mashBillGrains.add('Wheat');
-    if (malt > 0) mashBillGrains.add('Malt');
+    if (corn > 0) mashBillGrains.add("Corn");
+    if (rye > 0) mashBillGrains.add("Rye");
+    if (wheat > 0) mashBillGrains.add("Wheat");
+    if (malt > 0) mashBillGrains.add("Malt");
 
     // Collect all grains from mashing protocol
     const protocolGrains = new Set<string>();
     let foundPreMalt = false;
 
     for (const step of mashingProtocol) {
-      if (step.action === 'Add Grain') {
-        if (step.grainType === 'PreMalt') {
+      if (step.action === "Add Grain") {
+        if (step.grainType === "PreMalt") {
           foundPreMalt = true;
-          protocolGrains.add('Malt'); // PreMalt counts as Malt
+          protocolGrains.add("Malt"); // PreMalt counts as Malt
         } else {
           protocolGrains.add(step.grainType);
         }
@@ -374,16 +372,18 @@ export class RecipeGenerator {
     }
 
     // If we found PreMalt, ensure there's also a regular Malt addition
-    if (foundPreMalt && mashBillGrains.has('Malt')) {
+    if (foundPreMalt && mashBillGrains.has("Malt")) {
       let foundRegularMalt = false;
       for (const step of mashingProtocol) {
-        if (step.action === 'Add Grain' && step.grainType === 'Malt') {
+        if (step.action === "Add Grain" && step.grainType === "Malt") {
           foundRegularMalt = true;
           break;
         }
       }
       if (!foundRegularMalt) {
-        this.logger.error('PreMalt is present but missing regular Malt addition');
+        this.logger.error(
+          "PreMalt is present but missing regular Malt addition"
+        );
         return false;
       }
     }
@@ -391,7 +391,9 @@ export class RecipeGenerator {
     // Check if all mash bill grains are in the protocol
     for (const grain of mashBillGrains) {
       if (!protocolGrains.has(grain)) {
-        this.logger.error(`Grain ${grain} from mash bill is not present in mashing protocol`);
+        this.logger.error(
+          `Grain ${grain} from mash bill is not present in mashing protocol`
+        );
         return false;
       }
     }
@@ -399,7 +401,9 @@ export class RecipeGenerator {
     // Check if there are any extra grains in protocol that aren't in the mash bill
     for (const grain of protocolGrains) {
       if (!mashBillGrains.has(grain)) {
-        this.logger.error(`Grain ${grain} is in mashing protocol but not present in mash bill`);
+        this.logger.error(
+          `Grain ${grain} is in mashing protocol but not present in mash bill`
+        );
         return false;
       }
     }
@@ -411,47 +415,55 @@ export class RecipeGenerator {
 
     for (const step of mashingProtocol) {
       switch (step.action) {
-        case 'Add Liquid':
+        case "Add Liquid":
           if (foundGrain) {
-            this.logger.error('Invalid sequence: Water addition after grain addition');
+            this.logger.error(
+              "Invalid sequence: Water addition after grain addition"
+            );
             return false;
           }
           foundWater = true;
           break;
-        case 'Add Grain':
+        case "Add Grain":
           if (!foundWater) {
-            this.logger.error('Invalid sequence: Grain addition before water addition');
+            this.logger.error(
+              "Invalid sequence: Grain addition before water addition"
+            );
             return false;
           }
           foundGrain = true;
           break;
-        case 'Add Additive':
+        case "Add Additive":
           foundAdditive = true;
           break;
-        case 'Hold':
+        case "Hold":
           // Holds are allowed anywhere
           break;
         default:
-          this.logger.error(`Invalid action type in mashing protocol: ${step.action}`);
+          this.logger.error(
+            `Invalid action type in mashing protocol: ${step.action}`
+          );
           return false;
       }
     }
 
     // Ensure we have the minimum required steps
     if (!foundWater) {
-      this.logger.error('Missing water addition in mashing protocol');
+      this.logger.error("Missing water addition in mashing protocol");
       return false;
     }
     if (!foundGrain) {
-      this.logger.error('Missing grain addition in mashing protocol');
+      this.logger.error("Missing grain addition in mashing protocol");
       return false;
     }
     if (!foundAdditive) {
-      this.logger.error('Missing additive addition in mashing protocol');
+      this.logger.error("Missing additive addition in mashing protocol");
       return false;
     }
 
-    this.logger.log('Mashing protocol matches mash bill components and has valid sequence');
+    this.logger.log(
+      "Mashing protocol matches mash bill components and has valid sequence"
+    );
     return true;
   }
 
@@ -500,8 +512,10 @@ export class RecipeGenerator {
     console.info("Seeding database with custom seed for Mashing Recipe...");
 
     // Add validation for mashing protocol
-    if (!this.validateMashingProtocolAgainstMashBill(mashingProtocol, mashBill)) {
-      throw new Error('Invalid mashing protocol for given mash bill');
+    if (
+      !this.validateMashingProtocolAgainstMashBill(mashingProtocol, mashBill)
+    ) {
+      throw new Error("Invalid mashing protocol for given mash bill");
     }
 
     // ------------------------------------ BOM CREATION ------------------------------------
@@ -1797,32 +1811,34 @@ export class RecipeGenerator {
     binAssignments: BinAssignments,
     mashBill: string
   ): boolean {
-    this.logger.log('Validating grain assignments against mash bill...');
-    
+    this.logger.log("Validating grain assignments against mash bill...");
+
     // Extract grains from mash bill
-    const [corn, rye, wheat, malt] = mashBill.split('-').map(Number);
+    const [corn, rye, wheat, malt] = mashBill.split("-").map(Number);
     const mashBillGrains = new Set<string>();
-    
+
     // Only add grains that have non-zero percentages
-    if (corn > 0) mashBillGrains.add('Corn');
-    if (rye > 0) mashBillGrains.add('Rye');
-    if (wheat > 0) mashBillGrains.add('Wheat');
-    if (malt > 0) mashBillGrains.add('Malt');
+    if (corn > 0) mashBillGrains.add("Corn");
+    if (rye > 0) mashBillGrains.add("Rye");
+    if (wheat > 0) mashBillGrains.add("Wheat");
+    if (malt > 0) mashBillGrains.add("Malt");
 
     // Collect all grains from bin assignments
     const assignedGrains = new Set<string>();
     for (const [bin, grains] of Object.entries(binAssignments)) {
-      if (typeof grains === 'string') {
+      if (typeof grains === "string") {
         assignedGrains.add(grains);
       } else if (Array.isArray(grains)) {
-        grains.forEach(grain => assignedGrains.add(grain));
+        grains.forEach((grain) => assignedGrains.add(grain));
       }
     }
 
     // Check if all mash bill grains are assigned to bins
     for (const grain of mashBillGrains) {
       if (!assignedGrains.has(grain)) {
-        this.logger.error(`Grain ${grain} from mash bill is not assigned to any bin`);
+        this.logger.error(
+          `Grain ${grain} from mash bill is not assigned to any bin`
+        );
         return false;
       }
     }
@@ -1830,12 +1846,14 @@ export class RecipeGenerator {
     // Check if there are any extra grains assigned that aren't in the mash bill
     for (const grain of assignedGrains) {
       if (!mashBillGrains.has(grain)) {
-        this.logger.error(`Grain ${grain} is assigned to a bin but not present in mash bill`);
+        this.logger.error(
+          `Grain ${grain} is assigned to a bin but not present in mash bill`
+        );
         return false;
       }
     }
 
-    this.logger.log('Grain assignments match mash bill components');
+    this.logger.log("Grain assignments match mash bill components");
     return true;
   }
 
@@ -1868,7 +1886,10 @@ export class RecipeGenerator {
     }
 
     // Then validate against mash bill
-    return this.validateGrainAssignmentsAgainstMashBill(binAssignments, this.MASH_BILL);
+    return this.validateGrainAssignmentsAgainstMashBill(
+      binAssignments,
+      this.MASH_BILL
+    );
   }
 
   private isValidGrain(grain: string): boolean {
