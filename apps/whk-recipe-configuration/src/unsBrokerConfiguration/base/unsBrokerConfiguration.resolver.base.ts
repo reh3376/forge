@@ -26,6 +26,8 @@ import { UnsBrokerConfigurationFindUniqueArgs } from "./UnsBrokerConfigurationFi
 import { CreateUnsBrokerConfigurationArgs } from "./CreateUnsBrokerConfigurationArgs";
 import { UpdateUnsBrokerConfigurationArgs } from "./UpdateUnsBrokerConfigurationArgs";
 import { DeleteUnsBrokerConfigurationArgs } from "./DeleteUnsBrokerConfigurationArgs";
+import { UnsConfigurationFindManyArgs } from "../../unsConfiguration/base/UnsConfigurationFindManyArgs";
+import { UnsConfiguration } from "../../unsConfiguration/base/UnsConfiguration";
 import { UnsBrokerConfigurationService } from "../unsBrokerConfiguration.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => UnsBrokerConfiguration)
@@ -140,5 +142,25 @@ export class UnsBrokerConfigurationResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UnsConfiguration], { name: "unsConfigurations" })
+  @nestAccessControl.UseRoles({
+    resource: "UnsConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async findUnsConfigurations(
+    @graphql.Parent() parent: UnsBrokerConfiguration,
+    @graphql.Args() args: UnsConfigurationFindManyArgs
+  ): Promise<UnsConfiguration[]> {
+    const results = await this.service.findUnsConfigurations(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }
