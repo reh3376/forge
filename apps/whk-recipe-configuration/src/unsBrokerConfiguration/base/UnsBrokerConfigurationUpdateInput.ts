@@ -18,10 +18,13 @@ import {
   IsInt,
   Max,
   IsBoolean,
+  ValidateNested,
 } from "class-validator";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput } from "./UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput";
+import { Type } from "class-transformer";
 
 @InputType()
 class UnsBrokerConfigurationUpdateInput {
@@ -116,6 +119,18 @@ class UnsBrokerConfigurationUpdateInput {
     nullable: true,
   })
   tls?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput,
+  })
+  @ValidateNested()
+  @Type(() => UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput)
+  @IsOptional()
+  @Field(() => UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput, {
+    nullable: true,
+  })
+  unsConfigurations?: UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput;
 
   @ApiProperty({
     required: false,

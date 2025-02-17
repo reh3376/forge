@@ -26,6 +26,9 @@ import { UnsConfiguration } from "./UnsConfiguration";
 import { UnsConfigurationFindManyArgs } from "./UnsConfigurationFindManyArgs";
 import { UnsConfigurationWhereUniqueInput } from "./UnsConfigurationWhereUniqueInput";
 import { UnsConfigurationUpdateInput } from "./UnsConfigurationUpdateInput";
+import { UnsBrokerConfigurationFindManyArgs } from "../../unsBrokerConfiguration/base/UnsBrokerConfigurationFindManyArgs";
+import { UnsBrokerConfiguration } from "../../unsBrokerConfiguration/base/UnsBrokerConfiguration";
+import { UnsBrokerConfigurationWhereUniqueInput } from "../../unsBrokerConfiguration/base/UnsBrokerConfigurationWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -228,5 +231,113 @@ export class UnsConfigurationControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/brokers")
+  @ApiNestedQuery(UnsBrokerConfigurationFindManyArgs)
+  @UseRoles({
+    resource: "UnsBrokerConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async findBrokers(
+    @common.Req() request: Request,
+    @common.Param() params: UnsConfigurationWhereUniqueInput
+  ): Promise<UnsBrokerConfiguration[]> {
+    const query = plainToClass(
+      UnsBrokerConfigurationFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findBrokers(params.id, {
+      ...query,
+      select: {
+        baseTopicPath: true,
+        createdAt: true,
+        createdBy: true,
+        host: true,
+        id: true,
+        port: true,
+        protocol: true,
+        subscriptions: true,
+        tls: true,
+        updatedAt: true,
+        updatedBy: true,
+        username: true,
+        validateCertificate: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/brokers")
+  @UseRoles({
+    resource: "UnsConfiguration",
+    action: "update",
+    possession: "any",
+  })
+  async connectBrokers(
+    @common.Param() params: UnsConfigurationWhereUniqueInput,
+    @common.Body() body: UnsBrokerConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      brokers: {
+        connect: body,
+      },
+    };
+    await this.service.updateUnsConfiguration({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/brokers")
+  @UseRoles({
+    resource: "UnsConfiguration",
+    action: "update",
+    possession: "any",
+  })
+  async updateBrokers(
+    @common.Param() params: UnsConfigurationWhereUniqueInput,
+    @common.Body() body: UnsBrokerConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      brokers: {
+        set: body,
+      },
+    };
+    await this.service.updateUnsConfiguration({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/brokers")
+  @UseRoles({
+    resource: "UnsConfiguration",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBrokers(
+    @common.Param() params: UnsConfigurationWhereUniqueInput,
+    @common.Body() body: UnsBrokerConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      brokers: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUnsConfiguration({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

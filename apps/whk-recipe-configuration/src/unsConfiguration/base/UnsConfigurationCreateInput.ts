@@ -11,13 +11,16 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput } from "./UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
   IsBoolean,
-  IsOptional,
   IsEnum,
 } from "class-validator";
+import { Type } from "class-transformer";
 import { EnumUnsConfigurationEventType } from "./EnumUnsConfigurationEventType";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
@@ -25,6 +28,24 @@ import { InputJsonValue } from "../../types";
 
 @InputType()
 class UnsConfigurationCreateInput {
+  @ApiProperty({
+    required: true,
+    type: () =>
+      UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput
+  )
+  @IsOptional()
+  @Field(
+    () => UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput,
+    {
+      nullable: true,
+    }
+  )
+  brokers?: UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput;
+
   @ApiProperty({
     required: true,
     type: String,
