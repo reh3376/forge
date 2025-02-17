@@ -227,17 +227,6 @@ class TestParameterUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Boolean,
-  })
-  @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  isClassDef?: boolean | null;
-
-  @ApiProperty({
-    required: false,
     type: () => ItemUpdateManyWithoutTestParametersInput,
   })
   @ValidateNested()

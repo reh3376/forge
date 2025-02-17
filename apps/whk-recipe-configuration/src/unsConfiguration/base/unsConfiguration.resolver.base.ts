@@ -146,7 +146,7 @@ export class UnsConfigurationResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [UnsBrokerConfiguration], { name: "brokers" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "read",
     possession: "any",
