@@ -37,6 +37,7 @@ import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { Recipe } from "../../recipe/base/Recipe";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
@@ -310,6 +311,15 @@ class Item {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [TestParameter],
+  })
+  @ValidateNested()
+  @Type(() => TestParameter)
+  @IsOptional()
+  testParameters?: Array<TestParameter>;
 
   @ApiProperty({
     required: true,

@@ -26,6 +26,7 @@ import {
 
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { Item } from "../../item/base/Item";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 
@@ -240,6 +241,27 @@ class TestParameter {
     nullable: true,
   })
   isClassDef!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Item],
+  })
+  @ValidateNested()
+  @Type(() => Item)
+  @IsOptional()
+  item?: Array<Item>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemGroup!: string | null;
 
   @ApiProperty({
     required: false,

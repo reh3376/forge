@@ -522,6 +522,7 @@ export class ItemReceiptControllerBase {
         globalId: true,
         id: true,
         isClassDef: true,
+        itemGroup: true,
 
         itemReceipt: {
           select: {
