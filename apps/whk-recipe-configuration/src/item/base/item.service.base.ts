@@ -27,6 +27,7 @@ import {
   RecipeBomItem as PrismaRecipeBomItem,
   Recipe as PrismaRecipe,
   SalesOrder as PrismaSalesOrder,
+  TestParameter as PrismaTestParameter,
   Vendor as PrismaVendor,
 } from "@prisma/client";
 
@@ -194,6 +195,17 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .salesOrders(args);
+  }
+
+  async findTestParameters(
+    parentId: string,
+    args: Prisma.TestParameterFindManyArgs
+  ): Promise<PrismaTestParameter[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .testParameters(args);
   }
 
   async getLotContinerItem(parentId: string): Promise<PrismaLot | null> {

@@ -28,6 +28,7 @@ import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseUpdateManyWithoutTestParametersInput } from "./EquipmentPhaseUpdateManyWithoutTestParametersInput";
 import { TestParameterUpdateManyWithoutTestParametersInput } from "./TestParameterUpdateManyWithoutTestParametersInput";
+import { ItemUpdateManyWithoutTestParametersInput } from "./ItemUpdateManyWithoutTestParametersInput";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderUpdateManyWithoutTestParametersInput } from "./PurchaseOrderUpdateManyWithoutTestParametersInput";
 
@@ -223,6 +224,41 @@ class TestParameterUpdateInput {
     nullable: true,
   })
   instances?: TestParameterUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemUpdateManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemUpdateManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => ItemUpdateManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  item?: ItemUpdateManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemGroup?: string | null;
 
   @ApiProperty({
     required: false,

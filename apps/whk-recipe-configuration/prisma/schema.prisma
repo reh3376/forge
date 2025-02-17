@@ -77,6 +77,8 @@ model TestParameter {
   globalId                 String?                            @default(cuid())
   id                       String                             @id @default(cuid())
   instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
+  item                     Item[]
+  itemGroup                String?
   itemReceipt              ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
   itemReceiptId            String?
   // PurchaseOrder            PurchaseOrder?                     @relation(fields: [purchaseOrderId], references: [id])
@@ -455,6 +457,7 @@ model Item {
   recipes            Recipe[]
   salesOrders        SalesOrder[]
   schemaVersion      String?
+  testParameters     TestParameter[]
   updatedAt          DateTime            @updatedAt
   updatedBy          String?
   vendor             Vendor?             @relation(fields: [vendorId], references: [id])
