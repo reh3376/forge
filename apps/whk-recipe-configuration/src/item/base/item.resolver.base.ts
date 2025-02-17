@@ -51,6 +51,8 @@ import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
 import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -421,6 +423,26 @@ export class ItemResolverBase {
     @graphql.Args() args: SalesOrderFindManyArgs
   ): Promise<SalesOrder[]> {
     const results = await this.service.findSalesOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: TestParameterFindManyArgs
+  ): Promise<TestParameter[]> {
+    const results = await this.service.findTestParameters(parent.id, args);
 
     if (!results) {
       return [];

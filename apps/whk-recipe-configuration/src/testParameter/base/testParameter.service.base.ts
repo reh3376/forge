@@ -15,6 +15,7 @@ import {
   Prisma,
   TestParameter as PrismaTestParameter,
   EquipmentPhase as PrismaEquipmentPhase,
+  Item as PrismaItem,
   PurchaseOrder as PrismaPurchaseOrder,
   ItemReceipt as PrismaItemReceipt,
 } from "@prisma/client";
@@ -74,6 +75,17 @@ export class TestParameterServiceBase {
         where: { id: parentId },
       })
       .instances(args);
+  }
+
+  async findItem(
+    parentId: string,
+    args: Prisma.ItemFindManyArgs
+  ): Promise<PrismaItem[]> {
+    return this.prisma.testParameter
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .item(args);
   }
 
   async findPurchaseOrder(

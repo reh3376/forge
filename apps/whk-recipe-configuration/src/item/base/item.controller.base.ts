@@ -65,6 +65,9 @@ import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
+import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
+import { TestParameter } from "../../testParameter/base/TestParameter";
+import { TestParameterWhereUniqueInput } from "../../testParameter/base/TestParameterWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -2033,6 +2036,138 @@ export class ItemControllerBase {
   ): Promise<void> {
     const data = {
       salesOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/testParameters")
+  @ApiNestedQuery(TestParameterFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "TestParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findTestParameters(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<TestParameter[]> {
+    const query = plainToClass(TestParameterFindManyArgs, request.query);
+    const results = await this.service.findTestParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+
+        classId: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        globalId: true,
+        id: true,
+        isClassDef: true,
+        itemGroup: true,
+
+        itemReceipt: {
+          select: {
+            id: true,
+          },
+        },
+
+        name: true,
+        required: true,
+        schemaVersion: true,
+        testDetails: true,
+        testParamRevision: true,
+        testParamUnits: true,
+        testPass: true,
+        testResult: true,
+        testSetpointBooleanValue: true,
+        testSetpointLowerLimit: true,
+        testSetpointType: true,
+        testSetpointUpperLimit: true,
+        testSetpointValue: true,
+        testedAt: true,
+        testedBy: true,
+        tooltip: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectTestParameters(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateTestParameters(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/testParameters")
+  @nestAccessControl.UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectTestParameters(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: TestParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      testParameters: {
         disconnect: body,
       },
     };
