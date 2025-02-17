@@ -28,6 +28,7 @@ import { TestParameterWhereUniqueInput } from "./TestParameterWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutTestParametersInput } from "./EquipmentPhaseCreateNestedManyWithoutTestParametersInput";
 import { TestParameterCreateNestedManyWithoutTestParametersInput } from "./TestParameterCreateNestedManyWithoutTestParametersInput";
+import { ItemCreateNestedManyWithoutTestParametersInput } from "./ItemCreateNestedManyWithoutTestParametersInput";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderCreateNestedManyWithoutTestParametersInput } from "./PurchaseOrderCreateNestedManyWithoutTestParametersInput";
 
@@ -191,6 +192,30 @@ class TestParameterCreateInput {
     nullable: true,
   })
   isClassDef?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemCreateNestedManyWithoutTestParametersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemCreateNestedManyWithoutTestParametersInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutTestParametersInput, {
+    nullable: true,
+  })
+  item?: ItemCreateNestedManyWithoutTestParametersInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  itemGroup?: string | null;
 
   @ApiProperty({
     required: false,

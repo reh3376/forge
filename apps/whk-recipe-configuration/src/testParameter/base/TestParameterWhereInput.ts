@@ -21,6 +21,7 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { TestParameterListRelationFilter } from "./TestParameterListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptWhereUniqueInput";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
@@ -218,6 +219,29 @@ class TestParameterWhereInput {
     nullable: true,
   })
   isClassDef?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemListRelationFilter, {
+    nullable: true,
+  })
+  item?: ItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  itemGroup?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

@@ -11,12 +11,14 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { UnsBrokerConfiguration } from "../../unsBrokerConfiguration/base/UnsBrokerConfiguration";
 import {
+  ValidateNested,
+  IsOptional,
   IsDate,
   IsString,
   MaxLength,
   IsBoolean,
-  IsOptional,
   IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -27,6 +29,15 @@ import { JsonValue } from "type-fest";
 
 @ObjectType()
 class UnsConfiguration {
+  @ApiProperty({
+    required: true,
+    type: () => [UnsBrokerConfiguration],
+  })
+  @ValidateNested()
+  @Type(() => UnsBrokerConfiguration)
+  @IsOptional()
+  brokers?: Array<UnsBrokerConfiguration>;
+
   @ApiProperty({
     required: true,
   })

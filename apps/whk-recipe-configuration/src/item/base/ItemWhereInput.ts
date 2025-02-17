@@ -31,6 +31,7 @@ import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/Purcha
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
+import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -345,6 +346,18 @@ class ItemWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterListRelationFilter)
+  @IsOptional()
+  @Field(() => TestParameterListRelationFilter, {
+    nullable: true,
+  })
+  testParameters?: TestParameterListRelationFilter;
 
   @ApiProperty({
     required: false,

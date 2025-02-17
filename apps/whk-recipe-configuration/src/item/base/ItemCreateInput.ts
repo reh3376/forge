@@ -35,6 +35,7 @@ import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderC
 import { RecipeBomItemCreateNestedManyWithoutItemsInput } from "./RecipeBomItemCreateNestedManyWithoutItemsInput";
 import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedManyWithoutItemsInput";
 import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
+import { TestParameterCreateNestedManyWithoutItemsInput } from "./TestParameterCreateNestedManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -334,6 +335,18 @@ class ItemCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => TestParameterCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  testParameters?: TestParameterCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,

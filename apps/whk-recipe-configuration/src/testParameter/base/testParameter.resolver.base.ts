@@ -27,6 +27,8 @@ import { CreateTestParameterArgs } from "./CreateTestParameterArgs";
 import { UpdateTestParameterArgs } from "./UpdateTestParameterArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
@@ -185,6 +187,26 @@ export class TestParameterResolverBase {
     @graphql.Args() args: TestParameterFindManyArgs
   ): Promise<TestParameter[]> {
     const results = await this.service.findInstances(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Item], { name: "item" })
+  @UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findItem(
+    @graphql.Parent() parent: TestParameter,
+    @graphql.Args() args: ItemFindManyArgs
+  ): Promise<Item[]> {
+    const results = await this.service.findItem(parent.id, args);
 
     if (!results) {
       return [];

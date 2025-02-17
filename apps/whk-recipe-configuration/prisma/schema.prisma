@@ -77,6 +77,8 @@ model TestParameter {
   globalId                 String?                            @default(cuid())
   id                       String                             @id @default(cuid())
   instances                TestParameter[]                    @relation(name: "TestParameterClassIdTestParameterInstances")
+  item                     Item[]
+  itemGroup                String?
   itemReceipt              ItemReceipt?                       @relation(fields: [itemReceiptId], references: [id])
   itemReceiptId            String?
   // PurchaseOrder            PurchaseOrder?                     @relation(fields: [purchaseOrderId], references: [id])
@@ -455,6 +457,7 @@ model Item {
   recipes            Recipe[]
   salesOrders        SalesOrder[]
   schemaVersion      String?
+  testParameters     TestParameter[]
   updatedAt          DateTime            @updatedAt
   updatedBy          String?
   vendor             Vendor?             @relation(fields: [vendorId], references: [id])
@@ -1115,6 +1118,7 @@ model AdditiveActual {
 }
 
 model UnsConfiguration {
+  brokers                UnsBrokerConfiguration[]
   createdAt              DateTime                        @default(now())
   createdBy              String
   enabled                Boolean?                        @default(true)
@@ -1129,20 +1133,21 @@ model UnsConfiguration {
 }
 
 model UnsBrokerConfiguration {
-  baseTopicPath       String?  @default("#")
-  createdAt           DateTime @default(now())
+  baseTopicPath       String?            @default("#")
+  createdAt           DateTime           @default(now())
   createdBy           String
   host                String
-  id                  String   @id @default(cuid())
+  id                  String             @id @default(cuid())
   password            String?
-  port                Int?     @default(1883)
-  protocol            String?  @default("mqtt://")
+  port                Int?               @default(1883)
+  protocol            String?            @default("mqtt://")
   subscriptions       Json?
-  tls                 Boolean? @default(false)
-  updatedAt           DateTime @updatedAt
+  tls                 Boolean?           @default(false)
+  unsConfigurations   UnsConfiguration[]
+  updatedAt           DateTime           @updatedAt
   updatedBy           String?
   username            String?
-  validateCertificate Boolean? @default(false)
+  validateCertificate Boolean?           @default(false)
 }
 
 enum EnumPhaseParameterSetpointType {

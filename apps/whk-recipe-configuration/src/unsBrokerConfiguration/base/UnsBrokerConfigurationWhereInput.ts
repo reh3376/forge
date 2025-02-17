@@ -13,11 +13,12 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { UnsConfigurationListRelationFilter } from "../../unsConfiguration/base/UnsConfigurationListRelationFilter";
 
 @InputType()
 class UnsBrokerConfigurationWhereInput {
@@ -108,6 +109,18 @@ class UnsBrokerConfigurationWhereInput {
     nullable: true,
   })
   tls?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnsConfigurationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnsConfigurationListRelationFilter)
+  @IsOptional()
+  @Field(() => UnsConfigurationListRelationFilter, {
+    nullable: true,
+  })
+  unsConfigurations?: UnsConfigurationListRelationFilter;
 
   @ApiProperty({
     required: false,

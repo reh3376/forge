@@ -35,6 +35,7 @@ import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateM
 import { RecipeBomItemUpdateManyWithoutItemsInput } from "./RecipeBomItemUpdateManyWithoutItemsInput";
 import { RecipeUpdateManyWithoutItemsInput } from "./RecipeUpdateManyWithoutItemsInput";
 import { SalesOrderUpdateManyWithoutItemsInput } from "./SalesOrderUpdateManyWithoutItemsInput";
+import { TestParameterUpdateManyWithoutItemsInput } from "./TestParameterUpdateManyWithoutItemsInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -349,6 +350,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => TestParameterUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => TestParameterUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => TestParameterUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  testParameters?: TestParameterUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
