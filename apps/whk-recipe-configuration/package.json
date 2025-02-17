@@ -92,7 +92,7 @@
     "@types/graphql-upload": "^8.0.12",
     "@types/jest": "^29.5.5",
     "@types/mime-types": "^2.1.4",
-    "@types/multer": "^1.4.11",
+    "@types/multer": "^1.4.12",
     "@types/node": "^18.19.71",
     "@types/normalize-path": "3.0.2",
     "@types/passport-http": "0.3.11",
