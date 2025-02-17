@@ -433,7 +433,7 @@ export class ItemResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [TestParameter], { name: "testParameters" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",

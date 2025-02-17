@@ -2049,7 +2049,7 @@ export class ItemControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/testParameters")
   @ApiNestedQuery(TestParameterFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "TestParameter",
     action: "read",
     possession: "any",
@@ -2113,7 +2113,7 @@ export class ItemControllerBase {
   }
 
   @common.Post("/:id/testParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -2135,7 +2135,7 @@ export class ItemControllerBase {
   }
 
   @common.Patch("/:id/testParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",
@@ -2157,7 +2157,7 @@ export class ItemControllerBase {
   }
 
   @common.Delete("/:id/testParameters")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Item",
     action: "update",
     possession: "any",

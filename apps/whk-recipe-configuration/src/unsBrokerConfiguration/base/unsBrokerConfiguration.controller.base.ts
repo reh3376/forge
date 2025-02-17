@@ -249,7 +249,7 @@ export class UnsBrokerConfigurationControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/unsConfigurations")
   @ApiNestedQuery(UnsConfigurationFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsConfiguration",
     action: "read",
     possession: "any",
@@ -284,7 +284,7 @@ export class UnsBrokerConfigurationControllerBase {
   }
 
   @common.Post("/:id/unsConfigurations")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "update",
     possession: "any",
@@ -306,7 +306,7 @@ export class UnsBrokerConfigurationControllerBase {
   }
 
   @common.Patch("/:id/unsConfigurations")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "update",
     possession: "any",
@@ -328,7 +328,7 @@ export class UnsBrokerConfigurationControllerBase {
   }
 
   @common.Delete("/:id/unsConfigurations")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "UnsBrokerConfiguration",
     action: "update",
     possession: "any",
