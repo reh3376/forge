@@ -22,11 +22,28 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   async createItemReceipt<T extends Prisma.ItemReceiptCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemReceiptCreateArgs>
   ): Promise<import(".prisma/client").ItemReceipt> {
-    // get the grain tests statically for now.
+    // First get the item with its itemGroup
+    const item = await this.prisma.item.findUnique({
+      where: { id: (args.data as any).itemId },
+      select: {
+        id: true,
+        itemGroup: true,
+      },
+    });
+
+    if (!item) {
+      throw new Error("Item not found");
+    }
+
+    // Get both group-specific and common test parameter class definitions
     const grainTests = await this.prisma.testParameter.findMany({
       where: {
         active: true,
         isClassDef: true,
+        OR: [
+          { itemGroup: item.itemGroup }, // Group-specific tests
+          { itemGroup: null }, // Common tests that apply to all groups
+        ],
       },
     });
 
@@ -53,6 +70,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
             testSetpointLowerLimit: test.testSetpointLowerLimit,
             testSetpointUpperLimit: test.testSetpointUpperLimit,
             testSetpointValue: test.testSetpointValue,
+            itemGroup: test.itemGroup,
             active: true,
             isClassDef: false,
             classId: { connect: { id: test.id } },
