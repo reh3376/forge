@@ -1337,6 +1337,183 @@
         ]
       }
     },
+    "/api/testParameters/{id}/item": {
+      "get": {
+        "operationId": "TestParameterController_findItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/ItemWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["testParameters"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "TestParameterController_connectItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["testParameters"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "TestParameterController_updateItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["testParameters"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "TestParameterController_disconnectItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["testParameters"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/testParameters/{id}/purchaseOrder": {
       "get": {
         "operationId": "TestParameterController_findPurchaseOrder",
@@ -14876,6 +15053,183 @@
         ]
       }
     },
+    "/api/items/{id}/testParameters": {
+      "get": {
+        "operationId": "ItemController_findTestParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/TestParameterWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["items"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ItemController_connectTestParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["items"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "ItemController_updateTestParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["items"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ItemController_disconnectTestParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["items"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/itemGroups": {
       "post": {
         "operationId": "ItemGroupController_createItemGroup",
@@ -16232,16 +16586,7 @@
     "/api/purchaseOrders/with-line-items": {
       "get": {
         "operationId": "PurchaseOrderController_purchaseOrdersWithLineItems",
-        "parameters": [
-          {
-            "name": "purchaseOrderType",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -33366,6 +33711,183 @@
         ]
       }
     },
+    "/api/unsConfigurations/{id}/brokers": {
+      "get": {
+        "operationId": "UnsConfigurationController_findBrokers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnsBrokerConfigurationWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["unsConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UnsConfigurationController_connectBrokers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["unsConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UnsConfigurationController_updateBrokers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["unsConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UnsConfigurationController_disconnectBrokers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["unsConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/unsBrokerConfigurations": {
       "post": {
         "operationId": "UnsBrokerConfigurationController_createUnsBrokerConfiguration",
@@ -33641,6 +34163,183 @@
                 }
               }
             }
+          }
+        },
+        "tags": ["unsBrokerConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/unsBrokerConfigurations/{id}/unsConfigurations": {
+      "get": {
+        "operationId": "UnsBrokerConfigurationController_findUnsConfigurations",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "where",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnsConfigurationWhereInput"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "$ref": "#/components/schemas/Array"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "style": "deepObject",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["unsBrokerConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UnsBrokerConfigurationController_connectUnsConfigurations",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["unsBrokerConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UnsBrokerConfigurationController_updateUnsConfigurations",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["unsBrokerConfigurations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UnsBrokerConfigurationController_disconnectUnsConfigurations",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "tags": ["unsBrokerConfigurations"],
@@ -34402,6 +35101,15 @@
           },
           "isClassDef": {
             "type": "boolean"
+          },
+          "item": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          },
+          "itemGroup": {
+            "type": "string"
           },
           "itemReceipt": {
             "$ref": "#/components/schemas/ItemReceipt"
@@ -36893,6 +37601,12 @@
           "schemaVersion": {
             "type": "string"
           },
+          "testParameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestParameter"
+            }
+          },
           "updatedAt": {
             "format": "date-time",
             "type": "string"
@@ -37908,7 +38622,7 @@
           }
         }
       },
-      "ItemReceiptWhereUniqueInput": {
+      "MashingDatumWhereUniqueInput": {
         "type": "object",
         "properties": {
           "id": {
@@ -37916,6 +38630,43 @@
           }
         },
         "required": ["id"]
+      },
+      "AdditiveActualWhereInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "itemNumber": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "lotNumber": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "mashingDatum": {
+            "$ref": "#/components/schemas/MashingDatumWhereUniqueInput"
+          },
+          "quantity": {
+            "$ref": "#/components/schemas/IntFilter"
+          }
+        }
+      },
+      "AdditiveActualListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/AdditiveActualWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/AdditiveActualWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/AdditiveActualWhereInput"
+          }
+        }
       },
       "AssetWhereUniqueInput": {
         "type": "object",
@@ -37925,6 +38676,100 @@
           }
         },
         "required": ["id"]
+      },
+      "RecipeBomWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "MashingDatumWhereInput": {
+        "type": "object",
+        "properties": {
+          "additiveActuals": {
+            "$ref": "#/components/schemas/AdditiveActualListRelationFilter"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "backsetQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "bom": {
+            "$ref": "#/components/schemas/BomWhereUniqueInput"
+          },
+          "cookCompleteTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "cookDropTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "cookDuration": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "cookStartTime": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "cookStartedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "cookerNumber": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "cornQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "dropDuration": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "maltQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "operation": {
+            "$ref": "#/components/schemas/OperationWhereUniqueInput"
+          },
+          "preMaltQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "recipeBom": {
+            "$ref": "#/components/schemas/RecipeBomWhereUniqueInput"
+          },
+          "ryeQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "specialtyQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "totalDuration": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "waterQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "wheatQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          }
+        }
+      },
+      "MashingDatumListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/MashingDatumWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/MashingDatumWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/MashingDatumWhereInput"
+          }
+        }
       },
       "JsonFilter": {
         "type": "object",
@@ -38214,15 +39059,6 @@
           }
         }
       },
-      "RecipeBomWhereUniqueInput": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": ["id"]
-      },
       "RecipeBomItemWhereInput": {
         "type": "object",
         "properties": {
@@ -38399,6 +39235,15 @@
             "$ref": "#/components/schemas/BatchWhereInput"
           }
         }
+      },
+      "ItemReceiptWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
       },
       "InventoryWhereInput": {
         "type": "object",
@@ -38583,134 +39428,67 @@
           }
         }
       },
-      "MashingDatumWhereUniqueInput": {
+      "MashingProtocolWhereInput": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": ["id"]
-      },
-      "AdditiveActualWhereInput": {
-        "type": "object",
-        "properties": {
+          "batches": {
+            "$ref": "#/components/schemas/BatchListRelationFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
           "id": {
             "$ref": "#/components/schemas/StringFilter"
           },
-          "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          "master": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
           },
-          "itemNumber": {
+          "masterInstances": {
+            "$ref": "#/components/schemas/MashingProtocolListRelationFilter"
+          },
+          "masterMashingProtocol": {
+            "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
+          },
+          "name": {
             "$ref": "#/components/schemas/StringFilter"
           },
-          "lotNumber": {
-            "$ref": "#/components/schemas/StringFilter"
+          "productionOrderRecipeInstances": {
+            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceListRelationFilter"
           },
-          "mashingDatum": {
-            "$ref": "#/components/schemas/MashingDatumWhereUniqueInput"
+          "recipes": {
+            "$ref": "#/components/schemas/RecipeListRelationFilter"
           },
-          "quantity": {
-            "$ref": "#/components/schemas/IntFilter"
-          }
-        }
-      },
-      "AdditiveActualListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/AdditiveActualWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/AdditiveActualWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/AdditiveActualWhereInput"
-          }
-        }
-      },
-      "MashingDatumWhereInput": {
-        "type": "object",
-        "properties": {
-          "additiveActuals": {
-            "$ref": "#/components/schemas/AdditiveActualListRelationFilter"
-          },
-          "asset": {
-            "$ref": "#/components/schemas/AssetWhereUniqueInput"
-          },
-          "backsetQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "bom": {
-            "$ref": "#/components/schemas/BomWhereUniqueInput"
-          },
-          "cookCompleteTime": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "cookDropTime": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "cookDuration": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "cookStartTime": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "cookStartedBy": {
+          "revision": {
             "$ref": "#/components/schemas/StringNullableFilter"
           },
-          "cookerNumber": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "running": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
           },
-          "cornQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "runningInstances": {
+            "$ref": "#/components/schemas/MashingProtocolListRelationFilter"
           },
-          "dropDuration": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "runningMashingProtocol": {
+            "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
           },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
+          "steps": {
+            "$ref": "#/components/schemas/MashingProtocolStepListRelationFilter"
           },
-          "maltQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "operation": {
-            "$ref": "#/components/schemas/OperationWhereUniqueInput"
-          },
-          "preMaltQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "recipeBom": {
-            "$ref": "#/components/schemas/RecipeBomWhereUniqueInput"
-          },
-          "ryeQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "specialtyQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "totalDuration": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "waterQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "wheatQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
           }
         }
       },
-      "MashingDatumListRelationFilter": {
+      "MashingProtocolListRelationFilter": {
         "type": "object",
         "properties": {
           "every": {
-            "$ref": "#/components/schemas/MashingDatumWhereInput"
+            "$ref": "#/components/schemas/MashingProtocolWhereInput"
           },
           "some": {
-            "$ref": "#/components/schemas/MashingDatumWhereInput"
+            "$ref": "#/components/schemas/MashingProtocolWhereInput"
           },
           "none": {
-            "$ref": "#/components/schemas/MashingDatumWhereInput"
+            "$ref": "#/components/schemas/MashingProtocolWhereInput"
           }
         }
       },
@@ -38766,6 +39544,49 @@
           },
           "none": {
             "$ref": "#/components/schemas/RecipeBomWhereInput"
+          }
+        }
+      },
+      "ProductionOrderRecipeInstanceWhereInput": {
+        "type": "object",
+        "properties": {
+          "batches": {
+            "$ref": "#/components/schemas/BatchListRelationFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "mashingProtocol": {
+            "$ref": "#/components/schemas/MashingProtocolListRelationFilter"
+          },
+          "productionOrder": {
+            "$ref": "#/components/schemas/ProductionOrderWhereUniqueInput"
+          },
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+          },
+          "recipeBom": {
+            "$ref": "#/components/schemas/RecipeBomListRelationFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          }
+        }
+      },
+      "ProductionOrderRecipeInstanceListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceWhereInput"
           }
         }
       },
@@ -39333,557 +40154,6 @@
           }
         }
       },
-      "MashingProtocolWhereInput": {
-        "type": "object",
-        "properties": {
-          "batches": {
-            "$ref": "#/components/schemas/BatchListRelationFilter"
-          },
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "master": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "masterInstances": {
-            "$ref": "#/components/schemas/MashingProtocolListRelationFilter"
-          },
-          "masterMashingProtocol": {
-            "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
-          },
-          "name": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "productionOrderRecipeInstances": {
-            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceListRelationFilter"
-          },
-          "recipes": {
-            "$ref": "#/components/schemas/RecipeListRelationFilter"
-          },
-          "revision": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "running": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "runningInstances": {
-            "$ref": "#/components/schemas/MashingProtocolListRelationFilter"
-          },
-          "runningMashingProtocol": {
-            "$ref": "#/components/schemas/MashingProtocolWhereUniqueInput"
-          },
-          "steps": {
-            "$ref": "#/components/schemas/MashingProtocolStepListRelationFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          }
-        }
-      },
-      "MashingProtocolListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/MashingProtocolWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/MashingProtocolWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/MashingProtocolWhereInput"
-          }
-        }
-      },
-      "ProductionOrderRecipeInstanceWhereInput": {
-        "type": "object",
-        "properties": {
-          "batches": {
-            "$ref": "#/components/schemas/BatchListRelationFilter"
-          },
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "mashingProtocol": {
-            "$ref": "#/components/schemas/MashingProtocolListRelationFilter"
-          },
-          "productionOrder": {
-            "$ref": "#/components/schemas/ProductionOrderWhereUniqueInput"
-          },
-          "recipe": {
-            "$ref": "#/components/schemas/RecipeWhereUniqueInput"
-          },
-          "recipeBom": {
-            "$ref": "#/components/schemas/RecipeBomListRelationFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          }
-        }
-      },
-      "ProductionOrderRecipeInstanceListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceWhereInput"
-          }
-        }
-      },
-      "SalesOrderWhereUniqueInput": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": ["id"]
-      },
-      "ProductionOrderWhereInput": {
-        "type": "object",
-        "properties": {
-          "batches": {
-            "$ref": "#/components/schemas/BatchListRelationFilter"
-          },
-          "bom": {
-            "$ref": "#/components/schemas/BomWhereUniqueInput"
-          },
-          "className": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "complete": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "completedCooks": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "completedFermenters": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "completedQuantity": {
-            "$ref": "#/components/schemas/FloatNullableFilter"
-          },
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/CustomerWhereUniqueInput"
-          },
-          "customerCode": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "endDate": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "estimatedBarrelsPerFermenter": {
-            "$ref": "#/components/schemas/FloatNullableFilter"
-          },
-          "estimatedPGsPerBbl": {
-            "$ref": "#/components/schemas/FloatNullableFilter"
-          },
-          "estimatedPGsPerBushel": {
-            "$ref": "#/components/schemas/FloatNullableFilter"
-          },
-          "fermentationChemistries": {
-            "$ref": "#/components/schemas/FermentationChemistryListRelationFilter"
-          },
-          "fermentationDayData": {
-            "$ref": "#/components/schemas/FermentationDayDatumListRelationFilter"
-          },
-          "globalId": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "inProcess": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
-          },
-          "lots": {
-            "$ref": "#/components/schemas/LotListRelationFilter"
-          },
-          "name": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "plannedCooks": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "plannedFermenters": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "productionOrderRecipeInstances": {
-            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceListRelationFilter"
-          },
-          "quantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "recipe": {
-            "$ref": "#/components/schemas/RecipeWhereUniqueInput"
-          },
-          "recipeGroup": {
-            "$ref": "#/components/schemas/RecipeGroupWhereUniqueInput"
-          },
-          "salesOrder": {
-            "$ref": "#/components/schemas/SalesOrderWhereUniqueInput"
-          },
-          "scheduleOrder": {
-            "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
-          },
-          "scheduled": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "schemaVersion": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "startDate": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "Planned",
-              "Committed",
-              "Initiated",
-              "InProgress",
-              "Complete"
-            ]
-          },
-          "units": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "totalFermenters": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "totalCooks": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "executedCooks": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "executedFermenters": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          }
-        }
-      },
-      "ProductionOrderListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/ProductionOrderWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/ProductionOrderWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/ProductionOrderWhereInput"
-          }
-        }
-      },
-      "BomWhereInput": {
-        "type": "object",
-        "properties": {
-          "bomItem": {
-            "$ref": "#/components/schemas/BomItemListRelationFilter"
-          },
-          "bomName": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "bomRevision": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "bomType": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "className": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "editedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "effectiveEndDate": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "effectiveStartDate": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
-          },
-          "erpId": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "globalId": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "inactive": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
-          },
-          "mashingData": {
-            "$ref": "#/components/schemas/MashingDatumListRelationFilter"
-          },
-          "notes": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "productionOrder": {
-            "$ref": "#/components/schemas/ProductionOrderListRelationFilter"
-          },
-          "schemaVersion": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "unitProcedure": {
-            "$ref": "#/components/schemas/UnitProcedureListRelationFilter"
-          },
-          "unitProceduresPrimary": {
-            "$ref": "#/components/schemas/UnitProcedureListRelationFilter"
-          }
-        }
-      },
-      "BomListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/BomWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/BomWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/BomWhereInput"
-          }
-        }
-      },
-      "PurchaseOrderWhereUniqueInput": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": ["id"]
-      },
-      "ItemReceiptWhereInput": {
-        "type": "object",
-        "properties": {
-          "createdAt": {
-            "$ref": "#/components/schemas/DateTimeFilter"
-          },
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "driver": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "globalId": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "inventories": {
-            "$ref": "#/components/schemas/InventoryListRelationFilter"
-          },
-          "item": {
-            "$ref": "#/components/schemas/ItemWhereUniqueInput"
-          },
-          "loadId": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "lots": {
-            "$ref": "#/components/schemas/JsonFilter"
-          },
-          "purchaseOrder": {
-            "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
-          },
-          "quantity": {
-            "$ref": "#/components/schemas/FloatFilter"
-          },
-          "schemaVersion": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "status": {
-            "type": "string",
-            "enum": ["InProgress", "Complete", "Rejected", "Hold"]
-          },
-          "supplierLot": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "tests": {
-            "$ref": "#/components/schemas/TestParameterListRelationFilter"
-          },
-          "testsPassed": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "toAsset": {
-            "$ref": "#/components/schemas/AssetWhereUniqueInput"
-          },
-          "units": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "updatedAt": {
-            "$ref": "#/components/schemas/DateTimeFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "weighIn": {
-            "$ref": "#/components/schemas/FloatNullableFilter"
-          },
-          "weighOut": {
-            "$ref": "#/components/schemas/FloatNullableFilter"
-          }
-        }
-      },
-      "ItemReceiptListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/ItemReceiptWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/ItemReceiptWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/ItemReceiptWhereInput"
-          }
-        }
-      },
-      "VendorWhereUniqueInput": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": ["id"]
-      },
-      "ItemWhereInput": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "additiveActuals": {
-            "$ref": "#/components/schemas/AdditiveActualListRelationFilter"
-          },
-          "bomItems": {
-            "$ref": "#/components/schemas/BomItemListRelationFilter"
-          },
-          "bomsWipItem": {
-            "$ref": "#/components/schemas/BomListRelationFilter"
-          },
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "erpId": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "globalId": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "inventories": {
-            "$ref": "#/components/schemas/InventoryListRelationFilter"
-          },
-          "inventoryLogs": {
-            "$ref": "#/components/schemas/InventoryLogListRelationFilter"
-          },
-          "inventoryTransfers": {
-            "$ref": "#/components/schemas/InventoryTransferListRelationFilter"
-          },
-          "itemClass": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "itemDescription": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "itemGroup": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "itemName": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "itemNumber": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "itemReceipts": {
-            "$ref": "#/components/schemas/ItemReceiptListRelationFilter"
-          },
-          "itemRevision": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "itemType": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "lotContinerItem": {
-            "$ref": "#/components/schemas/LotWhereUniqueInput"
-          },
-          "lots": {
-            "$ref": "#/components/schemas/LotListRelationFilter"
-          },
-          "productionOrders": {
-            "$ref": "#/components/schemas/ProductionOrderListRelationFilter"
-          },
-          "purchaseOrders": {
-            "$ref": "#/components/schemas/PurchaseOrderListRelationFilter"
-          },
-          "recipeBoms": {
-            "$ref": "#/components/schemas/RecipeBomItemListRelationFilter"
-          },
-          "recipes": {
-            "$ref": "#/components/schemas/RecipeListRelationFilter"
-          },
-          "salesOrders": {
-            "$ref": "#/components/schemas/SalesOrderListRelationFilter"
-          },
-          "schemaVersion": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "vendor": {
-            "$ref": "#/components/schemas/VendorWhereUniqueInput"
-          }
-        }
-      },
-      "ItemListRelationFilter": {
-        "type": "object",
-        "properties": {
-          "every": {
-            "$ref": "#/components/schemas/ItemWhereInput"
-          },
-          "some": {
-            "$ref": "#/components/schemas/ItemWhereInput"
-          },
-          "none": {
-            "$ref": "#/components/schemas/ItemWhereInput"
-          }
-        }
-      },
       "SalesOrderWhereInput": {
         "type": "object",
         "properties": {
@@ -40091,6 +40361,218 @@
           },
           "none": {
             "$ref": "#/components/schemas/InventoryLogWhereInput"
+          }
+        }
+      },
+      "PurchaseOrderWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "ItemReceiptWhereInput": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "$ref": "#/components/schemas/DateTimeFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "driver": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "globalId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "inventories": {
+            "$ref": "#/components/schemas/InventoryListRelationFilter"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "loadId": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "lots": {
+            "$ref": "#/components/schemas/JsonFilter"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
+          },
+          "quantity": {
+            "$ref": "#/components/schemas/FloatFilter"
+          },
+          "schemaVersion": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["InProgress", "Complete", "Rejected", "Hold"]
+          },
+          "supplierLot": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "tests": {
+            "$ref": "#/components/schemas/TestParameterListRelationFilter"
+          },
+          "testsPassed": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "toAsset": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "units": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/DateTimeFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "weighIn": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "weighOut": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          }
+        }
+      },
+      "ItemReceiptListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/ItemReceiptWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/ItemReceiptWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/ItemReceiptWhereInput"
+          }
+        }
+      },
+      "VendorWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "PurchaseOrderWhereInput": {
+        "type": "object",
+        "properties": {
+          "acceptedLots": {
+            "$ref": "#/components/schemas/LotListRelationFilter"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          },
+          "className": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "complete": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "erpId": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "globalId": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemListRelationFilter"
+          },
+          "itemReceipts": {
+            "$ref": "#/components/schemas/ItemReceiptListRelationFilter"
+          },
+          "lineItems": {
+            "$ref": "#/components/schemas/JsonFilter"
+          },
+          "lotsRejected": {
+            "$ref": "#/components/schemas/PurchaseOrderListRelationFilter"
+          },
+          "name": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "purchaseOrderReceiptDate": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "purchaseOrderReceived": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "purchaseOrderRejectedLots": {
+            "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
+          },
+          "qualityTests": {
+            "$ref": "#/components/schemas/TestParameterListRelationFilter"
+          },
+          "receiptStatus": {
+            "type": "string",
+            "enum": [
+              "NotReceived",
+              "ReceiptInProgress",
+              "ReceiptComplete",
+              "PurchaseOrderComplete",
+              "InitializedNotReceived",
+              "ReceivedTested"
+            ]
+          },
+          "receivedQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "schemaVersion": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "totalOrderQuantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "transactionGroup": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "vendor": {
+            "$ref": "#/components/schemas/VendorWhereUniqueInput"
+          }
+        }
+      },
+      "PurchaseOrderListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/PurchaseOrderWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/PurchaseOrderWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/PurchaseOrderWhereInput"
           }
         }
       },
@@ -40453,14 +40935,23 @@
           }
         }
       },
-      "PurchaseOrderWhereInput": {
+      "SalesOrderWhereUniqueInput": {
         "type": "object",
         "properties": {
-          "acceptedLots": {
-            "$ref": "#/components/schemas/LotListRelationFilter"
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "ProductionOrderWhereInput": {
+        "type": "object",
+        "properties": {
+          "batches": {
+            "$ref": "#/components/schemas/BatchListRelationFilter"
           },
-          "asset": {
-            "$ref": "#/components/schemas/AssetWhereUniqueInput"
+          "bom": {
+            "$ref": "#/components/schemas/BomWhereUniqueInput"
           },
           "className": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -40468,8 +40959,230 @@
           "complete": {
             "$ref": "#/components/schemas/BooleanNullableFilter"
           },
-          "createdAt": {
+          "completedCooks": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "completedFermenters": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "completedQuantity": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerWhereUniqueInput"
+          },
+          "customerCode": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "endDate": {
             "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "estimatedBarrelsPerFermenter": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "estimatedPGsPerBbl": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "estimatedPGsPerBushel": {
+            "$ref": "#/components/schemas/FloatNullableFilter"
+          },
+          "fermentationChemistries": {
+            "$ref": "#/components/schemas/FermentationChemistryListRelationFilter"
+          },
+          "fermentationDayData": {
+            "$ref": "#/components/schemas/FermentationDayDatumListRelationFilter"
+          },
+          "globalId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "inProcess": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "lots": {
+            "$ref": "#/components/schemas/LotListRelationFilter"
+          },
+          "name": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "plannedCooks": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "plannedFermenters": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "productionOrderRecipeInstances": {
+            "$ref": "#/components/schemas/ProductionOrderRecipeInstanceListRelationFilter"
+          },
+          "quantity": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeWhereUniqueInput"
+          },
+          "recipeGroup": {
+            "$ref": "#/components/schemas/RecipeGroupWhereUniqueInput"
+          },
+          "salesOrder": {
+            "$ref": "#/components/schemas/SalesOrderWhereUniqueInput"
+          },
+          "scheduleOrder": {
+            "$ref": "#/components/schemas/ScheduleOrderWhereUniqueInput"
+          },
+          "scheduled": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "schemaVersion": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "startDate": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Planned",
+              "Committed",
+              "Initiated",
+              "InProgress",
+              "Complete"
+            ]
+          },
+          "units": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "totalFermenters": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "totalCooks": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "executedCooks": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          },
+          "executedFermenters": {
+            "$ref": "#/components/schemas/IntNullableFilter"
+          }
+        }
+      },
+      "ProductionOrderListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/ProductionOrderWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/ProductionOrderWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/ProductionOrderWhereInput"
+          }
+        }
+      },
+      "BomWhereInput": {
+        "type": "object",
+        "properties": {
+          "bomItem": {
+            "$ref": "#/components/schemas/BomItemListRelationFilter"
+          },
+          "bomName": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "bomRevision": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "bomType": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "className": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "editedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "effectiveEndDate": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "effectiveStartDate": {
+            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          },
+          "erpId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "globalId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "inactive": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemWhereUniqueInput"
+          },
+          "mashingData": {
+            "$ref": "#/components/schemas/MashingDatumListRelationFilter"
+          },
+          "notes": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "productionOrder": {
+            "$ref": "#/components/schemas/ProductionOrderListRelationFilter"
+          },
+          "schemaVersion": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "unitProcedure": {
+            "$ref": "#/components/schemas/UnitProcedureListRelationFilter"
+          },
+          "unitProceduresPrimary": {
+            "$ref": "#/components/schemas/UnitProcedureListRelationFilter"
+          }
+        }
+      },
+      "BomListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/BomWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/BomWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/BomWhereInput"
+          }
+        }
+      },
+      "ItemWhereInput": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "additiveActuals": {
+            "$ref": "#/components/schemas/AdditiveActualListRelationFilter"
+          },
+          "bomItems": {
+            "$ref": "#/components/schemas/BomItemListRelationFilter"
+          },
+          "bomsWipItem": {
+            "$ref": "#/components/schemas/BomListRelationFilter"
           },
           "createdBy": {
             "$ref": "#/components/schemas/StringFilter"
@@ -40478,66 +41191,70 @@
             "$ref": "#/components/schemas/StringFilter"
           },
           "globalId": {
-            "$ref": "#/components/schemas/StringFilter"
+            "$ref": "#/components/schemas/StringNullableFilter"
           },
           "id": {
             "$ref": "#/components/schemas/StringFilter"
           },
-          "item": {
-            "$ref": "#/components/schemas/ItemListRelationFilter"
+          "inventories": {
+            "$ref": "#/components/schemas/InventoryListRelationFilter"
+          },
+          "inventoryLogs": {
+            "$ref": "#/components/schemas/InventoryLogListRelationFilter"
+          },
+          "inventoryTransfers": {
+            "$ref": "#/components/schemas/InventoryTransferListRelationFilter"
+          },
+          "itemClass": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "itemDescription": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "itemGroup": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "itemName": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "itemNumber": {
+            "$ref": "#/components/schemas/StringFilter"
           },
           "itemReceipts": {
             "$ref": "#/components/schemas/ItemReceiptListRelationFilter"
           },
-          "lineItems": {
-            "$ref": "#/components/schemas/JsonFilter"
+          "itemRevision": {
+            "$ref": "#/components/schemas/IntNullableFilter"
           },
-          "lotsRejected": {
-            "$ref": "#/components/schemas/PurchaseOrderListRelationFilter"
-          },
-          "name": {
+          "itemType": {
             "$ref": "#/components/schemas/StringFilter"
           },
-          "purchaseOrderReceiptDate": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          "lotContinerItem": {
+            "$ref": "#/components/schemas/LotWhereUniqueInput"
           },
-          "purchaseOrderReceived": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
+          "lots": {
+            "$ref": "#/components/schemas/LotListRelationFilter"
           },
-          "purchaseOrderRejectedLots": {
-            "$ref": "#/components/schemas/PurchaseOrderWhereUniqueInput"
+          "productionOrders": {
+            "$ref": "#/components/schemas/ProductionOrderListRelationFilter"
           },
-          "qualityTests": {
-            "$ref": "#/components/schemas/TestParameterListRelationFilter"
+          "purchaseOrders": {
+            "$ref": "#/components/schemas/PurchaseOrderListRelationFilter"
           },
-          "receiptStatus": {
-            "type": "string",
-            "enum": [
-              "NotReceived",
-              "ReceiptInProgress",
-              "ReceiptComplete",
-              "PurchaseOrderComplete",
-              "InitializedNotReceived",
-              "ReceivedTested"
-            ]
+          "recipeBoms": {
+            "$ref": "#/components/schemas/RecipeBomItemListRelationFilter"
           },
-          "receivedQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "recipes": {
+            "$ref": "#/components/schemas/RecipeListRelationFilter"
           },
-          "revision": {
-            "$ref": "#/components/schemas/IntNullableFilter"
+          "salesOrders": {
+            "$ref": "#/components/schemas/SalesOrderListRelationFilter"
           },
           "schemaVersion": {
             "$ref": "#/components/schemas/StringNullableFilter"
           },
-          "totalOrderQuantity": {
-            "$ref": "#/components/schemas/IntNullableFilter"
-          },
-          "transactionGroup": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "updatedAt": {
-            "$ref": "#/components/schemas/DateTimeNullableFilter"
+          "testParameters": {
+            "$ref": "#/components/schemas/TestParameterListRelationFilter"
           },
           "updatedBy": {
             "$ref": "#/components/schemas/StringNullableFilter"
@@ -40547,17 +41264,17 @@
           }
         }
       },
-      "PurchaseOrderListRelationFilter": {
+      "ItemListRelationFilter": {
         "type": "object",
         "properties": {
           "every": {
-            "$ref": "#/components/schemas/PurchaseOrderWhereInput"
+            "$ref": "#/components/schemas/ItemWhereInput"
           },
           "some": {
-            "$ref": "#/components/schemas/PurchaseOrderWhereInput"
+            "$ref": "#/components/schemas/ItemWhereInput"
           },
           "none": {
-            "$ref": "#/components/schemas/PurchaseOrderWhereInput"
+            "$ref": "#/components/schemas/ItemWhereInput"
           }
         }
       },
@@ -40614,6 +41331,12 @@
           },
           "isClassDef": {
             "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemListRelationFilter"
+          },
+          "itemGroup": {
+            "$ref": "#/components/schemas/StringNullableFilter"
           },
           "itemReceipt": {
             "$ref": "#/components/schemas/ItemReceiptWhereUniqueInput"
@@ -40956,6 +41679,17 @@
           }
         }
       },
+      "ItemCreateNestedManyWithoutTestParametersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          }
+        }
+      },
       "PurchaseOrderCreateNestedManyWithoutTestParametersInput": {
         "type": "object",
         "properties": {
@@ -41011,6 +41745,12 @@
           },
           "isClassDef": {
             "type": "boolean"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemCreateNestedManyWithoutTestParametersInput"
+          },
+          "itemGroup": {
+            "type": "string"
           },
           "itemReceipt": {
             "$ref": "#/components/schemas/ItemReceiptWhereUniqueInput"
@@ -41101,6 +41841,29 @@
           }
         }
       },
+      "ItemUpdateManyWithoutTestParametersInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
+          }
+        }
+      },
       "PurchaseOrderUpdateManyWithoutTestParametersInput": {
         "type": "object",
         "properties": {
@@ -41175,6 +41938,12 @@
           },
           "instances": {
             "$ref": "#/components/schemas/TestParameterUpdateManyWithoutTestParametersInput"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemUpdateManyWithoutTestParametersInput"
+          },
+          "itemGroup": {
+            "type": "string"
           },
           "itemReceipt": {
             "$ref": "#/components/schemas/ItemReceiptWhereUniqueInput"
@@ -44687,6 +45456,17 @@
           }
         }
       },
+      "TestParameterCreateNestedManyWithoutItemsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestParameterWhereUniqueInput"
+            }
+          }
+        }
+      },
       "ItemCreateInput": {
         "type": "object",
         "properties": {
@@ -44767,6 +45547,9 @@
           },
           "schemaVersion": {
             "type": "string"
+          },
+          "testParameters": {
+            "$ref": "#/components/schemas/TestParameterCreateNestedManyWithoutItemsInput"
           },
           "updatedBy": {
             "type": "string"
@@ -45076,6 +45859,29 @@
           }
         }
       },
+      "TestParameterUpdateManyWithoutItemsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestParameterWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestParameterWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestParameterWhereUniqueInput"
+            }
+          }
+        }
+      },
       "ItemUpdateInput": {
         "type": "object",
         "properties": {
@@ -45156,6 +45962,9 @@
           },
           "schemaVersion": {
             "type": "string"
+          },
+          "testParameters": {
+            "$ref": "#/components/schemas/TestParameterUpdateManyWithoutItemsInput"
           },
           "updatedBy": {
             "type": "string"
@@ -50273,9 +51082,32 @@
           }
         }
       },
+      "UnsBrokerConfigurationWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsBrokerConfigurationWhereUniqueInput"
+            }
+          }
+        }
+      },
       "UnsConfigurationCreateInput": {
         "type": "object",
         "properties": {
+          "brokers": {
+            "$ref": "#/components/schemas/UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput"
+          },
           "createdBy": {
             "type": "string"
           },
@@ -50305,11 +51137,17 @@
             "type": "string"
           }
         },
-        "required": ["createdBy"]
+        "required": ["brokers", "createdBy"]
       },
       "UnsConfiguration": {
         "type": "object",
         "properties": {
+          "brokers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsBrokerConfiguration"
+            }
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -50350,108 +51188,7 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "createdBy", "id", "updatedAt"]
-      },
-      "UnsConfigurationWhereInput": {
-        "type": "object",
-        "properties": {
-          "createdBy": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "enabled": {
-            "$ref": "#/components/schemas/BooleanNullableFilter"
-          },
-          "entityName": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "filterCriteria": {
-            "$ref": "#/components/schemas/JsonFilter"
-          },
-          "id": {
-            "$ref": "#/components/schemas/StringFilter"
-          },
-          "topic": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "transformationFunction": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/StringNullableFilter"
-          }
-        }
-      },
-      "UnsConfigurationUpdateInput": {
-        "type": "object",
-        "properties": {
-          "createdBy": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "entityName": {
-            "type": "string"
-          },
-          "eventType": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": ["Create", "Read", "Update", "Delete"]
-            }
-          },
-          "filterCriteria": {
-            "type": "object"
-          },
-          "topic": {
-            "type": "string"
-          },
-          "transformationFunction": {
-            "type": "string"
-          },
-          "updatedBy": {
-            "type": "string"
-          }
-        }
-      },
-      "UnsBrokerConfigurationCreateInput": {
-        "type": "object",
-        "properties": {
-          "baseTopicPath": {
-            "type": "string"
-          },
-          "createdBy": {
-            "type": "string"
-          },
-          "host": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "port": {
-            "type": "number"
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "subscriptions": {
-            "type": "object"
-          },
-          "tls": {
-            "type": "boolean"
-          },
-          "updatedBy": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "validateCertificate": {
-            "type": "boolean"
-          }
-        },
-        "required": ["createdBy", "host"]
+        "required": ["brokers", "createdAt", "createdBy", "id", "updatedAt"]
       },
       "UnsBrokerConfiguration": {
         "type": "object",
@@ -50484,6 +51221,12 @@
           "tls": {
             "type": "boolean"
           },
+          "unsConfigurations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsConfiguration"
+            }
+          },
           "updatedAt": {
             "format": "date-time",
             "type": "string"
@@ -50499,6 +51242,52 @@
           }
         },
         "required": ["createdAt", "createdBy", "host", "id", "updatedAt"]
+      },
+      "UnsConfigurationWhereInput": {
+        "type": "object",
+        "properties": {
+          "brokers": {
+            "$ref": "#/components/schemas/UnsBrokerConfigurationListRelationFilter"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "enabled": {
+            "$ref": "#/components/schemas/BooleanNullableFilter"
+          },
+          "entityName": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "filterCriteria": {
+            "$ref": "#/components/schemas/JsonFilter"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StringFilter"
+          },
+          "topic": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "transformationFunction": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "updatedBy": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          }
+        }
+      },
+      "UnsConfigurationListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/UnsConfigurationWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/UnsConfigurationWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/UnsConfigurationWhereInput"
+          }
+        }
       },
       "UnsBrokerConfigurationWhereInput": {
         "type": "object",
@@ -50527,6 +51316,9 @@
           "tls": {
             "$ref": "#/components/schemas/BooleanNullableFilter"
           },
+          "unsConfigurations": {
+            "$ref": "#/components/schemas/UnsConfigurationListRelationFilter"
+          },
           "updatedBy": {
             "$ref": "#/components/schemas/StringNullableFilter"
           },
@@ -50535,6 +51327,164 @@
           },
           "validateCertificate": {
             "$ref": "#/components/schemas/BooleanNullableFilter"
+          }
+        }
+      },
+      "UnsBrokerConfigurationListRelationFilter": {
+        "type": "object",
+        "properties": {
+          "every": {
+            "$ref": "#/components/schemas/UnsBrokerConfigurationWhereInput"
+          },
+          "some": {
+            "$ref": "#/components/schemas/UnsBrokerConfigurationWhereInput"
+          },
+          "none": {
+            "$ref": "#/components/schemas/UnsBrokerConfigurationWhereInput"
+          }
+        }
+      },
+      "UnsBrokerConfigurationUpdateManyWithoutUnsConfigurationsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsBrokerConfigurationWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsBrokerConfigurationWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsBrokerConfigurationWhereUniqueInput"
+            }
+          }
+        }
+      },
+      "UnsConfigurationUpdateInput": {
+        "type": "object",
+        "properties": {
+          "brokers": {
+            "$ref": "#/components/schemas/UnsBrokerConfigurationUpdateManyWithoutUnsConfigurationsInput"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["Create", "Read", "Update", "Delete"]
+            }
+          },
+          "filterCriteria": {
+            "type": "object"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "transformationFunction": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "UnsConfigurationWhereUniqueInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "UnsConfigurationCreateNestedManyWithoutUnsBrokerConfigurationsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsConfigurationWhereUniqueInput"
+            }
+          }
+        }
+      },
+      "UnsBrokerConfigurationCreateInput": {
+        "type": "object",
+        "properties": {
+          "baseTopicPath": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subscriptions": {
+            "type": "object"
+          },
+          "tls": {
+            "type": "boolean"
+          },
+          "unsConfigurations": {
+            "$ref": "#/components/schemas/UnsConfigurationCreateNestedManyWithoutUnsBrokerConfigurationsInput"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "validateCertificate": {
+            "type": "boolean"
+          }
+        },
+        "required": ["createdBy", "host"]
+      },
+      "UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsConfigurationWhereUniqueInput"
+            }
+          },
+          "disconnect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsConfigurationWhereUniqueInput"
+            }
+          },
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnsConfigurationWhereUniqueInput"
+            }
           }
         }
       },
@@ -50564,6 +51514,9 @@
           },
           "tls": {
             "type": "boolean"
+          },
+          "unsConfigurations": {
+            "$ref": "#/components/schemas/UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput"
           },
           "updatedBy": {
             "type": "string"
