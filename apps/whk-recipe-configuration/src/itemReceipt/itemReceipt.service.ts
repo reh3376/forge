@@ -27,12 +27,12 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       where: { id: (args.data as any).itemId },
       select: {
         id: true,
-        itemGroup: true
-      }
+        itemGroup: true,
+      },
     });
 
     if (!item) {
-      throw new Error('Item not found');
+      throw new Error("Item not found");
     }
 
     // Get both group-specific and common test parameter class definitions
@@ -42,8 +42,8 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         isClassDef: true,
         OR: [
           { itemGroup: item.itemGroup }, // Group-specific tests
-          { itemGroup: null }  // Common tests that apply to all groups
-        ]
+          { itemGroup: null }, // Common tests that apply to all groups
+        ],
       },
     });
 
