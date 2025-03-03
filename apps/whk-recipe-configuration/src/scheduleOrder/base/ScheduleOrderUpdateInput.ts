@@ -296,7 +296,7 @@ class ScheduleOrderUpdateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(32)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
