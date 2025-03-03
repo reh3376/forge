@@ -290,7 +290,7 @@ class ScheduleOrderCreateInput {
     type: String,
   })
   @IsString()
-  @MaxLength(16)
+  @MaxLength(32)
   @Field(() => String)
   recipeName!: string;
 
