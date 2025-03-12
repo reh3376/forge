@@ -21,6 +21,7 @@ import {
 } from "class-validator";
 import { BatchUpdateManyWithoutCustomersInput } from "./BatchUpdateManyWithoutCustomersInput";
 import { Type } from "class-transformer";
+import { LotUpdateManyWithoutCustomersInput } from "./LotUpdateManyWithoutCustomersInput";
 import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { ProductionOrderUpdateManyWithoutCustomersInput } from "./ProductionOrderUpdateManyWithoutCustomersInput";
 import { RecipeUpdateManyWithoutCustomersInput } from "./RecipeUpdateManyWithoutCustomersInput";
@@ -112,6 +113,18 @@ class CustomerUpdateInput {
     nullable: true,
   })
   email?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotUpdateManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotUpdateManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => LotUpdateManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  furnishedLots?: LotUpdateManyWithoutCustomersInput;
 
   @ApiProperty({
     required: false,

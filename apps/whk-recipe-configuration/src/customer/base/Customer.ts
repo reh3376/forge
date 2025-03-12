@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
+import { Lot } from "../../lot/base/Lot";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
@@ -112,6 +113,15 @@ class Customer {
     nullable: true,
   })
   email!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Lot],
+  })
+  @ValidateNested()
+  @Type(() => Lot)
+  @IsOptional()
+  furnishedLots?: Array<Lot>;
 
   @ApiProperty({
     required: false,

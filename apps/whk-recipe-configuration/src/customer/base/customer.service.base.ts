@@ -15,6 +15,7 @@ import {
   Prisma,
   Customer as PrismaCustomer,
   Batch as PrismaBatch,
+  Lot as PrismaLot,
   ProductionOrder as PrismaProductionOrder,
   Recipe as PrismaRecipe,
   SalesOrder as PrismaSalesOrder,
@@ -64,6 +65,17 @@ export class CustomerServiceBase {
         where: { id: parentId },
       })
       .batches(args);
+  }
+
+  async findFurnishedLots(
+    parentId: string,
+    args: Prisma.LotFindManyArgs
+  ): Promise<PrismaLot[]> {
+    return this.prisma.customer
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .furnishedLots(args);
   }
 
   async findProductionOrders(

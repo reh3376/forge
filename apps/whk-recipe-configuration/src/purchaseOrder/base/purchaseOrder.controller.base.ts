@@ -401,6 +401,12 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
