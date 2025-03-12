@@ -226,6 +226,17 @@ class LotOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  furnishingCustomerId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   globalId?: SortOrder;
 
   @ApiProperty({

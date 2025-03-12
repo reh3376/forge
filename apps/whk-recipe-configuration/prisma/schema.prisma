@@ -482,6 +482,7 @@ model Customer {
   description      String?
   editedBy         String?
   email            String?
+  furnishedLots    Lot[]
   globalId         String?           @unique @default(cuid())
   id               String            @id @default(cuid())
   inventoryLog     InventoryLog?     @relation(fields: [inventoryLogId], references: [id])
@@ -664,6 +665,8 @@ model Lot {
   finalWeight                 Float?
   fromAsset                   Asset?              @relation(name: "fromAsset", fields: [fromAssetId], references: [id])
   fromAssetId                 String?
+  furnishingCustomer          Customer?           @relation(fields: [furnishingCustomerId], references: [id])
+  furnishingCustomerId        String?
   globalId                    String?             @unique @default(cuid())
   grainLbsFerm                Float?
   grainLbsPg                  Float?

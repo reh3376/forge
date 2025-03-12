@@ -956,6 +956,12 @@ export class ProductionOrderControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,

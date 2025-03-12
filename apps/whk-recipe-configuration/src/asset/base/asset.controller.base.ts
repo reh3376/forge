@@ -1480,6 +1480,12 @@ export class AssetControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
@@ -1661,6 +1667,12 @@ export class AssetControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },
@@ -1852,6 +1864,12 @@ export class AssetControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
@@ -2033,6 +2051,12 @@ export class AssetControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },

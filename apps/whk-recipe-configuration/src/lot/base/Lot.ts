@@ -31,6 +31,7 @@ import { Type } from "class-transformer";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
+import { Customer } from "../../customer/base/Customer";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
@@ -259,6 +260,15 @@ class Lot {
   @Type(() => Asset)
   @IsOptional()
   fromAsset?: Asset | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Customer,
+  })
+  @ValidateNested()
+  @Type(() => Customer)
+  @IsOptional()
+  furnishingCustomer?: Customer | null;
 
   @ApiProperty({
     required: false,
