@@ -35,6 +35,7 @@ import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfe
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
+import { Customer } from "../../customer/base/Customer";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
@@ -119,6 +120,12 @@ export class LotResolverBase {
             }
           : undefined,
 
+        furnishingCustomer: args.data.furnishingCustomer
+          ? {
+              connect: args.data.furnishingCustomer,
+            }
+          : undefined,
+
         productionOrder: args.data.productionOrder
           ? {
               connect: args.data.productionOrder,
@@ -181,6 +188,12 @@ export class LotResolverBase {
           fromAsset: args.data.fromAsset
             ? {
                 connect: args.data.fromAsset,
+              }
+            : undefined,
+
+          furnishingCustomer: args.data.furnishingCustomer
+            ? {
+                connect: args.data.furnishingCustomer,
               }
             : undefined,
 
@@ -376,6 +389,27 @@ export class LotResolverBase {
   })
   async getFromAsset(@graphql.Parent() parent: Lot): Promise<Asset | null> {
     const result = await this.service.getFromAsset(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Customer, {
+    nullable: true,
+    name: "furnishingCustomer",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Customer",
+    action: "read",
+    possession: "any",
+  })
+  async getFurnishingCustomer(
+    @graphql.Parent() parent: Lot
+  ): Promise<Customer | null> {
+    const result = await this.service.getFurnishingCustomer(parent.id);
 
     if (!result) {
       return null;

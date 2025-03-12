@@ -83,6 +83,12 @@ export class LotControllerBase {
             }
           : undefined,
 
+        furnishingCustomer: data.furnishingCustomer
+          ? {
+              connect: data.furnishingCustomer,
+            }
+          : undefined,
+
         productionOrder: data.productionOrder
           ? {
               connect: data.productionOrder,
@@ -145,6 +151,12 @@ export class LotControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },
@@ -265,6 +277,12 @@ export class LotControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
@@ -374,6 +392,12 @@ export class LotControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },
@@ -490,6 +514,12 @@ export class LotControllerBase {
               }
             : undefined,
 
+          furnishingCustomer: data.furnishingCustomer
+            ? {
+                connect: data.furnishingCustomer,
+              }
+            : undefined,
+
           productionOrder: data.productionOrder
             ? {
                 connect: data.productionOrder,
@@ -552,6 +582,12 @@ export class LotControllerBase {
           finalWeight: true,
 
           fromAsset: {
+            select: {
+              id: true,
+            },
+          },
+
+          furnishingCustomer: {
             select: {
               id: true,
             },
@@ -676,6 +712,12 @@ export class LotControllerBase {
           finalWeight: true,
 
           fromAsset: {
+            select: {
+              id: true,
+            },
+          },
+
+          furnishingCustomer: {
             select: {
               id: true,
             },
