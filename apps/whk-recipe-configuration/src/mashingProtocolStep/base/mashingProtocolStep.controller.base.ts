@@ -26,6 +26,9 @@ import { MashingProtocolStep } from "./MashingProtocolStep";
 import { MashingProtocolStepFindManyArgs } from "./MashingProtocolStepFindManyArgs";
 import { MashingProtocolStepWhereUniqueInput } from "./MashingProtocolStepWhereUniqueInput";
 import { MashingProtocolStepUpdateInput } from "./MashingProtocolStepUpdateInput";
+import { MashingProtocolStepActualFindManyArgs } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualFindManyArgs";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
+import { MashingProtocolStepActualWhereUniqueInput } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualWhereUniqueInput";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
@@ -325,6 +328,119 @@ export class MashingProtocolStepControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/mashingProtocolStepActuals")
+  @ApiNestedQuery(MashingProtocolStepActualFindManyArgs)
+  @UseRoles({
+    resource: "MashingProtocolStepActual",
+    action: "read",
+    possession: "any",
+  })
+  async findMashingProtocolStepActuals(
+    @common.Req() request: Request,
+    @common.Param() params: MashingProtocolStepWhereUniqueInput
+  ): Promise<MashingProtocolStepActual[]> {
+    const query = plainToClass(
+      MashingProtocolStepActualFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findMashingProtocolStepActuals(
+      params.id,
+      {
+        ...query,
+        select: {
+          actualValue: true,
+          createdAt: true,
+          createdBy: true,
+          id: true,
+
+          mashingProtocolStep: {
+            select: {
+              id: true,
+            },
+          },
+
+          stepCompletedAt: true,
+          timeActualValue: true,
+          updatedAt: true,
+          updatedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/mashingProtocolStepActuals")
+  @UseRoles({
+    resource: "MashingProtocolStep",
+    action: "update",
+    possession: "any",
+  })
+  async connectMashingProtocolStepActuals(
+    @common.Param() params: MashingProtocolStepWhereUniqueInput,
+    @common.Body() body: MashingProtocolStepActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingProtocolStepActuals: {
+        connect: body,
+      },
+    };
+    await this.service.updateMashingProtocolStep({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/mashingProtocolStepActuals")
+  @UseRoles({
+    resource: "MashingProtocolStep",
+    action: "update",
+    possession: "any",
+  })
+  async updateMashingProtocolStepActuals(
+    @common.Param() params: MashingProtocolStepWhereUniqueInput,
+    @common.Body() body: MashingProtocolStepActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingProtocolStepActuals: {
+        set: body,
+      },
+    };
+    await this.service.updateMashingProtocolStep({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/mashingProtocolStepActuals")
+  @UseRoles({
+    resource: "MashingProtocolStep",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMashingProtocolStepActuals(
+    @common.Param() params: MashingProtocolStepWhereUniqueInput,
+    @common.Body() body: MashingProtocolStepActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingProtocolStepActuals: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateMashingProtocolStep({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBomItem")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
   @UseRoles({
@@ -340,7 +456,7 @@ export class MashingProtocolStepControllerBase {
     const results = await this.service.findRecipeBomItem(params.id, {
       ...query,
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },

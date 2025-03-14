@@ -401,6 +401,12 @@ export class PurchaseOrderControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
@@ -552,6 +558,7 @@ export class PurchaseOrderControllerBase {
       ...query,
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,

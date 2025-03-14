@@ -24,6 +24,7 @@ import { RecipeBomUpdateManyWithoutRecipeBomsInput } from "./RecipeBomUpdateMany
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput";
 import { RecipeUpdateManyWithoutRecipeBomsInput } from "./RecipeUpdateManyWithoutRecipeBomsInput";
+import { RecipeBomActualUpdateManyWithoutRecipeBomsInput } from "./RecipeBomActualUpdateManyWithoutRecipeBomsInput";
 import { RecipeBomItemUpdateManyWithoutRecipeBomsInput } from "./RecipeBomItemUpdateManyWithoutRecipeBomsInput";
 
 @InputType()
@@ -98,6 +99,18 @@ class RecipeBomUpdateInput {
     nullable: true,
   })
   recipe?: RecipeUpdateManyWithoutRecipeBomsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomActualUpdateManyWithoutRecipeBomsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomActualUpdateManyWithoutRecipeBomsInput)
+  @IsOptional()
+  @Field(() => RecipeBomActualUpdateManyWithoutRecipeBomsInput, {
+    nullable: true,
+  })
+  recipeBomActuals?: RecipeBomActualUpdateManyWithoutRecipeBomsInput;
 
   @ApiProperty({
     required: false,

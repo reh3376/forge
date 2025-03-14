@@ -10,37 +10,37 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class RecipeBomItemUpdateManyWithoutRecipeBomItemsInput {
-  @Field(() => [RecipeBomItemWhereUniqueInput], {
+class LotUpdateManyWithoutCustomersInput {
+  @Field(() => [LotWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [RecipeBomItemWhereUniqueInput],
+    type: () => [LotWhereUniqueInput],
   })
-  connect?: Array<RecipeBomItemWhereUniqueInput>;
+  connect?: Array<LotWhereUniqueInput>;
 
-  @Field(() => [RecipeBomItemWhereUniqueInput], {
+  @Field(() => [LotWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [RecipeBomItemWhereUniqueInput],
+    type: () => [LotWhereUniqueInput],
   })
-  disconnect?: Array<RecipeBomItemWhereUniqueInput>;
+  disconnect?: Array<LotWhereUniqueInput>;
 
-  @Field(() => [RecipeBomItemWhereUniqueInput], {
+  @Field(() => [LotWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [RecipeBomItemWhereUniqueInput],
+    type: () => [LotWhereUniqueInput],
   })
-  set?: Array<RecipeBomItemWhereUniqueInput>;
+  set?: Array<LotWhereUniqueInput>;
 }
 
-export { RecipeBomItemUpdateManyWithoutRecipeBomItemsInput as RecipeBomItemUpdateManyWithoutRecipeBomItemsInput };
+export { LotUpdateManyWithoutCustomersInput as LotUpdateManyWithoutCustomersInput };

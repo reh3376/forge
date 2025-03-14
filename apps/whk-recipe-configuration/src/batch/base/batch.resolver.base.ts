@@ -25,15 +25,9 @@ import { BatchFindManyArgs } from "./BatchFindManyArgs";
 import { BatchFindUniqueArgs } from "./BatchFindUniqueArgs";
 import { CreateBatchArgs } from "./CreateBatchArgs";
 import { UpdateBatchArgs } from "./UpdateBatchArgs";
-import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
-import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { Asset } from "../../asset/base/Asset";
 import { Customer } from "../../customer/base/Customer";
 import { Lot } from "../../lot/base/Lot";
-import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
@@ -119,21 +113,9 @@ export class BatchResolverBase {
             }
           : undefined,
 
-        mashingProtocol: args.data.mashingProtocol
-          ? {
-              connect: args.data.mashingProtocol,
-            }
-          : undefined,
-
         parent: args.data.parent
           ? {
               connect: args.data.parent,
-            }
-          : undefined,
-
-        productionOrder: args.data.productionOrder
-          ? {
-              connect: args.data.productionOrder,
             }
           : undefined,
 
@@ -186,21 +168,9 @@ export class BatchResolverBase {
               }
             : undefined,
 
-          mashingProtocol: args.data.mashingProtocol
-            ? {
-                connect: args.data.mashingProtocol,
-              }
-            : undefined,
-
           parent: args.data.parent
             ? {
                 connect: args.data.parent,
-              }
-            : undefined,
-
-          productionOrder: args.data.productionOrder
-            ? {
-                connect: args.data.productionOrder,
               }
             : undefined,
 
@@ -239,51 +209,6 @@ export class BatchResolverBase {
     @graphql.Args() args: BatchFindManyArgs
   ): Promise<Batch[]> {
     const results = await this.service.findChildren(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationChemistry], {
-    name: "fermentationChemistries",
-  })
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationChemistries(
-    @graphql.Parent() parent: Batch,
-    @graphql.Args() args: FermentationChemistryFindManyArgs
-  ): Promise<FermentationChemistry[]> {
-    const results = await this.service.findFermentationChemistries(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeBomItem], { name: "recipeBomItems" })
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipeBomItems(
-    @graphql.Parent() parent: Batch,
-    @graphql.Args() args: RecipeBomItemFindManyArgs
-  ): Promise<RecipeBomItem[]> {
-    const results = await this.service.findRecipeBomItems(parent.id, args);
 
     if (!results) {
       return [];
@@ -350,27 +275,6 @@ export class BatchResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => MashingProtocol, {
-    nullable: true,
-    name: "mashingProtocol",
-  })
-  @UseRoles({
-    resource: "MashingProtocol",
-    action: "read",
-    possession: "any",
-  })
-  async getMashingProtocol(
-    @graphql.Parent() parent: Batch
-  ): Promise<MashingProtocol | null> {
-    const result = await this.service.getMashingProtocol(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Batch, {
     nullable: true,
     name: "parent",
@@ -382,27 +286,6 @@ export class BatchResolverBase {
   })
   async getParent(@graphql.Parent() parent: Batch): Promise<Batch | null> {
     const result = await this.service.getParent(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ProductionOrder, {
-    nullable: true,
-    name: "productionOrder",
-  })
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async getProductionOrder(
-    @graphql.Parent() parent: Batch
-  ): Promise<ProductionOrder | null> {
-    const result = await this.service.getProductionOrder(parent.id);
 
     if (!result) {
       return null;

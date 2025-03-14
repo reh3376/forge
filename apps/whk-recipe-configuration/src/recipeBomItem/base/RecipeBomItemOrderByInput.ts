@@ -28,7 +28,7 @@ class RecipeBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  batchId?: SortOrder;
+  activeInstanceId?: SortOrder;
 
   @ApiProperty({
     required: false,

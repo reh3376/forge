@@ -12,32 +12,24 @@ https://docs.amplication.com/how-to/custom-code
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { Asset } from "../../asset/base/Asset";
-
 import {
   ValidateNested,
   IsOptional,
   IsString,
   MaxLength,
   IsDate,
-  IsEnum,
   IsInt,
   Min,
   Max,
 } from "class-validator";
-
 import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Customer } from "../../customer/base/Customer";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Lot } from "../../lot/base/Lot";
-import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
-import { EnumBatchOperationType } from "./EnumBatchOperationType";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
-import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
 @ObjectType()
 class Batch {
@@ -49,18 +41,6 @@ class Batch {
   @Type(() => Asset)
   @IsOptional()
   asset?: Asset | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  assetPath!: string | null;
 
   @ApiProperty({
     required: false,
@@ -80,16 +60,6 @@ class Batch {
   @MaxLength(64)
   @Field(() => String)
   batchId!: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  batchInitData!: JsonValue;
 
   @ApiProperty({
     required: false,
@@ -125,26 +95,7 @@ class Batch {
   @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  customers!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
   durationSplits!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
 
   @ApiProperty({
     required: true,
@@ -165,69 +116,12 @@ class Batch {
 
   @ApiProperty({
     required: false,
-    type: () => MashingProtocol,
-  })
-  @ValidateNested()
-  @Type(() => MashingProtocol)
-  @IsOptional()
-  mashingProtocol?: MashingProtocol | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  operationIndex!: string | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumBatchOperationType,
-  })
-  @IsEnum(EnumBatchOperationType)
-  @IsOptional()
-  @Field(() => EnumBatchOperationType, {
-    nullable: true,
-  })
-  operationType?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Barreling01"
-    | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  parameterData!: JsonValue;
-
-  @ApiProperty({
-    required: false,
     type: () => Batch,
   })
   @ValidateNested()
   @Type(() => Batch)
   @IsOptional()
   parent?: Batch | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrder,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrder?: ProductionOrder | null;
 
   @ApiProperty({
     required: false,
@@ -259,27 +153,6 @@ class Batch {
   @Type(() => Recipe)
   @IsOptional()
   recipe?: Recipe | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [RecipeBomItem],
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItem)
-  @IsOptional()
-  recipeBomItems?: Array<RecipeBomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeName!: string | null;
 
   @ApiProperty({
     required: false,
