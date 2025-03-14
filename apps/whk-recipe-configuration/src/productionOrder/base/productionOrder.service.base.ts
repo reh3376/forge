@@ -14,7 +14,6 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ProductionOrder as PrismaProductionOrder,
-  Batch as PrismaBatch,
   FermentationChemistry as PrismaFermentationChemistry,
   FermentationDayDatum as PrismaFermentationDayDatum,
   Lot as PrismaLot,
@@ -61,17 +60,6 @@ export class ProductionOrderServiceBase {
     args: Prisma.ProductionOrderDeleteArgs
   ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.delete(args);
-  }
-
-  async findBatches(
-    parentId: string,
-    args: Prisma.BatchFindManyArgs
-  ): Promise<PrismaBatch[]> {
-    return this.prisma.productionOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .batches(args);
   }
 
   async findFermentationChemistries(

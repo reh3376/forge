@@ -28,6 +28,7 @@ import {
 import { Type } from "class-transformer";
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
 
@@ -171,6 +172,15 @@ class MashingProtocolStep {
   @Type(() => MashingProtocol)
   @IsOptional()
   mashingProtocol?: MashingProtocol | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingProtocolStepActual],
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepActual)
+  @IsOptional()
+  mashingProtocolStepActuals?: Array<MashingProtocolStepActual>;
 
   @ApiProperty({
     required: false,

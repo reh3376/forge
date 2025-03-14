@@ -62,10 +62,6 @@ export class FermentationChemistryControllerBase {
           connect: data.asset,
         },
 
-        batch: {
-          connect: data.batch,
-        },
-
         operation: {
           connect: data.operation,
         },
@@ -87,12 +83,6 @@ export class FermentationChemistryControllerBase {
         approvedBy: true,
 
         asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
           select: {
             id: true,
           },
@@ -152,12 +142,6 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
         id: true,
 
@@ -206,12 +190,6 @@ export class FermentationChemistryControllerBase {
         approvedBy: true,
 
         asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
           select: {
             id: true,
           },
@@ -278,10 +256,6 @@ export class FermentationChemistryControllerBase {
             connect: data.asset,
           },
 
-          batch: {
-            connect: data.batch,
-          },
-
           operation: {
             connect: data.operation,
           },
@@ -303,12 +277,6 @@ export class FermentationChemistryControllerBase {
           approvedBy: true,
 
           asset: {
-            select: {
-              id: true,
-            },
-          },
-
-          batch: {
             select: {
               id: true,
             },

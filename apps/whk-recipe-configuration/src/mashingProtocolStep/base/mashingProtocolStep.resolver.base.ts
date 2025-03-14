@@ -26,6 +26,8 @@ import { MashingProtocolStepFindUniqueArgs } from "./MashingProtocolStepFindUniq
 import { CreateMashingProtocolStepArgs } from "./CreateMashingProtocolStepArgs";
 import { UpdateMashingProtocolStepArgs } from "./UpdateMashingProtocolStepArgs";
 import { DeleteMashingProtocolStepArgs } from "./DeleteMashingProtocolStepArgs";
+import { MashingProtocolStepActualFindManyArgs } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualFindManyArgs";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
@@ -159,6 +161,31 @@ export class MashingProtocolStepResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MashingProtocolStepActual], {
+    name: "mashingProtocolStepActuals",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "MashingProtocolStepActual",
+    action: "read",
+    possession: "any",
+  })
+  async findMashingProtocolStepActuals(
+    @graphql.Parent() parent: MashingProtocolStep,
+    @graphql.Args() args: MashingProtocolStepActualFindManyArgs
+  ): Promise<MashingProtocolStepActual[]> {
+    const results = await this.service.findMashingProtocolStepActuals(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

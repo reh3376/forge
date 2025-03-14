@@ -21,7 +21,6 @@ import {
 } from "class-validator";
 import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
-import { Batch } from "../../batch/base/Batch";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
@@ -59,14 +58,6 @@ class FermentationChemistry {
   @ValidateNested()
   @Type(() => Asset)
   asset?: Asset;
-
-  @ApiProperty({
-    required: true,
-    type: () => Batch,
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  batch?: Batch;
 
   @ApiProperty({
     required: true,
