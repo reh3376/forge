@@ -283,10 +283,8 @@ export class CustomerControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -295,7 +293,6 @@ export class CustomerControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -305,23 +302,7 @@ export class CustomerControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -341,7 +322,6 @@ export class CustomerControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,

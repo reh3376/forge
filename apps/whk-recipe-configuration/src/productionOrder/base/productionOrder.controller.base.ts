@@ -26,9 +26,6 @@ import { ProductionOrder } from "./ProductionOrder";
 import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderWhereUniqueInput } from "./ProductionOrderWhereUniqueInput";
 import { ProductionOrderUpdateInput } from "./ProductionOrderUpdateInput";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
@@ -481,166 +478,6 @@ export class ProductionOrderControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/batches")
-  @ApiNestedQuery(BatchFindManyArgs)
-  @UseRoles({
-    resource: "Batch",
-    action: "read",
-    possession: "any",
-  })
-  async findBatches(
-    @common.Req() request: Request,
-    @common.Param() params: ProductionOrderWhereUniqueInput
-  ): Promise<Batch[]> {
-    const query = plainToClass(BatchFindManyArgs, request.query);
-    const results = await this.service.findBatches(params.id, {
-      ...query,
-      select: {
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        assetPath: true,
-        batchData: true,
-        batchId: true,
-        batchInitData: true,
-        createdAt: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        customers: true,
-        durationSplits: true,
-        id: true,
-
-        lot: {
-          select: {
-            id: true,
-          },
-        },
-
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
-        parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrderRecipeInstance: {
-          select: {
-            id: true,
-          },
-        },
-
-        quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeName: true,
-        revision: true,
-        totalDuration: true,
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/batches")
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async connectBatches(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      batches: {
-        connect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/batches")
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async updateBatches(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      batches: {
-        set: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/batches")
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectBatches(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      batches: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/fermentationChemistries")
   @ApiNestedQuery(FermentationChemistryFindManyArgs)
   @UseRoles({
@@ -663,12 +500,6 @@ export class ProductionOrderControllerBase {
         approvedBy: true,
 
         asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
           select: {
             id: true,
           },

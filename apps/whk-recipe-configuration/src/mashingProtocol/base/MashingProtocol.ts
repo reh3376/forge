@@ -11,14 +11,13 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { Batch } from "../../batch/base/Batch";
 import {
-  ValidateNested,
-  IsOptional,
   IsDate,
   IsString,
   MaxLength,
   IsBoolean,
+  IsOptional,
+  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
@@ -27,15 +26,6 @@ import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProto
 
 @ObjectType()
 class MashingProtocol {
-  @ApiProperty({
-    required: false,
-    type: () => [Batch],
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  batches?: Array<Batch>;
-
   @ApiProperty({
     required: true,
   })

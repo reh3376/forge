@@ -11,13 +11,11 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { RecipeBomItemListRelationFilter } from "./RecipeBomItemListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
@@ -32,15 +30,15 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 class RecipeBomItemWhereInput {
   @ApiProperty({
     required: false,
-    type: () => BatchWhereUniqueInput,
+    type: () => RecipeBomItemWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
+  @Type(() => RecipeBomItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
+  @Field(() => RecipeBomItemWhereUniqueInput, {
     nullable: true,
   })
-  batch?: BatchWhereUniqueInput;
+  activeInstance?: RecipeBomItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -86,18 +84,6 @@ class RecipeBomItemWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeBomItemListRelationFilter, {
-    nullable: true,
-  })
-  instances?: RecipeBomItemListRelationFilter;
 
   @ApiProperty({
     required: false,

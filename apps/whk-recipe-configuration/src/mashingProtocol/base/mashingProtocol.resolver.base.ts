@@ -25,8 +25,6 @@ import { MashingProtocolFindManyArgs } from "./MashingProtocolFindManyArgs";
 import { MashingProtocolFindUniqueArgs } from "./MashingProtocolFindUniqueArgs";
 import { CreateMashingProtocolArgs } from "./CreateMashingProtocolArgs";
 import { UpdateMashingProtocolArgs } from "./UpdateMashingProtocolArgs";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
@@ -154,26 +152,6 @@ export class MashingProtocolResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @UseRoles({
-    resource: "Batch",
-    action: "read",
-    possession: "any",
-  })
-  async findBatches(
-    @graphql.Parent() parent: MashingProtocol,
-    @graphql.Args() args: BatchFindManyArgs
-  ): Promise<Batch[]> {
-    const results = await this.service.findBatches(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

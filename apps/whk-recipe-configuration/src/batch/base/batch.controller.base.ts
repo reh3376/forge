@@ -26,12 +26,6 @@ import { Batch } from "./Batch";
 import { BatchFindManyArgs } from "./BatchFindManyArgs";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { BatchUpdateInput } from "./BatchUpdateInput";
-import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
-import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
-import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -77,21 +71,9 @@ export class BatchControllerBase {
             }
           : undefined,
 
-        mashingProtocol: data.mashingProtocol
-          ? {
-              connect: data.mashingProtocol,
-            }
-          : undefined,
-
         parent: data.parent
           ? {
               connect: data.parent,
-            }
-          : undefined,
-
-        productionOrder: data.productionOrder
-          ? {
-              connect: data.productionOrder,
             }
           : undefined,
 
@@ -114,10 +96,8 @@ export class BatchControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -126,7 +106,6 @@ export class BatchControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -136,23 +115,7 @@ export class BatchControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -172,7 +135,6 @@ export class BatchControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -203,10 +165,8 @@ export class BatchControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -215,7 +175,6 @@ export class BatchControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -225,23 +184,7 @@ export class BatchControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -261,7 +204,6 @@ export class BatchControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -293,10 +235,8 @@ export class BatchControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -305,7 +245,6 @@ export class BatchControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -315,23 +254,7 @@ export class BatchControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -351,7 +274,6 @@ export class BatchControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -408,21 +330,9 @@ export class BatchControllerBase {
               }
             : undefined,
 
-          mashingProtocol: data.mashingProtocol
-            ? {
-                connect: data.mashingProtocol,
-              }
-            : undefined,
-
           parent: data.parent
             ? {
                 connect: data.parent,
-              }
-            : undefined,
-
-          productionOrder: data.productionOrder
-            ? {
-                connect: data.productionOrder,
               }
             : undefined,
 
@@ -445,10 +355,8 @@ export class BatchControllerBase {
             },
           },
 
-          assetPath: true,
           batchData: true,
           batchId: true,
-          batchInitData: true,
           createdAt: true,
 
           customer: {
@@ -457,7 +365,6 @@ export class BatchControllerBase {
             },
           },
 
-          customers: true,
           durationSplits: true,
           id: true,
 
@@ -467,23 +374,7 @@ export class BatchControllerBase {
             },
           },
 
-          mashingProtocol: {
-            select: {
-              id: true,
-            },
-          },
-
-          operationIndex: true,
-          operationType: true,
-          parameterData: true,
-
           parent: {
-            select: {
-              id: true,
-            },
-          },
-
-          productionOrder: {
             select: {
               id: true,
             },
@@ -503,7 +394,6 @@ export class BatchControllerBase {
             },
           },
 
-          recipeName: true,
           revision: true,
           totalDuration: true,
           updatedAt: true,
@@ -541,10 +431,8 @@ export class BatchControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -553,7 +441,6 @@ export class BatchControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -563,23 +450,7 @@ export class BatchControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -599,7 +470,6 @@ export class BatchControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -669,269 +539,6 @@ export class BatchControllerBase {
   ): Promise<void> {
     const data = {
       children: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateBatch({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/fermentationChemistries")
-  @ApiNestedQuery(FermentationChemistryFindManyArgs)
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationChemistries(
-    @common.Req() request: Request,
-    @common.Param() params: BatchWhereUniqueInput
-  ): Promise<FermentationChemistry[]> {
-    const query = plainToClass(
-      FermentationChemistryFindManyArgs,
-      request.query
-    );
-    const results = await this.service.findFermentationChemistries(params.id, {
-      ...query,
-      select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        id: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        settingData: {
-          select: {
-            id: true,
-          },
-        },
-
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/fermentationChemistries")
-  @UseRoles({
-    resource: "Batch",
-    action: "update",
-    possession: "any",
-  })
-  async connectFermentationChemistries(
-    @common.Param() params: BatchWhereUniqueInput,
-    @common.Body() body: FermentationChemistryWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationChemistries: {
-        connect: body,
-      },
-    };
-    await this.service.updateBatch({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/fermentationChemistries")
-  @UseRoles({
-    resource: "Batch",
-    action: "update",
-    possession: "any",
-  })
-  async updateFermentationChemistries(
-    @common.Param() params: BatchWhereUniqueInput,
-    @common.Body() body: FermentationChemistryWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationChemistries: {
-        set: body,
-      },
-    };
-    await this.service.updateBatch({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/fermentationChemistries")
-  @UseRoles({
-    resource: "Batch",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectFermentationChemistries(
-    @common.Param() params: BatchWhereUniqueInput,
-    @common.Body() body: FermentationChemistryWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationChemistries: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateBatch({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipeBomItems")
-  @ApiNestedQuery(RecipeBomItemFindManyArgs)
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipeBomItems(
-    @common.Req() request: Request,
-    @common.Param() params: BatchWhereUniqueInput
-  ): Promise<RecipeBomItem[]> {
-    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
-    const results = await this.service.findRecipeBomItems(params.id, {
-      ...query,
-      select: {
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        lot: true,
-        operation: true,
-        operationIndex: true,
-        quantity: true,
-        quantityActual: true,
-
-        recipeBoms: {
-          select: {
-            id: true,
-          },
-        },
-
-        units: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/recipeBomItems")
-  @UseRoles({
-    resource: "Batch",
-    action: "update",
-    possession: "any",
-  })
-  async connectRecipeBomItems(
-    @common.Param() params: BatchWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBomItems: {
-        connect: body,
-      },
-    };
-    await this.service.updateBatch({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/recipeBomItems")
-  @UseRoles({
-    resource: "Batch",
-    action: "update",
-    possession: "any",
-  })
-  async updateRecipeBomItems(
-    @common.Param() params: BatchWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBomItems: {
-        set: body,
-      },
-    };
-    await this.service.updateBatch({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/recipeBomItems")
-  @UseRoles({
-    resource: "Batch",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectRecipeBomItems(
-    @common.Param() params: BatchWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBomItems: {
         disconnect: body,
       },
     };

@@ -27,6 +27,7 @@ import {
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { Type } from "class-transformer";
+import { MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput } from "./MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput";
 import { RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput } from "./RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
 
@@ -158,6 +159,24 @@ class MashingProtocolStepUpdateInput {
     nullable: true,
   })
   mashingProtocol?: MashingProtocolWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput
+  )
+  @IsOptional()
+  @Field(
+    () => MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput,
+    {
+      nullable: true,
+    }
+  )
+  mashingProtocolStepActuals?: MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput;
 
   @ApiProperty({
     required: false,

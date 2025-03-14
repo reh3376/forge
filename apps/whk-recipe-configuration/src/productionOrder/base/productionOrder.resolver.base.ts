@@ -25,8 +25,6 @@ import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderFindUniqueArgs } from "./ProductionOrderFindUniqueArgs";
 import { CreateProductionOrderArgs } from "./CreateProductionOrderArgs";
 import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
@@ -199,26 +197,6 @@ export class ProductionOrderResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Batch], { name: "batches" })
-  @UseRoles({
-    resource: "Batch",
-    action: "read",
-    possession: "any",
-  })
-  async findBatches(
-    @graphql.Parent() parent: ProductionOrder,
-    @graphql.Args() args: BatchFindManyArgs
-  ): Promise<Batch[]> {
-    const results = await this.service.findBatches(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

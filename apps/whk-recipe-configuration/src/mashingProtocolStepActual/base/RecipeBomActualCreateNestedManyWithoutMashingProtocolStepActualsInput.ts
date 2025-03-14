@@ -10,19 +10,19 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class BatchCreateNestedManyWithoutProductionOrdersInput {
-  @Field(() => [BatchWhereUniqueInput], {
+class RecipeBomActualCreateNestedManyWithoutMashingProtocolStepActualsInput {
+  @Field(() => [RecipeBomActualWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [BatchWhereUniqueInput],
+    type: () => [RecipeBomActualWhereUniqueInput],
   })
-  connect?: Array<BatchWhereUniqueInput>;
+  connect?: Array<RecipeBomActualWhereUniqueInput>;
 }
 
-export { BatchCreateNestedManyWithoutProductionOrdersInput as BatchCreateNestedManyWithoutProductionOrdersInput };
+export { RecipeBomActualCreateNestedManyWithoutMashingProtocolStepActualsInput as RecipeBomActualCreateNestedManyWithoutMashingProtocolStepActualsInput };

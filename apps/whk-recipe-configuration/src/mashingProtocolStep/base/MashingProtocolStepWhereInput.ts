@@ -18,6 +18,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
+import { MashingProtocolStepActualListRelationFilter } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
@@ -157,6 +158,18 @@ class MashingProtocolStepWhereInput {
     nullable: true,
   })
   mashingProtocol?: MashingProtocolWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolStepActualListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepActualListRelationFilter)
+  @IsOptional()
+  @Field(() => MashingProtocolStepActualListRelationFilter, {
+    nullable: true,
+  })
+  mashingProtocolStepActuals?: MashingProtocolStepActualListRelationFilter;
 
   @ApiProperty({
     required: false,
