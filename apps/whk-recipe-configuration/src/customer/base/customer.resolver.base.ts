@@ -171,7 +171,7 @@ export class CustomerResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Lot], { name: "furnishedLots" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",

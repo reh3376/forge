@@ -228,7 +228,7 @@ export class RecipeBomItemResolverBase {
     nullable: true,
     name: "activeInstance",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",

@@ -401,7 +401,7 @@ export class LotResolverBase {
     nullable: true,
     name: "furnishingCustomer",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "read",
     possession: "any",
