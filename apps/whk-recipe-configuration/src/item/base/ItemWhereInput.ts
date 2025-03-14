@@ -61,6 +61,17 @@ class ItemWhereInput {
 
   @ApiProperty({
     required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  baseBomItem?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => BomItemListRelationFilter,
   })
   @ValidateNested()
