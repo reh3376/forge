@@ -17,7 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { MashingProtocolStepActualWhereUniqueInput } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualWhereUniqueInput";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { DecimalNullableFilter } from "../../util/DecimalNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 
 @InputType()
 class RecipeBomActualWhereInput {
@@ -80,14 +80,14 @@ class RecipeBomActualWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DecimalNullableFilter,
+    type: FloatNullableFilter,
   })
-  @Type(() => DecimalNullableFilter)
+  @Type(() => FloatNullableFilter)
   @IsOptional()
-  @Field(() => DecimalNullableFilter, {
+  @Field(() => FloatNullableFilter, {
     nullable: true,
   })
-  value?: DecimalNullableFilter;
+  value?: FloatNullableFilter;
 }
 
 export { RecipeBomActualWhereInput as RecipeBomActualWhereInput };
