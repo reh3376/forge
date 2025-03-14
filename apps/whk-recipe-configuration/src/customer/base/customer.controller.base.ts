@@ -404,7 +404,7 @@ export class CustomerControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/furnishedLots")
   @ApiNestedQuery(LotFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Lot",
     action: "read",
     possession: "any",
@@ -528,7 +528,7 @@ export class CustomerControllerBase {
   }
 
   @common.Post("/:id/furnishedLots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "update",
     possession: "any",
@@ -550,7 +550,7 @@ export class CustomerControllerBase {
   }
 
   @common.Patch("/:id/furnishedLots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "update",
     possession: "any",
@@ -572,7 +572,7 @@ export class CustomerControllerBase {
   }
 
   @common.Delete("/:id/furnishedLots")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "Customer",
     action: "update",
     possession: "any",

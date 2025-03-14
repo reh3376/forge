@@ -330,7 +330,7 @@ export class MashingProtocolStepControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/mashingProtocolStepActuals")
   @ApiNestedQuery(MashingProtocolStepActualFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "read",
     possession: "any",
@@ -375,7 +375,7 @@ export class MashingProtocolStepControllerBase {
   }
 
   @common.Post("/:id/mashingProtocolStepActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStep",
     action: "update",
     possession: "any",
@@ -397,7 +397,7 @@ export class MashingProtocolStepControllerBase {
   }
 
   @common.Patch("/:id/mashingProtocolStepActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStep",
     action: "update",
     possession: "any",
@@ -419,7 +419,7 @@ export class MashingProtocolStepControllerBase {
   }
 
   @common.Delete("/:id/mashingProtocolStepActuals")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStep",
     action: "update",
     possession: "any",
