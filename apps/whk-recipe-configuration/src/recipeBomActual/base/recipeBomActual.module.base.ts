@@ -9,16 +9,10 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { registerEnumType } from "@nestjs/graphql";
-
-export enum EnumBatchOperationType {
-  Mashing01 = "Mashing01",
-  Fermentation01 = "Fermentation01",
-  Distillation01 = "Distillation01",
-  Processing01 = "Processing01",
-  Barreling01 = "Barreling01",
-}
-
-registerEnumType(EnumBatchOperationType, {
-  name: "EnumBatchOperationType",
-});
+import { Module } from "@nestjs/common";
+import { ACLModule } from "../../auth/acl.module";
+@Module({
+  imports: [ACLModule],
+  exports: [ACLModule],
+})
+export class RecipeBomActualModuleBase {}

@@ -342,7 +342,6 @@ model RecipeGroup {
 }
 
 model ProductionOrder {
-  batches                        Batch[]
   id                             String                          @id @default(cuid())
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
@@ -745,8 +744,6 @@ model FermentationChemistry {
   approvedBy        String?
   asset             Asset                     @relation(fields: [assetId], references: [id])
   assetId           String
-  batch             Batch                     @relation(fields: [batchId], references: [id])
-  batchId           String
   createdAt         DateTime                  @default(now())
   dailyData         FermentationDayDatum[]
   id                String                    @id @default(cuid())
@@ -827,36 +824,23 @@ model FermentationDayDatum {
 model Batch {
   asset                           Asset?                         @relation(fields: [assetId], references: [id])
   assetId                         String?
-  assetPath                       String?
   batchData                       Json?
   batchId                         String                         @unique
-  batchInitData                   Json?
   children                        Batch[]                        @relation(name: "BatchChildrenBatchParent")
   createdAt                       DateTime                       @default(now())
   customer                        Customer?                      @relation(fields: [customerId], references: [id])
   customerId                      String?
-  customers                       Json?
   durationSplits                  Json?
-  fermentationChemistries         FermentationChemistry[]
   id                              String                         @id @default(cuid())
   lot                             Lot?                           @relation(fields: [lotId], references: [id])
   lotId                           String?
-  mashingProtocol                 MashingProtocol?               @relation(fields: [mashingProtocolId], references: [id])
-  mashingProtocolId               String?
-  operationIndex                  String?
-  operationType                   EnumBatchOperationType?
-  parameterData                   Json?
   parent                          Batch?                         @relation(name: "BatchChildrenBatchParent", fields: [parentId], references: [id])
   parentId                        String?
-  productionOrder                 ProductionOrder?               @relation(fields: [productionOrderId], references: [id])
-  productionOrderId               String?
   productionOrderRecipeInstance   ProductionOrderRecipeInstance? @relation(fields: [productionOrderRecipeInstanceId], references: [id])
   productionOrderRecipeInstanceId String?
   quantity                        Int?
   recipe                          Recipe?                        @relation(fields: [recipeId], references: [id])
   recipeId                        String?
-  recipeBomItems                  RecipeBomItem[]
-  recipeName                      String?
   revision                        Int?                           @default(0)
   totalDuration                   Int?
   updatedAt                       DateTime                       @updatedAt
@@ -970,15 +954,13 @@ model ProductionOrderBomItem {
 }
 
 model RecipeBomItem {
-  batch                Batch?                     @relation(fields: [batchId], references: [id])
-  batchId              String?
-  classId              RecipeBomItem?             @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances", fields: [classIdid], references: [id])
-  classIdid            String?
+  activeInstance       RecipeBomItem?             @relation(name: "activeInstance", fields: [activeInstanceId], references: [id])
+  activeInstanceId     String?                    @unique
+  classId              RecipeBomItem?             @relation(name: "activeInstance")
   createdAt            DateTime                   @default(now())
   createdBy            String
   globalId             String?                    @unique @default(cuid())
   id                   String                     @id @default(cuid())
-  instances            RecipeBomItem[]            @relation(name: "RecipeBomItemClassIdRecipeBomItemInstances")
   isClassDefinition    Boolean?                   @default(false)
   item                 Item?                      @relation(fields: [itemId], references: [id])
   itemId               String?
@@ -996,7 +978,6 @@ model RecipeBomItem {
 }
 
 model MashingProtocol {
-  batches                        Batch[]
   createdAt                      DateTime                        @default(now())
   createdBy                      String
   id                             String                          @id @default(cuid())
@@ -1018,28 +999,29 @@ model MashingProtocol {
 }
 
 model MashingProtocolStep {
-  agitatorEnabled     Boolean?                         @default(false)
-  agitatorSpdSp       Float?
-  coolEnabled         Boolean?                         @default(false)
-  coolTempSp          Float?
-  createdAt           DateTime                         @default(now())
-  createdBy           String
-  heatEnabled         Boolean?                         @default(false)
-  heatTempSp          Float?
-  holdType            EnumMashingProtocolStepHoldType?
-  id                  String                           @id @default(cuid())
-  index               Int?
-  isClassDefinition   Boolean?                         @default(false)
-  mashingProtocol     MashingProtocol?                 @relation(fields: [mashingProtocolId], references: [id])
-  mashingProtocolId   String?
-  promptMessage       String?
-  recipeBomItem       RecipeBomItem[]
-  stepTime            Int?
-  stepType            EnumMashingProtocolStepStepType?
-  temperatureActual   Float?
-  temperatureSetpoint Float?
-  updatedAt           DateTime                         @updatedAt
-  updatedBy           String?
+  agitatorEnabled            Boolean?                         @default(false)
+  agitatorSpdSp              Decimal?
+  coolEnabled                Boolean?                         @default(false)
+  coolTempSp                 Decimal?
+  createdAt                  DateTime                         @default(now())
+  createdBy                  String
+  heatEnabled                Boolean?                         @default(false)
+  heatTempSp                 Decimal?
+  holdType                   EnumMashingProtocolStepHoldType?
+  id                         String                           @id @default(cuid())
+  index                      Int?
+  isClassDefinition          Boolean?                         @default(false)
+  mashingProtocol            MashingProtocol?                 @relation(fields: [mashingProtocolId], references: [id])
+  mashingProtocolId          String?
+  mashingProtocolStepActuals MashingProtocolStepActual[]
+  promptMessage              String?
+  recipeBomItem              RecipeBomItem[]
+  stepTime                   Int?
+  stepType                   EnumMashingProtocolStepStepType?
+  temperatureActual          Decimal?
+  temperatureSetpoint        Decimal?
+  updatedAt                  DateTime                         @updatedAt
+  updatedBy                  String?
 }
 
 model RecipeBom {
@@ -1052,6 +1034,7 @@ model RecipeBom {
   masterReceipeBomId             String?
   productionOrderRecipeInstances ProductionOrderRecipeInstance[]
   recipe                         Recipe[]
+  recipeBomActuals               RecipeBomActual[]
   recipeBomITem                  RecipeBomItem[]
   revision                       String?
   running                        Boolean?                        @default(false)
@@ -1151,6 +1134,33 @@ model UnsBrokerConfiguration {
   updatedBy           String?
   username            String?
   validateCertificate Boolean?           @default(false)
+}
+
+model MashingProtocolStepActual {
+  actualValue           Float
+  createdAt             DateTime            @default(now())
+  createdBy             String
+  id                    String              @id @default(cuid())
+  mashingProtocolStep   MashingProtocolStep @relation(fields: [mashingProtocolStepId], references: [id])
+  mashingProtocolStepId String
+  recipeBomActual       RecipeBomActual[]
+  stepCompletedAt       DateTime?
+  timeActualValue       Float?
+  updatedAt             DateTime            @updatedAt
+  updatedBy             String?
+}
+
+model RecipeBomActual {
+  createdAt                   DateTime                   @default(now())
+  createdBy                   String
+  id                          String                     @id @default(cuid())
+  mashingProtocolStepActual   MashingProtocolStepActual? @relation(fields: [mashingProtocolStepActualId], references: [id])
+  mashingProtocolStepActualId String?
+  recipeBom                   RecipeBom                  @relation(fields: [recipeBomId], references: [id])
+  recipeBomId                 String
+  updatedAt                   DateTime                   @updatedAt
+  updatedBy                   String?
+  value                       Decimal?
 }
 
 enum EnumPhaseParameterSetpointType {
@@ -1352,14 +1362,6 @@ enum EnumFermentationDayDatumDay {
   Second
   Third
   Final
-}
-
-enum EnumBatchOperationType {
-  Mashing01
-  Fermentation01
-  Distillation01
-  Processing01
-  Barreling01
 }
 
 enum EnumRecipeBomItemOperation {

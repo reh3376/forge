@@ -1675,7 +1675,7 @@ export class ItemControllerBase {
     const results = await this.service.findRecipeBoms(params.id, {
       ...query,
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },

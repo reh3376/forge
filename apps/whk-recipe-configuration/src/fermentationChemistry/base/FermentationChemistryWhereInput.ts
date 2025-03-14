@@ -16,7 +16,6 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
@@ -58,18 +57,6 @@ class FermentationChemistryWhereInput {
     nullable: true,
   })
   asset?: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => BatchWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
-  @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
-    nullable: true,
-  })
-  batch?: BatchWhereUniqueInput;
 
   @ApiProperty({
     required: false,

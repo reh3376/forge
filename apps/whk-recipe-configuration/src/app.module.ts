@@ -60,6 +60,8 @@ import { MashingDatumModule } from "./mashingDatum/mashingDatum.module";
 import { AdditiveActualModule } from "./additiveActual/additiveActual.module";
 import { UnsConfigurationModule } from "./unsConfiguration/unsConfiguration.module";
 import { UnsBrokerConfigurationModule } from "./unsBrokerConfiguration/unsBrokerConfiguration.module";
+import { MashingProtocolStepActualModule } from "./mashingProtocolStepActual/mashingProtocolStepActual.module";
+import { RecipeBomActualModule } from "./recipeBomActual/recipeBomActual.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -131,6 +133,8 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     AdditiveActualModule,
     UnsConfigurationModule,
     UnsBrokerConfigurationModule,
+    MashingProtocolStepActualModule,
+    RecipeBomActualModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

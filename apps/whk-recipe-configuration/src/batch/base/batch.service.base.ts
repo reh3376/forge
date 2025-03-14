@@ -14,13 +14,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Batch as PrismaBatch,
-  FermentationChemistry as PrismaFermentationChemistry,
-  RecipeBomItem as PrismaRecipeBomItem,
   Asset as PrismaAsset,
   Customer as PrismaCustomer,
   Lot as PrismaLot,
-  MashingProtocol as PrismaMashingProtocol,
-  ProductionOrder as PrismaProductionOrder,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Recipe as PrismaRecipe,
 } from "@prisma/client";
@@ -59,28 +55,6 @@ export class BatchServiceBase {
       .children(args);
   }
 
-  async findFermentationChemistries(
-    parentId: string,
-    args: Prisma.FermentationChemistryFindManyArgs
-  ): Promise<PrismaFermentationChemistry[]> {
-    return this.prisma.batch
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .fermentationChemistries(args);
-  }
-
-  async findRecipeBomItems(
-    parentId: string,
-    args: Prisma.RecipeBomItemFindManyArgs
-  ): Promise<PrismaRecipeBomItem[]> {
-    return this.prisma.batch
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .recipeBomItems(args);
-  }
-
   async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.batch
       .findUnique({
@@ -105,32 +79,12 @@ export class BatchServiceBase {
       .lot();
   }
 
-  async getMashingProtocol(
-    parentId: string
-  ): Promise<PrismaMashingProtocol | null> {
-    return this.prisma.batch
-      .findUnique({
-        where: { id: parentId },
-      })
-      .mashingProtocol();
-  }
-
   async getParent(parentId: string): Promise<PrismaBatch | null> {
     return this.prisma.batch
       .findUnique({
         where: { id: parentId },
       })
       .parent();
-  }
-
-  async getProductionOrder(
-    parentId: string
-  ): Promise<PrismaProductionOrder | null> {
-    return this.prisma.batch
-      .findUnique({
-        where: { id: parentId },
-      })
-      .productionOrder();
   }
 
   async getProductionOrderRecipeInstance(

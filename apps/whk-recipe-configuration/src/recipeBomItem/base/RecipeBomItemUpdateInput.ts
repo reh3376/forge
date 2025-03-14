@@ -11,7 +11,7 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 
 import {
   ValidateNested,
@@ -28,8 +28,6 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
-import { RecipeBomItemUpdateManyWithoutRecipeBomItemsInput } from "./RecipeBomItemUpdateManyWithoutRecipeBomItemsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
@@ -39,15 +37,15 @@ import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUn
 class RecipeBomItemUpdateInput {
   @ApiProperty({
     required: false,
-    type: () => BatchWhereUniqueInput,
+    type: () => RecipeBomItemWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
+  @Type(() => RecipeBomItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => BatchWhereUniqueInput, {
+  @Field(() => RecipeBomItemWhereUniqueInput, {
     nullable: true,
   })
-  batch?: BatchWhereUniqueInput | null;
+  activeInstance?: RecipeBomItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -84,18 +82,6 @@ class RecipeBomItemUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput)
-  @IsOptional()
-  @Field(() => RecipeBomItemUpdateManyWithoutRecipeBomItemsInput, {
-    nullable: true,
-  })
-  instances?: RecipeBomItemUpdateManyWithoutRecipeBomItemsInput;
 
   @ApiProperty({
     required: false,

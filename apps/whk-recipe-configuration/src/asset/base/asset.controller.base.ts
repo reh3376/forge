@@ -293,10 +293,8 @@ export class AssetControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -305,7 +303,6 @@ export class AssetControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -315,23 +312,7 @@ export class AssetControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -351,7 +332,6 @@ export class AssetControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -567,12 +547,6 @@ export class AssetControllerBase {
         approvedBy: true,
 
         asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batch: {
           select: {
             id: true,
           },

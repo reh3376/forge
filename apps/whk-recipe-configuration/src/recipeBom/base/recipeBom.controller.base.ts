@@ -35,6 +35,9 @@ import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionO
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
+import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
@@ -771,6 +774,117 @@ export class RecipeBomControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBomActuals")
+  @ApiNestedQuery(RecipeBomActualFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomActual",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomActuals(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeBomWhereUniqueInput
+  ): Promise<RecipeBomActual[]> {
+    const query = plainToClass(RecipeBomActualFindManyArgs, request.query);
+    const results = await this.service.findRecipeBomActuals(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+        value: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBomActuals")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBomActuals(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBomActuals")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBomActuals(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBomActuals")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBom",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBomActuals(
+    @common.Param() params: RecipeBomWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeBom({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBomITem")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
   @UseRoles({
@@ -786,7 +900,7 @@ export class RecipeBomControllerBase {
     const results = await this.service.findRecipeBomITem(params.id, {
       ...query,
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },

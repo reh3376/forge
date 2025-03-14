@@ -12,23 +12,17 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
-import { ValidateNested, IsOptional, IsEnum } from "class-validator";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { StringFilter } from "../../util/StringFilter";
 import { BatchListRelationFilter } from "./BatchListRelationFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
-import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 
 @InputType()
 class BatchWhereInput {
@@ -43,17 +37,6 @@ class BatchWhereInput {
     nullable: true,
   })
   asset?: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  assetPath?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -76,17 +59,6 @@ class BatchWhereInput {
     nullable: true,
   })
   batchId?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  batchInitData?: JsonFilter;
 
   @ApiProperty({
     required: false,
@@ -121,30 +93,7 @@ class BatchWhereInput {
   @Field(() => JsonFilter, {
     nullable: true,
   })
-  customers?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
   durationSplits?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationChemistryListRelationFilter, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -171,56 +120,6 @@ class BatchWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashingProtocolWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingProtocolWhereUniqueInput)
-  @IsOptional()
-  @Field(() => MashingProtocolWhereUniqueInput, {
-    nullable: true,
-  })
-  mashingProtocol?: MashingProtocolWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  operationIndex?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumBatchOperationType,
-  })
-  @IsEnum(EnumBatchOperationType)
-  @IsOptional()
-  @Field(() => EnumBatchOperationType, {
-    nullable: true,
-  })
-  operationType?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Barreling01";
-
-  @ApiProperty({
-    required: false,
-    type: JsonFilter,
-  })
-  @Type(() => JsonFilter)
-  @IsOptional()
-  @Field(() => JsonFilter, {
-    nullable: true,
-  })
-  parameterData?: JsonFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => BatchWhereUniqueInput,
   })
   @ValidateNested()
@@ -230,18 +129,6 @@ class BatchWhereInput {
     nullable: true,
   })
   parent?: BatchWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -277,29 +164,6 @@ class BatchWhereInput {
     nullable: true,
   })
   recipe?: RecipeWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeBomItemListRelationFilter, {
-    nullable: true,
-  })
-  recipeBomItems?: RecipeBomItemListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  recipeName?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
