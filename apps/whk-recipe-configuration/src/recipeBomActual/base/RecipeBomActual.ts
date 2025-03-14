@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
@@ -23,7 +23,6 @@ import {
 import { Type } from "class-transformer";
 import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
-import { Decimal } from "decimal.js";
 
 @ObjectType()
 class RecipeBomActual {
@@ -96,10 +95,10 @@ class RecipeBomActual {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  value!: Decimal | null;
+  value!: number | null;
 }
 
 export { RecipeBomActual as RecipeBomActual };

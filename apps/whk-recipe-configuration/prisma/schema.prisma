@@ -1001,13 +1001,13 @@ model MashingProtocol {
 
 model MashingProtocolStep {
   agitatorEnabled            Boolean?                         @default(false)
-  agitatorSpdSp              Decimal?
+  agitatorSpdSp              Float?
   coolEnabled                Boolean?                         @default(false)
-  coolTempSp                 Decimal?
+  coolTempSp                 Float?
   createdAt                  DateTime                         @default(now())
   createdBy                  String
   heatEnabled                Boolean?                         @default(false)
-  heatTempSp                 Decimal?
+  heatTempSp                 Float?
   holdType                   EnumMashingProtocolStepHoldType?
   id                         String                           @id @default(cuid())
   index                      Int?
@@ -1019,8 +1019,8 @@ model MashingProtocolStep {
   recipeBomItem              RecipeBomItem[]
   stepTime                   Int?
   stepType                   EnumMashingProtocolStepStepType?
-  temperatureActual          Decimal?
-  temperatureSetpoint        Decimal?
+  temperatureActual          Float?
+  temperatureSetpoint        Float?
   updatedAt                  DateTime                         @updatedAt
   updatedBy                  String?
 }
@@ -1161,7 +1161,7 @@ model RecipeBomActual {
   recipeBomId                 String
   updatedAt                   DateTime                   @updatedAt
   updatedBy                   String?
-  value                       Decimal?
+  value                       Float?
 }
 
 enum EnumPhaseParameterSetpointType {

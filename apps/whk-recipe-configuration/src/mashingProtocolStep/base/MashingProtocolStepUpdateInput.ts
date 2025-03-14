@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -51,7 +51,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(100)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   agitatorSpdSp?: number | null;
@@ -74,7 +74,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   coolTempSp?: number | null;
@@ -109,7 +109,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   heatTempSp?: number | null;
@@ -242,10 +242,10 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  recipeNumericalSetpoint?: number | null;
+  temperatureActual?: number | null;
 
   @ApiProperty({
     required: false,
@@ -254,7 +254,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   temperatureSetpoint?: number | null;

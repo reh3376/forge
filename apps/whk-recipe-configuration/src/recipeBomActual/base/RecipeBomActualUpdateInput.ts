@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
@@ -22,7 +22,6 @@ import {
 import { MashingProtocolStepActualWhereUniqueInput } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualWhereUniqueInput";
 import { Type } from "class-transformer";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
-import { Decimal } from "decimal.js";
 
 @InputType()
 class RecipeBomActualUpdateInput {
@@ -81,10 +80,10 @@ class RecipeBomActualUpdateInput {
   @IsNumber()
   @Max(99999999999)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  value?: Decimal | null;
+  value?: number | null;
 }
 
 export { RecipeBomActualUpdateInput as RecipeBomActualUpdateInput };

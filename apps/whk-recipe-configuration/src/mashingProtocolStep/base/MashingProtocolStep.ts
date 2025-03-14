@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -54,7 +54,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(100)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   agitatorSpdSp!: number | null;
@@ -77,7 +77,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   coolTempSp!: number | null;
@@ -117,7 +117,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   heatTempSp!: number | null;
@@ -243,7 +243,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   temperatureActual!: number | null;
@@ -255,7 +255,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   temperatureSetpoint!: number | null;
