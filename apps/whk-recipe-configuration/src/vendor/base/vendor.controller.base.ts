@@ -208,6 +208,7 @@ export class VendorControllerBase {
       ...query,
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,

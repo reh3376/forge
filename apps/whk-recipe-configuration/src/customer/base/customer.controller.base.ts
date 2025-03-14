@@ -29,6 +29,9 @@ import { CustomerUpdateInput } from "./CustomerUpdateInput";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
+import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -280,10 +283,8 @@ export class CustomerControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -292,7 +293,6 @@ export class CustomerControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -302,23 +302,7 @@ export class CustomerControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -338,7 +322,6 @@ export class CustomerControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -408,6 +391,198 @@ export class CustomerControllerBase {
   ): Promise<void> {
     const data = {
       batches: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/furnishedLots")
+  @ApiNestedQuery(LotFindManyArgs)
+  @UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findFurnishedLots(
+    @common.Req() request: Request,
+    @common.Param() params: CustomerWhereUniqueInput
+  ): Promise<Lot[]> {
+    const query = plainToClass(LotFindManyArgs, request.query);
+    const results = await this.service.findFurnishedLots(params.id, {
+      ...query,
+      select: {
+        avgBblFillByPg: true,
+        avgBblFillByWg: true,
+        avgPGsFerm: true,
+        bblEntryProof: true,
+        bblOem: true,
+        bblTotal: true,
+        bblType: true,
+        confirmed: true,
+
+        continerItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        createdBy: true,
+        densityFinal: true,
+        externalId: true,
+
+        filledFrom: {
+          select: {
+            id: true,
+          },
+        },
+
+        filledFromString: true,
+        finalVolume: true,
+        finalWeight: true,
+
+        fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
+        globalId: true,
+        grainLbsFerm: true,
+        grainLbsPg: true,
+        id: true,
+        initialVolume: true,
+        initialWeight: true,
+        isRawMaterial: true,
+        lotAlphaChar: true,
+        lotCreatedAt: true,
+        lotNumber: true,
+        notes: true,
+        pgLosses: true,
+
+        productionOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        proofInitial: true,
+
+        proofingTank: {
+          select: {
+            id: true,
+          },
+        },
+
+        purchaseOrderAcceptedLots: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        standardYield: true,
+        status: true,
+
+        tankOfOrigin: {
+          select: {
+            id: true,
+          },
+        },
+
+        totalFermenters: true,
+        totalPGs: true,
+        totalPGsByRecipe: true,
+        totalVolumeWg: true,
+        totalWGs: true,
+        totalWeight: true,
+        updatedAt: true,
+        warehouseEntryNumber: true,
+        whiskeyType: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/furnishedLots")
+  @UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async connectFurnishedLots(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      furnishedLots: {
+        connect: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/furnishedLots")
+  @UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async updateFurnishedLots(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      furnishedLots: {
+        set: body,
+      },
+    };
+    await this.service.updateCustomer({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/furnishedLots")
+  @UseRoles({
+    resource: "Customer",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectFurnishedLots(
+    @common.Param() params: CustomerWhereUniqueInput,
+    @common.Body() body: LotWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      furnishedLots: {
         disconnect: body,
       },
     };

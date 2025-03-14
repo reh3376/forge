@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { InputType, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -27,6 +27,7 @@ import {
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { Type } from "class-transformer";
+import { MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput } from "./MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput";
 import { RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput } from "./RecipeBomItemUpdateManyWithoutMashingProtocolStepsInput";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
 
@@ -50,7 +51,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(100)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   agitatorSpdSp?: number | null;
@@ -73,7 +74,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   coolTempSp?: number | null;
@@ -108,7 +109,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   heatTempSp?: number | null;
@@ -158,6 +159,24 @@ class MashingProtocolStepUpdateInput {
     nullable: true,
   })
   mashingProtocol?: MashingProtocolWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput
+  )
+  @IsOptional()
+  @Field(
+    () => MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput,
+    {
+      nullable: true,
+    }
+  )
+  mashingProtocolStepActuals?: MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput;
 
   @ApiProperty({
     required: false,
@@ -223,10 +242,10 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
-  recipeNumericalSetpoint?: number | null;
+  temperatureActual?: number | null;
 
   @ApiProperty({
     required: false,
@@ -235,7 +254,7 @@ class MashingProtocolStepUpdateInput {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   temperatureSetpoint?: number | null;

@@ -22,6 +22,7 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { StringFilter } from "../../util/StringFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
@@ -258,6 +259,18 @@ class LotWhereInput {
     nullable: true,
   })
   fromAsset?: AssetWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  furnishingCustomer?: CustomerWhereUniqueInput;
 
   @ApiProperty({
     required: false,

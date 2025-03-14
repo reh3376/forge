@@ -31,6 +31,7 @@ import { Type } from "class-transformer";
 import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedManyWithoutLotsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { InventoryTransferCreateNestedManyWithoutLotsInput } from "./InventoryTransferCreateNestedManyWithoutLotsInput";
 import { ItemCreateNestedManyWithoutLotsInput } from "./ItemCreateNestedManyWithoutLotsInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -267,6 +268,18 @@ class LotCreateInput {
     nullable: true,
   })
   fromAsset?: AssetWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => CustomerWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CustomerWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CustomerWhereUniqueInput, {
+    nullable: true,
+  })
+  furnishingCustomer?: CustomerWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

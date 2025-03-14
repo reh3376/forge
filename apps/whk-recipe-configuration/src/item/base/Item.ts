@@ -64,6 +64,17 @@ class Item {
 
   @ApiProperty({
     required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  baseBomItem!: boolean | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [BomItem],
   })
   @ValidateNested()

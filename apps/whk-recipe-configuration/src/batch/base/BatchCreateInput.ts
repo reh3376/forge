@@ -17,7 +17,6 @@ import {
   IsOptional,
   IsString,
   MaxLength,
-  IsEnum,
   IsInt,
   Min,
   Max,
@@ -28,15 +27,10 @@ import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
 import { BatchCreateNestedManyWithoutBatchesInput } from "./BatchCreateNestedManyWithoutBatchesInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { FermentationChemistryCreateNestedManyWithoutBatchesInput } from "./FermentationChemistryCreateNestedManyWithoutBatchesInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
-import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
-import { EnumBatchOperationType } from "./EnumBatchOperationType";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { RecipeBomItemCreateNestedManyWithoutBatchesInput } from "./RecipeBomItemCreateNestedManyWithoutBatchesInput";
 
 @InputType()
 class BatchCreateInput {
@@ -51,18 +45,6 @@ class BatchCreateInput {
     nullable: true,
   })
   asset?: AssetWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  assetPath?: string | null;
 
   @ApiProperty({
     required: false,
@@ -82,16 +64,6 @@ class BatchCreateInput {
   @MaxLength(64)
   @Field(() => String)
   batchId!: string;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  batchInitData?: InputJsonValue;
 
   @ApiProperty({
     required: false,
@@ -125,29 +97,7 @@ class BatchCreateInput {
   @Field(() => GraphQLJSON, {
     nullable: true,
   })
-  customers?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
   durationSplits?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryCreateNestedManyWithoutBatchesInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryCreateNestedManyWithoutBatchesInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryCreateNestedManyWithoutBatchesInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutBatchesInput;
 
   @ApiProperty({
     required: false,
@@ -163,57 +113,6 @@ class BatchCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => MashingProtocolWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingProtocolWhereUniqueInput)
-  @IsOptional()
-  @Field(() => MashingProtocolWhereUniqueInput, {
-    nullable: true,
-  })
-  mashingProtocol?: MashingProtocolWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  operationIndex?: string | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumBatchOperationType,
-  })
-  @IsEnum(EnumBatchOperationType)
-  @IsOptional()
-  @Field(() => EnumBatchOperationType, {
-    nullable: true,
-  })
-  operationType?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | "Barreling01"
-    | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsJSONValue()
-  @IsOptional()
-  @Field(() => GraphQLJSON, {
-    nullable: true,
-  })
-  parameterData?: InputJsonValue;
-
-  @ApiProperty({
-    required: false,
     type: () => BatchWhereUniqueInput,
   })
   @ValidateNested()
@@ -223,18 +122,6 @@ class BatchCreateInput {
     nullable: true,
   })
   parent?: BatchWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrder?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -272,30 +159,6 @@ class BatchCreateInput {
     nullable: true,
   })
   recipe?: RecipeWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomItemCreateNestedManyWithoutBatchesInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomItemCreateNestedManyWithoutBatchesInput)
-  @IsOptional()
-  @Field(() => RecipeBomItemCreateNestedManyWithoutBatchesInput, {
-    nullable: true,
-  })
-  recipeBomItems?: RecipeBomItemCreateNestedManyWithoutBatchesInput;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  recipeName?: string | null;
 
   @ApiProperty({
     required: false,

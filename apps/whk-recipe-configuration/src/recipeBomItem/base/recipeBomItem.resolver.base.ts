@@ -28,7 +28,6 @@ import { UpdateRecipeBomItemArgs } from "./UpdateRecipeBomItemArgs";
 import { DeleteRecipeBomItemArgs } from "./DeleteRecipeBomItemArgs";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
-import { Batch } from "../../batch/base/Batch";
 import { Item } from "../../item/base/Item";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { RecipeBomItemService } from "../recipeBomItem.service";
@@ -100,9 +99,9 @@ export class RecipeBomItemResolverBase {
       data: {
         ...args.data,
 
-        batch: args.data.batch
+        activeInstance: args.data.activeInstance
           ? {
-              connect: args.data.batch,
+              connect: args.data.activeInstance,
             }
           : undefined,
 
@@ -143,9 +142,9 @@ export class RecipeBomItemResolverBase {
         data: {
           ...args.data,
 
-          batch: args.data.batch
+          activeInstance: args.data.activeInstance
             ? {
-                connect: args.data.batch,
+                connect: args.data.activeInstance,
               }
             : undefined,
 
@@ -200,26 +199,6 @@ export class RecipeBomItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeBomItem], { name: "instances" })
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "read",
-    possession: "any",
-  })
-  async findInstances(
-    @graphql.Parent() parent: RecipeBomItem,
-    @graphql.Args() args: RecipeBomItemFindManyArgs
-  ): Promise<RecipeBomItem[]> {
-    const results = await this.service.findInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingProtocolStep], {
     name: "mashingProtocolSteps",
   })
@@ -245,19 +224,19 @@ export class RecipeBomItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Batch, {
+  @graphql.ResolveField(() => RecipeBomItem, {
     nullable: true,
-    name: "batch",
+    name: "activeInstance",
   })
   @UseRoles({
-    resource: "Batch",
+    resource: "RecipeBomItem",
     action: "read",
     possession: "any",
   })
-  async getBatch(
+  async getActiveInstance(
     @graphql.Parent() parent: RecipeBomItem
-  ): Promise<Batch | null> {
-    const result = await this.service.getBatch(parent.id);
+  ): Promise<RecipeBomItem | null> {
+    const result = await this.service.getActiveInstance(parent.id);
 
     if (!result) {
       return null;

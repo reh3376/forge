@@ -21,6 +21,7 @@ import {
 } from "class-validator";
 import { BatchCreateNestedManyWithoutCustomersInput } from "./BatchCreateNestedManyWithoutCustomersInput";
 import { Type } from "class-transformer";
+import { LotCreateNestedManyWithoutCustomersInput } from "./LotCreateNestedManyWithoutCustomersInput";
 import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { ProductionOrderCreateNestedManyWithoutCustomersInput } from "./ProductionOrderCreateNestedManyWithoutCustomersInput";
 import { RecipeCreateNestedManyWithoutCustomersInput } from "./RecipeCreateNestedManyWithoutCustomersInput";
@@ -106,6 +107,18 @@ class CustomerCreateInput {
     nullable: true,
   })
   email?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotCreateNestedManyWithoutCustomersInput,
+  })
+  @ValidateNested()
+  @Type(() => LotCreateNestedManyWithoutCustomersInput)
+  @IsOptional()
+  @Field(() => LotCreateNestedManyWithoutCustomersInput, {
+    nullable: true,
+  })
+  furnishedLots?: LotCreateNestedManyWithoutCustomersInput;
 
   @ApiProperty({
     required: false,

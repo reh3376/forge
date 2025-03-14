@@ -109,6 +109,7 @@ export class ItemControllerBase {
       },
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,
@@ -159,6 +160,7 @@ export class ItemControllerBase {
       ...args,
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,
@@ -210,6 +212,7 @@ export class ItemControllerBase {
       where: params,
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,
@@ -287,6 +290,7 @@ export class ItemControllerBase {
         },
         select: {
           active: true,
+          baseBomItem: true,
           createdAt: true,
           createdBy: true,
           erpId: true,
@@ -1233,6 +1237,12 @@ export class ItemControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
@@ -1669,7 +1679,7 @@ export class ItemControllerBase {
     const results = await this.service.findRecipeBoms(params.id, {
       ...query,
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },

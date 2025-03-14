@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { InventoryLogWhereUniqueInput } from "../../inventoryLog/base/InventoryLogWhereUniqueInput";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
@@ -114,6 +115,18 @@ class CustomerWhereInput {
     nullable: true,
   })
   email?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => LotListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => LotListRelationFilter)
+  @IsOptional()
+  @Field(() => LotListRelationFilter, {
+    nullable: true,
+  })
+  furnishedLots?: LotListRelationFilter;
 
   @ApiProperty({
     required: false,

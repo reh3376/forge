@@ -58,9 +58,9 @@ export class RecipeBomItemControllerBase {
       data: {
         ...data,
 
-        batch: data.batch
+        activeInstance: data.activeInstance
           ? {
-              connect: data.batch,
+              connect: data.activeInstance,
             }
           : undefined,
 
@@ -83,7 +83,7 @@ export class RecipeBomItemControllerBase {
           : undefined,
       },
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },
@@ -145,7 +145,7 @@ export class RecipeBomItemControllerBase {
     return this.service.recipeBomItems({
       ...args,
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },
@@ -206,7 +206,7 @@ export class RecipeBomItemControllerBase {
     const result = await this.service.recipeBomItem({
       where: params,
       select: {
-        batch: {
+        activeInstance: {
           select: {
             id: true,
           },
@@ -280,9 +280,9 @@ export class RecipeBomItemControllerBase {
         data: {
           ...data,
 
-          batch: data.batch
+          activeInstance: data.activeInstance
             ? {
-                connect: data.batch,
+                connect: data.activeInstance,
               }
             : undefined,
 
@@ -305,7 +305,7 @@ export class RecipeBomItemControllerBase {
             : undefined,
         },
         select: {
-          batch: {
+          activeInstance: {
             select: {
               id: true,
             },
@@ -374,7 +374,7 @@ export class RecipeBomItemControllerBase {
       return await this.service.deleteRecipeBomItem({
         where: params,
         select: {
-          batch: {
+          activeInstance: {
             select: {
               id: true,
             },
@@ -423,137 +423,6 @@ export class RecipeBomItemControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/instances")
-  @ApiNestedQuery(RecipeBomItemFindManyArgs)
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "read",
-    possession: "any",
-  })
-  async findInstances(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeBomItemWhereUniqueInput
-  ): Promise<RecipeBomItem[]> {
-    const query = plainToClass(RecipeBomItemFindManyArgs, request.query);
-    const results = await this.service.findInstances(params.id, {
-      ...query,
-      select: {
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        lot: true,
-        operation: true,
-        operationIndex: true,
-        quantity: true,
-        quantityActual: true,
-
-        recipeBoms: {
-          select: {
-            id: true,
-          },
-        },
-
-        units: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/instances")
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "update",
-    possession: "any",
-  })
-  async connectInstances(
-    @common.Param() params: RecipeBomItemWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeBomItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/instances")
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "update",
-    possession: "any",
-  })
-  async updateInstances(
-    @common.Param() params: RecipeBomItemWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeBomItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/instances")
-  @UseRoles({
-    resource: "RecipeBomItem",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectInstances(
-    @common.Param() params: RecipeBomItemWhereUniqueInput,
-    @common.Body() body: RecipeBomItemWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      instances: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeBomItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
