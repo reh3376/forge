@@ -167,7 +167,7 @@ export class MashingProtocolStepResolverBase {
   @graphql.ResolveField(() => [MashingProtocolStepActual], {
     name: "mashingProtocolStepActuals",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "read",
     possession: "any",
