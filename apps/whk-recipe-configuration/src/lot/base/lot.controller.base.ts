@@ -1199,6 +1199,7 @@ export class LotControllerBase {
       ...query,
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,

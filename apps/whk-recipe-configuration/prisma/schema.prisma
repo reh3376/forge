@@ -430,6 +430,7 @@ model ScheduleOrder {
 model Item {
   active             Boolean?            @default(true)
   additiveActuals    AdditiveActual[]
+  baseBomItem        Boolean?            @default(false)
   bomItems           BomItem[]
   bomsWipItem        Bom[]
   createdAt          DateTime            @default(now())
