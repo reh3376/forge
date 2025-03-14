@@ -11,13 +11,13 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { BatchCreateNestedManyWithoutProductionOrdersInput } from "./BatchCreateNestedManyWithoutProductionOrdersInput";
+import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 
 import {
   ValidateNested,
-  IsOptional,
   IsString,
   MaxLength,
+  IsOptional,
   IsBoolean,
   IsInt,
   Max,
@@ -28,7 +28,6 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
-import { BomWhereUniqueInput } from "../../bom/base/BomWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
 import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
@@ -43,18 +42,6 @@ import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
 
 @InputType()
 class ProductionOrderCreateInput {
-  @ApiProperty({
-    required: false,
-    type: () => BatchCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(() => BatchCreateNestedManyWithoutProductionOrdersInput, {
-    nullable: true,
-  })
-  batches?: BatchCreateNestedManyWithoutProductionOrdersInput;
-
   @ApiProperty({
     required: true,
     type: () => BomWhereUniqueInput,

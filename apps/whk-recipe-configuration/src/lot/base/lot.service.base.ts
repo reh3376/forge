@@ -19,6 +19,7 @@ import {
   InventoryTransfer as PrismaInventoryTransfer,
   Item as PrismaItem,
   Asset as PrismaAsset,
+  Customer as PrismaCustomer,
   ProductionOrder as PrismaProductionOrder,
   PurchaseOrder as PrismaPurchaseOrder,
   Recipe as PrismaRecipe,
@@ -113,6 +114,16 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .fromAsset();
+  }
+
+  async getFurnishingCustomer(
+    parentId: string
+  ): Promise<PrismaCustomer | null> {
+    return this.prisma.lot
+      .findUnique({
+        where: { id: parentId },
+      })
+      .furnishingCustomer();
   }
 
   async getProductionOrder(

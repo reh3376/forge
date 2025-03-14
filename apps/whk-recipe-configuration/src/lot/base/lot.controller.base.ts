@@ -83,6 +83,12 @@ export class LotControllerBase {
             }
           : undefined,
 
+        furnishingCustomer: data.furnishingCustomer
+          ? {
+              connect: data.furnishingCustomer,
+            }
+          : undefined,
+
         productionOrder: data.productionOrder
           ? {
               connect: data.productionOrder,
@@ -145,6 +151,12 @@ export class LotControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },
@@ -265,6 +277,12 @@ export class LotControllerBase {
           },
         },
 
+        furnishingCustomer: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         grainLbsFerm: true,
         grainLbsPg: true,
@@ -374,6 +392,12 @@ export class LotControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },
@@ -490,6 +514,12 @@ export class LotControllerBase {
               }
             : undefined,
 
+          furnishingCustomer: data.furnishingCustomer
+            ? {
+                connect: data.furnishingCustomer,
+              }
+            : undefined,
+
           productionOrder: data.productionOrder
             ? {
                 connect: data.productionOrder,
@@ -552,6 +582,12 @@ export class LotControllerBase {
           finalWeight: true,
 
           fromAsset: {
+            select: {
+              id: true,
+            },
+          },
+
+          furnishingCustomer: {
             select: {
               id: true,
             },
@@ -681,6 +717,12 @@ export class LotControllerBase {
             },
           },
 
+          furnishingCustomer: {
+            select: {
+              id: true,
+            },
+          },
+
           globalId: true,
           grainLbsFerm: true,
           grainLbsPg: true,
@@ -773,10 +815,8 @@ export class LotControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -785,7 +825,6 @@ export class LotControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -795,23 +834,7 @@ export class LotControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -831,7 +854,6 @@ export class LotControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -1177,6 +1199,7 @@ export class LotControllerBase {
       ...query,
       select: {
         active: true,
+        baseBomItem: true,
         createdAt: true,
         createdBy: true,
         erpId: true,

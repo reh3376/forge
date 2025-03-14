@@ -461,12 +461,6 @@ export class OperationControllerBase {
           },
         },
 
-        batch: {
-          select: {
-            id: true,
-          },
-        },
-
         createdAt: true,
         id: true,
 

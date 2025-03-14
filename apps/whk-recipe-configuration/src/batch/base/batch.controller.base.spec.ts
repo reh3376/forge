@@ -18,51 +18,39 @@ import { BatchService } from "../batch.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
-  assetPath: "exampleAssetPath",
   batchId: "exampleBatchId",
   createdAt: new Date(),
   id: "exampleId",
-  operationIndex: "exampleOperationIndex",
   quantity: 42,
-  recipeName: "exampleRecipeName",
   revision: 42,
   totalDuration: 42,
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
-  assetPath: "exampleAssetPath",
   batchId: "exampleBatchId",
   createdAt: new Date(),
   id: "exampleId",
-  operationIndex: "exampleOperationIndex",
   quantity: 42,
-  recipeName: "exampleRecipeName",
   revision: 42,
   totalDuration: 42,
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
-    assetPath: "exampleAssetPath",
     batchId: "exampleBatchId",
     createdAt: new Date(),
     id: "exampleId",
-    operationIndex: "exampleOperationIndex",
     quantity: 42,
-    recipeName: "exampleRecipeName",
     revision: 42,
     totalDuration: 42,
     updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
-  assetPath: "exampleAssetPath",
   batchId: "exampleBatchId",
   createdAt: new Date(),
   id: "exampleId",
-  operationIndex: "exampleOperationIndex",
   quantity: 42,
-  recipeName: "exampleRecipeName",
   revision: 42,
   totalDuration: 42,
   updatedAt: new Date(),

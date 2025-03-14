@@ -77,8 +77,6 @@ export class BatchService extends BatchServiceBase {
       for (const recipeBomItem of recipeBom.recipeBomITem) {
         this.prisma.recipeBomItem.create({
           data: {
-            batchId: recipeBomItem.batchId,
-            classIdid: recipeBomItem.classIdid,
             createdBy: recipeBomItem.createdBy,
             globalId: recipeBomItem.globalId,
             id: recipeBomItem.id,

@@ -9,7 +9,7 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { ObjectType, Field, Float } from "@nestjs/graphql";
+import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
@@ -28,6 +28,7 @@ import {
 import { Type } from "class-transformer";
 import { EnumMashingProtocolStepHoldType } from "./EnumMashingProtocolStepHoldType";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { EnumMashingProtocolStepStepType } from "./EnumMashingProtocolStepStepType";
 
@@ -53,7 +54,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(100)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   agitatorSpdSp!: number | null;
@@ -76,7 +77,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   coolTempSp!: number | null;
@@ -116,7 +117,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   heatTempSp!: number | null;
@@ -171,6 +172,15 @@ class MashingProtocolStep {
   @Type(() => MashingProtocol)
   @IsOptional()
   mashingProtocol?: MashingProtocol | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingProtocolStepActual],
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepActual)
+  @IsOptional()
+  mashingProtocolStepActuals?: Array<MashingProtocolStepActual>;
 
   @ApiProperty({
     required: false,
@@ -233,7 +243,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   temperatureActual!: number | null;
@@ -245,7 +255,7 @@ class MashingProtocolStep {
   @IsNumber()
   @Max(250)
   @IsOptional()
-  @Field(() => Float, {
+  @Field(() => Number, {
     nullable: true,
   })
   temperatureSetpoint!: number | null;

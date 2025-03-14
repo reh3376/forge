@@ -28,7 +28,6 @@ import { UpdateFermentationChemistryArgs } from "./UpdateFermentationChemistryAr
 import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
 import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Asset } from "../../asset/base/Asset";
-import { Batch } from "../../batch/base/Batch";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
@@ -105,10 +104,6 @@ export class FermentationChemistryResolverBase {
           connect: args.data.asset,
         },
 
-        batch: {
-          connect: args.data.batch,
-        },
-
         operation: {
           connect: args.data.operation,
         },
@@ -146,10 +141,6 @@ export class FermentationChemistryResolverBase {
 
           asset: {
             connect: args.data.asset,
-          },
-
-          batch: {
-            connect: args.data.batch,
           },
 
           operation: {
@@ -213,27 +204,6 @@ export class FermentationChemistryResolverBase {
     @graphql.Parent() parent: FermentationChemistry
   ): Promise<Asset | null> {
     const result = await this.service.getAsset(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Batch, {
-    nullable: true,
-    name: "batch",
-  })
-  @UseRoles({
-    resource: "Batch",
-    action: "read",
-    possession: "any",
-  })
-  async getBatch(
-    @graphql.Parent() parent: FermentationChemistry
-  ): Promise<Batch | null> {
-    const result = await this.service.getBatch(parent.id);
 
     if (!result) {
       return null;

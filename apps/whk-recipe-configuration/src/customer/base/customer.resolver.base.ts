@@ -27,6 +27,8 @@ import { CreateCustomerArgs } from "./CreateCustomerArgs";
 import { UpdateCustomerArgs } from "./UpdateCustomerArgs";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
+import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
+import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
@@ -159,6 +161,26 @@ export class CustomerResolverBase {
     @graphql.Args() args: BatchFindManyArgs
   ): Promise<Batch[]> {
     const results = await this.service.findBatches(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Lot], { name: "furnishedLots" })
+  @UseRoles({
+    resource: "Lot",
+    action: "read",
+    possession: "any",
+  })
+  async findFurnishedLots(
+    @graphql.Parent() parent: Customer,
+    @graphql.Args() args: LotFindManyArgs
+  ): Promise<Lot[]> {
+    const results = await this.service.findFurnishedLots(parent.id, args);
 
     if (!results) {
       return [];

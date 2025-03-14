@@ -23,6 +23,7 @@ import { Type } from "class-transformer";
 import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
 @ObjectType()
@@ -98,6 +99,15 @@ class RecipeBom {
   @Type(() => Recipe)
   @IsOptional()
   recipe?: Array<Recipe>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomActual],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomActual)
+  @IsOptional()
+  recipeBomActuals?: Array<RecipeBomActual>;
 
   @ApiProperty({
     required: true,

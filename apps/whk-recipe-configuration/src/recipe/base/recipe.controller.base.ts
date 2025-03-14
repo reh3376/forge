@@ -443,10 +443,8 @@ export class RecipeControllerBase {
           },
         },
 
-        assetPath: true,
         batchData: true,
         batchId: true,
-        batchInitData: true,
         createdAt: true,
 
         customer: {
@@ -455,7 +453,6 @@ export class RecipeControllerBase {
           },
         },
 
-        customers: true,
         durationSplits: true,
         id: true,
 
@@ -465,23 +462,7 @@ export class RecipeControllerBase {
           },
         },
 
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        operationIndex: true,
-        operationType: true,
-        parameterData: true,
-
         parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
           select: {
             id: true,
           },
@@ -501,7 +482,6 @@ export class RecipeControllerBase {
           },
         },
 
-        recipeName: true,
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -769,6 +749,12 @@ export class RecipeControllerBase {
         finalWeight: true,
 
         fromAsset: {
+          select: {
+            id: true,
+          },
+        },
+
+        furnishingCustomer: {
           select: {
             id: true,
           },

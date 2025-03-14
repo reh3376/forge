@@ -10,19 +10,18 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsString } from "class-validator";
 
 @InputType()
-class BatchCreateNestedManyWithoutProductionOrdersInput {
-  @Field(() => [BatchWhereUniqueInput], {
-    nullable: true,
-  })
+class RecipeBomActualWhereUniqueInput {
   @ApiProperty({
-    required: false,
-    type: () => [BatchWhereUniqueInput],
+    required: true,
+    type: String,
   })
-  connect?: Array<BatchWhereUniqueInput>;
+  @IsString()
+  @Field(() => String)
+  id!: string;
 }
 
-export { BatchCreateNestedManyWithoutProductionOrdersInput as BatchCreateNestedManyWithoutProductionOrdersInput };
+export { RecipeBomActualWhereUniqueInput as RecipeBomActualWhereUniqueInput };

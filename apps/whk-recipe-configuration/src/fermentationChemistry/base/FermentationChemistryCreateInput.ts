@@ -20,7 +20,6 @@ import {
 } from "class-validator";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput } from "./FermentationDayDatumCreateNestedManyWithoutFermentationChemistriesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
@@ -59,15 +58,6 @@ class FermentationChemistryCreateInput {
   @Type(() => AssetWhereUniqueInput)
   @Field(() => AssetWhereUniqueInput)
   asset!: AssetWhereUniqueInput;
-
-  @ApiProperty({
-    required: true,
-    type: () => BatchWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchWhereUniqueInput)
-  @Field(() => BatchWhereUniqueInput)
-  batch!: BatchWhereUniqueInput;
 
   @ApiProperty({
     required: false,
