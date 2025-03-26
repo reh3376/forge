@@ -103,9 +103,6 @@ export class BatchService extends BatchServiceBase {
       where: {
         id: batchId,
       },
-      include: {
-        recipeBomItems: true,
-      },
     });
 
     if (!batchData) {
@@ -117,19 +114,12 @@ export class BatchService extends BatchServiceBase {
         where: {
           itemId: itemId,
         },
-        include: {
-          batch: true,
-        },
       });
 
       if (!recipeBomItem) {
         throw new Error(
           `RecipeBomItem not found for recipeBomItemId: ${itemId}`
         );
-      }
-
-      if (recipeBomItem.batchId !== batchId) {
-        throw new Error(`Item ${itemId} is not in batch ${batchId}`);
       }
 
       // Update the quantity
@@ -163,12 +153,12 @@ export class BatchService extends BatchServiceBase {
     this.logger.verbose({
       message: `Created Batch: ${batch.batchId} & pushed to topic`,
     });
-    this.logger.verbose({
-      message: `Creating recipe bom items for recipe: ${args.data.recipeName}`,
-    });
-    if (args.data.recipeName) {
-      this.createRecipeBomItems(args.data.recipeName);
-    }
+    // this.logger.verbose({
+    //   message: `Creating recipe bom items for recipe: ${args.data.recipeName}`,
+    // });
+    // if (args.data.recipeName) {
+    //   this.createRecipeBomItems(args.data.recipeName);
+    // }
     return batch;
   }
 
@@ -252,9 +242,7 @@ export class BatchService extends BatchServiceBase {
       batchId: `${batchIdPrefix}${newIndex}`,
       // operation: args.operation,
       batchData: args.batchData,
-      parameterData: args.parameterData,
       asset: args.asset,
-      assetPath: args.assetPath,
     };
     return await this.createBatch({
       data: {
@@ -269,12 +257,10 @@ export class BatchService extends BatchServiceBase {
             }
           : { asset: undefined }),
         customer: undefined,
-        mashingProtocol: undefined,
         productionOrderRecipeInstance: undefined,
         parent: undefined,
         recipe: undefined,
         lot: undefined,
-        productionOrder: undefined,
       },
       include: {
         asset: true,
