@@ -40,6 +40,7 @@ export class PurchaseOrderService extends PurchaseOrderServiceBase {
     LEFT JOIN "Vendor" v on i."vendorId" = v.id
      WHERE i."itemGroup" LIKE ${`%${purchaseOrderType}%`}
      AND po.complete = false
+     AND po."receiptStatus" != 'PurchaseOrderComplete'
     ORDER BY li."itemName"`;
     // WHERE i."itemGroup" LIKE ${`%${purchaseOrderType}%`}`;
 
