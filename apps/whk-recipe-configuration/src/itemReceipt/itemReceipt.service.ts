@@ -24,7 +24,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   ): Promise<import(".prisma/client").ItemReceipt> {
     // Extract the item ID correctly from the input data
     let itemId: string | undefined;
-    
+
     if ((args.data as any).itemId) {
       // Direct itemId property
       itemId = (args.data as any).itemId;
