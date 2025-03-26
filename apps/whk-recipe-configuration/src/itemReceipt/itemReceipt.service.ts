@@ -22,9 +22,22 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   async createItemReceipt<T extends Prisma.ItemReceiptCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.ItemReceiptCreateArgs>
   ): Promise<import(".prisma/client").ItemReceipt> {
-    // First get the item with its itemGroup
+    // Extract the item ID correctly from the input data
+    let itemId: string | undefined;
+    
+    if ((args.data as any).itemId) {
+      // Direct itemId property
+      itemId = (args.data as any).itemId;
+    } else if ((args.data as any).item?.connect?.id) {
+      // Prisma relation format
+      itemId = (args.data as any).item.connect.id;
+    } else {
+      throw new Error("Item ID is required when creating an ItemReceipt");
+    }
+
+    // Get the item with its itemGroup
     const item = await this.prisma.item.findUnique({
-      where: { id: (args.data as any).itemId },
+      where: { id: itemId },
       select: {
         id: true,
         itemGroup: true,
