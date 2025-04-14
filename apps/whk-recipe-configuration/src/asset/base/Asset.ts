@@ -28,13 +28,11 @@ import {
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { EnumAssetStatus } from "./EnumAssetStatus";
 
@@ -112,15 +110,6 @@ class Asset {
   @MaxLength(256)
   @Field(() => String)
   description!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
 
   @ApiProperty({
     required: false,
@@ -222,15 +211,6 @@ class Asset {
   @Type(() => Lot)
   @IsOptional()
   lotsFilledFrom?: Array<Lot>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [MashingDatum],
-  })
-  @ValidateNested()
-  @Type(() => MashingDatum)
-  @IsOptional()
-  mashingData?: Array<MashingDatum>;
 
   @ApiProperty({
     required: true,

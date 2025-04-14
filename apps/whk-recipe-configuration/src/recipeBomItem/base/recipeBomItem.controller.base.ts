@@ -440,7 +440,6 @@ export class RecipeBomItemControllerBase {
         holdType: true,
         id: true,
         index: true,
-        isClassDefinition: true,
 
         mashingProtocol: {
           select: {

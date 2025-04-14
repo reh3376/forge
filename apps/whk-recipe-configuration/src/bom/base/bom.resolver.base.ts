@@ -27,8 +27,6 @@ import { CreateBomArgs } from "./CreateBomArgs";
 import { UpdateBomArgs } from "./UpdateBomArgs";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
-import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { ProductionOrderFindManyArgs } from "../../productionOrder/base/ProductionOrderFindManyArgs";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
@@ -145,26 +143,6 @@ export class BomResolverBase {
     @graphql.Args() args: BomItemFindManyArgs
   ): Promise<BomItem[]> {
     const results = await this.service.findBomItem(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashingData(
-    @graphql.Parent() parent: Bom,
-    @graphql.Args() args: MashingDatumFindManyArgs
-  ): Promise<MashingDatum[]> {
-    const results = await this.service.findMashingData(parent.id, args);
 
     if (!results) {
       return [];

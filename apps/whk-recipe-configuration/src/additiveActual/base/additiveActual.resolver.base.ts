@@ -27,7 +27,6 @@ import { CreateAdditiveActualArgs } from "./CreateAdditiveActualArgs";
 import { UpdateAdditiveActualArgs } from "./UpdateAdditiveActualArgs";
 import { DeleteAdditiveActualArgs } from "./DeleteAdditiveActualArgs";
 import { Item } from "../../item/base/Item";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { AdditiveActualService } from "../additiveActual.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => AdditiveActual)
@@ -102,12 +101,6 @@ export class AdditiveActualResolverBase {
               connect: args.data.item,
             }
           : undefined,
-
-        mashingDatum: args.data.mashingDatum
-          ? {
-              connect: args.data.mashingDatum,
-            }
-          : undefined,
       },
     });
   }
@@ -131,12 +124,6 @@ export class AdditiveActualResolverBase {
           item: args.data.item
             ? {
                 connect: args.data.item,
-              }
-            : undefined,
-
-          mashingDatum: args.data.mashingDatum
-            ? {
-                connect: args.data.mashingDatum,
               }
             : undefined,
         },
@@ -186,27 +173,6 @@ export class AdditiveActualResolverBase {
     @graphql.Parent() parent: AdditiveActual
   ): Promise<Item | null> {
     const result = await this.service.getItem(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => MashingDatum, {
-    nullable: true,
-    name: "mashingDatum",
-  })
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async getMashingDatum(
-    @graphql.Parent() parent: AdditiveActual
-  ): Promise<MashingDatum | null> {
-    const result = await this.service.getMashingDatum(parent.id);
 
     if (!result) {
       return null;

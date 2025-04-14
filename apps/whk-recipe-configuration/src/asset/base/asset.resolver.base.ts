@@ -27,8 +27,6 @@ import { CreateAssetArgs } from "./CreateAssetArgs";
 import { UpdateAssetArgs } from "./UpdateAssetArgs";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
-import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFindManyArgs";
@@ -39,8 +37,6 @@ import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindM
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
-import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { AssetService } from "../asset.service";
@@ -182,31 +178,6 @@ export class AssetResolverBase {
     @graphql.Args() args: AssetFindManyArgs
   ): Promise<Asset[]> {
     const results = await this.service.findChildren(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationChemistry], {
-    name: "fermentationChemistries",
-  })
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationChemistries(
-    @graphql.Parent() parent: Asset,
-    @graphql.Args() args: FermentationChemistryFindManyArgs
-  ): Promise<FermentationChemistry[]> {
-    const results = await this.service.findFermentationChemistries(
-      parent.id,
-      args
-    );
 
     if (!results) {
       return [];
@@ -397,26 +368,6 @@ export class AssetResolverBase {
     @graphql.Args() args: LotFindManyArgs
   ): Promise<Lot[]> {
     const results = await this.service.findLotsFilledFrom(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashingData(
-    @graphql.Parent() parent: Asset,
-    @graphql.Args() args: MashingDatumFindManyArgs
-  ): Promise<MashingDatum[]> {
-    const results = await this.service.findMashingData(parent.id, args);
 
     if (!results) {
       return [];

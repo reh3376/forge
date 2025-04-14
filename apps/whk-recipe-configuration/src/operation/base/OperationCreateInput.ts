@@ -29,9 +29,7 @@ import { InputJsonValue } from "../../types";
 import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
-import { FermentationChemistryCreateNestedManyWithoutOperationsInput } from "./FermentationChemistryCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
-import { MashingDatumCreateNestedManyWithoutOperationsInput } from "./MashingDatumCreateNestedManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 
@@ -123,18 +121,6 @@ class OperationCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationChemistryCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutOperationsInput;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -179,18 +165,6 @@ class OperationCreateInput {
     nullable: true,
   })
   lotId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => MashingDatumCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: true,

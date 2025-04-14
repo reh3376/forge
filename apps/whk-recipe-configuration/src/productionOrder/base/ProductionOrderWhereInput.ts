@@ -21,7 +21,6 @@ import { StringFilter } from "../../util/StringFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
-import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
@@ -177,18 +176,6 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   estimatedPGsPerBushel?: FloatNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationChemistryListRelationFilter, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryListRelationFilter;
 
   @ApiProperty({
     required: false,

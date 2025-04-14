@@ -14,13 +14,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsString,
-  ValidateNested,
-  IsOptional,
   IsBoolean,
+  IsOptional,
+  ValidateNested,
   MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
@@ -42,15 +41,6 @@ class RecipeBom {
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => [MashingDatum],
-  })
-  @ValidateNested()
-  @Type(() => MashingDatum)
-  @IsOptional()
-  mashingData?: Array<MashingDatum>;
 
   @ApiProperty({
     required: false,

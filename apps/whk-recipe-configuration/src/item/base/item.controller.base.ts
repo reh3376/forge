@@ -358,13 +358,6 @@ export class ItemControllerBase {
 
         itemNumber: true,
         lotNumber: true,
-
-        mashingDatum: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         updatedAt: true,
       },
