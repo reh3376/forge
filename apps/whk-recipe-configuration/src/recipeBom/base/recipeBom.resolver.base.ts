@@ -25,8 +25,6 @@ import { RecipeBomFindManyArgs } from "./RecipeBomFindManyArgs";
 import { RecipeBomFindUniqueArgs } from "./RecipeBomFindUniqueArgs";
 import { CreateRecipeBomArgs } from "./CreateRecipeBomArgs";
 import { UpdateRecipeBomArgs } from "./UpdateRecipeBomArgs";
-import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
@@ -156,26 +154,6 @@ export class RecipeBomResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashingData(
-    @graphql.Parent() parent: RecipeBom,
-    @graphql.Args() args: MashingDatumFindManyArgs
-  ): Promise<MashingDatum[]> {
-    const results = await this.service.findMashingData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

@@ -28,13 +28,11 @@ import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAssetsInput";
 import { Type } from "class-transformer";
 import { AssetUpdateManyWithoutAssetsInput } from "./AssetUpdateManyWithoutAssetsInput";
-import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
 import { InventoryUpdateManyWithoutAssetsInput } from "./InventoryUpdateManyWithoutAssetsInput";
 import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateManyWithoutAssetsInput";
 import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
 import { ItemReceiptUpdateManyWithoutAssetsInput } from "./ItemReceiptUpdateManyWithoutAssetsInput";
 import { LotUpdateManyWithoutAssetsInput } from "./LotUpdateManyWithoutAssetsInput";
-import { MashingDatumUpdateManyWithoutAssetsInput } from "./MashingDatumUpdateManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
 import { EnumAssetStatus } from "./EnumAssetStatus";
@@ -121,18 +119,6 @@ class AssetUpdateInput {
     nullable: true,
   })
   description?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
@@ -253,18 +239,6 @@ class AssetUpdateInput {
     nullable: true,
   })
   lotsFilledFrom?: LotUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => MashingDatumUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,

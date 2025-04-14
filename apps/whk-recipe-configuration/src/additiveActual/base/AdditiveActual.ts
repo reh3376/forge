@@ -23,7 +23,6 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 
 @ObjectType()
 class AdditiveActual {
@@ -69,15 +68,6 @@ class AdditiveActual {
   @MaxLength(1000)
   @Field(() => String)
   lotNumber!: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatum,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatum)
-  @IsOptional()
-  mashingDatum?: MashingDatum | null;
 
   @ApiProperty({
     required: true,

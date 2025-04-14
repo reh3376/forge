@@ -788,7 +788,6 @@ export class MashingProtocolControllerBase {
         holdType: true,
         id: true,
         index: true,
-        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
