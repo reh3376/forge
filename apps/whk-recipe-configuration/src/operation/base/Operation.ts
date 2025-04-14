@@ -29,8 +29,6 @@ import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 
@@ -127,15 +125,6 @@ class Operation {
 
   @ApiProperty({
     required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -185,15 +174,6 @@ class Operation {
     nullable: true,
   })
   lotId!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [MashingDatum],
-  })
-  @ValidateNested()
-  @Type(() => MashingDatum)
-  @IsOptional()
-  mashingData?: Array<MashingDatum>;
 
   @ApiProperty({
     required: true,

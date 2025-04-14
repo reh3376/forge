@@ -60,12 +60,6 @@ export class AdditiveActualControllerBase {
               connect: data.item,
             }
           : undefined,
-
-        mashingDatum: data.mashingDatum
-          ? {
-              connect: data.mashingDatum,
-            }
-          : undefined,
       },
       select: {
         createdAt: true,
@@ -79,13 +73,6 @@ export class AdditiveActualControllerBase {
 
         itemNumber: true,
         lotNumber: true,
-
-        mashingDatum: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         updatedAt: true,
       },
@@ -122,13 +109,6 @@ export class AdditiveActualControllerBase {
 
         itemNumber: true,
         lotNumber: true,
-
-        mashingDatum: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         updatedAt: true,
       },
@@ -164,13 +144,6 @@ export class AdditiveActualControllerBase {
 
         itemNumber: true,
         lotNumber: true,
-
-        mashingDatum: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         updatedAt: true,
       },
@@ -213,12 +186,6 @@ export class AdditiveActualControllerBase {
                 connect: data.item,
               }
             : undefined,
-
-          mashingDatum: data.mashingDatum
-            ? {
-                connect: data.mashingDatum,
-              }
-            : undefined,
         },
         select: {
           createdAt: true,
@@ -232,13 +199,6 @@ export class AdditiveActualControllerBase {
 
           itemNumber: true,
           lotNumber: true,
-
-          mashingDatum: {
-            select: {
-              id: true,
-            },
-          },
-
           quantity: true,
           updatedAt: true,
         },
@@ -282,13 +242,6 @@ export class AdditiveActualControllerBase {
 
           itemNumber: true,
           lotNumber: true,
-
-          mashingDatum: {
-            select: {
-              id: true,
-            },
-          },
-
           quantity: true,
           updatedAt: true,
         },

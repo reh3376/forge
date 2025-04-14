@@ -26,9 +26,6 @@ import { ProductionOrder } from "./ProductionOrder";
 import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderWhereUniqueInput } from "./ProductionOrderWhereUniqueInput";
 import { ProductionOrderUpdateInput } from "./ProductionOrderUpdateInput";
-import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
@@ -472,126 +469,6 @@ export class ProductionOrderControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/fermentationChemistries")
-  @ApiNestedQuery(FermentationChemistryFindManyArgs)
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationChemistries(
-    @common.Req() request: Request,
-    @common.Param() params: ProductionOrderWhereUniqueInput
-  ): Promise<FermentationChemistry[]> {
-    const query = plainToClass(
-      FermentationChemistryFindManyArgs,
-      request.query
-    );
-    const results = await this.service.findFermentationChemistries(params.id, {
-      ...query,
-      select: {
-        approved: true,
-        approvedBy: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        id: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/fermentationChemistries")
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async connectFermentationChemistries(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: FermentationChemistryWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationChemistries: {
-        connect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/fermentationChemistries")
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async updateFermentationChemistries(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: FermentationChemistryWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationChemistries: {
-        set: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/fermentationChemistries")
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectFermentationChemistries(
-    @common.Param() params: ProductionOrderWhereUniqueInput,
-    @common.Body() body: FermentationChemistryWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationChemistries: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateProductionOrder({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

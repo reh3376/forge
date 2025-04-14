@@ -15,13 +15,11 @@ import {
   Prisma,
   Asset as PrismaAsset,
   Batch as PrismaBatch,
-  FermentationChemistry as PrismaFermentationChemistry,
   Inventory as PrismaInventory,
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
   ItemReceipt as PrismaItemReceipt,
   Lot as PrismaLot,
-  MashingDatum as PrismaMashingDatum,
   PurchaseOrder as PrismaPurchaseOrder,
 } from "@prisma/client";
 
@@ -68,17 +66,6 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .children(args);
-  }
-
-  async findFermentationChemistries(
-    parentId: string,
-    args: Prisma.FermentationChemistryFindManyArgs
-  ): Promise<PrismaFermentationChemistry[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .fermentationChemistries(args);
   }
 
   async findInventories(
@@ -178,17 +165,6 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .lotsFilledFrom(args);
-  }
-
-  async findMashingData(
-    parentId: string,
-    args: Prisma.MashingDatumFindManyArgs
-  ): Promise<PrismaMashingDatum[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .mashingData(args);
   }
 
   async findPurchaseOrders(

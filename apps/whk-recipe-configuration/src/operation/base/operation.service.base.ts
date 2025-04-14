@@ -15,8 +15,6 @@ import {
   Prisma,
   Operation as PrismaOperation,
   EquipmentPhase as PrismaEquipmentPhase,
-  FermentationChemistry as PrismaFermentationChemistry,
-  MashingDatum as PrismaMashingDatum,
   UnitProcedure as PrismaUnitProcedure,
 } from "@prisma/client";
 
@@ -66,17 +64,6 @@ export class OperationServiceBase {
       .equipmentPhases(args);
   }
 
-  async findFermentationChemistries(
-    parentId: string,
-    args: Prisma.FermentationChemistryFindManyArgs
-  ): Promise<PrismaFermentationChemistry[]> {
-    return this.prisma.operation
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .fermentationChemistries(args);
-  }
-
   async findInstances(
     parentId: string,
     args: Prisma.OperationFindManyArgs
@@ -86,17 +73,6 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .instances(args);
-  }
-
-  async findMashingData(
-    parentId: string,
-    args: Prisma.MashingDatumFindManyArgs
-  ): Promise<PrismaMashingDatum[]> {
-    return this.prisma.operation
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .mashingData(args);
   }
 
   async getClassId(parentId: string): Promise<PrismaOperation | null> {

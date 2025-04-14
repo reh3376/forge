@@ -20,9 +20,7 @@ import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
-import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
-import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { EnumOperationName } from "./EnumOperationName";
 import { IntFilter } from "../../util/IntFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
@@ -133,18 +131,6 @@ class OperationWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => FermentationChemistryListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationChemistryListRelationFilter, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -198,18 +184,6 @@ class OperationWhereInput {
     nullable: true,
   })
   lotId?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashingDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

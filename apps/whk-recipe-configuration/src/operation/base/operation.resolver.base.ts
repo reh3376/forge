@@ -27,10 +27,6 @@ import { CreateOperationArgs } from "./CreateOperationArgs";
 import { UpdateOperationArgs } from "./UpdateOperationArgs";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
-import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { OperationService } from "../operation.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -176,31 +172,6 @@ export class OperationResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationChemistry], {
-    name: "fermentationChemistries",
-  })
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationChemistries(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: FermentationChemistryFindManyArgs
-  ): Promise<FermentationChemistry[]> {
-    const results = await this.service.findFermentationChemistries(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Operation], { name: "instances" })
   @UseRoles({
     resource: "Operation",
@@ -212,26 +183,6 @@ export class OperationResolverBase {
     @graphql.Args() args: OperationFindManyArgs
   ): Promise<Operation[]> {
     const results = await this.service.findInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashingData(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: MashingDatumFindManyArgs
-  ): Promise<MashingDatum[]> {
-    const results = await this.service.findMashingData(parent.id, args);
 
     if (!results) {
       return [];

@@ -14,7 +14,6 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   RecipeBom as PrismaRecipeBom,
-  MashingDatum as PrismaMashingDatum,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Recipe as PrismaRecipe,
   RecipeBomItem as PrismaRecipeBomItem,
@@ -53,17 +52,6 @@ export class RecipeBomServiceBase {
     args: Prisma.RecipeBomDeleteArgs
   ): Promise<PrismaRecipeBom> {
     return this.prisma.recipeBom.delete(args);
-  }
-
-  async findMashingData(
-    parentId: string,
-    args: Prisma.MashingDatumFindManyArgs
-  ): Promise<PrismaMashingDatum[]> {
-    return this.prisma.recipeBom
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .mashingData(args);
   }
 
   async findMasterInstances(

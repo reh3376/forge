@@ -79,7 +79,6 @@ export class MashingProtocolStepControllerBase {
         holdType: true,
         id: true,
         index: true,
-        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -128,7 +127,6 @@ export class MashingProtocolStepControllerBase {
         holdType: true,
         id: true,
         index: true,
-        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -176,7 +174,6 @@ export class MashingProtocolStepControllerBase {
         holdType: true,
         id: true,
         index: true,
-        isClassDefinition: true,
 
         mashingProtocol: {
           select: {
@@ -244,7 +241,6 @@ export class MashingProtocolStepControllerBase {
           holdType: true,
           id: true,
           index: true,
-          isClassDefinition: true,
 
           mashingProtocol: {
             select: {
@@ -300,7 +296,6 @@ export class MashingProtocolStepControllerBase {
           holdType: true,
           id: true,
           index: true,
-          isClassDefinition: true,
 
           mashingProtocol: {
             select: {

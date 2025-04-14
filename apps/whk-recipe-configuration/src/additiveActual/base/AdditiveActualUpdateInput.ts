@@ -22,7 +22,6 @@ import {
   Max,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 
 @InputType()
 class AdditiveActualUpdateInput {
@@ -61,18 +60,6 @@ class AdditiveActualUpdateInput {
     nullable: true,
   })
   lotNumber?: string;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumWhereUniqueInput)
-  @IsOptional()
-  @Field(() => MashingDatumWhereUniqueInput, {
-    nullable: true,
-  })
-  mashingDatum?: MashingDatumWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
