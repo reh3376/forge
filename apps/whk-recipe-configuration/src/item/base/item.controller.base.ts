@@ -1703,11 +1703,8 @@ export class ItemControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {

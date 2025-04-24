@@ -162,32 +162,30 @@ model EquipmentPhase {
 
 model Operation {
   abbreviation            String
-  active                  Boolean?                   @default(true)
+  active                  Boolean?                @default(true)
   auxiliaryPhases         Json?
-  classId                 Operation?                 @relation(name: "OperationClassIdOperationInstances", fields: [classIdId], references: [id])
+  classId                 Operation?              @relation(name: "OperationClassIdOperationInstances", fields: [classIdId], references: [id])
   classIdId               String?
-  createdAt               DateTime?                  @default(now())
+  createdAt               DateTime?               @default(now())
   createdBy               String
   description             String
   editedBy                String?
   equipmentPhases         EquipmentPhase[]
   fermentationChemistries FermentationChemistry[]
-  fermentationDayData     FermentationDayDatum[]
-  fermentationSettingData FermentationSettingDatum[]
-  globalId                String?                    @default(cuid())
-  id                      String                     @id @default(cuid())
-  instances               Operation[]                @relation(name: "OperationClassIdOperationInstances")
-  isClassDefinition       Boolean?                   @default(false)
-  lotId                   String?                    @unique
+  globalId                String?                 @default(cuid())
+  id                      String                  @id @default(cuid())
+  instances               Operation[]             @relation(name: "OperationClassIdOperationInstances")
+  isClassDefinition       Boolean?                @default(false)
+  lotId                   String?                 @unique
   mashingData             MashingDatum[]
   name                    EnumOperationName
   path                    String?
-  procedureSequenceIndex  Int                        @default(0)
-  revision                Int?                       @default(0)
-  schemaVersion           String?                    @default("0001-b")
-  unitProcedure           UnitProcedure?             @relation(fields: [unitProcedureId], references: [id])
+  procedureSequenceIndex  Int                     @default(0)
+  revision                Int?                    @default(0)
+  schemaVersion           String?                 @default("0001-b")
+  unitProcedure           UnitProcedure?          @relation(fields: [unitProcedureId], references: [id])
   unitProcedureId         String?
-  updatedAt               DateTime?                  @updatedAt
+  updatedAt               DateTime?               @updatedAt
 }
 
 model Procedure {
@@ -370,12 +368,8 @@ model ProductionOrder {
   status                         EnumProductionOrderStatus?      @default(Initiated)
   scheduleOrder                  ScheduleOrder?                  @relation(fields: [scheduleOrderId], references: [id])
   scheduleOrderId                String?
-  // salesOrder                    SalesOrder                      @relation(fields: [salesOrderId], references: [id])
-  // salesOrderId                  String                          @unique
   globalId                       String?                         @default(cuid())
-  // productionOrderUnitProcedures ProductionOrderUnitProcedure[]
   fermentationChemistries        FermentationChemistry[]
-  fermentationDayData            FermentationDayDatum[]
   lots                           Lot[]
   customerCode                   String?
   units                          String?
@@ -582,7 +576,6 @@ model Asset {
   createdBy               String
   description             String
   fermentationChemistries FermentationChemistry[]
-  fermentationDayData     FermentationDayDatum[]
   globalId                String?                 @unique @default(cuid())
   id                      String                  @id @default(cuid())
   inventories             Inventory[]
@@ -605,7 +598,6 @@ model Asset {
   status                  EnumAssetStatus?        @default(InService)
   updatedAt               DateTime                @updatedAt
   updatedBy               String?
-  MashDatum               MashDatum[]
 
   @@unique([name, revision])
 }
@@ -741,85 +733,17 @@ model Unit {
 }
 
 model FermentationChemistry {
-  approved          Boolean?                  @default(false)
+  approved          Boolean?         @default(false)
   approvedBy        String?
-  asset             Asset                     @relation(fields: [assetId], references: [id])
+  asset             Asset            @relation(fields: [assetId], references: [id])
   assetId           String
-  createdAt         DateTime                  @default(now())
-  dailyData         FermentationDayDatum[]
-  id                String                    @id @default(cuid())
-  operation         Operation                 @relation(fields: [operationId], references: [id])
+  createdAt         DateTime         @default(now())
+  id                String           @id @default(cuid())
+  operation         Operation        @relation(fields: [operationId], references: [id])
   operationId       String
-  productionOrder   ProductionOrder?          @relation(fields: [productionOrderId], references: [id])
+  productionOrder   ProductionOrder? @relation(fields: [productionOrderId], references: [id])
   productionOrderId String?
-  settingData       FermentationSettingDatum? @relation(fields: [settingDataId], references: [id])
-  settingDataId     String?                   @unique
-  updatedAt         DateTime                  @updatedAt
-  MashDatum         MashDatum[]
-}
-
-model MashDatum {
-  id                      String                 @id @default(cuid())
-  createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
-  lotId                   String
-  balling                 Float
-  pH                      Float
-  backSetPH               Float
-  backsetVolume           Float?
-  waterVolume             Float
-  cornLbs                 Float?
-  ryeLbs                  Float?
-  maltLbs                 Float?
-  wheatLbs                Float?
-  loggedBy                String
-  asset                   Asset?                 @relation(fields: [assetId], references: [id])
-  assetId                 String?
-  fermentationChemistry   FermentationChemistry? @relation(fields: [fermentationChemistryId], references: [id])
-  fermentationChemistryId String?
-  fermenterNumber         Int
-}
-
-model FermentationSettingDatum {
-  acid                    Float?
-  balling                 Float?
-  createdAt               DateTime               @default(now())
-  dryInches               Float?
-  fermentationChemistries FermentationChemistry?
-  fermenterNumber         Int
-  id                      String                 @id @default(cuid())
-  loggedBy                String
-  lotId                   String
-  operation               Operation?             @relation(fields: [operationId], references: [id])
-  operationId             String?
-  pH                      Float?
-  setTime                 DateTime
-  temperature             Float
-  updatedAt               DateTime               @updatedAt
-  yeastPitchTime          DateTime
-}
-
-model FermentationDayDatum {
-  id                      String                       @id @default(cuid())
-  createdAt               DateTime                     @default(now())
-  updatedAt               DateTime                     @updatedAt
-  productionOrder         ProductionOrder              @relation(fields: [productionOrderId], references: [id])
-  productionOrderId       String
-  lotId                   String
-  loggedBy                String
-  day                     EnumFermentationDayDatumDay? @default(First)
-  temperature             Float
-  balling                 Float
-  acid                    Float
-  pH                      Float
-  dryInches               Float?
-  operation               Operation                    @relation(fields: [operationId], references: [id])
-  operationId             String
-  fermenterNumber         Int
-  asset                   Asset?                       @relation(fields: [assetId], references: [id])
-  assetId                 String?
-  fermentationChemistry   FermentationChemistry?       @relation(fields: [fermentationChemistryId], references: [id])
-  fermentationChemistryId String?
+  updatedAt         DateTime         @updatedAt
 }
 
 model Batch {
@@ -965,12 +889,10 @@ model RecipeBomItem {
   isClassDefinition    Boolean?                   @default(false)
   item                 Item?                      @relation(fields: [itemId], references: [id])
   itemId               String?
-  lot                  String?
   mashingProtocolSteps MashingProtocolStep[]
   operation            EnumRecipeBomItemOperation
-  operationIndex       Int                        @default(-1)
   quantity             Float?
-  quantityActual       Float?
+  recipeBomActuals     RecipeBomActual[]
   recipeBoms           RecipeBom?                 @relation(fields: [recipeBomsId], references: [id])
   recipeBomsId         String?
   units                String
@@ -1035,7 +957,6 @@ model RecipeBom {
   masterReceipeBomId             String?
   productionOrderRecipeInstances ProductionOrderRecipeInstance[]
   recipe                         Recipe[]
-  recipeBomActuals               RecipeBomActual[]
   recipeBomITem                  RecipeBomItem[]
   revision                       String?
   running                        Boolean?                        @default(false)
@@ -1157,8 +1078,8 @@ model RecipeBomActual {
   id                          String                     @id @default(cuid())
   mashingProtocolStepActual   MashingProtocolStepActual? @relation(fields: [mashingProtocolStepActualId], references: [id])
   mashingProtocolStepActualId String?
-  recipeBom                   RecipeBom                  @relation(fields: [recipeBomId], references: [id])
-  recipeBomId                 String
+  recipeBomItem               RecipeBomItem              @relation(fields: [recipeBomItemId], references: [id])
+  recipeBomItemId             String
   updatedAt                   DateTime                   @updatedAt
   updatedBy                   String?
   value                       Float?
@@ -1356,13 +1277,6 @@ enum EnumLotWhiskeyType {
   RyeWhiskey
   WheatedBourbon
   WheatWhiskey
-}
-
-enum EnumFermentationDayDatumDay {
-  First
-  Second
-  Third
-  Final
 }
 
 enum EnumRecipeBomItemOperation {

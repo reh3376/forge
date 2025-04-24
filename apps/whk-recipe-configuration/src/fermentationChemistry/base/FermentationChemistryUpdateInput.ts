@@ -20,10 +20,8 @@ import {
 } from "class-validator";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { Type } from "class-transformer";
-import { FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput } from "./FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput";
 import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
-import { FermentationSettingDatumWhereUniqueInput } from "../../fermentationSettingDatum/base/FermentationSettingDatumWhereUniqueInput";
 
 @InputType()
 class FermentationChemistryUpdateInput {
@@ -64,22 +62,6 @@ class FermentationChemistryUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () =>
-      FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput)
-  @IsOptional()
-  @Field(
-    () => FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput,
-    {
-      nullable: true,
-    }
-  )
-  dailyData?: FermentationDayDatumUpdateManyWithoutFermentationChemistriesInput;
-
-  @ApiProperty({
-    required: false,
     type: () => OperationWhereUniqueInput,
   })
   @ValidateNested()
@@ -101,18 +83,6 @@ class FermentationChemistryUpdateInput {
     nullable: true,
   })
   productionOrder?: ProductionOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatumWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatumWhereUniqueInput)
-  @IsOptional()
-  @Field(() => FermentationSettingDatumWhereUniqueInput, {
-    nullable: true,
-  })
-  settingData?: FermentationSettingDatumWhereUniqueInput | null;
 }
 
 export { FermentationChemistryUpdateInput as FermentationChemistryUpdateInput };

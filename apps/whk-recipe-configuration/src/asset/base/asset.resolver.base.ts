@@ -29,8 +29,6 @@ import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLogFindManyArgs } from "../../inventoryLog/base/InventoryLogFindManyArgs";
@@ -209,28 +207,6 @@ export class AssetResolverBase {
       parent.id,
       args
     );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationDayDatum], {
-    name: "fermentationDayData",
-  })
-  @UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationDayData(
-    @graphql.Parent() parent: Asset,
-    @graphql.Args() args: FermentationDayDatumFindManyArgs
-  ): Promise<FermentationDayDatum[]> {
-    const results = await this.service.findFermentationDayData(parent.id, args);
 
     if (!results) {
       return [];

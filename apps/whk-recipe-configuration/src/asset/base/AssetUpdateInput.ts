@@ -29,7 +29,6 @@ import { BatchUpdateManyWithoutAssetsInput } from "./BatchUpdateManyWithoutAsset
 import { Type } from "class-transformer";
 import { AssetUpdateManyWithoutAssetsInput } from "./AssetUpdateManyWithoutAssetsInput";
 import { FermentationChemistryUpdateManyWithoutAssetsInput } from "./FermentationChemistryUpdateManyWithoutAssetsInput";
-import { FermentationDayDatumUpdateManyWithoutAssetsInput } from "./FermentationDayDatumUpdateManyWithoutAssetsInput";
 import { InventoryUpdateManyWithoutAssetsInput } from "./InventoryUpdateManyWithoutAssetsInput";
 import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateManyWithoutAssetsInput";
 import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
@@ -134,18 +133,6 @@ class AssetUpdateInput {
     nullable: true,
   })
   fermentationChemistries?: FermentationChemistryUpdateManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumUpdateManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumUpdateManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationDayDatumUpdateManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
