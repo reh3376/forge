@@ -78,6 +78,7 @@ export class ItemReceiptControllerBase {
           : undefined,
       },
       select: {
+        comments: true,
         createdAt: true,
         createdBy: true,
         driver: true,
@@ -114,6 +115,7 @@ export class ItemReceiptControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        vendorLoadId: true,
         weighIn: true,
         weighOut: true,
         siloNumber: true,
@@ -143,6 +145,7 @@ export class ItemReceiptControllerBase {
     return this.service.itemReceipts({
       ...args,
       select: {
+        comments: true,
         createdAt: true,
         createdBy: true,
         driver: true,
@@ -179,6 +182,7 @@ export class ItemReceiptControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        vendorLoadId: true,
         weighIn: true,
         weighOut: true,
         siloNumber: true,
@@ -209,6 +213,7 @@ export class ItemReceiptControllerBase {
     const result = await this.service.itemReceipt({
       where: params,
       select: {
+        comments: true,
         createdAt: true,
         createdBy: true,
         driver: true,
@@ -245,6 +250,7 @@ export class ItemReceiptControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        vendorLoadId: true,
         weighIn: true,
         weighOut: true,
         siloNumber: true,
@@ -305,6 +311,7 @@ export class ItemReceiptControllerBase {
             : undefined,
         },
         select: {
+          comments: true,
           createdAt: true,
           createdBy: true,
           driver: true,
@@ -341,6 +348,7 @@ export class ItemReceiptControllerBase {
           units: true,
           updatedAt: true,
           updatedBy: true,
+          vendorLoadId: true,
           weighIn: true,
           weighOut: true,
           siloNumber: true,

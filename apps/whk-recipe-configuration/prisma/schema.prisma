@@ -597,6 +597,7 @@ model Asset {
 }
 
 model ItemReceipt {
+  comments        String?
   createdAt       DateTime               @default(now())
   createdBy       String
   driver          String
@@ -620,11 +621,10 @@ model ItemReceipt {
   units           String
   updatedAt       DateTime               @updatedAt
   updatedBy       String?
-  weighIn         Float?
-  weighOut        Float?
   siloNumber      Int?
-  // asset           Asset?                 @relation(fields: [assetId], references: [id])
-  // assetId         String?
+  vendorLoadId    String?
+  weighIn         Decimal?
+  weighOut        Decimal?
 }
 
 model Lot {
@@ -1205,6 +1205,9 @@ enum EnumItemReceiptStatus {
   Complete
   Rejected
   Hold
+  Flagged
+  Confirmed
+  Denied
 }
 
 enum EnumLotStatus {

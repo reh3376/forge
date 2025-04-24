@@ -39,6 +39,18 @@ import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 @InputType()
 class ItemReceiptCreateInput {
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  comments?: string | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -153,7 +165,15 @@ class ItemReceiptCreateInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
+  status?:
+    | "InProgress"
+    | "Complete"
+    | "Rejected"
+    | "Hold"
+    | "Flagged"
+    | "Confirmed"
+    | "Denied"
+    | null;
 
   @ApiProperty({
     required: false,
@@ -222,6 +242,18 @@ class ItemReceiptCreateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  vendorLoadId?: string | null;
 
   @ApiProperty({
     required: false,

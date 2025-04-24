@@ -11,13 +11,11 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { DateTimeFilter } from "../../util/DateTimeFilter";
+import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringFilter } from "../../util/StringFilter";
-import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
-import { FloatFilter } from "../../util/FloatFilter";
-import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { EnumItemReceiptStatus } from "./EnumItemReceiptStatus";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
@@ -27,9 +25,22 @@ import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { JsonFilter } from "../../util/JsonFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
+import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { FloatFilter } from "../../util/FloatFilter";
 
 @InputType()
 class ItemReceiptWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  comments?: StringNullableFilter;
+
   @ApiProperty({
     required: false,
     type: DateTimeFilter,
@@ -174,7 +185,14 @@ class ItemReceiptWhereInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | "Rejected" | "Hold";
+  status?:
+    | "InProgress"
+    | "Complete"
+    | "Rejected"
+    | "Hold"
+    | "Flagged"
+    | "Confirmed"
+    | "Denied";
 
   @ApiProperty({
     required: false,
@@ -257,7 +275,18 @@ class ItemReceiptWhereInput {
 
   @ApiProperty({
     required: false,
-    type: FloatNullableFilter,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  vendorLoadId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
   })
   @Type(() => FloatNullableFilter)
   @IsOptional()
