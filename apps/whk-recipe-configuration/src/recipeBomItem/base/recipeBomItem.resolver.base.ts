@@ -227,7 +227,7 @@ export class RecipeBomItemResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBomActual], { name: "recipeBomActuals" })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "any",
