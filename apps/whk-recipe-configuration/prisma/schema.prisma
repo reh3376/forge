@@ -623,8 +623,8 @@ model ItemReceipt {
   updatedBy       String?
   siloNumber      Int?
   vendorLoadId    String?
-  weighIn         Decimal?
-  weighOut        Decimal?
+  weighIn         Float?
+  weighOut        Float?
 }
 
 model Lot {
