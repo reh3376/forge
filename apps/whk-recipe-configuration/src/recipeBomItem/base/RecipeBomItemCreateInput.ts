@@ -20,10 +20,8 @@ import {
   MaxLength,
   IsBoolean,
   IsEnum,
-  IsInt,
-  Min,
-  Max,
   IsNumber,
+  Max,
   IsDate,
 } from "class-validator";
 
@@ -31,6 +29,7 @@ import { Type } from "class-transformer";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
+import { RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput } from "./RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 
 @InputType()
@@ -105,18 +104,6 @@ class RecipeBomItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lot?: string | null;
-
-  @ApiProperty({
-    required: false,
     type: () => MashingProtocolStepCreateNestedManyWithoutRecipeBomItemsInput,
   })
   @ValidateNested()
@@ -140,16 +127,6 @@ class RecipeBomItemCreateInput {
     | "Processing01";
 
   @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-99)
-  @Max(9999)
-  @Field(() => Number)
-  operationIndex!: number;
-
-  @ApiProperty({
     required: false,
     type: Number,
   })
@@ -163,15 +140,15 @@ class RecipeBomItemCreateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: () => RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput,
   })
-  @IsNumber()
-  @Max(99999999999)
+  @ValidateNested()
+  @Type(() => RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput)
   @IsOptional()
-  @Field(() => Number, {
+  @Field(() => RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput, {
     nullable: true,
   })
-  quantityActual?: number | null;
+  recipeBomActuals?: RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput;
 
   @ApiProperty({
     required: false,

@@ -358,13 +358,6 @@ export class ItemControllerBase {
 
         itemNumber: true,
         lotNumber: true,
-
-        mashingDatum: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         updatedAt: true,
       },
@@ -1071,6 +1064,7 @@ export class ItemControllerBase {
     const results = await this.service.findItemReceipts(params.id, {
       ...query,
       select: {
+        comments: true,
         createdAt: true,
         createdBy: true,
         driver: true,
@@ -1107,6 +1101,7 @@ export class ItemControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        vendorLoadId: true,
         weighIn: true,
         weighOut: true,
       },
@@ -1703,11 +1698,8 @@ export class ItemControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {

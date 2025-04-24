@@ -14,8 +14,6 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ProductionOrder as PrismaProductionOrder,
-  FermentationChemistry as PrismaFermentationChemistry,
-  FermentationDayDatum as PrismaFermentationDayDatum,
   Lot as PrismaLot,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Bom as PrismaBom,
@@ -60,28 +58,6 @@ export class ProductionOrderServiceBase {
     args: Prisma.ProductionOrderDeleteArgs
   ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.delete(args);
-  }
-
-  async findFermentationChemistries(
-    parentId: string,
-    args: Prisma.FermentationChemistryFindManyArgs
-  ): Promise<PrismaFermentationChemistry[]> {
-    return this.prisma.productionOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .fermentationChemistries(args);
-  }
-
-  async findFermentationDayData(
-    parentId: string,
-    args: Prisma.FermentationDayDatumFindManyArgs
-  ): Promise<PrismaFermentationDayDatum[]> {
-    return this.prisma.productionOrder
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .fermentationDayData(args);
   }
 
   async findLots(

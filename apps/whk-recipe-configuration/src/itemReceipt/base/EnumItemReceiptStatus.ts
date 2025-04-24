@@ -16,6 +16,9 @@ export enum EnumItemReceiptStatus {
   Complete = "Complete",
   Rejected = "Rejected",
   Hold = "Hold",
+  Flagged = "Flagged",
+  Confirmed = "Confirmed",
+  Denied = "Denied",
 }
 
 registerEnumType(EnumItemReceiptStatus, {

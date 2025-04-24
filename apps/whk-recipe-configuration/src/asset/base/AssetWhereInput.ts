@@ -18,15 +18,12 @@ import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { AssetListRelationFilter } from "./AssetListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
-import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
-import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
-import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
@@ -123,30 +120,6 @@ class AssetWhereInput {
     nullable: true,
   })
   description?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationChemistryListRelationFilter, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationDayDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -277,18 +250,6 @@ class AssetWhereInput {
     nullable: true,
   })
   lotsFilledFrom?: LotListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashingDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

@@ -14,7 +14,7 @@ import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/Reci
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class RecipeBomActualUpdateManyWithoutRecipeBomsInput {
+class RecipeBomActualUpdateManyWithoutRecipeBomItemsInput {
   @Field(() => [RecipeBomActualWhereUniqueInput], {
     nullable: true,
   })
@@ -43,4 +43,4 @@ class RecipeBomActualUpdateManyWithoutRecipeBomsInput {
   set?: Array<RecipeBomActualWhereUniqueInput>;
 }
 
-export { RecipeBomActualUpdateManyWithoutRecipeBomsInput as RecipeBomActualUpdateManyWithoutRecipeBomsInput };
+export { RecipeBomActualUpdateManyWithoutRecipeBomItemsInput as RecipeBomActualUpdateManyWithoutRecipeBomItemsInput };

@@ -43,6 +43,18 @@ class ItemReceiptUpdateInput {
     type: String,
   })
   @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  comments?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
   @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
@@ -165,7 +177,15 @@ class ItemReceiptUpdateInput {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
+  status?:
+    | "InProgress"
+    | "Complete"
+    | "Rejected"
+    | "Hold"
+    | "Flagged"
+    | "Confirmed"
+    | "Denied"
+    | null;
 
   @ApiProperty({
     required: false,
@@ -237,6 +257,18 @@ class ItemReceiptUpdateInput {
     nullable: true,
   })
   updatedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  vendorLoadId?: string | null;
 
   @ApiProperty({
     required: false,

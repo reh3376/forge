@@ -25,10 +25,6 @@ import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderFindUniqueArgs } from "./ProductionOrderFindUniqueArgs";
 import { CreateProductionOrderArgs } from "./CreateProductionOrderArgs";
 import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
-import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
@@ -197,53 +193,6 @@ export class ProductionOrderResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationChemistry], {
-    name: "fermentationChemistries",
-  })
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationChemistries(
-    @graphql.Parent() parent: ProductionOrder,
-    @graphql.Args() args: FermentationChemistryFindManyArgs
-  ): Promise<FermentationChemistry[]> {
-    const results = await this.service.findFermentationChemistries(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationDayDatum], {
-    name: "fermentationDayData",
-  })
-  @UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationDayData(
-    @graphql.Parent() parent: ProductionOrder,
-    @graphql.Args() args: FermentationDayDatumFindManyArgs
-  ): Promise<FermentationDayDatum[]> {
-    const results = await this.service.findFermentationDayData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

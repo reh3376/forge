@@ -116,17 +116,6 @@ class RecipeBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  lot?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   operation?: SortOrder;
 
   @ApiProperty({
@@ -138,29 +127,7 @@ class RecipeBomItemOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  operationIndex?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   quantity?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  quantityActual?: SortOrder;
 
   @ApiProperty({
     required: false,

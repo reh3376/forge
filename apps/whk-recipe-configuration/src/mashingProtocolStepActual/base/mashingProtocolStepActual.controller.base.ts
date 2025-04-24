@@ -294,7 +294,7 @@ export class MashingProtocolStepActualControllerBase {
           },
         },
 
-        recipeBom: {
+        recipeBomItem: {
           select: {
             id: true,
           },

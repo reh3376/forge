@@ -26,18 +26,12 @@ import { RecipeBom } from "./RecipeBom";
 import { RecipeBomFindManyArgs } from "./RecipeBomFindManyArgs";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { RecipeBomUpdateInput } from "./RecipeBomUpdateInput";
-import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
-import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
-import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
-import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
@@ -264,144 +258,6 @@ export class RecipeBomControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/mashingData")
-  @ApiNestedQuery(MashingDatumFindManyArgs)
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashingData(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeBomWhereUniqueInput
-  ): Promise<MashingDatum[]> {
-    const query = plainToClass(MashingDatumFindManyArgs, request.query);
-    const results = await this.service.findMashingData(params.id, {
-      ...query,
-      select: {
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        backsetQuantity: true,
-
-        bom: {
-          select: {
-            id: true,
-          },
-        },
-
-        cookCompleteTime: true,
-        cookDropTime: true,
-        cookDuration: true,
-        cookStartTime: true,
-        cookStartedBy: true,
-        cookerNumber: true,
-        cornQuantity: true,
-        createdAt: true,
-        dropDuration: true,
-        id: true,
-        maltQuantity: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        preMaltQuantity: true,
-
-        recipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        ryeQuantity: true,
-        specialtyQuantity: true,
-        totalDuration: true,
-        updatedAt: true,
-        waterQuantity: true,
-        wheatQuantity: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/mashingData")
-  @UseRoles({
-    resource: "RecipeBom",
-    action: "update",
-    possession: "any",
-  })
-  async connectMashingData(
-    @common.Param() params: RecipeBomWhereUniqueInput,
-    @common.Body() body: MashingDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      mashingData: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/mashingData")
-  @UseRoles({
-    resource: "RecipeBom",
-    action: "update",
-    possession: "any",
-  })
-  async updateMashingData(
-    @common.Param() params: RecipeBomWhereUniqueInput,
-    @common.Body() body: MashingDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      mashingData: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/mashingData")
-  @UseRoles({
-    resource: "RecipeBom",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectMashingData(
-    @common.Param() params: RecipeBomWhereUniqueInput,
-    @common.Body() body: MashingDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      mashingData: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -774,117 +630,6 @@ export class RecipeBomControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipeBomActuals")
-  @ApiNestedQuery(RecipeBomActualFindManyArgs)
-  @UseRoles({
-    resource: "RecipeBomActual",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipeBomActuals(
-    @common.Req() request: Request,
-    @common.Param() params: RecipeBomWhereUniqueInput
-  ): Promise<RecipeBomActual[]> {
-    const query = plainToClass(RecipeBomActualFindManyArgs, request.query);
-    const results = await this.service.findRecipeBomActuals(params.id, {
-      ...query,
-      select: {
-        createdAt: true,
-        createdBy: true,
-        id: true,
-
-        mashingProtocolStepActual: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeBom: {
-          select: {
-            id: true,
-          },
-        },
-
-        updatedAt: true,
-        updatedBy: true,
-        value: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/recipeBomActuals")
-  @UseRoles({
-    resource: "RecipeBom",
-    action: "update",
-    possession: "any",
-  })
-  async connectRecipeBomActuals(
-    @common.Param() params: RecipeBomWhereUniqueInput,
-    @common.Body() body: RecipeBomActualWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBomActuals: {
-        connect: body,
-      },
-    };
-    await this.service.updateRecipeBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/recipeBomActuals")
-  @UseRoles({
-    resource: "RecipeBom",
-    action: "update",
-    possession: "any",
-  })
-  async updateRecipeBomActuals(
-    @common.Param() params: RecipeBomWhereUniqueInput,
-    @common.Body() body: RecipeBomActualWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBomActuals: {
-        set: body,
-      },
-    };
-    await this.service.updateRecipeBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/recipeBomActuals")
-  @UseRoles({
-    resource: "RecipeBom",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectRecipeBomActuals(
-    @common.Param() params: RecipeBomWhereUniqueInput,
-    @common.Body() body: RecipeBomActualWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipeBomActuals: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateRecipeBom({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBomITem")
   @ApiNestedQuery(RecipeBomItemFindManyArgs)
   @UseRoles({
@@ -924,11 +669,8 @@ export class RecipeBomControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {

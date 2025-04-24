@@ -10,12 +10,10 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-
 import {
   Prisma,
   AdditiveActual as PrismaAdditiveActual,
   Item as PrismaItem,
-  MashingDatum as PrismaMashingDatum,
 } from "@prisma/client";
 
 export class AdditiveActualServiceBase {
@@ -59,13 +57,5 @@ export class AdditiveActualServiceBase {
         where: { id: parentId },
       })
       .item();
-  }
-
-  async getMashingDatum(parentId: string): Promise<PrismaMashingDatum | null> {
-    return this.prisma.additiveActual
-      .findUnique({
-        where: { id: parentId },
-      })
-      .mashingDatum();
   }
 }
