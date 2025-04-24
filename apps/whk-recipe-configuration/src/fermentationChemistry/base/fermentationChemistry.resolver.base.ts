@@ -25,12 +25,9 @@ import { FermentationChemistryFindManyArgs } from "./FermentationChemistryFindMa
 import { FermentationChemistryFindUniqueArgs } from "./FermentationChemistryFindUniqueArgs";
 import { CreateFermentationChemistryArgs } from "./CreateFermentationChemistryArgs";
 import { UpdateFermentationChemistryArgs } from "./UpdateFermentationChemistryArgs";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Asset } from "../../asset/base/Asset";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { FermentationChemistryService } from "../fermentationChemistry.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => FermentationChemistry)
@@ -113,12 +110,6 @@ export class FermentationChemistryResolverBase {
               connect: args.data.productionOrder,
             }
           : undefined,
-
-        settingData: args.data.settingData
-          ? {
-              connect: args.data.settingData,
-            }
-          : undefined,
       },
     });
   }
@@ -152,12 +143,6 @@ export class FermentationChemistryResolverBase {
                 connect: args.data.productionOrder,
               }
             : undefined,
-
-          settingData: args.data.settingData
-            ? {
-                connect: args.data.settingData,
-              }
-            : undefined,
         },
       });
     } catch (error) {
@@ -168,26 +153,6 @@ export class FermentationChemistryResolverBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationDayDatum], { name: "dailyData" })
-  @UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findDailyData(
-    @graphql.Parent() parent: FermentationChemistry,
-    @graphql.Args() args: FermentationDayDatumFindManyArgs
-  ): Promise<FermentationDayDatum[]> {
-    const results = await this.service.findDailyData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -246,27 +211,6 @@ export class FermentationChemistryResolverBase {
     @graphql.Parent() parent: FermentationChemistry
   ): Promise<ProductionOrder | null> {
     const result = await this.service.getProductionOrder(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => FermentationSettingDatum, {
-    nullable: true,
-    name: "settingData",
-  })
-  @UseRoles({
-    resource: "FermentationSettingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async getSettingData(
-    @graphql.Parent() parent: FermentationChemistry
-  ): Promise<FermentationSettingDatum | null> {
-    const result = await this.service.getSettingData(parent.id);
 
     if (!result) {
       return null;

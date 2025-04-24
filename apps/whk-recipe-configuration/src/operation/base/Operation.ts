@@ -30,8 +30,6 @@ import { JsonValue } from "type-fest";
 import { Type } from "class-transformer";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
@@ -135,24 +133,6 @@ class Operation {
   @Type(() => FermentationChemistry)
   @IsOptional()
   fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationDayDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
-  @IsOptional()
-  fermentationDayData?: Array<FermentationDayDatum>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationSettingDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatum)
-  @IsOptional()
-  fermentationSettingData?: Array<FermentationSettingDatum>;
 
   @ApiProperty({
     required: false,

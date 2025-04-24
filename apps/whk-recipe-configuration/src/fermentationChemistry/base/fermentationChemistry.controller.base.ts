@@ -26,9 +26,6 @@ import { FermentationChemistry } from "./FermentationChemistry";
 import { FermentationChemistryFindManyArgs } from "./FermentationChemistryFindManyArgs";
 import { FermentationChemistryWhereUniqueInput } from "./FermentationChemistryWhereUniqueInput";
 import { FermentationChemistryUpdateInput } from "./FermentationChemistryUpdateInput";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -71,12 +68,6 @@ export class FermentationChemistryControllerBase {
               connect: data.productionOrder,
             }
           : undefined,
-
-        settingData: data.settingData
-          ? {
-              connect: data.settingData,
-            }
-          : undefined,
       },
       select: {
         approved: true,
@@ -98,12 +89,6 @@ export class FermentationChemistryControllerBase {
         },
 
         productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        settingData: {
           select: {
             id: true,
           },
@@ -157,12 +142,6 @@ export class FermentationChemistryControllerBase {
           },
         },
 
-        settingData: {
-          select: {
-            id: true,
-          },
-        },
-
         updatedAt: true,
       },
     });
@@ -205,12 +184,6 @@ export class FermentationChemistryControllerBase {
         },
 
         productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        settingData: {
           select: {
             id: true,
           },
@@ -265,12 +238,6 @@ export class FermentationChemistryControllerBase {
                 connect: data.productionOrder,
               }
             : undefined,
-
-          settingData: data.settingData
-            ? {
-                connect: data.settingData,
-              }
-            : undefined,
         },
         select: {
           approved: true,
@@ -297,12 +264,6 @@ export class FermentationChemistryControllerBase {
             },
           },
 
-          settingData: {
-            select: {
-              id: true,
-            },
-          },
-
           updatedAt: true,
         },
       });
@@ -314,137 +275,5 @@ export class FermentationChemistryControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/dailyData")
-  @ApiNestedQuery(FermentationDayDatumFindManyArgs)
-  @UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findDailyData(
-    @common.Req() request: Request,
-    @common.Param() params: FermentationChemistryWhereUniqueInput
-  ): Promise<FermentationDayDatum[]> {
-    const query = plainToClass(FermentationDayDatumFindManyArgs, request.query);
-    const results = await this.service.findDailyData(params.id, {
-      ...query,
-      select: {
-        acid: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        balling: true,
-        createdAt: true,
-        day: true,
-        dryInches: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        pH: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        temperature: true,
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/dailyData")
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "update",
-    possession: "any",
-  })
-  async connectDailyData(
-    @common.Param() params: FermentationChemistryWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      dailyData: {
-        connect: body,
-      },
-    };
-    await this.service.updateFermentationChemistry({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/dailyData")
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "update",
-    possession: "any",
-  })
-  async updateDailyData(
-    @common.Param() params: FermentationChemistryWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      dailyData: {
-        set: body,
-      },
-    };
-    await this.service.updateFermentationChemistry({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/dailyData")
-  @UseRoles({
-    resource: "FermentationChemistry",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectDailyData(
-    @common.Param() params: FermentationChemistryWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      dailyData: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateFermentationChemistry({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 }

@@ -30,8 +30,6 @@ import { OperationWhereUniqueInput } from "./OperationWhereUniqueInput";
 import { Type } from "class-transformer";
 import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./EquipmentPhaseCreateNestedManyWithoutOperationsInput";
 import { FermentationChemistryCreateNestedManyWithoutOperationsInput } from "./FermentationChemistryCreateNestedManyWithoutOperationsInput";
-import { FermentationDayDatumCreateNestedManyWithoutOperationsInput } from "./FermentationDayDatumCreateNestedManyWithoutOperationsInput";
-import { FermentationSettingDatumCreateNestedManyWithoutOperationsInput } from "./FermentationSettingDatumCreateNestedManyWithoutOperationsInput";
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
 import { MashingDatumCreateNestedManyWithoutOperationsInput } from "./MashingDatumCreateNestedManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
@@ -134,30 +132,6 @@ class OperationCreateInput {
     nullable: true,
   })
   fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutOperationsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => FermentationDayDatumCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutOperationsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatumCreateNestedManyWithoutOperationsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatumCreateNestedManyWithoutOperationsInput)
-  @IsOptional()
-  @Field(() => FermentationSettingDatumCreateNestedManyWithoutOperationsInput, {
-    nullable: true,
-  })
-  fermentationSettingData?: FermentationSettingDatumCreateNestedManyWithoutOperationsInput;
 
   @ApiProperty({
     required: false,

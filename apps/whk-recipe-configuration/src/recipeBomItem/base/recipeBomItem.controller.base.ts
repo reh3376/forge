@@ -29,6 +29,9 @@ import { RecipeBomItemUpdateInput } from "./RecipeBomItemUpdateInput";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
+import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
+import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -107,11 +110,8 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {
@@ -169,11 +169,8 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {
@@ -230,11 +227,8 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {
@@ -329,11 +323,8 @@ export class RecipeBomItemControllerBase {
             },
           },
 
-          lot: true,
           operation: true,
-          operationIndex: true,
           quantity: true,
-          quantityActual: true,
 
           recipeBoms: {
             select: {
@@ -398,11 +389,8 @@ export class RecipeBomItemControllerBase {
             },
           },
 
-          lot: true,
           operation: true,
-          operationIndex: true,
           quantity: true,
-          quantityActual: true,
 
           recipeBoms: {
             select: {
@@ -533,6 +521,117 @@ export class RecipeBomItemControllerBase {
   ): Promise<void> {
     const data = {
       mashingProtocolSteps: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateRecipeBomItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBomActuals")
+  @ApiNestedQuery(RecipeBomActualFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomActual",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomActuals(
+    @common.Req() request: Request,
+    @common.Param() params: RecipeBomItemWhereUniqueInput
+  ): Promise<RecipeBomActual[]> {
+    const query = plainToClass(RecipeBomActualFindManyArgs, request.query);
+    const results = await this.service.findRecipeBomActuals(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeBomItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+        value: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBomActuals")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBomActuals(
+    @common.Param() params: RecipeBomItemWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        connect: body,
+      },
+    };
+    await this.service.updateRecipeBomItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBomActuals")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBomActuals(
+    @common.Param() params: RecipeBomItemWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        set: body,
+      },
+    };
+    await this.service.updateRecipeBomItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBomActuals")
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomItem",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBomActuals(
+    @common.Param() params: RecipeBomItemWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
         disconnect: body,
       },
     };

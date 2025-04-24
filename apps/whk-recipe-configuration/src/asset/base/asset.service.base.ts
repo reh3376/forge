@@ -16,7 +16,6 @@ import {
   Asset as PrismaAsset,
   Batch as PrismaBatch,
   FermentationChemistry as PrismaFermentationChemistry,
-  FermentationDayDatum as PrismaFermentationDayDatum,
   Inventory as PrismaInventory,
   InventoryLog as PrismaInventoryLog,
   InventoryTransfer as PrismaInventoryTransfer,
@@ -80,17 +79,6 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .fermentationChemistries(args);
-  }
-
-  async findFermentationDayData(
-    parentId: string,
-    args: Prisma.FermentationDayDatumFindManyArgs
-  ): Promise<PrismaFermentationDayDatum[]> {
-    return this.prisma.asset
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .fermentationDayData(args);
   }
 
   async findInventories(

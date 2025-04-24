@@ -19,7 +19,6 @@ import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilte
 import { AssetListRelationFilter } from "./AssetListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
-import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
@@ -135,18 +134,6 @@ class AssetWhereInput {
     nullable: true,
   })
   fermentationChemistries?: FermentationChemistryListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationDayDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

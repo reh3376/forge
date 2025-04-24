@@ -21,8 +21,6 @@ import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { EquipmentPhaseListRelationFilter } from "../../equipmentPhase/base/EquipmentPhaseListRelationFilter";
 import { FermentationChemistryListRelationFilter } from "../../fermentationChemistry/base/FermentationChemistryListRelationFilter";
-import { FermentationDayDatumListRelationFilter } from "../../fermentationDayDatum/base/FermentationDayDatumListRelationFilter";
-import { FermentationSettingDatumListRelationFilter } from "../../fermentationSettingDatum/base/FermentationSettingDatumListRelationFilter";
 import { OperationListRelationFilter } from "./OperationListRelationFilter";
 import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { EnumOperationName } from "./EnumOperationName";
@@ -144,30 +142,6 @@ class OperationWhereInput {
     nullable: true,
   })
   fermentationChemistries?: FermentationChemistryListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationDayDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => FermentationSettingDatumListRelationFilter, {
-    nullable: true,
-  })
-  fermentationSettingData?: FermentationSettingDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

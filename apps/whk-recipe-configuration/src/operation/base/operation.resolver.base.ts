@@ -29,10 +29,6 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { FermentationSettingDatumFindManyArgs } from "../../fermentationSettingDatum/base/FermentationSettingDatumFindManyArgs";
-import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
 import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
@@ -193,53 +189,6 @@ export class OperationResolverBase {
     @graphql.Args() args: FermentationChemistryFindManyArgs
   ): Promise<FermentationChemistry[]> {
     const results = await this.service.findFermentationChemistries(
-      parent.id,
-      args
-    );
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationDayDatum], {
-    name: "fermentationDayData",
-  })
-  @UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationDayData(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: FermentationDayDatumFindManyArgs
-  ): Promise<FermentationDayDatum[]> {
-    const results = await this.service.findFermentationDayData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [FermentationSettingDatum], {
-    name: "fermentationSettingData",
-  })
-  @UseRoles({
-    resource: "FermentationSettingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationSettingData(
-    @graphql.Parent() parent: Operation,
-    @graphql.Args() args: FermentationSettingDatumFindManyArgs
-  ): Promise<FermentationSettingDatum[]> {
-    const results = await this.service.findFermentationSettingData(
       parent.id,
       args
     );

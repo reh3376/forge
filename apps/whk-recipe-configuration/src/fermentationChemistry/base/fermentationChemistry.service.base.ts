@@ -14,11 +14,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   FermentationChemistry as PrismaFermentationChemistry,
-  FermentationDayDatum as PrismaFermentationDayDatum,
   Asset as PrismaAsset,
   Operation as PrismaOperation,
   ProductionOrder as PrismaProductionOrder,
-  FermentationSettingDatum as PrismaFermentationSettingDatum,
 } from "@prisma/client";
 
 export class FermentationChemistryServiceBase {
@@ -56,17 +54,6 @@ export class FermentationChemistryServiceBase {
     return this.prisma.fermentationChemistry.delete(args);
   }
 
-  async findDailyData(
-    parentId: string,
-    args: Prisma.FermentationDayDatumFindManyArgs
-  ): Promise<PrismaFermentationDayDatum[]> {
-    return this.prisma.fermentationChemistry
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .dailyData(args);
-  }
-
   async getAsset(parentId: string): Promise<PrismaAsset | null> {
     return this.prisma.fermentationChemistry
       .findUnique({
@@ -91,15 +78,5 @@ export class FermentationChemistryServiceBase {
         where: { id: parentId },
       })
       .productionOrder();
-  }
-
-  async getSettingData(
-    parentId: string
-  ): Promise<PrismaFermentationSettingDatum | null> {
-    return this.prisma.fermentationChemistry
-      .findUnique({
-        where: { id: parentId },
-      })
-      .settingData();
   }
 }

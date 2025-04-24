@@ -21,10 +21,8 @@ import {
 } from "class-validator";
 import { Asset } from "../../asset/base/Asset";
 import { Type } from "class-transformer";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Operation } from "../../operation/base/Operation";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
-import { FermentationSettingDatum } from "../../fermentationSettingDatum/base/FermentationSettingDatum";
 
 @ObjectType()
 class FermentationChemistry {
@@ -68,15 +66,6 @@ class FermentationChemistry {
   createdAt!: Date;
 
   @ApiProperty({
-    required: false,
-    type: () => [FermentationDayDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
-  @IsOptional()
-  dailyData?: Array<FermentationDayDatum>;
-
-  @ApiProperty({
     required: true,
     type: String,
   })
@@ -100,15 +89,6 @@ class FermentationChemistry {
   @Type(() => ProductionOrder)
   @IsOptional()
   productionOrder?: ProductionOrder | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationSettingDatum,
-  })
-  @ValidateNested()
-  @Type(() => FermentationSettingDatum)
-  @IsOptional()
-  settingData?: FermentationSettingDatum | null;
 
   @ApiProperty({
     required: true,

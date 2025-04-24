@@ -29,7 +29,6 @@ import { BatchCreateNestedManyWithoutAssetsInput } from "./BatchCreateNestedMany
 import { Type } from "class-transformer";
 import { AssetCreateNestedManyWithoutAssetsInput } from "./AssetCreateNestedManyWithoutAssetsInput";
 import { FermentationChemistryCreateNestedManyWithoutAssetsInput } from "./FermentationChemistryCreateNestedManyWithoutAssetsInput";
-import { FermentationDayDatumCreateNestedManyWithoutAssetsInput } from "./FermentationDayDatumCreateNestedManyWithoutAssetsInput";
 import { InventoryCreateNestedManyWithoutAssetsInput } from "./InventoryCreateNestedManyWithoutAssetsInput";
 import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCreateNestedManyWithoutAssetsInput";
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
@@ -122,18 +121,6 @@ class AssetCreateInput {
     nullable: true,
   })
   fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutAssetsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumCreateNestedManyWithoutAssetsInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput)
-  @IsOptional()
-  @Field(() => FermentationDayDatumCreateNestedManyWithoutAssetsInput, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
