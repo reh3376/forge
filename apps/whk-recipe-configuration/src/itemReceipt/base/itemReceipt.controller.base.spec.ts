@@ -18,6 +18,7 @@ import { ItemReceiptService } from "../itemReceipt.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  comments: "exampleComments",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   driver: "exampleDriver",
@@ -31,10 +32,12 @@ const CREATE_INPUT = {
   units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
+  vendorLoadId: "exampleVendorLoadId",
   weighIn: 42.424242424,
   weighOut: 42.424242424,
 };
 const CREATE_RESULT = {
+  comments: "exampleComments",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   driver: "exampleDriver",
@@ -48,11 +51,13 @@ const CREATE_RESULT = {
   units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
+  vendorLoadId: "exampleVendorLoadId",
   weighIn: 42.424242424,
   weighOut: 42.424242424,
 };
 const FIND_MANY_RESULT = [
   {
+    comments: "exampleComments",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     driver: "exampleDriver",
@@ -66,11 +71,13 @@ const FIND_MANY_RESULT = [
     units: "exampleUnits",
     updatedAt: new Date(),
     updatedBy: "exampleUpdatedBy",
+    vendorLoadId: "exampleVendorLoadId",
     weighIn: 42.424242424,
     weighOut: 42.424242424,
   },
 ];
 const FIND_ONE_RESULT = {
+  comments: "exampleComments",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   driver: "exampleDriver",
@@ -84,6 +91,7 @@ const FIND_ONE_RESULT = {
   units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: "exampleUpdatedBy",
+  vendorLoadId: "exampleVendorLoadId",
   weighIn: 42.424242424,
   weighOut: 42.424242424,
 };

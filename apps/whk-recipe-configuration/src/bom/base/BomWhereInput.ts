@@ -19,7 +19,6 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 
@@ -180,18 +179,6 @@ class BomWhereInput {
     nullable: true,
   })
   item?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashingDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumListRelationFilter;
 
   @ApiProperty({
     required: false,

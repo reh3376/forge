@@ -72,7 +72,7 @@ class RecipeBomActualOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  recipeBomId?: SortOrder;
+  recipeBomItemId?: SortOrder;
 
   @ApiProperty({
     required: false,

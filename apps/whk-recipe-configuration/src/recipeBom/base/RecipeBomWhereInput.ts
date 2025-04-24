@@ -14,13 +14,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { MashingDatumListRelationFilter } from "../../mashingDatum/base/MashingDatumListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { RecipeBomListRelationFilter } from "./RecipeBomListRelationFilter";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
-import { RecipeBomActualListRelationFilter } from "../../recipeBomActual/base/RecipeBomActualListRelationFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
@@ -36,18 +34,6 @@ class RecipeBomWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumListRelationFilter)
-  @IsOptional()
-  @Field(() => MashingDatumListRelationFilter, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -107,18 +93,6 @@ class RecipeBomWhereInput {
     nullable: true,
   })
   recipe?: RecipeListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomActualListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomActualListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeBomActualListRelationFilter, {
-    nullable: true,
-  })
-  recipeBomActuals?: RecipeBomActualListRelationFilter;
 
   @ApiProperty({
     required: false,

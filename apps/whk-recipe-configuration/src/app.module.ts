@@ -41,9 +41,6 @@ import { ItemReceiptModule } from "./itemReceipt/itemReceipt.module";
 import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
-import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
-import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
-import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
 import { BatchModule } from "./batch/batch.module";
 import { VendorModule } from "./vendor/vendor.module";
 import { InventoryModule } from "./inventory/inventory.module";
@@ -56,7 +53,6 @@ import { MashingProtocolModule } from "./mashingProtocol/mashingProtocol.module"
 import { MashingProtocolStepModule } from "./mashingProtocolStep/mashingProtocolStep.module";
 import { RecipeBomModule } from "./recipeBom/recipeBom.module";
 import { ProductionOrderRecipeInstanceModule } from "./productionOrderRecipeInstance/productionOrderRecipeInstance.module";
-import { MashingDatumModule } from "./mashingDatum/mashingDatum.module";
 import { AdditiveActualModule } from "./additiveActual/additiveActual.module";
 import { UnsConfigurationModule } from "./unsConfiguration/unsConfiguration.module";
 import { UnsBrokerConfigurationModule } from "./unsBrokerConfiguration/unsBrokerConfiguration.module";
@@ -114,9 +110,6 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     LotModule,
     BomItemModule,
     UnitModule,
-    FermentationChemistryModule,
-    FermentationSettingDatumModule,
-    FermentationDayDatumModule,
     BatchModule,
     VendorModule,
     InventoryModule,
@@ -129,7 +122,6 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     MashingProtocolStepModule,
     RecipeBomModule,
     ProductionOrderRecipeInstanceModule,
-    MashingDatumModule,
     AdditiveActualModule,
     UnsConfigurationModule,
     UnsBrokerConfigurationModule,

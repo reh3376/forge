@@ -138,17 +138,6 @@ class MashingProtocolStepWhereInput {
 
   @ApiProperty({
     required: false,
-    type: BooleanNullableFilter,
-  })
-  @Type(() => BooleanNullableFilter)
-  @IsOptional()
-  @Field(() => BooleanNullableFilter, {
-    nullable: true,
-  })
-  isClassDefinition?: BooleanNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => MashingProtocolWhereUniqueInput,
   })
   @ValidateNested()

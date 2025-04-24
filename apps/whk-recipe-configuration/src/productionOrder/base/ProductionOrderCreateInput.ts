@@ -29,8 +29,6 @@ import {
 
 import { Type } from "class-transformer";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { FermentationChemistryCreateNestedManyWithoutProductionOrdersInput } from "./FermentationChemistryCreateNestedManyWithoutProductionOrdersInput";
-import { FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput } from "./FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutProductionOrdersInput } from "./LotCreateNestedManyWithoutProductionOrdersInput";
 import { ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput";
@@ -186,38 +184,6 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   estimatedPGsPerBushel?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(
-    () => FermentationChemistryCreateNestedManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  fermentationChemistries?: FermentationChemistryCreateNestedManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () =>
-      FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(
-    () => FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput,
-    {
-      nullable: true,
-    }
-  )
-  fermentationDayData?: FermentationDayDatumCreateNestedManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,
