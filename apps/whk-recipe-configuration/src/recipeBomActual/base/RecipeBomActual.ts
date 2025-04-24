@@ -22,7 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
-import { RecipeBom } from "../../recipeBom/base/RecipeBom";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
 @ObjectType()
 class RecipeBomActual {
@@ -62,11 +62,11 @@ class RecipeBomActual {
 
   @ApiProperty({
     required: true,
-    type: () => RecipeBom,
+    type: () => RecipeBomItem,
   })
   @ValidateNested()
-  @Type(() => RecipeBom)
-  recipeBom?: RecipeBom;
+  @Type(() => RecipeBomItem)
+  recipeBomItem?: RecipeBomItem;
 
   @ApiProperty({
     required: true,

@@ -29,7 +29,6 @@ import { EnumAssetAssetType } from "./EnumAssetAssetType";
 import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
@@ -122,15 +121,6 @@ class Asset {
   @Type(() => FermentationChemistry)
   @IsOptional()
   fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationDayDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
-  @IsOptional()
-  fermentationDayData?: Array<FermentationDayDatum>;
 
   @ApiProperty({
     required: false,

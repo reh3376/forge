@@ -28,6 +28,8 @@ import { UpdateRecipeBomItemArgs } from "./UpdateRecipeBomItemArgs";
 import { DeleteRecipeBomItemArgs } from "./DeleteRecipeBomItemArgs";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
+import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 import { Item } from "../../item/base/Item";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { RecipeBomItemService } from "../recipeBomItem.service";
@@ -215,6 +217,26 @@ export class RecipeBomItemResolverBase {
       parent.id,
       args
     );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeBomActual], { name: "recipeBomActuals" })
+  @nestAccessControl.UseRoles({
+    resource: "RecipeBomActual",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomActuals(
+    @graphql.Parent() parent: RecipeBomItem,
+    @graphql.Args() args: RecipeBomActualFindManyArgs
+  ): Promise<RecipeBomActual[]> {
+    const results = await this.service.findRecipeBomActuals(parent.id, args);
 
     if (!results) {
       return [];

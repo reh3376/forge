@@ -480,11 +480,8 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
-        lot: true,
         operation: true,
-        operationIndex: true,
         quantity: true,
-        quantityActual: true,
 
         recipeBoms: {
           select: {

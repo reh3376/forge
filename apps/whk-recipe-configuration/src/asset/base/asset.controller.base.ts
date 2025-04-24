@@ -32,9 +32,6 @@ import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { FermentationChemistryFindManyArgs } from "../../fermentationChemistry/base/FermentationChemistryFindManyArgs";
 import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
 import { FermentationChemistryWhereUniqueInput } from "../../fermentationChemistry/base/FermentationChemistryWhereUniqueInput";
-import { FermentationDayDatumFindManyArgs } from "../../fermentationDayDatum/base/FermentationDayDatumFindManyArgs";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
-import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
 import { InventoryFindManyArgs } from "../../inventory/base/InventoryFindManyArgs";
 import { Inventory } from "../../inventory/base/Inventory";
 import { InventoryWhereUniqueInput } from "../../inventory/base/InventoryWhereUniqueInput";
@@ -567,12 +564,6 @@ export class AssetControllerBase {
           },
         },
 
-        settingData: {
-          select: {
-            id: true,
-          },
-        },
-
         updatedAt: true,
       },
     });
@@ -640,138 +631,6 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       fermentationChemistries: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateAsset({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/fermentationDayData")
-  @ApiNestedQuery(FermentationDayDatumFindManyArgs)
-  @UseRoles({
-    resource: "FermentationDayDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findFermentationDayData(
-    @common.Req() request: Request,
-    @common.Param() params: AssetWhereUniqueInput
-  ): Promise<FermentationDayDatum[]> {
-    const query = plainToClass(FermentationDayDatumFindManyArgs, request.query);
-    const results = await this.service.findFermentationDayData(params.id, {
-      ...query,
-      select: {
-        acid: true,
-
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        balling: true,
-        createdAt: true,
-        day: true,
-        dryInches: true,
-
-        fermentationChemistry: {
-          select: {
-            id: true,
-          },
-        },
-
-        fermenterNumber: true,
-        id: true,
-        loggedBy: true,
-        lotId: true,
-
-        operation: {
-          select: {
-            id: true,
-          },
-        },
-
-        pH: true,
-
-        productionOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        temperature: true,
-        updatedAt: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/fermentationDayData")
-  @UseRoles({
-    resource: "Asset",
-    action: "update",
-    possession: "any",
-  })
-  async connectFermentationDayData(
-    @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationDayData: {
-        connect: body,
-      },
-    };
-    await this.service.updateAsset({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/fermentationDayData")
-  @UseRoles({
-    resource: "Asset",
-    action: "update",
-    possession: "any",
-  })
-  async updateFermentationDayData(
-    @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationDayData: {
-        set: body,
-      },
-    };
-    await this.service.updateAsset({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/fermentationDayData")
-  @UseRoles({
-    resource: "Asset",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectFermentationDayData(
-    @common.Param() params: AssetWhereUniqueInput,
-    @common.Body() body: FermentationDayDatumWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      fermentationDayData: {
         disconnect: body,
       },
     };

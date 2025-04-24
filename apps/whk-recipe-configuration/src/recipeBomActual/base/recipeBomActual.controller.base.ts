@@ -61,8 +61,8 @@ export class RecipeBomActualControllerBase {
             }
           : undefined,
 
-        recipeBom: {
-          connect: data.recipeBom,
+        recipeBomItem: {
+          connect: data.recipeBomItem,
         },
       },
       select: {
@@ -76,7 +76,7 @@ export class RecipeBomActualControllerBase {
           },
         },
 
-        recipeBom: {
+        recipeBomItem: {
           select: {
             id: true,
           },
@@ -118,7 +118,7 @@ export class RecipeBomActualControllerBase {
           },
         },
 
-        recipeBom: {
+        recipeBomItem: {
           select: {
             id: true,
           },
@@ -159,7 +159,7 @@ export class RecipeBomActualControllerBase {
           },
         },
 
-        recipeBom: {
+        recipeBomItem: {
           select: {
             id: true,
           },
@@ -209,8 +209,8 @@ export class RecipeBomActualControllerBase {
               }
             : undefined,
 
-          recipeBom: {
-            connect: data.recipeBom,
+          recipeBomItem: {
+            connect: data.recipeBomItem,
           },
         },
         select: {
@@ -224,7 +224,7 @@ export class RecipeBomActualControllerBase {
             },
           },
 
-          recipeBom: {
+          recipeBomItem: {
             select: {
               id: true,
             },
@@ -273,7 +273,7 @@ export class RecipeBomActualControllerBase {
             },
           },
 
-          recipeBom: {
+          recipeBomItem: {
             select: {
               id: true,
             },

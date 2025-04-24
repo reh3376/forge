@@ -17,7 +17,6 @@ import {
   MashingDatum as PrismaMashingDatum,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Recipe as PrismaRecipe,
-  RecipeBomActual as PrismaRecipeBomActual,
   RecipeBomItem as PrismaRecipeBomItem,
 } from "@prisma/client";
 
@@ -98,17 +97,6 @@ export class RecipeBomServiceBase {
         where: { id: parentId },
       })
       .recipe(args);
-  }
-
-  async findRecipeBomActuals(
-    parentId: string,
-    args: Prisma.RecipeBomActualFindManyArgs
-  ): Promise<PrismaRecipeBomActual[]> {
-    return this.prisma.recipeBom
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .recipeBomActuals(args);
   }
 
   async findRecipeBomITem(

@@ -42,8 +42,6 @@ import { LotModule } from "./lot/lot.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
 import { FermentationChemistryModule } from "./fermentationChemistry/fermentationChemistry.module";
-import { FermentationSettingDatumModule } from "./fermentationSettingDatum/fermentationSettingDatum.module";
-import { FermentationDayDatumModule } from "./fermentationDayDatum/fermentationDayDatum.module";
 import { BatchModule } from "./batch/batch.module";
 import { VendorModule } from "./vendor/vendor.module";
 import { InventoryModule } from "./inventory/inventory.module";
@@ -115,8 +113,6 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     BomItemModule,
     UnitModule,
     FermentationChemistryModule,
-    FermentationSettingDatumModule,
-    FermentationDayDatumModule,
     BatchModule,
     VendorModule,
     InventoryModule,
