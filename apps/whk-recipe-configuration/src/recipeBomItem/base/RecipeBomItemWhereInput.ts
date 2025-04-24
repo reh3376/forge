@@ -20,8 +20,8 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
-import { IntFilter } from "../../util/IntFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
+import { RecipeBomActualListRelationFilter } from "../../recipeBomActual/base/RecipeBomActualListRelationFilter";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
 import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
@@ -110,17 +110,6 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  lot?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => MashingProtocolStepListRelationFilter,
   })
   @ValidateNested()
@@ -148,17 +137,6 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: IntFilter,
-  })
-  @Type(() => IntFilter)
-  @IsOptional()
-  @Field(() => IntFilter, {
-    nullable: true,
-  })
-  operationIndex?: IntFilter;
-
-  @ApiProperty({
-    required: false,
     type: FloatNullableFilter,
   })
   @Type(() => FloatNullableFilter)
@@ -170,14 +148,15 @@ class RecipeBomItemWhereInput {
 
   @ApiProperty({
     required: false,
-    type: FloatNullableFilter,
+    type: () => RecipeBomActualListRelationFilter,
   })
-  @Type(() => FloatNullableFilter)
+  @ValidateNested()
+  @Type(() => RecipeBomActualListRelationFilter)
   @IsOptional()
-  @Field(() => FloatNullableFilter, {
+  @Field(() => RecipeBomActualListRelationFilter, {
     nullable: true,
   })
-  quantityActual?: FloatNullableFilter;
+  recipeBomActuals?: RecipeBomActualListRelationFilter;
 
   @ApiProperty({
     required: false,

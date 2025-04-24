@@ -22,7 +22,6 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { MashingDatumCreateNestedManyWithoutBomsInput } from "./MashingDatumCreateNestedManyWithoutBomsInput";
 import { ProductionOrderCreateNestedManyWithoutBomsInput } from "./ProductionOrderCreateNestedManyWithoutBomsInput";
 import { UnitProcedureCreateNestedManyWithoutBomsInput } from "./UnitProcedureCreateNestedManyWithoutBomsInput";
 
@@ -168,18 +167,6 @@ class BomCreateInput {
   @Type(() => ItemWhereUniqueInput)
   @Field(() => ItemWhereUniqueInput)
   item!: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumCreateNestedManyWithoutBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumCreateNestedManyWithoutBomsInput)
-  @IsOptional()
-  @Field(() => MashingDatumCreateNestedManyWithoutBomsInput, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumCreateNestedManyWithoutBomsInput;
 
   @ApiProperty({
     required: false,

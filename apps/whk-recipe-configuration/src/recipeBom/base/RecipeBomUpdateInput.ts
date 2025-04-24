@@ -11,36 +11,22 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { MashingDatumUpdateManyWithoutRecipeBomsInput } from "./MashingDatumUpdateManyWithoutRecipeBomsInput";
 import {
-  ValidateNested,
-  IsOptional,
   IsBoolean,
+  IsOptional,
+  ValidateNested,
   IsString,
   MaxLength,
 } from "class-validator";
-import { Type } from "class-transformer";
 import { RecipeBomUpdateManyWithoutRecipeBomsInput } from "./RecipeBomUpdateManyWithoutRecipeBomsInput";
+import { Type } from "class-transformer";
 import { RecipeBomWhereUniqueInput } from "./RecipeBomWhereUniqueInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutRecipeBomsInput";
 import { RecipeUpdateManyWithoutRecipeBomsInput } from "./RecipeUpdateManyWithoutRecipeBomsInput";
-import { RecipeBomActualUpdateManyWithoutRecipeBomsInput } from "./RecipeBomActualUpdateManyWithoutRecipeBomsInput";
 import { RecipeBomItemUpdateManyWithoutRecipeBomsInput } from "./RecipeBomItemUpdateManyWithoutRecipeBomsInput";
 
 @InputType()
 class RecipeBomUpdateInput {
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumUpdateManyWithoutRecipeBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumUpdateManyWithoutRecipeBomsInput)
-  @IsOptional()
-  @Field(() => MashingDatumUpdateManyWithoutRecipeBomsInput, {
-    nullable: true,
-  })
-  mashingData?: MashingDatumUpdateManyWithoutRecipeBomsInput;
-
   @ApiProperty({
     required: false,
     type: Boolean,
@@ -99,18 +85,6 @@ class RecipeBomUpdateInput {
     nullable: true,
   })
   recipe?: RecipeUpdateManyWithoutRecipeBomsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeBomActualUpdateManyWithoutRecipeBomsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeBomActualUpdateManyWithoutRecipeBomsInput)
-  @IsOptional()
-  @Field(() => RecipeBomActualUpdateManyWithoutRecipeBomsInput, {
-    nullable: true,
-  })
-  recipeBomActuals?: RecipeBomActualUpdateManyWithoutRecipeBomsInput;
 
   @ApiProperty({
     required: false,

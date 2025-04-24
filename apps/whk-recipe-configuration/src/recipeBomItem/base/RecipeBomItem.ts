@@ -20,16 +20,15 @@ import {
   MaxLength,
   IsBoolean,
   IsEnum,
-  IsInt,
-  Min,
-  Max,
   IsNumber,
+  Max,
 } from "class-validator";
 
 import { Type } from "class-transformer";
 import { Item } from "../../item/base/Item";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 
 @ObjectType()
@@ -111,18 +110,6 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lot!: string | null;
-
-  @ApiProperty({
-    required: false,
     type: () => [MashingProtocolStep],
   })
   @ValidateNested()
@@ -145,16 +132,6 @@ class RecipeBomItem {
     | "Processing01";
 
   @ApiProperty({
-    required: true,
-    type: Number,
-  })
-  @IsInt()
-  @Min(-99)
-  @Max(9999)
-  @Field(() => Number)
-  operationIndex!: number;
-
-  @ApiProperty({
     required: false,
     type: Number,
   })
@@ -168,15 +145,12 @@ class RecipeBomItem {
 
   @ApiProperty({
     required: false,
-    type: Number,
+    type: () => [RecipeBomActual],
   })
-  @IsNumber()
-  @Max(99999999999)
+  @ValidateNested()
+  @Type(() => RecipeBomActual)
   @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  quantityActual!: number | null;
+  recipeBomActuals?: Array<RecipeBomActual>;
 
   @ApiProperty({
     required: false,

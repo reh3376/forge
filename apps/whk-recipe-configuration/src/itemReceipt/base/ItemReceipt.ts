@@ -13,10 +13,10 @@ import { ObjectType, Field, Float } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 
 import {
-  IsDate,
   IsString,
   MaxLength,
   IsOptional,
+  IsDate,
   ValidateNested,
   IsInt,
   Max,
@@ -39,6 +39,18 @@ import { Asset } from "../../asset/base/Asset";
 
 @ObjectType()
 class ItemReceipt {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  comments!: string | null;
+
   @ApiProperty({
     required: true,
   })
@@ -163,7 +175,15 @@ class ItemReceipt {
   @Field(() => EnumItemReceiptStatus, {
     nullable: true,
   })
-  status?: "InProgress" | "Complete" | "Rejected" | "Hold" | null;
+  status?:
+    | "InProgress"
+    | "Complete"
+    | "Rejected"
+    | "Hold"
+    | "Flagged"
+    | "Confirmed"
+    | "Denied"
+    | null;
 
   @ApiProperty({
     required: false,
@@ -234,6 +254,18 @@ class ItemReceipt {
     nullable: true,
   })
   updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  vendorLoadId!: string | null;
 
   @ApiProperty({
     required: false,

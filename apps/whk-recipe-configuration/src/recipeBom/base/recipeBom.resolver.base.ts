@@ -25,17 +25,15 @@ import { RecipeBomFindManyArgs } from "./RecipeBomFindManyArgs";
 import { RecipeBomFindUniqueArgs } from "./RecipeBomFindUniqueArgs";
 import { CreateRecipeBomArgs } from "./CreateRecipeBomArgs";
 import { UpdateRecipeBomArgs } from "./UpdateRecipeBomArgs";
-import { MashingDatumFindManyArgs } from "../../mashingDatum/base/MashingDatumFindManyArgs";
-import { MashingDatum } from "../../mashingDatum/base/MashingDatum";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
-import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
-import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomService } from "../recipeBom.service";
+import { RecipeBomActualFindManyArgs } from "src/recipeBomActual/base/RecipeBomActualFindManyArgs";
+import { RecipeBomActual } from "@prisma/client";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeBom)
 export class RecipeBomResolverBase {
@@ -159,26 +157,6 @@ export class RecipeBomResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [MashingDatum], { name: "mashingData" })
-  @UseRoles({
-    resource: "MashingDatum",
-    action: "read",
-    possession: "any",
-  })
-  async findMashingData(
-    @graphql.Parent() parent: RecipeBom,
-    @graphql.Args() args: MashingDatumFindManyArgs
-  ): Promise<MashingDatum[]> {
-    const results = await this.service.findMashingData(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [RecipeBom], { name: "masterInstances" })
   @UseRoles({
     resource: "RecipeBom",
@@ -235,26 +213,6 @@ export class RecipeBomResolverBase {
     @graphql.Args() args: RecipeFindManyArgs
   ): Promise<Recipe[]> {
     const results = await this.service.findRecipe(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [RecipeBomActual], { name: "recipeBomActuals" })
-  @UseRoles({
-    resource: "RecipeBomActual",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipeBomActuals(
-    @graphql.Parent() parent: RecipeBom,
-    @graphql.Args() args: RecipeBomActualFindManyArgs
-  ): Promise<RecipeBomActual[]> {
-    const results = await this.service.findRecipeBomActuals(parent.id, args);
 
     if (!results) {
       return [];

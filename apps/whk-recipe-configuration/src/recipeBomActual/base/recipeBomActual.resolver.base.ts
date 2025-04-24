@@ -27,7 +27,7 @@ import { CreateRecipeBomActualArgs } from "./CreateRecipeBomActualArgs";
 import { UpdateRecipeBomActualArgs } from "./UpdateRecipeBomActualArgs";
 import { DeleteRecipeBomActualArgs } from "./DeleteRecipeBomActualArgs";
 import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
-import { RecipeBom } from "../../recipeBom/base/RecipeBom";
+import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomActualService } from "../recipeBomActual.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeBomActual)
@@ -103,8 +103,8 @@ export class RecipeBomActualResolverBase {
             }
           : undefined,
 
-        recipeBom: {
-          connect: args.data.recipeBom,
+        recipeBomItem: {
+          connect: args.data.recipeBomItem,
         },
       },
     });
@@ -132,8 +132,8 @@ export class RecipeBomActualResolverBase {
               }
             : undefined,
 
-          recipeBom: {
-            connect: args.data.recipeBom,
+          recipeBomItem: {
+            connect: args.data.recipeBomItem,
           },
         },
       });
@@ -190,19 +190,19 @@ export class RecipeBomActualResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => RecipeBom, {
+  @graphql.ResolveField(() => RecipeBomItem, {
     nullable: true,
-    name: "recipeBom",
+    name: "recipeBomItem",
   })
   @nestAccessControl.UseRoles({
-    resource: "RecipeBom",
+    resource: "RecipeBomItem",
     action: "read",
     possession: "any",
   })
-  async getRecipeBom(
+  async getRecipeBomItem(
     @graphql.Parent() parent: RecipeBomActual
-  ): Promise<RecipeBom | null> {
-    const result = await this.service.getRecipeBom(parent.id);
+  ): Promise<RecipeBomItem | null> {
+    const result = await this.service.getRecipeBomItem(parent.id);
 
     if (!result) {
       return null;

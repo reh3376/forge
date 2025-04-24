@@ -15,7 +15,6 @@ import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
-import { MashingDatumWhereUniqueInput } from "../../mashingDatum/base/MashingDatumWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 
 @InputType()
@@ -64,18 +63,6 @@ class AdditiveActualWhereInput {
     nullable: true,
   })
   lotNumber?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => MashingDatumWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => MashingDatumWhereUniqueInput)
-  @IsOptional()
-  @Field(() => MashingDatumWhereUniqueInput, {
-    nullable: true,
-  })
-  mashingDatum?: MashingDatumWhereUniqueInput;
 
   @ApiProperty({
     required: false,

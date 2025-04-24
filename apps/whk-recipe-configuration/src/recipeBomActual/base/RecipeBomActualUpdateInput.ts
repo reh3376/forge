@@ -21,7 +21,7 @@ import {
 } from "class-validator";
 import { MashingProtocolStepActualWhereUniqueInput } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualWhereUniqueInput";
 import { Type } from "class-transformer";
-import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
+import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 
 @InputType()
 class RecipeBomActualUpdateInput {
@@ -51,15 +51,15 @@ class RecipeBomActualUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeBomWhereUniqueInput,
+    type: () => RecipeBomItemWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => RecipeBomWhereUniqueInput)
+  @Type(() => RecipeBomItemWhereUniqueInput)
   @IsOptional()
-  @Field(() => RecipeBomWhereUniqueInput, {
+  @Field(() => RecipeBomItemWhereUniqueInput, {
     nullable: true,
   })
-  recipeBom?: RecipeBomWhereUniqueInput;
+  recipeBomItem?: RecipeBomItemWhereUniqueInput;
 
   @ApiProperty({
     required: false,

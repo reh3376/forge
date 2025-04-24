@@ -29,8 +29,6 @@ import {
 
 import { Type } from "class-transformer";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
-import { FermentationChemistryUpdateManyWithoutProductionOrdersInput } from "./FermentationChemistryUpdateManyWithoutProductionOrdersInput";
-import { FermentationDayDatumUpdateManyWithoutProductionOrdersInput } from "./FermentationDayDatumUpdateManyWithoutProductionOrdersInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutProductionOrdersInput } from "./LotUpdateManyWithoutProductionOrdersInput";
 import { ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutProductionOrdersInput";
@@ -195,30 +193,6 @@ class ProductionOrderUpdateInput {
     nullable: true,
   })
   estimatedPGsPerBushel?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationChemistryUpdateManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistryUpdateManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(() => FermentationChemistryUpdateManyWithoutProductionOrdersInput, {
-    nullable: true,
-  })
-  fermentationChemistries?: FermentationChemistryUpdateManyWithoutProductionOrdersInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => FermentationDayDatumUpdateManyWithoutProductionOrdersInput,
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatumUpdateManyWithoutProductionOrdersInput)
-  @IsOptional()
-  @Field(() => FermentationDayDatumUpdateManyWithoutProductionOrdersInput, {
-    nullable: true,
-  })
-  fermentationDayData?: FermentationDayDatumUpdateManyWithoutProductionOrdersInput;
 
   @ApiProperty({
     required: false,

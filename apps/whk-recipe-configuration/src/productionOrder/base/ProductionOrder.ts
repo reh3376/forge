@@ -29,8 +29,6 @@ import {
 
 import { Type } from "class-transformer";
 import { Customer } from "../../customer/base/Customer";
-import { FermentationChemistry } from "../../fermentationChemistry/base/FermentationChemistry";
-import { FermentationDayDatum } from "../../fermentationDayDatum/base/FermentationDayDatum";
 import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
@@ -156,24 +154,6 @@ class ProductionOrder {
     nullable: true,
   })
   estimatedPGsPerBushel!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationChemistry],
-  })
-  @ValidateNested()
-  @Type(() => FermentationChemistry)
-  @IsOptional()
-  fermentationChemistries?: Array<FermentationChemistry>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [FermentationDayDatum],
-  })
-  @ValidateNested()
-  @Type(() => FermentationDayDatum)
-  @IsOptional()
-  fermentationDayData?: Array<FermentationDayDatum>;
 
   @ApiProperty({
     required: false,

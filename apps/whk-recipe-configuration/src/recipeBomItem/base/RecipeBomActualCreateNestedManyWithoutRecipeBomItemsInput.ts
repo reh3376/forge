@@ -10,19 +10,19 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { InputType, Field } from "@nestjs/graphql";
-import { FermentationDayDatumWhereUniqueInput } from "../../fermentationDayDatum/base/FermentationDayDatumWhereUniqueInput";
+import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
 import { ApiProperty } from "@nestjs/swagger";
 
 @InputType()
-class FermentationDayDatumCreateNestedManyWithoutOperationsInput {
-  @Field(() => [FermentationDayDatumWhereUniqueInput], {
+class RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput {
+  @Field(() => [RecipeBomActualWhereUniqueInput], {
     nullable: true,
   })
   @ApiProperty({
     required: false,
-    type: () => [FermentationDayDatumWhereUniqueInput],
+    type: () => [RecipeBomActualWhereUniqueInput],
   })
-  connect?: Array<FermentationDayDatumWhereUniqueInput>;
+  connect?: Array<RecipeBomActualWhereUniqueInput>;
 }
 
-export { FermentationDayDatumCreateNestedManyWithoutOperationsInput as FermentationDayDatumCreateNestedManyWithoutOperationsInput };
+export { RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput as RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput };
