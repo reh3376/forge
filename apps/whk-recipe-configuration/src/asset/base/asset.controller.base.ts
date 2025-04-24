@@ -1021,6 +1021,7 @@ export class AssetControllerBase {
     const results = await this.service.findItemReceipts(params.id, {
       ...query,
       select: {
+        comments: true,
         createdAt: true,
         createdBy: true,
         driver: true,
@@ -1057,6 +1058,7 @@ export class AssetControllerBase {
         units: true,
         updatedAt: true,
         updatedBy: true,
+        vendorLoadId: true,
         weighIn: true,
         weighOut: true,
       },
