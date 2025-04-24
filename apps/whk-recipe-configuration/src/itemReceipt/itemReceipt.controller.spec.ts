@@ -108,6 +108,8 @@ describe("ItemReceiptController", () => {
         createdBy: "user-123",
         driver: "driver-123",
         units: "kg",
+        comments: null,
+        vendorLoadId: null
       };
       jest
         .spyOn(service, "createItemReceipt")
@@ -175,6 +177,8 @@ describe("ItemReceiptController", () => {
           weighIn: null,
           weighOut: null,
           units: "kg",
+          comments: null,
+          vendorLoadId: null
         },
         {
           id: "test-id-2",
@@ -198,6 +202,8 @@ describe("ItemReceiptController", () => {
           weighIn: null,
           weighOut: null,
           units: "kg",
+          comments: null,
+          vendorLoadId: null
         },
       ];
       jest.spyOn(service, "itemReceipts").mockResolvedValue(mockItemReceipts);
