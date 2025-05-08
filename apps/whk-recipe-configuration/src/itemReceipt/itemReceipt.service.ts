@@ -7,6 +7,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { Decimal } from "decimal.js";
 import { InventorySiloTrackingService } from "../inventory/inventory.silotracking.service";
+import { MessageQueueService } from "../rabbitmq/message-queue.service";
 
 @Injectable()
 export class ItemReceiptService extends ItemReceiptServiceBase {
@@ -14,6 +15,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
     protected readonly siloTrackingService: InventorySiloTrackingService,
+    protected readonly messageQueueService: MessageQueueService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {
     super(prisma);
@@ -95,6 +97,21 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       return createdItemReceipt;
     });
 
+    // Queue a create notification if needed
+    await this.messageQueueService.queueMessage(
+      itemReceipt.id,
+      "ItemReceipt",
+      WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
+      {
+        event_type: "create",
+        data: itemReceipt,
+        recordName: "ItemReceipt",
+      },
+      itemReceipt.createdBy
+    );
+    
+    this.logger.log(`Created and queued notification for ItemReceipt: ${itemReceipt.id}`);
+
     return itemReceipt;
   }
 
@@ -135,39 +152,6 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
 
       ERP BUDDIES PLACED LOGIC TO DO THIS CONVERSION. LEAVING THIS IN, IN CASE FUTURE NEED ARISES
       */
-      // if (itemReceiptPayload?.purchaseOrder?.transactionGroup?.startsWith('RM-GR-')) {
-      //   const item = itemReceiptPayload?.item;
-      //   this.logger.debug(`Item for the itemReceipt: ${item}`);
-      //   if (item) {
-      //     // Map transaction group to unitLookup record name
-      //     const transactionGroupToUnitMap = {
-      //       'RM-GR-MLT': 'Barley Bushel',
-      //       'RM-GR-WHT': 'Wheat Bushel',
-      //       'RM-GR-COR': 'Corn Bushel',
-      //       'RM-GR-RYE': 'Rye Bushel'
-      //     };
-
-      //     const transactionGroup = itemReceiptPayload?.purchaseOrder?.transactionGroup;
-      //     if (transactionGroup && transactionGroup in transactionGroupToUnitMap) {
-      //       const unitName = transactionGroupToUnitMap[transactionGroup as keyof typeof transactionGroupToUnitMap];
-
-      //       // Fetch the unitLookup record based on the mapped name
-      //       const unitLookup = await this.prisma.unitLookup.findUnique({
-      //         where: { name: unitName }
-      //       });
-
-      //       if (unitLookup) {
-      //         quantityInPounds = quantityInPounds / Number(unitLookup.conversionRate);
-      //       } else {
-      //         this.logger.warn(`Unit conversion not found for ${unitName}. Using original quantity.`);
-      //       }
-      //     } else {
-      //       this.logger.warn(`Transaction group ${transactionGroup} not mapped. Using original quantity.`);
-      //     }
-      //   }
-      //   // Update the quantity in the payload
-      //   itemReceiptPayload.quantity = new Decimal(quantityInPounds);
-      // }
 
       if (
         itemReceiptPayload?.purchaseOrder?.transactionGroup?.startsWith(
@@ -187,22 +171,29 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         }
       }
 
-      await this.rabbitProducer.emitMessage(
+      // Use the message queue service instead of direct rabbit producer
+      const messagePayload = {
+        event_type: "large_quantity_update",
+        data: {
+          ...itemReceiptPayload,
+        },
+        id: itemReceipt.id,
+        quantity: new Decimal(quantityInPounds),
+        item: itemReceiptPayload?.item,
+        purchaseOrder: itemReceiptPayload?.purchaseOrder,
+        recordName: "ItemReceipt",
+      };
+
+      await this.messageQueueService.queueMessage(
+        itemReceipt.id,
+        "ItemReceipt",
         WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
-        {
-          event_type: "large_quantity_update",
-          data: {
-            ...itemReceiptPayload,
-          },
-          id: itemReceipt.id,
-          quantity: new Decimal(quantityInPounds),
-          item: itemReceiptPayload?.item,
-          purchaseOrder: itemReceiptPayload?.purchaseOrder,
-          recordName: "ItemReceipt",
-        }
+        messagePayload,
+        itemReceipt.createdBy
       );
+      
       this.logger.log(
-        `Emitted large quantity update for ItemReceipt: ${itemReceipt.id}`
+        `Queued large quantity update for ItemReceipt: ${itemReceipt.id}`
       );
 
       this.logger.debug(
@@ -269,6 +260,21 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       } else {
         this.logger.warn("No silo number found for itemReceipt");
       }
+    } else {
+      // For regular updates that don't involve large quantities, still queue a standard update message
+      await this.messageQueueService.queueMessage(
+        itemReceipt.id,
+        "ItemReceipt",
+        WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
+        {
+          event_type: "update",
+          data: itemReceiptPayload,
+          recordName: "ItemReceipt",
+        },
+        itemReceipt.updatedBy || itemReceipt.createdBy
+      );
+      
+      this.logger.log(`Queued update notification for ItemReceipt: ${itemReceipt.id}`);
     }
 
     return itemReceipt;
@@ -279,15 +285,22 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
   ): Promise<import(".prisma/client").ItemReceipt> {
     const itemReceipt = await super.deleteItemReceipt(args);
 
-    await this.rabbitProducer.emitMessage(
+    // Use the message queue service for delete messages too
+    const messagePayload = {
+      event_type: "delete",
+      data: itemReceipt,
+      recordName: "ItemReceipt",
+    };
+
+    await this.messageQueueService.queueMessage(
+      itemReceipt.id,
+      "ItemReceipt",
       WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
-      {
-        event_type: "delete",
-        data: itemReceipt,
-        recordName: "ItemReceipt",
-      }
+      messagePayload,
+      itemReceipt.createdBy
     );
-    this.logger.log(`Deleted ItemReceipt: ${itemReceipt.id} & pushed to topic`);
+    
+    this.logger.log(`Queued delete event for ItemReceipt: ${itemReceipt.id}`);
 
     return itemReceipt;
   }
