@@ -5,10 +5,16 @@ import { RabbitMQProducerService } from "./rabbitmq.producer.service";
 import { RabbitMQController } from "./rabbitmq.controller";
 import { ConfigService } from "@nestjs/config";
 import { SyncService } from "../sync/sync.service";
+import { MessageQueueService } from "./message-queue.service";
+import { ScheduleModule } from "@nestjs/schedule";
+import { MessageQueueController } from "./message-queue.controller";
+import { MessageQueueAdminController } from "./message-queue-admin.controller";
+import { Reflector } from "@nestjs/core";
+import { NotificationModule } from "../providers/notification/notification.module";
 
 @Global()
 @Module({
-  imports: [],
+  imports: [ScheduleModule.forRoot(), NotificationModule],
   providers: [
     {
       provide: "RABBITMQ_CLIENT",
@@ -21,8 +27,10 @@ import { SyncService } from "../sync/sync.service";
     },
     RabbitMQProducerService,
     SyncService,
+    MessageQueueService,
+    Reflector,
   ],
-  controllers: [RabbitMQController],
-  exports: [RabbitMQProducerService],
+  controllers: [RabbitMQController, MessageQueueController, MessageQueueAdminController],
+  exports: [RabbitMQProducerService, MessageQueueService],
 })
 export class RabbitMQModule {}
