@@ -49,13 +49,13 @@ export class RabbitMQProducerService {
   ): Promise<void> {
     // Log headers for debugging
     console.log(`DEBUG: Emitting message to ${topic} with headers:`, headers);
-    
+
     // Include messageId in both headers and message body
     const messageWithId = {
       ...message,
-      messageId: headers?.messageId // Add messageId to the message body
+      messageId: headers?.messageId, // Add messageId to the message body
     };
-    
+
     const record = new RmqRecordBuilder(messageWithId)
       .setOptions({
         headers,

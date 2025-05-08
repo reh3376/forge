@@ -1,4 +1,10 @@
-import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from "@nestjs/microservices";
+import {
+  Ctx,
+  EventPattern,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from "@nestjs/microservices";
 import { RabbitMQMessage } from "./RabbitMQMessage";
 import { Controller, Inject, Logger } from "@nestjs/common";
 import { SyncService } from "../sync/sync.service";
@@ -182,65 +188,96 @@ export class RabbitMQController {
   ) {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
-    
+
     // Extract the data from the nested structure - safely handle different message formats
     let messageId: string | undefined;
     let status: string | undefined;
-    
+
     try {
       // Try multiple places where messageId might be found
-      if (typeof message === 'object' && message !== null) {
+      if (typeof message === "object" && message !== null) {
         // Case 1: Direct message format { messageId: 'xxx', status: 'xxx' }
-        if ('messageId' in message) {
+        if ("messageId" in message) {
           messageId = message.messageId;
           status = message.status;
         }
-        
+
         // Case 2: Nested in data property { data: { messageId: 'xxx', status: 'xxx' } }
-        else if ('data' in message && typeof message.data === 'object' && message.data !== null) {
+        else if (
+          "data" in message &&
+          typeof message.data === "object" &&
+          message.data !== null
+        ) {
           messageId = message.data.messageId;
           status = message.data.status;
         }
       }
-      
+
       // If not found in payload, try headers
       if (!messageId && originalMessage?.properties?.headers?.messageId) {
         messageId = originalMessage.properties.headers.messageId;
       }
-      
-      this.logger.log(`Received acknowledgment with message ID: ${messageId || 'MISSING'} and status: ${status || 'UNKNOWN'}`);
-      
+
+      this.logger.log(
+        `Received acknowledgment with message ID: ${
+          messageId || "MISSING"
+        } and status: ${status || "UNKNOWN"}`
+      );
+
       if (!messageId) {
-        this.logger.error(`Invalid acknowledgment format: missing messageId`, JSON.stringify(message));
-        console.log(`DEBUG: Original message properties:`, originalMessage?.properties);
+        this.logger.error(
+          `Invalid acknowledgment format: missing messageId`,
+          JSON.stringify(message)
+        );
+        console.log(
+          `DEBUG: Original message properties:`,
+          originalMessage?.properties
+        );
         // Still ack the RabbitMQ message to prevent it being requeued
         channel.ack(originalMessage);
         return;
       }
-      
+
       if (status === "success") {
         this.logger.log(`Attempting to acknowledge message ID: ${messageId}`);
-        const messageExists = await this.messageQueueService.messageExists(messageId);
-        
+        const messageExists = await this.messageQueueService.messageExists(
+          messageId
+        );
+
         if (!messageExists) {
           this.logger.warn(`Message ID ${messageId} not found in the database`);
-          console.log(`DEBUG: Message ID ${messageId} not found in the database`);
+          console.log(
+            `DEBUG: Message ID ${messageId} not found in the database`
+          );
         } else {
-          this.logger.log(`Message found in DB with status: ${messageExists.status}`);
+          this.logger.log(
+            `Message found in DB with status: ${messageExists.status}`
+          );
         }
-        
-        const result = await this.messageQueueService.acknowledgeMessage(messageId);
-        this.logger.log(`Message ${messageId} acknowledgment result: ${result ? 'success' : 'failed'}`);
+
+        const result = await this.messageQueueService.acknowledgeMessage(
+          messageId
+        );
+        this.logger.log(
+          `Message ${messageId} acknowledgment result: ${
+            result ? "success" : "failed"
+          }`
+        );
       } else {
         // Handle error acknowledgment
         this.logger.error(
-          `Message ${messageId} reported error: ${message?.data?.errorDetails || 'No details provided'}`
+          `Message ${messageId} reported error: ${
+            message?.data?.errorDetails || "No details provided"
+          }`
         );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error(`Error processing acknowledgment: ${errorMessage}`);
-      this.logger.error(`Message payload was: ${JSON.stringify(message, null, 2)}`);
+      this.logger.error(
+        `Message payload was: ${JSON.stringify(message, null, 2)}`
+      );
     } finally {
       // Always acknowledge the RabbitMQ message to prevent it from being requeued
       channel.ack(originalMessage);
@@ -248,7 +285,10 @@ export class RabbitMQController {
   }
 
   @MessagePattern("sync")
-  async handleSync(@Payload() data: RabbitMQMessage, @Ctx() context: RmqContext) {
+  async handleSync(
+    @Payload() data: RabbitMQMessage,
+    @Ctx() context: RmqContext
+  ) {
     const channel = context.getChannelRef();
     const message = context.getMessage();
 
@@ -264,12 +304,14 @@ export class RabbitMQController {
           payload,
           payload.action || "update"
         );
-        
+
         // Acknowledge the message
         channel.ack(message);
         return result;
       } else {
-        this.logger.warn(`Sync message missing entity_type: ${JSON.stringify(payload)}`);
+        this.logger.warn(
+          `Sync message missing entity_type: ${JSON.stringify(payload)}`
+        );
         channel.ack(message); // Still acknowledge to avoid blocking the queue
       }
     } catch (error) {

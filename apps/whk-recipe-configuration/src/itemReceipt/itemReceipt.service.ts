@@ -109,8 +109,10 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       },
       itemReceipt.createdBy
     );
-    
-    this.logger.log(`Created and queued notification for ItemReceipt: ${itemReceipt.id}`);
+
+    this.logger.log(
+      `Created and queued notification for ItemReceipt: ${itemReceipt.id}`
+    );
 
     return itemReceipt;
   }
@@ -191,7 +193,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         messagePayload,
         itemReceipt.createdBy
       );
-      
+
       this.logger.log(
         `Queued large quantity update for ItemReceipt: ${itemReceipt.id}`
       );
@@ -273,8 +275,10 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         },
         itemReceipt.updatedBy || itemReceipt.createdBy
       );
-      
-      this.logger.log(`Queued update notification for ItemReceipt: ${itemReceipt.id}`);
+
+      this.logger.log(
+        `Queued update notification for ItemReceipt: ${itemReceipt.id}`
+      );
     }
 
     return itemReceipt;
@@ -299,7 +303,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       messagePayload,
       itemReceipt.createdBy
     );
-    
+
     this.logger.log(`Queued delete event for ItemReceipt: ${itemReceipt.id}`);
 
     return itemReceipt;
