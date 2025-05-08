@@ -176,13 +176,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
       // Use the message queue service instead of direct rabbit producer
       const messagePayload = {
         event_type: "large_quantity_update",
-        data: {
-          ...itemReceiptPayload,
-        },
-        id: itemReceipt.id,
-        quantity: new Decimal(quantityInPounds),
-        item: itemReceiptPayload?.item,
-        purchaseOrder: itemReceiptPayload?.purchaseOrder,
+        data: itemReceiptPayload,
         recordName: "ItemReceipt",
       };
 
@@ -269,7 +263,7 @@ export class ItemReceiptService extends ItemReceiptServiceBase {
         "ItemReceipt",
         WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
         {
-          event_type: "update",
+          event_type: "UPDATE",
           data: itemReceiptPayload,
           recordName: "ItemReceipt",
         },
