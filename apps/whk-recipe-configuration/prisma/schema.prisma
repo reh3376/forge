@@ -1030,6 +1030,24 @@ model RecipeBomActual {
   value                       Float?
 }
 
+model MessageQueue {
+  id             String                 @id @default(cuid())
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  entityId       String
+  entityType     String
+  topic          String
+  payload        Json
+  status         EnumMessageQueueStatus @default(PENDING)
+  attempts       Int                    @default(0)
+  maxAttempts    Int                    @default(3)
+  lastAttemptAt  DateTime?
+  errorMessage   String?
+  acknowledgedAt DateTime?
+  messageId      String?                @unique
+  createdBy      String
+}
+
 enum EnumPhaseParameterSetpointType {
   Boolean
   Numeric
@@ -1257,4 +1275,12 @@ enum EnumUnsConfigurationEventType {
   Read
   Update
   Delete
+}
+
+enum EnumMessageQueueStatus {
+  PENDING
+  SENT
+  ACKNOWLEDGED
+  FAILED
+  RETRYING
 }
