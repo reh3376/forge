@@ -67,6 +67,7 @@ import { ServeStaticOptionsService } from "./serveStaticOptions.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { NotificationModule } from "./providers/notification/notification.module";
 
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
@@ -131,6 +132,7 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     PrismaModule,
     SecretsManagerModule,
     SyncModule,
+    NotificationModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRootAsync({
       useClass: ServeStaticOptionsService,
