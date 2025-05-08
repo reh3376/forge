@@ -30,7 +30,11 @@ import { NotificationModule } from "../providers/notification/notification.modul
     MessageQueueService,
     Reflector,
   ],
-  controllers: [RabbitMQController, MessageQueueController, MessageQueueAdminController],
+  controllers: [
+    RabbitMQController,
+    MessageQueueController,
+    MessageQueueAdminController,
+  ],
   exports: [RabbitMQProducerService, MessageQueueService],
 })
 export class RabbitMQModule {}

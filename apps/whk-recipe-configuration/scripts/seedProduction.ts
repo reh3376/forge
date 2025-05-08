@@ -91,7 +91,7 @@ async function createEntityIfNotExists<T extends BaseEntity>(
 ) {
   // Use type assertion to let TypeScript know we know what we're doing
   const model = client[entityType as keyof PrismaClient] as any;
-  
+
   const existing = await model.findFirst({ where: findWhere });
 
   if (!existing) {

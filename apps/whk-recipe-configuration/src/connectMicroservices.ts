@@ -16,7 +16,7 @@ export async function connectMicroservices(app: INestApplication) {
     "vendor",
     "purchaseorder",
     "salesorder",
-    "message_acknowledgment"
+    "message_acknowledgment",
   ];
 
   services.forEach((service) => {
@@ -24,8 +24,8 @@ export async function connectMicroservices(app: INestApplication) {
       strategy: new RabbitMQ(
         generateRabbitMQClientOptions(
           configService,
-          service === "message_acknowledgment" 
-            ? "message_acknowledgment" 
+          service === "message_acknowledgment"
+            ? "message_acknowledgment"
             : `wh.whk01.distillery01.${service}`
         ).options
       ),
