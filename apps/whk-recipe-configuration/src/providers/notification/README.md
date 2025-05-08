@@ -30,4 +30,4 @@ ADMIN_EMAIL_2=admin2@example.com
 2. Get the connection string from the Azure portal
 3. Configure a domain for sending emails through Azure Communication Services
 4. Add the environment variables listed above to your deployment
-5. Restart the application for the changes to take effect 
+5. Restart the application for the changes to take effect
