@@ -14,7 +14,7 @@ import { registerEnumType } from "@nestjs/graphql";
 export enum EnumLotStatus {
   Started = "Started",
   PendingValidation = "PendingValidation",
-  Submitted = "Submitted",
+  Verified = "Verified",
   Complete = "Complete",
 }
 
