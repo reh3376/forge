@@ -42,7 +42,8 @@ export class LotService extends LotServiceBase {
 
     */
     let mergedLot: any = {};
-
+    let explicitStatus: EnumLotStatus | undefined;
+    
     if (type === "create") {
       mergedLot = { ...lot };
     } else if (type === "update" && "where" in lot && "data" in lot) {
@@ -63,6 +64,8 @@ export class LotService extends LotServiceBase {
     } else {
       throw new Error("Invalid input for lot calculation");
     }
+
+    explicitStatus = mergedLot.status as EnumLotStatus | undefined;
 
     // Perform calculations
     if (mergedLot.densityFinal && mergedLot.densityFinal <= 1) {
@@ -103,9 +106,13 @@ export class LotService extends LotServiceBase {
       if (mergedLot.bblTotal) {
         mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
         mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
-        mergedLot.status = EnumLotStatus.PendingValidation;
+        if (!explicitStatus) {
+          mergedLot.status = EnumLotStatus.PendingValidation;
+        }
       } else {
-        mergedLot.status = EnumLotStatus.Started;
+        if (!explicitStatus) {
+          mergedLot.status = EnumLotStatus.Started;
+        }
       }
     }
 
@@ -118,7 +125,7 @@ export class LotService extends LotServiceBase {
       avgPGsFerm: mergedLot.avgPGsFerm,
       avgBblFillByPg: mergedLot.avgBblFillByPg,
       avgBblFillByWg: mergedLot.avgBblFillByWg,
-      status: mergedLot.status,
+      status: explicitStatus ?? mergedLot.status,
       densityFinal: mergedLot.densityFinal,
     };
   }
