@@ -18,6 +18,38 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
+  private roundLotFloatFields(
+    data: Prisma.LotCreateInput | Prisma.LotUpdateInput
+  ): void {
+    const floatFields = [
+      "avgBblFillByPg",
+      "avgBblFillByWg",
+      "avgPGsFerm",
+      "bblEntryProof",
+      "finalVolume",
+      "finalWeight",
+      "grainLbsFerm",
+      "grainLbsPg",
+      "initialVolume",
+      "initialWeight",
+      "pgLosses",
+      "proofInitial",
+      "standardYield",
+      "totalFermenters",
+      "totalPGs",
+      "totalPGsByRecipe",
+      "totalVolumeWg",
+      "totalWGs",
+      "totalWeight",
+    ];
+    for (const field of floatFields) {
+      const value = (data as any)[field];
+      if (typeof value === "number") {
+        (data as any)[field] = Math.round(value * 100) / 100;
+      }
+    }
+  }
+
   async calculateLotAnalytics(
     lot:
       | LotCreateInput
@@ -215,12 +247,14 @@ export class LotService extends LotServiceBase {
       args.data as LotCreateInput
     );
 
+    const createData = {
+      ...args.data,
+      ...calculatedData,
+      lotNumber: `${fullLotNumber}`,
+    };
+    this.roundLotFloatFields(createData);
     const lot = await super.createLot({
-      data: {
-        ...args.data,
-        ...calculatedData,
-        lotNumber: `${fullLotNumber}`,
-      },
+      data: createData,
       include: {
         ...args.include,
         productionOrder: true,
@@ -261,6 +295,7 @@ export class LotService extends LotServiceBase {
       ...args.data,
       ...calculatedData,
     };
+    this.roundLotFloatFields(args.data);
     const Lot = await super.updateLot({
       data: {
         ...args.data,
