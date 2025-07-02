@@ -74,7 +74,6 @@ export class LotService extends LotServiceBase {
 
     */
     let mergedLot: any = {};
-    let explicitStatus: EnumLotStatus | undefined;
 
     if (type === "create") {
       mergedLot = { ...lot };
@@ -97,7 +96,7 @@ export class LotService extends LotServiceBase {
       throw new Error("Invalid input for lot calculation");
     }
 
-    explicitStatus = mergedLot.status as EnumLotStatus | undefined;
+    const explicitStatus = mergedLot.status as EnumLotStatus | undefined;
 
     // Perform calculations
     if (mergedLot.densityFinal && mergedLot.densityFinal <= 1) {
