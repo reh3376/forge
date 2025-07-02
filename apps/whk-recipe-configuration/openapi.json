@@ -62,9 +62,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/stats": {
@@ -76,9 +74,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/retry/{id}": {
@@ -99,9 +95,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/retry-all": {
@@ -113,9 +107,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/test-email": {
@@ -131,9 +123,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/ghost-messages": {
@@ -146,9 +136,7 @@
             "description": "List of ghost messages retrieved successfully"
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/clear-ghost-messages": {
@@ -164,9 +152,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/force-fail/{id}": {
@@ -191,9 +177,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/message-queue/fix-max-attempt-messages": {
@@ -209,9 +193,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "message-queue-admin"
-        ]
+        "tags": ["message-queue-admin"]
       }
     },
     "/api/login": {
@@ -240,9 +222,7 @@
             }
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/users": {
@@ -315,9 +295,7 @@
             }
           }
         },
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "security": [
           {
             "bearer": []
@@ -370,9 +348,7 @@
             }
           }
         },
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "security": [
           {
             "bearer": []
@@ -416,9 +392,7 @@
             }
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -494,9 +468,7 @@
             }
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -549,9 +521,7 @@
             }
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -612,9 +582,7 @@
             }
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -680,9 +648,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -719,9 +685,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -758,9 +722,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -797,9 +759,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -865,9 +825,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -904,9 +862,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -943,9 +899,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -982,9 +936,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "phaseParameters"
-        ],
+        "tags": ["phaseParameters"],
         "security": [
           {
             "bearer": []
@@ -1028,9 +980,7 @@
             }
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1106,9 +1056,7 @@
             }
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1161,9 +1109,7 @@
             }
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1224,9 +1170,7 @@
             }
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1292,9 +1236,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1331,9 +1273,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1370,9 +1310,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1409,9 +1347,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1477,9 +1413,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1516,9 +1450,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1555,9 +1487,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1594,9 +1524,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1662,9 +1590,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1701,9 +1627,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1740,9 +1664,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1779,9 +1701,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1847,9 +1767,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1886,9 +1804,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1925,9 +1841,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -1964,9 +1878,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "testParameters"
-        ],
+        "tags": ["testParameters"],
         "security": [
           {
             "bearer": []
@@ -2010,9 +1922,7 @@
             }
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2088,9 +1998,7 @@
             }
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2143,9 +2051,7 @@
             }
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2206,9 +2112,7 @@
             }
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2274,9 +2178,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2313,9 +2215,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2352,9 +2252,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2391,9 +2289,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeParameters"
-        ],
+        "tags": ["recipeParameters"],
         "security": [
           {
             "bearer": []
@@ -2437,9 +2333,7 @@
             }
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2515,9 +2409,7 @@
             }
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2570,9 +2462,7 @@
             }
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2633,9 +2523,7 @@
             }
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2701,9 +2589,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2740,9 +2626,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2779,9 +2663,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2818,9 +2700,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "instructions"
-        ],
+        "tags": ["instructions"],
         "security": [
           {
             "bearer": []
@@ -2864,9 +2744,7 @@
             }
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -2942,9 +2820,7 @@
             }
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -2997,9 +2873,7 @@
             }
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3060,9 +2934,7 @@
             }
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3128,9 +3000,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3167,9 +3037,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3206,9 +3074,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3245,9 +3111,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3313,9 +3177,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3352,9 +3214,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3391,9 +3251,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3430,9 +3288,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3498,9 +3354,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3537,9 +3391,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3576,9 +3428,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3615,9 +3465,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3683,9 +3531,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3722,9 +3568,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3761,9 +3605,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3800,9 +3642,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3868,9 +3708,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3907,9 +3745,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3946,9 +3782,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -3985,9 +3819,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "equipmentPhases"
-        ],
+        "tags": ["equipmentPhases"],
         "security": [
           {
             "bearer": []
@@ -4031,9 +3863,7 @@
             }
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4109,9 +3939,7 @@
             }
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4164,9 +3992,7 @@
             }
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4227,9 +4053,7 @@
             }
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4295,9 +4119,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4334,9 +4156,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4373,9 +4193,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4412,9 +4230,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4480,9 +4296,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4519,9 +4333,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4558,9 +4370,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4597,9 +4407,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "operations"
-        ],
+        "tags": ["operations"],
         "security": [
           {
             "bearer": []
@@ -4643,9 +4451,7 @@
             }
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -4721,9 +4527,7 @@
             }
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -4776,9 +4580,7 @@
             }
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -4839,9 +4641,7 @@
             }
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -4907,9 +4707,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -4946,9 +4744,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -4985,9 +4781,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -5024,9 +4818,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -5092,9 +4884,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -5131,9 +4921,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -5170,9 +4958,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -5209,9 +4995,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "procedures"
-        ],
+        "tags": ["procedures"],
         "security": [
           {
             "bearer": []
@@ -5242,9 +5026,7 @@
             "description": "Bad Request"
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5265,9 +5047,7 @@
             "description": "Internal Server Error"
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5291,9 +5071,7 @@
             "description": "Bad Request"
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5337,9 +5115,7 @@
             }
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5415,9 +5191,7 @@
             }
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5470,9 +5244,7 @@
             }
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5533,9 +5305,7 @@
             }
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5601,9 +5371,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5640,9 +5408,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5679,9 +5445,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5718,9 +5482,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5786,9 +5548,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5825,9 +5585,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5864,9 +5622,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5903,9 +5659,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -5971,9 +5725,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6010,9 +5762,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6049,9 +5799,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6088,9 +5836,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6156,9 +5902,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6195,9 +5939,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6234,9 +5976,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6273,9 +6013,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6341,9 +6079,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6380,9 +6116,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6419,9 +6153,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6458,9 +6190,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6526,9 +6256,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6565,9 +6293,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6604,9 +6330,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6643,9 +6367,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6711,9 +6433,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6750,9 +6470,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6789,9 +6507,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6828,9 +6544,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6896,9 +6610,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6935,9 +6647,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -6974,9 +6684,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -7013,9 +6721,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -7081,9 +6787,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -7120,9 +6824,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -7159,9 +6861,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -7198,9 +6898,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipes"
-        ],
+        "tags": ["recipes"],
         "security": [
           {
             "bearer": []
@@ -7244,9 +6942,7 @@
             }
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7322,9 +7018,7 @@
             }
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7377,9 +7071,7 @@
             }
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7440,9 +7132,7 @@
             }
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7508,9 +7198,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7547,9 +7235,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7586,9 +7272,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7625,9 +7309,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7693,9 +7375,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7732,9 +7412,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7771,9 +7449,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7810,9 +7486,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7878,9 +7552,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7917,9 +7589,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7956,9 +7626,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -7995,9 +7663,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -8063,9 +7729,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -8102,9 +7766,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -8141,9 +7803,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -8180,9 +7840,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "boms"
-        ],
+        "tags": ["boms"],
         "security": [
           {
             "bearer": []
@@ -8237,9 +7895,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8302,9 +7958,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8367,9 +8021,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8433,9 +8085,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8499,9 +8149,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8571,9 +8219,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8629,9 +8275,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8709,9 +8353,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8764,9 +8406,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrderQueues"
-        ],
+        "tags": ["scheduleOrderQueues"],
         "security": [
           {
             "bearer": []
@@ -8810,9 +8450,7 @@
             }
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -8888,9 +8526,7 @@
             }
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -8943,9 +8579,7 @@
             }
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9006,9 +8640,7 @@
             }
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9074,9 +8706,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9113,9 +8743,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9152,9 +8780,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9191,9 +8817,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9259,9 +8883,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9298,9 +8920,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9337,9 +8957,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9376,9 +8994,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9444,9 +9060,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9483,9 +9097,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9522,9 +9134,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9561,9 +9171,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9629,9 +9237,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9668,9 +9274,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9707,9 +9311,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9746,9 +9348,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitProcedures"
-        ],
+        "tags": ["unitProcedures"],
         "security": [
           {
             "bearer": []
@@ -9792,9 +9392,7 @@
             }
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -9870,9 +9468,7 @@
             }
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -9925,9 +9521,7 @@
             }
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -9988,9 +9582,7 @@
             }
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10056,9 +9648,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10095,9 +9685,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10134,9 +9722,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10173,9 +9759,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10241,9 +9825,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10280,9 +9862,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10319,9 +9899,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10358,9 +9936,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10426,9 +10002,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10465,9 +10039,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10504,9 +10076,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10543,9 +10113,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeGroups"
-        ],
+        "tags": ["recipeGroups"],
         "security": [
           {
             "bearer": []
@@ -10589,9 +10157,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10667,9 +10233,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10722,9 +10286,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10785,9 +10347,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10853,9 +10413,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10892,9 +10450,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10931,9 +10487,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -10970,9 +10524,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -11038,9 +10590,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -11077,9 +10627,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -11116,9 +10664,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -11155,9 +10701,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrders"
-        ],
+        "tags": ["productionOrders"],
         "security": [
           {
             "bearer": []
@@ -11201,9 +10745,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11279,9 +10821,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11334,9 +10874,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11397,9 +10935,7 @@
             }
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11465,9 +11001,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11504,9 +11038,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11543,9 +11075,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11582,9 +11112,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11650,9 +11178,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11689,9 +11215,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11728,9 +11252,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11767,9 +11289,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "scheduleOrders"
-        ],
+        "tags": ["scheduleOrders"],
         "security": [
           {
             "bearer": []
@@ -11813,9 +11333,7 @@
             }
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -11891,9 +11409,7 @@
             }
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -11946,9 +11462,7 @@
             }
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12009,9 +11523,7 @@
             }
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12077,9 +11589,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12116,9 +11626,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12155,9 +11663,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12194,9 +11700,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12262,9 +11766,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12301,9 +11803,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12340,9 +11840,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12379,9 +11877,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12447,9 +11943,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12486,9 +11980,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12525,9 +12017,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12564,9 +12054,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12632,9 +12120,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12671,9 +12157,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12710,9 +12194,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12749,9 +12231,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12817,9 +12297,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12856,9 +12334,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12895,9 +12371,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -12934,9 +12408,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13002,9 +12474,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13041,9 +12511,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13080,9 +12548,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13119,9 +12585,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13187,9 +12651,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13226,9 +12688,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13265,9 +12725,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13304,9 +12762,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13372,9 +12828,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13411,9 +12865,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13450,9 +12902,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13489,9 +12939,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13557,9 +13005,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13596,9 +13042,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13635,9 +13079,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13674,9 +13116,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13742,9 +13182,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13781,9 +13219,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13820,9 +13256,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13859,9 +13293,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13927,9 +13359,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -13966,9 +13396,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14005,9 +13433,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14044,9 +13470,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14112,9 +13536,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14151,9 +13573,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14190,9 +13610,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14229,9 +13647,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14297,9 +13713,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14336,9 +13750,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14375,9 +13787,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14414,9 +13824,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14482,9 +13890,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14521,9 +13927,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14560,9 +13964,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14599,9 +14001,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "security": [
           {
             "bearer": []
@@ -14645,9 +14045,7 @@
             }
           }
         },
-        "tags": [
-          "itemGroups"
-        ],
+        "tags": ["itemGroups"],
         "security": [
           {
             "bearer": []
@@ -14723,9 +14121,7 @@
             }
           }
         },
-        "tags": [
-          "itemGroups"
-        ],
+        "tags": ["itemGroups"],
         "security": [
           {
             "bearer": []
@@ -14778,9 +14174,7 @@
             }
           }
         },
-        "tags": [
-          "itemGroups"
-        ],
+        "tags": ["itemGroups"],
         "security": [
           {
             "bearer": []
@@ -14841,9 +14235,7 @@
             }
           }
         },
-        "tags": [
-          "itemGroups"
-        ],
+        "tags": ["itemGroups"],
         "security": [
           {
             "bearer": []
@@ -14887,9 +14279,7 @@
             }
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -14965,9 +14355,7 @@
             }
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15020,9 +14408,7 @@
             }
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15083,9 +14469,7 @@
             }
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15151,9 +14535,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15190,9 +14572,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15229,9 +14609,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15268,9 +14646,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15336,9 +14712,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15375,9 +14749,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15414,9 +14786,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15453,9 +14823,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15521,9 +14889,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15560,9 +14926,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15599,9 +14963,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15638,9 +15000,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15706,9 +15066,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15745,9 +15103,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15784,9 +15140,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15823,9 +15177,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15891,9 +15243,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15930,9 +15280,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -15969,9 +15317,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -16008,9 +15354,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -16076,9 +15420,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -16115,9 +15457,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -16154,9 +15494,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -16193,9 +15531,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "customers"
-        ],
+        "tags": ["customers"],
         "security": [
           {
             "bearer": []
@@ -16232,9 +15568,7 @@
             }
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16280,9 +15614,7 @@
             }
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16326,9 +15658,7 @@
             }
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16404,9 +15734,7 @@
             }
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16459,9 +15787,7 @@
             }
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16522,9 +15848,7 @@
             }
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16590,9 +15914,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16629,9 +15951,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16668,9 +15988,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16707,9 +16025,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16775,9 +16091,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16814,9 +16128,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16853,9 +16165,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16892,9 +16202,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16960,9 +16268,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -16999,9 +16305,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17038,9 +16342,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17077,9 +16379,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17145,9 +16445,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17184,9 +16482,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17223,9 +16519,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17262,9 +16556,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17330,9 +16622,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17369,9 +16659,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17408,9 +16696,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17447,9 +16733,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "purchaseOrders"
-        ],
+        "tags": ["purchaseOrders"],
         "security": [
           {
             "bearer": []
@@ -17493,9 +16777,7 @@
             }
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17571,9 +16853,7 @@
             }
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17626,9 +16906,7 @@
             }
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17689,9 +16967,7 @@
             }
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17757,9 +17033,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17796,9 +17070,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17835,9 +17107,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17874,9 +17144,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "salesOrders"
-        ],
+        "tags": ["salesOrders"],
         "security": [
           {
             "bearer": []
@@ -17920,9 +17188,7 @@
             }
           }
         },
-        "tags": [
-          "tests"
-        ],
+        "tags": ["tests"],
         "security": [
           {
             "bearer": []
@@ -17998,9 +17264,7 @@
             }
           }
         },
-        "tags": [
-          "tests"
-        ],
+        "tags": ["tests"],
         "security": [
           {
             "bearer": []
@@ -18053,9 +17317,7 @@
             }
           }
         },
-        "tags": [
-          "tests"
-        ],
+        "tags": ["tests"],
         "security": [
           {
             "bearer": []
@@ -18116,9 +17378,7 @@
             }
           }
         },
-        "tags": [
-          "tests"
-        ],
+        "tags": ["tests"],
         "security": [
           {
             "bearer": []
@@ -18162,9 +17422,7 @@
             }
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18240,9 +17498,7 @@
             }
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18295,9 +17551,7 @@
             }
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18358,9 +17612,7 @@
             }
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18426,9 +17678,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18465,9 +17715,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18504,9 +17752,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18543,9 +17789,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18611,9 +17855,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18650,9 +17892,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18689,9 +17929,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18728,9 +17966,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18796,9 +18032,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18835,9 +18069,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18874,9 +18106,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18913,9 +18143,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -18981,9 +18209,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19020,9 +18246,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19059,9 +18283,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19098,9 +18320,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19166,9 +18386,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19205,9 +18423,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19244,9 +18460,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19283,9 +18497,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19351,9 +18563,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19390,9 +18600,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19429,9 +18637,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19468,9 +18674,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19536,9 +18740,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19575,9 +18777,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19614,9 +18814,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19653,9 +18851,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19721,9 +18917,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19760,9 +18954,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19799,9 +18991,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19838,9 +19028,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19906,9 +19094,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19945,9 +19131,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -19984,9 +19168,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20023,9 +19205,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20091,9 +19271,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20130,9 +19308,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20169,9 +19345,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20208,9 +19382,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20276,9 +19448,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20315,9 +19485,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20354,9 +19522,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20393,9 +19559,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20461,9 +19625,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20500,9 +19662,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20539,9 +19699,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20578,9 +19736,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "assets"
-        ],
+        "tags": ["assets"],
         "security": [
           {
             "bearer": []
@@ -20624,9 +19780,7 @@
             }
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -20702,9 +19856,7 @@
             }
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -20757,9 +19909,7 @@
             }
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -20820,9 +19970,7 @@
             }
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -20888,9 +20036,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -20927,9 +20073,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -20966,9 +20110,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -21005,9 +20147,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -21073,9 +20213,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -21112,9 +20250,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -21151,9 +20287,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -21190,9 +20324,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "itemReceipts"
-        ],
+        "tags": ["itemReceipts"],
         "security": [
           {
             "bearer": []
@@ -21225,12 +20357,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "lotId",
-                  "assetId",
-                  "quantity",
-                  "itemId"
-                ]
+                "required": ["lotId", "assetId", "quantity", "itemId"]
               }
             }
           }
@@ -21247,9 +20374,7 @@
             }
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21276,10 +20401,7 @@
                     "type": "number"
                   }
                 },
-                "required": [
-                  "assetId",
-                  "quantity"
-                ]
+                "required": ["assetId", "quantity"]
               }
             }
           }
@@ -21289,9 +20411,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21318,9 +20438,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21368,9 +20486,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21414,9 +20530,7 @@
             }
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21492,9 +20606,7 @@
             }
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21547,9 +20659,7 @@
             }
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21610,9 +20720,7 @@
             }
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21663,9 +20771,7 @@
             }
           }
         },
-        "tags": [
-          "inventories"
-        ],
+        "tags": ["inventories"],
         "security": [
           {
             "bearer": []
@@ -21709,9 +20815,7 @@
             }
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -21787,9 +20891,7 @@
             }
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -21842,9 +20944,7 @@
             }
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -21905,9 +21005,7 @@
             }
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -21958,9 +21056,7 @@
             }
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22026,9 +21122,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22065,9 +21159,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22104,9 +21196,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22143,9 +21233,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22211,9 +21299,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22250,9 +21336,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22289,9 +21373,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22328,9 +21410,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22396,9 +21476,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22435,9 +21513,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22474,9 +21550,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22513,9 +21587,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22581,9 +21653,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22620,9 +21690,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22659,9 +21727,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22698,9 +21764,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "lots"
-        ],
+        "tags": ["lots"],
         "security": [
           {
             "bearer": []
@@ -22744,9 +21808,7 @@
             }
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -22822,9 +21884,7 @@
             }
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -22877,9 +21937,7 @@
             }
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -22940,9 +21998,7 @@
             }
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23008,9 +22064,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23047,9 +22101,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23086,9 +22138,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23125,9 +22175,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23193,9 +22241,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23232,9 +22278,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23271,9 +22315,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23310,9 +22352,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "bomItems"
-        ],
+        "tags": ["bomItems"],
         "security": [
           {
             "bearer": []
@@ -23356,9 +22396,7 @@
             }
           }
         },
-        "tags": [
-          "units"
-        ],
+        "tags": ["units"],
         "security": [
           {
             "bearer": []
@@ -23434,9 +22472,7 @@
             }
           }
         },
-        "tags": [
-          "units"
-        ],
+        "tags": ["units"],
         "security": [
           {
             "bearer": []
@@ -23489,9 +22525,7 @@
             }
           }
         },
-        "tags": [
-          "units"
-        ],
+        "tags": ["units"],
         "security": [
           {
             "bearer": []
@@ -23552,9 +22586,7 @@
             }
           }
         },
-        "tags": [
-          "units"
-        ],
+        "tags": ["units"],
         "security": [
           {
             "bearer": []
@@ -23590,9 +22622,7 @@
                     }
                   }
                 },
-                "required": [
-                  "items"
-                ]
+                "required": ["items"]
               }
             }
           }
@@ -23609,9 +22639,7 @@
             }
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -23656,9 +22684,7 @@
             }
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -23702,9 +22728,7 @@
             }
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -23780,9 +22804,7 @@
             }
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -23835,9 +22857,7 @@
             }
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -23898,9 +22918,7 @@
             }
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -23966,9 +22984,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -24005,9 +23021,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -24044,9 +23058,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -24083,9 +23095,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "batches"
-        ],
+        "tags": ["batches"],
         "security": [
           {
             "bearer": []
@@ -24129,9 +23139,7 @@
             }
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24207,9 +23215,7 @@
             }
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24262,9 +23268,7 @@
             }
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24325,9 +23329,7 @@
             }
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24393,9 +23395,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24432,9 +23432,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24471,9 +23469,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24510,9 +23506,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24578,9 +23572,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24617,9 +23609,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24656,9 +23646,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24695,9 +23683,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "vendors"
-        ],
+        "tags": ["vendors"],
         "security": [
           {
             "bearer": []
@@ -24741,9 +23727,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -24819,9 +23803,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -24874,9 +23856,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -24937,9 +23917,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -24990,9 +23968,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -25058,9 +24034,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -25097,9 +24071,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -25136,9 +24108,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -25175,9 +24145,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryLogs"
-        ],
+        "tags": ["inventoryLogs"],
         "security": [
           {
             "bearer": []
@@ -25221,9 +24189,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25299,9 +24265,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25354,9 +24318,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25417,9 +24379,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25470,9 +24430,7 @@
             }
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25538,9 +24496,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25577,9 +24533,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25616,9 +24570,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25655,9 +24607,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "inventoryTransfers"
-        ],
+        "tags": ["inventoryTransfers"],
         "security": [
           {
             "bearer": []
@@ -25701,9 +24651,7 @@
             }
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -25779,9 +24727,7 @@
             }
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -25834,9 +24780,7 @@
             }
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -25897,9 +24841,7 @@
             }
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -25950,9 +24892,7 @@
             }
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -26018,9 +24958,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -26057,9 +24995,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -26096,9 +25032,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -26135,9 +25069,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unitLookups"
-        ],
+        "tags": ["unitLookups"],
         "security": [
           {
             "bearer": []
@@ -26181,9 +25113,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderBomItems"
-        ],
+        "tags": ["productionOrderBomItems"],
         "security": [
           {
             "bearer": []
@@ -26259,9 +25189,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderBomItems"
-        ],
+        "tags": ["productionOrderBomItems"],
         "security": [
           {
             "bearer": []
@@ -26314,9 +25242,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderBomItems"
-        ],
+        "tags": ["productionOrderBomItems"],
         "security": [
           {
             "bearer": []
@@ -26377,9 +25303,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderBomItems"
-        ],
+        "tags": ["productionOrderBomItems"],
         "security": [
           {
             "bearer": []
@@ -26430,9 +25354,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderBomItems"
-        ],
+        "tags": ["productionOrderBomItems"],
         "security": [
           {
             "bearer": []
@@ -26476,9 +25398,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26554,9 +25474,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26609,9 +25527,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26672,9 +25588,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26725,9 +25639,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26793,9 +25705,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26832,9 +25742,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26871,9 +25779,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26910,9 +25816,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -26978,9 +25882,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -27017,9 +25919,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -27056,9 +25956,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -27095,9 +25993,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBomItems"
-        ],
+        "tags": ["recipeBomItems"],
         "security": [
           {
             "bearer": []
@@ -27141,9 +26037,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27219,9 +26113,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27274,9 +26166,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27337,9 +26227,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27405,9 +26293,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27444,9 +26330,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27483,9 +26367,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27522,9 +26404,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27590,9 +26470,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27629,9 +26507,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27668,9 +26544,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27707,9 +26581,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27775,9 +26647,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27814,9 +26684,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27853,9 +26721,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27892,9 +26758,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27960,9 +26824,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -27999,9 +26861,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28038,9 +26898,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28077,9 +26935,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28145,9 +27001,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28184,9 +27038,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28223,9 +27075,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28262,9 +27112,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocols"
-        ],
+        "tags": ["mashingProtocols"],
         "security": [
           {
             "bearer": []
@@ -28308,9 +27156,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28386,9 +27232,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28441,9 +27285,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28504,9 +27346,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28557,9 +27397,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28625,9 +27463,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28664,9 +27500,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28703,9 +27537,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28742,9 +27574,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28810,9 +27640,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28849,9 +27677,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28888,9 +27714,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28927,9 +27751,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolSteps"
-        ],
+        "tags": ["mashingProtocolSteps"],
         "security": [
           {
             "bearer": []
@@ -28973,9 +27795,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29051,9 +27871,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29106,9 +27924,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29169,9 +27985,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29237,9 +28051,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29276,9 +28088,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29315,9 +28125,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29354,9 +28162,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29422,9 +28228,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29461,9 +28265,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29500,9 +28302,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29539,9 +28339,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29607,9 +28405,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29646,9 +28442,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29685,9 +28479,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29724,9 +28516,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29792,9 +28582,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29831,9 +28619,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29870,9 +28656,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29909,9 +28693,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -29977,9 +28759,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -30016,9 +28796,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -30055,9 +28833,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -30094,9 +28870,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "recipeBoms"
-        ],
+        "tags": ["recipeBoms"],
         "security": [
           {
             "bearer": []
@@ -30140,9 +28914,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30218,9 +28990,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30273,9 +29043,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30336,9 +29104,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30389,9 +29155,7 @@
             }
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30457,9 +29221,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30496,9 +29258,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30535,9 +29295,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30574,9 +29332,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30642,9 +29398,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30681,9 +29435,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30720,9 +29472,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30759,9 +29509,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30827,9 +29575,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30866,9 +29612,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30905,9 +29649,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30944,9 +29686,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "productionOrderRecipeInstances"
-        ],
+        "tags": ["productionOrderRecipeInstances"],
         "security": [
           {
             "bearer": []
@@ -30990,9 +29730,7 @@
             }
           }
         },
-        "tags": [
-          "additiveActuals"
-        ],
+        "tags": ["additiveActuals"],
         "security": [
           {
             "bearer": []
@@ -31068,9 +29806,7 @@
             }
           }
         },
-        "tags": [
-          "additiveActuals"
-        ],
+        "tags": ["additiveActuals"],
         "security": [
           {
             "bearer": []
@@ -31123,9 +29859,7 @@
             }
           }
         },
-        "tags": [
-          "additiveActuals"
-        ],
+        "tags": ["additiveActuals"],
         "security": [
           {
             "bearer": []
@@ -31186,9 +29920,7 @@
             }
           }
         },
-        "tags": [
-          "additiveActuals"
-        ],
+        "tags": ["additiveActuals"],
         "security": [
           {
             "bearer": []
@@ -31239,9 +29971,7 @@
             }
           }
         },
-        "tags": [
-          "additiveActuals"
-        ],
+        "tags": ["additiveActuals"],
         "security": [
           {
             "bearer": []
@@ -31285,9 +30015,7 @@
             }
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31363,9 +30091,7 @@
             }
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31418,9 +30144,7 @@
             }
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31481,9 +30205,7 @@
             }
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31534,9 +30256,7 @@
             }
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31602,9 +30322,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31641,9 +30359,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31680,9 +30396,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31719,9 +30433,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsConfigurations"
-        ],
+        "tags": ["unsConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31765,9 +30477,7 @@
             }
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31843,9 +30553,7 @@
             }
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31898,9 +30606,7 @@
             }
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -31961,9 +30667,7 @@
             }
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -32014,9 +30718,7 @@
             }
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -32082,9 +30784,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -32121,9 +30821,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -32160,9 +30858,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -32199,9 +30895,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "unsBrokerConfigurations"
-        ],
+        "tags": ["unsBrokerConfigurations"],
         "security": [
           {
             "bearer": []
@@ -32245,9 +30939,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32323,9 +31015,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32378,9 +31068,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32441,9 +31129,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32494,9 +31180,7 @@
             }
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32562,9 +31246,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32601,9 +31283,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32640,9 +31320,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32679,9 +31357,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "mashingProtocolStepActuals"
-        ],
+        "tags": ["mashingProtocolStepActuals"],
         "security": [
           {
             "bearer": []
@@ -32725,9 +31401,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomActuals"
-        ],
+        "tags": ["recipeBomActuals"],
         "security": [
           {
             "bearer": []
@@ -32803,9 +31477,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomActuals"
-        ],
+        "tags": ["recipeBomActuals"],
         "security": [
           {
             "bearer": []
@@ -32858,9 +31530,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomActuals"
-        ],
+        "tags": ["recipeBomActuals"],
         "security": [
           {
             "bearer": []
@@ -32921,9 +31591,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomActuals"
-        ],
+        "tags": ["recipeBomActuals"],
         "security": [
           {
             "bearer": []
@@ -32974,9 +31642,7 @@
             }
           }
         },
-        "tags": [
-          "recipeBomActuals"
-        ],
+        "tags": ["recipeBomActuals"],
         "security": [
           {
             "bearer": []
@@ -33034,10 +31700,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "username",
-          "password"
-        ]
+        "required": ["username", "password"]
       },
       "UserInfo": {
         "type": "object",
@@ -33084,10 +31747,7 @@
           },
           "mode": {
             "type": "string",
-            "enum": [
-              "Default",
-              "Insensitive"
-            ]
+            "enum": ["Default", "Insensitive"]
           },
           "not": {
             "type": "string"
@@ -33135,10 +31795,7 @@
           },
           "mode": {
             "type": "string",
-            "enum": [
-              "Default",
-              "Insensitive"
-            ]
+            "enum": ["Default", "Insensitive"]
           },
           "not": {
             "type": "string"
@@ -33197,13 +31854,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "id",
-          "roles",
-          "updatedAt",
-          "username"
-        ]
+        "required": ["createdAt", "id", "roles", "updatedAt", "username"]
       },
       "ForbiddenException": {
         "type": "object",
@@ -33215,10 +31866,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "statusCode",
-          "message"
-        ]
+        "required": ["statusCode", "message"]
       },
       "NotFoundException": {
         "type": "object",
@@ -33230,10 +31878,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "statusCode",
-          "message"
-        ]
+        "required": ["statusCode", "message"]
       },
       "PhaseParameterWhereUniqueInput": {
         "type": "object",
@@ -33242,9 +31887,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "EquipmentPhaseWhereUniqueInput": {
         "type": "object",
@@ -33253,9 +31896,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "EquipmentPhaseCreateNestedManyWithoutPhaseParametersInput": {
         "type": "object",
@@ -33338,11 +31979,7 @@
           },
           "setpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "String"
-            ]
+            "enum": ["Boolean", "Numeric", "String"]
           },
           "setpointUpperLimit": {
             "type": "number"
@@ -33459,11 +32096,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "id", "updatedAt"]
       },
       "RecipeParameter": {
         "type": "object",
@@ -33519,11 +32152,7 @@
           },
           "recipeSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "Text"
-            ]
+            "enum": ["Boolean", "Numeric", "Text"]
           },
           "recipeSetpointUpperLimit": {
             "type": "number"
@@ -33667,11 +32296,7 @@
           },
           "holdType": {
             "type": "string",
-            "enum": [
-              "Heat",
-              "Cool",
-              "Hold"
-            ]
+            "enum": ["Heat", "Cool", "Hold"]
           },
           "id": {
             "type": "string"
@@ -33728,12 +32353,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "createdBy", "id", "updatedAt"]
       },
       "RecipeBomItem": {
         "type": "object",
@@ -33870,12 +32490,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "id",
-          "recipeBomITem",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "id", "recipeBomITem", "updatedAt"]
       },
       "Operation": {
         "type": "object",
@@ -34005,9 +32620,7 @@
           },
           "name": {
             "type": "string",
-            "enum": [
-              "Line1"
-            ]
+            "enum": ["Line1"]
           },
           "revision": {
             "type": "number"
@@ -34029,12 +32642,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "createdBy", "id", "updatedAt"]
       },
       "UnitProcedure": {
         "type": "object",
@@ -34285,12 +32893,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Created",
-              "Scheduled",
-              "InProgress",
-              "Complete"
-            ]
+            "enum": ["Created", "Scheduled", "InProgress", "Complete"]
           },
           "totalBarrels": {
             "type": "number"
@@ -34367,13 +32970,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "id",
-          "recipe",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "createdBy", "id", "recipe", "updatedAt"]
       },
       "Recipe": {
         "type": "object",
@@ -34954,10 +33551,7 @@
           },
           "testSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numerical"
-            ]
+            "enum": ["Boolean", "Numerical"]
           },
           "testedAt": {
             "type": "object"
@@ -35142,12 +33736,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "createdBy", "id", "updatedAt"]
       },
       "PurchaseOrder": {
         "type": "object",
@@ -35257,14 +33846,7 @@
             "$ref": "#/components/schemas/Vendor"
           }
         },
-        "required": [
-          "createdBy",
-          "erpId",
-          "globalId",
-          "id",
-          "item",
-          "name"
-        ]
+        "required": ["createdBy", "erpId", "globalId", "id", "item", "name"]
       },
       "Lot": {
         "type": "object",
@@ -35410,12 +33992,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Started",
-              "PendingValidation",
-              "Submitted",
-              "Complete"
-            ]
+            "enum": ["Started", "PendingValidation", "Submitted", "Complete"]
           },
           "tankOfOrigin": {
             "$ref": "#/components/schemas/Asset"
@@ -35458,13 +34035,7 @@
             ]
           }
         },
-        "required": [
-          "batches",
-          "createdAt",
-          "id",
-          "lotNumber",
-          "updatedAt"
-        ]
+        "required": ["batches", "createdAt", "id", "lotNumber", "updatedAt"]
       },
       "InventoryLog": {
         "type": "object",
@@ -35688,12 +34259,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "batchId",
-          "createdAt",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["batchId", "createdAt", "id", "updatedAt"]
       },
       "Asset": {
         "type": "object",
@@ -35821,10 +34387,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "OOS",
-              "InService"
-            ]
+            "enum": ["OOS", "InService"]
           },
           "updatedAt": {
             "format": "date-time",
@@ -36445,13 +35008,7 @@
             }
           }
         },
-        "required": [
-          "createdBy",
-          "id",
-          "name",
-          "operation",
-          "stepType"
-        ]
+        "required": ["createdBy", "id", "name", "operation", "stepType"]
       },
       "PhaseParameter": {
         "type": "object",
@@ -36525,11 +35082,7 @@
           },
           "setpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "String"
-            ]
+            "enum": ["Boolean", "Numeric", "String"]
           },
           "setpointUpperLimit": {
             "type": "number"
@@ -36587,9 +35140,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "BomItemWhereUniqueInput": {
         "type": "object",
@@ -36598,9 +35149,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "DateTimeNullableFilter": {
         "type": "object",
@@ -36652,9 +35201,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "LotWhereUniqueInput": {
         "type": "object",
@@ -36663,9 +35210,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "FloatFilter": {
         "type": "object",
@@ -36889,9 +35434,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "IntNullableFilter": {
         "type": "object",
@@ -37001,11 +35544,7 @@
           },
           "setpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "String"
-            ]
+            "enum": ["Boolean", "Numeric", "String"]
           },
           "setpointUpperLimit": {
             "$ref": "#/components/schemas/FloatNullableFilter"
@@ -37051,9 +35590,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "DateTimeFilter": {
         "type": "object",
@@ -37139,9 +35676,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "AssetWhereUniqueInput": {
         "type": "object",
@@ -37150,9 +35685,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "JsonFilter": {
         "type": "object",
@@ -37172,9 +35705,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ProductionOrderRecipeInstanceWhereUniqueInput": {
         "type": "object",
@@ -37183,9 +35714,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeWhereUniqueInput": {
         "type": "object",
@@ -37194,9 +35723,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "BatchWhereInput": {
         "type": "object",
@@ -37266,9 +35793,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "InventoryWhereInput": {
         "type": "object",
@@ -37356,9 +35881,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "MashingProtocolWhereUniqueInput": {
         "type": "object",
@@ -37367,9 +35890,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeParameterWhereInput": {
         "type": "object",
@@ -37433,11 +35954,7 @@
           },
           "recipeSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "Text"
-            ]
+            "enum": ["Boolean", "Numeric", "Text"]
           },
           "recipeSetpointUpperLimit": {
             "$ref": "#/components/schemas/FloatNullableFilter"
@@ -37477,9 +35994,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "MashingProtocolStepActualWhereUniqueInput": {
         "type": "object",
@@ -37488,9 +36003,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeBomItemWhereUniqueInput": {
         "type": "object",
@@ -37499,9 +36012,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeBomActualWhereInput": {
         "type": "object",
@@ -37590,9 +36101,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeBomItemWhereInput": {
         "type": "object",
@@ -37687,11 +36196,7 @@
           },
           "holdType": {
             "type": "string",
-            "enum": [
-              "Heat",
-              "Cool",
-              "Hold"
-            ]
+            "enum": ["Heat", "Cool", "Hold"]
           },
           "id": {
             "$ref": "#/components/schemas/StringFilter"
@@ -37821,9 +36326,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeBomWhereInput": {
         "type": "object",
@@ -37927,9 +36430,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ScheduleOrderQueueWhereUniqueInput": {
         "type": "object",
@@ -37938,9 +36439,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ScheduleOrderWhereInput": {
         "type": "object",
@@ -38025,12 +36524,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Created",
-              "Scheduled",
-              "InProgress",
-              "Complete"
-            ]
+            "enum": ["Created", "Scheduled", "InProgress", "Complete"]
           },
           "totalBarrels": {
             "$ref": "#/components/schemas/IntNullableFilter"
@@ -38061,9 +36555,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "OperationWhereInput": {
         "type": "object",
@@ -38164,9 +36656,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ScheduleOrderWhereUniqueInput": {
         "type": "object",
@@ -38175,9 +36665,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ScheduleOrderQueueWhereInput": {
         "type": "object",
@@ -38652,9 +37140,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ItemReceiptWhereInput": {
         "type": "object",
@@ -38763,9 +37249,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "PurchaseOrderWhereInput": {
         "type": "object",
@@ -38964,10 +37448,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "OOS",
-              "InService"
-            ]
+            "enum": ["OOS", "InService"]
           },
           "updatedAt": {
             "$ref": "#/components/schemas/DateTimeFilter"
@@ -39174,12 +37655,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Started",
-              "PendingValidation",
-              "Submitted",
-              "Complete"
-            ]
+            "enum": ["Started", "PendingValidation", "Submitted", "Complete"]
           },
           "tankOfOrigin": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
@@ -39243,9 +37719,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ProductionOrderWhereInput": {
         "type": "object",
@@ -39649,10 +38123,7 @@
           },
           "testSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numerical"
-            ]
+            "enum": ["Boolean", "Numerical"]
           },
           "testedAt": {
             "$ref": "#/components/schemas/DateTimeNullableFilter"
@@ -39929,11 +38400,7 @@
           },
           "setpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "String"
-            ]
+            "enum": ["Boolean", "Numeric", "String"]
           },
           "setpointUpperLimit": {
             "type": "number"
@@ -40079,10 +38546,7 @@
           },
           "testSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numerical"
-            ]
+            "enum": ["Boolean", "Numerical"]
           },
           "testedAt": {
             "type": "object"
@@ -40097,12 +38561,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "active",
-          "testParamUnits",
-          "createdBy",
-          "name"
-        ]
+        "required": ["active", "testParamUnits", "createdBy", "name"]
       },
       "EquipmentPhaseUpdateManyWithoutTestParametersInput": {
         "type": "object",
@@ -40228,10 +38687,7 @@
           },
           "testSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numerical"
-            ]
+            "enum": ["Boolean", "Numerical"]
           },
           "equipmentPhases": {
             "$ref": "#/components/schemas/EquipmentPhaseUpdateManyWithoutTestParametersInput"
@@ -40359,11 +38815,7 @@
           },
           "recipeSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "Text"
-            ]
+            "enum": ["Boolean", "Numeric", "Text"]
           },
           "recipeSetpointUpperLimit": {
             "type": "number"
@@ -40465,11 +38917,7 @@
           },
           "recipeSetpointType": {
             "type": "string",
-            "enum": [
-              "Boolean",
-              "Numeric",
-              "Text"
-            ]
+            "enum": ["Boolean", "Numeric", "Text"]
           },
           "recipeSetpointUpperLimit": {
             "type": "number"
@@ -40527,11 +38975,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "filePath",
-          "revision"
-        ]
+        "required": ["createdBy", "filePath", "revision"]
       },
       "EquipmentPhaseUpdateManyWithoutInstructionsInput": {
         "type": "object",
@@ -40617,9 +39061,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "InstructionCreateNestedManyWithoutEquipmentPhasesInput": {
         "type": "object",
@@ -40772,12 +39214,7 @@
             "$ref": "#/components/schemas/TestParameterCreateNestedManyWithoutEquipmentPhasesInput"
           }
         },
-        "required": [
-          "createdBy",
-          "name",
-          "operation",
-          "stepType"
-        ]
+        "required": ["createdBy", "name", "operation", "stepType"]
       },
       "BomItemUpdateManyWithoutEquipmentPhasesInput": {
         "type": "object",
@@ -41274,9 +39711,7 @@
           },
           "name": {
             "type": "string",
-            "enum": [
-              "Line1"
-            ]
+            "enum": ["Line1"]
           },
           "revision": {
             "type": "number"
@@ -41291,9 +39726,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy"
-        ]
+        "required": ["createdBy"]
       },
       "ProcedureWhereInput": {
         "type": "object",
@@ -41324,9 +39757,7 @@
           },
           "name": {
             "type": "string",
-            "enum": [
-              "Line1"
-            ]
+            "enum": ["Line1"]
           },
           "revision": {
             "$ref": "#/components/schemas/IntNullableFilter"
@@ -41428,9 +39859,7 @@
           },
           "name": {
             "type": "string",
-            "enum": [
-              "Line1"
-            ]
+            "enum": ["Line1"]
           },
           "revision": {
             "type": "number"
@@ -41486,9 +39915,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeParameterCreateNestedManyWithoutRecipesInput": {
         "type": "object",
@@ -41650,11 +40077,7 @@
             ]
           }
         },
-        "required": [
-          "Recipe",
-          "createdBy",
-          "customer"
-        ]
+        "required": ["Recipe", "createdBy", "customer"]
       },
       "BatchUpdateManyWithoutRecipesInput": {
         "type": "object",
@@ -42049,13 +40472,7 @@
             "$ref": "#/components/schemas/UnitProcedureCreateNestedManyWithoutBomsInput"
           }
         },
-        "required": [
-          "bomItem",
-          "bomName",
-          "bomRevision",
-          "createdBy",
-          "item"
-        ]
+        "required": ["bomItem", "bomName", "bomRevision", "createdBy", "item"]
       },
       "BomItemUpdateManyWithoutBomsInput": {
         "type": "object",
@@ -42222,10 +40639,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "scheduleOrder"
-        ]
+        "required": ["createdBy", "scheduleOrder"]
       },
       "ScheduleOrderQueueUpdateInput": {
         "type": "object",
@@ -42377,11 +40791,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "name",
-          "procedure"
-        ]
+        "required": ["createdBy", "name", "procedure"]
       },
       "UnitProcedureUpdateManyWithoutUnitProceduresInput": {
         "type": "object",
@@ -42608,10 +41018,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "recipe"
-        ]
+        "required": ["createdBy", "recipe"]
       },
       "RecipeGroupWhereInput": {
         "type": "object",
@@ -42890,12 +41297,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "bom",
-          "createdBy",
-          "customer",
-          "item"
-        ]
+        "required": ["bom", "createdBy", "customer", "item"]
       },
       "LotUpdateManyWithoutProductionOrdersInput": {
         "type": "object",
@@ -43165,12 +41567,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Created",
-              "Scheduled",
-              "InProgress",
-              "Complete"
-            ]
+            "enum": ["Created", "Scheduled", "InProgress", "Complete"]
           },
           "totalBarrels": {
             "type": "number"
@@ -43315,12 +41712,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Created",
-              "Scheduled",
-              "InProgress",
-              "Complete"
-            ]
+            "enum": ["Created", "Scheduled", "InProgress", "Complete"]
           },
           "totalBarrels": {
             "type": "number"
@@ -43340,9 +41732,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "AdditiveActualCreateNestedManyWithoutItemsInput": {
         "type": "object",
@@ -43384,9 +41774,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "InventoryCreateNestedManyWithoutItemsInput": {
         "type": "object",
@@ -43417,9 +41805,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "InventoryTransferCreateNestedManyWithoutItemsInput": {
         "type": "object",
@@ -43614,13 +42000,7 @@
             "$ref": "#/components/schemas/VendorWhereUniqueInput"
           }
         },
-        "required": [
-          "createdBy",
-          "erpId",
-          "itemName",
-          "itemNumber",
-          "itemType"
-        ]
+        "required": ["createdBy", "erpId", "itemName", "itemNumber", "itemType"]
       },
       "AdditiveActualUpdateManyWithoutItemsInput": {
         "type": "object",
@@ -44052,9 +42432,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "ItemGroup": {
         "type": "object",
@@ -44080,12 +42458,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "id",
-          "name",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "id", "name", "updatedAt"]
       },
       "ItemGroupWhereInput": {
         "type": "object",
@@ -44242,12 +42615,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "address",
-          "createdBy",
-          "name",
-          "revision"
-        ]
+        "required": ["address", "createdBy", "name", "revision"]
       },
       "BatchUpdateManyWithoutCustomersInput": {
         "type": "object",
@@ -44585,13 +42953,7 @@
             "$ref": "#/components/schemas/VendorWhereUniqueInput"
           }
         },
-        "required": [
-          "createdBy",
-          "erpId",
-          "globalId",
-          "item",
-          "name"
-        ]
+        "required": ["createdBy", "erpId", "globalId", "item", "name"]
       },
       "LotUpdateManyWithoutPurchaseOrdersInput": {
         "type": "object",
@@ -44853,13 +43215,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "globalId",
-          "item",
-          "quantity",
-          "revision"
-        ]
+        "required": ["createdBy", "globalId", "item", "quantity", "revision"]
       },
       "ItemUpdateManyWithoutSalesOrdersInput": {
         "type": "object",
@@ -44965,11 +43321,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "active",
-          "createdBy",
-          "testName"
-        ]
+        "required": ["active", "createdBy", "testName"]
       },
       "Test": {
         "type": "object",
@@ -45012,13 +43364,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "active",
-          "createdAt",
-          "createdBy",
-          "id",
-          "testName"
-        ]
+        "required": ["active", "createdAt", "createdBy", "id", "testName"]
       },
       "TestWhereInput": {
         "type": "object",
@@ -45264,10 +43610,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "OOS",
-              "InService"
-            ]
+            "enum": ["OOS", "InService"]
           },
           "updatedBy": {
             "type": "string"
@@ -45549,10 +43892,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "OOS",
-              "InService"
-            ]
+            "enum": ["OOS", "InService"]
           },
           "updatedBy": {
             "type": "string"
@@ -45862,11 +44202,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "asset",
-          "createdBy",
-          "item"
-        ]
+        "required": ["asset", "createdBy", "item"]
       },
       "InventoryUpdateInput": {
         "type": "object",
@@ -46088,12 +44424,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Started",
-              "PendingValidation",
-              "Submitted",
-              "Complete"
-            ]
+            "enum": ["Started", "PendingValidation", "Submitted", "Complete"]
           },
           "tankOfOrigin": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
@@ -46132,10 +44463,7 @@
             ]
           }
         },
-        "required": [
-          "batches",
-          "lotNumber"
-        ]
+        "required": ["batches", "lotNumber"]
       },
       "ItemCreateNestedManyWithoutLotsInput": {
         "type": "object",
@@ -46365,12 +44693,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Started",
-              "PendingValidation",
-              "Submitted",
-              "Complete"
-            ]
+            "enum": ["Started", "PendingValidation", "Submitted", "Complete"]
           },
           "tankOfOrigin": {
             "$ref": "#/components/schemas/AssetWhereUniqueInput"
@@ -46478,11 +44801,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "item",
-          "quantity"
-        ]
+        "required": ["createdBy", "item", "quantity"]
       },
       "EquipmentPhaseUpdateManyWithoutBomItemsInput": {
         "type": "object",
@@ -46621,11 +44940,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "id", "updatedAt"]
       },
       "UnitWhereInput": {
         "type": "object",
@@ -46695,10 +45010,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "operation",
-          "createdBy"
-        ]
+        "required": ["operation", "createdBy"]
       },
       "BatchCreateNestedManyWithoutBatchesInput": {
         "type": "object",
@@ -46754,9 +45066,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "batchId"
-        ]
+        "required": ["batchId"]
       },
       "BatchUpdateManyWithoutBatchesInput": {
         "type": "object",
@@ -46881,9 +45191,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy"
-        ]
+        "required": ["createdBy"]
       },
       "VendorWhereInput": {
         "type": "object",
@@ -47057,14 +45365,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "asset",
-          "date",
-          "dateTime",
-          "item",
-          "loggedBy",
-          "units"
-        ]
+        "required": ["asset", "date", "dateTime", "item", "loggedBy", "units"]
       },
       "CustomerUpdateManyWithoutInventoryLogsInput": {
         "type": "object",
@@ -47243,9 +45544,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "UnitLookupCreateNestedManyWithoutUnitLookupsInput": {
         "type": "object",
@@ -47476,11 +45775,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "id", "updatedAt"]
       },
       "ProductionOrderBomItemWhereInput": {
         "type": "object",
@@ -47512,9 +45807,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "RecipeBomActualCreateNestedManyWithoutRecipeBomItemsInput": {
         "type": "object",
@@ -47576,11 +45869,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "createdBy",
-          "operation",
-          "units"
-        ]
+        "required": ["createdBy", "operation", "units"]
       },
       "MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput": {
         "type": "object",
@@ -47765,11 +46054,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy",
-          "name",
-          "steps"
-        ]
+        "required": ["createdBy", "name", "steps"]
       },
       "MashingProtocolUpdateManyWithoutMashingProtocolsInput": {
         "type": "object",
@@ -47955,11 +46240,7 @@
           },
           "holdType": {
             "type": "string",
-            "enum": [
-              "Heat",
-              "Cool",
-              "Hold"
-            ]
+            "enum": ["Heat", "Cool", "Hold"]
           },
           "index": {
             "type": "number"
@@ -48003,9 +46284,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdBy"
-        ]
+        "required": ["createdBy"]
       },
       "MashingProtocolStepActualUpdateManyWithoutMashingProtocolStepsInput": {
         "type": "object",
@@ -48079,11 +46358,7 @@
           },
           "holdType": {
             "type": "string",
-            "enum": [
-              "Heat",
-              "Cool",
-              "Hold"
-            ]
+            "enum": ["Heat", "Cool", "Hold"]
           },
           "index": {
             "type": "number"
@@ -48206,9 +46481,7 @@
             "$ref": "#/components/schemas/RecipeBomWhereUniqueInput"
           }
         },
-        "required": [
-          "recipeBomITem"
-        ]
+        "required": ["recipeBomITem"]
       },
       "RecipeBomUpdateManyWithoutRecipeBomsInput": {
         "type": "object",
@@ -48514,11 +46787,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "itemNumber",
-          "lotNumber",
-          "quantity"
-        ]
+        "required": ["itemNumber", "lotNumber", "quantity"]
       },
       "AdditiveActualUpdateInput": {
         "type": "object",
@@ -48544,9 +46813,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "UnsBrokerConfigurationCreateNestedManyWithoutUnsConfigurationsInput": {
         "type": "object",
@@ -48578,12 +46845,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "Create",
-                "Read",
-                "Update",
-                "Delete"
-              ]
+              "enum": ["Create", "Read", "Update", "Delete"]
             }
           },
           "filterCriteria": {
@@ -48599,10 +46861,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "brokers",
-          "createdBy"
-        ]
+        "required": ["brokers", "createdBy"]
       },
       "UnsConfiguration": {
         "type": "object",
@@ -48630,12 +46889,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "Create",
-                "Read",
-                "Update",
-                "Delete"
-              ]
+              "enum": ["Create", "Read", "Update", "Delete"]
             }
           },
           "filterCriteria": {
@@ -48658,13 +46912,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "brokers",
-          "createdAt",
-          "createdBy",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["brokers", "createdAt", "createdBy", "id", "updatedAt"]
       },
       "UnsBrokerConfiguration": {
         "type": "object",
@@ -48717,13 +46965,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "host",
-          "id",
-          "updatedAt"
-        ]
+        "required": ["createdAt", "createdBy", "host", "id", "updatedAt"]
       },
       "UnsConfigurationWhereInput": {
         "type": "object",
@@ -48868,12 +47110,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "Create",
-                "Read",
-                "Update",
-                "Delete"
-              ]
+              "enum": ["Create", "Read", "Update", "Delete"]
             }
           },
           "filterCriteria": {
@@ -48897,9 +47134,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "UnsConfigurationCreateNestedManyWithoutUnsBrokerConfigurationsInput": {
         "type": "object",
@@ -48952,10 +47187,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "createdBy",
-          "host"
-        ]
+        "required": ["createdBy", "host"]
       },
       "UnsConfigurationUpdateManyWithoutUnsBrokerConfigurationsInput": {
         "type": "object",
@@ -49057,11 +47289,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "actualValue",
-          "createdBy",
-          "mashingProtocolStep"
-        ]
+        "required": ["actualValue", "createdBy", "mashingProtocolStep"]
       },
       "RecipeBomActualUpdateManyWithoutMashingProtocolStepActualsInput": {
         "type": "object",
@@ -49131,10 +47359,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "createdBy",
-          "recipeBomItem"
-        ]
+        "required": ["createdBy", "recipeBomItem"]
       },
       "RecipeBomActualUpdateInput": {
         "type": "object",
