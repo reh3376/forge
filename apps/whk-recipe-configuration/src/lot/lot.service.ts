@@ -75,7 +75,7 @@ export class LotService extends LotServiceBase {
     */
     let mergedLot: any = {};
     let explicitStatus: EnumLotStatus | undefined;
-    
+
     if (type === "create") {
       mergedLot = { ...lot };
     } else if (type === "update" && "where" in lot && "data" in lot) {
