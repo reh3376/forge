@@ -15,3 +15,16 @@
 #Server Specific
 prisma/migrations/
 package-lock.json
+
+# Helm templates (contain Go template syntax that prettier can't parse)
+helm/
+**/helm/
+*.yaml
+*.yml
+
+# Submodules
+submodules/
+
+# Generated files
+openapi.json
+schema.graphql

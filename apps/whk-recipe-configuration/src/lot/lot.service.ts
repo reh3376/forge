@@ -74,8 +74,7 @@ export class LotService extends LotServiceBase {
 
     */
     let mergedLot: any = {};
-    let explicitStatus: EnumLotStatus | undefined;
-    
+
     if (type === "create") {
       mergedLot = { ...lot };
     } else if (type === "update" && "where" in lot && "data" in lot) {
@@ -97,7 +96,7 @@ export class LotService extends LotServiceBase {
       throw new Error("Invalid input for lot calculation");
     }
 
-    explicitStatus = mergedLot.status as EnumLotStatus | undefined;
+    const explicitStatus = mergedLot.status as EnumLotStatus | undefined;
 
     // Perform calculations
     if (mergedLot.densityFinal && mergedLot.densityFinal <= 1) {
@@ -172,6 +171,8 @@ export class LotService extends LotServiceBase {
     const barrelTypeMapping: { [key: string]: string } = {
       WVG: "01",
       ISC: "10",
+      OTHER: "99",
+      CUS: "90",
     };
     const bblOem = args.data.bblOem;
     if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
