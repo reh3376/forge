@@ -505,7 +505,7 @@ class Lot {
   @Field(() => EnumLotStatus, {
     nullable: true,
   })
-  status?: "Started" | "PendingValidation" | "Submitted" | "Complete" | null;
+  status?: "Started" | "PendingValidation" | "Verified" | "Complete" | null;
 
   @ApiProperty({
     required: false,
