@@ -18,6 +18,38 @@ export class LotService extends LotServiceBase {
     super(prisma);
   }
 
+  private roundLotFloatFields(
+    data: Prisma.LotCreateInput | Prisma.LotUpdateInput
+  ): void {
+    const floatFields = [
+      "avgBblFillByPg",
+      "avgBblFillByWg",
+      "avgPGsFerm",
+      "bblEntryProof",
+      "finalVolume",
+      "finalWeight",
+      "grainLbsFerm",
+      "grainLbsPg",
+      "initialVolume",
+      "initialWeight",
+      "pgLosses",
+      "proofInitial",
+      "standardYield",
+      "totalFermenters",
+      "totalPGs",
+      "totalPGsByRecipe",
+      "totalVolumeWg",
+      "totalWGs",
+      "totalWeight",
+    ];
+    for (const field of floatFields) {
+      const value = (data as any)[field];
+      if (typeof value === "number") {
+        (data as any)[field] = Math.round(value * 100) / 100;
+      }
+    }
+  }
+
   async calculateLotAnalytics(
     lot:
       | LotCreateInput
@@ -42,7 +74,8 @@ export class LotService extends LotServiceBase {
 
     */
     let mergedLot: any = {};
-
+    let explicitStatus: EnumLotStatus | undefined;
+    
     if (type === "create") {
       mergedLot = { ...lot };
     } else if (type === "update" && "where" in lot && "data" in lot) {
@@ -63,6 +96,8 @@ export class LotService extends LotServiceBase {
     } else {
       throw new Error("Invalid input for lot calculation");
     }
+
+    explicitStatus = mergedLot.status as EnumLotStatus | undefined;
 
     // Perform calculations
     if (mergedLot.densityFinal && mergedLot.densityFinal <= 1) {
@@ -103,9 +138,13 @@ export class LotService extends LotServiceBase {
       if (mergedLot.bblTotal) {
         mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
         mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
-        mergedLot.status = EnumLotStatus.PendingValidation;
+        if (!explicitStatus) {
+          mergedLot.status = EnumLotStatus.PendingValidation;
+        }
       } else {
-        mergedLot.status = EnumLotStatus.Started;
+        if (!explicitStatus) {
+          mergedLot.status = EnumLotStatus.Started;
+        }
       }
     }
 
@@ -118,7 +157,7 @@ export class LotService extends LotServiceBase {
       avgPGsFerm: mergedLot.avgPGsFerm,
       avgBblFillByPg: mergedLot.avgBblFillByPg,
       avgBblFillByWg: mergedLot.avgBblFillByWg,
-      status: mergedLot.status,
+      status: explicitStatus ?? mergedLot.status,
       densityFinal: mergedLot.densityFinal,
     };
   }
@@ -210,12 +249,14 @@ export class LotService extends LotServiceBase {
       args.data as LotCreateInput
     );
 
+    const createData = {
+      ...args.data,
+      ...calculatedData,
+      lotNumber: `${fullLotNumber}`,
+    };
+    this.roundLotFloatFields(createData);
     const lot = await super.createLot({
-      data: {
-        ...args.data,
-        ...calculatedData,
-        lotNumber: `${fullLotNumber}`,
-      },
+      data: createData,
       include: {
         ...args.include,
         productionOrder: true,
@@ -256,6 +297,7 @@ export class LotService extends LotServiceBase {
       ...args.data,
       ...calculatedData,
     };
+    this.roundLotFloatFields(args.data);
     const Lot = await super.updateLot({
       data: {
         ...args.data,
