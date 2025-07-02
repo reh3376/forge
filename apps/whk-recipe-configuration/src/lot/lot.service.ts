@@ -133,6 +133,8 @@ export class LotService extends LotServiceBase {
     const barrelTypeMapping: { [key: string]: string } = {
       WVG: "01",
       ISC: "10",
+      OTHER: "99",
+      CUS: "90",
     };
     const bblOem = args.data.bblOem;
     if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
