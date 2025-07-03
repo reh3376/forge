@@ -62,7 +62,7 @@ jobs:
       - name: Copy Project Files to Remote Server
         shell: powershell
         run: |
-          scp -r -i "~\.ssh\ldkrvm01" C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
+          scp -r -i "C:\actions-runner\.ssh\ldkrvm01" C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
         env:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
