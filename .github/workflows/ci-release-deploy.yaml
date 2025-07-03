@@ -63,7 +63,7 @@ jobs:
         shell: powershell
         run: |
           scp -o StrictHostKeyChecking=no `
-              -i "C:\actions-runner\.ssh\ldkrvm01" `
+              -i "~\.ssh\ldkrvm01" `
               C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\* `
               ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
         env:
@@ -73,8 +73,8 @@ jobs:
       - name: Copy .env to Remote Server
         shell: powershell
         run: |
-          scp -v -o StrictHostKeyChecking=no `
-              -i "C:\actions-runner\.ssh\ldkrvm01" `
+          scp -o StrictHostKeyChecking=no -v `
+              -i "~\.ssh\ldkrvm01" `
               C:\actions-runner\_work\whk-mes\whk-mes\apps\whk-recipe-configuration\.env `
               ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/usr/local/src/repos/whk-mes-deploy
         env:
@@ -84,7 +84,7 @@ jobs:
       - name: Verify Files on Remote Server
         run: |
           ssh -o StrictHostKeyChecking=no `
-              -i "C:\actions-runner\.ssh\ldkrvm01" `
+              -i "~\.ssh\ldkrvm01" `
               ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} `
               "ls -la /usr/local/src/repos/whk-mes-deploy"
         env:
@@ -94,7 +94,7 @@ jobs:
       - name: Set Permissions for .env
         run: |
           ssh -o StrictHostKeyChecking=no `
-              -i "C:\actions-runner\.ssh\ldkrvm01" `
+              -i "~\.ssh\ldkrvm01" `
               ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} `
               "chmod 600 /usr/local/src/repos/whk-mes-deploy/.env"
         env:
@@ -104,7 +104,7 @@ jobs:
       - name: Run deploy script
         run: |
           ssh -o StrictHostKeyChecking=no `
-              -i "C:\actions-runner\.ssh\ldkrvm01" `
+              -i "~\.ssh\ldkrvm01" `
               ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} `
               "cd /usr/local/src/repos/whk-mes-deploy && chmod +x deploy.sh && ./deploy.sh"
         env:
@@ -114,7 +114,7 @@ jobs:
       - name: Run Prisma migrations on remote server
         run: |
           ssh -o StrictHostKeyChecking=no `
-              -i "C:\actions-runner\.ssh\ldkrvm01" `
+              -i "~\.ssh\ldkrvm01" `
               ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} `
               "cd /usr/local/src/repos/whk-mes-deploy && npx prisma migrate deploy"
         env:
