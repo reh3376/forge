@@ -59,6 +59,7 @@ import { UnsBrokerConfigurationModule } from "./unsBrokerConfiguration/unsBroker
 import { MashingProtocolStepActualModule } from "./mashingProtocolStepActual/mashingProtocolStepActual.module";
 import { RecipeBomActualModule } from "./recipeBomActual/recipeBomActual.module";
 import { HealthModule } from "./health/health.module";
+import { SchemaVersionModule } from "./schemaVersion/schemaVersion.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
 import { StorageModule } from "./storage/storage.module";
@@ -129,6 +130,7 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     MashingProtocolStepActualModule,
     RecipeBomActualModule,
     HealthModule,
+    SchemaVersionModule,
     PrismaModule,
     SecretsManagerModule,
     SyncModule,
