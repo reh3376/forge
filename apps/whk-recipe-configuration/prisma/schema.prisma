@@ -16,6 +16,7 @@ model User {
   roles     Json
   updatedAt DateTime @updatedAt
   username  String   @unique
+  schemaVersion String?
 }
 
 model PhaseParameter {
@@ -415,6 +416,7 @@ model ScheduleOrder {
   updatedAt                        DateTime                 @updatedAt
   updatedBy                        String?
   scheduleOrderQueueId             String?                  @unique
+  schemaVersion String?
 }
 
 model Item {
@@ -461,6 +463,7 @@ model ItemGroup {
   id          String   @id @default(cuid())
   name        String
   updatedAt   DateTime @updatedAt
+  schemaVersion String?
 }
 
 model Customer {
@@ -714,6 +717,7 @@ model BomItem {
   units             String?
   updatedAt         DateTime         @updatedAt
   updatedBy         String?
+  schemaVersion String?
 }
 
 model Unit {
@@ -724,6 +728,7 @@ model Unit {
   name      String?
   unitType  String?
   updatedAt DateTime @updatedAt
+  schemaVersion String?
 }
 
 model Batch {
@@ -749,6 +754,7 @@ model Batch {
   revision                        Int?                           @default(0)
   totalDuration                   Int?
   updatedAt                       DateTime                       @updatedAt
+  schemaVersion String?
 }
 
 model Vendor {
@@ -765,6 +771,7 @@ model Vendor {
   purchaseOrders     PurchaseOrder[]
   updatedAt          DateTime        @updatedAt
   updatedBy          String?
+  schemaVersion String?
 }
 
 model Inventory {
@@ -815,6 +822,7 @@ model InventoryLog {
   revision            Int?       @default(0)
   units               String
   updatedAt           DateTime   @updatedAt
+  schemaVersion String?
 }
 
 model InventoryTransfer {
@@ -834,6 +842,7 @@ model InventoryTransfer {
   toLocation   Asset[]  @relation(name: "inventoryTransfersTo")
   updatedAt    DateTime @updatedAt
   updatedBy    String?
+  schemaVersion String?
 }
 
 model UnitLookup {
@@ -850,12 +859,14 @@ model UnitLookup {
   pluralAbbreviation String       @unique
   pluralName         String       @unique
   unitLookupRecords  UnitLookup[] @relation(name: "baseRecord")
+  schemaVersion String?
 }
 
 model ProductionOrderBomItem {
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
+  schemaVersion String?
 }
 
 model RecipeBomItem {
@@ -878,6 +889,7 @@ model RecipeBomItem {
   units                String
   updatedAt            DateTime                   @updatedAt
   updatedBy            DateTime?
+  schemaVersion String?
 }
 
 model MashingProtocol {
@@ -899,6 +911,7 @@ model MashingProtocol {
   steps                          MashingProtocolStep[]
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
+  schemaVersion String?
 }
 
 model MashingProtocolStep {
@@ -924,6 +937,7 @@ model MashingProtocolStep {
   temperatureSetpoint        Float?
   updatedAt                  DateTime                         @updatedAt
   updatedBy                  String?
+  schemaVersion String?
 }
 
 model RecipeBom {
@@ -942,6 +956,7 @@ model RecipeBom {
   runningRecipeBom               RecipeBom?                      @relation(name: "runningRecipeBom", fields: [runningRecipeBomId], references: [id])
   runningRecipeBomId             String?
   updatedAt                      DateTime                        @updatedAt
+  schemaVersion String?
 }
 
 model ProductionOrderRecipeInstance {
@@ -957,6 +972,7 @@ model ProductionOrderRecipeInstance {
   recipeBom         RecipeBom[]
   updatedAt         DateTime          @updatedAt
   updatedBy         String?
+  schemaVersion String?
 }
 
 model AdditiveActual {
@@ -968,6 +984,7 @@ model AdditiveActual {
   lotNumber  String
   quantity   Int
   updatedAt  DateTime @updatedAt
+  schemaVersion String?
 }
 
 model UnsConfiguration {
@@ -983,6 +1000,7 @@ model UnsConfiguration {
   transformationFunction String?
   updatedAt              DateTime                        @updatedAt
   updatedBy              String?
+  schemaVersion String?
 }
 
 model UnsBrokerConfiguration {
@@ -1001,6 +1019,7 @@ model UnsBrokerConfiguration {
   updatedBy           String?
   username            String?
   validateCertificate Boolean?           @default(false)
+  schemaVersion String?
 }
 
 model MashingProtocolStepActual {
@@ -1015,6 +1034,7 @@ model MashingProtocolStepActual {
   timeActualValue       Float?
   updatedAt             DateTime            @updatedAt
   updatedBy             String?
+  schemaVersion String?
 }
 
 model RecipeBomActual {
@@ -1028,6 +1048,7 @@ model RecipeBomActual {
   updatedAt                   DateTime                   @updatedAt
   updatedBy                   String?
   value                       Float?
+  schemaVersion String?
 }
 
 model MessageQueue {
@@ -1046,6 +1067,7 @@ model MessageQueue {
   acknowledgedAt DateTime?
   messageId      String?                @unique
   createdBy      String
+  schemaVersion String?
 }
 
 enum EnumPhaseParameterSetpointType {
