@@ -174,13 +174,14 @@ export class LotService extends LotServiceBase {
       OTHER: "99",
       CUS: "90",
     };
-    const bblOem = args.data.bblOem;
-    if (!args.data.bblOem || !barrelTypeMapping[args.data.bblOem]) {
+    // Accept case-insensitive values for the OEM
+    const bblOem = args.data.bblOem?.toUpperCase();
+    if (!bblOem || !barrelTypeMapping[bblOem]) {
       throw new Error(
-        "BBL OEM must be provided and must be one of the following: WVG, ISC"
+        "BBL OEM must be provided and must be one of the following: WVG, ISC, Other"
       );
     }
-    const bblType = barrelTypeMapping[bblOem as string];
+    const bblType = barrelTypeMapping[bblOem];
 
     // Validate and normalize lotAlphaChar
     if (!args.data.lotAlphaChar || !/^[a-zA-Z]$/.test(args.data.lotAlphaChar)) {
