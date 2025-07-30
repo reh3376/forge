@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { LotService } from './lot.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { RabbitMQProducerService } from '../rabbitmq/rabbitmq.producer.service';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { EnumLotWhiskeyType, EnumLotStatus } from '@prisma/client';
-import { EnumRecipeWhiskeyType } from '../recipe/base/EnumRecipeWhiskeyType';
+import { Test, TestingModule } from "@nestjs/testing";
+import { LotService } from "./lot.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { EnumLotWhiskeyType, EnumLotStatus } from "@prisma/client";
+import { EnumRecipeWhiskeyType } from "../recipe/base/EnumRecipeWhiskeyType";
 
-describe('LotService Integration Tests', () => {
+describe("LotService Integration Tests", () => {
   let service: LotService;
   let prismaService: PrismaService;
 
@@ -70,17 +70,21 @@ describe('LotService Integration Tests', () => {
     jest.clearAllMocks();
   });
 
-  describe('Recipe Name to ID Integration', () => {
-    it('should create recipe when name does not exist and then create lot', async () => {
-      const recipeName = 'Test Single Malt Recipe';
-      const mockCustomer = { id: 'customer-1', name: 'Test Customer' };
-      const mockItem = { id: 'item-1', itemNumber: 'TEST-ITEM' };
-      const mockNewRecipe = { id: 'recipe-1', Recipe: recipeName, item: mockItem };
-      const mockLot = { 
-        id: 'lot-1', 
-        lotNumber: '24A01A.01',
+  describe("Recipe Name to ID Integration", () => {
+    it("should create recipe when name does not exist and then create lot", async () => {
+      const recipeName = "Test Single Malt Recipe";
+      const mockCustomer = { id: "customer-1", name: "Test Customer" };
+      const mockItem = { id: "item-1", itemNumber: "TEST-ITEM" };
+      const mockNewRecipe = {
+        id: "recipe-1",
+        Recipe: recipeName,
+        item: mockItem,
+      };
+      const mockLot = {
+        id: "lot-1",
+        lotNumber: "24A01A.01",
         recipe: mockNewRecipe,
-        item: mockItem 
+        item: mockItem,
       };
 
       // Setup mocks for recipe creation flow
@@ -89,60 +93,61 @@ describe('LotService Integration Tests', () => {
       mockPrismaService.item.findFirst.mockResolvedValue(null);
       mockPrismaService.item.create.mockResolvedValue(mockItem);
       mockPrismaService.recipe.create.mockResolvedValue(mockNewRecipe);
-      
+
       // Setup mocks for lot creation
       mockPrismaService.recipe.findUnique.mockResolvedValue(mockNewRecipe);
       mockPrismaService.lot.findMany.mockResolvedValue([]);
 
       // Mock the parent createLot method
-      const superCreateLotSpy = jest.spyOn(Object.getPrototypeOf(LotService.prototype), 'createLot')
+      const superCreateLotSpy = jest
+        .spyOn(Object.getPrototypeOf(LotService.prototype), "createLot")
         .mockResolvedValue(mockLot as any);
 
       // Mock calculateLotAnalytics
-      jest.spyOn(service as any, 'calculateLotAnalytics').mockResolvedValue({
+      jest.spyOn(service as any, "calculateLotAnalytics").mockResolvedValue({
         totalWeight: 1000,
-        status: EnumLotStatus.PendingValidation
+        status: EnumLotStatus.PendingValidation,
       });
 
       // Mock lots method
-      jest.spyOn(service, 'lots').mockResolvedValue([]);
+      jest.spyOn(service, "lots").mockResolvedValue([]);
 
       const createLotArgs = {
         data: {
           recipeName: recipeName,
           whiskeyType: EnumLotWhiskeyType.AmericanSingleMalt,
-          bblOem: 'WVG',
-          lotAlphaChar: 'A',
-          lotNumber: '',
-          createdBy: 'test-user',
+          bblOem: "WVG",
+          lotAlphaChar: "A",
+          lotNumber: "",
+          createdBy: "test-user",
           bblEntryProof: 125,
           totalWeight: 1000,
           densityFinal: 8.5,
-          bblTotal: 10
-        }
+          bblTotal: 10,
+        },
       };
 
       const result = await service.createLot(createLotArgs as any);
 
       // Verify recipe was created with correct whiskey type detection
       expect(mockPrismaService.recipe.findFirst).toHaveBeenCalledWith({
-        where: { Recipe: recipeName }
+        where: { Recipe: recipeName },
       });
       expect(mockPrismaService.recipe.create).toHaveBeenCalledWith({
         data: {
           Recipe: recipeName,
-          createdBy: 'test-user',
-          customer: { connect: { id: 'customer-1' } },
-          item: { connect: { id: 'item-1' } },
+          createdBy: "test-user",
+          customer: { connect: { id: "customer-1" } },
+          item: { connect: { id: "item-1" } },
           revision: 1,
           // whiskeyType would be set here in real implementation
-        }
+        },
       });
 
       // Verify lot was created with the new recipe
       expect(mockPrismaService.recipe.findUnique).toHaveBeenCalledWith({
-        where: { id: 'recipe-1' },
-        include: { item: true }
+        where: { id: "recipe-1" },
+        include: { item: true },
       });
 
       // Verify the result
@@ -151,18 +156,18 @@ describe('LotService Integration Tests', () => {
       superCreateLotSpy.mockRestore();
     });
 
-    it('should use existing recipe when name exists', async () => {
-      const recipeName = 'Existing Recipe';
-      const mockExistingRecipe = { 
-        id: 'existing-recipe-1', 
+    it("should use existing recipe when name exists", async () => {
+      const recipeName = "Existing Recipe";
+      const mockExistingRecipe = {
+        id: "existing-recipe-1",
         Recipe: recipeName,
-        item: { id: 'item-1', itemNumber: 'EXISTING-ITEM' }
+        item: { id: "item-1", itemNumber: "EXISTING-ITEM" },
       };
-      const mockLot = { 
-        id: 'lot-2', 
-        lotNumber: '24A01B.01',
+      const mockLot = {
+        id: "lot-2",
+        lotNumber: "24A01B.01",
         recipe: mockExistingRecipe,
-        item: mockExistingRecipe.item 
+        item: mockExistingRecipe.item,
       };
 
       // Setup mocks - recipe already exists
@@ -171,37 +176,38 @@ describe('LotService Integration Tests', () => {
       mockPrismaService.lot.findMany.mockResolvedValue([]);
 
       // Mock the parent createLot method
-      const superCreateLotSpy = jest.spyOn(Object.getPrototypeOf(LotService.prototype), 'createLot')
+      const superCreateLotSpy = jest
+        .spyOn(Object.getPrototypeOf(LotService.prototype), "createLot")
         .mockResolvedValue(mockLot as any);
 
       // Mock calculateLotAnalytics
-      jest.spyOn(service as any, 'calculateLotAnalytics').mockResolvedValue({
+      jest.spyOn(service as any, "calculateLotAnalytics").mockResolvedValue({
         totalWeight: 1000,
-        status: EnumLotStatus.PendingValidation
+        status: EnumLotStatus.PendingValidation,
       });
 
       // Mock lots method
-      jest.spyOn(service, 'lots').mockResolvedValue([]);
+      jest.spyOn(service, "lots").mockResolvedValue([]);
 
       const createLotArgs = {
         data: {
           recipeName: recipeName,
-          bblOem: 'WVG',
-          lotAlphaChar: 'B',
-          lotNumber: '',
-          createdBy: 'test-user',
+          bblOem: "WVG",
+          lotAlphaChar: "B",
+          lotNumber: "",
+          createdBy: "test-user",
           bblEntryProof: 115,
           totalWeight: 1200,
           densityFinal: 8.0,
-          bblTotal: 12
-        }
+          bblTotal: 12,
+        },
       };
 
       const result = await service.createLot(createLotArgs as any);
 
       // Verify recipe lookup was called
       expect(mockPrismaService.recipe.findFirst).toHaveBeenCalledWith({
-        where: { Recipe: recipeName }
+        where: { Recipe: recipeName },
       });
 
       // Verify recipe was NOT created (since it exists)
@@ -209,8 +215,8 @@ describe('LotService Integration Tests', () => {
 
       // Verify lot was created with existing recipe
       expect(mockPrismaService.recipe.findUnique).toHaveBeenCalledWith({
-        where: { id: 'existing-recipe-1' },
-        include: { item: true }
+        where: { id: "existing-recipe-1" },
+        include: { item: true },
       });
 
       expect(result).toEqual(mockLot);
@@ -218,52 +224,53 @@ describe('LotService Integration Tests', () => {
       superCreateLotSpy.mockRestore();
     });
 
-    it('should handle lot updates with recipe names', async () => {
-      const newRecipeName = 'Updated Recipe Name';
-      const mockNewRecipe = { 
-        id: 'new-recipe-1', 
+    it("should handle lot updates with recipe names", async () => {
+      const newRecipeName = "Updated Recipe Name";
+      const mockNewRecipe = {
+        id: "new-recipe-1",
         Recipe: newRecipeName,
-        item: { id: 'item-2', itemNumber: 'NEW-ITEM' }
+        item: { id: "item-2", itemNumber: "NEW-ITEM" },
       };
-      const mockUpdatedLot = { 
-        id: 'lot-1', 
+      const mockUpdatedLot = {
+        id: "lot-1",
         recipe: mockNewRecipe,
-        notes: 'Updated with new recipe'
+        notes: "Updated with new recipe",
       };
 
       // Setup mocks for recipe creation (new recipe)
       mockPrismaService.recipe.findFirst.mockResolvedValue(null);
-      const mockCustomer = { id: 'customer-1', name: 'Test Customer' };
-      const mockItem = { id: 'item-2', itemNumber: 'NEW-ITEM' };
+      const mockCustomer = { id: "customer-1", name: "Test Customer" };
+      const mockItem = { id: "item-2", itemNumber: "NEW-ITEM" };
       mockPrismaService.customer.findFirst.mockResolvedValue(mockCustomer);
       mockPrismaService.item.findFirst.mockResolvedValue(null);
       mockPrismaService.item.create.mockResolvedValue(mockItem);
       mockPrismaService.recipe.create.mockResolvedValue(mockNewRecipe);
 
       // Mock the parent updateLot method
-      const superUpdateLotSpy = jest.spyOn(Object.getPrototypeOf(LotService.prototype), 'updateLot')
+      const superUpdateLotSpy = jest
+        .spyOn(Object.getPrototypeOf(LotService.prototype), "updateLot")
         .mockResolvedValue(mockUpdatedLot as any);
 
       // Mock calculateLotAnalytics
-      jest.spyOn(service as any, 'calculateLotAnalytics').mockResolvedValue({
+      jest.spyOn(service as any, "calculateLotAnalytics").mockResolvedValue({
         totalWeight: 1100,
-        status: EnumLotStatus.PendingValidation
+        status: EnumLotStatus.PendingValidation,
       });
 
       const updateLotArgs = {
-        where: { id: 'lot-1' },
+        where: { id: "lot-1" },
         data: {
           recipeName: newRecipeName,
           whiskeyType: EnumLotWhiskeyType.WheatWhiskey,
-          notes: 'Updated with new recipe'
-        }
+          notes: "Updated with new recipe",
+        },
       };
 
       const result = await service.updateLot(updateLotArgs as any);
 
       // Verify new recipe was created
       expect(mockPrismaService.recipe.findFirst).toHaveBeenCalledWith({
-        where: { Recipe: newRecipeName }
+        where: { Recipe: newRecipeName },
       });
       expect(mockPrismaService.recipe.create).toHaveBeenCalled();
 
@@ -273,34 +280,38 @@ describe('LotService Integration Tests', () => {
     });
   });
 
-  describe('Whiskey Type Detection Integration', () => {
-    it('should detect correct whiskey types from recipe names during lot creation', async () => {
+  describe("Whiskey Type Detection Integration", () => {
+    it("should detect correct whiskey types from recipe names during lot creation", async () => {
       const testCases = [
-        { 
-          recipeName: 'Premium Single Malt Recipe', 
-          expectedType: EnumRecipeWhiskeyType.MaltWhiskey 
+        {
+          recipeName: "Premium Single Malt Recipe",
+          expectedType: EnumRecipeWhiskeyType.MaltWhiskey,
         },
-        { 
-          recipeName: 'Wheat Bourbon Special', 
-          expectedType: EnumRecipeWhiskeyType.WheatedBourbon 
+        {
+          recipeName: "Wheat Bourbon Special",
+          expectedType: EnumRecipeWhiskeyType.WheatedBourbon,
         },
-        { 
-          recipeName: 'Rye Whiskey Premium', 
-          expectedType: EnumRecipeWhiskeyType.RyeWhiskey 
+        {
+          recipeName: "Rye Whiskey Premium",
+          expectedType: EnumRecipeWhiskeyType.RyeWhiskey,
         },
-        { 
-          recipeName: 'Traditional Bourbon', 
-          expectedType: EnumRecipeWhiskeyType.RyeBourbon 
-        }
+        {
+          recipeName: "Traditional Bourbon",
+          expectedType: EnumRecipeWhiskeyType.RyeBourbon,
+        },
       ];
 
       for (const testCase of testCases) {
         // Clear mocks for each test case
         jest.clearAllMocks();
 
-        const mockCustomer = { id: 'customer-1', name: 'Test Customer' };
-        const mockItem = { id: 'item-1', itemNumber: 'TEST-ITEM' };
-        const mockRecipe = { id: 'recipe-1', Recipe: testCase.recipeName, item: mockItem };
+        const mockCustomer = { id: "customer-1", name: "Test Customer" };
+        const mockItem = { id: "item-1", itemNumber: "TEST-ITEM" };
+        const mockRecipe = {
+          id: "recipe-1",
+          Recipe: testCase.recipeName,
+          item: mockItem,
+        };
 
         // Setup mocks
         mockPrismaService.recipe.findFirst.mockResolvedValue(null); // New recipe
@@ -310,56 +321,60 @@ describe('LotService Integration Tests', () => {
         mockPrismaService.recipe.create.mockResolvedValue(mockRecipe);
 
         // Test the whiskey type detection directly
-        const detectedType = service['detectWhiskeyTypeFromRecipeName'](testCase.recipeName);
+        const detectedType = service["detectWhiskeyTypeFromRecipeName"](
+          testCase.recipeName
+        );
         expect(detectedType).toBe(testCase.expectedType);
 
         // Test integration with recipe creation
-        const recipeId = await service['findOrCreateRecipeByName'](
-          testCase.recipeName, 
-          'test-user'
+        const recipeId = await service["findOrCreateRecipeByName"](
+          testCase.recipeName,
+          "test-user"
         );
 
-        expect(recipeId).toBe('recipe-1');
+        expect(recipeId).toBe("recipe-1");
         expect(mockLogger.log).toHaveBeenCalledWith(
-          expect.stringContaining(`Creating recipe with whiskey type: ${testCase.expectedType}`)
+          expect.stringContaining(
+            `Creating recipe with whiskey type: ${testCase.expectedType}`
+          )
         );
       }
     });
   });
 
-  describe('Error Handling Integration', () => {
-    it('should throw error when neither recipe nor recipeName provided', async () => {
+  describe("Error Handling Integration", () => {
+    it("should throw error when neither recipe nor recipeName provided", async () => {
       const createLotArgs = {
         data: {
-          bblOem: 'WVG',
-          lotAlphaChar: 'E',
-          lotNumber: '',
-          createdBy: 'test-user'
-        }
+          bblOem: "WVG",
+          lotAlphaChar: "E",
+          lotNumber: "",
+          createdBy: "test-user",
+        },
       };
 
-      await expect(
-        service.createLot(createLotArgs as any)
-      ).rejects.toThrow('Either recipe or recipeName is required');
+      await expect(service.createLot(createLotArgs as any)).rejects.toThrow(
+        "Either recipe or recipeName is required"
+      );
     });
 
-    it('should throw error when recipe is not found after creation', async () => {
+    it("should throw error when recipe is not found after creation", async () => {
       mockPrismaService.recipe.findFirst.mockResolvedValue(null);
       mockPrismaService.recipe.findUnique.mockResolvedValue(null); // Recipe not found
 
       const createLotArgs = {
         data: {
-          recipeName: 'Test Recipe',
-          bblOem: 'WVG',
-          lotAlphaChar: 'A',
-          lotNumber: '',
-          createdBy: 'test-user'
-        }
+          recipeName: "Test Recipe",
+          bblOem: "WVG",
+          lotAlphaChar: "A",
+          lotNumber: "",
+          createdBy: "test-user",
+        },
       };
 
-      await expect(
-        service.createLot(createLotArgs as any)
-      ).rejects.toThrow('Recipe not found');
+      await expect(service.createLot(createLotArgs as any)).rejects.toThrow(
+        "Recipe not found"
+      );
     });
   });
-}); 
+});

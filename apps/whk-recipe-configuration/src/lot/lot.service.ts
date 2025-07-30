@@ -31,7 +31,8 @@ export class LotService extends LotServiceBase {
     }
 
     const mapping: { [key in EnumLotWhiskeyType]: EnumRecipeWhiskeyType } = {
-      [EnumLotWhiskeyType.AmericanSingleMalt]: EnumRecipeWhiskeyType.MaltWhiskey,
+      [EnumLotWhiskeyType.AmericanSingleMalt]:
+        EnumRecipeWhiskeyType.MaltWhiskey,
       [EnumLotWhiskeyType.CornBourbon]: EnumRecipeWhiskeyType.RyeBourbon, // Generic bourbon, defaulting to rye bourbon
       [EnumLotWhiskeyType.CornWhiskey]: EnumRecipeWhiskeyType.RyeBourbon, // Corn whiskey mapped to bourbon for recipe purposes
       [EnumLotWhiskeyType.RyeBourbon]: EnumRecipeWhiskeyType.RyeBourbon,
@@ -47,34 +48,40 @@ export class LotService extends LotServiceBase {
    * Detect whiskey type from recipe name using similar logic to RecipeGenerator
    * This provides a fallback when lot whiskey type is not available
    */
-  private detectWhiskeyTypeFromRecipeName(recipeName: string): EnumRecipeWhiskeyType {
+  private detectWhiskeyTypeFromRecipeName(
+    recipeName: string
+  ): EnumRecipeWhiskeyType {
     const upperName = recipeName.toUpperCase();
-    
+
     // Look for key indicators in the recipe name
     if (upperName.includes("MALT") || upperName.includes("SINGLE MALT")) {
       return EnumRecipeWhiskeyType.MaltWhiskey;
     }
-    
+
     if (upperName.includes("WHEAT") && upperName.includes("BOURBON")) {
       return EnumRecipeWhiskeyType.WheatedBourbon;
     }
-    
+
     if (upperName.includes("WHEAT") && upperName.includes("WHISKEY")) {
       return EnumRecipeWhiskeyType.WheatWhiskey;
     }
-    
+
     if (upperName.includes("RYE") && upperName.includes("WHISKEY")) {
       return EnumRecipeWhiskeyType.RyeWhiskey;
     }
-    
-    if (upperName.includes("FOUR GRAIN") || upperName.includes("4 GRAIN") || upperName.includes("FOUR-GRAIN")) {
+
+    if (
+      upperName.includes("FOUR GRAIN") ||
+      upperName.includes("4 GRAIN") ||
+      upperName.includes("FOUR-GRAIN")
+    ) {
       if (upperName.includes("BOURBON")) {
         return EnumRecipeWhiskeyType.FourGrainBourbon;
       } else if (upperName.includes("WHISKEY")) {
         return EnumRecipeWhiskeyType.FourGrainWhiskey;
       }
     }
-    
+
     // Default to RyeBourbon for any bourbon or unknown types
     return EnumRecipeWhiskeyType.RyeBourbon;
   }
@@ -104,7 +111,7 @@ export class LotService extends LotServiceBase {
 
     // Get or create a default customer (using first available customer or create a default one)
     let defaultCustomer = await this.prisma.customer.findFirst({
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: "asc" },
     });
 
     if (!defaultCustomer) {
@@ -118,7 +125,7 @@ export class LotService extends LotServiceBase {
     }
 
     // Create a basic item for the recipe
-    const itemNumber = `${recipeName.replace(/\s+/g, '-').toUpperCase()}-ITEM`;
+    const itemNumber = `${recipeName.replace(/\s+/g, "-").toUpperCase()}-ITEM`;
     let recipeItem = await this.prisma.item.findFirst({
       where: {
         itemNumber: itemNumber,
@@ -142,7 +149,8 @@ export class LotService extends LotServiceBase {
     let recipeWhiskeyType: EnumRecipeWhiskeyType;
     if (whiskeyType) {
       // Use lot whiskey type if provided
-      recipeWhiskeyType = this.mapLotWhiskeyTypeToRecipeWhiskeyType(whiskeyType);
+      recipeWhiskeyType =
+        this.mapLotWhiskeyTypeToRecipeWhiskeyType(whiskeyType);
     } else {
       // Fallback to detecting from recipe name
       recipeWhiskeyType = this.detectWhiskeyTypeFromRecipeName(recipeName);
@@ -162,7 +170,9 @@ export class LotService extends LotServiceBase {
       },
     });
 
-    this.logger.log(`Created new recipe: ${newRecipe.id} with whiskey type logic: ${recipeWhiskeyType}`);
+    this.logger.log(
+      `Created new recipe: ${newRecipe.id} with whiskey type logic: ${recipeWhiskeyType}`
+    );
 
     this.logger.log(`Created new recipe: ${newRecipe.id}`);
     return newRecipe.id;
@@ -177,7 +187,7 @@ export class LotService extends LotServiceBase {
     whiskeyType?: EnumLotWhiskeyType
   ): Promise<string> {
     // If it's a string, treat it as a recipe name
-    if (typeof recipeInput === 'string') {
+    if (typeof recipeInput === "string") {
       return this.findOrCreateRecipeByName(recipeInput, createdBy, whiskeyType);
     }
 
@@ -408,7 +418,7 @@ export class LotService extends LotServiceBase {
     // Process recipe input (supports both ID and name)
     let recipeId: string;
     const recipeName = (args.data as any).recipeName;
-    
+
     if (recipeName) {
       // If recipeName is provided, use it
       recipeId = await this.processRecipeInput(
@@ -482,7 +492,7 @@ export class LotService extends LotServiceBase {
   ): Promise<import(".prisma/client").Lot> {
     // Process recipe input if provided (supports both ID and name)
     const recipeName = (args.data as any).recipeName;
-    
+
     if (recipeName) {
       // If recipeName is provided, use it
       const recipeId = await this.processRecipeInput(

@@ -499,7 +499,8 @@ class LotUpdateInput {
   @ApiProperty({
     required: false,
     type: String,
-    description: "Recipe name - if provided, recipe will be found or created automatically"
+    description:
+      "Recipe name - if provided, recipe will be found or created automatically",
   })
   @IsString()
   @MaxLength(256)
