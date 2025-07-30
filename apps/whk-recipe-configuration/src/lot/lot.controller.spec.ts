@@ -430,7 +430,7 @@ describe("Lot", () => {
     const updateData = {
       recipeName: "Updated Recipe Name",
       whiskeyType: "WheatWhiskey",
-      notes: "Updated with recipe name"
+      notes: "Updated with recipe name",
     };
 
     await request(app.getHttpServer())
@@ -450,7 +450,7 @@ describe("Lot", () => {
       bblEntryProof: 125,
       totalWeight: 1000,
       densityFinal: 8.5,
-      bblTotal: 10
+      bblTotal: 10,
     };
 
     const response = await request(app.getHttpServer())
@@ -463,9 +463,9 @@ describe("Lot", () => {
       avgBblFillByPg: expect.any(Number),
       avgBblFillByWg: expect.any(Number),
     });
-    
+
     // Verify recipeName was processed (even though it's not in response, the service should have handled it)
-    expect(typeof typedCreateData.recipeName).toBe('string');
+    expect(typeof typedCreateData.recipeName).toBe("string");
   });
 
   test("PATCH /lots/:id with typed LotUpdateInput including recipeName", async () => {
@@ -473,7 +473,7 @@ describe("Lot", () => {
     const typedUpdateData: Partial<LotUpdateInput> & { recipeName: string } = {
       recipeName: "TypeScript Updated Recipe",
       whiskeyType: "WheatedBourbon",
-      notes: "Updated with TypeScript types"
+      notes: "Updated with TypeScript types",
     };
 
     await request(app.getHttpServer())
@@ -482,7 +482,7 @@ describe("Lot", () => {
       .expect(HttpStatus.OK);
 
     // Verify recipeName was processed as expected type
-    expect(typeof typedUpdateData.recipeName).toBe('string');
+    expect(typeof typedUpdateData.recipeName).toBe("string");
   });
 
   afterAll(async () => {
