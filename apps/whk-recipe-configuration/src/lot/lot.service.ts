@@ -490,48 +490,54 @@ export class LotService extends LotServiceBase {
   async updateLot<T extends Prisma.LotUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>
   ): Promise<import(".prisma/client").Lot> {
-    // Process recipe input if provided (supports both ID and name)
+    // Extract custom fields that aren't part of the Prisma schema
     const recipeName = (args.data as any).recipeName;
+    const whiskeyType = (args.data as any).whiskeyType;
+    
+    // Create a copy of args.data without the custom fields
+    const { recipeName: _, whiskeyType: __, ...prismaData } = args.data as any;
 
+    // Process recipe input if provided (supports both ID and name)
     if (recipeName) {
       // If recipeName is provided, use it
       const recipeId = await this.processRecipeInput(
         recipeName,
         "system", // For updates, use system as default
-        (args.data as any).whiskeyType || undefined
+        whiskeyType || undefined
       );
-      args.data.recipe = { connect: { id: recipeId } };
-    } else if (args.data.recipe) {
+      prismaData.recipe = { connect: { id: recipeId } };
+    } else if (prismaData.recipe) {
       // Otherwise use recipe ID if provided
       const recipeId = await this.processRecipeInput(
-        args.data.recipe,
+        prismaData.recipe,
         "system", // For updates, use system as default
-        (args.data as any).whiskeyType || undefined
+        whiskeyType || undefined
       );
-      args.data.recipe = { connect: { id: recipeId } };
+      prismaData.recipe = { connect: { id: recipeId } };
     }
 
     const calculatedData = await this.calculateLotAnalytics(
       {
         where: args.where,
         data: {
-          ...args.data,
-          filledFrom: args.data.filledFrom
-            ? { connect: { id: args.data.filledFrom.connect?.id } }
+          ...prismaData,
+          filledFrom: prismaData.filledFrom
+            ? { connect: { id: prismaData.filledFrom.connect?.id } }
             : undefined,
         },
       },
       "update"
     );
-    args.data = {
-      ...args.data,
+    
+    const finalData = {
+      ...prismaData,
       ...calculatedData,
     };
-    this.roundLotFloatFields(args.data);
+    
+    this.roundLotFloatFields(finalData);
+    
     const Lot = await super.updateLot({
-      data: {
-        ...args.data,
-      },
+      data: finalData,
       include: {
         ...args.include,
         productionOrder: true,
@@ -540,6 +546,7 @@ export class LotService extends LotServiceBase {
       },
       where: args.where,
     });
+    
     await this.rabbitProducer.emitMessage(
       WhMessageBrokerTopics.WhWhk01Distillery01Lot,
       {
@@ -548,6 +555,7 @@ export class LotService extends LotServiceBase {
         recordName: "Lot",
       }
     );
+    
     this.logger.log(`Updated Lot: ${Lot.lotNumber} & pushed to topic`);
     return Lot;
   }
