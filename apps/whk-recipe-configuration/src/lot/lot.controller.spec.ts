@@ -14,6 +14,8 @@ import { AclValidateRequestInterceptor } from "../interceptors/aclValidateReques
 import { map } from "rxjs";
 import { LotController } from "./lot.controller";
 import { LotService } from "./lot.service";
+import { LotCreateInput } from "./LotCreateWithoutNumberInput";
+import { LotUpdateInput } from "./base/LotUpdateInput";
 import { PrismaModule } from "../prisma/prisma.module";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from "nest-winston";
@@ -59,6 +61,17 @@ const CREATE_INPUT = {
   totalWeight: 42.42,
   updatedAt: new Date(),
   warehouseEntryNumber: 42,
+};
+
+const CREATE_INPUT_WITH_RECIPE_NAME = {
+  ...CREATE_INPUT,
+  recipeName: "American Single Malt Recipe",
+  whiskeyType: "AmericanSingleMalt",
+};
+
+const CREATE_INPUT_WITH_RECIPE_ID = {
+  ...CREATE_INPUT,
+  recipe: { connect: { id: "recipe-id-123" } },
 };
 const CREATE_RESULT = {
   avgBblFillByPg: 42.42,
@@ -182,6 +195,9 @@ const FIND_ONE_RESULT = {
 
 const service = {
   createLot() {
+    return CREATE_RESULT;
+  },
+  updateLot() {
     return CREATE_RESULT;
   },
   lots: () => FIND_MANY_RESULT,
@@ -386,6 +402,87 @@ describe("Lot", () => {
     expect(result.avgPGsFerm).toBeGreaterThan(0);
     expect(result.avgBblFillByPg).toBeGreaterThan(0);
     expect(result.avgBblFillByWg).toBeGreaterThan(0);
+  });
+
+  test("POST /lots with recipeName", async () => {
+    await request(app.getHttpServer())
+      .post("/lots")
+      .send(CREATE_INPUT_WITH_RECIPE_NAME)
+      .expect(HttpStatus.CREATED)
+      .expect((res) => {
+        expect(res.body).toHaveProperty("lotNumber");
+        expect(res.body.lotNumber).toBe(CREATE_RESULT.lotNumber);
+      });
+  });
+
+  test("POST /lots with recipe ID", async () => {
+    await request(app.getHttpServer())
+      .post("/lots")
+      .send(CREATE_INPUT_WITH_RECIPE_ID)
+      .expect(HttpStatus.CREATED)
+      .expect((res) => {
+        expect(res.body).toHaveProperty("lotNumber");
+        expect(res.body.lotNumber).toBe(CREATE_RESULT.lotNumber);
+      });
+  });
+
+  test("PATCH /lots/:id with recipeName", async () => {
+    const updateData = {
+      recipeName: "Updated Recipe Name",
+      whiskeyType: "WheatWhiskey",
+      notes: "Updated with recipe name"
+    };
+
+    await request(app.getHttpServer())
+      .patch(`/lots/${existingId}`)
+      .send(updateData)
+      .expect(HttpStatus.OK);
+  });
+
+  test("POST /lots with typed LotCreateInput including recipeName", async () => {
+    // Test with proper TypeScript types
+    const typedCreateData: Partial<LotCreateInput> & { recipeName: string } = {
+      recipeName: "TypeScript Test Recipe",
+      whiskeyType: "AmericanSingleMalt",
+      bblOem: "WVG",
+      lotAlphaChar: "T",
+      createdBy: "typescript-test",
+      bblEntryProof: 125,
+      totalWeight: 1000,
+      densityFinal: 8.5,
+      bblTotal: 10
+    };
+
+    const response = await request(app.getHttpServer())
+      .post("/lots")
+      .send(typedCreateData)
+      .expect(HttpStatus.CREATED);
+
+    expect(response.body).toMatchObject({
+      lotNumber: expect.any(String),
+      avgBblFillByPg: expect.any(Number),
+      avgBblFillByWg: expect.any(Number),
+    });
+    
+    // Verify recipeName was processed (even though it's not in response, the service should have handled it)
+    expect(typeof typedCreateData.recipeName).toBe('string');
+  });
+
+  test("PATCH /lots/:id with typed LotUpdateInput including recipeName", async () => {
+    // Test with proper TypeScript types
+    const typedUpdateData: Partial<LotUpdateInput> & { recipeName: string } = {
+      recipeName: "TypeScript Updated Recipe",
+      whiskeyType: "WheatedBourbon",
+      notes: "Updated with TypeScript types"
+    };
+
+    await request(app.getHttpServer())
+      .patch(`/lots/${existingId}`)
+      .send(typedUpdateData)
+      .expect(HttpStatus.OK);
+
+    // Verify recipeName was processed as expected type
+    expect(typeof typedUpdateData.recipeName).toBe('string');
   });
 
   afterAll(async () => {

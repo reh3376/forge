@@ -3,10 +3,11 @@ import { PrismaService } from "../prisma/prisma.service";
 import { LotServiceBase } from "./base/lot.service.base";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
-import { EnumLotStatus, Lot, Prisma } from "@prisma/client";
+import { EnumLotStatus, Lot, Prisma, EnumLotWhiskeyType } from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 import { LotUpdateInput } from "./base/LotUpdateInput";
+import { EnumRecipeWhiskeyType } from "../recipe/base/EnumRecipeWhiskeyType";
 
 @Injectable()
 export class LotService extends LotServiceBase {
@@ -16,6 +17,181 @@ export class LotService extends LotServiceBase {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {
     super(prisma);
+  }
+
+  /**
+   * Map EnumLotWhiskeyType to EnumRecipeWhiskeyType
+   * Based on TTB regulations and existing app logic
+   */
+  private mapLotWhiskeyTypeToRecipeWhiskeyType(
+    lotWhiskeyType?: EnumLotWhiskeyType
+  ): EnumRecipeWhiskeyType {
+    if (!lotWhiskeyType) {
+      return EnumRecipeWhiskeyType.RyeBourbon; // Default
+    }
+
+    const mapping: { [key in EnumLotWhiskeyType]: EnumRecipeWhiskeyType } = {
+      [EnumLotWhiskeyType.AmericanSingleMalt]: EnumRecipeWhiskeyType.MaltWhiskey,
+      [EnumLotWhiskeyType.CornBourbon]: EnumRecipeWhiskeyType.RyeBourbon, // Generic bourbon, defaulting to rye bourbon
+      [EnumLotWhiskeyType.CornWhiskey]: EnumRecipeWhiskeyType.RyeBourbon, // Corn whiskey mapped to bourbon for recipe purposes
+      [EnumLotWhiskeyType.RyeBourbon]: EnumRecipeWhiskeyType.RyeBourbon,
+      [EnumLotWhiskeyType.RyeWhiskey]: EnumRecipeWhiskeyType.RyeWhiskey,
+      [EnumLotWhiskeyType.WheatedBourbon]: EnumRecipeWhiskeyType.WheatedBourbon,
+      [EnumLotWhiskeyType.WheatWhiskey]: EnumRecipeWhiskeyType.WheatWhiskey,
+    };
+
+    return mapping[lotWhiskeyType] || EnumRecipeWhiskeyType.RyeBourbon;
+  }
+
+  /**
+   * Detect whiskey type from recipe name using similar logic to RecipeGenerator
+   * This provides a fallback when lot whiskey type is not available
+   */
+  private detectWhiskeyTypeFromRecipeName(recipeName: string): EnumRecipeWhiskeyType {
+    const upperName = recipeName.toUpperCase();
+    
+    // Look for key indicators in the recipe name
+    if (upperName.includes("MALT") || upperName.includes("SINGLE MALT")) {
+      return EnumRecipeWhiskeyType.MaltWhiskey;
+    }
+    
+    if (upperName.includes("WHEAT") && upperName.includes("BOURBON")) {
+      return EnumRecipeWhiskeyType.WheatedBourbon;
+    }
+    
+    if (upperName.includes("WHEAT") && upperName.includes("WHISKEY")) {
+      return EnumRecipeWhiskeyType.WheatWhiskey;
+    }
+    
+    if (upperName.includes("RYE") && upperName.includes("WHISKEY")) {
+      return EnumRecipeWhiskeyType.RyeWhiskey;
+    }
+    
+    if (upperName.includes("FOUR GRAIN") || upperName.includes("4 GRAIN") || upperName.includes("FOUR-GRAIN")) {
+      if (upperName.includes("BOURBON")) {
+        return EnumRecipeWhiskeyType.FourGrainBourbon;
+      } else if (upperName.includes("WHISKEY")) {
+        return EnumRecipeWhiskeyType.FourGrainWhiskey;
+      }
+    }
+    
+    // Default to RyeBourbon for any bourbon or unknown types
+    return EnumRecipeWhiskeyType.RyeBourbon;
+  }
+
+  /**
+   * Find or create a recipe by name. If recipe doesn't exist, create it with basic defaults.
+   */
+  private async findOrCreateRecipeByName(
+    recipeName: string,
+    createdBy: string,
+    whiskeyType?: EnumLotWhiskeyType
+  ): Promise<string> {
+    // First try to find existing recipe by name
+    const existingRecipe = await this.prisma.recipe.findFirst({
+      where: {
+        Recipe: recipeName,
+      },
+    });
+
+    if (existingRecipe) {
+      this.logger.log(`Found existing recipe: ${existingRecipe.id}`);
+      return existingRecipe.id;
+    }
+
+    // Recipe doesn't exist, create it
+    this.logger.log(`Creating new recipe: ${recipeName}`);
+
+    // Get or create a default customer (using first available customer or create a default one)
+    let defaultCustomer = await this.prisma.customer.findFirst({
+      orderBy: { createdAt: 'asc' }
+    });
+
+    if (!defaultCustomer) {
+      defaultCustomer = await this.prisma.customer.create({
+        data: {
+          name: "Default Customer",
+          address: "Default Address",
+          createdBy: createdBy,
+        },
+      });
+    }
+
+    // Create a basic item for the recipe
+    const itemNumber = `${recipeName.replace(/\s+/g, '-').toUpperCase()}-ITEM`;
+    let recipeItem = await this.prisma.item.findFirst({
+      where: {
+        itemNumber: itemNumber,
+      },
+    });
+
+    if (!recipeItem) {
+      recipeItem = await this.prisma.item.create({
+        data: {
+          itemNumber: itemNumber,
+          itemName: recipeName,
+          itemDescription: `Item for ${recipeName}`,
+          itemType: "FG", // Finished Good
+          erpId: itemNumber,
+          createdBy: createdBy,
+        },
+      });
+    }
+
+    // Determine whiskey type for the recipe
+    let recipeWhiskeyType: EnumRecipeWhiskeyType;
+    if (whiskeyType) {
+      // Use lot whiskey type if provided
+      recipeWhiskeyType = this.mapLotWhiskeyTypeToRecipeWhiskeyType(whiskeyType);
+    } else {
+      // Fallback to detecting from recipe name
+      recipeWhiskeyType = this.detectWhiskeyTypeFromRecipeName(recipeName);
+    }
+
+    this.logger.log(`Creating recipe with whiskey type: ${recipeWhiskeyType}`);
+
+    // Create the recipe (whiskeyType can be added when schema is updated)
+    const newRecipe = await this.prisma.recipe.create({
+      data: {
+        Recipe: recipeName,
+        createdBy: createdBy,
+        customer: { connect: { id: defaultCustomer.id } },
+        item: { connect: { id: recipeItem.id } },
+        revision: 1,
+        // whiskeyType: recipeWhiskeyType, // TODO: Add when schema supports whiskeyType
+      },
+    });
+
+    this.logger.log(`Created new recipe: ${newRecipe.id} with whiskey type logic: ${recipeWhiskeyType}`);
+
+    this.logger.log(`Created new recipe: ${newRecipe.id}`);
+    return newRecipe.id;
+  }
+
+  /**
+   * Process recipe input - handles both recipe ID and recipe name
+   */
+  private async processRecipeInput(
+    recipeInput: any,
+    createdBy: string,
+    whiskeyType?: EnumLotWhiskeyType
+  ): Promise<string> {
+    // If it's a string, treat it as a recipe name
+    if (typeof recipeInput === 'string') {
+      return this.findOrCreateRecipeByName(recipeInput, createdBy, whiskeyType);
+    }
+
+    // If it's an object with connect.id, use the existing ID
+    if (recipeInput?.connect?.id) {
+      return recipeInput.connect.id;
+    }
+
+    // If it's an object with just id, use that
+    if (recipeInput?.id) {
+      return recipeInput.id;
+    }
+
+    throw new Error("Invalid recipe input format");
   }
 
   private roundLotFloatFields(
@@ -229,16 +405,39 @@ export class LotService extends LotServiceBase {
     }
     this.logger.log(`fullLotNumber: ${fullLotNumber}`);
 
-    // Get the item from the recipe
+    // Process recipe input (supports both ID and name)
+    let recipeId: string;
+    const recipeName = (args.data as any).recipeName;
+    
+    if (recipeName) {
+      // If recipeName is provided, use it
+      recipeId = await this.processRecipeInput(
+        recipeName,
+        args.data.createdBy || "system",
+        args.data.whiskeyType || undefined
+      );
+    } else if (args.data.recipe) {
+      // Otherwise use recipe ID
+      recipeId = await this.processRecipeInput(
+        args.data.recipe,
+        args.data.createdBy || "system",
+        args.data.whiskeyType || undefined
+      );
+    } else {
+      throw new Error("Either recipe or recipeName is required");
+    }
+
+    // Get the recipe and its item
     const recipe = await this.prisma.recipe.findUnique({
-      where: { id: args.data.recipe?.connect?.id },
+      where: { id: recipeId },
       include: { item: true },
     });
     if (!recipe) {
       throw new Error("Recipe not found");
     }
 
-    // Update the args.data with the item from the recipe
+    // Update the args.data with the recipe and item
+    args.data.recipe = { connect: { id: recipeId } };
     if (!recipe.item) {
       throw new Error("Recipe does not have an associated item");
     }
@@ -281,6 +480,27 @@ export class LotService extends LotServiceBase {
   async updateLot<T extends Prisma.LotUpdateArgs>(
     args: Prisma.SelectSubset<T, Prisma.LotUpdateArgs>
   ): Promise<import(".prisma/client").Lot> {
+    // Process recipe input if provided (supports both ID and name)
+    const recipeName = (args.data as any).recipeName;
+    
+    if (recipeName) {
+      // If recipeName is provided, use it
+      const recipeId = await this.processRecipeInput(
+        recipeName,
+        "system", // For updates, use system as default
+        (args.data as any).whiskeyType || undefined
+      );
+      args.data.recipe = { connect: { id: recipeId } };
+    } else if (args.data.recipe) {
+      // Otherwise use recipe ID if provided
+      const recipeId = await this.processRecipeInput(
+        args.data.recipe,
+        "system", // For updates, use system as default
+        (args.data as any).whiskeyType || undefined
+      );
+      args.data.recipe = { connect: { id: recipeId } };
+    }
+
     const calculatedData = await this.calculateLotAnalytics(
       {
         where: args.where,
