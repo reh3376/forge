@@ -423,6 +423,20 @@ class LotCreateInput {
   @ApiProperty({
     required: false,
     type: String,
+    description:
+      "Recipe name - if provided, recipe will be found or created automatically",
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  recipeName?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
   })
   @IsString()
   @MaxLength(256)
