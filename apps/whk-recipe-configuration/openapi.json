@@ -33005,6 +33005,17 @@
           }
         }
       }
+    },
+    "/api/schema-version": {
+      "get": {
+        "operationId": "SchemaVersionController_getVersion",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "info": {
@@ -35413,7 +35424,7 @@
             "enum": [
               "Started",
               "PendingValidation",
-              "Submitted",
+              "Verified",
               "Complete"
             ]
           },
@@ -39177,7 +39188,7 @@
             "enum": [
               "Started",
               "PendingValidation",
-              "Submitted",
+              "Verified",
               "Complete"
             ]
           },
@@ -46091,7 +46102,7 @@
             "enum": [
               "Started",
               "PendingValidation",
-              "Submitted",
+              "Verified",
               "Complete"
             ]
           },
@@ -46368,7 +46379,7 @@
             "enum": [
               "Started",
               "PendingValidation",
-              "Submitted",
+              "Verified",
               "Complete"
             ]
           },
