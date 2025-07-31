@@ -34,7 +34,11 @@
     "lint:windows": "eslint \".\\src\\**\\*.ts\"",
     "lint:dev:fix": "eslint --fix './src/**/*.ts'",
     "ssl:generate": "./scripts/generate-ssl.sh",
-    "format:dev": "prettier --write ."
+    "format:dev": "prettier --write .",
+    "update:lot-items": "node ./scripts/update-lot-items.js",
+    "update:lot-items:production": "node ./scripts/update-lot-items.js --production",
+    "update:item-records": "node ./scripts/update-item-records.js",
+    "update:item-records:production": "node ./scripts/update-item-records.js --production"
   },
   "dependencies": {
     "@amplication/opentelemetry-nestjs": "^4.5.0",
@@ -77,6 +81,7 @@
     "nest-access-control": "^3.1.0",
     "nest-winston": "^1.10.0",
     "newrelic": "latest",
+    "node-fetch": "^2.6.7",
     "npm-run-all": "4.1.5",
     "openai": "^4.85.4",
     "passport": "0.7.0",
