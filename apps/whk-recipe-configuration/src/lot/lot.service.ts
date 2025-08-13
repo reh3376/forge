@@ -493,7 +493,7 @@ export class LotService extends LotServiceBase {
     // Extract custom fields that aren't part of the Prisma schema
     const recipeName = (args.data as any).recipeName;
     const whiskeyType = (args.data as any).whiskeyType;
-    
+
     // Create a copy of args.data without the custom fields
     const { recipeName: _, whiskeyType: __, ...prismaData } = args.data as any;
 
@@ -528,14 +528,14 @@ export class LotService extends LotServiceBase {
       },
       "update"
     );
-    
+
     const finalData = {
       ...prismaData,
       ...calculatedData,
     };
-    
+
     this.roundLotFloatFields(finalData);
-    
+
     const Lot = await super.updateLot({
       data: finalData,
       include: {
@@ -546,7 +546,7 @@ export class LotService extends LotServiceBase {
       },
       where: args.where,
     });
-    
+
     await this.rabbitProducer.emitMessage(
       WhMessageBrokerTopics.WhWhk01Distillery01Lot,
       {
@@ -555,7 +555,7 @@ export class LotService extends LotServiceBase {
         recordName: "Lot",
       }
     );
-    
+
     this.logger.log(`Updated Lot: ${Lot.lotNumber} & pushed to topic`);
     return Lot;
   }
