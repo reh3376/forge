@@ -70,6 +70,28 @@ export class RecipeGenerator {
     this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
   }
 
+  private normalizeRecipeParamName(name: string): string {
+    const original = (name ?? "").toString().trim();
+    const normalized = original.toLowerCase().replace(/[\s_-]+/g, "");
+
+    // Handle explicit Temperature -> Temp variants we support
+    if (normalized === "controltemperature") {
+      return "ControlTemp";
+    }
+    if (
+      normalized === "settemperature" ||
+      normalized === "fermsettemperature"
+    ) {
+      return "SetTemp";
+    }
+    if (normalized === "lowtemperatureinfusion") {
+      return "LowTempInfusion";
+    }
+
+    // Default: return as provided
+    return original;
+  }
+
   // Function to calculate grain quantities based on mash bill
   private calculateGrainQuantities(mashBill: string, totalGrainWeight: number) {
     const [cornPercent, ryePercent, wheatPercent, maltPercent] = mashBill
@@ -500,7 +522,10 @@ export class RecipeGenerator {
     this.BBL_ITEM_NUMBERS = bblItemNumbers;
     this.YEAST_ITEM_NUMBERS_QTYS = yeastItemNumbersQtys;
     this.MASHING_PROTOCOL = mashingProtocol;
-    this.RECIPE_PARAMETERS = recipeParameters;
+    this.RECIPE_PARAMETERS = (recipeParameters || []).map((p: any) => ({
+      ...p,
+      name: this.normalizeRecipeParamName(p?.name),
+    }));
     this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
     if (this.BARREL_INFO !== "") {
       this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
@@ -1448,6 +1473,7 @@ export class RecipeGenerator {
           unitProcedures: {
             connect: { id: mashingUnitProcedure.id },
           },
+          targetProof: this.FINAL_PROOF,
         },
         include: {
           item: true,
@@ -1481,6 +1507,7 @@ export class RecipeGenerator {
             connect: newParams.map((param) => ({ id: param.id })),
           },
           customerCode: this.CUSTOMER_CODE,
+          targetProof: this.FINAL_PROOF,
         },
         include: {
           item: true,
@@ -1508,10 +1535,7 @@ export class RecipeGenerator {
     // Create a recipe group and add the recipe to it
     console.log("Creating recipe group and adding recipe...");
     let recipeGroup: RecipeGroup;
-    const recipeGroupName = this.RECIPE.split("-")
-      .slice(1, -1)
-      .join("-")
-      .replace(/\n|\r/g, "");
+    const recipeGroupName = this.MASH_BILL.replace(/\n|\r/g, "");
     console.log(`Extracted recipe group name: ${recipeGroupName}`);
     const existingRecipeGroup = await client.recipeGroup.findFirst({
       where: {
