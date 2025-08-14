@@ -41,23 +41,55 @@ jobs:
         working-directory: ./apps/whk-recipe-configuration
 
       - name: Check code formatting
-        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+        id: prettier_check
+        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" > prettier_report.txt 2>&1 || (cat prettier_report.txt && exit 1)
         working-directory: ./apps/whk-recipe-configuration
 
+      - name: Upload Prettier Report
+        if: steps.prettier_check.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: prettier-report
+          path: ./apps/whk-recipe-configuration/prettier_report.txt
+
+      - name: Comment PR with Prettier Results
+        if: github.event_name == 'pull_request' && steps.prettier_check.outcome == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const prettierReport = fs.readFileSync('./apps/whk-recipe-configuration/prettier_report.txt', 'utf8');
+            const comment = `
+            ❌ Prettier found formatting issues:
+
+            \`\`\`
+            ${prettierReport}
+            \`\`\`
+
+            Please run Prettier (e.g., npm run format) and commit the changes.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
       - name: Run ESLint
+        id: eslint_check
         run: |
           npm run lint > eslint_report.txt || (cat eslint_report.txt && exit 1)
         working-directory: ./apps/whk-recipe-configuration
 
       - name: Upload ESLint Report
-        if: failure()
+        if: steps.eslint_check.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: eslint-report
           path: ./apps/whk-recipe-configuration/eslint_report.txt
 
       - name: Comment PR with ESLint Results
-        if: github.event_name == 'pull_request' && failure()
+        if: github.event_name == 'pull_request' && steps.eslint_check.outcome == 'failure'
         uses: actions/github-script@v6
         with:
           script: |
