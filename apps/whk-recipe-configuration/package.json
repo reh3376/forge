@@ -38,7 +38,8 @@
     "update:lot-items": "node ./scripts/update-lot-items.js",
     "update:lot-items:production": "node ./scripts/update-lot-items.js --production",
     "update:item-records": "node ./scripts/update-item-records.js",
-    "update:item-records:production": "node ./scripts/update-item-records.js --production"
+    "update:item-records:production": "node ./scripts/update-item-records.js --production",
+    "backfill:recipeParameters": "ts-node scripts/backfill.recipe.parameters.ts"
   },
   "dependencies": {
     "@amplication/opentelemetry-nestjs": "^4.5.0",
