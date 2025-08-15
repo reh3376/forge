@@ -80,7 +80,7 @@ export class SchemaVersionController {
   private async refresh() {
     const [row] = await this.prisma.$queryRaw<
       { migration_name: string }[]
-    >`SELECT migration_name FROM _prisma_migrations ORDER BY finished_at DESC LIMIT 1`;
+    >`SELECT migration_name FROM _prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL ORDER BY finished_at DESC LIMIT 1`;
     this.cached = row?.migration_name ?? null;
   }
 

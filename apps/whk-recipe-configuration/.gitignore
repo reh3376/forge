@@ -25,3 +25,6 @@ newrelic.js
 
 nr-security-home/*
 newrelic_agent.log
+
+# Local TLS certs (generated for dev only)
+/.certs/

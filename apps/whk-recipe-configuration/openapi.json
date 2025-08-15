@@ -21798,8 +21798,8 @@
       }
     },
     "/api/lots/{id}": {
-      "get": {
-        "operationId": "LotController_lot",
+      "patch": {
+        "operationId": "LotController_updateLot",
         "parameters": [
           {
             "name": "id",
@@ -21810,6 +21810,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotUpdateInput"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -21851,8 +21861,8 @@
           }
         ]
       },
-      "patch": {
-        "operationId": "LotController_updateLot",
+      "get": {
+        "operationId": "LotController_lot",
         "parameters": [
           {
             "name": "id",
@@ -21863,16 +21873,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LotUpdateInput"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "",
@@ -46148,17 +46148,6 @@
           "lotNumber"
         ]
       },
-      "ItemCreateNestedManyWithoutLotsInput": {
-        "type": "object",
-        "properties": {
-          "connect": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ItemWhereUniqueInput"
-            }
-          }
-        }
-      },
       "BatchUpdateManyWithoutLotsInput": {
         "type": "object",
         "properties": {
@@ -46368,6 +46357,10 @@
           "recipe": {
             "$ref": "#/components/schemas/RecipeWhereUniqueInput"
           },
+          "recipeName": {
+            "type": "string",
+            "description": "Recipe name - if provided, recipe will be found or created automatically"
+          },
           "schemaVersion": {
             "type": "string"
           },
@@ -46418,6 +46411,17 @@
               "WheatedBourbon",
               "WheatWhiskey"
             ]
+          }
+        }
+      },
+      "ItemCreateNestedManyWithoutLotsInput": {
+        "type": "object",
+        "properties": {
+          "connect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemWhereUniqueInput"
+            }
           }
         }
       },
