@@ -12,7 +12,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, windows]
+    runs-on: [blacksmith-8vcpu-ubuntu-2404, windows]
     environment: Production
 
     steps:
