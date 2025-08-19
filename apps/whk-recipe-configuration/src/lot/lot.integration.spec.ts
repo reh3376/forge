@@ -142,6 +142,14 @@ describe("LotService Integration Tests", () => {
           revision: 1,
           // whiskeyType would be set here in real implementation
         },
+        include: {
+          item: true,
+          customer: true,
+          recipeGroup: true,
+          recipeBoms: true,
+          unitProcedures: true,
+          productionOrders: true,
+        },
       });
 
       // Verify lot was created with the new recipe
@@ -149,6 +157,26 @@ describe("LotService Integration Tests", () => {
         where: { id: "recipe-1" },
         include: { item: true },
       });
+
+      // Verify RabbitMQ message was sent for the new recipe
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledWith(
+        "wh.whk01.distillery01.recipe",
+        {
+          recordName: "Recipe",
+          event_type: "create",
+          data: mockNewRecipe,
+        }
+      );
+
+      // Verify RabbitMQ message was sent for the lot
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledWith(
+        "wh.whk01.distillery01.lot",
+        {
+          event_type: "create",
+          data: mockLot,
+          recordName: "Lot",
+        }
+      );
 
       // Verify the result
       expect(result).toEqual(mockLot);
@@ -219,6 +247,17 @@ describe("LotService Integration Tests", () => {
         include: { item: true },
       });
 
+      // Verify RabbitMQ message was NOT sent for existing recipe (only called once for lot)
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledTimes(1);
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledWith(
+        "wh.whk01.distillery01.lot",
+        {
+          event_type: "create",
+          data: mockLot,
+          recordName: "Lot",
+        }
+      );
+
       expect(result).toEqual(mockLot);
 
       superCreateLotSpy.mockRestore();
@@ -272,7 +311,42 @@ describe("LotService Integration Tests", () => {
       expect(mockPrismaService.recipe.findFirst).toHaveBeenCalledWith({
         where: { Recipe: newRecipeName },
       });
-      expect(mockPrismaService.recipe.create).toHaveBeenCalled();
+      expect(mockPrismaService.recipe.create).toHaveBeenCalledWith({
+        data: {
+          Recipe: newRecipeName,
+          createdBy: "system",
+          customer: { connect: { id: "customer-1" } },
+          item: { connect: { id: "item-2" } },
+          revision: 1,
+        },
+        include: {
+          item: true,
+          customer: true,
+          recipeGroup: true,
+          recipeBoms: true,
+          unitProcedures: true,
+          productionOrders: true,
+        },
+      });
+
+      // Verify RabbitMQ messages were sent for both recipe and lot
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledTimes(2);
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledWith(
+        "wh.whk01.distillery01.recipe",
+        {
+          recordName: "Recipe",
+          event_type: "create",
+          data: mockNewRecipe,
+        }
+      );
+      expect(mockRabbitMQProducer.emitMessage).toHaveBeenCalledWith(
+        "wh.whk01.distillery01.lot",
+        {
+          event_type: "update",
+          data: mockUpdatedLot,
+          recordName: "Lot",
+        }
+      );
 
       expect(result).toEqual(mockUpdatedLot);
 
