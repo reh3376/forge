@@ -168,13 +168,31 @@ export class LotService extends LotServiceBase {
         revision: 1,
         // whiskeyType: recipeWhiskeyType, // TODO: Add when schema supports whiskeyType
       },
+      include: {
+        item: true,
+        customer: true,
+        recipeGroup: true,
+        recipeBoms: true,
+        unitProcedures: true,
+        productionOrders: true,
+      },
     });
 
     this.logger.log(
       `Created new recipe: ${newRecipe.id} with whiskey type logic: ${recipeWhiskeyType}`
     );
 
-    this.logger.log(`Created new recipe: ${newRecipe.id}`);
+    // Emit RabbitMQ message for the newly created recipe
+    await this.rabbitProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Recipe,
+      {
+        recordName: "Recipe",
+        event_type: "create",
+        data: newRecipe,
+      }
+    );
+
+    this.logger.log(`Created new recipe: ${newRecipe.id} & pushed to topic`);
     return newRecipe.id;
   }
 

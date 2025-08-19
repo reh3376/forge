@@ -303,6 +303,14 @@ describe("LotService", () => {
           item: { connect: { id: "item-id-123" } },
           revision: 1,
         },
+        include: {
+          item: true,
+          customer: true,
+          recipeGroup: true,
+          recipeBoms: true,
+          unitProcedures: true,
+          productionOrders: true,
+        },
       });
     });
 
