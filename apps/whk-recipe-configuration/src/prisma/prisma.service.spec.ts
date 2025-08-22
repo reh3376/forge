@@ -2,9 +2,16 @@ import { PrismaService } from "./prisma.service";
 
 class TestPrismaService extends PrismaService {
   public middlewareFns: any[] = [];
-  $use(fn: any) {
-    this.middlewareFns.push(fn);
+
+  constructor() {
+    super();
+    this.middlewareFns = [];
+    // Override the $use method after calling super()
+    this.$use = (fn: any) => {
+      this.middlewareFns.push(fn);
+    };
   }
+
   $queryRaw = jest.fn();
 }
 

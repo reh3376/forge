@@ -1,9 +1,42 @@
 import { Injectable, OnModuleInit, INestApplication } from "@nestjs/common";
 import { Prisma, PrismaClient } from "@prisma/client";
 
+function roundLotFloatFields(data: Record<string, any>) {
+  for (const [key, value] of Object.entries(data)) {
+    if (key === "densityFinal") {
+      continue;
+    }
+    if (typeof value === "number") {
+      data[key] = Math.round(value * 100) / 100;
+    } else if (
+      value &&
+      typeof value === "object" &&
+      "set" in value &&
+      typeof value.set === "number"
+    ) {
+      value.set = Math.round(value.set * 100) / 100;
+    }
+  }
+}
+
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   private cachedVersion: string | null = null;
+  constructor() {
+    super();
+
+    this.$use(async (params, next) => {
+      if (
+        params.model === "Lot" &&
+        (params.action === "create" || params.action === "update") &&
+        params.args?.data
+      ) {
+        roundLotFloatFields(params.args.data);
+      }
+
+      return next(params);
+    });
+  }
 
   async onModuleInit() {
     await this.$connect();
