@@ -160,13 +160,13 @@ export class EnzymeDosingService {
       console.log(
         `Total grain load: ${sanitizedTotalGrainLoadLbs}, Corn: ${cornQuantity}, Rye: ${ryeQuantity}, Wheat: ${wheatQuantity}, Malt: ${maltQuantity}. Enzyme does per MT: ${enzyme.dosePerMetricTon}`
       );
-      dose =
-        Math.round(
-          enzyme.dosePerMetricTon * totalGrainMetricTons * ryeQuantity * 100
-        ) / 100 ||
-        Math.round(
-          enzyme.dosePerMetricTon * totalGrainMetricTons * wheatQuantity * 100
-        ) / 100;
+      // Laminex/Viscoferm new formula (applies to Viscosity category only):
+      // dose = (Rye% or Wheat%) * (1.5 * Total Metric Tons + 9e-16)
+      // - Rye/Wheat are percentages from the mash bill (use Rye if present else Wheat)
+      // - Total Metric Tons is totalGrainLoadLbs / 2205
+      const grainFraction = ((rye > 0 ? rye : wheat) || 0) / 100;
+      const viscosityBase = 1.5 * totalGrainMetricTons + 9e-16;
+      dose = Math.round(grainFraction * viscosityBase * 100) / 100;
     }
     if (dose) {
       return {
