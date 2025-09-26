@@ -1655,7 +1655,9 @@ export class RecipeGenerator {
     // Create a sample production order
     console.log("Creating sample production order...");
 
-    const productionOrderName = `PRO${dayOfYear}`;
+    // Get last two digits of year to include in name
+    const yearLastTwoDigits = currentDate.getFullYear().toString().slice(-2);
+    const productionOrderName = `PRO${yearLastTwoDigits}${dayOfYear}`;
     const existingProductionOrder = await client.productionOrder.findFirst({
       where: {
         name: {
@@ -1724,7 +1726,22 @@ export class RecipeGenerator {
         customerCode: this.CUSTOMER_CODE,
         units: "Barrels",
         quantity: this.ORDER_QTY,
-        name: `${productionOrderName}${newProductionOrderNumber}`,
+        name: await (async () => {
+          const baseName = `${productionOrderName}${newProductionOrderNumber}`;
+          let suffix = 0;
+          let finalName = baseName;
+
+          while (
+            await client.productionOrder.findFirst({
+              where: { name: finalName },
+            })
+          ) {
+            suffix++;
+            finalName = `${baseName}-${suffix}`;
+          }
+
+          return finalName;
+        })(),
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
         totalCooks: Math.ceil(this.ORDER_QTY / this.BBLS_PER_FERM) * 3,
@@ -1748,7 +1765,7 @@ export class RecipeGenerator {
 
     // Create a sample schedule order
     console.log("Creating sample schedule order...");
-    const scheduleOrderName = `SHO${dayOfYear}`;
+    const scheduleOrderName = `SHO${yearLastTwoDigits}${dayOfYear}`;
     const newScheduleOrder = await client.scheduleOrder.create({
       data: {
         productionOrders: {
@@ -1763,7 +1780,22 @@ export class RecipeGenerator {
         recipeGroup: {
           connect: { id: recipeGroup.id },
         },
-        name: `${scheduleOrderName}${newProductionOrderNumber}`,
+        name: await (async () => {
+          const baseName = `${scheduleOrderName}${newProductionOrderNumber}`;
+          let suffix = 0;
+          let finalName = baseName;
+
+          while (
+            await client.scheduleOrder.findFirst({
+              where: { name: finalName },
+            })
+          ) {
+            suffix++;
+            finalName = `${baseName}-${suffix}`;
+          }
+
+          return finalName;
+        })(),
       },
     });
 
