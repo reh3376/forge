@@ -46,3 +46,6 @@ pnpm-lock.yaml
 
 # Claude settings (keep local settings out of git)
 .claude/settings.local.json
+# Python cache artifacts
+__pycache__/
+*.py[cod]

@@ -92,11 +92,58 @@ export class RecipeGenerator {
     return original;
   }
 
+  private parseMashBillComponent(segment: string): number {
+    if (!segment) {
+      return NaN;
+    }
+    const s = String(segment).trim();
+    if (!s) return NaN;
+    // Preserve leading negative sign if present; extract first signed decimal number
+    const match = s.match(/(-?\d+(?:\.\d+)?)/);
+    return match ? parseFloat(match[1]) : NaN;
+  }
+
+  private getNormalizedMashBillValues(mashBill: string): number[] {
+    // Handle cases where the mash bill starts with a negative number
+    // by replacing the first "-" with a placeholder if it's at the start
+    let processedMashBill = mashBill;
+    if (mashBill.startsWith("-")) {
+      processedMashBill = "NEG" + mashBill.substring(1);
+    }
+
+    const segments = processedMashBill
+      .split("-")
+      .slice(0, 4)
+      .map((segment) => {
+        // Restore the negative sign if we used the placeholder
+        if (segment.startsWith("NEG")) {
+          return "-" + segment.substring(3);
+        }
+        return segment;
+      });
+
+    return segments
+      .map((segment) => {
+        const value = this.parseMashBillComponent(segment);
+        return Number.isFinite(value) ? value : 0;
+      })
+      .concat(Array(Math.max(0, 4)).fill(0))
+      .slice(0, 4);
+  }
+
   // Function to calculate grain quantities based on mash bill
   private calculateGrainQuantities(mashBill: string, totalGrainWeight: number) {
-    const [cornPercent, ryePercent, wheatPercent, maltPercent] = mashBill
-      .split("-")
-      .map((percent) => parseFloat(percent) / 100);
+    const [
+      cornPercentRaw = 0,
+      ryePercentRaw = 0,
+      wheatPercentRaw = 0,
+      maltPercentRaw = 0,
+    ] = this.getNormalizedMashBillValues(mashBill);
+
+    const cornPercent = cornPercentRaw / 100;
+    const ryePercent = ryePercentRaw / 100;
+    const wheatPercent = wheatPercentRaw / 100;
+    const maltPercent = maltPercentRaw / 100;
 
     return {
       Corn: Math.round(totalGrainWeight * cornPercent),
@@ -341,24 +388,30 @@ export class RecipeGenerator {
     grainType: string,
     mashBill: string
   ): number {
-    // Split the mash bill into components
     const components = mashBill.split("-");
-    let totalPercentage = 0;
+    const normalizedValues = this.getNormalizedMashBillValues(mashBill);
+    const totalPercentage = normalizedValues.reduce(
+      (sum, value) => sum + value,
+      0
+    );
+    const targetGrain = grainType.toUpperCase();
+    const orderedGrains = ["CORN", "RYE", "WHEAT", "MALT"]; // Default sequence when segments are numeric-only
+
     let grainPercentage = 0;
 
-    // Calculate percentages
-    components.forEach((component) => {
-      const match = component.match(/(\d+)/);
-      if (match) {
-        const percentage = parseInt(match[1], 10);
-        totalPercentage += percentage;
-        if (component.includes(grainType)) {
-          grainPercentage += percentage;
-        }
+    components.forEach((component, index) => {
+      const numericValue = normalizedValues[index] ?? 0;
+      const componentGrain = component.replace(/[^A-Z]/gi, "").toUpperCase();
+      const matchesByName =
+        componentGrain.length > 0 && componentGrain.includes(targetGrain);
+      const matchesByOrder =
+        componentGrain.length === 0 && orderedGrains[index] === targetGrain;
+
+      if (matchesByName || matchesByOrder) {
+        grainPercentage += numericValue;
       }
     });
 
-    // Return percentage if total is valid, otherwise 0
     return totalPercentage > 0 ? (grainPercentage / totalPercentage) * 100 : 0;
   }
 
@@ -369,7 +422,8 @@ export class RecipeGenerator {
     this.logger.log("Validating mashing protocol against mash bill...");
 
     // Extract grains from mash bill
-    const [corn, rye, wheat, malt] = mashBill.split("-").map(Number);
+    const [corn = 0, rye = 0, wheat = 0, malt = 0] =
+      this.getNormalizedMashBillValues(mashBill);
     const mashBillGrains = new Set<string>();
 
     // Only add grains that have non-zero percentages
@@ -1369,18 +1423,17 @@ export class RecipeGenerator {
     }
 
     const determineMashBill = (parameter: string): string => {
-      const parts = parameter.split("-").map((part) => parseInt(part, 10));
+      const parts = this.getNormalizedMashBillValues(parameter);
 
       let validCount = 0;
       let hasNegative = false;
 
-      for (let i = 0; i < parts.length; i++) {
-        const value = parts[i];
-
+      for (const value of parts) {
         if (value < 0) {
           hasNegative = true;
           break;
-        } else if (value > 0) {
+        }
+        if (value > 0) {
           validCount++;
         }
       }
@@ -1407,12 +1460,11 @@ export class RecipeGenerator {
     console.log(`Grain type: ${mashBillType}`);
 
     const isFourGrainMashBill = (parameter: string): boolean => {
-      // console.log("4-grain Mash Bill detected");
-      return determineMashBill(mashBill) === "4-grain" ? true : false;
+      return determineMashBill(parameter) === "4-grain";
     };
 
-    const isFourGrain = isFourGrainMashBill(mashBillType);
-    console.log(`Grain type: ${determineMashBill(mashBillType)}`);
+    const isFourGrain = isFourGrainMashBill(mashBill);
+    console.log(`Grain type: ${determineMashBill(mashBill)}`);
 
     // Create or update the Recipe record and link it to the Mashing Unit Procedure
     const existingRecipe = await client.recipe.findFirst({
@@ -1870,7 +1922,8 @@ export class RecipeGenerator {
     this.logger.log("Validating grain assignments against mash bill...");
 
     // Extract grains from mash bill
-    const [corn, rye, wheat, malt] = mashBill.split("-").map(Number);
+    const [corn = 0, rye = 0, wheat = 0, malt = 0] =
+      this.getNormalizedMashBillValues(mashBill);
     const mashBillGrains = new Set<string>();
 
     // Only add grains that have non-zero percentages
