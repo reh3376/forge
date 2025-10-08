@@ -113,7 +113,7 @@ export class RecipeGenerator {
 
     const segments = processedMashBill
       .split("-")
-      .slice(0, 4)
+      .slice(0, 5)
       .map((segment) => {
         // Restore the negative sign if we used the placeholder
         if (segment.startsWith("NEG")) {
@@ -127,8 +127,8 @@ export class RecipeGenerator {
         const value = this.parseMashBillComponent(segment);
         return Number.isFinite(value) ? value : 0;
       })
-      .concat(Array(Math.max(0, 4)).fill(0))
-      .slice(0, 4);
+      .concat(Array(Math.max(0, 5)).fill(0))
+      .slice(0, 5);
   }
 
   // Function to calculate grain quantities based on mash bill
@@ -138,18 +138,21 @@ export class RecipeGenerator {
       ryePercentRaw = 0,
       wheatPercentRaw = 0,
       maltPercentRaw = 0,
+      specialtyPercentRaw = 0,
     ] = this.getNormalizedMashBillValues(mashBill);
 
     const cornPercent = cornPercentRaw / 100;
     const ryePercent = ryePercentRaw / 100;
     const wheatPercent = wheatPercentRaw / 100;
     const maltPercent = maltPercentRaw / 100;
+    const specialtyPercent = specialtyPercentRaw / 100;
 
     return {
       Corn: Math.round(totalGrainWeight * cornPercent),
       Rye: Math.round(totalGrainWeight * ryePercent),
       Wheat: Math.round(totalGrainWeight * wheatPercent),
       Malt: Math.round(totalGrainWeight * maltPercent),
+      Specialty: Math.round(totalGrainWeight * specialtyPercent),
     };
   }
 
@@ -395,7 +398,7 @@ export class RecipeGenerator {
       0
     );
     const targetGrain = grainType.toUpperCase();
-    const orderedGrains = ["CORN", "RYE", "WHEAT", "MALT"]; // Default sequence when segments are numeric-only
+    const orderedGrains = ["CORN", "RYE", "WHEAT", "MALT", "SPECIALTY"]; // Default sequence when segments are numeric-only
 
     let grainPercentage = 0;
 
@@ -422,7 +425,7 @@ export class RecipeGenerator {
     this.logger.log("Validating mashing protocol against mash bill...");
 
     // Extract grains from mash bill
-    const [corn = 0, rye = 0, wheat = 0, malt = 0] =
+    const [corn = 0, rye = 0, wheat = 0, malt = 0, specialty = 0] =
       this.getNormalizedMashBillValues(mashBill);
     const mashBillGrains = new Set<string>();
 
@@ -431,6 +434,7 @@ export class RecipeGenerator {
     if (rye > 0) mashBillGrains.add("Rye");
     if (wheat > 0) mashBillGrains.add("Wheat");
     if (malt > 0) mashBillGrains.add("Malt");
+    if (specialty > 0) mashBillGrains.add("Specialty");
 
     // Collect all grains from mashing protocol
     const protocolGrains = new Set<string>();
@@ -559,7 +563,8 @@ export class RecipeGenerator {
     yeastItemNumbersQtys: { [key: string]: number },
     mashingProtocol: any[],
     recipeParameters: any[],
-    binAssignments: BinAssignments // Updated type
+    binAssignments: BinAssignments, // Updated type
+    specialtyItemNumber?: string
   ): Promise<void> {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
@@ -613,9 +618,31 @@ export class RecipeGenerator {
     const wheatItemId = "cm0e1ocx0012xl6xv4i696cfh";
     const citricItemId = "clyd1ofpw0032fd45omeixgvv";
 
+    // Look up specialty item ID if specialty item number is provided
+    const client = new PrismaClient();
+    let specialtyItemId: string | undefined;
+    if (specialtyItemNumber) {
+      const specialtyItem = await client.item.findFirst({
+        where: {
+          itemNumber: specialtyItemNumber,
+        },
+      });
+      if (!specialtyItem) {
+        await client.$disconnect();
+        throw new Error(
+          `Specialty item with item number ${specialtyItemNumber} not found`
+        );
+      }
+      specialtyItemId = specialtyItem.id;
+      console.log(
+        `Found specialty item: ${specialtyItem.id}, ${specialtyItem.itemNumber}`
+      );
+    }
+
     // --------------------------- Processing Bin Assignments ---------------------------
     // Validate bin assignments
     if (!this.validateBinAssignments(binAssignments)) {
+      await client.$disconnect();
       throw new Error("Invalid bin assignments");
     }
 
@@ -668,7 +695,6 @@ export class RecipeGenerator {
       `Finalized mashing protocol: ${JSON.stringify(finalizedMashingProtocol)}`
     );
 
-    const client = new PrismaClient();
     console.log("Creating recipe...");
     const itemNumber =
       this.BARREL_INFO !== ""
@@ -822,6 +848,10 @@ export class RecipeGenerator {
               break;
             case "Wheat":
               itemId = wheatItemId;
+              quantity = step.qty || 0;
+              break;
+            case "Specialty":
+              itemId = specialtyItemId;
               quantity = step.qty || 0;
               break;
             default:
@@ -1224,10 +1254,13 @@ export class RecipeGenerator {
                 if (
                   (phase.action === "Add Grain" &&
                     phase.grainType &&
-                    component.item.itemNumber
+                    ((component.item.itemNumber
                       .toLowerCase()
                       .includes(phase.grainType.toLowerCase()) &&
-                    phase.grainType != "Corn") ||
+                      phase.grainType != "Corn") ||
+                      (phase.grainType === "Specialty" &&
+                        specialtyItemId &&
+                        component.itemId === specialtyItemId))) ||
                   (phase.action === "Add Liquid" &&
                     ((phase.liquidType01 &&
                       component.item.itemNumber
@@ -1922,7 +1955,7 @@ export class RecipeGenerator {
     this.logger.log("Validating grain assignments against mash bill...");
 
     // Extract grains from mash bill
-    const [corn = 0, rye = 0, wheat = 0, malt = 0] =
+    const [corn = 0, rye = 0, wheat = 0, malt = 0, specialty = 0] =
       this.getNormalizedMashBillValues(mashBill);
     const mashBillGrains = new Set<string>();
 
@@ -1931,6 +1964,7 @@ export class RecipeGenerator {
     if (rye > 0) mashBillGrains.add("Rye");
     if (wheat > 0) mashBillGrains.add("Wheat");
     if (malt > 0) mashBillGrains.add("Malt");
+    if (specialty > 0) mashBillGrains.add("Specialty");
 
     // Collect all grains from bin assignments
     const assignedGrains = new Set<string>();
@@ -2002,7 +2036,7 @@ export class RecipeGenerator {
   }
 
   private isValidGrain(grain: string): boolean {
-    const validGrains = ["Rye", "Corn", "Malt", "Wheat"]; // Extend as needed
+    const validGrains = ["Rye", "Corn", "Malt", "Wheat", "Specialty"]; // Extend as needed
     return validGrains.includes(grain);
   }
 }

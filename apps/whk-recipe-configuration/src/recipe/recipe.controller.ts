@@ -133,7 +133,8 @@ export class RecipeController extends RecipeControllerBase {
       yeastItemNumbersQtys: { [key: string]: number };
       mashingProtocol: any[];
       recipeParameters: { name: string; setpointValue: number }[];
-      binAssignments: { [key: string]: string };
+      binAssignments: { [key: string]: string | string[] };
+      specialtyItemNumber?: string;
     }
   ) {
     try {
@@ -153,7 +154,8 @@ export class RecipeController extends RecipeControllerBase {
         generateRecipeDto.yeastItemNumbersQtys,
         generateRecipeDto.mashingProtocol,
         generateRecipeDto.recipeParameters,
-        generateRecipeDto.binAssignments
+        generateRecipeDto.binAssignments,
+        generateRecipeDto.specialtyItemNumber
       );
       return { message: "Recipe generated successfully" };
     } catch (error: unknown) {
