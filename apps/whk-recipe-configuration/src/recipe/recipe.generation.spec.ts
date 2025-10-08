@@ -44,7 +44,7 @@ describe("RecipeGenerator mash bill parsing", () => {
     const generator = createGenerator();
     const values = (generator as any).getNormalizedMashBillValues("100-0-0-0");
 
-    expect(values).toEqual([100, 0, 0, 0]);
+    expect(values).toEqual([100, 0, 0, 0, 0]);
   });
 
   it("preserves negative percentages for validation detection", () => {
@@ -52,6 +52,46 @@ describe("RecipeGenerator mash bill parsing", () => {
     const values = (generator as any).getNormalizedMashBillValues(
       "-20-70-30-0"
     );
-    expect(values).toEqual([-20, 70, 30, 0]);
+    expect(values).toEqual([-20, 70, 30, 0, 0]);
+  });
+
+  it("handles 5-grain mash bills with specialty grain", () => {
+    const generator = createGenerator();
+    const result = (generator as any).calculateGrainQuantities(
+      "40-20-15-15-10",
+      1000
+    );
+
+    expect(result.Corn).toBe(400);
+    expect(result.Rye).toBe(200);
+    expect(result.Wheat).toBe(150);
+    expect(result.Malt).toBe(150);
+    expect(result.Specialty).toBe(100);
+  });
+
+  it("extracts 5 normalized values from 5-grain mash bill", () => {
+    const generator = createGenerator();
+    const values = (generator as any).getNormalizedMashBillValues(
+      "40-20-15-15-10"
+    );
+
+    expect(values).toEqual([40, 20, 15, 15, 10]);
+  });
+
+  it("calculates specialty grain percentage correctly", () => {
+    const generator = createGenerator();
+    const percentage = (generator as any).calculateGrainPercentage(
+      "SPECIALTY",
+      "40-20-15-15-10"
+    );
+
+    expect(percentage).toBeCloseTo(10, 5);
+  });
+
+  it("pads 5-grain mash bill with zeros when fewer than 5 values provided", () => {
+    const generator = createGenerator();
+    const values = (generator as any).getNormalizedMashBillValues("70-20-10");
+
+    expect(values).toEqual([70, 20, 10, 0, 0]);
   });
 });
