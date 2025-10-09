@@ -109,12 +109,12 @@ export class EnzymeDosingService {
     }
 
     const mashBillParts = mashBill.split("-").map((part) => parseFloat(part));
-    if (mashBillParts.length !== 4) {
+    if (mashBillParts.length !== 4 && mashBillParts.length !== 5) {
       throw new Error(
-        "Mash bill must have four components separated by dashes."
+        "Mash bill must have four or five components separated by dashes."
       );
     }
-    const [corn, rye, wheat, malt] = mashBillParts;
+    const [corn, rye, wheat, malt, specialty = 0] = mashBillParts;
     const cornQuantity =
       (corn * totalGrainLoadLbs) / 100 / EnzymeDosingService.METRIC_TON_DIVISOR;
     const ryeQuantity =

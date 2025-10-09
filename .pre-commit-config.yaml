@@ -3,7 +3,7 @@ repos:
   - id: commitizen
   - id: commitizen-branch
     stages:
-    - push
+    - pre-push
   repo: https://github.com/commitizen-tools/commitizen
   rev: v3.25.0
 - repo: https://github.com/gitguardian/ggshield
@@ -11,4 +11,18 @@ repos:
   hooks:
     - id: ggshield
       language_version: python3
-      stages: [ commit ]
+      stages: [ pre-commit ]
+- repo: local
+  hooks:
+    - id: eslint
+      name: eslint
+      entry: bash -c 'cd apps/whk-recipe-configuration && npm run lint:dev:fix'
+      language: system
+      files: apps/whk-recipe-configuration/src/.*\.ts$
+      pass_filenames: false
+    - id: prettier
+      name: prettier
+      entry: bash -c 'cd apps/whk-recipe-configuration && npm run format:dev'
+      language: system
+      files: apps/whk-recipe-configuration/.*\.(ts|js|json|md|yml|yaml)$
+      pass_filenames: false

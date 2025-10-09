@@ -3,7 +3,12 @@
     "allow": [
       "WebSearch",
       "mcp__linear-server__list_projects",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Read(//Users/pmannion/Documents/whiskeyhouse/whk-mes/.git/hooks/**)",
+      "Bash(git rev-parse:*)",
+      "Read(//Users/pmannion/Documents/whiskeyhouse/whk-mes/**)",
+      "Bash(pre-commit:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
