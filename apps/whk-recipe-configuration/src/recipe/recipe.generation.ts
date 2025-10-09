@@ -621,18 +621,92 @@ export class RecipeGenerator {
     // Look up specialty item ID if specialty item number is provided
     const client = new PrismaClient();
     let specialtyItemId: string | undefined;
-    if (specialtyItemNumber) {
-      const specialtyItem = await client.item.findFirst({
+
+    // Extract specialty percentage from mash bill to validate requirements
+    const [, , , , specialtyPercentRaw = 0] = this.getNormalizedMashBillValues(
+      this.MASH_BILL
+    );
+
+    // Normalize the specialty item number once (trim and store)
+    const normalizedSpecialtyItemNumber = specialtyItemNumber?.trim() || "";
+
+    // Validate that if mash bill requires specialty > 0, a specialty item number must be provided
+    if (specialtyPercentRaw > 0 && !normalizedSpecialtyItemNumber) {
+      await client.$disconnect();
+      throw new Error(
+        `Specialty item with item number ${
+          specialtyItemNumber || "(not provided)"
+        } not found`
+      );
+    }
+
+    // Only perform lookup if specialty item number is provided
+    if (normalizedSpecialtyItemNumber) {
+      console.log(
+        `Looking up specialty item with itemNumber: "${specialtyItemNumber}" (normalized: "${normalizedSpecialtyItemNumber}")`
+      );
+
+      let specialtyItem = null;
+
+      // Step 1: Try exact match with case-insensitive mode on normalized value
+      console.log(`Trying exact match with case-insensitive mode`);
+      specialtyItem = await client.item.findFirst({
         where: {
-          itemNumber: specialtyItemNumber,
+          itemNumber: {
+            equals: normalizedSpecialtyItemNumber,
+            mode: "insensitive",
+          },
         },
       });
+
+      // Step 2: If original is different from normalized, try exact match on original value
+      if (
+        !specialtyItem &&
+        specialtyItemNumber !== normalizedSpecialtyItemNumber
+      ) {
+        console.log(
+          `Exact match not found, trying original value (with whitespace)`
+        );
+        specialtyItem = await client.item.findFirst({
+          where: {
+            itemNumber: {
+              equals: specialtyItemNumber,
+              mode: "insensitive",
+            },
+          },
+        });
+      }
+
+      // Step 3: Try contains search with case-insensitive mode on normalized value
+      if (!specialtyItem) {
+        console.log(`Still not found, trying contains search`);
+        const allItems = await client.item.findMany({
+          where: {
+            itemNumber: {
+              contains: normalizedSpecialtyItemNumber,
+              mode: "insensitive",
+            },
+          },
+          take: 10,
+        });
+        console.log(
+          `Items found with contains search:`,
+          allItems.map((i) => ({ id: i.id, itemNumber: i.itemNumber }))
+        );
+        if (allItems.length > 0) {
+          specialtyItem = allItems[0];
+          console.log(`Using first match from contains search`);
+        }
+      }
+
+      // Step 4: If still not found, throw error before any FG item lookups
       if (!specialtyItem) {
         await client.$disconnect();
         throw new Error(
           `Specialty item with item number ${specialtyItemNumber} not found`
         );
       }
+
       specialtyItemId = specialtyItem.id;
       console.log(
         `Found specialty item: ${specialtyItem.id}, ${specialtyItem.itemNumber}`

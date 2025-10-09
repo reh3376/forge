@@ -10,6 +10,7 @@ jest.mock("@prisma/client", () => {
   const mockPrismaClient = {
     item: {
       findFirst: jest.fn(),
+      findMany: jest.fn(),
     },
     customer: {
       findFirst: jest.fn(),
@@ -212,10 +213,9 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
     });
 
     it("should throw error when specialty item number is provided but item is not found", async () => {
-      // Mock specialty item not found (first call for specialty, second call for FG item)
-      mockPrismaClient.item.findFirst
-        .mockResolvedValueOnce(null) // Specialty item not found
-        .mockResolvedValueOnce({ id: "fg-item-123", itemNumber: "test" }); // FG item found
+      // Mock specialty item not found through all lookup attempts
+      mockPrismaClient.item.findFirst.mockResolvedValueOnce(null); // Case-insensitive exact match fails
+      mockPrismaClient.item.findMany.mockResolvedValueOnce([]); // Contains search returns no results
 
       await expect(
         recipeGenerator.createRecipeData(
