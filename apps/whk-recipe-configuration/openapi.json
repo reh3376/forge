@@ -35111,6 +35111,14 @@
           "additionalDetails": {
             "type": "object"
           },
+          "category": {
+            "type": "string",
+            "description": "Denormalized vendor category label/name for display and filtering purposes"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "Denormalized external/ERP category identifier, not a foreign key relation"
+          },
           "contactInformation": {
             "type": "object"
           },
@@ -46871,6 +46879,14 @@
           "additionalDetails": {
             "type": "object"
           },
+          "category": {
+            "type": "string",
+            "description": "Denormalized vendor category label/name for display and filtering purposes"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "Denormalized external/ERP category identifier, not a foreign key relation"
+          },
           "contactInformation": {
             "type": "object"
           },
@@ -46908,6 +46924,12 @@
           },
           "additionalDetails": {
             "$ref": "#/components/schemas/JsonFilter"
+          },
+          "category": {
+            "$ref": "#/components/schemas/StringNullableFilter"
+          },
+          "categoryId": {
+            "$ref": "#/components/schemas/StringNullableFilter"
           },
           "contactInformation": {
             "$ref": "#/components/schemas/JsonFilter"
@@ -46992,6 +47014,14 @@
           },
           "additionalDetails": {
             "type": "object"
+          },
+          "category": {
+            "type": "string",
+            "description": "Denormalized vendor category label/name for display and filtering purposes"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "Denormalized external/ERP category identifier, not a foreign key relation"
           },
           "contactInformation": {
             "type": "object"
