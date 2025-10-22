@@ -19,6 +19,8 @@ const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
   active: "true",
+  category: "Supplies",
+  categoryId: "4",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   erpId: "exampleErpId",
@@ -30,6 +32,8 @@ const CREATE_INPUT = {
 };
 const CREATE_RESULT = {
   active: "true",
+  category: "Supplies",
+  categoryId: "4",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   erpId: "exampleErpId",
@@ -42,6 +46,8 @@ const CREATE_RESULT = {
 const FIND_MANY_RESULT = [
   {
     active: "true",
+    category: "Supplies",
+    categoryId: "4",
     createdAt: new Date(),
     createdBy: "exampleCreatedBy",
     erpId: "exampleErpId",
@@ -54,6 +60,8 @@ const FIND_MANY_RESULT = [
 ];
 const FIND_ONE_RESULT = {
   active: "true",
+  category: "Supplies",
+  categoryId: "4",
   createdAt: new Date(),
   createdBy: "exampleCreatedBy",
   erpId: "exampleErpId",
