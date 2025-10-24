@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { LotService } from "./lot.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhiskeyTypeService } from "../whiskeyType/whiskeyType.service";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { EnumLotWhiskeyType, EnumLotStatus } from "@prisma/client";
 import { EnumRecipeWhiskeyType } from "../recipe/base/EnumRecipeWhiskeyType";
@@ -40,6 +41,20 @@ describe("LotService", () => {
     emitMessage: jest.fn(),
   };
 
+  const mockWhiskeyTypeService = {
+    findByCode: jest.fn(),
+    findMany: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    count: jest.fn(),
+    getActiveWhiskeyTypes: jest.fn(),
+    getTTBDefinitions: jest.fn(),
+    getDerivedTypes: jest.fn(),
+    getWhiskeyTypeWithRelations: jest.fn(),
+  };
+
   const mockLogger = {
     log: jest.fn(),
     error: jest.fn(),
@@ -58,6 +73,10 @@ describe("LotService", () => {
         {
           provide: RabbitMQProducerService,
           useValue: mockRabbitMQProducer,
+        },
+        {
+          provide: WhiskeyTypeService,
+          useValue: mockWhiskeyTypeService,
         },
         {
           provide: WINSTON_MODULE_NEST_PROVIDER,

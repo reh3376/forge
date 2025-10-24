@@ -3,17 +3,25 @@ import { PrismaService } from "../prisma/prisma.service";
 import { LotServiceBase } from "./base/lot.service.base";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
-import { EnumLotStatus, Lot, Prisma, EnumLotWhiskeyType } from "@prisma/client";
+import {
+  EnumLotStatus,
+  Lot,
+  Prisma,
+  EnumLotWhiskeyType,
+  WhiskeyType,
+} from "@prisma/client";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 import { LotUpdateInput } from "./base/LotUpdateInput";
 import { EnumRecipeWhiskeyType } from "../recipe/base/EnumRecipeWhiskeyType";
+import { WhiskeyTypeService } from "../whiskeyType/whiskeyType.service";
 
 @Injectable()
 export class LotService extends LotServiceBase {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly rabbitProducer: RabbitMQProducerService,
+    private readonly whiskeyTypeService: WhiskeyTypeService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {
     super(prisma);
@@ -84,6 +92,48 @@ export class LotService extends LotServiceBase {
 
     // Default to RyeBourbon for any bourbon or unknown types
     return EnumRecipeWhiskeyType.RyeBourbon;
+  }
+
+  /**
+   * Get WhiskeyType entity by legacy Lot enum value
+   * Provides backward compatibility during migration period
+   */
+  async getWhiskeyTypeByLotEnum(
+    enumValue: EnumLotWhiskeyType
+  ): Promise<WhiskeyType | null> {
+    const codeMapping: Record<EnumLotWhiskeyType, string> = {
+      [EnumLotWhiskeyType.AmericanSingleMalt]: "ASM",
+      [EnumLotWhiskeyType.CornBourbon]: "CB",
+      [EnumLotWhiskeyType.CornWhiskey]: "CW",
+      [EnumLotWhiskeyType.RyeBourbon]: "RB",
+      [EnumLotWhiskeyType.RyeWhiskey]: "RW",
+      [EnumLotWhiskeyType.WheatedBourbon]: "WB",
+      [EnumLotWhiskeyType.WheatWhiskey]: "WW",
+    };
+
+    const code = codeMapping[enumValue];
+    return code ? this.whiskeyTypeService.findByCode(code) : null;
+  }
+
+  /**
+   * Get WhiskeyType entity by legacy Recipe enum value
+   * Provides backward compatibility during migration period
+   */
+  async getWhiskeyTypeByRecipeEnum(
+    enumValue: EnumRecipeWhiskeyType
+  ): Promise<WhiskeyType | null> {
+    const codeMapping: Record<EnumRecipeWhiskeyType, string> = {
+      [EnumRecipeWhiskeyType.RyeBourbon]: "RB",
+      [EnumRecipeWhiskeyType.WheatedBourbon]: "WB",
+      [EnumRecipeWhiskeyType.FourGrainBourbon]: "FGB",
+      [EnumRecipeWhiskeyType.RyeWhiskey]: "RW",
+      [EnumRecipeWhiskeyType.WheatWhiskey]: "WW",
+      [EnumRecipeWhiskeyType.MaltWhiskey]: "MW",
+      [EnumRecipeWhiskeyType.FourGrainWhiskey]: "FGW",
+    };
+
+    const code = codeMapping[enumValue];
+    return code ? this.whiskeyTypeService.findByCode(code) : null;
   }
 
   /**

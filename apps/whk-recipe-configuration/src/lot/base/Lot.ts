@@ -38,6 +38,7 @@ import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
+import { WhiskeyType } from "../../whiskeyType/base/WhiskeyType";
 
 @ObjectType()
 class Lot {
@@ -626,6 +627,18 @@ class Lot {
     | "WheatedBourbon"
     | "WheatWhiskey"
     | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => WhiskeyType,
+  })
+  @ValidateNested()
+  @Type(() => WhiskeyType)
+  @IsOptional()
+  @Field(() => WhiskeyType, {
+    nullable: true,
+  })
+  whiskeyTypeRelation?: WhiskeyType | null;
 }
 
 export { Lot as Lot };

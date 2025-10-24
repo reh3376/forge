@@ -36,6 +36,7 @@ import { RecipeWhereUniqueInput } from "../recipe/base/RecipeWhereUniqueInput";
 import { EnumLotWhiskeyType } from "./base/EnumLotWhiskeyType";
 import { BomItemCreateNestedManyWithoutLotsInput } from "./base/BomItemCreateNestedManyWithoutLotsInput";
 import { EnumLotStatus } from "./base/EnumLotStatus";
+import { Prisma } from "@prisma/client";
 
 @InputType()
 class LotCreateInput {
@@ -571,6 +572,17 @@ class LotCreateInput {
     | "WheatedBourbon"
     | "WheatWhiskey"
     | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @ValidateNested()
+  @Type(() => Object)
+  @IsOptional()
+  @Field(() => Object, {
+    nullable: true,
+  })
+  whiskeyTypeRelation?: Prisma.WhiskeyTypeCreateNestedOneWithoutLotsInput;
 
   @ApiProperty({
     required: false,
