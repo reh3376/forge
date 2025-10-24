@@ -18,6 +18,8 @@
     "prod:seed:assets": "ts-node scripts/seed.prod.assets.ts",
     "prod:seed:unit": "ts-node scripts/seed.prod.unitLink.ts",
     "prod:seed:recipeParameters": "ts-node scripts/seed.prod.recipeParameters.ts",
+    "seed:whiskey-types": "ts-node scripts/seeding/seed-whiskey-types.ts",
+    "verify:whiskey-type-migration": "ts-node scripts/verify-whiskey-type-migration.ts",
     "db:prod:deploy": "prisma migrate deploy",
     "db:prod:markresolved": "prisma migrate resolve --applied",
     "db:prod:usecaution:init": "run-s \"db:dev:migrate-save -- --name 'initial version'\"",

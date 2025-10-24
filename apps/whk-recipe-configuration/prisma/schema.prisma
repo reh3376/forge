@@ -245,6 +245,10 @@ model Recipe {
   updatedAt                      DateTime                        @updatedAt
   updatedBy                      String?
   whiskeyType                    EnumRecipeWhiskeyType?          @default(RyeBourbon)
+  whiskeyTypeId                  String?
+  whiskeyTypeRelation            WhiskeyType?                    @relation(fields: [whiskeyTypeId], references: [id])
+
+  @@index([whiskeyTypeId])
 }
 
 model Bom {
@@ -692,6 +696,28 @@ model Lot {
   updatedAt                   DateTime            @updatedAt
   warehouseEntryNumber        Int?
   whiskeyType                 EnumLotWhiskeyType?
+  whiskeyTypeId               String?
+  whiskeyTypeRelation         WhiskeyType?        @relation(fields: [whiskeyTypeId], references: [id])
+
+  @@index([whiskeyTypeId])
+}
+
+model WhiskeyType {
+  id                 String         @id @default(cuid())
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  code               String         @unique
+  name               String
+  description        String?
+  category           String?
+  active             Boolean        @default(true)
+  globalId           String?        @unique @default(cuid())
+  isTTBDefinition    Boolean        @default(false)
+  ttbWhiskeyTypeId   String?
+  lots               Lot[]
+  recipes            Recipe[]
+  ttbWhiskeyType     WhiskeyType?   @relation("TTBWhiskeyTypeHierarchy", fields: [ttbWhiskeyTypeId], references: [id])
+  derivedWhiskeyTypes WhiskeyType[] @relation("TTBWhiskeyTypeHierarchy")
 }
 
 model BomItem {

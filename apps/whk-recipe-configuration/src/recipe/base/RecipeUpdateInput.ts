@@ -41,6 +41,7 @@ import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupW
 import { ScheduleOrderUpdateManyWithoutRecipesInput } from "./ScheduleOrderUpdateManyWithoutRecipesInput";
 import { UnitProcedureUpdateManyWithoutRecipesInput } from "./UnitProcedureUpdateManyWithoutRecipesInput";
 import { EnumRecipeWhiskeyType } from "./EnumRecipeWhiskeyType";
+import { Prisma } from "@prisma/client";
 
 @InputType()
 class RecipeUpdateInput {
@@ -372,6 +373,15 @@ class RecipeUpdateInput {
     | "MaltWhiskey"
     | "FourGrainWhiskey"
     | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsOptional()
+  @Field(() => Object, {
+    nullable: true,
+  })
+  whiskeyTypeRelation?: Prisma.WhiskeyTypeUpdateOneWithoutRecipesNestedInput;
 }
 
 export { RecipeUpdateInput as RecipeUpdateInput };

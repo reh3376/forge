@@ -39,6 +39,7 @@ import { TestModule } from "./test/test.module";
 import { AssetModule } from "./asset/asset.module";
 import { ItemReceiptModule } from "./itemReceipt/itemReceipt.module";
 import { LotModule } from "./lot/lot.module";
+import { WhiskeyTypeModule } from "./whiskeyType/whiskeyType.module";
 import { BomItemModule } from "./bomItem/bomItem.module";
 import { UnitModule } from "./unit/unit.module";
 import { BatchModule } from "./batch/batch.module";
@@ -110,6 +111,7 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     AssetModule,
     ItemReceiptModule,
     LotModule,
+    WhiskeyTypeModule,
     BomItemModule,
     UnitModule,
     BatchModule,

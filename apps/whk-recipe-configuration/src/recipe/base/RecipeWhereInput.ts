@@ -34,6 +34,8 @@ import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupW
 import { ScheduleOrderListRelationFilter } from "../../scheduleOrder/base/ScheduleOrderListRelationFilter";
 import { UnitProcedureListRelationFilter } from "../../unitProcedure/base/UnitProcedureListRelationFilter";
 import { EnumRecipeWhiskeyType } from "./EnumRecipeWhiskeyType";
+import { WhiskeyTypeWhereInput } from "../../whiskeyType/base/WhiskeyTypeWhereInput";
+import { Prisma } from "@prisma/client";
 
 @InputType()
 class RecipeWhereInput {
@@ -365,6 +367,18 @@ class RecipeWhereInput {
     | "WheatWhiskey"
     | "MaltWhiskey"
     | "FourGrainWhiskey";
+
+  @ApiProperty({
+    required: false,
+    type: () => WhiskeyTypeWhereInput,
+  })
+  @ValidateNested()
+  @Type(() => WhiskeyTypeWhereInput)
+  @IsOptional()
+  @Field(() => WhiskeyTypeWhereInput, {
+    nullable: true,
+  })
+  whiskeyTypeRelation?: WhiskeyTypeWhereInput;
 }
 
 export { RecipeWhereInput as RecipeWhereInput };

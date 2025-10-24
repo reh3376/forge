@@ -39,6 +39,7 @@ import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { EnumRecipeWhiskeyType } from "./EnumRecipeWhiskeyType";
+import { WhiskeyType } from "../../whiskeyType/base/WhiskeyType";
 
 @ObjectType()
 class Recipe {
@@ -345,6 +346,18 @@ class Recipe {
     | "MaltWhiskey"
     | "FourGrainWhiskey"
     | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => WhiskeyType,
+  })
+  @ValidateNested()
+  @Type(() => WhiskeyType)
+  @IsOptional()
+  @Field(() => WhiskeyType, {
+    nullable: true,
+  })
+  whiskeyTypeRelation?: WhiskeyType | null;
 }
 
 export { Recipe as Recipe };

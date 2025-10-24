@@ -18,6 +18,7 @@ import { LotCreateInput } from "./LotCreateWithoutNumberInput";
 import { LotUpdateInput } from "./base/LotUpdateInput";
 import { PrismaModule } from "../prisma/prisma.module";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { WhiskeyTypeService } from "../whiskeyType/whiskeyType.service";
 import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from "nest-winston";
 import { RabbitMQModule } from "../rabbitmq/rabbitmq.module";
 import { ConfigService } from "@nestjs/config";
@@ -317,6 +318,15 @@ describe("Lot", () => {
           provide: RabbitMQProducerService,
           useValue: {
             // Mock implementation of RabbitMQProducerService methods
+          },
+        },
+        {
+          provide: WhiskeyTypeService,
+          useValue: {
+            findByCode: jest.fn(),
+            findMany: jest.fn(),
+            findOne: jest.fn(),
+            getActiveWhiskeyTypes: jest.fn(),
           },
         },
         {

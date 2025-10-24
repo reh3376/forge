@@ -39,6 +39,7 @@ import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/Purchase
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { EnumLotStatus } from "./EnumLotStatus";
 import { EnumLotWhiskeyType } from "./EnumLotWhiskeyType";
+import { Prisma } from "@prisma/client";
 
 @InputType()
 class LotUpdateInput {
@@ -659,6 +660,15 @@ class LotUpdateInput {
     | "WheatedBourbon"
     | "WheatWhiskey"
     | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsOptional()
+  @Field(() => Object, {
+    nullable: true,
+  })
+  whiskeyTypeRelation?: Prisma.WhiskeyTypeUpdateOneWithoutLotsNestedInput;
 }
 
 export { LotUpdateInput as LotUpdateInput };
