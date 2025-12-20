@@ -474,7 +474,7 @@ model Customer {
   batches          Batch[]
   createdAt        DateTime          @default(now())
   createdBy        String
-  customerCode     String?
+  customerCode     String?           @unique
   description      String?
   editedBy         String?
   email            String?
