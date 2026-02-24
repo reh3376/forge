@@ -327,7 +327,15 @@ class ScheduleOrderCreateInput {
   @Field(() => EnumScheduleOrderStatus, {
     nullable: true,
   })
-  status?: "Created" | "Scheduled" | "InProgress" | "Complete" | null;
+  status?:
+    | "Created"
+    | "Scheduled"
+    | "InProgress"
+    | "Complete"
+    | "ReadyForSeparation"
+    | "Separating"
+    | "Separated"
+    | null;
 
   @ApiProperty({
     required: false,

@@ -28,7 +28,6 @@ import { UpdateSalesOrderArgs } from "./UpdateSalesOrderArgs";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
 import { Item } from "../../item/base/Item";
 import { Customer } from "../../customer/base/Customer";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { SalesOrderService } from "../salesOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => SalesOrder)
@@ -103,12 +102,6 @@ export class SalesOrderResolverBase {
               connect: args.data.customer,
             }
           : undefined,
-
-        productionOrders: args.data.productionOrders
-          ? {
-              connect: args.data.productionOrders,
-            }
-          : undefined,
       },
     });
   }
@@ -132,12 +125,6 @@ export class SalesOrderResolverBase {
           customer: args.data.customer
             ? {
                 connect: args.data.customer,
-              }
-            : undefined,
-
-          productionOrders: args.data.productionOrders
-            ? {
-                connect: args.data.productionOrders,
               }
             : undefined,
         },
@@ -186,27 +173,6 @@ export class SalesOrderResolverBase {
     @graphql.Parent() parent: SalesOrder
   ): Promise<Customer | null> {
     const result = await this.service.getCustomer(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => ProductionOrder, {
-    nullable: true,
-    name: "productionOrders",
-  })
-  @UseRoles({
-    resource: "ProductionOrder",
-    action: "read",
-    possession: "any",
-  })
-  async getProductionOrders(
-    @graphql.Parent() parent: SalesOrder
-  ): Promise<ProductionOrder | null> {
-    const result = await this.service.getProductionOrders(parent.id);
 
     if (!result) {
       return null;

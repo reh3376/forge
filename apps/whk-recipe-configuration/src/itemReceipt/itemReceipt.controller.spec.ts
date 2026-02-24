@@ -6,6 +6,7 @@ import { EnumItemReceiptStatus, Prisma } from "@prisma/client";
 import { ItemReceiptCreateInput } from "./base/ItemReceiptCreateInput";
 import { ItemReceiptUpdateInput } from "./base/ItemReceiptUpdateInput";
 import { Reflector } from "@nestjs/core";
+import { ConfigService } from "@nestjs/config";
 import { NotFoundException } from "@nestjs/common";
 
 // Mock the ACGuard
@@ -62,6 +63,10 @@ describe("ItemReceiptController", () => {
         {
           provide: "__roles_builder__",
           useValue: mockRolesBuilder,
+        },
+        {
+          provide: ConfigService,
+          useValue: { get: jest.fn().mockReturnValue("development") },
         },
       ],
     }).compile();

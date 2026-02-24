@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 
 @ObjectType()
@@ -59,6 +60,15 @@ class RecipeBomActual {
   @Type(() => MashingProtocolStepActual)
   @IsOptional()
   mashingProtocolStepActual?: MashingProtocolStepActual | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstance,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstance)
+  @IsOptional()
+  productionOrderRecipeInstance?: ProductionOrderRecipeInstance | null;
 
   @ApiProperty({
     required: true,

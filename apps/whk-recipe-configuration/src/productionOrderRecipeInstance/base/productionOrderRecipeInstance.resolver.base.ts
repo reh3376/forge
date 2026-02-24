@@ -32,6 +32,8 @@ import { MashingProtocolFindManyArgs } from "../../mashingProtocol/base/MashingP
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
+import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { ProductionOrderRecipeInstanceService } from "../productionOrderRecipeInstance.service";
@@ -222,6 +224,26 @@ export class ProductionOrderRecipeInstanceResolverBase {
     @graphql.Args() args: RecipeBomFindManyArgs
   ): Promise<RecipeBom[]> {
     const results = await this.service.findRecipeBom(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeBomActual], { name: "recipeBomActuals" })
+  @UseRoles({
+    resource: "RecipeBomActual",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomActuals(
+    @graphql.Parent() parent: ProductionOrderRecipeInstance,
+    @graphql.Args() args: RecipeBomActualFindManyArgs
+  ): Promise<RecipeBomActual[]> {
+    const results = await this.service.findRecipeBomActuals(parent.id, args);
 
     if (!results) {
       return [];

@@ -29,6 +29,9 @@ import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentP
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { OperationService } from "../operation.service";
+import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
+import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
+import { Prisma } from "@prisma/client";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Operation)
 export class OperationResolverBase {
@@ -189,6 +192,38 @@ export class OperationResolverBase {
     }
 
     return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [RecipeParameter], { name: "recipeParameters" })
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeParameters(
+    @graphql.Parent() parent: Operation,
+    @graphql.Args() args: RecipeParameterFindManyArgs
+  ): Promise<RecipeParameter[]> {
+    // Convert GraphQL args to Prisma args
+    const prismaArgs: Prisma.RecipeParameterFindManyArgs = {
+      where: args.where,
+      skip: args.skip,
+      take: args.take,
+      orderBy: args.orderBy as any, // Type assertion needed here
+    };
+
+    const results = await this.service.findRecipeParameters(
+      parent.id,
+      prismaArgs
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    // Type assertion to match the expected GraphQL RecipeParameter type
+    return results as unknown as RecipeParameter[];
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

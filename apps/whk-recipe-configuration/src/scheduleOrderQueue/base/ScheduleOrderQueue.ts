@@ -11,26 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-
+import { Asset } from "../../asset/base/Asset";
 import {
+  ValidateNested,
+  IsOptional,
   IsDate,
   IsString,
   MaxLength,
-  IsOptional,
-  IsEnum,
-  ValidateNested,
   IsInt,
   Min,
   Max,
 } from "class-validator";
-
 import { Type } from "class-transformer";
-import { EnumScheduleOrderQueueNextOperation } from "./EnumScheduleOrderQueueNextOperation";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 
 @ObjectType()
 class ScheduleOrderQueue {
+  @ApiProperty({
+    required: false,
+    type: () => [Asset],
+  })
+  @ValidateNested()
+  @Type(() => Asset)
+  @IsOptional()
+  @Field(() => [Asset], {
+    nullable: true,
+  })
+  areas?: Array<Asset>;
+
   @ApiProperty({
     required: true,
   })
@@ -67,43 +75,6 @@ class ScheduleOrderQueue {
   @IsString()
   @Field(() => String)
   id!: string;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumScheduleOrderQueueNextOperation,
-  })
-  @IsEnum(EnumScheduleOrderQueueNextOperation)
-  @IsOptional()
-  @Field(() => EnumScheduleOrderQueueNextOperation, {
-    nullable: true,
-  })
-  nextOperation?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedure,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedure)
-  @IsOptional()
-  nextUnitProcedure?: UnitProcedure | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  nextUnitProcedureName!: string | null;
 
   @ApiProperty({
     required: false,

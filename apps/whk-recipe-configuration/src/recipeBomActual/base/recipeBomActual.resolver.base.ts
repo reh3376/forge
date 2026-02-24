@@ -27,8 +27,10 @@ import { CreateRecipeBomActualArgs } from "./CreateRecipeBomActualArgs";
 import { UpdateRecipeBomActualArgs } from "./UpdateRecipeBomActualArgs";
 import { DeleteRecipeBomActualArgs } from "./DeleteRecipeBomActualArgs";
 import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomActualService } from "../recipeBomActual.service";
+import { UseRoles } from "nest-access-control";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeBomActual)
 export class RecipeBomActualResolverBase {
@@ -38,7 +40,7 @@ export class RecipeBomActualResolverBase {
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "any",
@@ -54,7 +56,7 @@ export class RecipeBomActualResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [RecipeBomActual])
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "any",
@@ -67,7 +69,7 @@ export class RecipeBomActualResolverBase {
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => RecipeBomActual, { nullable: true })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "own",
@@ -84,7 +86,7 @@ export class RecipeBomActualResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeBomActual)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "create",
     possession: "any",
@@ -103,6 +105,12 @@ export class RecipeBomActualResolverBase {
             }
           : undefined,
 
+        productionOrderRecipeInstance: args.data.productionOrderRecipeInstance
+          ? {
+              connect: args.data.productionOrderRecipeInstance,
+            }
+          : undefined,
+
         recipeBomItem: {
           connect: args.data.recipeBomItem,
         },
@@ -112,7 +120,7 @@ export class RecipeBomActualResolverBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => RecipeBomActual)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "update",
     possession: "any",
@@ -132,6 +140,12 @@ export class RecipeBomActualResolverBase {
               }
             : undefined,
 
+          productionOrderRecipeInstance: args.data.productionOrderRecipeInstance
+            ? {
+                connect: args.data.productionOrderRecipeInstance,
+              }
+            : undefined,
+
           recipeBomItem: {
             connect: args.data.recipeBomItem,
           },
@@ -148,7 +162,7 @@ export class RecipeBomActualResolverBase {
   }
 
   @graphql.Mutation(() => RecipeBomActual)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "delete",
     possession: "any",
@@ -173,7 +187,7 @@ export class RecipeBomActualResolverBase {
     nullable: true,
     name: "mashingProtocolStepActual",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "read",
     possession: "any",
@@ -190,11 +204,34 @@ export class RecipeBomActualResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => ProductionOrderRecipeInstance, {
+    nullable: true,
+    name: "productionOrderRecipeInstance",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrderRecipeInstance(
+    @graphql.Parent() parent: RecipeBomActual
+  ): Promise<ProductionOrderRecipeInstance | null> {
+    const result = await this.service.getProductionOrderRecipeInstance(
+      parent.id
+    );
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => RecipeBomItem, {
     nullable: true,
     name: "recipeBomItem",
   })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomItem",
     action: "read",
     possession: "any",

@@ -20,20 +20,20 @@ import {
   MaxLength,
   IsBoolean,
   IsDate,
-  IsEnum,
   IsInt,
   Max,
+  IsEnum,
 } from "class-validator";
 
 import { Asset } from "../../asset/base/Asset";
 import { Expose, Type } from "class-transformer";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
 import { TestParameter } from "../../testParameter/base/TestParameter";
+import { EnumPurchaseOrderStatus } from "./EnumPurchaseOrderStatus";
 import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
@@ -213,24 +213,6 @@ class PurchaseOrder {
 
   @ApiProperty({
     required: false,
-    enum: EnumPurchaseOrderReceiptStatus,
-  })
-  @IsEnum(EnumPurchaseOrderReceiptStatus)
-  @IsOptional()
-  @Field(() => EnumPurchaseOrderReceiptStatus, {
-    nullable: true,
-  })
-  receiptStatus?:
-    | "NotReceived"
-    | "ReceiptInProgress"
-    | "ReceiptComplete"
-    | "PurchaseOrderComplete"
-    | "InitializedNotReceived"
-    | "ReceivedTested"
-    | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
@@ -264,6 +246,23 @@ class PurchaseOrder {
     nullable: true,
   })
   schemaVersion!: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumPurchaseOrderStatus,
+  })
+  @IsEnum(EnumPurchaseOrderStatus)
+  @IsOptional()
+  @Field(() => EnumPurchaseOrderStatus, {
+    nullable: true,
+  })
+  status?:
+    | "Planned"
+    | "Committed"
+    | "Initiated"
+    | "InProgress"
+    | "Complete"
+    | null;
 
   @ApiProperty({
     required: false,

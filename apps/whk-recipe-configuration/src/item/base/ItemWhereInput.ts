@@ -15,6 +15,7 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { AdditiveActualListRelationFilter } from "../../additiveActual/base/AdditiveActualListRelationFilter";
+import { BatchMaterialConsumptionListRelationFilter } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionListRelationFilter";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
 import { BomListRelationFilter } from "../../bom/base/BomListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
@@ -29,9 +30,9 @@ import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { ProductionOrderListRelationFilter } from "../../productionOrder/base/ProductionOrderListRelationFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
 import { RecipeBomItemListRelationFilter } from "../../recipeBomItem/base/RecipeBomItemListRelationFilter";
-import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { SalesOrderListRelationFilter } from "../../salesOrder/base/SalesOrderListRelationFilter";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -69,6 +70,18 @@ class ItemWhereInput {
     nullable: true,
   })
   baseBomItem?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionListRelationFilter, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -297,6 +310,18 @@ class ItemWhereInput {
   @Field(() => ProductionOrderListRelationFilter, {
     nullable: true,
   })
+  productionOrderContainerItems?: ProductionOrderListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderListRelationFilter)
+  @IsOptional()
+  @Field(() => ProductionOrderListRelationFilter, {
+    nullable: true,
+  })
   productionOrders?: ProductionOrderListRelationFilter;
 
   @ApiProperty({
@@ -322,18 +347,6 @@ class ItemWhereInput {
     nullable: true,
   })
   recipeBoms?: RecipeBomItemListRelationFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => RecipeListRelationFilter)
-  @IsOptional()
-  @Field(() => RecipeListRelationFilter, {
-    nullable: true,
-  })
-  recipes?: RecipeListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -369,6 +382,18 @@ class ItemWhereInput {
     nullable: true,
   })
   testParameters?: TestParameterListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  units?: UnitsWhereUniqueInput;
 
   @ApiProperty({
     required: false,

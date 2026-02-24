@@ -61,6 +61,17 @@ class MashingProtocolOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  isTemplate?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   master?: SortOrder;
 
   @ApiProperty({
@@ -94,6 +105,17 @@ class MashingProtocolOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
+  productionOrderRecipeInstancesId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
   revision?: SortOrder;
 
   @ApiProperty({
@@ -117,6 +139,28 @@ class MashingProtocolOrderByInput {
     nullable: true,
   })
   runningMashingProtocolId?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  templateCategory?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  templateDescription?: SortOrder;
 
   @ApiProperty({
     required: false,

@@ -23,6 +23,7 @@ import { MashingProtocolCreateNestedManyWithoutProductionOrderRecipeInstancesInp
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeBomCreateNestedManyWithoutProductionOrderRecipeInstancesInput } from "./RecipeBomCreateNestedManyWithoutProductionOrderRecipeInstancesInput";
+import { RecipeBomActualCreateNestedManyWithoutProductionOrderRecipeInstancesInput } from "./RecipeBomActualCreateNestedManyWithoutProductionOrderRecipeInstancesInput";
 
 @InputType()
 class ProductionOrderRecipeInstanceCreateInput {
@@ -105,6 +106,26 @@ class ProductionOrderRecipeInstanceCreateInput {
     }
   )
   recipeBom?: RecipeBomCreateNestedManyWithoutProductionOrderRecipeInstancesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      RecipeBomActualCreateNestedManyWithoutProductionOrderRecipeInstancesInput,
+  })
+  @ValidateNested()
+  @Type(
+    () =>
+      RecipeBomActualCreateNestedManyWithoutProductionOrderRecipeInstancesInput
+  )
+  @IsOptional()
+  @Field(
+    () =>
+      RecipeBomActualCreateNestedManyWithoutProductionOrderRecipeInstancesInput,
+    {
+      nullable: true,
+    }
+  )
+  recipeBomActuals?: RecipeBomActualCreateNestedManyWithoutProductionOrderRecipeInstancesInput;
 
   @ApiProperty({
     required: false,

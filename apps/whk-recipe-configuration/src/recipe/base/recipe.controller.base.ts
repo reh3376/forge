@@ -26,9 +26,9 @@ import { Recipe } from "./Recipe";
 import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
 import { RecipeUpdateInput } from "./RecipeUpdateInput";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
-import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
+import { CommentFindManyArgs } from "../../comment/base/CommentFindManyArgs";
+import { Comment } from "../../comment/base/Comment";
+import { CommentWhereUniqueInput } from "../../comment/base/CommentWhereUniqueInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
@@ -50,6 +50,7 @@ import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/Schedule
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
+import { Prisma } from "@prisma/client";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -87,12 +88,6 @@ export class RecipeControllerBase {
           connect: data.customer,
         },
 
-        item: data.item
-          ? {
-              connect: data.item,
-            }
-          : undefined,
-
         mashingProtocol: data.mashingProtocol
           ? {
               connect: data.mashingProtocol,
@@ -126,16 +121,9 @@ export class RecipeControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -151,7 +139,6 @@ export class RecipeControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -196,16 +183,9 @@ export class RecipeControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -221,7 +201,6 @@ export class RecipeControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -267,16 +246,9 @@ export class RecipeControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -292,7 +264,6 @@ export class RecipeControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -341,12 +312,6 @@ export class RecipeControllerBase {
             connect: data.customer,
           },
 
-          item: data.item
-            ? {
-                connect: data.item,
-              }
-            : undefined,
-
           mashingProtocol: data.mashingProtocol
             ? {
                 connect: data.mashingProtocol,
@@ -380,16 +345,9 @@ export class RecipeControllerBase {
           },
 
           customerCode: true,
-          estimatedAbv: true,
           globalId: true,
           id: true,
           isClassDefinition: true,
-
-          item: {
-            select: {
-              id: true,
-            },
-          },
 
           mashingProtocol: {
             select: {
@@ -405,7 +363,6 @@ export class RecipeControllerBase {
 
           revision: true,
           schemaVersion: true,
-          targetProof: true,
           updatedAt: true,
           updatedBy: true,
           whiskeyType: true,
@@ -422,38 +379,22 @@ export class RecipeControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/batches")
-  @ApiNestedQuery(BatchFindManyArgs)
+  @common.Get("/:id/comments")
+  @ApiNestedQuery(CommentFindManyArgs)
   @UseRoles({
-    resource: "Batch",
+    resource: "Comment",
     action: "read",
     possession: "any",
   })
-  async findBatches(
+  async findComments(
     @common.Req() request: Request,
     @common.Param() params: RecipeWhereUniqueInput
-  ): Promise<Batch[]> {
-    const query = plainToClass(BatchFindManyArgs, request.query);
-    const results = await this.service.findBatches(params.id, {
+  ): Promise<Comment[]> {
+    const query = plainToClass(CommentFindManyArgs, request.query);
+    const results = await this.service.findComments(params.id, {
       ...query,
       select: {
-        asset: {
-          select: {
-            id: true,
-          },
-        },
-
-        batchData: true,
-        batchId: true,
         createdAt: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        durationSplits: true,
         id: true,
 
         lot: {
@@ -462,29 +403,21 @@ export class RecipeControllerBase {
           },
         },
 
-        parent: {
-          select: {
-            id: true,
-          },
-        },
-
-        productionOrderRecipeInstance: {
-          select: {
-            id: true,
-          },
-        },
-
-        quantity: true,
-
         recipe: {
           select: {
             id: true,
           },
         },
 
-        revision: true,
-        totalDuration: true,
+        replyTo: {
+          select: {
+            id: true,
+          },
+        },
+
+        text: true,
         updatedAt: true,
+        user: true,
       },
     });
     if (results === null) {
@@ -495,18 +428,18 @@ export class RecipeControllerBase {
     return results;
   }
 
-  @common.Post("/:id/batches")
+  @common.Post("/:id/comments")
   @UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async connectBatches(
+  async connectComments(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
+    @common.Body() body: CommentWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      batches: {
+      comments: {
         connect: body,
       },
     };
@@ -517,18 +450,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Patch("/:id/batches")
+  @common.Patch("/:id/comments")
   @UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async updateBatches(
+  async updateComments(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
+    @common.Body() body: CommentWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      batches: {
+      comments: {
         set: body,
       },
     };
@@ -539,18 +472,18 @@ export class RecipeControllerBase {
     });
   }
 
-  @common.Delete("/:id/batches")
+  @common.Delete("/:id/comments")
   @UseRoles({
     resource: "Recipe",
     action: "update",
     possession: "any",
   })
-  async disconnectBatches(
+  async disconnectComments(
     @common.Param() params: RecipeWhereUniqueInput,
-    @common.Body() body: BatchWhereUniqueInput[]
+    @common.Body() body: CommentWhereUniqueInput[]
   ): Promise<void> {
     const data = {
-      batches: {
+      comments: {
         disconnect: body,
       },
     };
@@ -597,16 +530,9 @@ export class RecipeControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -622,7 +548,6 @@ export class RecipeControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -809,7 +734,6 @@ export class RecipeControllerBase {
           },
         },
 
-        totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
         totalVolumeWg: true,
@@ -907,37 +831,61 @@ export class RecipeControllerBase {
     @common.Param() params: RecipeWhereUniqueInput
   ): Promise<RecipeParameter[]> {
     const query = plainToClass(RecipeParameterFindManyArgs, request.query);
-    const results = await this.service.findRecipeParameters(params.id, {
-      ...query,
+
+    // Convert controller query to Prisma query
+    const prismaQuery: Prisma.RecipeParameterFindManyArgs = {
+      where: query.where,
+      skip: query.skip,
+      take: query.take,
+      orderBy: query.orderBy as any, // Type assertion needed here
       select: {
         active: true,
         className: true,
+        configurable: true,
         createdAt: true,
         createdBy: true,
         description: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeNumericalSetpoint: true,
-        recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        required: true,
         revision: true,
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
       },
-    });
+    };
+
+    const results = await this.service.findParameters(params.id, prismaQuery);
+
     if (results === null) {
       throw new errors.NotFoundException(
         `No resource was found for ${JSON.stringify(params)}`
       );
     }
-    return results;
+
+    // Type assertion to match the expected controller RecipeParameter type
+    return results as unknown as RecipeParameter[];
   }
 
   @common.Post("/:id/parameters")
@@ -1146,10 +1094,8 @@ export class RecipeControllerBase {
 
         className: true,
         complete: true,
-        totalCooks: true,
-        totalFermenters: true,
-        executedCooks: true,
-        executedFermenters: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -1161,9 +1107,7 @@ export class RecipeControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -1174,16 +1118,18 @@ export class RecipeControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -1199,9 +1145,16 @@ export class RecipeControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
+        upperControlLimit: true,
       },
     });
     if (results === null) {
@@ -1299,6 +1252,12 @@ export class RecipeControllerBase {
         master: true,
 
         masterRecipeBom: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstances: {
           select: {
             id: true,
           },

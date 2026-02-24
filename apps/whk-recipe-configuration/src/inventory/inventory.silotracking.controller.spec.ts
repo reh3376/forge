@@ -4,6 +4,7 @@ import { InventoryService } from "./inventory.service";
 import { InventorySiloTrackingService } from "./inventory.silotracking.service";
 import { RolesBuilder, ACGuard } from "nest-access-control";
 import { Reflector } from "@nestjs/core";
+import { ConfigService } from "@nestjs/config";
 
 describe("InventoryController", () => {
   let controller: InventoryController;
@@ -46,6 +47,10 @@ describe("InventoryController", () => {
           },
         },
         ACGuard,
+        {
+          provide: ConfigService,
+          useValue: { get: jest.fn().mockReturnValue("development") },
+        },
       ],
     }).compile();
 

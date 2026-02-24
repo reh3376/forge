@@ -1,5 +1,7 @@
-import { Controller, Post, Body, Logger } from "@nestjs/common";
+import { Controller, Post, Body, Inject } from "@nestjs/common";
 import { MessageQueueService } from "./message-queue.service";
+import { Logger } from "winston";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 interface AcknowledgeMessageDto {
   messageId: string;
@@ -7,13 +9,14 @@ interface AcknowledgeMessageDto {
 
 @Controller("message-queue")
 export class MessageQueueController {
-  private readonly logger = new Logger(MessageQueueController.name);
-
-  constructor(private readonly messageQueueService: MessageQueueService) {}
+  constructor(
+    private readonly messageQueueService: MessageQueueService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+  ) {}
 
   @Post("acknowledge")
   async acknowledgeMessage(@Body() dto: AcknowledgeMessageDto) {
-    this.logger.log(`Acknowledging message ${dto.messageId}`);
+    this.logger.debug(`Acknowledging message ${dto.messageId}`);
     const result = await this.messageQueueService.acknowledgeMessage(
       dto.messageId
     );

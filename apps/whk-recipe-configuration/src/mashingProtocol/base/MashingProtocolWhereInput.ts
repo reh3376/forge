@@ -13,14 +13,16 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional, ValidateNested } from "class-validator";
+import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
+import { MashingProtocolStepActualListRelationFilter } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualListRelationFilter";
 import { MashingProtocolListRelationFilter } from "./MashingProtocolListRelationFilter";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { MashingProtocolStepListRelationFilter } from "../../mashingProtocolStep/base/MashingProtocolStepListRelationFilter";
+import { EnumMashingProtocolTemplateCategory } from "./EnumMashingProtocolTemplateCategory";
 
 @InputType()
 class MashingProtocolWhereInput {
@@ -45,6 +47,29 @@ class MashingProtocolWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  isTemplate?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolStepActualListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepActualListRelationFilter)
+  @IsOptional()
+  @Field(() => MashingProtocolStepActualListRelationFilter, {
+    nullable: true,
+  })
+  mashingProtocolStepActuals?: MashingProtocolStepActualListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -173,6 +198,34 @@ class MashingProtocolWhereInput {
     nullable: true,
   })
   steps?: MashingProtocolStepListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumMashingProtocolTemplateCategory,
+  })
+  @IsEnum(EnumMashingProtocolTemplateCategory)
+  @IsOptional()
+  @Field(() => EnumMashingProtocolTemplateCategory, {
+    nullable: true,
+  })
+  templateCategory?:
+    | "RyeBourbon"
+    | "WheatedBourbon"
+    | "FourGrainBourbon"
+    | "RyeWhiskey"
+    | "WheatWhiskey"
+    | "MaltWhiskey";
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  templateDescription?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

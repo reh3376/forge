@@ -25,11 +25,16 @@ import { BatchFindManyArgs } from "./BatchFindManyArgs";
 import { BatchFindUniqueArgs } from "./BatchFindUniqueArgs";
 import { CreateBatchArgs } from "./CreateBatchArgs";
 import { UpdateBatchArgs } from "./UpdateBatchArgs";
+import { BatchMaterialConsumptionFindManyArgs } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionFindManyArgs";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
+import { BatchParameterValueFindManyArgs } from "../../batchParameterValue/base/BatchParameterValueFindManyArgs";
+import { BatchParameterValue } from "../../batchParameterValue/base/BatchParameterValue";
+import { BatchTimeSeriesDataFindManyArgs } from "../../batchTimeSeriesData/base/BatchTimeSeriesDataFindManyArgs";
+import { BatchTimeSeriesData } from "../../batchTimeSeriesData/base/BatchTimeSeriesData";
 import { Asset } from "../../asset/base/Asset";
 import { Customer } from "../../customer/base/Customer";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
-import { Recipe } from "../../recipe/base/Recipe";
 import { BatchService } from "../batch.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Batch)
@@ -124,12 +129,6 @@ export class BatchResolverBase {
               connect: args.data.productionOrderRecipeInstance,
             }
           : undefined,
-
-        recipe: args.data.recipe
-          ? {
-              connect: args.data.recipe,
-            }
-          : undefined,
       },
     });
   }
@@ -179,12 +178,6 @@ export class BatchResolverBase {
                 connect: args.data.productionOrderRecipeInstance,
               }
             : undefined,
-
-          recipe: args.data.recipe
-            ? {
-                connect: args.data.recipe,
-              }
-            : undefined,
         },
       });
     } catch (error) {
@@ -195,6 +188,81 @@ export class BatchResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BatchMaterialConsumption], {
+    name: "batchMaterialConsumptions",
+  })
+  @UseRoles({
+    resource: "BatchMaterialConsumption",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchMaterialConsumptions(
+    @graphql.Parent() parent: Batch,
+    @graphql.Args() args: BatchMaterialConsumptionFindManyArgs
+  ): Promise<BatchMaterialConsumption[]> {
+    const results = await this.service.findBatchMaterialConsumptions(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BatchParameterValue], {
+    name: "batchParameterValues",
+  })
+  @UseRoles({
+    resource: "BatchParameterValue",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchParameterValues(
+    @graphql.Parent() parent: Batch,
+    @graphql.Args() args: BatchParameterValueFindManyArgs
+  ): Promise<BatchParameterValue[]> {
+    const results = await this.service.findBatchParameterValues(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BatchTimeSeriesData], {
+    name: "batchTimeSeriesDataItems",
+  })
+  @UseRoles({
+    resource: "BatchTimeSeriesData",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchTimeSeriesDataItems(
+    @graphql.Parent() parent: Batch,
+    @graphql.Args() args: BatchTimeSeriesDataFindManyArgs
+  ): Promise<BatchTimeSeriesData[]> {
+    const results = await this.service.findBatchTimeSeriesDataItems(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -309,25 +377,6 @@ export class BatchResolverBase {
     const result = await this.service.getProductionOrderRecipeInstance(
       parent.id
     );
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Recipe, {
-    nullable: true,
-    name: "recipe",
-  })
-  @UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async getRecipe(@graphql.Parent() parent: Batch): Promise<Recipe | null> {
-    const result = await this.service.getRecipe(parent.id);
 
     if (!result) {
       return null;

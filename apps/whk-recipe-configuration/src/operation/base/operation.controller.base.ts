@@ -29,6 +29,10 @@ import { OperationUpdateInput } from "./OperationUpdateInput";
 import { EquipmentPhaseFindManyArgs } from "../../equipmentPhase/base/EquipmentPhaseFindManyArgs";
 import { EquipmentPhase } from "../../equipmentPhase/base/EquipmentPhase";
 import { EquipmentPhaseWhereUniqueInput } from "../../equipmentPhase/base/EquipmentPhaseWhereUniqueInput";
+import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
+import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
+import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
+import { Prisma } from "@prisma/client";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -69,6 +73,8 @@ export class OperationControllerBase {
               connect: data.unitProcedure,
             }
           : undefined,
+
+        RecipeParameter: data.RecipeParameter,
       },
       select: {
         abbreviation: true,
@@ -253,6 +259,8 @@ export class OperationControllerBase {
                 connect: data.unitProcedure,
               }
             : undefined,
+
+          RecipeParameter: data.RecipeParameter,
         },
         select: {
           abbreviation: true,
@@ -534,6 +542,132 @@ export class OperationControllerBase {
   ): Promise<void> {
     const data = {
       instances: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeParameters")
+  @ApiNestedQuery(RecipeParameterFindManyArgs)
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeParameters(
+    @common.Req() request: Request,
+    @common.Param() params: OperationWhereUniqueInput
+  ): Promise<RecipeParameter[]> {
+    const query = plainToClass(RecipeParameterFindManyArgs, request.query);
+    const results = await this.service.findRecipeParameters(params.id, {
+      ...query,
+      select: {
+        active: true,
+        className: true,
+        configurable: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        globalId: true,
+        id: true,
+        isClassDefinition: true,
+
+        operation: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeNumericalSetpoint: true,
+        recipeParamName: true,
+        recipeSetpointBooleanValue: true,
+        recipeSetpointLowerLimit: true,
+        recipeSetpointType: true,
+        recipeSetpointUpperLimit: true,
+        required: true,
+        revision: true,
+        schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+      },
+    } as Prisma.RecipeParameterFindManyArgs);
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results as unknown as RecipeParameter[];
+  }
+
+  @common.Post("/:id/recipeParameters")
+  @UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeParameters(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      RecipeParameter: {
+        connect: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeParameters")
+  @UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeParameters(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      RecipeParameter: {
+        set: body,
+      },
+    };
+    await this.service.updateOperation({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeParameters")
+  @UseRoles({
+    resource: "Operation",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeParameters(
+    @common.Param() params: OperationWhereUniqueInput,
+    @common.Body() body: RecipeParameterWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      RecipeParameter: {
         disconnect: body,
       },
     };

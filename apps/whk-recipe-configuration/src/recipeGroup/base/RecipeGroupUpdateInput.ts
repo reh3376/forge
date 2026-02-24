@@ -19,9 +19,8 @@ import {
   IsInt,
   Max,
 } from "class-validator";
-import { ProductionOrderUpdateManyWithoutRecipeGroupsInput } from "./ProductionOrderUpdateManyWithoutRecipeGroupsInput";
-import { Type } from "class-transformer";
 import { RecipeUpdateManyWithoutRecipeGroupsInput } from "./RecipeUpdateManyWithoutRecipeGroupsInput";
+import { Type } from "class-transformer";
 import { ScheduleOrderUpdateManyWithoutRecipeGroupsInput } from "./ScheduleOrderUpdateManyWithoutRecipeGroupsInput";
 
 @InputType()
@@ -49,18 +48,6 @@ class RecipeGroupUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderUpdateManyWithoutRecipeGroupsInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderUpdateManyWithoutRecipeGroupsInput)
-  @IsOptional()
-  @Field(() => ProductionOrderUpdateManyWithoutRecipeGroupsInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderUpdateManyWithoutRecipeGroupsInput;
 
   @ApiProperty({
     required: false,

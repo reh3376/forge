@@ -117,17 +117,6 @@ class RecipeOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  estimatedAbv?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   globalId?: SortOrder;
 
   @ApiProperty({
@@ -151,17 +140,6 @@ class RecipeOrderByInput {
     nullable: true,
   })
   isClassDefinition?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  itemId?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -206,17 +184,6 @@ class RecipeOrderByInput {
     nullable: true,
   })
   schemaVersion?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  targetProof?: SortOrder;
 
   @ApiProperty({
     required: false,

@@ -26,10 +26,14 @@ import { LotFindUniqueArgs } from "./LotFindUniqueArgs";
 import { CreateLotArgs } from "./CreateLotArgs";
 import { UpdateLotArgs } from "./UpdateLotArgs";
 import { DeleteLotArgs } from "./DeleteLotArgs";
+import { BatchMaterialConsumptionFindManyArgs } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionFindManyArgs";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
+import { CommentFindManyArgs } from "../../comment/base/CommentFindManyArgs";
+import { Comment } from "../../comment/base/Comment";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
@@ -258,6 +262,31 @@ export class LotResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BatchMaterialConsumption], {
+    name: "batchMaterialConsumptions",
+  })
+  @UseRoles({
+    resource: "BatchMaterialConsumption",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchMaterialConsumptions(
+    @graphql.Parent() parent: Lot,
+    @graphql.Args() args: BatchMaterialConsumptionFindManyArgs
+  ): Promise<BatchMaterialConsumption[]> {
+    const results = await this.service.findBatchMaterialConsumptions(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Batch], { name: "batches" })
   @UseRoles({
     resource: "Batch",
@@ -289,6 +318,26 @@ export class LotResolverBase {
     @graphql.Args() args: BomItemFindManyArgs
   ): Promise<BomItem[]> {
     const results = await this.service.findBomItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Comment], { name: "comments" })
+  @UseRoles({
+    resource: "Comment",
+    action: "read",
+    possession: "any",
+  })
+  async findComments(
+    @graphql.Parent() parent: Lot,
+    @graphql.Args() args: CommentFindManyArgs
+  ): Promise<Comment[]> {
+    const results = await this.service.findComments(parent.id, args);
 
     if (!results) {
       return [];

@@ -10,7 +10,13 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, ItemGroup as PrismaItemGroup } from "@prisma/client";
+
+import {
+  Prisma,
+  ItemGroup as PrismaItemGroup,
+  MillingBinConfiguration as PrismaMillingBinConfiguration,
+  Units as PrismaUnits,
+} from "@prisma/client";
 
 export class ItemGroupServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -45,5 +51,27 @@ export class ItemGroupServiceBase {
     args: Prisma.ItemGroupDeleteArgs
   ): Promise<PrismaItemGroup> {
     return this.prisma.itemGroup.delete(args);
+  }
+
+  async findMillingBinConfigurations(
+    parentId: string,
+    args: Prisma.MillingBinConfigurationFindManyArgs
+  ): Promise<PrismaMillingBinConfiguration[]> {
+    return this.prisma.itemGroup
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .millingBinConfigurations(args);
+  }
+
+  async findUnitsItems(
+    parentId: string,
+    args: Prisma.UnitsFindManyArgs
+  ): Promise<PrismaUnits[]> {
+    return this.prisma.itemGroup
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .unitsItems(args);
   }
 }

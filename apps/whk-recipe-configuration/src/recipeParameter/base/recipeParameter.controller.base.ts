@@ -29,6 +29,7 @@ import { RecipeParameterUpdateInput } from "./RecipeParameterUpdateInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+import { Prisma } from "@prisma/client";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -54,8 +55,21 @@ export class RecipeParameterControllerBase {
   async createRecipeParameter(
     @common.Body() data: RecipeParameterCreateInput
   ): Promise<RecipeParameter> {
-    return await this.service.createRecipeParameter({
-      data: data,
+    // Convert controller input to Prisma input
+    const prismaData: Prisma.RecipeParameterCreateInput = {
+      ...data,
+      // Handle operation relationship properly if it exists in the input
+      operation: data.operation
+        ? {
+            connect: {
+              id: data.operation as unknown as string, // Cast enum to string ID
+            },
+          }
+        : undefined,
+    };
+
+    const result = await this.service.createRecipeParameter({
+      data: prismaData as any,
       select: {
         active: true,
         className: true,
@@ -68,17 +82,20 @@ export class RecipeParameterControllerBase {
         recipeNumericalSetpoint: true,
         recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        required: true,
         revision: true,
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
       },
     });
+
+    // Type assertion for the return value
+    return result as unknown as RecipeParameter;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -97,8 +114,13 @@ export class RecipeParameterControllerBase {
     @common.Req() request: Request
   ): Promise<RecipeParameter[]> {
     const args = plainToClass(RecipeParameterFindManyArgs, request.query);
-    return this.service.recipeParameters({
-      ...args,
+
+    // Convert controller query to Prisma query
+    const prismaArgs: Prisma.RecipeParameterFindManyArgs = {
+      where: args.where,
+      skip: args.skip,
+      take: args.take,
+      orderBy: args.orderBy as any,
       select: {
         active: true,
         className: true,
@@ -111,17 +133,22 @@ export class RecipeParameterControllerBase {
         recipeNumericalSetpoint: true,
         recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        required: true,
         revision: true,
         schemaVersion: true,
         updatedAt: true,
         updatedBy: true,
       },
-    });
+    };
+
+    const results = await this.service.recipeParameters(prismaArgs);
+
+    // Type assertion for the return values
+    return results as unknown as RecipeParameter[];
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -153,11 +180,11 @@ export class RecipeParameterControllerBase {
         recipeNumericalSetpoint: true,
         recipeParamDescription: true,
         recipeParamName: true,
-        recipeParamUnits: true,
         recipeSetpointBooleanValue: true,
         recipeSetpointLowerLimit: true,
         recipeSetpointType: true,
         recipeSetpointUpperLimit: true,
+        required: true,
         revision: true,
         schemaVersion: true,
         updatedAt: true,
@@ -169,7 +196,8 @@ export class RecipeParameterControllerBase {
         `No resource was found for ${JSON.stringify(params)}`
       );
     }
-    return result;
+    // Type assertion for the return value
+    return result as unknown as RecipeParameter;
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
@@ -192,9 +220,22 @@ export class RecipeParameterControllerBase {
     @common.Body() data: RecipeParameterUpdateInput
   ): Promise<RecipeParameter | null> {
     try {
-      return await this.service.updateRecipeParameter({
+      // Convert controller input to Prisma input
+      const prismaData: Prisma.RecipeParameterUpdateInput = {
+        ...data,
+        // Handle operation relationship properly if it exists in the input
+        operation: data.operation
+          ? {
+              connect: {
+                id: data.operation as unknown as string, // Cast enum to string ID
+              },
+            }
+          : undefined,
+      };
+
+      const result = await this.service.updateRecipeParameter({
         where: params,
-        data: data,
+        data: prismaData as any,
         select: {
           active: true,
           className: true,
@@ -207,17 +248,94 @@ export class RecipeParameterControllerBase {
           recipeNumericalSetpoint: true,
           recipeParamDescription: true,
           recipeParamName: true,
-          recipeParamUnits: true,
           recipeSetpointBooleanValue: true,
           recipeSetpointLowerLimit: true,
           recipeSetpointType: true,
           recipeSetpointUpperLimit: true,
+          required: true,
           revision: true,
           schemaVersion: true,
+
+          units: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
           updatedBy: true,
         },
       });
+
+      // Type assertion for the return value
+      return result as unknown as RecipeParameter;
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.Delete("/:id")
+  @swagger.ApiOkResponse({ type: RecipeParameter })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async deleteRecipeParameter(
+    @common.Param() params: RecipeParameterWhereUniqueInput
+  ): Promise<RecipeParameter | null> {
+    try {
+      const result = await this.service.deleteRecipeParameter({
+        where: params,
+        select: {
+          active: true,
+          className: true,
+          configurable: true,
+          createdAt: true,
+          createdBy: true,
+          description: true,
+          globalId: true,
+          id: true,
+          isClassDefinition: true,
+
+          operation: {
+            select: {
+              id: true,
+            },
+          },
+
+          recipeNumericalSetpoint: true,
+          recipeParamName: true,
+          recipeSetpointBooleanValue: true,
+          recipeSetpointLowerLimit: true,
+          recipeSetpointType: true,
+          recipeSetpointUpperLimit: true,
+          required: true,
+          revision: true,
+          schemaVersion: true,
+
+          units: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+          updatedBy: true,
+        },
+      });
+
+      // Type assertion for the return value
+      return result as unknown as RecipeParameter;
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new errors.NotFoundException(
@@ -241,8 +359,13 @@ export class RecipeParameterControllerBase {
     @common.Param() params: RecipeParameterWhereUniqueInput
   ): Promise<Recipe[]> {
     const query = plainToClass(RecipeFindManyArgs, request.query);
-    const results = await this.service.findRecipe(params.id, {
-      ...query,
+
+    // Convert controller query to Prisma query
+    const prismaQuery: Prisma.RecipeFindManyArgs = {
+      where: query.where,
+      skip: query.skip,
+      take: query.take,
+      orderBy: query.orderBy as any,
       select: {
         Recipe: true,
         active: true,
@@ -264,16 +387,9 @@ export class RecipeParameterControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -289,19 +405,24 @@ export class RecipeParameterControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         totalCooks: true,
         totalFermenters: true,
         updatedAt: true,
         updatedBy: true,
+        whiskeyType: true,
       },
-    });
+    };
+
+    const results = await this.service.findRecipe(params.id, prismaQuery);
+
     if (results === null) {
       throw new errors.NotFoundException(
         `No resource was found for ${JSON.stringify(params)}`
       );
     }
-    return results;
+
+    // Type assertion for the return values
+    return results as unknown as Recipe[];
   }
 
   @common.Post("/:id/recipe")

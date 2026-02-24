@@ -73,6 +73,12 @@ export class RecipeBomItemControllerBase {
             }
           : undefined,
 
+        displayUnits: data.displayUnits
+          ? {
+              connect: data.displayUnits,
+            }
+          : undefined,
+
         item: data.item
           ? {
               connect: data.item,
@@ -100,6 +106,13 @@ export class RecipeBomItemControllerBase {
 
         createdAt: true,
         createdBy: true,
+
+        displayUnits: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
         isClassDefinition: true,
@@ -119,7 +132,6 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -159,6 +171,13 @@ export class RecipeBomItemControllerBase {
 
         createdAt: true,
         createdBy: true,
+
+        displayUnits: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
         isClassDefinition: true,
@@ -178,7 +197,6 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -217,6 +235,13 @@ export class RecipeBomItemControllerBase {
 
         createdAt: true,
         createdBy: true,
+
+        displayUnits: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
         isClassDefinition: true,
@@ -236,7 +261,6 @@ export class RecipeBomItemControllerBase {
           },
         },
 
-        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -286,6 +310,12 @@ export class RecipeBomItemControllerBase {
               }
             : undefined,
 
+          displayUnits: data.displayUnits
+            ? {
+                connect: data.displayUnits,
+              }
+            : undefined,
+
           item: data.item
             ? {
                 connect: data.item,
@@ -313,6 +343,13 @@ export class RecipeBomItemControllerBase {
 
           createdAt: true,
           createdBy: true,
+
+          displayUnits: {
+            select: {
+              id: true,
+            },
+          },
+
           globalId: true,
           id: true,
           isClassDefinition: true,
@@ -332,7 +369,6 @@ export class RecipeBomItemControllerBase {
             },
           },
 
-          units: true,
           updatedAt: true,
           updatedBy: true,
         },
@@ -379,6 +415,13 @@ export class RecipeBomItemControllerBase {
 
           createdAt: true,
           createdBy: true,
+
+          displayUnits: {
+            select: {
+              id: true,
+            },
+          },
+
           globalId: true,
           id: true,
           isClassDefinition: true,
@@ -398,7 +441,6 @@ export class RecipeBomItemControllerBase {
             },
           },
 
-          units: true,
           updatedAt: true,
           updatedBy: true,
         },
@@ -551,6 +593,12 @@ export class RecipeBomItemControllerBase {
         id: true,
 
         mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },

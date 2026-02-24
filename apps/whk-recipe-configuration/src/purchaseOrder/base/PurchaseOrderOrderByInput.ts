@@ -171,17 +171,6 @@ class PurchaseOrderOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  receiptStatus?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   receivedQuantity?: SortOrder;
 
   @ApiProperty({
@@ -205,6 +194,17 @@ class PurchaseOrderOrderByInput {
     nullable: true,
   })
   schemaVersion?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["asc", "desc"],
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  status?: SortOrder;
 
   @ApiProperty({
     required: false,

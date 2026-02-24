@@ -1,0 +1,67 @@
+# fly.toml app configuration file generated for whk-mes-staging on 2025-10-31T05:21:21-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'whk-mes-staging'
+primary_region = 'ord'
+
+[build]
+  dockerfile = 'apps/whk-recipe-configuration/Dockerfile'
+  build-target = 'production'
+  [build.args]
+    NODE_VERSION = '18.20.8'
+
+[env]
+  BCRYPT_SALT = '10'
+  CORS_CREDENTIALS = 'true'
+  CORS_ENABLED = 'true'
+  NODE_ENV = 'production'
+  PORT = '3000'
+  RABBITMQ_URL = 'amqp://user:staging_pass@whk-rabbitmq-staging.internal:5672'
+  RABBITMQ_URLS = 'amqp://user:staging_pass@whk-rabbitmq-staging.internal:5672'
+  REDIS_HOST = 'whk-redis-staging.internal'
+  REDIS_PORT = '6379'
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 3000
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 80
+    handlers = ['http']
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ['tls', 'http']
+
+  [services.concurrency]
+    type = 'connections'
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.tcp_checks]]
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '10s'
+
+  [[services.http_checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/api/health'
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[[metrics]]
+  port = 9091
+  path = '/metrics'
+  https = false

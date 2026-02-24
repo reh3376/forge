@@ -26,9 +26,11 @@ import {
   IsEnum,
 } from "class-validator";
 
-import { BatchUpdateManyWithoutLotsInput } from "./BatchUpdateManyWithoutLotsInput";
+import { BatchMaterialConsumptionUpdateManyWithoutLotsInput } from "./BatchMaterialConsumptionUpdateManyWithoutLotsInput";
 import { Type } from "class-transformer";
+import { BatchUpdateManyWithoutLotsInput } from "./BatchUpdateManyWithoutLotsInput";
 import { BomItemUpdateManyWithoutLotsInput } from "./BomItemUpdateManyWithoutLotsInput";
+import { CommentUpdateManyWithoutLotsInput } from "./CommentUpdateManyWithoutLotsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
@@ -78,6 +80,18 @@ class LotUpdateInput {
     nullable: true,
   })
   avgPGsFerm?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionUpdateManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionUpdateManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionUpdateManyWithoutLotsInput, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionUpdateManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,
@@ -150,6 +164,18 @@ class LotUpdateInput {
     nullable: true,
   })
   bomItems?: BomItemUpdateManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentUpdateManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => CommentUpdateManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => CommentUpdateManyWithoutLotsInput, {
+    nullable: true,
+  })
+  comments?: CommentUpdateManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,
@@ -665,9 +691,7 @@ class LotUpdateInput {
     required: false,
   })
   @IsOptional()
-  @Field(() => Object, {
-    nullable: true,
-  })
+  // @Field(() => Object, { nullable: true }) // Commented out: GraphQL cannot handle Object type for Prisma nested input
   whiskeyTypeRelation?: Prisma.WhiskeyTypeUpdateOneWithoutLotsNestedInput;
 }
 

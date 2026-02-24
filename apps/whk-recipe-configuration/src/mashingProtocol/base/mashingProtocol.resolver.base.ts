@@ -25,12 +25,14 @@ import { MashingProtocolFindManyArgs } from "./MashingProtocolFindManyArgs";
 import { MashingProtocolFindUniqueArgs } from "./MashingProtocolFindUniqueArgs";
 import { CreateMashingProtocolArgs } from "./CreateMashingProtocolArgs";
 import { UpdateMashingProtocolArgs } from "./UpdateMashingProtocolArgs";
-import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
-import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
+import { DeleteMashingProtocolArgs } from "./DeleteMashingProtocolArgs";
+import { MashingProtocolStepActualFindManyArgs } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualFindManyArgs";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/MashingProtocolStepFindManyArgs";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { MashingProtocolService } from "../mashingProtocol.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => MashingProtocol)
@@ -106,6 +108,12 @@ export class MashingProtocolResolverBase {
             }
           : undefined,
 
+        productionOrderRecipeInstances: args.data.productionOrderRecipeInstances
+          ? {
+              connect: args.data.productionOrderRecipeInstances,
+            }
+          : undefined,
+
         runningMashingProtocol: args.data.runningMashingProtocol
           ? {
               connect: args.data.runningMashingProtocol,
@@ -137,6 +145,13 @@ export class MashingProtocolResolverBase {
               }
             : undefined,
 
+          productionOrderRecipeInstances: args.data
+            .productionOrderRecipeInstances
+            ? {
+                connect: args.data.productionOrderRecipeInstances,
+              }
+            : undefined,
+
           runningMashingProtocol: args.data.runningMashingProtocol
             ? {
                 connect: args.data.runningMashingProtocol,
@@ -154,6 +169,52 @@ export class MashingProtocolResolverBase {
     }
   }
 
+  @graphql.Mutation(() => MashingProtocol)
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "delete",
+    possession: "any",
+  })
+  async deleteMashingProtocol(
+    @graphql.Args() args: DeleteMashingProtocolArgs
+  ): Promise<MashingProtocol | null> {
+    try {
+      return await this.service.deleteMashingProtocol(args);
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MashingProtocolStepActual], {
+    name: "mashingProtocolStepActuals",
+  })
+  @UseRoles({
+    resource: "MashingProtocolStepActual",
+    action: "read",
+    possession: "any",
+  })
+  async findMashingProtocolStepActuals(
+    @graphql.Parent() parent: MashingProtocol,
+    @graphql.Args() args: MashingProtocolStepActualFindManyArgs
+  ): Promise<MashingProtocolStepActual[]> {
+    const results = await this.service.findMashingProtocolStepActuals(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [MashingProtocol], { name: "masterInstances" })
   @UseRoles({
@@ -166,31 +227,6 @@ export class MashingProtocolResolverBase {
     @graphql.Args() args: MashingProtocolFindManyArgs
   ): Promise<MashingProtocol[]> {
     const results = await this.service.findMasterInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
-    name: "productionOrderRecipeInstances",
-  })
-  @UseRoles({
-    resource: "ProductionOrderRecipeInstance",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderRecipeInstances(
-    @graphql.Parent() parent: MashingProtocol,
-    @graphql.Args() args: ProductionOrderRecipeInstanceFindManyArgs
-  ): Promise<ProductionOrderRecipeInstance[]> {
-    const results = await this.service.findProductionOrderRecipeInstances(
-      parent.id,
-      args
-    );
 
     if (!results) {
       return [];
@@ -277,6 +313,26 @@ export class MashingProtocolResolverBase {
     if (!result) {
       return null;
     }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
+    nullable: false,
+    name: "productionOrderRecipeInstances",
+  })
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrderRecipeInstances(
+    @graphql.Parent() parent: MashingProtocol
+  ): Promise<ProductionOrderRecipeInstance[]> {
+    const result = await this.service.getProductionOrderRecipeInstances(
+      parent.id
+    );
+
     return result;
   }
 

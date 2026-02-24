@@ -16,13 +16,15 @@ import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 import { JsonFilter } from "../../util/JsonFilter";
 import { StringFilter } from "../../util/StringFilter";
+import { BatchMaterialConsumptionListRelationFilter } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionListRelationFilter";
+import { BatchParameterValueListRelationFilter } from "../../batchParameterValue/base/BatchParameterValueListRelationFilter";
+import { BatchTimeSeriesDataListRelationFilter } from "../../batchTimeSeriesData/base/BatchTimeSeriesDataListRelationFilter";
 import { BatchListRelationFilter } from "./BatchListRelationFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class BatchWhereInput {
@@ -59,6 +61,42 @@ class BatchWhereInput {
     nullable: true,
   })
   batchId?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionListRelationFilter, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchParameterValueListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchParameterValueListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchParameterValueListRelationFilter, {
+    nullable: true,
+  })
+  batchParameterValues?: BatchParameterValueListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchTimeSeriesDataListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchTimeSeriesDataListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchTimeSeriesDataListRelationFilter, {
+    nullable: true,
+  })
+  batchTimeSeriesDataItems?: BatchTimeSeriesDataListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -152,18 +190,6 @@ class BatchWhereInput {
     nullable: true,
   })
   quantity?: IntNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput;
 
   @ApiProperty({
     required: false,

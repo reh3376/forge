@@ -50,25 +50,31 @@ export class UnsBrokerConfigurationServiceBase {
 
       data: {
         ...args.data,
-        password: await this.passwordService.hash(args.data.password as string),
+        // Only hash the password if it's provided, supporting anonymous MQTT connections
+        password:
+          args.data.password !== undefined
+            ? await this.passwordService.hash(args.data.password as string)
+            : undefined,
       },
     });
   }
   async updateUnsBrokerConfiguration(
     args: Prisma.UnsBrokerConfigurationUpdateArgs
   ): Promise<PrismaUnsBrokerConfiguration> {
+    // Properly handle password updates, ensuring null/undefined values are preserved
+    let passwordUpdate = undefined;
+    if (args.data.password !== undefined) {
+      passwordUpdate = await transformStringFieldUpdateInput(
+        args.data.password as string,
+        (password) => this.passwordService.hash(password)
+      );
+    }
+
     return this.prisma.unsBrokerConfiguration.update({
       ...args,
-
       data: {
         ...args.data,
-
-        password:
-          args.data.password &&
-          (await transformStringFieldUpdateInput(
-            args.data.password as string,
-            (password) => this.passwordService.hash(password)
-          )),
+        password: passwordUpdate,
       },
     });
   }

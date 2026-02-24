@@ -28,3 +28,6 @@ newrelic_agent.log
 
 # Local TLS certs (generated for dev only)
 /.certs/
+prisma/ERD.md
+prisma/ERD.svg
+prisma/ERD.svgwhk-mes-20250904.sql

@@ -26,9 +26,9 @@ import { MashingProtocol } from "./MashingProtocol";
 import { MashingProtocolFindManyArgs } from "./MashingProtocolFindManyArgs";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
 import { MashingProtocolUpdateInput } from "./MashingProtocolUpdateInput";
-import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
-import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
-import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
+import { MashingProtocolStepActualFindManyArgs } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualFindManyArgs";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
+import { MashingProtocolStepActualWhereUniqueInput } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualWhereUniqueInput";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
@@ -70,6 +70,12 @@ export class MashingProtocolControllerBase {
             }
           : undefined,
 
+        productionOrderRecipeInstances: data.productionOrderRecipeInstances
+          ? {
+              connect: data.productionOrderRecipeInstances,
+            }
+          : undefined,
+
         runningMashingProtocol: data.runningMashingProtocol
           ? {
               connect: data.runningMashingProtocol,
@@ -80,6 +86,7 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        isTemplate: true,
         master: true,
 
         masterMashingProtocol: {
@@ -89,6 +96,13 @@ export class MashingProtocolControllerBase {
         },
 
         name: true,
+
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -98,6 +112,8 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        templateCategory: true,
+        templateDescription: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -126,6 +142,7 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        isTemplate: true,
         master: true,
 
         masterMashingProtocol: {
@@ -135,6 +152,13 @@ export class MashingProtocolControllerBase {
         },
 
         name: true,
+
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -144,6 +168,8 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        templateCategory: true,
+        templateDescription: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -171,6 +197,7 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        isTemplate: true,
         master: true,
 
         masterMashingProtocol: {
@@ -180,6 +207,13 @@ export class MashingProtocolControllerBase {
         },
 
         name: true,
+
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -189,6 +223,8 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        templateCategory: true,
+        templateDescription: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -232,6 +268,12 @@ export class MashingProtocolControllerBase {
               }
             : undefined,
 
+          productionOrderRecipeInstances: data.productionOrderRecipeInstances
+            ? {
+                connect: data.productionOrderRecipeInstances,
+              }
+            : undefined,
+
           runningMashingProtocol: data.runningMashingProtocol
             ? {
                 connect: data.runningMashingProtocol,
@@ -242,6 +284,7 @@ export class MashingProtocolControllerBase {
           createdAt: true,
           createdBy: true,
           id: true,
+          isTemplate: true,
           master: true,
 
           masterMashingProtocol: {
@@ -251,6 +294,13 @@ export class MashingProtocolControllerBase {
           },
 
           name: true,
+
+          productionOrderRecipeInstances: {
+            select: {
+              id: true,
+            },
+          },
+
           revision: true,
           running: true,
 
@@ -260,6 +310,8 @@ export class MashingProtocolControllerBase {
             },
           },
 
+          templateCategory: true,
+          templateDescription: true,
           updatedAt: true,
           updatedBy: true,
         },
@@ -272,6 +324,188 @@ export class MashingProtocolControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.Delete("/:id")
+  @swagger.ApiOkResponse({ type: MashingProtocol })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
+  async deleteMashingProtocol(
+    @common.Param() params: MashingProtocolWhereUniqueInput
+  ): Promise<MashingProtocol | null> {
+    try {
+      return await this.service.deleteMashingProtocol({
+        where: params,
+        select: {
+          createdAt: true,
+          createdBy: true,
+          id: true,
+          isTemplate: true,
+          master: true,
+
+          masterMashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
+
+          name: true,
+
+          productionOrderRecipeInstances: {
+            select: {
+              id: true,
+            },
+          },
+
+          revision: true,
+          running: true,
+
+          runningMashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
+
+          templateCategory: true,
+          templateDescription: true,
+          updatedAt: true,
+          updatedBy: true,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new errors.NotFoundException(
+          `No resource was found for ${JSON.stringify(params)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/mashingProtocolStepActuals")
+  @ApiNestedQuery(MashingProtocolStepActualFindManyArgs)
+  @UseRoles({
+    resource: "MashingProtocolStepActual",
+    action: "read",
+    possession: "any",
+  })
+  async findMashingProtocolStepActuals(
+    @common.Req() request: Request,
+    @common.Param() params: MashingProtocolWhereUniqueInput
+  ): Promise<MashingProtocolStepActual[]> {
+    const query = plainToClass(
+      MashingProtocolStepActualFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findMashingProtocolStepActuals(
+      params.id,
+      {
+        ...query,
+        select: {
+          actualValue: true,
+          createdAt: true,
+          createdBy: true,
+          id: true,
+
+          mashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
+
+          mashingProtocolStep: {
+            select: {
+              id: true,
+            },
+          },
+
+          stepCompletedAt: true,
+          timeActualValue: true,
+          updatedAt: true,
+          updatedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/mashingProtocolStepActuals")
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async connectMashingProtocolStepActuals(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolStepActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingProtocolStepActuals: {
+        connect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/mashingProtocolStepActuals")
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async updateMashingProtocolStepActuals(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolStepActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingProtocolStepActuals: {
+        set: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/mashingProtocolStepActuals")
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMashingProtocolStepActuals(
+    @common.Param() params: MashingProtocolWhereUniqueInput,
+    @common.Body() body: MashingProtocolStepActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      mashingProtocolStepActuals: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateMashingProtocol({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -293,6 +527,7 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        isTemplate: true,
         master: true,
 
         masterMashingProtocol: {
@@ -302,6 +537,13 @@ export class MashingProtocolControllerBase {
         },
 
         name: true,
+
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -311,6 +553,8 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        templateCategory: true,
+        templateDescription: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -390,122 +634,6 @@ export class MashingProtocolControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/productionOrderRecipeInstances")
-  @ApiNestedQuery(ProductionOrderRecipeInstanceFindManyArgs)
-  @UseRoles({
-    resource: "ProductionOrderRecipeInstance",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderRecipeInstances(
-    @common.Req() request: Request,
-    @common.Param() params: MashingProtocolWhereUniqueInput
-  ): Promise<ProductionOrderRecipeInstance[]> {
-    const query = plainToClass(
-      ProductionOrderRecipeInstanceFindManyArgs,
-      request.query
-    );
-    const results = await this.service.findProductionOrderRecipeInstances(
-      params.id,
-      {
-        ...query,
-        select: {
-          createdAt: true,
-          createdBy: true,
-          id: true,
-
-          productionOrder: {
-            select: {
-              id: true,
-            },
-          },
-
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
-          updatedAt: true,
-          updatedBy: true,
-        },
-      }
-    );
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/productionOrderRecipeInstances")
-  @UseRoles({
-    resource: "MashingProtocol",
-    action: "update",
-    possession: "any",
-  })
-  async connectProductionOrderRecipeInstances(
-    @common.Param() params: MashingProtocolWhereUniqueInput,
-    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderRecipeInstances: {
-        connect: body,
-      },
-    };
-    await this.service.updateMashingProtocol({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/productionOrderRecipeInstances")
-  @UseRoles({
-    resource: "MashingProtocol",
-    action: "update",
-    possession: "any",
-  })
-  async updateProductionOrderRecipeInstances(
-    @common.Param() params: MashingProtocolWhereUniqueInput,
-    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderRecipeInstances: {
-        set: body,
-      },
-    };
-    await this.service.updateMashingProtocol({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/productionOrderRecipeInstances")
-  @UseRoles({
-    resource: "MashingProtocol",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectProductionOrderRecipeInstances(
-    @common.Param() params: MashingProtocolWhereUniqueInput,
-    @common.Body() body: ProductionOrderRecipeInstanceWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      productionOrderRecipeInstances: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateMashingProtocol({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipes")
   @ApiNestedQuery(RecipeFindManyArgs)
   @UseRoles({
@@ -541,16 +669,9 @@ export class MashingProtocolControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -566,7 +687,6 @@ export class MashingProtocolControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -665,6 +785,7 @@ export class MashingProtocolControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        isTemplate: true,
         master: true,
 
         masterMashingProtocol: {
@@ -674,6 +795,13 @@ export class MashingProtocolControllerBase {
         },
 
         name: true,
+
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -683,6 +811,8 @@ export class MashingProtocolControllerBase {
           },
         },
 
+        templateCategory: true,
+        templateDescription: true,
         updatedAt: true,
         updatedBy: true,
       },

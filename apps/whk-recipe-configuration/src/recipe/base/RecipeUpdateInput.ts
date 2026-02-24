@@ -25,12 +25,11 @@ import {
 } from "class-validator";
 
 import { Recipe } from "./Recipe";
-import { BatchUpdateManyWithoutRecipesInput } from "./BatchUpdateManyWithoutRecipesInput";
-import { Type } from "class-transformer";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
+import { Type } from "class-transformer";
+import { CommentUpdateManyWithoutRecipesInput } from "./CommentUpdateManyWithoutRecipesInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { RecipeUpdateManyWithoutRecipesInput } from "./RecipeUpdateManyWithoutRecipesInput";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotUpdateManyWithoutRecipesInput } from "./LotUpdateManyWithoutRecipesInput";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { RecipeParameterUpdateManyWithoutRecipesInput } from "./RecipeParameterUpdateManyWithoutRecipesInput";
@@ -70,18 +69,6 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () => BatchUpdateManyWithoutRecipesInput,
-  })
-  @ValidateNested()
-  @Type(() => BatchUpdateManyWithoutRecipesInput)
-  @IsOptional()
-  @Field(() => BatchUpdateManyWithoutRecipesInput, {
-    nullable: true,
-  })
-  batches?: BatchUpdateManyWithoutRecipesInput;
-
-  @ApiProperty({
-    required: false,
     type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
@@ -91,6 +78,18 @@ class RecipeUpdateInput {
     nullable: true,
   })
   classId?: RecipeWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentUpdateManyWithoutRecipesInput,
+  })
+  @ValidateNested()
+  @Type(() => CommentUpdateManyWithoutRecipesInput)
+  @IsOptional()
+  @Field(() => CommentUpdateManyWithoutRecipesInput, {
+    nullable: true,
+  })
+  comments?: CommentUpdateManyWithoutRecipesInput;
 
   @ApiProperty({
     required: false,
@@ -142,18 +141,6 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(20)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  estimatedAbv?: number | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -186,18 +173,6 @@ class RecipeUpdateInput {
     nullable: true,
   })
   isClassDefinition?: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -321,18 +296,6 @@ class RecipeUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  targetProof?: number | null;
-
-  @ApiProperty({
-    required: false,
     type: () => UnitProcedureUpdateManyWithoutRecipesInput,
   })
   @ValidateNested()
@@ -378,9 +341,7 @@ class RecipeUpdateInput {
     required: false,
   })
   @IsOptional()
-  @Field(() => Object, {
-    nullable: true,
-  })
+  // @Field(() => Object, { nullable: true }) // Commented out: GraphQL cannot handle Object type for Prisma nested input
   whiskeyTypeRelation?: Prisma.WhiskeyTypeUpdateOneWithoutRecipesNestedInput;
 }
 

@@ -15,6 +15,7 @@ import {
   Prisma,
   MashingProtocolStepActual as PrismaMashingProtocolStepActual,
   RecipeBomActual as PrismaRecipeBomActual,
+  MashingProtocol as PrismaMashingProtocol,
   MashingProtocolStep as PrismaMashingProtocolStep,
 } from "@prisma/client";
 
@@ -62,6 +63,16 @@ export class MashingProtocolStepActualServiceBase {
         where: { id: parentId },
       })
       .recipeBomActual(args);
+  }
+
+  async getMashingProtocol(
+    parentId: string
+  ): Promise<PrismaMashingProtocol | null> {
+    return this.prisma.mashingProtocolStepActual
+      .findUnique({
+        where: { id: parentId },
+      })
+      .mashingProtocol();
   }
 
   async getMashingProtocolStep(

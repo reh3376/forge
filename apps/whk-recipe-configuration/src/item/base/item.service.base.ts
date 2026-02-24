@@ -15,6 +15,7 @@ import {
   Prisma,
   Item as PrismaItem,
   AdditiveActual as PrismaAdditiveActual,
+  BatchMaterialConsumption as PrismaBatchMaterialConsumption,
   BomItem as PrismaBomItem,
   Bom as PrismaBom,
   Inventory as PrismaInventory,
@@ -25,9 +26,9 @@ import {
   ProductionOrder as PrismaProductionOrder,
   PurchaseOrder as PrismaPurchaseOrder,
   RecipeBomItem as PrismaRecipeBomItem,
-  Recipe as PrismaRecipe,
   SalesOrder as PrismaSalesOrder,
   TestParameter as PrismaTestParameter,
+  Units as PrismaUnits,
   Vendor as PrismaVendor,
 } from "@prisma/client";
 
@@ -63,6 +64,17 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .additiveActuals(args);
+  }
+
+  async findBatchMaterialConsumptions(
+    parentId: string,
+    args: Prisma.BatchMaterialConsumptionFindManyArgs
+  ): Promise<PrismaBatchMaterialConsumption[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batchMaterialConsumptions(args);
   }
 
   async findBomItems(
@@ -142,6 +154,17 @@ export class ItemServiceBase {
       .lots(args);
   }
 
+  async findProductionOrderContainerItems(
+    parentId: string,
+    args: Prisma.ProductionOrderFindManyArgs
+  ): Promise<PrismaProductionOrder[]> {
+    return this.prisma.item
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .productionOrderContainerItems(args);
+  }
+
   async findProductionOrders(
     parentId: string,
     args: Prisma.ProductionOrderFindManyArgs
@@ -175,17 +198,6 @@ export class ItemServiceBase {
       .recipeBoms(args);
   }
 
-  async findRecipes(
-    parentId: string,
-    args: Prisma.RecipeFindManyArgs
-  ): Promise<PrismaRecipe[]> {
-    return this.prisma.item
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .recipes(args);
-  }
-
   async findSalesOrders(
     parentId: string,
     args: Prisma.SalesOrderFindManyArgs
@@ -214,6 +226,14 @@ export class ItemServiceBase {
         where: { id: parentId },
       })
       .lotContinerItem();
+  }
+
+  async getUnits(parentId: string): Promise<PrismaUnits | null> {
+    return this.prisma.item
+      .findUnique({
+        where: { id: parentId },
+      })
+      .units();
   }
 
   async getVendor(parentId: string): Promise<PrismaVendor | null> {

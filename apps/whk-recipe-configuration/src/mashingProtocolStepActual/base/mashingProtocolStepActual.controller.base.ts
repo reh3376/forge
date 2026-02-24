@@ -29,6 +29,7 @@ import { MashingProtocolStepActualUpdateInput } from "./MashingProtocolStepActua
 import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
 import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
+import { UseRoles } from "nest-access-control";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -40,7 +41,7 @@ export class MashingProtocolStepActualControllerBase {
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: MashingProtocolStepActual })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "create",
     possession: "any",
@@ -58,6 +59,10 @@ export class MashingProtocolStepActualControllerBase {
       data: {
         ...data,
 
+        mashingProtocol: {
+          connect: data.mashingProtocol,
+        },
+
         mashingProtocolStep: {
           connect: data.mashingProtocolStep,
         },
@@ -67,6 +72,12 @@ export class MashingProtocolStepActualControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
 
         mashingProtocolStep: {
           select: {
@@ -86,7 +97,7 @@ export class MashingProtocolStepActualControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [MashingProtocolStepActual] })
   @ApiNestedQuery(MashingProtocolStepActualFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "read",
     possession: "any",
@@ -109,6 +120,12 @@ export class MashingProtocolStepActualControllerBase {
         createdBy: true,
         id: true,
 
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
+
         mashingProtocolStep: {
           select: {
             id: true,
@@ -127,7 +144,7 @@ export class MashingProtocolStepActualControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: MashingProtocolStepActual })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "read",
     possession: "own",
@@ -145,6 +162,12 @@ export class MashingProtocolStepActualControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+
+        mashingProtocol: {
+          select: {
+            id: true,
+          },
+        },
 
         mashingProtocolStep: {
           select: {
@@ -170,7 +193,7 @@ export class MashingProtocolStepActualControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: MashingProtocolStepActual })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "update",
     possession: "any",
@@ -191,6 +214,10 @@ export class MashingProtocolStepActualControllerBase {
         data: {
           ...data,
 
+          mashingProtocol: {
+            connect: data.mashingProtocol,
+          },
+
           mashingProtocolStep: {
             connect: data.mashingProtocolStep,
           },
@@ -200,6 +227,12 @@ export class MashingProtocolStepActualControllerBase {
           createdAt: true,
           createdBy: true,
           id: true,
+
+          mashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
 
           mashingProtocolStep: {
             select: {
@@ -226,7 +259,7 @@ export class MashingProtocolStepActualControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: MashingProtocolStepActual })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "delete",
     possession: "any",
@@ -245,6 +278,12 @@ export class MashingProtocolStepActualControllerBase {
           createdAt: true,
           createdBy: true,
           id: true,
+
+          mashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
 
           mashingProtocolStep: {
             select: {
@@ -271,7 +310,7 @@ export class MashingProtocolStepActualControllerBase {
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/recipeBomActual")
   @ApiNestedQuery(RecipeBomActualFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "any",
@@ -289,6 +328,12 @@ export class MashingProtocolStepActualControllerBase {
         id: true,
 
         mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },
@@ -314,7 +359,7 @@ export class MashingProtocolStepActualControllerBase {
   }
 
   @common.Post("/:id/recipeBomActual")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "update",
     possession: "any",
@@ -336,7 +381,7 @@ export class MashingProtocolStepActualControllerBase {
   }
 
   @common.Patch("/:id/recipeBomActual")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "update",
     possession: "any",
@@ -358,7 +403,7 @@ export class MashingProtocolStepActualControllerBase {
   }
 
   @common.Delete("/:id/recipeBomActual")
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "MashingProtocolStepActual",
     action: "update",
     possession: "any",

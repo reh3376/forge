@@ -19,10 +19,10 @@ import {
   ValidateNested,
   IsOptional,
   IsDate,
+  IsInt,
+  Max,
   IsNumber,
   Min,
-  Max,
-  IsInt,
 } from "class-validator";
 
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
@@ -33,7 +33,10 @@ import { InventoryLog } from "../../inventoryLog/base/InventoryLog";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { Lot } from "../../lot/base/Lot";
+import { MillingBinConfiguration } from "../../millingBinConfiguration/base/MillingBinConfiguration";
+import { OperatorShift } from "../../operatorShift/base/OperatorShift";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @ObjectType()
@@ -133,6 +136,18 @@ class Asset {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  index!: number | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [Inventory],
   })
   @ValidateNested()
@@ -213,6 +228,15 @@ class Asset {
   lotsFilledFrom?: Array<Lot>;
 
   @ApiProperty({
+    required: false,
+    type: () => [MillingBinConfiguration],
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfiguration)
+  @IsOptional()
+  millingBinConfigurations?: Array<MillingBinConfiguration>;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -220,6 +244,15 @@ class Asset {
   @MaxLength(256)
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [OperatorShift],
+  })
+  @ValidateNested()
+  @Type(() => OperatorShift)
+  @IsOptional()
+  operatorShifts?: Array<OperatorShift>;
 
   @ApiProperty({
     required: false,
@@ -263,6 +296,15 @@ class Asset {
     nullable: true,
   })
   revision!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ScheduleOrderQueue],
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueue)
+  @IsOptional()
+  scheduleOrderQueues?: Array<ScheduleOrderQueue>;
 
   @ApiProperty({
     required: true,

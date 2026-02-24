@@ -13,8 +13,10 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
+import { MillingBinConfigurationListRelationFilter } from "../../millingBinConfiguration/base/MillingBinConfigurationListRelationFilter";
+import { UnitsListRelationFilter } from "../../units/base/UnitsListRelationFilter";
 
 @InputType()
 class ItemGroupWhereInput {
@@ -53,6 +55,18 @@ class ItemGroupWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => MillingBinConfigurationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationListRelationFilter)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationListRelationFilter, {
+    nullable: true,
+  })
+  millingBinConfigurations?: MillingBinConfigurationListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -61,6 +75,18 @@ class ItemGroupWhereInput {
     nullable: true,
   })
   name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UnitsListRelationFilter)
+  @IsOptional()
+  @Field(() => UnitsListRelationFilter, {
+    nullable: true,
+  })
+  unitsItems?: UnitsListRelationFilter;
 }
 
 export { ItemGroupWhereInput as ItemGroupWhereInput };

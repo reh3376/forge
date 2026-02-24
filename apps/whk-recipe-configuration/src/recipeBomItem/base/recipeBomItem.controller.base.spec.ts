@@ -24,7 +24,6 @@ const CREATE_INPUT = {
   id: "exampleId",
   isClassDefinition: "true",
   quantity: 42.42,
-  units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: new Date(),
 };
@@ -35,7 +34,6 @@ const CREATE_RESULT = {
   id: "exampleId",
   isClassDefinition: "true",
   quantity: 42.42,
-  units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: new Date(),
 };
@@ -47,7 +45,6 @@ const FIND_MANY_RESULT = [
     id: "exampleId",
     isClassDefinition: "true",
     quantity: 42.42,
-    units: "exampleUnits",
     updatedAt: new Date(),
     updatedBy: new Date(),
   },
@@ -59,7 +56,6 @@ const FIND_ONE_RESULT = {
   id: "exampleId",
   isClassDefinition: "true",
   quantity: 42.42,
-  units: "exampleUnits",
   updatedAt: new Date(),
   updatedBy: new Date(),
 };

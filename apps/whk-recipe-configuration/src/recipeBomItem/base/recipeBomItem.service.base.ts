@@ -16,6 +16,7 @@ import {
   RecipeBomItem as PrismaRecipeBomItem,
   MashingProtocolStep as PrismaMashingProtocolStep,
   RecipeBomActual as PrismaRecipeBomActual,
+  Units as PrismaUnits,
   Item as PrismaItem,
   RecipeBom as PrismaRecipeBom,
 } from "@prisma/client";
@@ -93,6 +94,14 @@ export class RecipeBomItemServiceBase {
         where: { id: parentId },
       })
       .classId();
+  }
+
+  async getDisplayUnits(parentId: string): Promise<PrismaUnits | null> {
+    return this.prisma.recipeBomItem
+      .findUnique({
+        where: { id: parentId },
+      })
+      .displayUnits();
   }
 
   async getItem(parentId: string): Promise<PrismaItem | null> {

@@ -20,9 +20,9 @@ import {
   MaxLength,
   IsBoolean,
   IsDate,
-  IsEnum,
   IsInt,
   Max,
+  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -35,7 +35,7 @@ import { InputJsonValue } from "../../types";
 import { PurchaseOrderCreateNestedManyWithoutPurchaseOrdersInput } from "./PurchaseOrderCreateNestedManyWithoutPurchaseOrdersInput";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
 import { TestParameterCreateNestedManyWithoutPurchaseOrdersInput } from "./TestParameterCreateNestedManyWithoutPurchaseOrdersInput";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
+import { EnumPurchaseOrderStatus } from "./EnumPurchaseOrderStatus";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -217,24 +217,6 @@ class PurchaseOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumPurchaseOrderReceiptStatus,
-  })
-  @IsEnum(EnumPurchaseOrderReceiptStatus)
-  @IsOptional()
-  @Field(() => EnumPurchaseOrderReceiptStatus, {
-    nullable: true,
-  })
-  receiptStatus?:
-    | "NotReceived"
-    | "ReceiptInProgress"
-    | "ReceiptComplete"
-    | "PurchaseOrderComplete"
-    | "InitializedNotReceived"
-    | "ReceivedTested"
-    | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
@@ -268,6 +250,23 @@ class PurchaseOrderCreateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumPurchaseOrderStatus,
+  })
+  @IsEnum(EnumPurchaseOrderStatus)
+  @IsOptional()
+  @Field(() => EnumPurchaseOrderStatus, {
+    nullable: true,
+  })
+  status?:
+    | "Planned"
+    | "Committed"
+    | "Initiated"
+    | "InProgress"
+    | "Complete"
+    | null;
 
   @ApiProperty({
     required: false,

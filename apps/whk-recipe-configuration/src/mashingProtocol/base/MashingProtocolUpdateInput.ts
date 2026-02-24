@@ -17,13 +17,16 @@ import {
   IsOptional,
   IsBoolean,
   ValidateNested,
+  IsEnum,
 } from "class-validator";
-import { MashingProtocolUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolUpdateManyWithoutMashingProtocolsInput";
+import { MashingProtocolStepActualUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolStepActualUpdateManyWithoutMashingProtocolsInput";
 import { Type } from "class-transformer";
+import { MashingProtocolUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolUpdateManyWithoutMashingProtocolsInput";
 import { MashingProtocolWhereUniqueInput } from "./MashingProtocolWhereUniqueInput";
-import { ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput } from "./ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput";
+import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { RecipeUpdateManyWithoutMashingProtocolsInput } from "./RecipeUpdateManyWithoutMashingProtocolsInput";
 import { MashingProtocolStepUpdateManyWithoutMashingProtocolsInput } from "./MashingProtocolStepUpdateManyWithoutMashingProtocolsInput";
+import { EnumMashingProtocolTemplateCategory } from "./EnumMashingProtocolTemplateCategory";
 
 @InputType()
 class MashingProtocolUpdateInput {
@@ -38,6 +41,32 @@ class MashingProtocolUpdateInput {
     nullable: true,
   })
   createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isTemplate?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolStepActualUpdateManyWithoutMashingProtocolsInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepActualUpdateManyWithoutMashingProtocolsInput)
+  @IsOptional()
+  @Field(
+    () => MashingProtocolStepActualUpdateManyWithoutMashingProtocolsInput,
+    {
+      nullable: true,
+    }
+  )
+  mashingProtocolStepActuals?: MashingProtocolStepActualUpdateManyWithoutMashingProtocolsInput;
 
   @ApiProperty({
     required: false,
@@ -88,21 +117,15 @@ class MashingProtocolUpdateInput {
 
   @ApiProperty({
     required: false,
-    type: () =>
-      ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput,
+    type: () => ProductionOrderRecipeInstanceWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(
-    () => ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput
-  )
+  @Type(() => ProductionOrderRecipeInstanceWhereUniqueInput)
   @IsOptional()
-  @Field(
-    () => ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput,
-    {
-      nullable: true,
-    }
-  )
-  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceUpdateManyWithoutMashingProtocolsInput;
+  @Field(() => ProductionOrderRecipeInstanceWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstanceWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -174,6 +197,36 @@ class MashingProtocolUpdateInput {
     nullable: true,
   })
   steps?: MashingProtocolStepUpdateManyWithoutMashingProtocolsInput;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumMashingProtocolTemplateCategory,
+  })
+  @IsEnum(EnumMashingProtocolTemplateCategory)
+  @IsOptional()
+  @Field(() => EnumMashingProtocolTemplateCategory, {
+    nullable: true,
+  })
+  templateCategory?:
+    | "RyeBourbon"
+    | "WheatedBourbon"
+    | "FourGrainBourbon"
+    | "RyeWhiskey"
+    | "WheatWhiskey"
+    | "MaltWhiskey"
+    | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  templateDescription?: string | null;
 
   @ApiProperty({
     required: false,

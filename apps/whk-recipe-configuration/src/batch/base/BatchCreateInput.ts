@@ -25,12 +25,14 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { BatchMaterialConsumptionCreateNestedManyWithoutBatchesInput } from "./BatchMaterialConsumptionCreateNestedManyWithoutBatchesInput";
+import { BatchParameterValueCreateNestedManyWithoutBatchesInput } from "./BatchParameterValueCreateNestedManyWithoutBatchesInput";
+import { BatchTimeSeriesDataCreateNestedManyWithoutBatchesInput } from "./BatchTimeSeriesDataCreateNestedManyWithoutBatchesInput";
 import { BatchCreateNestedManyWithoutBatchesInput } from "./BatchCreateNestedManyWithoutBatchesInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class BatchCreateInput {
@@ -64,6 +66,42 @@ class BatchCreateInput {
   @MaxLength(64)
   @Field(() => String)
   batchId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionCreateNestedManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionCreateNestedManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionCreateNestedManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionCreateNestedManyWithoutBatchesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchParameterValueCreateNestedManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchParameterValueCreateNestedManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchParameterValueCreateNestedManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  batchParameterValues?: BatchParameterValueCreateNestedManyWithoutBatchesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchTimeSeriesDataCreateNestedManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchTimeSeriesDataCreateNestedManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchTimeSeriesDataCreateNestedManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  batchTimeSeriesDataItems?: BatchTimeSeriesDataCreateNestedManyWithoutBatchesInput;
 
   @ApiProperty({
     required: false,
@@ -147,18 +185,6 @@ class BatchCreateInput {
     nullable: true,
   })
   quantity?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

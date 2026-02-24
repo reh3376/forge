@@ -315,13 +315,6 @@ export class CustomerControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -617,6 +610,8 @@ export class CustomerControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -628,9 +623,7 @@ export class CustomerControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -641,20 +634,18 @@ export class CustomerControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
-        totalCooks: true,
-        totalFermenters: true,
-        executedCooks: true,
-        executedFermenters: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -670,9 +661,16 @@ export class CustomerControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
+        upperControlLimit: true,
       },
     });
     if (results === null) {
@@ -785,16 +783,9 @@ export class CustomerControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -810,7 +801,6 @@ export class CustomerControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -922,13 +912,6 @@ export class CustomerControllerBase {
         lineItems: true,
         name: true,
         orderType: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         requestedShipDate: true,
         revision: true,

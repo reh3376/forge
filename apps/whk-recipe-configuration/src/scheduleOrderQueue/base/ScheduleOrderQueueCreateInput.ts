@@ -11,23 +11,33 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+import { AssetCreateNestedManyWithoutScheduleOrderQueuesInput } from "./AssetCreateNestedManyWithoutScheduleOrderQueuesInput";
 import {
+  ValidateNested,
+  IsOptional,
   IsString,
   MaxLength,
-  IsOptional,
-  IsEnum,
-  ValidateNested,
   IsInt,
   Min,
   Max,
 } from "class-validator";
-import { EnumScheduleOrderQueueNextOperation } from "./EnumScheduleOrderQueueNextOperation";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { Type } from "class-transformer";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderQueueCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => AssetCreateNestedManyWithoutScheduleOrderQueuesInput,
+  })
+  @ValidateNested()
+  @Type(() => AssetCreateNestedManyWithoutScheduleOrderQueuesInput)
+  @IsOptional()
+  @Field(() => AssetCreateNestedManyWithoutScheduleOrderQueuesInput, {
+    nullable: true,
+  })
+  areas?: AssetCreateNestedManyWithoutScheduleOrderQueuesInput;
+
   @ApiProperty({
     required: true,
     type: String,
@@ -48,46 +58,6 @@ class ScheduleOrderQueueCreateInput {
     nullable: true,
   })
   globalId?: string | null;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumScheduleOrderQueueNextOperation,
-  })
-  @IsEnum(EnumScheduleOrderQueueNextOperation)
-  @IsOptional()
-  @Field(() => EnumScheduleOrderQueueNextOperation, {
-    nullable: true,
-  })
-  nextOperation?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01"
-    | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  nextUnitProcedure?: UnitProcedureWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(1000)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  nextUnitProcedureName?: string | null;
 
   @ApiProperty({
     required: false,

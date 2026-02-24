@@ -15,6 +15,7 @@ import { FloatFilter } from "../../util/FloatFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
 import { RecipeBomActualListRelationFilter } from "../../recipeBomActual/base/RecipeBomActualListRelationFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
@@ -55,6 +56,18 @@ class MashingProtocolStepActualWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput;
 
   @ApiProperty({
     required: false,

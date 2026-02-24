@@ -11,10 +11,11 @@ import { MessageQueueController } from "./message-queue.controller";
 import { MessageQueueAdminController } from "./message-queue-admin.controller";
 import { Reflector } from "@nestjs/core";
 import { NotificationModule } from "../providers/notification/notification.module";
+import { AuditModule } from "../audit/audit.module";
 
 @Global()
 @Module({
-  imports: [ScheduleModule.forRoot(), NotificationModule],
+  imports: [ScheduleModule.forRoot(), NotificationModule, AuditModule],
   providers: [
     {
       provide: "RABBITMQ_CLIENT",

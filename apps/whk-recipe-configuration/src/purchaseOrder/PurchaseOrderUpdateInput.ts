@@ -16,7 +16,6 @@ import {
 
 import { Expose, Type } from "class-transformer";
 import { PurchaseOrderWhereUniqueInput } from "./base/PurchaseOrderWhereUniqueInput";
-import { EnumPurchaseOrderReceiptStatus } from "./base/EnumPurchaseOrderReceiptStatus";
 import { PurchaseOrderUpdateManyWithoutPurchaseOrdersInput } from "./base/PurchaseOrderUpdateManyWithoutPurchaseOrdersInput";
 import { ItemReceiptUpdateManyWithoutPurchaseOrdersInput } from "./base/ItemReceiptUpdateManyWithoutPurchaseOrdersInput";
 import { LotUpdateManyWithoutPurchaseOrdersInput } from "./base/LotUpdateManyWithoutPurchaseOrdersInput";
@@ -27,6 +26,7 @@ import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../types";
 import { VendorWhereUniqueInput } from "../vendor/VendorWhereUniqueInput";
 import { VendorWhereConnectUniqueInput } from "../vendor/VendorWhereConnectUniqueInput";
+import { EnumPurchaseOrderStatus } from "./base/EnumPurchaseOrderStatus";
 
 @InputType()
 class PurchaseOrderUpdateInput {
@@ -161,20 +161,19 @@ class PurchaseOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumPurchaseOrderReceiptStatus,
+    enum: EnumPurchaseOrderStatus,
   })
-  @IsEnum(EnumPurchaseOrderReceiptStatus)
+  @IsEnum(EnumPurchaseOrderStatus)
   @IsOptional()
-  @Field(() => EnumPurchaseOrderReceiptStatus, {
+  @Field(() => EnumPurchaseOrderStatus, {
     nullable: true,
   })
   receiptStatus?:
-    | "NotReceived"
-    | "ReceiptInProgress"
-    | "ReceiptComplete"
-    | "PurchaseOrderComplete"
-    | "InitializedNotReceived"
-    | "ReceivedTested"
+    | "Planned"
+    | "Committed"
+    | "Initiated"
+    | "InProgress"
+    | "Complete"
     | null;
 
   @ApiProperty({

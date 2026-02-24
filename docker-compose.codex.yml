@@ -1,0 +1,206 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: whk-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: whk_mes
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - whk-network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: whk-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - whk-network
+
+  # RabbitMQ for message queuing
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: whk-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - whk-network
+
+  # MQTT Broker (Eclipse Mosquitto)
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: whk-mosquitto
+    ports:
+      - "1884:1883"
+      - "9002:9001"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - whk-network
+
+  # Backend API (NestJS)
+  backend:
+    build:
+      context: ./apps/whk-recipe-configuration
+      dockerfile: Dockerfile.dev
+    container_name: whk-backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/whk_mes
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://admin:password@rabbitmq:5672
+      MQTT_BROKER_URL: mqtt://mosquitto:1883
+      JWT_SECRET: your-jwt-secret-key-change-this-in-production
+      PORT: 3000
+    ports:
+      - "3001:3000"
+      - "9229:9229" # Debug port
+    volumes:
+      - ./apps/whk-recipe-configuration:/app
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - whk-network
+    command: npm run start:debug
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./apps/mes-ui
+      dockerfile: Dockerfile.dev
+    container_name: whk-frontend
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_GRAPHQL_URL: http://localhost:3001/graphql
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./apps/mes-ui:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - whk-network
+    command: npm run dev
+
+  # Admin Panel (React)
+  admin:
+    build:
+      context: ./apps/whk-recipe-configuration-admin
+      dockerfile: Dockerfile.dev
+    container_name: whk-admin
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_URL: http://localhost:3001
+      REACT_APP_GRAPHQL_URL: http://localhost:3001/graphql
+    ports:
+      - "3003:3000"
+    volumes:
+      - ./apps/whk-recipe-configuration-admin:/app
+      - /app/node_modules
+      - /app/build
+    depends_on:
+      - backend
+    networks:
+      - whk-network
+    command: npm start
+
+  # Database management tool
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: whk-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@whk.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5051:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - whk-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: whk-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./config/ssl:/etc/ssl/certs
+    depends_on:
+      - backend
+      - frontend
+      - admin
+    networks:
+      - whk-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  mosquitto_data:
+    driver: local
+  mosquitto_logs:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  whk-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -20,7 +20,10 @@ import {
   InventoryTransfer as PrismaInventoryTransfer,
   ItemReceipt as PrismaItemReceipt,
   Lot as PrismaLot,
+  MillingBinConfiguration as PrismaMillingBinConfiguration,
+  OperatorShift as PrismaOperatorShift,
   PurchaseOrder as PrismaPurchaseOrder,
+  ScheduleOrderQueue as PrismaScheduleOrderQueue,
 } from "@prisma/client";
 
 export class AssetServiceBase {
@@ -167,6 +170,28 @@ export class AssetServiceBase {
       .lotsFilledFrom(args);
   }
 
+  async findMillingBinConfigurations(
+    parentId: string,
+    args: Prisma.MillingBinConfigurationFindManyArgs
+  ): Promise<PrismaMillingBinConfiguration[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .millingBinConfigurations(args);
+  }
+
+  async findOperatorShifts(
+    parentId: string,
+    args: Prisma.OperatorShiftFindManyArgs
+  ): Promise<PrismaOperatorShift[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .operatorShifts(args);
+  }
+
   async findPurchaseOrders(
     parentId: string,
     args: Prisma.PurchaseOrderFindManyArgs
@@ -176,6 +201,17 @@ export class AssetServiceBase {
         where: { id: parentId },
       })
       .purchaseOrders(args);
+  }
+
+  async findScheduleOrderQueues(
+    parentId: string,
+    args: Prisma.ScheduleOrderQueueFindManyArgs
+  ): Promise<PrismaScheduleOrderQueue[]> {
+    return this.prisma.asset
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .scheduleOrderQueues(args);
   }
 
   async getParent(parentId: string): Promise<PrismaAsset | null> {

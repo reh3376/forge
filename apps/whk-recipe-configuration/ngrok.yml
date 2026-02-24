@@ -1,0 +1,26 @@
+# ngrok configuration for staging backend tunnel
+# Requires ngrok account with static domain ($8/mo plan)
+
+version: "2"
+authtoken: 2gylqYV8cosnj0IWt2P4tmnYlQO_4yzreDKHHggvpVTYiEPMj
+
+tunnels:
+  whk-backend-staging:
+    # Static ngrok domain (paid plan)
+    addr: 3000
+    proto: http
+    domain: staging.whiskeyhouse.ngrok.dev
+
+    # Request inspection
+    inspect: true
+
+# Console UI
+web_addr: localhost:4040
+
+# Region (choose closest to your users)
+region: us
+
+# Logging
+log_level: info
+log_format: json
+log: logs/ngrok.log

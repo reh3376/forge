@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { AdditiveActualUpdateManyWithoutItemsInput } from "./AdditiveActualUpdateManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { BatchMaterialConsumptionUpdateManyWithoutItemsInput } from "./BatchMaterialConsumptionUpdateManyWithoutItemsInput";
 import { BomItemUpdateManyWithoutItemsInput } from "./BomItemUpdateManyWithoutItemsInput";
 import { BomUpdateManyWithoutItemsInput } from "./BomUpdateManyWithoutItemsInput";
 import { InventoryUpdateManyWithoutItemsInput } from "./InventoryUpdateManyWithoutItemsInput";
@@ -33,9 +34,9 @@ import { LotUpdateManyWithoutItemsInput } from "./LotUpdateManyWithoutItemsInput
 import { ProductionOrderUpdateManyWithoutItemsInput } from "./ProductionOrderUpdateManyWithoutItemsInput";
 import { PurchaseOrderUpdateManyWithoutItemsInput } from "./PurchaseOrderUpdateManyWithoutItemsInput";
 import { RecipeBomItemUpdateManyWithoutItemsInput } from "./RecipeBomItemUpdateManyWithoutItemsInput";
-import { RecipeUpdateManyWithoutItemsInput } from "./RecipeUpdateManyWithoutItemsInput";
 import { SalesOrderUpdateManyWithoutItemsInput } from "./SalesOrderUpdateManyWithoutItemsInput";
 import { TestParameterUpdateManyWithoutItemsInput } from "./TestParameterUpdateManyWithoutItemsInput";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -73,6 +74,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   baseBomItem?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -300,6 +313,18 @@ class ItemUpdateInput {
   @Field(() => ProductionOrderUpdateManyWithoutItemsInput, {
     nullable: true,
   })
+  productionOrderContainerItems?: ProductionOrderUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderUpdateManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderUpdateManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderUpdateManyWithoutItemsInput, {
+    nullable: true,
+  })
   productionOrders?: ProductionOrderUpdateManyWithoutItemsInput;
 
   @ApiProperty({
@@ -325,18 +350,6 @@ class ItemUpdateInput {
     nullable: true,
   })
   recipeBoms?: RecipeBomItemUpdateManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeUpdateManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeUpdateManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => RecipeUpdateManyWithoutItemsInput, {
-    nullable: true,
-  })
-  recipes?: RecipeUpdateManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -373,6 +386,18 @@ class ItemUpdateInput {
     nullable: true,
   })
   testParameters?: TestParameterUpdateManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  units?: UnitsWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

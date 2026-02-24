@@ -1,34 +1,47 @@
 # Define the default Node.js version
-ARG NODE_VERSION=23.1.0
+ARG NODE_VERSION=18.20.8
 
-# multi-stage: base (build)
+# multi-stage: base (build) - Build from monorepo root
 FROM node:${NODE_VERSION} AS base
+
+# Force cache invalidation
+ARG CACHEBUST=1
 
 # Add New Relic Env Vars
 ENV NEW_RELIC_NO_CONFIG_FILE=true
 ENV NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
 ENV NEW_RELIC_LOG=stdout
 
-# create directory where the application will be built
-WORKDIR /app
+# Set working directory to monorepo root
+WORKDIR /monorepo
 
-# copy over the dependency manifests, both the package.json 
-# and the package-lock.json are copied over
+# Copy root package files
 COPY package*.json ./
+COPY turbo.json ./
 
-# installs packages and their dependencies
+# Copy workspace package files
+COPY apps/whk-recipe-configuration/package*.json ./apps/whk-recipe-configuration/
+COPY apps/shared/package*.json ./apps/shared/
+
+# Install all dependencies (monorepo)
 RUN npm install
 
-# copy over the prisma schema
-COPY prisma/schema.prisma ./prisma/
+# Copy shared library
+COPY apps/shared ./apps/shared
 
-# generate the prisma client based on the schema
+# Build shared library
+RUN cd apps/shared && npm run build
+
+# Copy backend app
+COPY apps/whk-recipe-configuration ./apps/whk-recipe-configuration
+
+# Change to backend directory
+WORKDIR /monorepo/apps/whk-recipe-configuration
+
+# Generate Prisma client
 RUN npm run prisma:generate
 
-# copy over the code base
-COPY . .
-
-# create the bundle of the application
+# Build backend
 RUN npm run build
 
 # multi-stage: production (runtime)
@@ -43,27 +56,18 @@ ARG gid=$uid
 # [temporary] work around to be able to run prisma
 RUN apt-get update -y && apt-get install -y openssl
 
-# create directory where the application will be executed from
-WORKDIR /app
-
 # add the user and group
 RUN groupadd --gid ${gid} ${user}
 RUN useradd --uid ${uid} --gid ${gid} -m ${user}
 
-# copy over the bundled code from the build stage
-COPY --from=base /app/node_modules/ ./node_modules
-COPY --from=base /app/package.json ./package.json
-COPY --from=base /app/dist ./dist
-COPY --from=base /app/prisma ./prisma
-COPY --from=base /app/scripts ./scripts
-COPY --from=base /app/src ./src
-COPY --from=base /app/tsconfig* ./
+# Copy entire monorepo structure to preserve node_modules hoisting
+COPY --from=base /monorepo /monorepo
 
-# change ownership of the workspace directory
-RUN chown -R ${uid}:${gid} /app/
+# Set working directory to backend app
+WORKDIR /monorepo/apps/whk-recipe-configuration
 
-# get rid of the development dependencies
-RUN npm install --production
+# change ownership
+RUN chown -R ${uid}:${gid} /monorepo/
 
 # set user to the created non-privileged user
 USER ${user}
@@ -72,5 +76,10 @@ USER ${user}
 ENV PORT=3000
 EXPOSE ${PORT}
 
+# Set NODE_PATH to find modules in monorepo node_modules
+ENV NODE_PATH=/app/node_modules
+
 # start the server using the previously built application
-CMD [ "node", "./dist/main.js" ]
+# Generate Prisma client at startup (workaround for cross-platform build issues)
+# Run migrations to ensure database schema is up to date
+CMD sh -c "npx prisma generate && npx prisma migrate deploy && node ./dist/main.js"

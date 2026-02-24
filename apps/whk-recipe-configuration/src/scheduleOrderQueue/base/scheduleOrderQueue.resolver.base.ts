@@ -22,7 +22,9 @@ import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
 import { ScheduleOrderQueueCountArgs } from "./ScheduleOrderQueueCountArgs";
 import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs";
 import { ScheduleOrderQueueFindUniqueArgs } from "./ScheduleOrderQueueFindUniqueArgs";
-import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
+import { ScheduleOrderQueueWhereUniqueInput } from "./ScheduleOrderQueueWhereUniqueInput";
+import { AssetFindManyArgs } from "../../asset/base/AssetFindManyArgs";
+import { Asset } from "../../asset/base/Asset";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -79,24 +81,48 @@ export class ScheduleOrderQueueResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => UnitProcedure, {
-    nullable: true,
-    name: "nextUnitProcedure",
-  })
+  @graphql.Mutation(() => ScheduleOrderQueue)
   @UseRoles({
-    resource: "UnitProcedure",
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  async completeScheduleOrderQueue(
+    @graphql.Args("where") where: ScheduleOrderQueueWhereUniqueInput
+  ): Promise<ScheduleOrderQueue> {
+    try {
+      return await this.service.completeScheduleOrderQueue({
+        where,
+        data: {},
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Asset], { name: "areas" })
+  @UseRoles({
+    resource: "Asset",
     action: "read",
     possession: "any",
   })
-  async getNextUnitProcedure(
-    @graphql.Parent() parent: ScheduleOrderQueue
-  ): Promise<UnitProcedure | null> {
-    const result = await this.service.getNextUnitProcedure(parent.id);
+  async findAreas(
+    @graphql.Parent() parent: ScheduleOrderQueue,
+    @graphql.Args() args: AssetFindManyArgs
+  ): Promise<Asset[]> {
+    const results = await this.service.findAreas(parent.id, args);
 
-    if (!result) {
-      return null;
+    if (!results) {
+      return [];
     }
-    return result;
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

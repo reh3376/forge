@@ -22,4 +22,20 @@ export class ProductionOrderRecipeInstanceResolver extends ProductionOrderRecipe
   ) {
     super(service, rolesBuilder);
   }
+
+  @graphql.Mutation(() => ProductionOrderRecipeInstance)
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "create",
+    possession: "any",
+  })
+  async createProductionOrderRecipeInstanceFromScheduleQueue(
+    @graphql.Args("scheduleOrderQueueId") scheduleOrderQueueId: string,
+    @graphql.Args("createdBy") createdBy: string
+  ): Promise<any> {
+    return this.service.createProductionOrderRecipeInstanceFromScheduleQueue(
+      scheduleOrderQueueId,
+      createdBy
+    );
+  }
 }

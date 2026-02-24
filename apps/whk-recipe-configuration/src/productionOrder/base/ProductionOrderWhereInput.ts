@@ -17,18 +17,21 @@ import { Type } from "class-transformer";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
+import { EnumProductionOrderContainerType } from "./EnumProductionOrderContainerType";
 import { StringFilter } from "../../util/StringFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { MillingBinConfigurationWhereUniqueInput } from "../../millingBinConfiguration/base/MillingBinConfigurationWhereUniqueInput";
 import { ProductionOrderRecipeInstanceListRelationFilter } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceListRelationFilter";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
-import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
+import { DateTimeFilter } from "../../util/DateTimeFilter";
 
 @InputType()
 class ProductionOrderWhereInput {
@@ -101,6 +104,35 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => ItemListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ItemListRelationFilter)
+  @IsOptional()
+  @Field(() => ItemListRelationFilter, {
+    nullable: true,
+  })
+  containerItem?: ItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumProductionOrderContainerType,
+  })
+  @IsEnum(EnumProductionOrderContainerType)
+  @IsOptional()
+  @Field(() => EnumProductionOrderContainerType, {
+    nullable: true,
+  })
+  containerType?:
+    | "LargeBarrel"
+    | "SmallBarrel"
+    | "BulkLoadout"
+    | "PlasticDrum"
+    | "IbcTote275"
+    | "SsTote275";
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -135,14 +167,14 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeNullableFilter,
+    type: DateTimeFilter,
   })
-  @Type(() => DateTimeNullableFilter)
+  @Type(() => DateTimeFilter)
   @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
+  @Field(() => DateTimeFilter, {
     nullable: true,
   })
-  endDate?: DateTimeNullableFilter;
+  endDate?: DateTimeFilter;
 
   @ApiProperty({
     required: false,
@@ -176,6 +208,39 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   estimatedPGsPerBushel?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  executedCooks?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  executedFermenters?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  finalProof?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -233,6 +298,29 @@ class ProductionOrderWhereInput {
     nullable: true,
   })
   lots?: LotListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  lowerControlLimit?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => MillingBinConfigurationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationWhereUniqueInput, {
+    nullable: true,
+  })
+  millingBinConfiguration?: MillingBinConfigurationWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -304,30 +392,6 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeGroupWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeGroupWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeGroupWhereUniqueInput, {
-    nullable: true,
-  })
-  recipeGroup?: RecipeGroupWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => SalesOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  salesOrder?: SalesOrderWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: () => ScheduleOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -362,14 +426,14 @@ class ProductionOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    type: DateTimeNullableFilter,
+    type: DateTimeFilter,
   })
-  @Type(() => DateTimeNullableFilter)
+  @Type(() => DateTimeFilter)
   @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
+  @Field(() => DateTimeFilter, {
     nullable: true,
   })
-  startDate?: DateTimeNullableFilter;
+  startDate?: DateTimeFilter;
 
   @ApiProperty({
     required: false,
@@ -380,40 +444,13 @@ class ProductionOrderWhereInput {
   @Field(() => EnumProductionOrderStatus, {
     nullable: true,
   })
-  status?: "Planned" | "Committed" | "Initiated" | "InProgress" | "Complete";
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  units?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: DateTimeNullableFilter,
-  })
-  @Type(() => DateTimeNullableFilter)
-  @IsOptional()
-  @Field(() => DateTimeNullableFilter, {
-    nullable: true,
-  })
-  updatedBy?: DateTimeNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: IntNullableFilter,
-  })
-  @Type(() => IntNullableFilter)
-  @IsOptional()
-  @Field(() => IntNullableFilter, {
-    nullable: true,
-  })
-  totalFermenters?: IntNullableFilter;
+  status?:
+    | "Planned"
+    | "Committed"
+    | "Initiated"
+    | "InProgress"
+    | "Complete"
+    | "Cancelled";
 
   @ApiProperty({
     required: false,
@@ -435,7 +472,41 @@ class ProductionOrderWhereInput {
   @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  executedCooks?: IntNullableFilter;
+  totalFermenters?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: FloatNullableFilter,
+  })
+  @Type(() => FloatNullableFilter)
+  @IsOptional()
+  @Field(() => FloatNullableFilter, {
+    nullable: true,
+  })
+  totalGrainWeight?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  units?: UnitsWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  updatedBy?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -446,7 +517,128 @@ class ProductionOrderWhereInput {
   @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  executedFermenters?: IntNullableFilter;
+  upperControlLimit?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  createdAt?: DateTimeFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  estimatedAbv?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  notes?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  priority?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  productionOrderName?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  productionOrderNumber?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  recipeId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  recipeName?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  revision?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  salesOrderId?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: DateTimeFilter,
+  })
+  @Type(() => DateTimeFilter)
+  @IsOptional()
+  @Field(() => DateTimeFilter, {
+    nullable: true,
+  })
+  updatedAt?: DateTimeFilter;
 }
 
 export { ProductionOrderWhereInput as ProductionOrderWhereInput };

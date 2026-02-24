@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@whk/shared": ["apps/shared/src"],
+      "@whk/shared/*": ["apps/shared/src/*"],
+      "@whk/backend/*": ["apps/whk-recipe-configuration/src/*"],
+      "@whk/frontend/*": ["apps/mes-ui/*"]
+    },
+    "target": "es2020",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "strict": true
+  },
+  "references": [
+    { "path": "./apps/shared" },
+    { "path": "./apps/whk-recipe-configuration" },
+    { "path": "./apps/mes-ui" }
+  ],
+  "files": [],
+  "exclude": ["node_modules"]
+}

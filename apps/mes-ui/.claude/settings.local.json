@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.docs.inductiveautomation.com)",
+      "Read(//Users/pmannion/Library/Application Support/CleanShot/media/media_L8MKT4FPWN/**)",
+      "Read(//Users/pmannion/Documents/whiskeyhouse/whk-recipe-configuration/**)",
+      "Read(//Users/pmannion/Documents/whiskeyhouse/whk-recipe-configuration/**)",
+      "Read(//Users/pmannion/Documents/whiskeyhouse/whk-recipe-configuration/**)",
+      "Read(//Users/pmannion/Documents/whiskeyhouse/whk-recipe-configuration/**)",
+      "Bash(npm run seed:*)",
+      "Bash(node:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "/Users/pmannion/Documents/whiskeyhouse/whk-recipe-configuration/apps/whk-recipe-configuration"
+    ]
+  }
+}

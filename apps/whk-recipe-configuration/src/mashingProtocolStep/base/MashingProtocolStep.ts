@@ -216,6 +216,7 @@ class MashingProtocolStep {
   stepType?:
     | "Hold"
     | "LiquidAdd"
+    | "GrainAdd"
     | "Corn"
     | "Wheat"
     | "Rye"
@@ -223,6 +224,7 @@ class MashingProtocolStep {
     | "Malt"
     | "Prompt"
     | "AdditiveAdd"
+    | "SpecialtyGrainAdd"
     | null;
 
   @ApiProperty({

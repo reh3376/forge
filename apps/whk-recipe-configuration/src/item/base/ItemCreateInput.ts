@@ -22,6 +22,7 @@ import {
 } from "class-validator";
 import { AdditiveActualCreateNestedManyWithoutItemsInput } from "./AdditiveActualCreateNestedManyWithoutItemsInput";
 import { Type } from "class-transformer";
+import { BatchMaterialConsumptionCreateNestedManyWithoutItemsInput } from "./BatchMaterialConsumptionCreateNestedManyWithoutItemsInput";
 import { BomItemCreateNestedManyWithoutItemsInput } from "./BomItemCreateNestedManyWithoutItemsInput";
 import { BomCreateNestedManyWithoutItemsInput } from "./BomCreateNestedManyWithoutItemsInput";
 import { InventoryCreateNestedManyWithoutItemsInput } from "./InventoryCreateNestedManyWithoutItemsInput";
@@ -33,9 +34,9 @@ import { LotCreateNestedManyWithoutItemsInput } from "./LotCreateNestedManyWitho
 import { ProductionOrderCreateNestedManyWithoutItemsInput } from "./ProductionOrderCreateNestedManyWithoutItemsInput";
 import { PurchaseOrderCreateNestedManyWithoutItemsInput } from "./PurchaseOrderCreateNestedManyWithoutItemsInput";
 import { RecipeBomItemCreateNestedManyWithoutItemsInput } from "./RecipeBomItemCreateNestedManyWithoutItemsInput";
-import { RecipeCreateNestedManyWithoutItemsInput } from "./RecipeCreateNestedManyWithoutItemsInput";
 import { SalesOrderCreateNestedManyWithoutItemsInput } from "./SalesOrderCreateNestedManyWithoutItemsInput";
 import { TestParameterCreateNestedManyWithoutItemsInput } from "./TestParameterCreateNestedManyWithoutItemsInput";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -73,6 +74,18 @@ class ItemCreateInput {
     nullable: true,
   })
   baseBomItem?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -285,6 +298,18 @@ class ItemCreateInput {
   @Field(() => ProductionOrderCreateNestedManyWithoutItemsInput, {
     nullable: true,
   })
+  productionOrderContainerItems?: ProductionOrderCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderCreateNestedManyWithoutItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderCreateNestedManyWithoutItemsInput)
+  @IsOptional()
+  @Field(() => ProductionOrderCreateNestedManyWithoutItemsInput, {
+    nullable: true,
+  })
   productionOrders?: ProductionOrderCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
@@ -310,18 +335,6 @@ class ItemCreateInput {
     nullable: true,
   })
   recipeBoms?: RecipeBomItemCreateNestedManyWithoutItemsInput;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeCreateNestedManyWithoutItemsInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeCreateNestedManyWithoutItemsInput)
-  @IsOptional()
-  @Field(() => RecipeCreateNestedManyWithoutItemsInput, {
-    nullable: true,
-  })
-  recipes?: RecipeCreateNestedManyWithoutItemsInput;
 
   @ApiProperty({
     required: false,
@@ -358,6 +371,18 @@ class ItemCreateInput {
     nullable: true,
   })
   testParameters?: TestParameterCreateNestedManyWithoutItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  units?: UnitsWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

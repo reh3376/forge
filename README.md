@@ -1,6 +1,62 @@
-# WHK Recipe Configuration Service
+# WhiskeyHouse Manufacturing Execution System (MES)
 
-A backend service for managing and configuring manufacturing recipes built with NestJS, Prisma ORM, and GraphQL.
+A comprehensive manufacturing execution system for whiskey production built with NestJS, Prisma ORM, and GraphQL. This system provides end-to-end production management from raw material receipt through finished goods, with complete traceability and ERP integration.
+
+## MES Phase 1 Initiative
+
+The MES Phase 1 initiative represents a comprehensive transformation of WhiskeyHouse's production operations, digitizing and automating core manufacturing processes while establishing robust traceability and integration with ERP systems.
+
+### 🎯 Initiative Status: **66% Complete** (16/24 projects)
+- ✅ **Completed**: 8 projects
+- 🔄 **In Progress**: 8 projects  
+- 🧪 **Testing**: 1 project
+- ⏳ **Planned**: 7 projects
+
+### 🏗️ Core Functional Areas
+
+#### Order Management
+- **Production Orders (PrOs)**: Individual production units with complete specifications
+- **Schedule Orders (SchOs)**: Production grouping and resource allocation
+- **Production Order Wizard**: Comprehensive order creation with automatic item generation
+
+#### Recipe Management  
+- **Master Recipes**: Recipe definitions with BOM and mashing protocols
+- **Active Recipe Instances**: Live production recipe instantiation and modification
+- **Recipe Parameters**: Operation-specific parameter management
+
+#### Schedule Management
+- **Queue-Based Scheduling**: Index-based production sequencing
+- **Timeline Management**: Automated phase timing and resource planning
+- **Deviation Tracking**: Real-time progress monitoring and reporting
+
+#### Integration
+- **NetSuite ERP**: Bidirectional data synchronization
+- **RabbitMQ Messaging**: Asynchronous system communication
+- **Equipment Interface**: MQTT-based real-time data collection
+
+### 📋 Key Features Implemented
+- 50+ Prisma database models with comprehensive relationships
+- Production order lifecycle management with automatic item number generation
+- Queue-based scheduling with real-time timeline calculation
+- Recipe management with active instance modification capabilities
+- Complete inventory and lot traceability
+- Quality management and testing integration
+- Role-based access control with optimized permission system
+- Comprehensive audit logging and change tracking
+
+### 📚 Documentation
+- [**Initiative Overview**](./docs/mes-phase-1-initiative-overview.md) - Complete initiative context and objectives
+- [**Implementation Status**](./docs/mes-phase-1-implementation-status.md) - Current progress and milestones
+- [**Order Management**](./docs/features/order-management/README.md) - Production and schedule order management
+- [**Recipe Management**](./docs/features/recipe-management/active-recipe-instances.md) - Recipe system and instances
+- [**Schedule Management**](./docs/features/scheduling/queue-index-management.md) - Queue-based scheduling system
+- [**Data Model**](./docs/architecture/mes-data-model.md) - Comprehensive database schema
+- [**NetSuite Integration**](./docs/integration/netsuite-integration.md) - ERP integration patterns
+- [**RabbitMQ Messaging**](./docs/integration/rabbitmq-messaging.md) - Messaging infrastructure
+
+---
+
+## Technical Overview
 
 ## Technology Stack
 

@@ -1,3 +1,15 @@
+// Polyfill crypto for @nestjs/schedule compatibility in environments without a global implementation
+import { webcrypto } from "crypto";
+
+if (!globalThis.crypto) {
+  Object.defineProperty(globalThis, "crypto", {
+    value: webcrypto,
+    configurable: false,
+    enumerable: false,
+    writable: false,
+  });
+}
+
 import { Logger, ValidationPipe } from "@nestjs/common";
 import {
   AbstractHttpAdapter,
@@ -21,6 +33,7 @@ import https from "https";
 import http from "http";
 import express from "express";
 import { ExpressAdapter } from "@nestjs/platform-express";
+import cors from "cors";
 
 const {
   PORT = 3000,
@@ -42,11 +55,49 @@ function getHttpsServer(
   httpsOptions: HttpsOptions,
   APP_MODE: string | undefined
 ) {
+  // Get CORS configuration from environment variables
+  const corsOrigins = process.env.CORS_ORIGINS;
+  const corsCredentials = process.env.CORS_CREDENTIALS !== "false";
+  const corsEnabled = process.env.CORS_ENABLED !== "false";
+
+  // Parse origins from comma-separated string or use defaults
+  // For staging/production, add to CORS_ORIGINS env var:
+  //   - ngrok tunnel URL (e.g., https://your-domain.ngrok-free.app)
+  //   - Vercel deployment URL (e.g., https://mes-ui-staging.vercel.app)
+  //   - Vercel preview URLs (e.g., https://mes-ui-*.vercel.app)
+  const allowedOrigins = corsOrigins
+    ? corsOrigins.split(",").map((origin: string) => origin.trim())
+    : [
+        "http://localhost:4000",
+        "http://localhost:3000",
+        "http://127.0.0.1:4000",
+        "http://127.0.0.1:3000",
+      ];
+
+  const corsConfig = corsEnabled
+    ? {
+        origin: allowedOrigins,
+        credentials: corsCredentials,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allowedHeaders: [
+          "Content-Type",
+          "Authorization",
+          "apollo-require-preflight",
+          "x-apollo-operation-name",
+          "Accept",
+          "Origin",
+          "X-Requested-With",
+        ],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+      }
+    : false;
+
   switch (APP_MODE) {
     case "http":
-      return { cors: true };
+      return { cors: corsConfig };
     case "https":
-      return { httpsOptions, cors: true };
+      return { httpsOptions, cors: corsConfig };
     case "both":
       return new ExpressAdapter(server);
     default:
@@ -56,6 +107,62 @@ function getHttpsServer(
 
 async function main() {
   const server = express();
+
+  // Get CORS configuration from environment variables
+  const corsOrigins = process.env.CORS_ORIGINS;
+  const corsCredentials = process.env.CORS_CREDENTIALS !== "false";
+  const corsEnabled = process.env.CORS_ENABLED !== "false";
+
+  // Parse origins from comma-separated string or use defaults
+  // For staging/production, add to CORS_ORIGINS env var:
+  //   - ngrok tunnel URL (e.g., https://your-domain.ngrok-free.app)
+  //   - Vercel deployment URL (e.g., https://mes-ui-staging.vercel.app)
+  //   - Vercel preview URLs (e.g., https://mes-ui-*.vercel.app)
+  const allowedOrigins = corsOrigins
+    ? corsOrigins.split(",").map((origin: string) => origin.trim())
+    : [
+        "http://localhost:4000",
+        "http://localhost:3000",
+        "http://127.0.0.1:4000",
+        "http://127.0.0.1:3000",
+      ];
+
+  const corsConfig = corsEnabled
+    ? {
+        origin: allowedOrigins,
+        credentials: corsCredentials,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allowedHeaders: [
+          "Content-Type",
+          "Authorization",
+          "apollo-require-preflight",
+          "x-apollo-operation-name",
+          "Accept",
+          "Origin",
+          "X-Requested-With",
+        ],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+      }
+    : false;
+
+  // Add CORS middleware to Express server BEFORE NestJS app creation
+  if (corsEnabled && corsConfig) {
+    server.use(cors(corsConfig));
+
+    // Add specific OPTIONS handler for /graphql endpoint
+    server.options("/graphql", (req, res) => {
+      res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+      res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      res.header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization, apollo-require-preflight, x-apollo-operation-name"
+      );
+      res.header("Access-Control-Allow-Credentials", "true");
+      res.sendStatus(204);
+    });
+  }
+
   let app = null;
   if (process.env.DEV_TOOLS_ENABLE === "false") {
     app = await NestFactory.create(
@@ -63,12 +170,15 @@ async function main() {
       getHttpsServer(server, httpsOptions, APP_MODE) as AbstractHttpAdapter
     );
   } else {
-    app = await NestFactory.create(AppModule, { snapshot: true });
+    // For development, create app with the Express server that has the OPTIONS handler
+    const adapter = new ExpressAdapter(server);
+    app = await NestFactory.create(AppModule, adapter);
   }
-  // const app = await NestFactory.create(AppModule, {
-  //   cors: true,
-  //   bufferLogs: true
-  // });
+
+  // Enable CORS explicitly
+  if (corsEnabled && corsConfig) {
+    app.enableCors(corsConfig);
+  }
 
   app.useGlobalInterceptors(new NewrelicInterceptor());
 

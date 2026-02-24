@@ -8,9 +8,21 @@ import { RecipeCookCreationService } from "./recipe.cookcreation.service";
 import { RabbitMQModule } from "../rabbitmq/rabbitmq.module";
 import { RecipeGenerator } from "./recipe.generation";
 import { EnzymeDosingService } from "./enzyme.dosing";
+import { EnzymeConfigurationModule } from "../enzymeConfiguration/enzymeConfiguration.module";
+import { SystemConfigurationModule } from "../systemConfiguration/systemConfiguration.module";
+import { ItemModule } from "../item/item.module";
+import { PrismaModule } from "../prisma/prisma.module";
 
 @Module({
-  imports: [RecipeModuleBase, forwardRef(() => AuthModule), RabbitMQModule],
+  imports: [
+    RecipeModuleBase,
+    forwardRef(() => AuthModule),
+    RabbitMQModule,
+    EnzymeConfigurationModule,
+    SystemConfigurationModule,
+    ItemModule,
+    PrismaModule,
+  ],
   controllers: [RecipeController],
   providers: [
     RecipeService,

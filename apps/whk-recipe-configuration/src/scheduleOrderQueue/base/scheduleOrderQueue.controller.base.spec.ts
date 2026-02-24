@@ -14,6 +14,7 @@ import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateReq
 import { map } from "rxjs";
 import { ScheduleOrderQueueController } from "../scheduleOrderQueue.controller";
 import { ScheduleOrderQueueService } from "../scheduleOrderQueue.service";
+import { ScheduleOrderService } from "../../scheduleOrder/scheduleOrder.service";
 
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
@@ -22,7 +23,6 @@ const CREATE_INPUT = {
   createdBy: "exampleCreatedBy",
   globalId: "exampleGlobalId",
   id: "exampleId",
-  nextUnitProcedureName: "exampleNextUnitProcedureName",
   queueIndex: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
@@ -33,7 +33,6 @@ const CREATE_RESULT = {
   createdBy: "exampleCreatedBy",
   globalId: "exampleGlobalId",
   id: "exampleId",
-  nextUnitProcedureName: "exampleNextUnitProcedureName",
   queueIndex: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
@@ -45,7 +44,6 @@ const FIND_MANY_RESULT = [
     createdBy: "exampleCreatedBy",
     globalId: "exampleGlobalId",
     id: "exampleId",
-    nextUnitProcedureName: "exampleNextUnitProcedureName",
     queueIndex: 42,
     schemaVersion: "exampleSchemaVersion",
     updatedAt: new Date(),
@@ -57,7 +55,6 @@ const FIND_ONE_RESULT = {
   createdBy: "exampleCreatedBy",
   globalId: "exampleGlobalId",
   id: "exampleId",
-  nextUnitProcedureName: "exampleNextUnitProcedureName",
   queueIndex: 42,
   schemaVersion: "exampleSchemaVersion",
   updatedAt: new Date(),
@@ -119,6 +116,10 @@ describe("ScheduleOrderQueue", () => {
           provide: ScheduleOrderQueueService,
           useValue: service,
         },
+        {
+          provide: ScheduleOrderService,
+          useValue: {},
+        },
       ],
       controllers: [ScheduleOrderQueueController],
       imports: [ACLModule],
@@ -173,6 +174,8 @@ describe("ScheduleOrderQueue", () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 });

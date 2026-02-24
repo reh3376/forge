@@ -23,6 +23,7 @@ import { MashingProtocolUpdateManyWithoutProductionOrderRecipeInstancesInput } f
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeBomUpdateManyWithoutProductionOrderRecipeInstancesInput } from "./RecipeBomUpdateManyWithoutProductionOrderRecipeInstancesInput";
+import { RecipeBomActualUpdateManyWithoutProductionOrderRecipeInstancesInput } from "./RecipeBomActualUpdateManyWithoutProductionOrderRecipeInstancesInput";
 
 @InputType()
 class ProductionOrderRecipeInstanceUpdateInput {
@@ -103,6 +104,24 @@ class ProductionOrderRecipeInstanceUpdateInput {
     nullable: true,
   })
   recipeBom?: RecipeBomUpdateManyWithoutProductionOrderRecipeInstancesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () =>
+      RecipeBomActualUpdateManyWithoutProductionOrderRecipeInstancesInput,
+  })
+  @ValidateNested()
+  @Type(
+    () => RecipeBomActualUpdateManyWithoutProductionOrderRecipeInstancesInput
+  )
+  @IsOptional()
+  @Field(
+    () => RecipeBomActualUpdateManyWithoutProductionOrderRecipeInstancesInput,
+    {
+      nullable: true,
+    }
+  )
+  recipeBomActuals?: RecipeBomActualUpdateManyWithoutProductionOrderRecipeInstancesInput;
 
   @ApiProperty({
     required: false,

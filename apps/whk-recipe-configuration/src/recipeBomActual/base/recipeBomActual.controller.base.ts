@@ -26,6 +26,7 @@ import { RecipeBomActual } from "./RecipeBomActual";
 import { RecipeBomActualFindManyArgs } from "./RecipeBomActualFindManyArgs";
 import { RecipeBomActualWhereUniqueInput } from "./RecipeBomActualWhereUniqueInput";
 import { RecipeBomActualUpdateInput } from "./RecipeBomActualUpdateInput";
+import { UseRoles } from "nest-access-control";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -37,7 +38,7 @@ export class RecipeBomActualControllerBase {
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: RecipeBomActual })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "create",
     possession: "any",
@@ -61,6 +62,12 @@ export class RecipeBomActualControllerBase {
             }
           : undefined,
 
+        productionOrderRecipeInstance: data.productionOrderRecipeInstance
+          ? {
+              connect: data.productionOrderRecipeInstance,
+            }
+          : undefined,
+
         recipeBomItem: {
           connect: data.recipeBomItem,
         },
@@ -71,6 +78,12 @@ export class RecipeBomActualControllerBase {
         id: true,
 
         mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },
@@ -93,7 +106,7 @@ export class RecipeBomActualControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [RecipeBomActual] })
   @ApiNestedQuery(RecipeBomActualFindManyArgs)
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "any",
@@ -118,6 +131,12 @@ export class RecipeBomActualControllerBase {
           },
         },
 
+        productionOrderRecipeInstance: {
+          select: {
+            id: true,
+          },
+        },
+
         recipeBomItem: {
           select: {
             id: true,
@@ -135,7 +154,7 @@ export class RecipeBomActualControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: RecipeBomActual })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "read",
     possession: "own",
@@ -154,6 +173,12 @@ export class RecipeBomActualControllerBase {
         id: true,
 
         mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
           select: {
             id: true,
           },
@@ -182,7 +207,7 @@ export class RecipeBomActualControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: RecipeBomActual })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "update",
     possession: "any",
@@ -209,6 +234,12 @@ export class RecipeBomActualControllerBase {
               }
             : undefined,
 
+          productionOrderRecipeInstance: data.productionOrderRecipeInstance
+            ? {
+                connect: data.productionOrderRecipeInstance,
+              }
+            : undefined,
+
           recipeBomItem: {
             connect: data.recipeBomItem,
           },
@@ -219,6 +250,12 @@ export class RecipeBomActualControllerBase {
           id: true,
 
           mashingProtocolStepActual: {
+            select: {
+              id: true,
+            },
+          },
+
+          productionOrderRecipeInstance: {
             select: {
               id: true,
             },
@@ -248,7 +285,7 @@ export class RecipeBomActualControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: RecipeBomActual })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
+  @UseRoles({
     resource: "RecipeBomActual",
     action: "delete",
     possession: "any",
@@ -268,6 +305,12 @@ export class RecipeBomActualControllerBase {
           id: true,
 
           mashingProtocolStepActual: {
+            select: {
+              id: true,
+            },
+          },
+
+          productionOrderRecipeInstance: {
             select: {
               id: true,
             },

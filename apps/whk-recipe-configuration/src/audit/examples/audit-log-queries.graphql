@@ -1,0 +1,193 @@
+# Example GraphQL queries for the Audit Log system
+
+# 0. Simple test query to verify the endpoint is working
+query TestAuditLogs {
+  auditLogs(page: 1, limit: 5) {
+    data {
+      id
+      entityType
+      action
+      createdAt
+    }
+    total
+    page
+    limit
+  }
+}
+
+# 1. Get paginated audit logs with basic filtering
+query GetAuditLogs($page: Int, $limit: Int, $filters: AuditLogFilterInput) {
+  auditLogs(page: $page, limit: $limit, filters: $filters) {
+    data {
+      id
+      globalId
+      entityType
+      entityId
+      action
+      oldValues
+      newValues
+      user {
+        id
+        username
+        firstName
+        lastName
+      }
+      ipAddress
+      userAgent
+      createdAt
+      updatedAt
+    }
+    total
+    page
+    limit
+    totalPages
+    hasNextPage
+    hasPreviousPage
+  }
+}
+
+# 2. Get audit history for a specific entity
+query GetEntityAuditHistory(
+  $entityType: String!
+  $entityId: String!
+  $page: Int
+  $limit: Int
+) {
+  entityAuditHistory(
+    entityType: $entityType
+    entityId: $entityId
+    page: $page
+    limit: $limit
+  ) {
+    data {
+      id
+      action
+      oldValues
+      newValues
+      user {
+        username
+        firstName
+        lastName
+      }
+      createdAt
+    }
+    total
+    totalPages
+  }
+}
+
+# 3. Get audit history for a specific user
+query GetUserAuditHistory(
+  $userId: String!
+  $page: Int
+  $limit: Int
+  $entityType: String
+  $action: AuditAction
+) {
+  userAuditHistory(
+    userId: $userId
+    page: $page
+    limit: $limit
+    entityType: $entityType
+    action: $action
+  ) {
+    data {
+      id
+      entityType
+      entityId
+      action
+      oldValues
+      newValues
+      createdAt
+    }
+    total
+    totalPages
+  }
+}
+
+# 4. Get a specific audit log by ID
+query GetAuditLogById($id: String!) {
+  auditLog(id: $id) {
+    id
+    globalId
+    entityType
+    entityId
+    action
+    oldValues
+    newValues
+    user {
+      id
+      username
+      firstName
+      lastName
+    }
+    ipAddress
+    userAgent
+    createdAt
+    updatedAt
+  }
+}
+
+# 5. Get formatted audit summary for display
+query GetFormattedAuditSummary(
+  $limit: Int
+  $entityType: String
+  $entityId: String
+) {
+  formattedAuditSummary(
+    limit: $limit
+    entityType: $entityType
+    entityId: $entityId
+  ) {
+    id
+    timestamp
+    action
+    entity
+    user
+    changes
+    ipAddress
+  }
+}
+
+# Example variables for the queries:
+
+# For GetAuditLogs:
+# {
+#   "page": 1,
+#   "limit": 20,
+#   "filters": {
+#     "entityType": "EnzymeConfiguration",
+#     "action": "UPDATE",
+#     "startDate": "2024-01-01T00:00:00.000Z",
+#     "endDate": "2024-12-31T23:59:59.999Z"
+#   }
+# }
+
+# For GetEntityAuditHistory:
+# {
+#   "entityType": "EnzymeConfiguration",
+#   "entityId": "clzhhlsx30f09mbc9r5mj02z7",
+#   "page": 1,
+#   "limit": 10
+# }
+
+# For GetUserAuditHistory:
+# {
+#   "userId": "user123",
+#   "page": 1,
+#   "limit": 20,
+#   "entityType": "Recipe",
+#   "action": "CREATE"
+# }
+
+# For GetAuditLogById:
+# {
+#   "id": "clzhhlsx30f09mbc9r5mj02z7"
+# }
+
+# For GetFormattedAuditSummary:
+# {
+#   "limit": 50,
+#   "entityType": "EnzymeConfiguration",
+#   "entityId": "clzhhlsx30f09mbc9r5mj02z7"
+# }

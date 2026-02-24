@@ -21,6 +21,7 @@ import {
   IsOptional,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 
@@ -59,6 +60,14 @@ class MashingProtocolStepActual {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => MashingProtocol,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocol)
+  mashingProtocol?: MashingProtocol;
 
   @ApiProperty({
     required: true,

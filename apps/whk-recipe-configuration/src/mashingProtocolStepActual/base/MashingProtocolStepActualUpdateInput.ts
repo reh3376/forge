@@ -20,8 +20,9 @@ import {
   ValidateNested,
   IsDate,
 } from "class-validator";
-import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
+import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { Type } from "class-transformer";
+import { MashingProtocolStepWhereUniqueInput } from "../../mashingProtocolStep/base/MashingProtocolStepWhereUniqueInput";
 import { RecipeBomActualUpdateManyWithoutMashingProtocolStepActualsInput } from "./RecipeBomActualUpdateManyWithoutMashingProtocolStepActualsInput";
 
 @InputType()
@@ -49,6 +50,18 @@ class MashingProtocolStepActualUpdateInput {
     nullable: true,
   })
   createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => MashingProtocolWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MashingProtocolWhereUniqueInput, {
+    nullable: true,
+  })
+  mashingProtocol?: MashingProtocolWhereUniqueInput;
 
   @ApiProperty({
     required: false,

@@ -23,6 +23,9 @@ import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterRespon
 import { ScheduleOrderQueueFindManyArgs } from "./ScheduleOrderQueueFindManyArgs";
 import { ScheduleOrderQueue } from "./ScheduleOrderQueue";
 import { ScheduleOrderQueueWhereUniqueInput } from "./ScheduleOrderQueueWhereUniqueInput";
+import { AssetFindManyArgs } from "../../asset/base/AssetFindManyArgs";
+import { Asset } from "../../asset/base/Asset";
+import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -55,15 +58,6 @@ export class ScheduleOrderQueueControllerBase {
         createdBy: true,
         globalId: true,
         id: true,
-        nextOperation: true,
-
-        nextUnitProcedure: {
-          select: {
-            id: true,
-          },
-        },
-
-        nextUnitProcedureName: true,
         queueIndex: true,
 
         scheduleOrder: {
@@ -101,15 +95,6 @@ export class ScheduleOrderQueueControllerBase {
         createdBy: true,
         globalId: true,
         id: true,
-        nextOperation: true,
-
-        nextUnitProcedure: {
-          select: {
-            id: true,
-          },
-        },
-
-        nextUnitProcedureName: true,
         queueIndex: true,
 
         scheduleOrder: {
@@ -129,5 +114,119 @@ export class ScheduleOrderQueueControllerBase {
       );
     }
     return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/areas")
+  @ApiNestedQuery(AssetFindManyArgs)
+  @UseRoles({
+    resource: "Asset",
+    action: "read",
+    possession: "any",
+  })
+  async findAreas(
+    @common.Req() request: Request,
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput
+  ): Promise<Asset[]> {
+    const query = plainToClass(AssetFindManyArgs, request.query);
+    const results = await this.service.findAreas(params.id, {
+      ...query,
+      select: {
+        assetPath: true,
+        assetType: true,
+        createdAt: true,
+        createdBy: true,
+        description: true,
+        globalId: true,
+        id: true,
+        index: true,
+        name: true,
+
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+
+        proofInitial: true,
+        revision: true,
+        schemaVersion: true,
+        status: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/areas")
+  @UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  async connectAreas(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() body: AssetWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      areas: {
+        connect: body,
+      },
+    };
+    await this.service.updateScheduleOrderQueue({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/areas")
+  @UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  async updateAreas(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() body: AssetWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      areas: {
+        set: body,
+      },
+    };
+    await this.service.updateScheduleOrderQueue({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/areas")
+  @UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectAreas(
+    @common.Param() params: ScheduleOrderQueueWhereUniqueInput,
+    @common.Body() body: AssetWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      areas: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateScheduleOrderQueue({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

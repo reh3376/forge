@@ -19,15 +19,18 @@ import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilte
 import { AssetListRelationFilter } from "./AssetListRelationFilter";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { InventoryListRelationFilter } from "../../inventory/base/InventoryListRelationFilter";
 import { InventoryLogListRelationFilter } from "../../inventoryLog/base/InventoryLogListRelationFilter";
 import { InventoryTransferListRelationFilter } from "../../inventoryTransfer/base/InventoryTransferListRelationFilter";
 import { ItemReceiptListRelationFilter } from "../../itemReceipt/base/ItemReceiptListRelationFilter";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
+import { MillingBinConfigurationListRelationFilter } from "../../millingBinConfiguration/base/MillingBinConfigurationListRelationFilter";
+import { OperatorShiftListRelationFilter } from "../../operatorShift/base/OperatorShiftListRelationFilter";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { PurchaseOrderListRelationFilter } from "../../purchaseOrder/base/PurchaseOrderListRelationFilter";
-import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { ScheduleOrderQueueListRelationFilter } from "../../scheduleOrderQueue/base/ScheduleOrderQueueListRelationFilter";
 import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @InputType()
@@ -145,6 +148,17 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  index?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
     type: () => InventoryListRelationFilter,
   })
   @ValidateNested()
@@ -253,6 +267,18 @@ class AssetWhereInput {
 
   @ApiProperty({
     required: false,
+    type: () => MillingBinConfigurationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationListRelationFilter)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationListRelationFilter, {
+    nullable: true,
+  })
+  millingBinConfigurations?: MillingBinConfigurationListRelationFilter;
+
+  @ApiProperty({
+    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -261,6 +287,18 @@ class AssetWhereInput {
     nullable: true,
   })
   name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperatorShiftListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => OperatorShiftListRelationFilter)
+  @IsOptional()
+  @Field(() => OperatorShiftListRelationFilter, {
+    nullable: true,
+  })
+  operatorShifts?: OperatorShiftListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -307,6 +345,18 @@ class AssetWhereInput {
     nullable: true,
   })
   revision?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueListRelationFilter)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueListRelationFilter, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueListRelationFilter;
 
   @ApiProperty({
     required: false,

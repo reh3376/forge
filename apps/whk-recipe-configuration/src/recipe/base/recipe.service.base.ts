@@ -14,7 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Recipe as PrismaRecipe,
-  Batch as PrismaBatch,
+  Comment as PrismaComment,
   Lot as PrismaLot,
   RecipeParameter as PrismaRecipeParameter,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
@@ -23,7 +23,6 @@ import {
   ScheduleOrder as PrismaScheduleOrder,
   UnitProcedure as PrismaUnitProcedure,
   Customer as PrismaCustomer,
-  Item as PrismaItem,
   MashingProtocol as PrismaMashingProtocol,
   RecipeGroup as PrismaRecipeGroup,
 } from "@prisma/client";
@@ -53,15 +52,15 @@ export class RecipeServiceBase {
     return this.prisma.recipe.delete(args);
   }
 
-  async findBatches(
+  async findComments(
     parentId: string,
-    args: Prisma.BatchFindManyArgs
-  ): Promise<PrismaBatch[]> {
+    args: Prisma.CommentFindManyArgs
+  ): Promise<PrismaComment[]> {
     return this.prisma.recipe
       .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .batches(args);
+      .comments(args);
   }
 
   async findInstances(
@@ -86,7 +85,7 @@ export class RecipeServiceBase {
       .lots(args);
   }
 
-  async findRecipeParameters(
+  async findParameters(
     parentId: string,
     args: Prisma.RecipeParameterFindManyArgs
   ): Promise<PrismaRecipeParameter[]> {
@@ -166,14 +165,6 @@ export class RecipeServiceBase {
         where: { id: parentId },
       })
       .customer();
-  }
-
-  async getItem(parentId: string): Promise<PrismaItem | null> {
-    return this.prisma.recipe
-      .findUnique({
-        where: { id: parentId },
-      })
-      .item();
   }
 
   async getMashingProtocol(

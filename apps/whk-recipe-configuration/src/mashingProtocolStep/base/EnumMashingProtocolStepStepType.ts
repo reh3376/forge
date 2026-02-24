@@ -14,6 +14,7 @@ import { registerEnumType } from "@nestjs/graphql";
 export enum EnumMashingProtocolStepStepType {
   Hold = "Hold",
   LiquidAdd = "LiquidAdd",
+  GrainAdd = "GrainAdd",
   Corn = "Corn",
   Wheat = "Wheat",
   Rye = "Rye",
@@ -21,6 +22,7 @@ export enum EnumMashingProtocolStepStepType {
   Malt = "Malt",
   Prompt = "Prompt",
   AdditiveAdd = "AdditiveAdd",
+  SpecialtyGrainAdd = "SpecialtyGrainAdd",
 }
 
 registerEnumType(EnumMashingProtocolStepStepType, {

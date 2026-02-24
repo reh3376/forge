@@ -1,4 +1,4 @@
-import { StorageFileBase } from "src/storage/base/storage.types";
+import { StorageFileBase } from "../../base/storage.types";
 
 export interface LocalStorageFile extends StorageFileBase {
   metadata?: {

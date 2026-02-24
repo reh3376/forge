@@ -1,0 +1,47 @@
+# Task ID: 11
+# Title: Implement Live Production Dashboard
+# Status: done
+# Dependencies: 4, 5
+# Priority: high
+# Description: Create a real-time production dashboard with live data, order tracking, and equipment status monitoring, featuring a line overview with timeline/Gantt chart visualization.
+# Details:
+1. Design and implement production dashboard layout with equipment-focused timeline view
+2. Create real-time data visualization components
+3. Implement order tracking through production stages
+4. Add equipment status monitoring and alerts (running, idle, maintenance, offline)
+5. Create production KPI tracking and visualization
+6. Implement batch progress tracking with stage completion
+7. Add exception handling and alert management
+8. Create production variance tracking against schedule
+9. Implement real-time inventory consumption tracking
+10. Develop calendar-based timeline/Gantt chart visualization (weekly/monthly views)
+11. Set up production line rows for Mashing01, Fermentation01, Distillation01, Processing01, Barreling01
+12. Implement current time indicator (blue vertical line) on timeline
+13. Create order bars showing estimated start/end dates with basic order info
+14. Design grid-based layout with date columns and equipment rows
+15. Enable visualization of multiple orders running simultaneously on different lines
+16. Implement visual capacity utilization across all production stages
+17. Add order details on hover/click interactions
+
+# Test Strategy:
+Test real-time data updates via WebSockets. Verify order tracking accuracy. Test alert generation and display. Validate KPI calculations and visualizations. Test responsive behavior of dashboard components. Verify timeline/Gantt chart visualization accuracy. Test production line status indicators. Validate multiple order visualization. Test hover/click interactions for order details. Verify integration with production scheduling data.
+
+# Subtasks:
+## 11.1. Implement Line Overview with Timeline/Gantt Chart [done]
+### Dependencies: None
+### Description: Create a calendar-based timeline view with production line rows and order visualization
+### Details:
+
+
+## 11.2. Implement Production Line Tracking [done]
+### Dependencies: None
+### Description: Enable visualization of multiple orders and equipment status across production lines
+### Details:
+
+
+## 11.3. Implement Dashboard Integration [done]
+### Dependencies: None
+### Description: Connect dashboard to production scheduling data and enable interactive features
+### Details:
+
+

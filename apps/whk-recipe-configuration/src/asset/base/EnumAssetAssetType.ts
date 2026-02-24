@@ -9,7 +9,6 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-import { Unit } from "../../unit/base/Unit";
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum EnumAssetAssetType {

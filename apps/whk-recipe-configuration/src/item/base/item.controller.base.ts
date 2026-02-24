@@ -29,6 +29,9 @@ import { ItemUpdateInput } from "./ItemUpdateInput";
 import { AdditiveActualFindManyArgs } from "../../additiveActual/base/AdditiveActualFindManyArgs";
 import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
 import { AdditiveActualWhereUniqueInput } from "../../additiveActual/base/AdditiveActualWhereUniqueInput";
+import { BatchMaterialConsumptionFindManyArgs } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionFindManyArgs";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
+import { BatchMaterialConsumptionWhereUniqueInput } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionWhereUniqueInput";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
@@ -59,9 +62,6 @@ import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/Purchase
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
-import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
-import { Recipe } from "../../recipe/base/Recipe";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
@@ -101,6 +101,12 @@ export class ItemControllerBase {
             }
           : undefined,
 
+        units: data.units
+          ? {
+              connect: data.units,
+            }
+          : undefined,
+
         vendor: data.vendor
           ? {
               connect: data.vendor,
@@ -130,6 +136,13 @@ export class ItemControllerBase {
         },
 
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
 
@@ -181,6 +194,13 @@ export class ItemControllerBase {
         },
 
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
 
@@ -233,6 +253,13 @@ export class ItemControllerBase {
         },
 
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
 
@@ -282,6 +309,12 @@ export class ItemControllerBase {
               }
             : undefined,
 
+          units: data.units
+            ? {
+                connect: data.units,
+              }
+            : undefined,
+
           vendor: data.vendor
             ? {
                 connect: data.vendor,
@@ -311,6 +344,13 @@ export class ItemControllerBase {
           },
 
           schemaVersion: true,
+
+          units: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
           updatedBy: true,
 
@@ -426,6 +466,134 @@ export class ItemControllerBase {
   ): Promise<void> {
     const data = {
       additiveActuals: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batchMaterialConsumptions")
+  @ApiNestedQuery(BatchMaterialConsumptionFindManyArgs)
+  @UseRoles({
+    resource: "BatchMaterialConsumption",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchMaterialConsumptions(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<BatchMaterialConsumption[]> {
+    const query = plainToClass(
+      BatchMaterialConsumptionFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findBatchMaterialConsumptions(
+      params.id,
+      {
+        ...query,
+        select: {
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
+          binNumber: true,
+          consumedAt: true,
+          createdAt: true,
+          id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
+          quantity: true,
+          supplierLot: true,
+          units: true,
+          updatedAt: true,
+          verified: true,
+          verifiedAt: true,
+          verifiedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatchMaterialConsumptions(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatchMaterialConsumptions(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatchMaterialConsumptions(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
         disconnect: body,
       },
     };
@@ -1287,7 +1455,6 @@ export class ItemControllerBase {
           },
         },
 
-        totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
         totalVolumeWg: true,
@@ -1373,6 +1540,170 @@ export class ItemControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/productionOrderContainerItems")
+  @ApiNestedQuery(ProductionOrderFindManyArgs)
+  @UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderContainerItems(
+    @common.Req() request: Request,
+    @common.Param() params: ItemWhereUniqueInput
+  ): Promise<ProductionOrder[]> {
+    const query = plainToClass(ProductionOrderFindManyArgs, request.query);
+    const results = await this.service.findProductionOrderContainerItems(
+      params.id,
+      {
+        ...query,
+        select: {
+          bom: {
+            select: {
+              id: true,
+            },
+          },
+
+          className: true,
+          complete: true,
+          completedQuantity: true,
+          containerType: true,
+          createdAt: true,
+          createdBy: true,
+
+          customer: {
+            select: {
+              id: true,
+            },
+          },
+
+          customerCode: true,
+          endDate: true,
+          finalProof: true,
+          globalId: true,
+          id: true,
+          inProcess: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
+          lowerControlLimit: true,
+
+          millingBinConfiguration: {
+            select: {
+              id: true,
+            },
+          },
+
+          name: true,
+          quantity: true,
+
+          recipe: {
+            select: {
+              id: true,
+            },
+          },
+
+          scheduleOrder: {
+            select: {
+              id: true,
+            },
+          },
+
+          scheduled: true,
+          schemaVersion: true,
+          startDate: true,
+          status: true,
+
+          units: {
+            select: {
+              id: true,
+            },
+          },
+
+          updatedAt: true,
+          updatedBy: true,
+          upperControlLimit: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/productionOrderContainerItems")
+  @UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async connectProductionOrderContainerItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderContainerItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/productionOrderContainerItems")
+  @UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async updateProductionOrderContainerItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderContainerItems: {
+        set: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/productionOrderContainerItems")
+  @UseRoles({
+    resource: "Item",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectProductionOrderContainerItems(
+    @common.Param() params: ItemWhereUniqueInput,
+    @common.Body() body: ProductionOrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      productionOrderContainerItems: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItem({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/productionOrders")
   @ApiNestedQuery(ProductionOrderFindManyArgs)
   @UseRoles({
@@ -1396,6 +1727,8 @@ export class ItemControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -1407,9 +1740,7 @@ export class ItemControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -1420,16 +1751,18 @@ export class ItemControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -1445,13 +1778,16 @@ export class ItemControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
-        totalFermenters: true,
-        totalCooks: true,
-        executedCooks: true,
-        executedFermenters: true,
+        upperControlLimit: true,
       },
     });
     if (results === null) {
@@ -1568,10 +1904,10 @@ export class ItemControllerBase {
           },
         },
 
-        receiptStatus: true,
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
+        status: true,
         totalOrderQuantity: true,
         transactionGroup: true,
         updatedAt: true,
@@ -1688,6 +2024,13 @@ export class ItemControllerBase {
 
         createdAt: true,
         createdBy: true,
+
+        displayUnits: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
         isClassDefinition: true,
@@ -1707,7 +2050,6 @@ export class ItemControllerBase {
           },
         },
 
-        units: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -1787,147 +2129,6 @@ export class ItemControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/recipes")
-  @ApiNestedQuery(RecipeFindManyArgs)
-  @UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipes(
-    @common.Req() request: Request,
-    @common.Param() params: ItemWhereUniqueInput
-  ): Promise<Recipe[]> {
-    const query = plainToClass(RecipeFindManyArgs, request.query);
-    const results = await this.service.findRecipes(params.id, {
-      ...query,
-      select: {
-        Recipe: true,
-        active: true,
-
-        classId: {
-          select: {
-            id: true,
-          },
-        },
-
-        cooksPerFerm: true,
-        createdAt: true,
-        createdBy: true,
-
-        customer: {
-          select: {
-            id: true,
-          },
-        },
-
-        customerCode: true,
-        estimatedAbv: true,
-        globalId: true,
-        id: true,
-        isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
-
-        mashingProtocol: {
-          select: {
-            id: true,
-          },
-        },
-
-        recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
-        revision: true,
-        schemaVersion: true,
-        targetProof: true,
-        updatedAt: true,
-        updatedBy: true,
-        whiskeyType: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/recipes")
-  @UseRoles({
-    resource: "Item",
-    action: "update",
-    possession: "any",
-  })
-  async connectRecipes(
-    @common.Param() params: ItemWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipes: {
-        connect: body,
-      },
-    };
-    await this.service.updateItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/recipes")
-  @UseRoles({
-    resource: "Item",
-    action: "update",
-    possession: "any",
-  })
-  async updateRecipes(
-    @common.Param() params: ItemWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipes: {
-        set: body,
-      },
-    };
-    await this.service.updateItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/recipes")
-  @UseRoles({
-    resource: "Item",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectRecipes(
-    @common.Param() params: ItemWhereUniqueInput,
-    @common.Body() body: RecipeWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      recipes: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateItem({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/salesOrders")
   @ApiNestedQuery(SalesOrderFindManyArgs)
   @UseRoles({
@@ -1959,13 +2160,6 @@ export class ItemControllerBase {
         lineItems: true,
         name: true,
         orderType: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         requestedShipDate: true,
         revision: true,

@@ -14,6 +14,8 @@ import {
   Prisma,
   RecipeParameter as PrismaRecipeParameter,
   Recipe as PrismaRecipe,
+  Operation as PrismaOperation,
+  Units as PrismaUnits,
 } from "@prisma/client";
 
 export class RecipeParameterServiceBase {
@@ -60,5 +62,21 @@ export class RecipeParameterServiceBase {
         where: { id: parentId },
       })
       .recipe(args);
+  }
+
+  async getOperation(parentId: string): Promise<PrismaOperation | null> {
+    return this.prisma.recipeParameter
+      .findUnique({
+        where: { id: parentId },
+      })
+      .operation();
+  }
+
+  async getUnits(parentId: string): Promise<PrismaUnits | null> {
+    return this.prisma.recipeParameter
+      .findUnique({
+        where: { id: parentId },
+      })
+      .units();
   }
 }

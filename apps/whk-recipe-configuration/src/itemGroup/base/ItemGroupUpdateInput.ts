@@ -11,7 +11,15 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, MaxLength, IsOptional } from "class-validator";
+import {
+  IsString,
+  MaxLength,
+  IsOptional,
+  ValidateNested,
+} from "class-validator";
+import { MillingBinConfigurationUpdateManyWithoutItemGroupsInput } from "./MillingBinConfigurationUpdateManyWithoutItemGroupsInput";
+import { Type } from "class-transformer";
+import { UnitsUpdateManyWithoutItemGroupsInput } from "./UnitsUpdateManyWithoutItemGroupsInput";
 
 @InputType()
 class ItemGroupUpdateInput {
@@ -41,6 +49,18 @@ class ItemGroupUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => MillingBinConfigurationUpdateManyWithoutItemGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationUpdateManyWithoutItemGroupsInput)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationUpdateManyWithoutItemGroupsInput, {
+    nullable: true,
+  })
+  millingBinConfigurations?: MillingBinConfigurationUpdateManyWithoutItemGroupsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -50,6 +70,29 @@ class ItemGroupUpdateInput {
     nullable: true,
   })
   name?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsUpdateManyWithoutItemGroupsInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsUpdateManyWithoutItemGroupsInput)
+  @IsOptional()
+  @Field(() => UnitsUpdateManyWithoutItemGroupsInput, {
+    nullable: true,
+  })
+  unitsItems?: UnitsUpdateManyWithoutItemGroupsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  grainCharacterId?: string | null;
 }
 
 export { ItemGroupUpdateInput as ItemGroupUpdateInput };

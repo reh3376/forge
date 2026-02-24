@@ -26,9 +26,11 @@ import {
   IsEnum,
 } from "class-validator";
 
-import { Batch } from "../../batch/base/Batch";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
 import { Type } from "class-transformer";
+import { Batch } from "../../batch/base/Batch";
 import { BomItem } from "../../bomItem/base/BomItem";
+import { Comment } from "../../comment/base/Comment";
 import { Item } from "../../item/base/Item";
 import { Asset } from "../../asset/base/Asset";
 import { Customer } from "../../customer/base/Customer";
@@ -77,6 +79,15 @@ class Lot {
     nullable: true,
   })
   avgPGsFerm!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BatchMaterialConsumption],
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumption)
+  @IsOptional()
+  batchMaterialConsumptions?: Array<BatchMaterialConsumption>;
 
   @ApiProperty({
     required: true,
@@ -143,6 +154,15 @@ class Lot {
   @Type(() => BomItem)
   @IsOptional()
   bomItems?: Array<BomItem>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Comment],
+  })
+  @ValidateNested()
+  @Type(() => Comment)
+  @IsOptional()
+  comments?: Array<Comment>;
 
   @ApiProperty({
     required: false,

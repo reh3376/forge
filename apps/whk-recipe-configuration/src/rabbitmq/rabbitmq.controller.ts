@@ -229,8 +229,8 @@ export class RabbitMQController {
           `Invalid acknowledgment format: missing messageId`,
           JSON.stringify(message)
         );
-        console.log(
-          `DEBUG: Original message properties:`,
+        this.logger.debug(
+          `Original message properties:`,
           originalMessage?.properties
         );
         // Still ack the RabbitMQ message to prevent it being requeued
@@ -246,8 +246,8 @@ export class RabbitMQController {
 
         if (!messageExists) {
           this.logger.warn(`Message ID ${messageId} not found in the database`);
-          console.log(
-            `DEBUG: Message ID ${messageId} not found in the database`
+          this.logger.debug(
+            `Message ID ${messageId} not found in the database`
           );
         } else {
           this.logger.log(

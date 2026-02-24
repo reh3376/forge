@@ -26,7 +26,6 @@ import { Item } from "../../item/base/Item";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
-import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 
 @ObjectType()
 class SalesOrder {
@@ -139,15 +138,6 @@ class SalesOrder {
     nullable: true,
   })
   orderType!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrder,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrder)
-  @IsOptional()
-  productionOrders?: ProductionOrder | null;
 
   @ApiProperty({
     required: true,

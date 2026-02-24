@@ -16,7 +16,7 @@ export class DateTimeFilter {
     nullable: true,
   })
   @Type(() => Date)
-  equals?: Date;
+  equals?: Date | string;
 
   @ApiProperty({
     required: false,
@@ -27,7 +27,7 @@ export class DateTimeFilter {
     nullable: true,
   })
   @Type(() => Date)
-  not?: Date;
+  not?: Date | string;
 
   @ApiProperty({
     required: false,
@@ -60,7 +60,7 @@ export class DateTimeFilter {
     nullable: true,
   })
   @Type(() => Date)
-  lt?: Date;
+  lt?: Date | string;
 
   @ApiProperty({
     required: false,
@@ -71,7 +71,7 @@ export class DateTimeFilter {
     nullable: true,
   })
   @Type(() => Date)
-  lte?: Date;
+  lte?: Date | string;
 
   @ApiProperty({
     required: false,
@@ -82,7 +82,7 @@ export class DateTimeFilter {
     nullable: true,
   })
   @Type(() => Date)
-  gt?: Date;
+  gt?: Date | string;
 
   @ApiProperty({
     required: false,
@@ -93,5 +93,5 @@ export class DateTimeFilter {
     nullable: true,
   })
   @Type(() => Date)
-  gte?: Date;
+  gte?: Date | string;
 }

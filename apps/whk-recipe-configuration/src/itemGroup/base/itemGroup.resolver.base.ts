@@ -25,6 +25,10 @@ import { ItemGroupFindManyArgs } from "./ItemGroupFindManyArgs";
 import { ItemGroupFindUniqueArgs } from "./ItemGroupFindUniqueArgs";
 import { CreateItemGroupArgs } from "./CreateItemGroupArgs";
 import { UpdateItemGroupArgs } from "./UpdateItemGroupArgs";
+import { MillingBinConfigurationFindManyArgs } from "../../millingBinConfiguration/base/MillingBinConfigurationFindManyArgs";
+import { MillingBinConfiguration } from "../../millingBinConfiguration/base/MillingBinConfiguration";
+import { UnitsFindManyArgs } from "../../units/base/UnitsFindManyArgs";
+import { Units } from "../../units/base/Units";
 import { ItemGroupService } from "../itemGroup.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ItemGroup)
@@ -118,5 +122,50 @@ export class ItemGroupResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MillingBinConfiguration], {
+    name: "millingBinConfigurations",
+  })
+  @UseRoles({
+    resource: "MillingBinConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async findMillingBinConfigurations(
+    @graphql.Parent() parent: ItemGroup,
+    @graphql.Args() args: MillingBinConfigurationFindManyArgs
+  ): Promise<MillingBinConfiguration[]> {
+    const results = await this.service.findMillingBinConfigurations(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Units], { name: "unitsItems" })
+  @UseRoles({
+    resource: "Units",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitsItems(
+    @graphql.Parent() parent: ItemGroup,
+    @graphql.Args() args: UnitsFindManyArgs
+  ): Promise<Units[]> {
+    const results = await this.service.findUnitsItems(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }

@@ -1,0 +1,146 @@
+---
+alwaysApply: true
+---
+# TaskMaster Quick Reference
+
+**For complete workflow guidance**: See @dev_workflow.mdc
+**For comprehensive tool reference**: See @taskmaster-detailed.mdc
+
+## **MCP Tools (Recommended)**
+
+### **Core Workflow**
+- `get_tasks` - List tasks with status filtering
+- `next_task` - Get next available task based on dependencies  
+- `get_task` - View specific task details
+- `set_task_status` - Update task status (pending/in-progress/done)
+
+### **Task Management**
+- `add_task` - Create new task with AI structuring
+- `expand_task` - Break down complex tasks into subtasks
+- `update_task` - Modify specific task with new context
+- `update_subtask` - Append notes to subtask details
+
+### **Project Setup**
+- `initialize_project` - Set up TaskMaster structure
+- `parse_prd` - Generate initial tasks from PRD document
+- `models` - Configure AI models for different roles
+
+### **Analysis & Planning**
+- `analyze_project_complexity` - Determine which tasks need breakdown
+- `complexity_report` - View analysis results
+- `expand_all` - Expand multiple tasks based on complexity
+
+### **Dependencies & Structure**
+- `add_dependency` / `remove_dependency` - Manage task relationships
+- `validate_dependencies` / `fix_dependencies` - Ensure valid structure
+- `move_task` - Reorganize task hierarchy
+
+## **Key Parameters**
+
+### **Common Options**
+- `projectRoot` - Absolute path to project directory (required for MCP)
+- `id` - Task ID (e.g., "15" or "15.2" for subtasks)
+- `status` - pending/in-progress/done/review/cancelled/deferred
+- `research` - Enable Perplexity AI for enhanced results
+
+### **AI-Powered Tools**
+⚠️ **These tools make AI calls and can take up to a minute:**
+- `parse_prd`, `analyze_project_complexity`, `expand_task`, `expand_all`
+- `add_task`, `update_task`, `update_subtask`, `update`
+
+## **Configuration**
+
+### **Primary Config**: `.taskmasterconfig` (managed via `models` tool)
+- AI model selections (main/research/fallback)
+- Parameters (max tokens, temperature)
+- Project settings
+
+### **API Keys**: `.env` (CLI) or `.cursor/mcp.json` (MCP)
+```bash
+ANTHROPIC_API_KEY=sk-...
+PERPLEXITY_API_KEY=pplx-...
+OPENAI_API_KEY=sk-...
+# See dev_workflow.mdc for complete list
+```
+
+## **Common Patterns**
+
+### **Session Start**
+```typescript
+// 1. Check current status
+mcp_taskmaster-ai_get_tasks({projectRoot: "/path/to/project"})
+
+// 2. Get next task
+mcp_taskmaster-ai_next_task({projectRoot: "/path/to/project"})
+
+// 3. View task details
+mcp_taskmaster-ai_get_task({id: "15", projectRoot: "/path/to/project"})
+```
+
+### **Task Breakdown**
+```typescript
+// 1. Analyze complexity first
+mcp_taskmaster-ai_analyze_project_complexity({
+  projectRoot: "/path/to/project", 
+  research: true
+})
+
+// 2. Expand based on analysis
+mcp_taskmaster-ai_expand_task({
+  id: "15", 
+  projectRoot: "/path/to/project",
+  research: true,
+  force: true  // Replace existing subtasks
+})
+```
+
+### **Implementation Logging**
+```typescript
+// Start work
+mcp_taskmaster-ai_set_task_status({
+  id: "15.2", 
+  status: "in-progress",
+  projectRoot: "/path/to/project"
+})
+
+// Log progress iteratively
+mcp_taskmaster-ai_update_subtask({
+  id: "15.2",
+  prompt: "Discovered X, implemented Y, next need to Z...",
+  projectRoot: "/path/to/project"
+})
+
+// Complete task
+mcp_taskmaster-ai_set_task_status({
+  id: "15.2", 
+  status: "done",
+  projectRoot: "/path/to/project"
+})
+```
+
+## **CLI Fallback Commands**
+
+**Installation**: `npm install -g task-master-ai`
+
+**Key Commands**:
+- `task-master list` → `get_tasks`
+- `task-master next` → `next_task` 
+- `task-master show <id>` → `get_task`
+- `task-master expand --id=<id> --research` → `expand_task`
+- `task-master set-status --id=<id> --status=done` → `set_task_status`
+
+**Full CLI Reference**: See original taskmaster.mdc or `task-master --help`
+
+## **Integration Points**
+
+- **With Memory MCP**: Document task artifacts as entities
+- **With Jira**: Link tasks to business tickets  
+- **With Git**: Commit messages reference task IDs
+- **With Context Framework**: Tasks drive development sessions
+
+For detailed workflow patterns and complete command reference, see @dev_workflow.mdc and @taskmaster-detailed.mdc.
+
+
+---
+
+For details on how these commands fit into the development process, see @dev_workflow.mdc.

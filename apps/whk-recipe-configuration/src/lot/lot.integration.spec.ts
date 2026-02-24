@@ -31,6 +31,9 @@ describe("LotService Integration Tests", () => {
       create: jest.fn(),
       update: jest.fn(),
     },
+    productionOrder: {
+      findUnique: jest.fn(),
+    },
     $disconnect: jest.fn(),
   };
 
@@ -99,6 +102,12 @@ describe("LotService Integration Tests", () => {
         Recipe: recipeName,
         item: mockItem,
       };
+      const mockRecipeWithPOs = {
+        ...mockNewRecipe,
+        productionOrders: [
+          { id: "po-1", createdAt: new Date("2024-01-01") },
+        ],
+      };
       const mockLot = {
         id: "lot-1",
         lotNumber: "24A01A.01",
@@ -114,8 +123,12 @@ describe("LotService Integration Tests", () => {
       mockPrismaService.recipe.create.mockResolvedValue(mockNewRecipe);
 
       // Setup mocks for lot creation
-      mockPrismaService.recipe.findUnique.mockResolvedValue(mockNewRecipe);
+      mockPrismaService.recipe.findUnique.mockResolvedValue(mockRecipeWithPOs);
       mockPrismaService.lot.findMany.mockResolvedValue([]);
+      mockPrismaService.productionOrder.findUnique.mockResolvedValue({
+        id: "po-1",
+        item: mockItem,
+      });
 
       // Mock the parent createLot method
       const superCreateLotSpy = jest
@@ -157,12 +170,9 @@ describe("LotService Integration Tests", () => {
           Recipe: recipeName,
           createdBy: "test-user",
           customer: { connect: { id: "customer-1" } },
-          item: { connect: { id: "item-1" } },
           revision: 1,
-          // whiskeyType would be set here in real implementation
         },
         include: {
-          item: true,
           customer: true,
           recipeGroup: true,
           recipeBoms: true,
@@ -174,7 +184,7 @@ describe("LotService Integration Tests", () => {
       // Verify lot was created with the new recipe
       expect(mockPrismaService.recipe.findUnique).toHaveBeenCalledWith({
         where: { id: "recipe-1" },
-        include: { item: true },
+        include: { productionOrders: true },
       });
 
       // Verify RabbitMQ message was sent for the new recipe
@@ -210,6 +220,12 @@ describe("LotService Integration Tests", () => {
         Recipe: recipeName,
         item: { id: "item-1", itemNumber: "EXISTING-ITEM" },
       };
+      const mockExistingRecipeWithPOs = {
+        ...mockExistingRecipe,
+        productionOrders: [
+          { id: "po-existing-1", createdAt: new Date("2024-01-01") },
+        ],
+      };
       const mockLot = {
         id: "lot-2",
         lotNumber: "24A01B.01",
@@ -219,8 +235,12 @@ describe("LotService Integration Tests", () => {
 
       // Setup mocks - recipe already exists
       mockPrismaService.recipe.findFirst.mockResolvedValue(mockExistingRecipe);
-      mockPrismaService.recipe.findUnique.mockResolvedValue(mockExistingRecipe);
+      mockPrismaService.recipe.findUnique.mockResolvedValue(mockExistingRecipeWithPOs);
       mockPrismaService.lot.findMany.mockResolvedValue([]);
+      mockPrismaService.productionOrder.findUnique.mockResolvedValue({
+        id: "po-existing-1",
+        item: { id: "item-1", itemNumber: "EXISTING-ITEM" },
+      });
 
       // Mock the parent createLot method
       const superCreateLotSpy = jest
@@ -263,7 +283,7 @@ describe("LotService Integration Tests", () => {
       // Verify lot was created with existing recipe
       expect(mockPrismaService.recipe.findUnique).toHaveBeenCalledWith({
         where: { id: "existing-recipe-1" },
-        include: { item: true },
+        include: { productionOrders: true },
       });
 
       // Verify RabbitMQ message was NOT sent for existing recipe (only called once for lot)
@@ -335,11 +355,9 @@ describe("LotService Integration Tests", () => {
           Recipe: newRecipeName,
           createdBy: "system",
           customer: { connect: { id: "customer-1" } },
-          item: { connect: { id: "item-2" } },
           revision: 1,
         },
         include: {
-          item: true,
           customer: true,
           recipeGroup: true,
           recipeBoms: true,

@@ -1,0 +1,450 @@
+---
+description: Coordinated MCP server orchestration for maximum development context delivery
+globs: **/*
+alwaysApply: true
+priority: 1
+---
+
+# Context Delivery Framework
+
+## **Core Philosophy**
+This framework maximizes development context by orchestrating multiple MCP servers to provide:
+- **Persistent Knowledge**: Graphiti knowledge graph for entity relationships
+- **Semantic Search**: Qdrant vector database for RAG and embeddings
+- **Task Management**: TaskMaster for workflow orchestration (@taskmaster-detailed.mdc)
+- **Real-time Data**: PostgreSQL and GraphQL for current system state
+- **Infrastructure Context**: MCP_DOCKER for deployment and operational insights
+- **UI Testing & Automation**: Playwright MCP for end-to-end testing and user interaction validation
+
+## **🎯 Primary Context Delivery Strategy**
+
+### **1. Session Initialization Pattern**
+```typescript
+// ALWAYS start development sessions with this sequence:
+
+// A. Get current task context
+mcp_taskmaster-ai_next_task() // or get_tasks() for overview
+
+// B. Search knowledge graph for related entities
+mcp_graphiti-memory_search_memory_nodes("current task or feature area")
+mcp_graphiti-memory_search_memory_facts("related business process")
+
+// C. Enhance with vector search for similar patterns
+mcp_qdrant_qdrant-find("implementation patterns for [current task]")
+
+// D. Query current system state
+mcp_neo4j-cypher_execute_query("MATCH (n) WHERE n.name CONTAINS '[feature]' RETURN n")
+
+// E. Get real-time data context
+// Use postgres-mes-local or mcp-graphql-mes for current data
+```
+
+### **2. Development Context Enrichment**
+```typescript
+// During active development, continuously enrich context:
+
+// When discovering new patterns or entities:
+mcp_graphiti-memory_add_memory({
+  name: "Implementation Discovery",
+  episode_body: "Found that [component] requires [specific pattern] because [reason]",
+  source: "text"
+})
+
+// When finding reusable solutions:
+mcp_qdrant_qdrant-store({
+  information: "Solution: [problem] solved by [approach] in [location]",
+  metadata: { task_id: "current_task", pattern_type: "solution" }
+})
+
+// When updating task progress:
+mcp_taskmaster-ai_update_subtask({
+  id: "current_subtask",
+  prompt: "Implementation findings: [detailed discoveries]"
+})
+```
+
+### **3. Cross-System Context Correlation**
+```typescript
+// Link discoveries across all systems:
+
+// 1. Document in knowledge graph
+mcp_graphiti-memory_add_memory({
+  name: "System Integration Point",
+  episode_body: JSON.stringify({
+    component: "ComponentName",
+    database_tables: ["table1", "table2"],
+    api_endpoints: ["/api/endpoint"],
+    business_process: "ProcessName"
+  }),
+  source: "json"
+})
+
+// 2. Create searchable vectors
+mcp_qdrant_qdrant-store({
+  information: "Integration: ComponentName connects to [tables] via [endpoints] for [process]",
+  metadata: { 
+    type: "integration",
+    component: "ComponentName",
+    system: "MES"
+  }
+})
+
+// 3. Update task with architectural insights
+mcp_taskmaster-ai_update_task({
+  id: "current_task",
+  prompt: "Architectural discovery: [integration details and implications]"
+})
+```
+
+## **🔄 Coordinated Workflow Patterns**
+
+### **Pattern 1: Feature Development**
+```typescript
+// 1. PLANNING PHASE
+// Get task context
+const nextTask = mcp_taskmaster-ai_next_task()
+
+// Search existing knowledge
+const relatedEntities = mcp_graphiti-memory_search_memory_nodes(nextTask.title)
+const similarPatterns = mcp_qdrant_qdrant-find(`similar to ${nextTask.description}`)
+
+// Query current system state
+const currentSchema = mcp_neo4j-cypher_execute_query("MATCH (n:Table) RETURN n")
+const currentData = postgres-mes-local.query("SELECT * FROM relevant_table LIMIT 10")
+
+// 2. IMPLEMENTATION PHASE
+// Document discoveries as you code
+mcp_graphiti-memory_add_memory({
+  name: `${nextTask.title} Implementation`,
+  episode_body: "Implementation approach: [detailed plan based on discoveries]"
+})
+
+// Store reusable patterns
+mcp_qdrant_qdrant-store({
+  information: "Code pattern: [specific implementation] for [use case]",
+  metadata: { task_id: nextTask.id, pattern_type: "implementation" }
+})
+
+// 3. COMPLETION PHASE
+// Update task with final details
+mcp_taskmaster-ai_update_task({
+  id: nextTask.id,
+  prompt: "Completed implementation with [key decisions and patterns used]"
+})
+
+// Mark complete
+mcp_taskmaster-ai_set_task_status({
+  id: nextTask.id,
+  status: "done"
+})
+```
+
+### **Pattern 2: Bug Investigation**
+```typescript
+// 1. CONTEXT GATHERING
+// Search knowledge graph for related issues
+const relatedIssues = mcp_graphiti-memory_search_memory_facts("bug symptoms or error message")
+
+// Find similar problems in vector database
+const similarBugs = mcp_qdrant_qdrant-find("similar error patterns or symptoms")
+
+// Query system state for current data
+const systemState = mcp_neo4j-cypher_execute_query("MATCH (n) WHERE n.status = 'error' RETURN n")
+const errorLogs = postgres-mes-local.query("SELECT * FROM logs WHERE level = 'ERROR' ORDER BY timestamp DESC LIMIT 50")
+
+// 2. INVESTIGATION TRACKING
+// Document investigation process
+mcp_graphiti-memory_add_memory({
+  name: "Bug Investigation: [Bug Title]",
+  episode_body: `
+    Symptoms: [observed behavior]
+    Investigation steps: [what was checked]
+    Root cause: [technical explanation]
+    Fix applied: [solution implemented]
+  `
+})
+
+// 3. KNOWLEDGE PRESERVATION
+// Store solution for future reference
+mcp_qdrant_qdrant-store({
+  information: "Bug fix: [problem] caused by [root cause] fixed by [solution]",
+  metadata: { 
+    type: "bug_fix",
+    component: "affected_component",
+    severity: "high/medium/low"
+  }
+})
+```
+
+### **Pattern 3: Architecture Exploration**
+```typescript
+// 1. SYSTEM UNDERSTANDING
+// Get comprehensive system view
+const systemGraph = mcp_graphiti-memory_search_memory_nodes("system architecture")
+const codePatterns = mcp_qdrant_qdrant-find("architectural patterns in codebase")
+
+// Query database schema
+const schema = mcp_neo4j-cypher_execute_query(`
+  MATCH (n:Table)-[r:REFERENCES]->(m:Table)
+  RETURN n.name, r.type, m.name
+`)
+
+// Get current data relationships
+const dataFlow = mcp-graphql-mes.query(`
+  query SystemOverview {
+    __schema {
+      types {
+        name
+        fields {
+          name
+          type { name }
+        }
+      }
+    }
+  }
+`)
+
+// 2. PATTERN DOCUMENTATION
+// Document architectural insights
+mcp_graphiti-memory_add_memory({
+  name: "System Architecture Analysis",
+  episode_body: JSON.stringify({
+    database_schema: "key relationships and constraints",
+    api_structure: "GraphQL schema patterns",
+    component_hierarchy: "UI component relationships",
+    data_flow: "how data moves through system"
+  }),
+  source: "json"
+})
+```
+
+### **Pattern 4: UI Testing & Validation**
+```typescript
+// 1. TEST PLANNING PHASE
+// Get current task and testing requirements
+const currentTask = mcp_taskmaster-ai_next_task()
+const testingKnowledge = mcp_graphiti-memory_search_memory_facts("UI testing patterns")
+const similarTestCases = mcp_qdrant_qdrant-find("end-to-end testing scenarios")
+
+// 2. AUTOMATED UI TESTING
+// Navigate and validate UI components
+playwright.goto("http://localhost:3000/recipe-management")
+playwright.click("[data-testid='create-recipe-button']")
+playwright.fill("[data-testid='recipe-name-input']", "Test Recipe")
+playwright.click("[data-testid='save-recipe-button']")
+
+// Validate real-time data integration
+const recipeData = postgres-mes-local.query("SELECT * FROM recipes WHERE name = 'Test Recipe'")
+playwright.waitForSelector(`[data-testid='recipe-${recipeData[0].id}']`)
+
+// 3. CROSS-SYSTEM VALIDATION
+// Verify UI state matches database state
+const uiState = playwright.evaluate("() => window.__REDUX_STATE__")
+const dbState = postgres-mes-local.query("SELECT * FROM production_orders WHERE recipe_id = ?", [recipeData[0].id])
+
+// Document test results and patterns
+mcp_graphiti-memory_add_memory({
+  name: "UI Test Validation",
+  episode_body: JSON.stringify({
+    test_scenario: "Recipe creation workflow",
+    ui_interactions: ["navigation", "form_filling", "submission"],
+    data_validation: "database consistency verified",
+    performance_metrics: "load times and responsiveness",
+    edge_cases_tested: ["validation errors", "network failures"]
+  }),
+  source: "json"
+})
+
+// Store reusable test patterns
+mcp_qdrant_qdrant-store({
+  information: "Test pattern: Recipe management workflow validated via Playwright with database verification",
+  metadata: { 
+    type: "test_pattern",
+    component: "RecipeManagement",
+    test_type: "end_to_end",
+    validation_level: "full_stack"
+  }
+})
+
+// 4. REGRESSION TESTING
+// Run existing test suite and compare results
+const testResults = playwright.runTestSuite("recipe-management.spec.ts")
+const historicalResults = mcp_qdrant_qdrant-find("previous test results for recipe management")
+
+// Update task with testing insights
+mcp_taskmaster-ai_update_subtask({
+  id: "current_subtask",
+  prompt: `UI Testing completed:
+    - All user flows validated
+    - Database consistency verified
+    - Performance benchmarks met
+    - Regression tests passed: ${testResults.passed}/${testResults.total}`
+})
+```
+
+### **Pattern 5: Manufacturing UI Workflows**
+```typescript
+// 1. PRODUCTION WORKFLOW TESTING
+// Test complex manufacturing sequences
+playwright.goto("http://localhost:3000/production")
+
+// Simulate production order creation
+playwright.click("[data-testid='new-production-order']")
+playwright.selectOption("[data-testid='recipe-selector']", "IPA Recipe")
+playwright.fill("[data-testid='batch-size']", "1000")
+playwright.click("[data-testid='start-production']")
+
+// Validate real-time MQTT integration
+const mqttData = mcp_qdrant_qdrant-find("MQTT message patterns for production start")
+playwright.waitForSelector("[data-testid='production-status'][data-status='running']")
+
+// Test enzyme dosing interface
+playwright.click("[data-testid='enzyme-dosing-tab']")
+playwright.fill("[data-testid='enzyme-amount']", "2.5")
+playwright.click("[data-testid='dose-enzyme']")
+
+// Verify database updates
+const enzymeLog = postgres-mes-local.query(`
+  SELECT * FROM additive_actual 
+  WHERE production_order_id = ? 
+  ORDER BY created_at DESC LIMIT 1
+`, [productionOrderId])
+
+// Document manufacturing test patterns
+mcp_graphiti-memory_add_memory({
+  name: "Manufacturing UI Test Pattern",
+  episode_body: `
+    Production workflow: Order creation → Recipe selection → Batch configuration → Enzyme dosing
+    Real-time validation: MQTT integration confirmed
+    Database consistency: All production events logged
+    User experience: Responsive interface with immediate feedback
+  `
+})
+```
+
+## **🎛️ MCP_DOCKER Integration Patterns**
+
+### **Infrastructure Context**
+```typescript
+// Use MCP_DOCKER for deployment and operational context:
+
+// Check container status during development
+mcp_MCP_DOCKER.listContainers() // See what's running
+
+// Monitor logs for debugging
+mcp_MCP_DOCKER.getLogs("container_name") // Real-time debugging
+
+// Check resource usage
+mcp_MCP_DOCKER.getStats("container_name") // Performance context
+
+// Validate deployments
+mcp_MCP_DOCKER.inspectContainer("container_name") // Configuration verification
+```
+
+### **Database Context Enhancement**
+```typescript
+// Combine Docker insights with database operations:
+
+// Check database container health
+const dbHealth = mcp_MCP_DOCKER.getStats("postgres-container")
+
+// Query with infrastructure context
+const queryResult = postgres-mes-local.query("SELECT * FROM health_metrics")
+
+// Document infrastructure dependencies
+mcp_graphiti-memory_add_memory({
+  name: "Infrastructure Dependencies",
+  episode_body: `
+    Database container: ${dbHealth.status}
+    Performance metrics: ${queryResult.summary}
+    Scaling requirements: [based on usage patterns]
+  `
+})
+```
+
+## **📊 Context Quality Metrics**
+
+### **Completeness Indicators**
+- **Task Context**: ✅ Current task details and dependencies
+- **Knowledge Graph**: ✅ Related entities and relationships
+- **Vector Search**: ✅ Similar patterns and solutions
+- **System State**: ✅ Current data and schema
+- **Infrastructure**: ✅ Container and deployment status
+- **UI Testing**: ✅ End-to-end validation and user workflows
+
+### **Context Freshness**
+- **Real-time**: Database queries, GraphQL introspection
+- **Session-persistent**: Knowledge graph, vector embeddings
+- **Project-persistent**: Task management, architectural patterns
+
+## **🚀 Optimization Strategies**
+
+### **Performance Patterns**
+```typescript
+// Parallel context gathering for speed:
+const [taskContext, knowledgeGraph, vectorSearch, systemState] = await Promise.all([
+  mcp_taskmaster-ai_next_task(),
+  mcp_graphiti-memory_search_memory_nodes("current feature"),
+  mcp_qdrant_qdrant-find("related patterns"),
+  mcp_neo4j-cypher_execute_query("MATCH (n:Component) RETURN n LIMIT 10")
+])
+```
+
+### **Context Caching**
+```typescript
+// Cache expensive operations:
+// 1. Store frequently accessed patterns in Qdrant
+// 2. Use Graphiti for persistent architectural knowledge
+// 3. Cache database schema information in knowledge graph
+```
+
+### **Progressive Context Loading**
+```typescript
+// Start with essential context, then enhance:
+// 1. Task context (immediate)
+// 2. Knowledge graph search (fast)
+// 3. Vector similarity search (medium)
+// 4. Database queries (slower)
+// 5. Infrastructure checks (background)
+```
+
+## **🎯 Context Delivery Decision Matrix**
+
+| Development Activity | Primary Tools | Context Strategy |
+|---------------------|---------------|------------------|
+| **New Feature** | TaskMaster → Graphiti → Qdrant | Task planning + knowledge search + pattern matching |
+| **Bug Fix** | Graphiti → Qdrant → PostgreSQL | Historical issues + similar bugs + current data |
+| **Architecture** | neo4j-cypher → Graphiti → MCP_DOCKER | System structure + relationships + infrastructure |
+| **API Integration** | GraphQL → Graphiti → Qdrant | Schema introspection + integration patterns + examples |
+| **Database Work** | PostgreSQL → neo4j-cypher → Graphiti | Data analysis + schema relationships + architectural context |
+| **Deployment** | MCP_DOCKER → TaskMaster → Graphiti | Infrastructure status + deployment tasks + operational knowledge |
+| **UI Testing** | Playwright → Qdrant → PostgreSQL | End-to-end automation + test patterns + data validation |
+| **Manufacturing Workflows** | Playwright → GraphQL → MQTT → Graphiti | UI automation + real-time data + production patterns |
+
+## **🔧 Implementation Checklist**
+
+### **Session Start**
+- [ ] Get current task from TaskMaster
+- [ ] Search knowledge graph for related entities
+- [ ] Query vector database for similar patterns
+- [ ] Check system state via database/GraphQL
+- [ ] Verify infrastructure status
+- [ ] Review existing test coverage with Playwright
+
+### **During Development**
+- [ ] Document discoveries in knowledge graph
+- [ ] Store reusable patterns in vector database
+- [ ] Update task progress with detailed findings
+- [ ] Link new knowledge to existing entities
+- [ ] Create/update UI tests for new features
+- [ ] Validate cross-system integration via automated tests
+
+### **Session End**
+- [ ] Update task status
+- [ ] Commit new knowledge to graph
+- [ ] Store final patterns in vector database
+- [ ] Document architectural insights
+- [ ] Run regression test suite
+- [ ] Store test results and patterns for future reference
+
+This framework ensures maximum context delivery by orchestrating all your MCP servers in a coordinated, intelligent manner that builds persistent knowledge while providing immediate, relevant context for development tasks.

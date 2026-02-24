@@ -14,10 +14,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
+import { BatchMaterialConsumptionListRelationFilter } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionListRelationFilter";
 import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { BomItemListRelationFilter } from "../../bomItem/base/BomItemListRelationFilter";
+import { CommentListRelationFilter } from "../../comment/base/CommentListRelationFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { DateTimeFilter } from "../../util/DateTimeFilter";
@@ -36,6 +38,42 @@ import { Prisma } from "@prisma/client";
 
 @InputType()
 class LotWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => [LotWhereInput],
+  })
+  @ValidateNested({ each: true })
+  @Type(() => LotWhereInput)
+  @IsOptional()
+  @Field(() => [LotWhereInput], {
+    nullable: true,
+  })
+  OR?: LotWhereInput[];
+
+  @ApiProperty({
+    required: false,
+    type: () => [LotWhereInput],
+  })
+  @ValidateNested({ each: true })
+  @Type(() => LotWhereInput)
+  @IsOptional()
+  @Field(() => [LotWhereInput], {
+    nullable: true,
+  })
+  AND?: LotWhereInput[];
+
+  @ApiProperty({
+    required: false,
+    type: () => LotWhereInput,
+  })
+  @ValidateNested()
+  @Type(() => LotWhereInput)
+  @IsOptional()
+  @Field(() => LotWhereInput, {
+    nullable: true,
+  })
+  NOT?: LotWhereInput;
+
   @ApiProperty({
     required: false,
     type: FloatNullableFilter,
@@ -68,6 +106,18 @@ class LotWhereInput {
     nullable: true,
   })
   avgPGsFerm?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionListRelationFilter)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionListRelationFilter, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -136,6 +186,18 @@ class LotWhereInput {
     nullable: true,
   })
   bomItems?: BomItemListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => CommentListRelationFilter)
+  @IsOptional()
+  @Field(() => CommentListRelationFilter, {
+    nullable: true,
+  })
+  comments?: CommentListRelationFilter;
 
   @ApiProperty({
     required: false,

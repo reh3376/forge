@@ -15,6 +15,7 @@ import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { MashingProtocolStepActualWhereUniqueInput } from "../../mashingProtocolStepActual/base/MashingProtocolStepActualWhereUniqueInput";
+import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
 import { RecipeBomItemWhereUniqueInput } from "../../recipeBomItem/base/RecipeBomItemWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
@@ -54,6 +55,18 @@ class RecipeBomActualWhereInput {
     nullable: true,
   })
   mashingProtocolStepActual?: MashingProtocolStepActualWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => ProductionOrderRecipeInstanceWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrderRecipeInstanceWhereUniqueInput)
+  @IsOptional()
+  @Field(() => ProductionOrderRecipeInstanceWhereUniqueInput, {
+    nullable: true,
+  })
+  productionOrderRecipeInstance?: ProductionOrderRecipeInstanceWhereUniqueInput;
 
   @ApiProperty({
     required: false,
