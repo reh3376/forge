@@ -1,6 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { RecipeGenerator } from "./recipe.generation";
 import { EnzymeDosingService } from "./enzyme.dosing";
+import { PrismaService } from "../prisma/prisma.service";
 
 describe("RecipeGenerator mash bill parsing", () => {
   const createGenerator = () => {
@@ -8,13 +9,14 @@ describe("RecipeGenerator mash bill parsing", () => {
     const enzymeService = {
       calculateEnzymeDosing: jest.fn(),
     } as unknown as EnzymeDosingService;
+    const prismaServiceStub = {} as unknown as PrismaService;
     const loggerStub = {
       log: jest.fn(),
       error: jest.fn(),
       warn: jest.fn(),
     } as unknown as Logger;
 
-    return new RecipeGenerator(rabbitProducerStub, enzymeService, loggerStub);
+    return new RecipeGenerator(rabbitProducerStub, enzymeService, prismaServiceStub, loggerStub);
   };
 
   it("handles decimal mash bill values when calculating grain quantities", () => {
@@ -24,10 +26,11 @@ describe("RecipeGenerator mash bill parsing", () => {
       1000
     );
 
-    expect(result.Corn).toBe(685);
-    expect(result.Rye).toBe(105);
-    expect(result.Wheat).toBe(0);
-    expect(result.Malt).toBe(210);
+    // calculateGrainQuantities returns decimal fractions (percentage / 100)
+    expect(result.Corn).toBeCloseTo(0.685, 5);
+    expect(result.Rye).toBeCloseTo(0.105, 5);
+    expect(result.Wheat).toBeCloseTo(0, 5);
+    expect(result.Malt).toBeCloseTo(0.21, 5);
   });
 
   it("extracts decimal percentages when determining grain ratios", () => {
@@ -62,11 +65,12 @@ describe("RecipeGenerator mash bill parsing", () => {
       1000
     );
 
-    expect(result.Corn).toBe(400);
-    expect(result.Rye).toBe(200);
-    expect(result.Wheat).toBe(150);
-    expect(result.Malt).toBe(150);
-    expect(result.Specialty).toBe(100);
+    // calculateGrainQuantities returns decimal fractions (percentage / 100)
+    expect(result.Corn).toBeCloseTo(0.4, 5);
+    expect(result.Rye).toBeCloseTo(0.2, 5);
+    expect(result.Wheat).toBeCloseTo(0.15, 5);
+    expect(result.Malt).toBeCloseTo(0.15, 5);
+    expect(result.Specialty).toBeCloseTo(0.1, 5);
   });
 
   it("extracts 5 normalized values from 5-grain mash bill", () => {

@@ -110,10 +110,10 @@ export class PurchaseOrderControllerBase {
           },
         },
 
-        receiptStatus: true,
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
+        status: true,
         totalOrderQuantity: true,
         transactionGroup: true,
         updatedAt: true,
@@ -171,10 +171,10 @@ export class PurchaseOrderControllerBase {
           },
         },
 
-        receiptStatus: true,
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
+        status: true,
         totalOrderQuantity: true,
         transactionGroup: true,
         updatedAt: true,
@@ -231,10 +231,10 @@ export class PurchaseOrderControllerBase {
           },
         },
 
-        receiptStatus: true,
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
+        status: true,
         totalOrderQuantity: true,
         transactionGroup: true,
         updatedAt: true,
@@ -323,10 +323,10 @@ export class PurchaseOrderControllerBase {
             },
           },
 
-          receiptStatus: true,
           receivedQuantity: true,
           revision: true,
           schemaVersion: true,
+          status: true,
           totalOrderQuantity: true,
           transactionGroup: true,
           updatedAt: true,
@@ -579,6 +579,13 @@ export class PurchaseOrderControllerBase {
         },
 
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
 
@@ -835,10 +842,10 @@ export class PurchaseOrderControllerBase {
           },
         },
 
-        receiptStatus: true,
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
+        status: true,
         totalOrderQuantity: true,
         transactionGroup: true,
         updatedAt: true,

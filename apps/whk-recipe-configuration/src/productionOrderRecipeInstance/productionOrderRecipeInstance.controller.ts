@@ -19,4 +19,51 @@ export class ProductionOrderRecipeInstanceController extends ProductionOrderReci
   ) {
     super(service, rolesBuilder);
   }
+
+  @common.Post("create-from-schedule-queue/:scheduleOrderQueueId")
+  @swagger.ApiOperation({
+    summary: "Create production order recipe instance from schedule queue",
+    description:
+      "Creates a production order recipe instance when a schedule order queue becomes active at mashing (index = 0). This also creates instances of recipe parameters, recipe BOMs, and mashing protocols linked to the production order recipe instance.",
+  })
+  @swagger.ApiParam({
+    name: "scheduleOrderQueueId",
+    type: "string",
+    description:
+      "Schedule order queue ID that is active at mashing (index = 0)",
+  })
+  @swagger.ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        createdBy: {
+          type: "string",
+          description: "Username of the user creating the instance",
+        },
+      },
+      required: ["createdBy"],
+    },
+  })
+  @swagger.ApiCreatedResponse({
+    description:
+      "Production order recipe instance created successfully with all related instances",
+  })
+  @swagger.ApiBadRequestResponse({
+    description:
+      "Schedule order queue not found or not at index 0 (active at mashing)",
+  })
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "create",
+    possession: "any",
+  })
+  async createFromScheduleQueue(
+    @common.Param("scheduleOrderQueueId") scheduleOrderQueueId: string,
+    @common.Body() body: { createdBy: string }
+  ) {
+    return this.service.createProductionOrderRecipeInstanceFromScheduleQueue(
+      scheduleOrderQueueId,
+      body.createdBy
+    );
+  }
 }

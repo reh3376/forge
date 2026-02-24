@@ -27,6 +27,8 @@ import { CreateItemArgs } from "./CreateItemArgs";
 import { UpdateItemArgs } from "./UpdateItemArgs";
 import { AdditiveActualFindManyArgs } from "../../additiveActual/base/AdditiveActualFindManyArgs";
 import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
+import { BatchMaterialConsumptionFindManyArgs } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionFindManyArgs";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomFindManyArgs } from "../../bom/base/BomFindManyArgs";
@@ -47,12 +49,11 @@ import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrde
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
-import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
-import { Recipe } from "../../recipe/base/Recipe";
 import { SalesOrderFindManyArgs } from "../../salesOrder/base/SalesOrderFindManyArgs";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { TestParameterFindManyArgs } from "../../testParameter/base/TestParameterFindManyArgs";
 import { TestParameter } from "../../testParameter/base/TestParameter";
+import { Units } from "../../units/base/Units";
 import { Vendor } from "../../vendor/base/Vendor";
 import { ItemService } from "../item.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -123,6 +124,12 @@ export class ItemResolverBase {
             }
           : undefined,
 
+        units: args.data.units
+          ? {
+              connect: args.data.units,
+            }
+          : undefined,
+
         vendor: args.data.vendor
           ? {
               connect: args.data.vendor,
@@ -149,6 +156,12 @@ export class ItemResolverBase {
           lotContinerItem: args.data.lotContinerItem
             ? {
                 connect: args.data.lotContinerItem,
+              }
+            : undefined,
+
+          units: args.data.units
+            ? {
+                connect: args.data.units,
               }
             : undefined,
 
@@ -181,6 +194,31 @@ export class ItemResolverBase {
     @graphql.Args() args: AdditiveActualFindManyArgs
   ): Promise<AdditiveActual[]> {
     const results = await this.service.findAdditiveActuals(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [BatchMaterialConsumption], {
+    name: "batchMaterialConsumptions",
+  })
+  @UseRoles({
+    resource: "BatchMaterialConsumption",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchMaterialConsumptions(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: BatchMaterialConsumptionFindManyArgs
+  ): Promise<BatchMaterialConsumption[]> {
+    const results = await this.service.findBatchMaterialConsumptions(
+      parent.id,
+      args
+    );
 
     if (!results) {
       return [];
@@ -332,6 +370,31 @@ export class ItemResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrder], {
+    name: "productionOrderContainerItems",
+  })
+  @UseRoles({
+    resource: "ProductionOrder",
+    action: "read",
+    possession: "any",
+  })
+  async findProductionOrderContainerItems(
+    @graphql.Parent() parent: Item,
+    @graphql.Args() args: ProductionOrderFindManyArgs
+  ): Promise<ProductionOrder[]> {
+    const results = await this.service.findProductionOrderContainerItems(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [ProductionOrder], { name: "productionOrders" })
   @UseRoles({
     resource: "ProductionOrder",
@@ -383,26 +446,6 @@ export class ItemResolverBase {
     @graphql.Args() args: RecipeBomItemFindManyArgs
   ): Promise<RecipeBomItem[]> {
     const results = await this.service.findRecipeBoms(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Recipe], { name: "recipes" })
-  @UseRoles({
-    resource: "Recipe",
-    action: "read",
-    possession: "any",
-  })
-  async findRecipes(
-    @graphql.Parent() parent: Item,
-    @graphql.Args() args: RecipeFindManyArgs
-  ): Promise<Recipe[]> {
-    const results = await this.service.findRecipes(parent.id, args);
 
     if (!results) {
       return [];
@@ -465,6 +508,25 @@ export class ItemResolverBase {
     @graphql.Parent() parent: Item
   ): Promise<Lot | null> {
     const result = await this.service.getLotContinerItem(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Units, {
+    nullable: true,
+    name: "units",
+  })
+  @UseRoles({
+    resource: "Units",
+    action: "read",
+    possession: "any",
+  })
+  async getUnits(@graphql.Parent() parent: Item): Promise<Units | null> {
+    const result = await this.service.getUnits(parent.id);
 
     if (!result) {
       return null;

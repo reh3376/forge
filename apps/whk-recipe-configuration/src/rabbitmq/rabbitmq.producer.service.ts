@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientRMQ, RmqRecordBuilder } from "@nestjs/microservices";
 import { RabbitMQMessage } from "./RabbitMQMessage";
 import { RabbitMQMessageHeaders } from "./RabbitMQMessageHeaders";
@@ -6,6 +6,8 @@ import { AllMessageBrokerTopics } from "./topics";
 
 @Injectable()
 export class RabbitMQProducerService {
+  private readonly logger = new Logger(RabbitMQProducerService.name);
+
   constructor(@Inject("RABBITMQ_CLIENT") private rabbitMQClient: ClientRMQ) {}
 
   private isnumber(value: any) {
@@ -48,7 +50,7 @@ export class RabbitMQProducerService {
     priority?: number
   ): Promise<void> {
     // Log headers for debugging
-    console.log(`DEBUG: Emitting message to ${topic} with headers:`, headers);
+    this.logger.debug(`Emitting message to ${topic} with headers:`, headers);
 
     // Include messageId in both headers and message body
     const messageWithId = {
@@ -69,11 +71,11 @@ export class RabbitMQProducerService {
     await channel.waitForConnect();
 
     await channel.assertExchange(topic, "fanout", { durable: true });
-    console.log(
-      JSON.stringify(
+    this.logger.debug(
+      `Publishing message to topic ${topic}: ${JSON.stringify(
         { pattern: topic, data: record },
         this.recursivenumberReplacer.bind(this)
-      )
+      )}`
     );
     await channel.publish(
       topic,

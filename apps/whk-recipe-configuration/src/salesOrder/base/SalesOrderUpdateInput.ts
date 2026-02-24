@@ -26,7 +26,6 @@ import { ItemUpdateManyWithoutSalesOrdersInput } from "./ItemUpdateManyWithoutSa
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 
 @InputType()
 class SalesOrderUpdateInput {
@@ -135,18 +134,6 @@ class SalesOrderUpdateInput {
     nullable: true,
   })
   orderType?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

@@ -25,8 +25,8 @@ import { RecipeFindManyArgs } from "./RecipeFindManyArgs";
 import { RecipeFindUniqueArgs } from "./RecipeFindUniqueArgs";
 import { CreateRecipeArgs } from "./CreateRecipeArgs";
 import { UpdateRecipeArgs } from "./UpdateRecipeArgs";
-import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
-import { Batch } from "../../batch/base/Batch";
+import { CommentFindManyArgs } from "../../comment/base/CommentFindManyArgs";
+import { Comment } from "../../comment/base/Comment";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { RecipeParameterFindManyArgs } from "../../recipeParameter/base/RecipeParameterFindManyArgs";
@@ -42,10 +42,14 @@ import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
 import { UnitProcedureFindManyArgs } from "../../unitProcedure/base/UnitProcedureFindManyArgs";
 import { UnitProcedure } from "../../unitProcedure/base/UnitProcedure";
 import { Customer } from "../../customer/base/Customer";
-import { Item } from "../../item/base/Item";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
 import { RecipeService } from "../recipe.service";
+import { Prisma } from "@prisma/client";
+
+// Import needed for relationship management
+import { RecipeParameterWhereUniqueInput } from "../../recipeParameter/base/RecipeParameterWhereUniqueInput";
+
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Recipe)
 export class RecipeResolverBase {
@@ -120,12 +124,6 @@ export class RecipeResolverBase {
           connect: args.data.customer,
         },
 
-        item: args.data.item
-          ? {
-              connect: args.data.item,
-            }
-          : undefined,
-
         mashingProtocol: args.data.mashingProtocol
           ? {
               connect: args.data.mashingProtocol,
@@ -167,12 +165,6 @@ export class RecipeResolverBase {
             connect: args.data.customer,
           },
 
-          item: args.data.item
-            ? {
-                connect: args.data.item,
-              }
-            : undefined,
-
           mashingProtocol: args.data.mashingProtocol
             ? {
                 connect: args.data.mashingProtocol,
@@ -197,17 +189,17 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Batch], { name: "batches" })
+  @graphql.ResolveField(() => [Comment], { name: "comments" })
   @UseRoles({
-    resource: "Batch",
+    resource: "Comment",
     action: "read",
     possession: "any",
   })
-  async findBatches(
+  async findComments(
     @graphql.Parent() parent: Recipe,
-    @graphql.Args() args: BatchFindManyArgs
-  ): Promise<Batch[]> {
-    const results = await this.service.findBatches(parent.id, args);
+    @graphql.Args() args: CommentFindManyArgs
+  ): Promise<Comment[]> {
+    const results = await this.service.findComments(parent.id, args);
 
     if (!results) {
       return [];
@@ -267,13 +259,22 @@ export class RecipeResolverBase {
     @graphql.Parent() parent: Recipe,
     @graphql.Args() args: RecipeParameterFindManyArgs
   ): Promise<RecipeParameter[]> {
-    const results = await this.service.findRecipeParameters(parent.id, args);
+    // Convert GraphQL args to Prisma args
+    const prismaArgs: Prisma.RecipeParameterFindManyArgs = {
+      where: args.where,
+      skip: args.skip,
+      take: args.take,
+      orderBy: args.orderBy as any,
+    };
+
+    const results = await this.service.findParameters(parent.id, prismaArgs);
 
     if (!results) {
       return [];
     }
 
-    return results;
+    // Type assertion to match the expected GraphQL RecipeParameter type
+    return results as unknown as RecipeParameter[];
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -422,25 +423,6 @@ export class RecipeResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => Item, {
-    nullable: true,
-    name: "item",
-  })
-  @UseRoles({
-    resource: "Item",
-    action: "read",
-    possession: "any",
-  })
-  async getItem(@graphql.Parent() parent: Recipe): Promise<Item | null> {
-    const result = await this.service.getItem(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => MashingProtocol, {
     nullable: true,
     name: "mashingProtocol",
@@ -480,5 +462,94 @@ export class RecipeResolverBase {
       return null;
     }
     return result;
+  }
+
+  // New mutations for managing RecipeParameter relationships
+
+  @graphql.Mutation(() => Recipe)
+  @UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeParameters(
+    @graphql.Args("id") id: string,
+    @graphql.Args({
+      name: "parameters",
+      type: () => [RecipeParameterWhereUniqueInput],
+    })
+    parameters: RecipeParameterWhereUniqueInput[]
+  ): Promise<Recipe> {
+    const data = {
+      parameters: {
+        connect: parameters,
+      },
+    };
+
+    const result = await this.service.updateRecipe({
+      where: { id },
+      data: data as any,
+      select: { id: true },
+    });
+
+    return result as unknown as Recipe;
+  }
+
+  @graphql.Mutation(() => Recipe)
+  @UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeParameters(
+    @graphql.Args("id") id: string,
+    @graphql.Args({
+      name: "parameters",
+      type: () => [RecipeParameterWhereUniqueInput],
+    })
+    parameters: RecipeParameterWhereUniqueInput[]
+  ): Promise<Recipe> {
+    const data = {
+      parameters: {
+        set: parameters,
+      },
+    };
+
+    const result = await this.service.updateRecipe({
+      where: { id },
+      data: data as any,
+      select: { id: true },
+    });
+
+    return result as unknown as Recipe;
+  }
+
+  @graphql.Mutation(() => Recipe)
+  @UseRoles({
+    resource: "Recipe",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeParameters(
+    @graphql.Args("id") id: string,
+    @graphql.Args({
+      name: "parameters",
+      type: () => [RecipeParameterWhereUniqueInput],
+    })
+    parameters: RecipeParameterWhereUniqueInput[]
+  ): Promise<Recipe> {
+    const data = {
+      parameters: {
+        disconnect: parameters,
+      },
+    };
+
+    const result = await this.service.updateRecipe({
+      where: { id },
+      data: data as any,
+      select: { id: true },
+    });
+
+    return result as unknown as Recipe;
   }
 }

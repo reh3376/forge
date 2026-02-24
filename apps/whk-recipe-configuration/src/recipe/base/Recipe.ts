@@ -25,10 +25,9 @@ import {
   IsEnum,
 } from "class-validator";
 
-import { Batch } from "../../batch/base/Batch";
 import { Type } from "class-transformer";
+import { Comment } from "../../comment/base/Comment";
 import { Customer } from "../../customer/base/Customer";
-import { Item } from "../../item/base/Item";
 import { Lot } from "../../lot/base/Lot";
 import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { RecipeParameter } from "../../recipeParameter/base/RecipeParameter";
@@ -65,21 +64,21 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: () => [Batch],
-  })
-  @ValidateNested()
-  @Type(() => Batch)
-  @IsOptional()
-  batches?: Array<Batch>;
-
-  @ApiProperty({
-    required: false,
     type: () => Recipe,
   })
   @ValidateNested()
   @Type(() => Recipe)
   @IsOptional()
   classId?: Recipe | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Comment],
+  })
+  @ValidateNested()
+  @Type(() => Comment)
+  @IsOptional()
+  comments?: Array<Comment>;
 
   @ApiProperty({
     required: false,
@@ -132,18 +131,6 @@ class Recipe {
 
   @ApiProperty({
     required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(20)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  estimatedAbv!: number | null;
-
-  @ApiProperty({
-    required: false,
     type: String,
   })
   @IsString()
@@ -181,15 +168,6 @@ class Recipe {
     nullable: true,
   })
   isClassDefinition!: boolean | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Item,
-  })
-  @ValidateNested()
-  @Type(() => Item)
-  @IsOptional()
-  item?: Item | null;
 
   @ApiProperty({
     required: false,
@@ -286,18 +264,6 @@ class Recipe {
     nullable: true,
   })
   schemaVersion!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsNumber()
-  @Max(99999999999)
-  @IsOptional()
-  @Field(() => Float, {
-    nullable: true,
-  })
-  targetProof!: number | null;
 
   @ApiProperty({
     required: false,

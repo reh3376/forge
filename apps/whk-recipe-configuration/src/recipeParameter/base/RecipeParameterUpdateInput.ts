@@ -25,6 +25,7 @@ import {
 } from "class-validator";
 
 import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
+import { EnumRecipeParameterCategory } from "./EnumRecipeParameterCategory";
 import { RecipeUpdateManyWithoutRecipeParametersInput } from "./RecipeUpdateManyWithoutRecipeParametersInput";
 import { Type } from "class-transformer";
 import { Decimal } from "decimal.js";
@@ -54,6 +55,23 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   className?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeParameterCategory,
+  })
+  @IsEnum(EnumRecipeParameterCategory)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterCategory, {
+    nullable: true,
+  })
+  parameterCategory?:
+    | "Input"
+    | "Output"
+    | "Calculated"
+    | "MashingActual"
+    | "ProcessingActual"
+    | null;
 
   @ApiProperty({
     required: false,
@@ -222,7 +240,7 @@ class RecipeParameterUpdateInput {
   @Field(() => EnumRecipeParameterRecipeSetpointType, {
     nullable: true,
   })
-  recipeSetpointType?: "Boolean" | "Numeric" | "Text";
+  recipeSetpointType?: "Boolean" | "Numeric" | "Text" | null;
 
   @ApiProperty({
     required: false,
@@ -235,6 +253,17 @@ class RecipeParameterUpdateInput {
     nullable: true,
   })
   recipeSetpointUpperLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  required?: boolean | null;
 
   @ApiProperty({
     required: false,

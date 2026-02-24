@@ -348,6 +348,12 @@ export class MashingProtocolStepControllerBase {
           createdBy: true,
           id: true,
 
+          mashingProtocol: {
+            select: {
+              id: true,
+            },
+          },
+
           mashingProtocolStep: {
             select: {
               id: true,
@@ -465,6 +471,13 @@ export class MashingProtocolStepControllerBase {
 
         createdAt: true,
         createdBy: true,
+
+        displayUnits: {
+          select: {
+            id: true,
+          },
+        },
+
         globalId: true,
         id: true,
         isClassDefinition: true,
@@ -484,7 +497,6 @@ export class MashingProtocolStepControllerBase {
           },
         },
 
-        units: true,
         updatedAt: true,
         updatedBy: true,
       },

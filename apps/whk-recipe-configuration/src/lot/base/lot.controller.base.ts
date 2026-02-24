@@ -26,12 +26,18 @@ import { Lot } from "./Lot";
 import { LotFindManyArgs } from "./LotFindManyArgs";
 import { LotWhereUniqueInput } from "./LotWhereUniqueInput";
 import { LotUpdateInput } from "./LotUpdateInput";
+import { BatchMaterialConsumptionFindManyArgs } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionFindManyArgs";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
+import { BatchMaterialConsumptionWhereUniqueInput } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionWhereUniqueInput";
 import { BatchFindManyArgs } from "../../batch/base/BatchFindManyArgs";
 import { Batch } from "../../batch/base/Batch";
 import { BatchWhereUniqueInput } from "../../batch/base/BatchWhereUniqueInput";
 import { BomItemFindManyArgs } from "../../bomItem/base/BomItemFindManyArgs";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { BomItemWhereUniqueInput } from "../../bomItem/base/BomItemWhereUniqueInput";
+import { CommentFindManyArgs } from "../../comment/base/CommentFindManyArgs";
+import { Comment } from "../../comment/base/Comment";
+import { CommentWhereUniqueInput } from "../../comment/base/CommentWhereUniqueInput";
 import { InventoryTransferFindManyArgs } from "../../inventoryTransfer/base/InventoryTransferFindManyArgs";
 import { InventoryTransfer } from "../../inventoryTransfer/base/InventoryTransfer";
 import { InventoryTransferWhereUniqueInput } from "../../inventoryTransfer/base/InventoryTransferWhereUniqueInput";
@@ -794,6 +800,134 @@ export class LotControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batchMaterialConsumptions")
+  @ApiNestedQuery(BatchMaterialConsumptionFindManyArgs)
+  @UseRoles({
+    resource: "BatchMaterialConsumption",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchMaterialConsumptions(
+    @common.Req() request: Request,
+    @common.Param() params: LotWhereUniqueInput
+  ): Promise<BatchMaterialConsumption[]> {
+    const query = plainToClass(
+      BatchMaterialConsumptionFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findBatchMaterialConsumptions(
+      params.id,
+      {
+        ...query,
+        select: {
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
+          binNumber: true,
+          consumedAt: true,
+          createdAt: true,
+          id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
+          quantity: true,
+          supplierLot: true,
+          units: true,
+          updatedAt: true,
+          verified: true,
+          verifiedAt: true,
+          verifiedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatchMaterialConsumptions(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        connect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatchMaterialConsumptions(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        set: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatchMaterialConsumptions(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/batches")
   @ApiNestedQuery(BatchFindManyArgs)
   @UseRoles({
@@ -847,13 +981,6 @@ export class LotControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -1062,6 +1189,122 @@ export class LotControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/comments")
+  @ApiNestedQuery(CommentFindManyArgs)
+  @UseRoles({
+    resource: "Comment",
+    action: "read",
+    possession: "any",
+  })
+  async findComments(
+    @common.Req() request: Request,
+    @common.Param() params: LotWhereUniqueInput
+  ): Promise<Comment[]> {
+    const query = plainToClass(CommentFindManyArgs, request.query);
+    const results = await this.service.findComments(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        id: true,
+
+        lot: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipe: {
+          select: {
+            id: true,
+          },
+        },
+
+        replyTo: {
+          select: {
+            id: true,
+          },
+        },
+
+        text: true,
+        updatedAt: true,
+        user: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/comments")
+  @UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async connectComments(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: CommentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      comments: {
+        connect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/comments")
+  @UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async updateComments(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: CommentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      comments: {
+        set: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/comments")
+  @UseRoles({
+    resource: "Lot",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectComments(
+    @common.Param() params: LotWhereUniqueInput,
+    @common.Body() body: CommentWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      comments: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateLot({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/inventoryTransfers")
   @ApiNestedQuery(InventoryTransferFindManyArgs)
   @UseRoles({
@@ -1220,6 +1463,13 @@ export class LotControllerBase {
         },
 
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
 

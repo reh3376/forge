@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { RabbitMQProducerService } from "./rabbitmq.producer.service";
 import { AllMessageBrokerTopics } from "./topics";
@@ -6,24 +6,28 @@ import { RabbitMQMessage } from "./RabbitMQMessage";
 import { RabbitMQMessageHeaders } from "./RabbitMQMessageHeaders";
 import { Cron } from "@nestjs/schedule";
 import { AzureEmailService } from "../providers/notification/azure-email.service";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { Logger } from "winston";
+import { AuditMiddlewareService } from "../audit/audit-middleware.service";
 
 @Injectable()
 export class MessageQueueService {
-  private readonly logger = new Logger(MessageQueueService.name);
   // Track ghost messages that exist in RabbitMQ but not in our database
   private ghostMessages: Set<string> = new Set();
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly rabbitProducer: RabbitMQProducerService,
-    private readonly emailService: AzureEmailService
+    private readonly emailService: AzureEmailService,
+    private readonly auditMiddleware: AuditMiddlewareService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {}
 
   /**
    * Send a test email to verify the email service is working
    */
   async sendTestEmail(): Promise<void> {
-    this.logger.log("Attempting to send test email...");
+    this.logger.debug("Attempting to send test email...");
     try {
       await this.emailService.sendFailedMessageNotification(
         "test-message-id-" + Date.now(),
@@ -32,7 +36,7 @@ export class MessageQueueService {
         "test-entity-type",
         "This is a test email to verify the notification system is working properly"
       );
-      this.logger.log("Test email sent successfully");
+      this.logger.debug("Test email sent successfully");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -104,7 +108,7 @@ export class MessageQueueService {
       );
 
       // Send notification about the permanent failure
-      this.logger.log(
+      this.logger.debug(
         `Triggering failure notification for message ${messageQueueId}`
       );
       await this.sendFailureNotification(messageQueue);
@@ -125,8 +129,8 @@ export class MessageQueueService {
       this.logger.debug(
         `Sending message ${messageQueueId} to topic ${messageQueue.topic} with header messageId: ${headers.messageId}`
       );
-      console.log(
-        `DEBUG: Sending message with ID ${messageQueueId} using headers:`,
+      this.logger.debug(
+        `Sending message with ID ${messageQueueId} using headers:`,
         headers
       );
 
@@ -199,7 +203,7 @@ export class MessageQueueService {
    * Private implementation
    */
   private async sendFailureNotification(messageQueue: any): Promise<void> {
-    this.logger.log(
+    this.logger.debug(
       `Sending failure notification for message ID: ${messageQueue.id}, attempts: ${messageQueue.attempts}/${messageQueue.maxAttempts}`
     );
 
@@ -223,7 +227,7 @@ export class MessageQueueService {
         messageQueue.entityType,
         messageQueue.errorMessage || "Unknown error"
       );
-      this.logger.log(
+      this.logger.debug(
         `Failure notification sent successfully for message ${messageQueue.id}`
       );
 
@@ -287,7 +291,7 @@ export class MessageQueueService {
 
         // Add to ghost messages set to prevent resending
         this.ghostMessages.add(messageId);
-        this.logger.log(
+        this.logger.debug(
           `Added ${messageId} to ghost messages tracking (total: ${this.ghostMessages.size})`
         );
 
@@ -337,25 +341,30 @@ export class MessageQueueService {
    */
   @Cron("*/3 * * * *") // Run every 3 minutes (changed from 5 minutes for testing)
   async retryFailedMessages() {
-    const failedMessages = await this.prisma.messageQueue.findMany({
-      where: {
-        status: "FAILED",
-        attempts: { lt: 3 }, // Less than max attempts
-      },
-    });
+    await this.auditMiddleware.withSystemContext(
+      "scheduled-retry-failed-messages",
+      async () => {
+        const failedMessages = await this.prisma.messageQueue.findMany({
+          where: {
+            status: "FAILED",
+            attempts: { lt: 3 }, // Less than max attempts
+          },
+        });
 
-    this.logger.log(`Retrying ${failedMessages.length} failed messages`);
+        this.logger.debug(`Retrying ${failedMessages.length} failed messages`);
 
-    for (const message of failedMessages) {
-      await this.prisma.messageQueue.update({
-        where: { id: message.id },
-        data: {
-          status: "RETRYING",
-        },
-      });
+        for (const message of failedMessages) {
+          await this.prisma.messageQueue.update({
+            where: { id: message.id },
+            data: {
+              status: "RETRYING",
+            },
+          });
 
-      await this.sendMessage(message.id);
-    }
+          await this.sendMessage(message.id);
+        }
+      }
+    );
   }
 
   /**
@@ -363,91 +372,97 @@ export class MessageQueueService {
    */
   @Cron("*/3 * * * *") // Run every 3 minutes (changed from 15 minutes for testing)
   async resendPendingMessages() {
-    // Find messages that were sent but not acknowledged within 3 minutes
-    const pendingMessages = await this.prisma.messageQueue.findMany({
-      where: {
-        status: { in: ["SENT", "RETRYING"] }, // Check both SENT and RETRYING status
-        lastAttemptAt: {
-          lt: new Date(Date.now() - 3 * 60 * 1000), // 3 minutes ago (changed from 15 minutes for testing)
-        },
-      },
-    });
-
-    // Filter out any ghost messages we're tracking
-    const filteredPendingMessages = pendingMessages.filter(
-      (message) => !this.ghostMessages.has(message.id)
-    );
-
-    if (pendingMessages.length !== filteredPendingMessages.length) {
-      this.logger.log(
-        `Filtered out ${
-          pendingMessages.length - filteredPendingMessages.length
-        } ghost messages from resend list`
-      );
-    }
-
-    this.logger.log(
-      `Checking ${filteredPendingMessages.length} pending messages for resend or failure`
-    );
-
-    // First, process messages that have reached max attempts
-    const maxAttemptMessages = filteredPendingMessages.filter(
-      (message) => message.attempts >= message.maxAttempts
-    );
-    if (maxAttemptMessages.length > 0) {
-      this.logger.warn(
-        `Found ${maxAttemptMessages.length} messages that reached max attempts but were not marked as FAILED`
-      );
-    }
-
-    // Process messages that have reached max attempts
-    for (const message of maxAttemptMessages) {
-      this.logger.warn(
-        `Message ${message.id} has reached max attempts (${message.attempts}/${message.maxAttempts}) but was still in ${message.status} status. Marking as FAILED.`
-      );
-
-      try {
-        // Update the message to FAILED status
-        await this.prisma.messageQueue.update({
-          where: { id: message.id },
-          data: {
-            status: "FAILED",
-            errorMessage:
-              "Maximum retry attempts reached without acknowledgment",
+    await this.auditMiddleware.withSystemContext(
+      "scheduled-resend-pending-messages",
+      async () => {
+        // Find messages that were sent but not acknowledged within 3 minutes
+        const pendingMessages = await this.prisma.messageQueue.findMany({
+          where: {
+            status: { in: ["SENT", "RETRYING"] }, // Check both SENT and RETRYING status
+            lastAttemptAt: {
+              lt: new Date(Date.now() - 3 * 60 * 1000), // Ensure positive value with parentheses
+            },
           },
         });
 
-        // Immediately trigger notification
-        this.logger.log(
-          `Triggering failure notification for message ${message.id} that reached max attempts`
+        // Filter out any ghost messages we're tracking
+        const filteredPendingMessages = pendingMessages.filter(
+          (message) => !this.ghostMessages.has(message.id)
         );
-        await this.sendFailureNotification({
-          ...message,
-          status: "FAILED",
-          errorMessage: "Maximum retry attempts reached without acknowledgment",
-        });
-      } catch (error) {
-        this.logger.error(
-          `Failed to update message ${message.id} status to FAILED: ${
-            error instanceof Error ? error.message : String(error)
-          }`
-        );
-      }
-    }
 
-    // Then, process messages that need to be retried (under max attempts)
-    const messagesToRetry = filteredPendingMessages.filter(
-      (message) => message.attempts < message.maxAttempts
+        if (pendingMessages.length !== filteredPendingMessages.length) {
+          this.logger.debug(
+            `Filtered out ${
+              pendingMessages.length - filteredPendingMessages.length
+            } ghost messages from resend list`
+          );
+        }
+
+        this.logger.debug(
+          `Checking ${filteredPendingMessages.length} pending messages for resend or failure`
+        );
+
+        // First, process messages that have reached max attempts
+        const maxAttemptMessages = filteredPendingMessages.filter(
+          (message) => message.attempts >= message.maxAttempts
+        );
+        if (maxAttemptMessages.length > 0) {
+          this.logger.warn(
+            `Found ${maxAttemptMessages.length} messages that reached max attempts but were not marked as FAILED`
+          );
+        }
+
+        // Process messages that have reached max attempts
+        for (const message of maxAttemptMessages) {
+          this.logger.warn(
+            `Message ${message.id} has reached max attempts (${message.attempts}/${message.maxAttempts}) but was still in ${message.status} status. Marking as FAILED.`
+          );
+
+          try {
+            // Update the message to FAILED status
+            await this.prisma.messageQueue.update({
+              where: { id: message.id },
+              data: {
+                status: "FAILED",
+                errorMessage:
+                  "Maximum retry attempts reached without acknowledgment",
+              },
+            });
+
+            // Immediately trigger notification
+            this.logger.debug(
+              `Triggering failure notification for message ${message.id} that reached max attempts`
+            );
+            await this.sendFailureNotification({
+              ...message,
+              status: "FAILED",
+              errorMessage:
+                "Maximum retry attempts reached without acknowledgment",
+            });
+          } catch (error) {
+            this.logger.error(
+              `Failed to update message ${message.id} status to FAILED: ${
+                error instanceof Error ? error.message : String(error)
+              }`
+            );
+          }
+        }
+
+        // Then, process messages that need to be retried (under max attempts)
+        const messagesToRetry = filteredPendingMessages.filter(
+          (message) => message.attempts < message.maxAttempts
+        );
+        if (messagesToRetry.length > 0) {
+          this.logger.debug(
+            `Resending ${messagesToRetry.length} messages that are under max retry attempts`
+          );
+
+          for (const message of messagesToRetry) {
+            await this.sendMessage(message.id);
+          }
+        }
+      }
     );
-    if (messagesToRetry.length > 0) {
-      this.logger.log(
-        `Resending ${messagesToRetry.length} messages that are under max retry attempts`
-      );
-
-      for (const message of messagesToRetry) {
-        await this.sendMessage(message.id);
-      }
-    }
   }
 
   /**
@@ -455,77 +470,86 @@ export class MessageQueueService {
    */
   @Cron("*/5 * * * *") // Run every 5 minutes
   async checkMaxAttemptsMessages() {
-    // First check for FAILED status messages that need notifications
-    const failedMaxAttemptsMessages = await this.prisma.messageQueue.findMany({
-      where: {
-        status: "FAILED",
-        attempts: { gte: 3 }, // Equal to or greater than max attempts
-      },
-    });
-
-    this.logger.log(
-      `Found ${failedMaxAttemptsMessages.length} FAILED messages that have reached maximum retry attempts, checking for notifications`
-    );
-
-    for (const message of failedMaxAttemptsMessages) {
-      // Check if notification was likely sent by looking at the error message
-      const notificationSent =
-        message.errorMessage?.includes("[NOTIFIED]") || false;
-
-      if (!notificationSent) {
-        this.logger.log(
-          `Sending missing notification for FAILED message ${message.id} (attempts: ${message.attempts}/${message.maxAttempts})`
-        );
-        await this.sendFailureNotification(message);
-      }
-    }
-
-    // Check for any non-FAILED messages that have reached max attempts but haven't been marked as FAILED
-    const nonFailedMaxAttemptsMessages =
-      await this.prisma.messageQueue.findMany({
-        where: {
-          status: { notIn: ["FAILED", "ACKNOWLEDGED"] },
-          attempts: { gte: 3 }, // Equal to or greater than max attempts
-        },
-      });
-
-    if (nonFailedMaxAttemptsMessages.length > 0) {
-      this.logger.warn(
-        `Found ${nonFailedMaxAttemptsMessages.length} messages that reached max attempts but were not marked as FAILED`
-      );
-
-      for (const message of nonFailedMaxAttemptsMessages) {
-        this.logger.warn(
-          `Message ${message.id} has reached max attempts (${message.attempts}/${message.maxAttempts}) but has status ${message.status}. Marking as FAILED.`
-        );
-
-        try {
-          // Update to FAILED status
-          await this.prisma.messageQueue.update({
-            where: { id: message.id },
-            data: {
+    await this.auditMiddleware.withSystemContext(
+      "scheduled-check-max-attempts",
+      async () => {
+        // First check for FAILED status messages that need notifications
+        const failedMaxAttemptsMessages =
+          await this.prisma.messageQueue.findMany({
+            where: {
               status: "FAILED",
-              errorMessage:
-                "Maximum retry attempts reached - automatically fixed by system check",
+              attempts: { gte: 3 }, // Equal to or greater than max attempts
             },
           });
 
-          // Re-fetch the updated message
-          const updatedMessage = await this.prisma.messageQueue.findUnique({
-            where: { id: message.id },
+        this.logger.debug(
+          `Found ${failedMaxAttemptsMessages.length} FAILED messages that have reached maximum retry attempts, checking for notifications`
+        );
+
+        for (const message of failedMaxAttemptsMessages) {
+          // Check if notification was likely sent by looking at the error message
+          const notificationSent =
+            message.errorMessage?.includes("[NOTIFIED]") || false;
+
+          if (!notificationSent) {
+            this.logger.debug(
+              `Sending missing notification for FAILED message ${message.id} (attempts: ${message.attempts}/${message.maxAttempts})`
+            );
+            await this.sendFailureNotification(message);
+          }
+        }
+
+        // Check for any non-FAILED messages that have reached max attempts but haven't been marked as FAILED
+        const nonFailedMaxAttemptsMessages =
+          await this.prisma.messageQueue.findMany({
+            where: {
+              status: { notIn: ["FAILED", "ACKNOWLEDGED"] },
+              attempts: { gte: 3 }, // Equal to or greater than max attempts
+            },
           });
 
-          // Send notification
-          await this.sendFailureNotification(updatedMessage);
-        } catch (error) {
-          this.logger.error(
-            `Failed to update message ${message.id} status to FAILED: ${
-              error instanceof Error ? error.message : String(error)
-            }`
+        if (nonFailedMaxAttemptsMessages.length > 0) {
+          this.logger.warn(
+            `Found ${nonFailedMaxAttemptsMessages.length} non-FAILED messages that have reached max attempts`
           );
+
+          for (const message of nonFailedMaxAttemptsMessages) {
+            this.logger.warn(
+              `Message ${message.id} has reached max attempts (${message.attempts}/${message.maxAttempts}) but is still in ${message.status} status. Marking as FAILED.`
+            );
+
+            try {
+              // Update the message to FAILED status
+              await this.prisma.messageQueue.update({
+                where: { id: message.id },
+                data: {
+                  status: "FAILED",
+                  errorMessage:
+                    "Maximum retry attempts reached - marked as failed by cleanup job",
+                },
+              });
+
+              // Send notification
+              this.logger.debug(
+                `Triggering failure notification for message ${message.id} marked as failed by cleanup`
+              );
+              await this.sendFailureNotification({
+                ...message,
+                status: "FAILED",
+                errorMessage:
+                  "Maximum retry attempts reached - marked as failed by cleanup job",
+              });
+            } catch (error) {
+              this.logger.error(
+                `Failed to update message ${message.id} status to FAILED: ${
+                  error instanceof Error ? error.message : String(error)
+                }`
+              );
+            }
+          }
         }
       }
-    }
+    );
   }
 
   /**
@@ -533,6 +557,7 @@ export class MessageQueueService {
    */
   @Cron("0 */6 * * *") // Run every 6 hours
   async cleanupGhostMessages() {
+    // This doesn't involve database operations, so no need for audit context
     const previousSize = this.ghostMessages.size;
 
     // Keep only the last 1000 ghost messages to prevent memory issues
@@ -541,7 +566,7 @@ export class MessageQueueService {
       this.ghostMessages = new Set(toKeep);
     }
 
-    this.logger.log(
+    this.logger.debug(
       `Ghost messages cleanup: was ${previousSize}, now ${this.ghostMessages.size}`
     );
   }
@@ -559,7 +584,7 @@ export class MessageQueueService {
   async clearGhostMessages(): Promise<number> {
     const count = this.ghostMessages.size;
     this.ghostMessages.clear();
-    this.logger.log(`Manually cleared ${count} ghost messages`);
+    this.logger.debug(`Manually cleared ${count} ghost messages`);
     return count;
   }
 }

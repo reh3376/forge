@@ -14,9 +14,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   RecipeBom as PrismaRecipeBom,
-  ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Recipe as PrismaRecipe,
   RecipeBomItem as PrismaRecipeBomItem,
+  ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
 } from "@prisma/client";
 
 export class RecipeBomServiceBase {
@@ -65,17 +65,6 @@ export class RecipeBomServiceBase {
       .masterInstances(args);
   }
 
-  async findProductionOrderRecipeInstances(
-    parentId: string,
-    args: Prisma.ProductionOrderRecipeInstanceFindManyArgs
-  ): Promise<PrismaProductionOrderRecipeInstance[]> {
-    return this.prisma.recipeBom
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderRecipeInstances(args);
-  }
-
   async findRecipe(
     parentId: string,
     args: Prisma.RecipeFindManyArgs
@@ -115,6 +104,17 @@ export class RecipeBomServiceBase {
         where: { id: parentId },
       })
       .masterRecipeBom();
+  }
+
+  async getProductionOrderRecipeInstances(
+    parentId: string
+  ): Promise<PrismaProductionOrderRecipeInstance[]> {
+    const result = await this.prisma.recipeBom
+      .findUnique({
+        where: { id: parentId },
+      })
+      .productionOrderRecipeInstances();
+    return result || [];
   }
 
   async getRunningRecipeBom(parentId: string): Promise<PrismaRecipeBom | null> {

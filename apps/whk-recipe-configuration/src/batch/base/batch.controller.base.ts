@@ -26,6 +26,15 @@ import { Batch } from "./Batch";
 import { BatchFindManyArgs } from "./BatchFindManyArgs";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { BatchUpdateInput } from "./BatchUpdateInput";
+import { BatchMaterialConsumptionFindManyArgs } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionFindManyArgs";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
+import { BatchMaterialConsumptionWhereUniqueInput } from "../../batchMaterialConsumption/base/BatchMaterialConsumptionWhereUniqueInput";
+import { BatchParameterValueFindManyArgs } from "../../batchParameterValue/base/BatchParameterValueFindManyArgs";
+import { BatchParameterValue } from "../../batchParameterValue/base/BatchParameterValue";
+import { BatchParameterValueWhereUniqueInput } from "../../batchParameterValue/base/BatchParameterValueWhereUniqueInput";
+import { BatchTimeSeriesDataFindManyArgs } from "../../batchTimeSeriesData/base/BatchTimeSeriesDataFindManyArgs";
+import { BatchTimeSeriesData } from "../../batchTimeSeriesData/base/BatchTimeSeriesData";
+import { BatchTimeSeriesDataWhereUniqueInput } from "../../batchTimeSeriesData/base/BatchTimeSeriesDataWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -82,12 +91,6 @@ export class BatchControllerBase {
               connect: data.productionOrderRecipeInstance,
             }
           : undefined,
-
-        recipe: data.recipe
-          ? {
-              connect: data.recipe,
-            }
-          : undefined,
       },
       select: {
         asset: {
@@ -128,13 +131,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -197,13 +193,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -267,13 +256,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -341,12 +323,6 @@ export class BatchControllerBase {
                 connect: data.productionOrderRecipeInstance,
               }
             : undefined,
-
-          recipe: data.recipe
-            ? {
-                connect: data.recipe,
-              }
-            : undefined,
         },
         select: {
           asset: {
@@ -387,13 +363,6 @@ export class BatchControllerBase {
           },
 
           quantity: true,
-
-          recipe: {
-            select: {
-              id: true,
-            },
-          },
-
           revision: true,
           totalDuration: true,
           updatedAt: true,
@@ -407,6 +376,354 @@ export class BatchControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batchMaterialConsumptions")
+  @ApiNestedQuery(BatchMaterialConsumptionFindManyArgs)
+  @UseRoles({
+    resource: "BatchMaterialConsumption",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchMaterialConsumptions(
+    @common.Req() request: Request,
+    @common.Param() params: BatchWhereUniqueInput
+  ): Promise<BatchMaterialConsumption[]> {
+    const query = plainToClass(
+      BatchMaterialConsumptionFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findBatchMaterialConsumptions(
+      params.id,
+      {
+        ...query,
+        select: {
+          batch: {
+            select: {
+              id: true,
+            },
+          },
+
+          binNumber: true,
+          consumedAt: true,
+          createdAt: true,
+          id: true,
+
+          item: {
+            select: {
+              id: true,
+            },
+          },
+
+          lot: {
+            select: {
+              id: true,
+            },
+          },
+
+          quantity: true,
+          supplierLot: true,
+          units: true,
+          updatedAt: true,
+          verified: true,
+          verifiedAt: true,
+          verifiedBy: true,
+        },
+      }
+    );
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatchMaterialConsumptions(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        connect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatchMaterialConsumptions(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        set: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batchMaterialConsumptions")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatchMaterialConsumptions(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchMaterialConsumptionWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchMaterialConsumptions: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batchParameterValues")
+  @ApiNestedQuery(BatchParameterValueFindManyArgs)
+  @UseRoles({
+    resource: "BatchParameterValue",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchParameterValues(
+    @common.Req() request: Request,
+    @common.Param() params: BatchWhereUniqueInput
+  ): Promise<BatchParameterValue[]> {
+    const query = plainToClass(BatchParameterValueFindManyArgs, request.query);
+    const results = await this.service.findBatchParameterValues(params.id, {
+      ...query,
+      select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
+        booleanValue: true,
+        collectedAt: true,
+        collectionSource: true,
+        createdAt: true,
+        dataQuality: true,
+        deviationPercent: true,
+        id: true,
+        isWithinSpec: true,
+        numericValue: true,
+        parameterConfig: true,
+        stringValue: true,
+        updatedAt: true,
+        validatedAt: true,
+        validatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batchParameterValues")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatchParameterValues(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchParameterValueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchParameterValues: {
+        connect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batchParameterValues")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatchParameterValues(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchParameterValueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchParameterValues: {
+        set: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batchParameterValues")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatchParameterValues(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchParameterValueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchParameterValues: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/batchTimeSeriesDataItems")
+  @ApiNestedQuery(BatchTimeSeriesDataFindManyArgs)
+  @UseRoles({
+    resource: "BatchTimeSeriesData",
+    action: "read",
+    possession: "any",
+  })
+  async findBatchTimeSeriesDataItems(
+    @common.Req() request: Request,
+    @common.Param() params: BatchWhereUniqueInput
+  ): Promise<BatchTimeSeriesData[]> {
+    const query = plainToClass(BatchTimeSeriesDataFindManyArgs, request.query);
+    const results = await this.service.findBatchTimeSeriesDataItems(params.id, {
+      ...query,
+      select: {
+        batch: {
+          select: {
+            id: true,
+          },
+        },
+
+        booleanValue: true,
+        createdAt: true,
+        id: true,
+        numericValue: true,
+        quality: true,
+        source: true,
+        stringValue: true,
+        tagName: true,
+        timestamp: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/batchTimeSeriesDataItems")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async connectBatchTimeSeriesDataItems(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchTimeSeriesDataWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchTimeSeriesDataItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/batchTimeSeriesDataItems")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async updateBatchTimeSeriesDataItems(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchTimeSeriesDataWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchTimeSeriesDataItems: {
+        set: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/batchTimeSeriesDataItems")
+  @UseRoles({
+    resource: "Batch",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectBatchTimeSeriesDataItems(
+    @common.Param() params: BatchWhereUniqueInput,
+    @common.Body() body: BatchTimeSeriesDataWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      batchTimeSeriesDataItems: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateBatch({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -463,13 +780,6 @@ export class BatchControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,

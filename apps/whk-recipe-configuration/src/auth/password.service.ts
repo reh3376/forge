@@ -36,7 +36,11 @@ export class PasswordService {
    * @param password the password to be encrypted
    * @return encrypted password
    */
-  hash(password: string): Promise<string> {
+  hash(password: string | null | undefined): Promise<string> {
+    // Handle null or undefined passwords (for anonymous MQTT connections)
+    if (password === null || password === undefined) {
+      return Promise.resolve("");
+    }
     return hash(password, this.salt);
   }
 }

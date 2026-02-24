@@ -11,17 +11,28 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { AssetListRelationFilter } from "../../asset/base/AssetListRelationFilter";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional, IsEnum, ValidateNested } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EnumScheduleOrderQueueNextOperation } from "./EnumScheduleOrderQueueNextOperation";
-import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 
 @InputType()
 class ScheduleOrderQueueWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => AssetListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => AssetListRelationFilter)
+  @IsOptional()
+  @Field(() => AssetListRelationFilter, {
+    nullable: true,
+  })
+  areas?: AssetListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -54,44 +65,6 @@ class ScheduleOrderQueueWhereInput {
     nullable: true,
   })
   id?: StringFilter;
-
-  @ApiProperty({
-    required: false,
-    enum: EnumScheduleOrderQueueNextOperation,
-  })
-  @IsEnum(EnumScheduleOrderQueueNextOperation)
-  @IsOptional()
-  @Field(() => EnumScheduleOrderQueueNextOperation, {
-    nullable: true,
-  })
-  nextOperation?:
-    | "Mashing01"
-    | "Fermentation01"
-    | "Distillation01"
-    | "Processing01";
-
-  @ApiProperty({
-    required: false,
-    type: () => UnitProcedureWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => UnitProcedureWhereUniqueInput)
-  @IsOptional()
-  @Field(() => UnitProcedureWhereUniqueInput, {
-    nullable: true,
-  })
-  nextUnitProcedure?: UnitProcedureWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  nextUnitProcedureName?: StringNullableFilter;
 
   @ApiProperty({
     required: false,

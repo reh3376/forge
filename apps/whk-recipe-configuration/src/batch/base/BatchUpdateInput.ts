@@ -25,12 +25,14 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { BatchMaterialConsumptionUpdateManyWithoutBatchesInput } from "./BatchMaterialConsumptionUpdateManyWithoutBatchesInput";
+import { BatchParameterValueUpdateManyWithoutBatchesInput } from "./BatchParameterValueUpdateManyWithoutBatchesInput";
+import { BatchTimeSeriesDataUpdateManyWithoutBatchesInput } from "./BatchTimeSeriesDataUpdateManyWithoutBatchesInput";
 import { BatchUpdateManyWithoutBatchesInput } from "./BatchUpdateManyWithoutBatchesInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
 import { BatchWhereUniqueInput } from "./BatchWhereUniqueInput";
 import { ProductionOrderRecipeInstanceWhereUniqueInput } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceWhereUniqueInput";
-import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 
 @InputType()
 class BatchUpdateInput {
@@ -67,6 +69,42 @@ class BatchUpdateInput {
     nullable: true,
   })
   batchId?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionUpdateManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionUpdateManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionUpdateManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionUpdateManyWithoutBatchesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchParameterValueUpdateManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchParameterValueUpdateManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchParameterValueUpdateManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  batchParameterValues?: BatchParameterValueUpdateManyWithoutBatchesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchTimeSeriesDataUpdateManyWithoutBatchesInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchTimeSeriesDataUpdateManyWithoutBatchesInput)
+  @IsOptional()
+  @Field(() => BatchTimeSeriesDataUpdateManyWithoutBatchesInput, {
+    nullable: true,
+  })
+  batchTimeSeriesDataItems?: BatchTimeSeriesDataUpdateManyWithoutBatchesInput;
 
   @ApiProperty({
     required: false,
@@ -150,18 +188,6 @@ class BatchUpdateInput {
     nullable: true,
   })
   quantity?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => RecipeWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeWhereUniqueInput, {
-    nullable: true,
-  })
-  recipe?: RecipeWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

@@ -214,12 +214,10 @@ export class LotService extends LotServiceBase {
         Recipe: recipeName,
         createdBy: createdBy,
         customer: { connect: { id: defaultCustomer.id } },
-        item: { connect: { id: recipeItem.id } },
         revision: 1,
         // whiskeyType: recipeWhiskeyType, // TODO: Add when schema supports whiskeyType
       },
       include: {
-        item: true,
         customer: true,
         recipeGroup: true,
         recipeBoms: true,
@@ -328,9 +326,11 @@ export class LotService extends LotServiceBase {
 
     */
     let mergedLot: any = {};
+    let explicitStatus: EnumLotStatus | undefined;
 
     if (type === "create") {
       mergedLot = { ...lot };
+      explicitStatus = (lot as any).status;
     } else if (type === "update" && "where" in lot && "data" in lot) {
       const existingLot = await this.prisma.lot.findUnique({
         where: { id: lot.where.id },
@@ -340,6 +340,7 @@ export class LotService extends LotServiceBase {
         throw new Error("Lot not found");
       }
 
+      explicitStatus = (lot.data as any).status;
       mergedLot = {
         ...existingLot,
         ...Object.fromEntries(
@@ -349,8 +350,6 @@ export class LotService extends LotServiceBase {
     } else {
       throw new Error("Invalid input for lot calculation");
     }
-
-    const explicitStatus = mergedLot.status as EnumLotStatus | undefined;
 
     // Perform calculations
     if (mergedLot.densityFinal && mergedLot.densityFinal <= 1) {
@@ -391,18 +390,21 @@ export class LotService extends LotServiceBase {
       if (mergedLot.bblTotal) {
         mergedLot.avgBblFillByPg = mergedLot.totalPGs / mergedLot.bblTotal;
         mergedLot.avgBblFillByWg = mergedLot.totalWGs / mergedLot.bblTotal;
-        if (!explicitStatus) {
+        // Only set calculated status if no explicit status was provided
+        if (explicitStatus === undefined) {
           mergedLot.status = EnumLotStatus.PendingValidation;
         }
       } else {
-        if (!explicitStatus) {
+        // Only set calculated status if no explicit status was provided
+        if (explicitStatus === undefined) {
           mergedLot.status = EnumLotStatus.Started;
         }
       }
     }
 
     // Return only the calculated fields and essential data
-    return {
+    // Include explicit status if provided, otherwise use calculated status
+    const result = {
       totalWeight: mergedLot.totalWeight,
       totalVolumeWg: mergedLot.totalVolumeWg,
       totalPGs: mergedLot.totalPGs,
@@ -413,6 +415,15 @@ export class LotService extends LotServiceBase {
       status: explicitStatus ?? mergedLot.status,
       densityFinal: mergedLot.densityFinal,
     };
+
+    // Only include status in result if we have one (either explicit or calculated)
+    if (explicitStatus !== undefined) {
+      (result as any).status = explicitStatus;
+    } else if (mergedLot.status !== undefined) {
+      (result as any).status = mergedLot.status;
+    }
+
+    return result;
   }
 
   async createLot<T extends Prisma.LotCreateArgs>(
@@ -505,21 +516,44 @@ export class LotService extends LotServiceBase {
       throw new Error("Either recipe or recipeName is required");
     }
 
-    // Get the recipe and its item
+    // Get the recipe and its production orders
     const recipe = await this.prisma.recipe.findUnique({
       where: { id: recipeId },
-      include: { item: true },
+      include: { productionOrders: true },
     });
     if (!recipe) {
       throw new Error("Recipe not found");
     }
 
-    // Update the args.data with the recipe and item
+    // Update the args.data with the recipe
     args.data.recipe = { connect: { id: recipeId } };
-    if (!recipe.item) {
-      throw new Error("Recipe does not have an associated item");
+
+    // Update the args.data with the item from the latest production order for this recipe
+    if (!recipe.productionOrders || recipe.productionOrders.length === 0) {
+      throw new Error("Recipe does not have any associated production orders");
     }
-    args.data.item = { connect: { id: recipe.item.id } };
+
+    // Sort production orders by creation date (descending) to get the latest one
+    const latestProductionOrder = [...recipe.productionOrders].sort((a, b) => {
+      return (
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime()
+      );
+    })[0];
+
+    // Get the item from the latest production order
+    const productionOrder = await this.prisma.productionOrder.findUnique({
+      where: { id: latestProductionOrder.id },
+      include: { item: true },
+    });
+
+    if (!productionOrder || !productionOrder.item) {
+      throw new Error(
+        "Latest production order does not have an associated item"
+      );
+    }
+
+    args.data.item = { connect: { id: productionOrder.item.id } };
 
     // Calculate the lot analytics
     const calculatedData = await this.calculateLotAnalytics(

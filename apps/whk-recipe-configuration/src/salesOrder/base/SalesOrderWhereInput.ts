@@ -19,7 +19,6 @@ import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqu
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { ItemListRelationFilter } from "../../item/base/ItemListRelationFilter";
 import { JsonFilter } from "../../util/JsonFilter";
-import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { IntFilter } from "../../util/IntFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 
@@ -147,18 +146,6 @@ class SalesOrderWhereInput {
     nullable: true,
   })
   orderType?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => ProductionOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ProductionOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ProductionOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  productionOrders?: ProductionOrderWhereUniqueInput;
 
   @ApiProperty({
     required: false,

@@ -512,6 +512,8 @@ export class ScheduleOrderControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -523,9 +525,7 @@ export class ScheduleOrderControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -536,16 +536,18 @@ export class ScheduleOrderControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -561,13 +563,16 @@ export class ScheduleOrderControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        totalCooks: true,
-        totalFermenters: true,
-        executedCooks: true,
-        executedFermenters: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
+        upperControlLimit: true,
       },
     });
     if (results === null) {

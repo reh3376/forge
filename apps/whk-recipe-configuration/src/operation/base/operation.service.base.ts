@@ -16,6 +16,7 @@ import {
   Operation as PrismaOperation,
   EquipmentPhase as PrismaEquipmentPhase,
   UnitProcedure as PrismaUnitProcedure,
+  RecipeParameter as PrismaRecipeParameter,
 } from "@prisma/client";
 
 export class OperationServiceBase {
@@ -91,5 +92,16 @@ export class OperationServiceBase {
         where: { id: parentId },
       })
       .unitProcedure();
+  }
+
+  async findRecipeParameters(
+    parentId: string,
+    args: Prisma.RecipeParameterFindManyArgs
+  ): Promise<PrismaRecipeParameter[]> {
+    return this.prisma.operation
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .RecipeParameter(args);
   }
 }

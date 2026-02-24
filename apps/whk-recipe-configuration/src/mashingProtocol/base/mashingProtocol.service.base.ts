@@ -14,9 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   MashingProtocol as PrismaMashingProtocol,
-  ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
+  MashingProtocolStepActual as PrismaMashingProtocolStepActual,
   Recipe as PrismaRecipe,
   MashingProtocolStep as PrismaMashingProtocolStep,
+  ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
 } from "@prisma/client";
 
 export class MashingProtocolServiceBase {
@@ -54,6 +55,17 @@ export class MashingProtocolServiceBase {
     return this.prisma.mashingProtocol.delete(args);
   }
 
+  async findMashingProtocolStepActuals(
+    parentId: string,
+    args: Prisma.MashingProtocolStepActualFindManyArgs
+  ): Promise<PrismaMashingProtocolStepActual[]> {
+    return this.prisma.mashingProtocol
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .mashingProtocolStepActuals(args);
+  }
+
   async findMasterInstances(
     parentId: string,
     args: Prisma.MashingProtocolFindManyArgs
@@ -63,17 +75,6 @@ export class MashingProtocolServiceBase {
         where: { id: parentId },
       })
       .masterInstances(args);
-  }
-
-  async findProductionOrderRecipeInstances(
-    parentId: string,
-    args: Prisma.ProductionOrderRecipeInstanceFindManyArgs
-  ): Promise<PrismaProductionOrderRecipeInstance[]> {
-    return this.prisma.mashingProtocol
-      .findUniqueOrThrow({
-        where: { id: parentId },
-      })
-      .productionOrderRecipeInstances(args);
   }
 
   async findRecipes(
@@ -117,6 +118,17 @@ export class MashingProtocolServiceBase {
         where: { id: parentId },
       })
       .masterMashingProtocol();
+  }
+
+  async getProductionOrderRecipeInstances(
+    parentId: string
+  ): Promise<PrismaProductionOrderRecipeInstance[]> {
+    const result = await this.prisma.mashingProtocol
+      .findUnique({
+        where: { id: parentId },
+      })
+      .productionOrderRecipeInstances();
+    return result || [];
   }
 
   async getRunningMashingProtocol(

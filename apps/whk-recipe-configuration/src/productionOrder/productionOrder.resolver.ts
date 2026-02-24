@@ -11,6 +11,7 @@ import * as common from "@nestjs/common";
 import { ProductionOrderResolverBase } from "./base/productionOrder.resolver.base";
 import { ProductionOrder } from "./base/ProductionOrder";
 import { ProductionOrderService } from "./productionOrder.service";
+import { CreateProductionOrderWizardArgs } from "./dto/create-production-order-wizard-graphql.input";
 
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ProductionOrder)
@@ -45,5 +46,17 @@ export class ProductionOrderResolver extends ProductionOrderResolverBase {
         scheduleOrder: true,
       },
     });
+  }
+
+  @graphql.Mutation(() => ProductionOrder)
+  @UseRoles({
+    resource: "ProductionOrder",
+    action: "create",
+    possession: "any",
+  })
+  async createProductionOrderFromWizard(
+    @graphql.Args() args: CreateProductionOrderWizardArgs
+  ): Promise<ProductionOrder> {
+    return this.service.createProductionOrderFromWizard(args.data);
   }
 }

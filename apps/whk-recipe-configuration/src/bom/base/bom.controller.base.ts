@@ -404,6 +404,8 @@ export class BomControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -415,14 +417,20 @@ export class BomControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
 
         item: {
+          select: {
+            id: true,
+          },
+        },
+
+        lowerControlLimit: true,
+
+        millingBinConfiguration: {
           select: {
             id: true,
           },
@@ -439,12 +447,6 @@ export class BomControllerBase {
           },
         },
 
-        recipeGroup: {
-          select: {
-            id: true,
-          },
-        },
-
         scheduleOrder: {
           select: {
             id: true,
@@ -455,13 +457,16 @@ export class BomControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
-        totalCooks: true,
-        totalFermenters: true,
-        executedCooks: true,
-        executedFermenters: true,
+        upperControlLimit: true,
       },
     });
     if (results === null) {

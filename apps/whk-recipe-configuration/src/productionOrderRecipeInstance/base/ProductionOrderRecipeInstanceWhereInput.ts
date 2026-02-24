@@ -19,6 +19,7 @@ import { MashingProtocolListRelationFilter } from "../../mashingProtocol/base/Ma
 import { ProductionOrderWhereUniqueInput } from "../../productionOrder/base/ProductionOrderWhereUniqueInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
 import { RecipeBomListRelationFilter } from "../../recipeBom/base/RecipeBomListRelationFilter";
+import { RecipeBomActualListRelationFilter } from "../../recipeBomActual/base/RecipeBomActualListRelationFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 
 @InputType()
@@ -104,6 +105,18 @@ class ProductionOrderRecipeInstanceWhereInput {
     nullable: true,
   })
   recipeBom?: RecipeBomListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeBomActualListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomActualListRelationFilter)
+  @IsOptional()
+  @Field(() => RecipeBomActualListRelationFilter, {
+    nullable: true,
+  })
+  recipeBomActuals?: RecipeBomActualListRelationFilter;
 
   @ApiProperty({
     required: false,

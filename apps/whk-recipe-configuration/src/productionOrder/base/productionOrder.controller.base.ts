@@ -26,6 +26,9 @@ import { ProductionOrder } from "./ProductionOrder";
 import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderWhereUniqueInput } from "./ProductionOrderWhereUniqueInput";
 import { ProductionOrderUpdateInput } from "./ProductionOrderUpdateInput";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
+import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
@@ -73,21 +76,27 @@ export class ProductionOrderControllerBase {
           connect: data.item,
         },
 
+        millingBinConfiguration: data.millingBinConfiguration
+          ? {
+              connect: data.millingBinConfiguration,
+            }
+          : undefined,
+
         recipe: data.recipe
           ? {
               connect: data.recipe,
             }
           : undefined,
 
-        recipeGroup: data.recipeGroup
-          ? {
-              connect: data.recipeGroup,
-            }
-          : undefined,
-
         scheduleOrder: data.scheduleOrder
           ? {
               connect: data.scheduleOrder,
+            }
+          : undefined,
+
+        units: data.units
+          ? {
+              connect: data.units,
             }
           : undefined,
       },
@@ -100,6 +109,8 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -111,9 +122,7 @@ export class ProductionOrderControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -124,16 +133,18 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -149,13 +160,16 @@ export class ProductionOrderControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
-        totalFermenters: true,
-        totalCooks: true,
-        executedCooks: true,
-        executedFermenters: true,
+        upperControlLimit: true,
       },
     });
   }
@@ -187,6 +201,8 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -198,9 +214,7 @@ export class ProductionOrderControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -211,16 +225,18 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -236,13 +252,16 @@ export class ProductionOrderControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
-        totalFermenters: true,
-        totalCooks: true,
-        executedCooks: true,
-        executedFermenters: true,
+        upperControlLimit: true,
       },
     });
   }
@@ -273,6 +292,8 @@ export class ProductionOrderControllerBase {
 
         className: true,
         complete: true,
+        completedQuantity: true,
+        containerType: true,
         createdAt: true,
         createdBy: true,
 
@@ -284,9 +305,7 @@ export class ProductionOrderControllerBase {
 
         customerCode: true,
         endDate: true,
-        estimatedBarrelsPerFermenter: true,
-        estimatedPGsPerBbl: true,
-        estimatedPGsPerBushel: true,
+        finalProof: true,
         globalId: true,
         id: true,
         inProcess: true,
@@ -297,16 +316,18 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        name: true,
-        quantity: true,
+        lowerControlLimit: true,
 
-        recipe: {
+        millingBinConfiguration: {
           select: {
             id: true,
           },
         },
 
-        recipeGroup: {
+        name: true,
+        quantity: true,
+
+        recipe: {
           select: {
             id: true,
           },
@@ -322,13 +343,16 @@ export class ProductionOrderControllerBase {
         schemaVersion: true,
         startDate: true,
         status: true,
-        units: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
-        totalFermenters: true,
-        totalCooks: true,
-        executedCooks: true,
-        executedFermenters: true,
+        upperControlLimit: true,
       },
     });
     if (result === null) {
@@ -376,21 +400,27 @@ export class ProductionOrderControllerBase {
             connect: data.item,
           },
 
+          millingBinConfiguration: data.millingBinConfiguration
+            ? {
+                connect: data.millingBinConfiguration,
+              }
+            : undefined,
+
           recipe: data.recipe
             ? {
                 connect: data.recipe,
               }
             : undefined,
 
-          recipeGroup: data.recipeGroup
-            ? {
-                connect: data.recipeGroup,
-              }
-            : undefined,
-
           scheduleOrder: data.scheduleOrder
             ? {
                 connect: data.scheduleOrder,
+              }
+            : undefined,
+
+          units: data.units
+            ? {
+                connect: data.units,
               }
             : undefined,
         },
@@ -403,6 +433,8 @@ export class ProductionOrderControllerBase {
 
           className: true,
           complete: true,
+          completedQuantity: true,
+          containerType: true,
           createdAt: true,
           createdBy: true,
 
@@ -414,9 +446,7 @@ export class ProductionOrderControllerBase {
 
           customerCode: true,
           endDate: true,
-          estimatedBarrelsPerFermenter: true,
-          estimatedPGsPerBbl: true,
-          estimatedPGsPerBushel: true,
+          finalProof: true,
           globalId: true,
           id: true,
           inProcess: true,
@@ -427,16 +457,18 @@ export class ProductionOrderControllerBase {
             },
           },
 
-          name: true,
-          quantity: true,
+          lowerControlLimit: true,
 
-          recipe: {
+          millingBinConfiguration: {
             select: {
               id: true,
             },
           },
 
-          recipeGroup: {
+          name: true,
+          quantity: true,
+
+          recipe: {
             select: {
               id: true,
             },
@@ -452,13 +484,16 @@ export class ProductionOrderControllerBase {
           schemaVersion: true,
           startDate: true,
           status: true,
-          units: true,
+
+          units: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
           updatedBy: true,
-          totalFermenters: true,
-          totalCooks: true,
-          executedCooks: true,
-          executedFermenters: true,
+          upperControlLimit: true,
         },
       });
     } catch (error) {
@@ -469,6 +504,135 @@ export class ProductionOrderControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/containerItem")
+  @ApiNestedQuery(ItemFindManyArgs)
+  @UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findContainerItem(
+    @common.Req() request: Request,
+    @common.Param() params: ProductionOrderWhereUniqueInput
+  ): Promise<Item[]> {
+    const query = plainToClass(ItemFindManyArgs, request.query);
+    const results = await this.service.findContainerItem(params.id, {
+      ...query,
+      select: {
+        active: true,
+        baseBomItem: true,
+        createdAt: true,
+        createdBy: true,
+        erpId: true,
+        globalId: true,
+        id: true,
+        itemClass: true,
+        itemDescription: true,
+        itemGroup: true,
+        itemName: true,
+        itemNumber: true,
+        itemRevision: true,
+        itemType: true,
+
+        lotContinerItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+
+        vendor: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/containerItem")
+  @UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async connectContainerItem(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      containerItem: {
+        connect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/containerItem")
+  @UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async updateContainerItem(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      containerItem: {
+        set: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/containerItem")
+  @UseRoles({
+    resource: "ProductionOrder",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectContainerItem(
+    @common.Param() params: ProductionOrderWhereUniqueInput,
+    @common.Body() body: ItemWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      containerItem: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProductionOrder({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -578,7 +742,6 @@ export class ProductionOrderControllerBase {
           },
         },
 
-        totalFermenters: true,
         totalPGs: true,
         totalPGsByRecipe: true,
         totalVolumeWg: true,

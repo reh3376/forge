@@ -16,6 +16,9 @@ export enum EnumScheduleOrderStatus {
   Scheduled = "Scheduled",
   InProgress = "InProgress",
   Complete = "Complete",
+  ReadyForSeparation = "ReadyForSeparation",
+  Separating = "Separating",
+  Separated = "Separated",
 }
 
 registerEnumType(EnumScheduleOrderStatus, {

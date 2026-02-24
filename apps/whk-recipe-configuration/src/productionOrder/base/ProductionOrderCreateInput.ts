@@ -22,21 +22,24 @@ import {
   IsInt,
   Max,
   IsNumber,
+  IsEnum,
   IsDate,
   Min,
-  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { Decimal } from "decimal.js";
+import { ItemCreateNestedManyWithoutProductionOrdersInput } from "./ItemCreateNestedManyWithoutProductionOrdersInput";
+import { EnumProductionOrderContainerType } from "./EnumProductionOrderContainerType";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotCreateNestedManyWithoutProductionOrdersInput } from "./LotCreateNestedManyWithoutProductionOrdersInput";
+import { MillingBinConfigurationWhereUniqueInput } from "../../millingBinConfiguration/base/MillingBinConfigurationWhereUniqueInput";
 import { ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput } from "./ProductionOrderRecipeInstanceCreateNestedManyWithoutProductionOrdersInput";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { RecipeGroupWhereUniqueInput } from "../../recipeGroup/base/RecipeGroupWhereUniqueInput";
-import { SalesOrderWhereUniqueInput } from "../../salesOrder/base/SalesOrderWhereUniqueInput";
 import { ScheduleOrderWhereUniqueInput } from "../../scheduleOrder/base/ScheduleOrderWhereUniqueInput";
 import { EnumProductionOrderStatus } from "./EnumProductionOrderStatus";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 
 @InputType()
 class ProductionOrderCreateInput {
@@ -107,6 +110,36 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   completedQuantity?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ItemCreateNestedManyWithoutProductionOrdersInput,
+  })
+  @ValidateNested()
+  @Type(() => ItemCreateNestedManyWithoutProductionOrdersInput)
+  @IsOptional()
+  @Field(() => ItemCreateNestedManyWithoutProductionOrdersInput, {
+    nullable: true,
+  })
+  containerItem?: ItemCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumProductionOrderContainerType,
+  })
+  @IsEnum(EnumProductionOrderContainerType)
+  @IsOptional()
+  @Field(() => EnumProductionOrderContainerType, {
+    nullable: true,
+  })
+  containerType?:
+    | "LargeBarrel"
+    | "SmallBarrel"
+    | "BulkLoadout"
+    | "PlasticDrum"
+    | "IbcTote275"
+    | "SsTote275"
+    | null;
 
   @ApiProperty({
     required: true,
@@ -187,6 +220,42 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  executedCooks?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  executedFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  finalProof?: number | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -228,6 +297,30 @@ class ProductionOrderCreateInput {
     nullable: true,
   })
   lots?: LotCreateNestedManyWithoutProductionOrdersInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  lowerControlLimit?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => MillingBinConfigurationWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationWhereUniqueInput)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationWhereUniqueInput, {
+    nullable: true,
+  })
+  millingBinConfiguration?: MillingBinConfigurationWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -312,30 +405,6 @@ class ProductionOrderCreateInput {
 
   @ApiProperty({
     required: false,
-    type: () => RecipeGroupWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => RecipeGroupWhereUniqueInput)
-  @IsOptional()
-  @Field(() => RecipeGroupWhereUniqueInput, {
-    nullable: true,
-  })
-  recipeGroup?: RecipeGroupWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => SalesOrderWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => SalesOrderWhereUniqueInput)
-  @IsOptional()
-  @Field(() => SalesOrderWhereUniqueInput, {
-    nullable: true,
-  })
-  salesOrder?: SalesOrderWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
     type: () => ScheduleOrderWhereUniqueInput,
   })
   @ValidateNested()
@@ -395,47 +464,15 @@ class ProductionOrderCreateInput {
     | "Initiated"
     | "InProgress"
     | "Complete"
+    | "Cancelled"
     | null;
 
   @ApiProperty({
     required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  units?: string | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  @Field(() => Date, {
-    nullable: true,
-  })
-  updatedBy?: Date | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
-  @IsOptional()
-  @Field(() => Number, {
-    nullable: true,
-  })
-  totalFermenters?: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: Number,
-  })
-  @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
@@ -447,22 +484,60 @@ class ProductionOrderCreateInput {
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  executedCooks?: number | null;
+  totalFermenters?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  totalGrainWeight?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  units?: UnitsWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(256)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  updatedBy?: string | null;
 
   @ApiProperty({
     required: false,
     type: Number,
   })
   @IsInt()
+  @Max(99999999999)
   @IsOptional()
   @Field(() => Number, {
     nullable: true,
   })
-  executedFermenters?: number | null;
+  upperControlLimit?: number | null;
 }
 
 export { ProductionOrderCreateInput as ProductionOrderCreateInput };

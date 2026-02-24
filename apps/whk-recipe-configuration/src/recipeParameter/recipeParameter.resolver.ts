@@ -12,6 +12,14 @@ import { RecipeParameterResolverBase } from "./base/recipeParameter.resolver.bas
 import { RecipeParameter } from "./base/RecipeParameter";
 import { RecipeParameterService } from "./recipeParameter.service";
 
+/**
+ * RecipeParameter resolver with GraphQL endpoints.
+ *
+ * The base resolver has been extended with additional mutations for managing Recipe relationships:
+ * - connectRecipeParameterRecipe: Connect Recipe entities to a RecipeParameter (matches POST /:id/recipe endpoint)
+ * - updateRecipeParameterRecipe: Set Recipe entities for a RecipeParameter (matches PATCH /:id/recipe endpoint)
+ * - disconnectRecipeParameterRecipe: Disconnect Recipe entities from a RecipeParameter (matches DELETE /:id/recipe endpoint)
+ */
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeParameter)
 export class RecipeParameterResolver extends RecipeParameterResolverBase {

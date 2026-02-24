@@ -32,9 +32,6 @@ import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUn
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
-import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
-import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -653,16 +650,9 @@ export class UnitProcedureControllerBase {
         },
 
         customerCode: true,
-        estimatedAbv: true,
         globalId: true,
         id: true,
         isClassDefinition: true,
-
-        item: {
-          select: {
-            id: true,
-          },
-        },
 
         mashingProtocol: {
           select: {
@@ -678,7 +668,6 @@ export class UnitProcedureControllerBase {
 
         revision: true,
         schemaVersion: true,
-        targetProof: true,
         updatedAt: true,
         updatedBy: true,
         whiskeyType: true,
@@ -748,122 +737,6 @@ export class UnitProcedureControllerBase {
   ): Promise<void> {
     const data = {
       recipe: {
-        disconnect: body,
-      },
-    };
-    await this.service.updateUnitProcedure({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.Get("/:id/scheduleOrderQueues")
-  @ApiNestedQuery(ScheduleOrderQueueFindManyArgs)
-  @UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "read",
-    possession: "any",
-  })
-  async findScheduleOrderQueues(
-    @common.Req() request: Request,
-    @common.Param() params: UnitProcedureWhereUniqueInput
-  ): Promise<ScheduleOrderQueue[]> {
-    const query = plainToClass(ScheduleOrderQueueFindManyArgs, request.query);
-    const results = await this.service.findScheduleOrderQueues(params.id, {
-      ...query,
-      select: {
-        createdAt: true,
-        createdBy: true,
-        globalId: true,
-        id: true,
-        nextOperation: true,
-
-        nextUnitProcedure: {
-          select: {
-            id: true,
-          },
-        },
-
-        nextUnitProcedureName: true,
-        queueIndex: true,
-
-        scheduleOrder: {
-          select: {
-            id: true,
-          },
-        },
-
-        schemaVersion: true,
-        updatedAt: true,
-        updatedBy: true,
-      },
-    });
-    if (results === null) {
-      throw new errors.NotFoundException(
-        `No resource was found for ${JSON.stringify(params)}`
-      );
-    }
-    return results;
-  }
-
-  @common.Post("/:id/scheduleOrderQueues")
-  @UseRoles({
-    resource: "UnitProcedure",
-    action: "update",
-    possession: "any",
-  })
-  async connectScheduleOrderQueues(
-    @common.Param() params: UnitProcedureWhereUniqueInput,
-    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      scheduleOrderQueues: {
-        connect: body,
-      },
-    };
-    await this.service.updateUnitProcedure({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Patch("/:id/scheduleOrderQueues")
-  @UseRoles({
-    resource: "UnitProcedure",
-    action: "update",
-    possession: "any",
-  })
-  async updateScheduleOrderQueues(
-    @common.Param() params: UnitProcedureWhereUniqueInput,
-    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      scheduleOrderQueues: {
-        set: body,
-      },
-    };
-    await this.service.updateUnitProcedure({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.Delete("/:id/scheduleOrderQueues")
-  @UseRoles({
-    resource: "UnitProcedure",
-    action: "update",
-    possession: "any",
-  })
-  async disconnectScheduleOrderQueues(
-    @common.Param() params: UnitProcedureWhereUniqueInput,
-    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
-  ): Promise<void> {
-    const data = {
-      scheduleOrderQueues: {
         disconnect: body,
       },
     };

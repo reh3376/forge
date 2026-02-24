@@ -30,9 +30,13 @@ const CREATE_INPUT = {
   estimatedBarrelsPerFermenter: 42.42,
   estimatedPGsPerBbl: 42.42,
   estimatedPGsPerBushel: 42.42,
+  executedCooks: 42,
+  executedFermenters: 42,
+  finalProof: 42.42,
   globalId: "exampleGlobalId",
   id: "exampleId",
   inProcess: "true",
+  lowerControlLimit: 42,
   name: "exampleName",
   plannedCooks: 42,
   plannedFermenters: 42,
@@ -40,9 +44,12 @@ const CREATE_INPUT = {
   scheduled: "true",
   schemaVersion: "exampleSchemaVersion",
   startDate: new Date(),
-  units: "exampleUnits",
+  totalCooks: 42,
+  totalFermenters: 42,
+  totalGrainWeight: 42.42,
   updatedAt: new Date(),
-  updatedBy: new Date(),
+  updatedBy: "exampleUpdatedBy",
+  upperControlLimit: 42,
 };
 const CREATE_RESULT = {
   className: "exampleClassName",
@@ -57,9 +64,13 @@ const CREATE_RESULT = {
   estimatedBarrelsPerFermenter: 42.42,
   estimatedPGsPerBbl: 42.42,
   estimatedPGsPerBushel: 42.42,
+  executedCooks: 42,
+  executedFermenters: 42,
+  finalProof: 42.42,
   globalId: "exampleGlobalId",
   id: "exampleId",
   inProcess: "true",
+  lowerControlLimit: 42,
   name: "exampleName",
   plannedCooks: 42,
   plannedFermenters: 42,
@@ -67,9 +78,12 @@ const CREATE_RESULT = {
   scheduled: "true",
   schemaVersion: "exampleSchemaVersion",
   startDate: new Date(),
-  units: "exampleUnits",
+  totalCooks: 42,
+  totalFermenters: 42,
+  totalGrainWeight: 42.42,
   updatedAt: new Date(),
-  updatedBy: new Date(),
+  updatedBy: "exampleUpdatedBy",
+  upperControlLimit: 42,
 };
 const FIND_MANY_RESULT = [
   {
@@ -85,9 +99,13 @@ const FIND_MANY_RESULT = [
     estimatedBarrelsPerFermenter: 42.42,
     estimatedPGsPerBbl: 42.42,
     estimatedPGsPerBushel: 42.42,
+    executedCooks: 42,
+    executedFermenters: 42,
+    finalProof: 42.42,
     globalId: "exampleGlobalId",
     id: "exampleId",
     inProcess: "true",
+    lowerControlLimit: 42,
     name: "exampleName",
     plannedCooks: 42,
     plannedFermenters: 42,
@@ -95,9 +113,12 @@ const FIND_MANY_RESULT = [
     scheduled: "true",
     schemaVersion: "exampleSchemaVersion",
     startDate: new Date(),
-    units: "exampleUnits",
+    totalCooks: 42,
+    totalFermenters: 42,
+    totalGrainWeight: 42.42,
     updatedAt: new Date(),
-    updatedBy: new Date(),
+    updatedBy: "exampleUpdatedBy",
+    upperControlLimit: 42,
   },
 ];
 const FIND_ONE_RESULT = {
@@ -113,9 +134,13 @@ const FIND_ONE_RESULT = {
   estimatedBarrelsPerFermenter: 42.42,
   estimatedPGsPerBbl: 42.42,
   estimatedPGsPerBushel: 42.42,
+  executedCooks: 42,
+  executedFermenters: 42,
+  finalProof: 42.42,
   globalId: "exampleGlobalId",
   id: "exampleId",
   inProcess: "true",
+  lowerControlLimit: 42,
   name: "exampleName",
   plannedCooks: 42,
   plannedFermenters: 42,
@@ -123,9 +148,12 @@ const FIND_ONE_RESULT = {
   scheduled: "true",
   schemaVersion: "exampleSchemaVersion",
   startDate: new Date(),
-  units: "exampleUnits",
+  totalCooks: 42,
+  totalFermenters: 42,
+  totalGrainWeight: 42.42,
   updatedAt: new Date(),
-  updatedBy: new Date(),
+  updatedBy: "exampleUpdatedBy",
+  upperControlLimit: 42,
 };
 
 const service = {
@@ -214,7 +242,6 @@ describe("ProductionOrder", () => {
         endDate: CREATE_RESULT.endDate.toISOString(),
         startDate: CREATE_RESULT.startDate.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        updatedBy: CREATE_RESULT.updatedBy.toISOString(),
       });
   });
 
@@ -229,7 +256,6 @@ describe("ProductionOrder", () => {
           endDate: FIND_MANY_RESULT[0].endDate.toISOString(),
           startDate: FIND_MANY_RESULT[0].startDate.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
-          updatedBy: FIND_MANY_RESULT[0].updatedBy.toISOString(),
         },
       ]);
   });
@@ -255,7 +281,6 @@ describe("ProductionOrder", () => {
         endDate: FIND_ONE_RESULT.endDate.toISOString(),
         startDate: FIND_ONE_RESULT.startDate.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
-        updatedBy: FIND_ONE_RESULT.updatedBy.toISOString(),
       });
   });
 
@@ -271,7 +296,6 @@ describe("ProductionOrder", () => {
         endDate: CREATE_RESULT.endDate.toISOString(),
         startDate: CREATE_RESULT.startDate.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-        updatedBy: CREATE_RESULT.updatedBy.toISOString(),
       })
       .then(function () {
         agent

@@ -1,0 +1,127 @@
+# Task ID: 9
+# Title: Implement Production Scheduling Interface
+# Status: done
+# Dependencies: 4, 5
+# Priority: high
+# Description: Create the production scheduling interface with ERP integration, resource allocation, and timeline visualization for whiskey production workflow (Mashing → Fermentation → Distillation → Barreling), including a three-step Production Order Creation Wizard.
+# Details:
+1. Design and implement three-panel scheduling interface:
+   - Production Orders list with filtering ("View All", "Show Unscheduled")
+   - Schedule table with comprehensive columns (Index, Sch Order, Customer, etc.)
+   - Order forms with improved UX
+2. Create ERP integration for order synchronization
+3. Implement recipe-based scheduling with capacity planning, supporting whiskey production terminology:
+   - Proof Gallons, Total Barrels calculations
+   - Production stage durations tracking
+   - Recipe codes (DWL-75-21-00-04-R01 format)
+   - Container types and Customer codes
+   - Mash Bills (60-40-00-00, etc.)
+4. Add resource allocation and optimization
+5. Create equipment availability tracking
+6. Implement Gantt chart visualization using Recharts or D3.js for the complete production timeline
+7. Add schedule conflict detection and resolution
+8. Create batch scheduling with dependency management
+9. Implement drag-and-drop schedule adjustments
+10. Redesign the Edit Scheduled Order modal with improved UX:
+    - Organize 28+ fields into logical sections/tabs
+    - Implement progressive disclosure for complex data
+    - Add auto-calculations for durations and quantities
+    - Ensure mobile-responsive design for factory floor devices
+11. Implement Production Order Creation Wizard with three steps:
+    - Order Details with comprehensive form fields
+    - Bill of Materials with recipe integration
+    - Milling Bins Configuration for equipment assignment
+12. Add recipe-to-production conversion functionality:
+    - Recipe selection driving default production parameters
+    - BOM conversion from recipe ingredients to production quantities
+    - Scaling calculations based on production quantity vs recipe yield
+    - Equipment assignment based on recipe requirements
+
+# Test Strategy:
+Test schedule creation and modification with whiskey production workflow. Verify ERP integration with mock data including proof gallons, barrel counts, and production durations. Test conflict detection and resolution. Validate Gantt chart visualization of the complete production timeline. Test drag-and-drop functionality. Verify form UX improvements and field organization. Test mobile responsiveness on factory floor devices. Validate auto-calculations for production durations and quantities. Test the three-step Production Order Creation Wizard flow. Verify recipe-to-production conversion functionality with different recipes and quantities. Test equipment assignment and availability checking. Validate BOM conversion and scaling calculations.
+
+# Subtasks:
+## 9.1. Design three-panel interface layout [done]
+### Dependencies: None
+### Description: Create wireframes and design for the three-panel interface: Production Orders list, Schedule table, and Order forms.
+### Details:
+
+
+## 9.2. Implement Production Orders panel with filtering [done]
+### Dependencies: None
+### Description: Build the Production Orders panel with "View All" and "Show Unscheduled" filtering options.
+### Details:
+
+
+## 9.3. Implement Schedule table with whiskey production columns [done]
+### Dependencies: None
+### Description: Create the Schedule table with columns: Index, Sch Order, Customer, Prod Order, Mash Bill, Est. POs, Mash Date, Ferm Start, Ferm End, Distill Date, Barrel Date, Cooks, Forms.
+### Details:
+
+
+## 9.4. Implement Edit Scheduled Order modal with improved UX [done]
+### Dependencies: None
+### Description: Redesign the order form with 28+ fields organized into logical sections/tabs, implementing progressive disclosure and auto-calculations.
+### Details:
+
+
+## 9.5. Implement whiskey production terminology and calculations [done]
+### Dependencies: None
+### Description: Add support for Proof Gallons, Total Barrels, production stage durations, recipe codes, container types, customer codes, and mash bills.
+### Details:
+
+
+## 9.6. Create ERP integration for order synchronization [done]
+### Dependencies: None
+### Description: Implement API integration with the ERP system to sync production orders and schedules.
+### Details:
+
+
+## 9.7. Implement Gantt chart for whiskey production timeline [done]
+### Dependencies: None
+### Description: Create visualization showing Mashing → Fermentation → Distillation → Barreling timeline using Recharts or D3.js.
+### Details:
+
+
+## 9.8. Implement mobile-responsive design [done]
+### Dependencies: None
+### Description: Ensure the interface works well on factory floor devices with responsive design principles.
+### Details:
+
+
+## 9.9. Design Production Order Creation Wizard UI [done]
+### Dependencies: None
+### Description: Create wireframes and design for the three-step wizard with left sidebar progress tracking similar to recipe creation wizard.
+### Details:
+
+
+## 9.10. Implement Order Details step [done]
+### Dependencies: None
+### Description: Build the first wizard step with Production Order Information section including Start/End Date inputs, Recipe dropdown, Quantity input, Container Type/Item dropdowns, Final Proof input, Fermenters/Cooks inputs, and calculation fields.
+### Details:
+
+
+## 9.11. Implement Bill of Materials step [done]
+### Dependencies: None
+### Description: Create the second wizard step with Recipe BOM dropdown, 'Convert Recipe BOM' button, data table for BOM items with CRUD functionality, real-time cost/quantity calculations, and validation.
+### Details:
+
+
+## 9.12. Implement Milling Bin Configuration step [done]
+### Dependencies: None
+### Description: Build the third wizard step with Milling Bin Configuration dropdown, Add/Remove Configuration buttons, equipment assignment table, and save functionality.
+### Details:
+
+
+## 9.13. Implement recipe-to-production conversion logic [done]
+### Dependencies: None
+### Description: Create functionality to convert recipe data to production parameters, including BOM conversion, scaling calculations, and equipment assignment based on recipe requirements.
+### Details:
+
+
+## 9.14. Integrate Production Order Wizard with scheduling system [done]
+### Dependencies: None
+### Description: Connect the wizard to the scheduling interface, enabling start/end date calculations, equipment availability checking, capacity planning, and production order status workflow management.
+### Details:
+
+

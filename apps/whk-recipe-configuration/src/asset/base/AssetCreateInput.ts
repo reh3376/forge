@@ -18,10 +18,10 @@ import {
   IsEnum,
   ValidateNested,
   IsOptional,
+  IsInt,
+  Max,
   IsNumber,
   Min,
-  Max,
-  IsInt,
 } from "class-validator";
 
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
@@ -33,8 +33,11 @@ import { InventoryLogCreateNestedManyWithoutAssetsInput } from "./InventoryLogCr
 import { InventoryTransferCreateNestedManyWithoutAssetsInput } from "./InventoryTransferCreateNestedManyWithoutAssetsInput";
 import { ItemReceiptCreateNestedManyWithoutAssetsInput } from "./ItemReceiptCreateNestedManyWithoutAssetsInput";
 import { LotCreateNestedManyWithoutAssetsInput } from "./LotCreateNestedManyWithoutAssetsInput";
+import { MillingBinConfigurationCreateNestedManyWithoutAssetsInput } from "./MillingBinConfigurationCreateNestedManyWithoutAssetsInput";
+import { OperatorShiftCreateNestedManyWithoutAssetsInput } from "./OperatorShiftCreateNestedManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderCreateNestedManyWithoutAssetsInput } from "./PurchaseOrderCreateNestedManyWithoutAssetsInput";
+import { ScheduleOrderQueueCreateNestedManyWithoutAssetsInput } from "./ScheduleOrderQueueCreateNestedManyWithoutAssetsInput";
 import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @InputType()
@@ -119,6 +122,18 @@ class AssetCreateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  index?: number | null;
 
   @ApiProperty({
     required: false,
@@ -229,6 +244,18 @@ class AssetCreateInput {
   lotsFilledFrom?: LotCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
+    required: false,
+    type: () => MillingBinConfigurationCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  millingBinConfigurations?: MillingBinConfigurationCreateNestedManyWithoutAssetsInput;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -236,6 +263,18 @@ class AssetCreateInput {
   @MaxLength(256)
   @Field(() => String)
   name!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperatorShiftCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperatorShiftCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => OperatorShiftCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  operatorShifts?: OperatorShiftCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
@@ -285,6 +324,18 @@ class AssetCreateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueCreateNestedManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueCreateNestedManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueCreateNestedManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueCreateNestedManyWithoutAssetsInput;
 
   @ApiProperty({
     required: true,

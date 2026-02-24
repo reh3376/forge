@@ -73,12 +73,12 @@ class RecipeBom {
 
   @ApiProperty({
     required: false,
-    type: () => [ProductionOrderRecipeInstance],
+    type: () => ProductionOrderRecipeInstance,
   })
   @ValidateNested()
   @Type(() => ProductionOrderRecipeInstance)
   @IsOptional()
-  productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstance | null;
 
   @ApiProperty({
     required: false,

@@ -15,6 +15,7 @@ import { RecipeBomItemWhereUniqueInput } from "./RecipeBomItemWhereUniqueInput";
 import { ValidateNested, IsOptional, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
 import { StringFilter } from "../../util/StringFilter";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
@@ -62,6 +63,18 @@ class RecipeBomItemWhereInput {
     nullable: true,
   })
   createdBy?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  displayUnits?: UnitsWhereUniqueInput;
 
   @ApiProperty({
     required: false,
@@ -169,17 +182,6 @@ class RecipeBomItemWhereInput {
     nullable: true,
   })
   recipeBoms?: RecipeBomWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
-    type: StringFilter,
-  })
-  @Type(() => StringFilter)
-  @IsOptional()
-  @Field(() => StringFilter, {
-    nullable: true,
-  })
-  units?: StringFilter;
 
   @ApiProperty({
     required: false,

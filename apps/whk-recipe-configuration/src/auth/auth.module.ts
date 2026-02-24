@@ -1,5 +1,5 @@
 import { forwardRef, Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { JWT_EXPIRATION } from "../constants";
@@ -18,9 +18,10 @@ import { UserModule } from "../user/user.module";
   imports: [
     forwardRef(() => UserModule),
     PassportModule,
+    ConfigModule,
     SecretsManagerModule,
     JwtModule.registerAsync({
-      imports: [SecretsManagerModule],
+      imports: [SecretsManagerModule, ConfigModule],
       inject: [SecretsManagerService, ConfigService],
       useFactory: async (
         secretsService: SecretsManagerService,

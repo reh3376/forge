@@ -16,7 +16,6 @@ import {
   SalesOrder as PrismaSalesOrder,
   Item as PrismaItem,
   Customer as PrismaCustomer,
-  ProductionOrder as PrismaProductionOrder,
 } from "@prisma/client";
 
 export class SalesOrderServiceBase {
@@ -71,15 +70,5 @@ export class SalesOrderServiceBase {
         where: { id: parentId },
       })
       .customer();
-  }
-
-  async getProductionOrders(
-    parentId: string
-  ): Promise<PrismaProductionOrder | null> {
-    return this.prisma.salesOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .productionOrders();
   }
 }

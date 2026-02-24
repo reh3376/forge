@@ -25,17 +25,18 @@ import { ProductionOrderFindManyArgs } from "./ProductionOrderFindManyArgs";
 import { ProductionOrderFindUniqueArgs } from "./ProductionOrderFindUniqueArgs";
 import { CreateProductionOrderArgs } from "./CreateProductionOrderArgs";
 import { UpdateProductionOrderArgs } from "./UpdateProductionOrderArgs";
+import { ItemFindManyArgs } from "../../item/base/ItemFindManyArgs";
+import { Item } from "../../item/base/Item";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Bom } from "../../bom/base/Bom";
 import { Customer } from "../../customer/base/Customer";
-import { Item } from "../../item/base/Item";
+import { MillingBinConfiguration } from "../../millingBinConfiguration/base/MillingBinConfiguration";
 import { Recipe } from "../../recipe/base/Recipe";
-import { RecipeGroup } from "../../recipeGroup/base/RecipeGroup";
-import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { ScheduleOrder } from "../../scheduleOrder/base/ScheduleOrder";
+import { Units } from "../../units/base/Units";
 import { ProductionOrderService } from "../productionOrder.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ProductionOrder)
@@ -117,21 +118,27 @@ export class ProductionOrderResolverBase {
           connect: args.data.item,
         },
 
+        millingBinConfiguration: args.data.millingBinConfiguration
+          ? {
+              connect: args.data.millingBinConfiguration,
+            }
+          : undefined,
+
         recipe: args.data.recipe
           ? {
               connect: args.data.recipe,
             }
           : undefined,
 
-        recipeGroup: args.data.recipeGroup
-          ? {
-              connect: args.data.recipeGroup,
-            }
-          : undefined,
-
         scheduleOrder: args.data.scheduleOrder
           ? {
               connect: args.data.scheduleOrder,
+            }
+          : undefined,
+
+        units: args.data.units
+          ? {
+              connect: args.data.units,
             }
           : undefined,
       },
@@ -166,21 +173,27 @@ export class ProductionOrderResolverBase {
             connect: args.data.item,
           },
 
+          millingBinConfiguration: args.data.millingBinConfiguration
+            ? {
+                connect: args.data.millingBinConfiguration,
+              }
+            : undefined,
+
           recipe: args.data.recipe
             ? {
                 connect: args.data.recipe,
               }
             : undefined,
 
-          recipeGroup: args.data.recipeGroup
-            ? {
-                connect: args.data.recipeGroup,
-              }
-            : undefined,
-
           scheduleOrder: args.data.scheduleOrder
             ? {
                 connect: args.data.scheduleOrder,
+              }
+            : undefined,
+
+          units: args.data.units
+            ? {
+                connect: args.data.units,
               }
             : undefined,
         },
@@ -193,6 +206,26 @@ export class ProductionOrderResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Item], { name: "containerItem" })
+  @UseRoles({
+    resource: "Item",
+    action: "read",
+    possession: "any",
+  })
+  async findContainerItem(
+    @graphql.Parent() parent: ProductionOrder,
+    @graphql.Args() args: ItemFindManyArgs
+  ): Promise<Item[]> {
+    const results = await this.service.findContainerItem(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -302,6 +335,27 @@ export class ProductionOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => MillingBinConfiguration, {
+    nullable: true,
+    name: "millingBinConfiguration",
+  })
+  @UseRoles({
+    resource: "MillingBinConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async getMillingBinConfiguration(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<MillingBinConfiguration | null> {
+    const result = await this.service.getMillingBinConfiguration(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Recipe, {
     nullable: true,
     name: "recipe",
@@ -323,27 +377,6 @@ export class ProductionOrderResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => RecipeGroup, {
-    nullable: true,
-    name: "recipeGroup",
-  })
-  @UseRoles({
-    resource: "RecipeGroup",
-    action: "read",
-    possession: "any",
-  })
-  async getRecipeGroup(
-    @graphql.Parent() parent: ProductionOrder
-  ): Promise<RecipeGroup | null> {
-    const result = await this.service.getRecipeGroup(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => ScheduleOrder, {
     nullable: true,
     name: "scheduleOrder",
@@ -357,6 +390,27 @@ export class ProductionOrderResolverBase {
     @graphql.Parent() parent: ProductionOrder
   ): Promise<ScheduleOrder | null> {
     const result = await this.service.getScheduleOrder(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Units, {
+    nullable: true,
+    name: "units",
+  })
+  @UseRoles({
+    resource: "Units",
+    action: "read",
+    possession: "any",
+  })
+  async getUnits(
+    @graphql.Parent() parent: ProductionOrder
+  ): Promise<Units | null> {
+    const result = await this.service.getUnits(parent.id);
 
     if (!result) {
       return null;

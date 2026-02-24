@@ -14,11 +14,13 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Batch as PrismaBatch,
+  BatchMaterialConsumption as PrismaBatchMaterialConsumption,
+  BatchParameterValue as PrismaBatchParameterValue,
+  BatchTimeSeriesData as PrismaBatchTimeSeriesData,
   Asset as PrismaAsset,
   Customer as PrismaCustomer,
   Lot as PrismaLot,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
-  Recipe as PrismaRecipe,
 } from "@prisma/client";
 
 export class BatchServiceBase {
@@ -42,6 +44,39 @@ export class BatchServiceBase {
   }
   async deleteBatch(args: Prisma.BatchDeleteArgs): Promise<PrismaBatch> {
     return this.prisma.batch.delete(args);
+  }
+
+  async findBatchMaterialConsumptions(
+    parentId: string,
+    args: Prisma.BatchMaterialConsumptionFindManyArgs
+  ): Promise<PrismaBatchMaterialConsumption[]> {
+    return this.prisma.batch
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batchMaterialConsumptions(args);
+  }
+
+  async findBatchParameterValues(
+    parentId: string,
+    args: Prisma.BatchParameterValueFindManyArgs
+  ): Promise<PrismaBatchParameterValue[]> {
+    return this.prisma.batch
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batchParameterValues(args);
+  }
+
+  async findBatchTimeSeriesDataItems(
+    parentId: string,
+    args: Prisma.BatchTimeSeriesDataFindManyArgs
+  ): Promise<PrismaBatchTimeSeriesData[]> {
+    return this.prisma.batch
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batchTimeSeriesDataItems(args);
   }
 
   async findChildren(
@@ -95,13 +130,5 @@ export class BatchServiceBase {
         where: { id: parentId },
       })
       .productionOrderRecipeInstance();
-  }
-
-  async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
-    return this.prisma.batch
-      .findUnique({
-        where: { id: parentId },
-      })
-      .recipe();
   }
 }

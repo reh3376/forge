@@ -16,14 +16,13 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, IsEnum } from "class-validator";
 import { Recipe } from "./Recipe";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
-import { BatchListRelationFilter } from "../../batch/base/BatchListRelationFilter";
 import { RecipeWhereUniqueInput } from "./RecipeWhereUniqueInput";
+import { CommentListRelationFilter } from "../../comment/base/CommentListRelationFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { RecipeListRelationFilter } from "./RecipeListRelationFilter";
-import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { LotListRelationFilter } from "../../lot/base/LotListRelationFilter";
 import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/MashingProtocolWhereUniqueInput";
 import { RecipeParameterListRelationFilter } from "../../recipeParameter/base/RecipeParameterListRelationFilter";
@@ -63,18 +62,6 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => BatchListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => BatchListRelationFilter)
-  @IsOptional()
-  @Field(() => BatchListRelationFilter, {
-    nullable: true,
-  })
-  batches?: BatchListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: () => RecipeWhereUniqueInput,
   })
   @ValidateNested()
@@ -84,6 +71,18 @@ class RecipeWhereInput {
     nullable: true,
   })
   classId?: RecipeWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => CommentListRelationFilter)
+  @IsOptional()
+  @Field(() => CommentListRelationFilter, {
+    nullable: true,
+  })
+  comments?: CommentListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -132,17 +131,6 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: FloatNullableFilter,
-  })
-  @Type(() => FloatNullableFilter)
-  @IsOptional()
-  @Field(() => FloatNullableFilter, {
-    nullable: true,
-  })
-  estimatedAbv?: FloatNullableFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringNullableFilter,
   })
   @Type(() => StringNullableFilter)
@@ -188,18 +176,6 @@ class RecipeWhereInput {
 
   @ApiProperty({
     required: false,
-    type: () => ItemWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => ItemWhereUniqueInput)
-  @IsOptional()
-  @Field(() => ItemWhereUniqueInput, {
-    nullable: true,
-  })
-  item?: ItemWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: () => LotListRelationFilter,
   })
   @ValidateNested()
@@ -232,7 +208,7 @@ class RecipeWhereInput {
   @Field(() => RecipeParameterListRelationFilter, {
     nullable: true,
   })
-  RecipeParameters?: RecipeParameterListRelationFilter;
+  parameters?: RecipeParameterListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -315,17 +291,6 @@ class RecipeWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: FloatNullableFilter,
-  })
-  @Type(() => FloatNullableFilter)
-  @IsOptional()
-  @Field(() => FloatNullableFilter, {
-    nullable: true,
-  })
-  targetProof?: FloatNullableFilter;
 
   @ApiProperty({
     required: false,

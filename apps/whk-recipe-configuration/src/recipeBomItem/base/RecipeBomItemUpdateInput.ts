@@ -26,6 +26,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput } from "./MashingProtocolStepUpdateManyWithoutRecipeBomItemsInput";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
@@ -69,6 +70,18 @@ class RecipeBomItemUpdateInput {
     nullable: true,
   })
   createdBy?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => UnitsWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UnitsWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UnitsWhereUniqueInput, {
+    nullable: true,
+  })
+  displayUnits?: UnitsWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,
@@ -167,18 +180,6 @@ class RecipeBomItemUpdateInput {
     nullable: true,
   })
   recipeBoms?: RecipeBomWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  units?: string;
 
   @ApiProperty({
     required: false,

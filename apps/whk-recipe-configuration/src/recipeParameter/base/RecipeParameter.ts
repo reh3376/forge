@@ -30,6 +30,9 @@ import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
 import { Recipe } from "../../recipe/base/Recipe";
 import { Decimal } from "decimal.js";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
+import { EnumRecipeParameterCategory } from "./EnumRecipeParameterCategory";
+import { Units } from "../../units/base/Units";
+import { Operation } from "../../operation/base/Operation";
 
 @ObjectType()
 class RecipeParameter {
@@ -49,6 +52,23 @@ class RecipeParameter {
   @MaxLength(256)
   @Field(() => String)
   className!: string;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumRecipeParameterCategory,
+  })
+  @IsEnum(EnumRecipeParameterCategory)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterCategory, {
+    nullable: true,
+  })
+  parameterCategory?:
+    | "Input"
+    | "Output"
+    | "Calculated"
+    | "MashingActual"
+    | "ProcessingActual"
+    | null;
 
   @ApiProperty({
     required: true,
@@ -154,15 +174,26 @@ class RecipeParameter {
 
   @ApiProperty({
     required: false,
+    type: () => Units,
+  })
+  @ValidateNested()
+  @Type(() => Units)
+  @IsOptional()
+  @Field(() => Units, {
+    nullable: true,
+  })
+  units?: Units | null;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
-  @MaxLength(256)
   @IsOptional()
   @Field(() => String, {
     nullable: true,
   })
-  recipeParamUnits!: string | null;
+  unitsId?: string | null;
 
   @ApiProperty({
     required: false,
@@ -195,7 +226,7 @@ class RecipeParameter {
   @Field(() => EnumRecipeParameterRecipeSetpointType, {
     nullable: true,
   })
-  recipeSetpointType?: "Boolean" | "Numeric" | "Text";
+  recipeSetpointType?: "Boolean" | "Numeric" | "Text" | null;
 
   @ApiProperty({
     required: false,
@@ -208,6 +239,17 @@ class RecipeParameter {
     nullable: true,
   })
   recipeSetpointUpperLimit!: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  required!: boolean | null;
 
   @ApiProperty({
     required: false,
@@ -255,6 +297,29 @@ class RecipeParameter {
     nullable: true,
   })
   updatedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => Operation,
+  })
+  @ValidateNested()
+  @Type(() => Operation)
+  @IsOptional()
+  @Field(() => Operation, {
+    nullable: true,
+  })
+  operation?: Operation | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  operationId?: string | null;
 }
 
 export { RecipeParameter as RecipeParameter };

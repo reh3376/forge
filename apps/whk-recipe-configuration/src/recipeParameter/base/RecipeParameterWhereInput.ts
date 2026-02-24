@@ -19,11 +19,14 @@ import { DateTimeFilter } from "../../util/DateTimeFilter";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { EnumRecipeParameterOperation } from "./EnumRecipeParameterOperation";
+import { EnumRecipeParameterCategory } from "./EnumRecipeParameterCategory";
+import { EnumRecipeParameterCategoryNullableFilter } from "./EnumRecipeParameterCategoryNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 import { RecipeListRelationFilter } from "../../recipe/base/RecipeListRelationFilter";
 import { FloatNullableFilter } from "../../util/FloatNullableFilter";
 import { EnumRecipeParameterRecipeSetpointType } from "./EnumRecipeParameterRecipeSetpointType";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
+import { OperationWhereUniqueInput } from "../../operation/base/OperationWhereUniqueInput";
 
 @InputType()
 class RecipeParameterWhereInput {
@@ -48,6 +51,17 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   className?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: EnumRecipeParameterCategoryNullableFilter,
+  })
+  @Type(() => EnumRecipeParameterCategoryNullableFilter)
+  @IsOptional()
+  @Field(() => EnumRecipeParameterCategoryNullableFilter, {
+    nullable: true,
+  })
+  parameterCategory?: EnumRecipeParameterCategoryNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -117,18 +131,26 @@ class RecipeParameterWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumRecipeParameterOperation,
+    type: () => OperationWhereUniqueInput,
   })
-  @IsEnum(EnumRecipeParameterOperation)
+  @ValidateNested()
+  @Type(() => OperationWhereUniqueInput)
   @IsOptional()
-  @Field(() => EnumRecipeParameterOperation, {
+  @Field(() => OperationWhereUniqueInput, {
     nullable: true,
   })
-  operation?:
-    | "Mashing01"
-    | "Ferrmentation01"
-    | "Distillation01"
-    | "Processing01";
+  operation?: OperationWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  operationId?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -240,6 +262,17 @@ class RecipeParameterWhereInput {
     nullable: true,
   })
   recipeSetpointUpperLimit?: FloatNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: BooleanNullableFilter,
+  })
+  @Type(() => BooleanNullableFilter)
+  @IsOptional()
+  @Field(() => BooleanNullableFilter, {
+    nullable: true,
+  })
+  required?: BooleanNullableFilter;
 
   @ApiProperty({
     required: false,

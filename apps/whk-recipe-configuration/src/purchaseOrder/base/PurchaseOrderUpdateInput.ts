@@ -20,9 +20,9 @@ import {
   MaxLength,
   IsBoolean,
   IsDate,
-  IsEnum,
   IsInt,
   Max,
+  IsEnum,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -35,7 +35,7 @@ import { InputJsonValue } from "../../types";
 import { PurchaseOrderUpdateManyWithoutPurchaseOrdersInput } from "./PurchaseOrderUpdateManyWithoutPurchaseOrdersInput";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
 import { TestParameterUpdateManyWithoutPurchaseOrdersInput } from "./TestParameterUpdateManyWithoutPurchaseOrdersInput";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
+import { EnumPurchaseOrderStatus } from "./EnumPurchaseOrderStatus";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -229,24 +229,6 @@ class PurchaseOrderUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumPurchaseOrderReceiptStatus,
-  })
-  @IsEnum(EnumPurchaseOrderReceiptStatus)
-  @IsOptional()
-  @Field(() => EnumPurchaseOrderReceiptStatus, {
-    nullable: true,
-  })
-  receiptStatus?:
-    | "NotReceived"
-    | "ReceiptInProgress"
-    | "ReceiptComplete"
-    | "PurchaseOrderComplete"
-    | "InitializedNotReceived"
-    | "ReceivedTested"
-    | null;
-
-  @ApiProperty({
-    required: false,
     type: Number,
   })
   @IsInt()
@@ -280,6 +262,23 @@ class PurchaseOrderUpdateInput {
     nullable: true,
   })
   schemaVersion?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumPurchaseOrderStatus,
+  })
+  @IsEnum(EnumPurchaseOrderStatus)
+  @IsOptional()
+  @Field(() => EnumPurchaseOrderStatus, {
+    nullable: true,
+  })
+  status?:
+    | "Planned"
+    | "Committed"
+    | "Initiated"
+    | "InProgress"
+    | "Complete"
+    | null;
 
   @ApiProperty({
     required: false,

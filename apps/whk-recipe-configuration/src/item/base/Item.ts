@@ -25,6 +25,7 @@ import {
 
 import { AdditiveActual } from "../../additiveActual/base/AdditiveActual";
 import { Type } from "class-transformer";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
 import { BomItem } from "../../bomItem/base/BomItem";
 import { Bom } from "../../bom/base/Bom";
 import { Inventory } from "../../inventory/base/Inventory";
@@ -35,9 +36,9 @@ import { Lot } from "../../lot/base/Lot";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
-import { Recipe } from "../../recipe/base/Recipe";
 import { SalesOrder } from "../../salesOrder/base/SalesOrder";
 import { TestParameter } from "../../testParameter/base/TestParameter";
+import { Units } from "../../units/base/Units";
 import { Vendor } from "../../vendor/base/Vendor";
 
 @ObjectType()
@@ -72,6 +73,15 @@ class Item {
     nullable: true,
   })
   baseBomItem!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BatchMaterialConsumption],
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumption)
+  @IsOptional()
+  batchMaterialConsumptions?: Array<BatchMaterialConsumption>;
 
   @ApiProperty({
     required: false,
@@ -273,6 +283,15 @@ class Item {
   @ValidateNested()
   @Type(() => ProductionOrder)
   @IsOptional()
+  productionOrderContainerItems?: Array<ProductionOrder>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [ProductionOrder],
+  })
+  @ValidateNested()
+  @Type(() => ProductionOrder)
+  @IsOptional()
   productionOrders?: Array<ProductionOrder>;
 
   @ApiProperty({
@@ -292,15 +311,6 @@ class Item {
   @Type(() => RecipeBomItem)
   @IsOptional()
   recipeBoms?: Array<RecipeBomItem>;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Recipe],
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipes?: Array<Recipe>;
 
   @ApiProperty({
     required: false,
@@ -331,6 +341,15 @@ class Item {
   @Type(() => TestParameter)
   @IsOptional()
   testParameters?: Array<TestParameter>;
+
+  @ApiProperty({
+    required: false,
+    type: () => Units,
+  })
+  @ValidateNested()
+  @Type(() => Units)
+  @IsOptional()
+  units?: Units | null;
 
   @ApiProperty({
     required: true,

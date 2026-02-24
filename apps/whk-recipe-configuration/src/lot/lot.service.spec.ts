@@ -35,6 +35,9 @@ describe("LotService", () => {
       update: jest.fn(),
       findMany: jest.fn(),
     },
+    productionOrder: {
+      findUnique: jest.fn(),
+    },
   };
 
   const mockRabbitMQProducer = {
@@ -319,11 +322,9 @@ describe("LotService", () => {
           Recipe: "Test Recipe",
           createdBy: "system",
           customer: { connect: { id: "customer-id-123" } },
-          item: { connect: { id: "item-id-123" } },
           revision: 1,
         },
         include: {
-          item: true,
           customer: true,
           recipeGroup: true,
           recipeBoms: true,
@@ -461,6 +462,12 @@ describe("LotService", () => {
         id: "item-id-123",
         itemNumber: "TEST-RECIPE-ITEM",
       },
+      productionOrders: [
+        {
+          id: "po-id-123",
+          createdAt: new Date("2024-01-01"),
+        },
+      ],
     };
 
     const mockCreateLotArgs = {
@@ -486,6 +493,10 @@ describe("LotService", () => {
     beforeEach(() => {
       mockPrismaService.recipe.findUnique.mockResolvedValue(mockRecipe);
       mockPrismaService.lot.findMany.mockResolvedValue([]);
+      mockPrismaService.productionOrder.findUnique.mockResolvedValue({
+        id: "po-id-123",
+        item: { id: "item-id-123", itemNumber: "TEST-RECIPE-ITEM" },
+      });
 
       processRecipeInputSpy = jest
         .spyOn(service as any, "processRecipeInput")
@@ -528,7 +539,7 @@ describe("LotService", () => {
       );
       expect(mockPrismaService.recipe.findUnique).toHaveBeenCalledWith({
         where: { id: "recipe-id-123" },
-        include: { item: true },
+        include: { productionOrders: true },
       });
     });
 

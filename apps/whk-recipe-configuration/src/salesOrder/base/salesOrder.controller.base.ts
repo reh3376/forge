@@ -63,12 +63,6 @@ export class SalesOrderControllerBase {
               connect: data.customer,
             }
           : undefined,
-
-        productionOrders: data.productionOrders
-          ? {
-              connect: data.productionOrders,
-            }
-          : undefined,
       },
       select: {
         createdAt: true,
@@ -87,13 +81,6 @@ export class SalesOrderControllerBase {
         lineItems: true,
         name: true,
         orderType: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         requestedShipDate: true,
         revision: true,
@@ -137,13 +124,6 @@ export class SalesOrderControllerBase {
         lineItems: true,
         name: true,
         orderType: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         requestedShipDate: true,
         revision: true,
@@ -188,13 +168,6 @@ export class SalesOrderControllerBase {
         lineItems: true,
         name: true,
         orderType: true,
-
-        productionOrders: {
-          select: {
-            id: true,
-          },
-        },
-
         quantity: true,
         requestedShipDate: true,
         revision: true,
@@ -241,12 +214,6 @@ export class SalesOrderControllerBase {
                 connect: data.customer,
               }
             : undefined,
-
-          productionOrders: data.productionOrders
-            ? {
-                connect: data.productionOrders,
-              }
-            : undefined,
         },
         select: {
           createdAt: true,
@@ -265,13 +232,6 @@ export class SalesOrderControllerBase {
           lineItems: true,
           name: true,
           orderType: true,
-
-          productionOrders: {
-            select: {
-              id: true,
-            },
-          },
-
           quantity: true,
           requestedShipDate: true,
           revision: true,
@@ -328,6 +288,13 @@ export class SalesOrderControllerBase {
         },
 
         schemaVersion: true,
+
+        units: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         updatedBy: true,
 

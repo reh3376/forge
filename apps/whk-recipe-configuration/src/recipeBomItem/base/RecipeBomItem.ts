@@ -25,6 +25,7 @@ import {
 } from "class-validator";
 
 import { Type } from "class-transformer";
+import { Units } from "../../units/base/Units";
 import { Item } from "../../item/base/Item";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { EnumRecipeBomItemOperation } from "./EnumRecipeBomItemOperation";
@@ -67,6 +68,18 @@ class RecipeBomItem {
   @MaxLength(1000)
   @Field(() => String)
   createdBy!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => Units,
+  })
+  @ValidateNested()
+  @Type(() => Units)
+  @IsOptional()
+  @Field(() => Units, {
+    nullable: true,
+  })
+  displayUnits?: Units | null;
 
   @ApiProperty({
     required: false,
@@ -160,15 +173,6 @@ class RecipeBomItem {
   @Type(() => RecipeBom)
   @IsOptional()
   recipeBoms?: RecipeBom | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MaxLength(256)
-  @Field(() => String)
-  units!: string;
 
   @ApiProperty({
     required: true,

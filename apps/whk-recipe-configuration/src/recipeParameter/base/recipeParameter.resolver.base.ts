@@ -28,6 +28,12 @@ import { UpdateRecipeParameterArgs } from "./UpdateRecipeParameterArgs";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeParameterService } from "../recipeParameter.service";
+import { DeleteRecipeParameterArgs } from "./DeleteRecipeParameterArgs";
+import { Operation } from "../../operation/base/Operation";
+import { Units } from "../../units/base/Units";
+import { Prisma } from "@prisma/client";
+import { RecipeWhereUniqueInput } from "../../recipe/base/RecipeWhereUniqueInput";
+
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => RecipeParameter)
 export class RecipeParameterResolverBase {
@@ -61,7 +67,18 @@ export class RecipeParameterResolverBase {
   async recipeParameters(
     @graphql.Args() args: RecipeParameterFindManyArgs
   ): Promise<RecipeParameter[]> {
-    return this.service.recipeParameters(args);
+    // Convert GraphQL args to Prisma args
+    const prismaArgs: Prisma.RecipeParameterFindManyArgs = {
+      where: args.where,
+      skip: args.skip,
+      take: args.take,
+      orderBy: args.orderBy as any,
+    };
+
+    const results = await this.service.recipeParameters(prismaArgs);
+
+    // Type assertion to match the expected GraphQL RecipeParameter type
+    return results as unknown as RecipeParameter[];
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
@@ -78,7 +95,8 @@ export class RecipeParameterResolverBase {
     if (result === null) {
       return null;
     }
-    return result;
+    // Type assertion to match the expected GraphQL RecipeParameter type
+    return result as unknown as RecipeParameter;
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
@@ -91,10 +109,26 @@ export class RecipeParameterResolverBase {
   async createRecipeParameter(
     @graphql.Args() args: CreateRecipeParameterArgs
   ): Promise<RecipeParameter> {
-    return await this.service.createRecipeParameter({
+    // Convert GraphQL data to Prisma data
+    const prismaData = {
       ...args,
-      data: args.data,
-    });
+      data: {
+        ...args.data,
+        // Handle operation field properly if it exists
+        operation: args.data.operation
+          ? {
+              connect: {
+                id: args.data.operation as unknown as string, // Cast enum to string ID
+              },
+            }
+          : undefined,
+      },
+    };
+
+    const result = await this.service.createRecipeParameter(prismaData as any);
+
+    // Type assertion to match the expected GraphQL RecipeParameter type
+    return result as unknown as RecipeParameter;
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
@@ -108,10 +142,52 @@ export class RecipeParameterResolverBase {
     @graphql.Args() args: UpdateRecipeParameterArgs
   ): Promise<RecipeParameter | null> {
     try {
-      return await this.service.updateRecipeParameter({
+      // Convert GraphQL data to Prisma data
+      const prismaData = {
         ...args,
-        data: args.data,
-      });
+        data: {
+          ...args.data,
+          // Handle operation field properly if it exists
+          operation: args.data.operation
+            ? {
+                connect: {
+                  id: args.data.operation as unknown as string, // Cast enum to string ID
+                },
+              }
+            : undefined,
+        },
+      };
+
+      const result = await this.service.updateRecipeParameter(
+        prismaData as any
+      );
+
+      // Type assertion to match the expected GraphQL RecipeParameter type
+      return result as unknown as RecipeParameter;
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => RecipeParameter)
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "delete",
+    possession: "any",
+  })
+  async deleteRecipeParameter(
+    @graphql.Args() args: DeleteRecipeParameterArgs
+  ): Promise<RecipeParameter | null> {
+    try {
+      const result = await this.service.deleteRecipeParameter(args);
+
+      // Type assertion to match the expected GraphQL RecipeParameter type
+      return result as unknown as RecipeParameter;
     } catch (error) {
       if (isRecordNotFoundError(error)) {
         throw new GraphQLError(
@@ -133,12 +209,141 @@ export class RecipeParameterResolverBase {
     @graphql.Parent() parent: RecipeParameter,
     @graphql.Args() args: RecipeFindManyArgs
   ): Promise<Recipe[]> {
-    const results = await this.service.findRecipe(parent.id, args);
+    // Convert GraphQL args to Prisma args
+    const prismaArgs: Prisma.RecipeFindManyArgs = {
+      where: args.where,
+      skip: args.skip,
+      take: args.take,
+      orderBy: args.orderBy as any,
+    };
+
+    const results = await this.service.findRecipe(parent.id, prismaArgs);
 
     if (!results) {
       return [];
     }
 
-    return results;
+    // Type assertion to match the expected GraphQL Recipe type
+    return results as unknown as Recipe[];
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Operation, {
+    nullable: true,
+    name: "operation",
+  })
+  @UseRoles({
+    resource: "Operation",
+    action: "read",
+    possession: "any",
+  })
+  async getOperation(
+    @graphql.Parent() parent: RecipeParameter
+  ): Promise<Operation | null> {
+    const result = await this.service.getOperation(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Units, {
+    nullable: true,
+    name: "units",
+  })
+  @UseRoles({
+    resource: "Units",
+    action: "read",
+    possession: "any",
+  })
+  async getUnits(
+    @graphql.Parent() parent: RecipeParameter
+  ): Promise<Units | null> {
+    const result = await this.service.getUnits(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @graphql.Mutation(() => RecipeParameter)
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeParameterRecipe(
+    @graphql.Args("id") id: string,
+    @graphql.Args({ name: "recipes", type: () => [RecipeWhereUniqueInput] })
+    recipes: RecipeWhereUniqueInput[]
+  ): Promise<RecipeParameter> {
+    const data = {
+      recipe: {
+        connect: recipes,
+      },
+    };
+
+    const result = await this.service.updateRecipeParameter({
+      where: { id },
+      data: data as any,
+      select: { id: true },
+    });
+
+    return result as unknown as RecipeParameter;
+  }
+
+  @graphql.Mutation(() => RecipeParameter)
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeParameterRecipe(
+    @graphql.Args("id") id: string,
+    @graphql.Args({ name: "recipes", type: () => [RecipeWhereUniqueInput] })
+    recipes: RecipeWhereUniqueInput[]
+  ): Promise<RecipeParameter> {
+    const data = {
+      recipe: {
+        set: recipes,
+      },
+    };
+
+    const result = await this.service.updateRecipeParameter({
+      where: { id },
+      data: data as any,
+      select: { id: true },
+    });
+
+    return result as unknown as RecipeParameter;
+  }
+
+  @graphql.Mutation(() => RecipeParameter)
+  @UseRoles({
+    resource: "RecipeParameter",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeParameterRecipe(
+    @graphql.Args("id") id: string,
+    @graphql.Args({ name: "recipes", type: () => [RecipeWhereUniqueInput] })
+    recipes: RecipeWhereUniqueInput[]
+  ): Promise<RecipeParameter> {
+    const data = {
+      recipe: {
+        disconnect: recipes,
+      },
+    };
+
+    const result = await this.service.updateRecipeParameter({
+      where: { id },
+      data: data as any,
+      select: { id: true },
+    });
+
+    return result as unknown as RecipeParameter;
   }
 }

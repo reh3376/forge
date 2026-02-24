@@ -1,0 +1,174 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+const GRAPHQL_ENDPOINT = process.env['NEXT_PUBLIC_MES_GRAPHQL_URL'] || 'http://localhost:3000/graphql'
+const MES_API_BASE = process.env['NEXT_PUBLIC_MES_API_URL'] || 'http://localhost:3000/api'
+
+// Service account credentials for MES backend
+const MES_USERNAME = process.env['MES_BACKEND_USER'] || process.env['MES_USERNAME'] || 'mes'
+const MES_PASSWORD = process.env['MES_BACKEND_PASSWORD'] || process.env['MES_PASSWORD'] || 'password'
+
+// Cache for the service account JWT token
+let serviceAccountToken: string | null = null
+let tokenExpiry: number = 0
+
+/**
+ * Get or refresh the service account JWT token for MES backend
+ */
+async function getServiceAccountToken(): Promise<string | null> {
+  // Check if we have a valid cached token
+  const now = Math.floor(Date.now() / 1000)
+  if (serviceAccountToken && tokenExpiry > now + 60) { // Refresh 1 minute before expiry
+    return serviceAccountToken
+  }
+
+  try {
+    console.log('🔐 Authenticating proxy as MES service account:', MES_USERNAME)
+    
+    const loginUrl = `${MES_API_BASE.replace('/api', '')}/api/login`
+    const response = await fetch(loginUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: MES_USERNAME,
+        password: MES_PASSWORD,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`🔐 Service account login failed: ${response.status} ${response.statusText}`, errorText)
+      return null
+    }
+
+    const authData = await response.json()
+    serviceAccountToken = authData.accessToken
+    
+    // Decode token to get expiry (basic decode without verification)
+    try {
+      const payload = JSON.parse(atob(authData.accessToken.split('.')[1]))
+      tokenExpiry = payload.exp || (now + 3600) // Default to 1 hour if no exp
+    } catch {
+      tokenExpiry = now + 3600 // Default to 1 hour
+    }
+    
+    console.log('🔐 Service account authentication successful, token expires at:', new Date(tokenExpiry * 1000).toISOString())
+    return serviceAccountToken
+    
+  } catch (error) {
+    console.error('🔐 Service account authentication error:', error)
+    serviceAccountToken = null
+    tokenExpiry = 0
+    return null
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    
+    // Get service account JWT token for MES backend
+    const mesToken = await getServiceAccountToken()
+    
+    const authHeaders: Record<string, string> = {}
+    
+    if (mesToken) {
+      // Use service account JWT token for backend authentication
+      authHeaders['authorization'] = `Bearer ${mesToken}`
+      console.log('🔐 Using service account JWT token for MES backend')
+    } else {
+      // Fallback to development mode headers if service account auth fails
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔐 Service account auth failed, using development bypass headers')
+        authHeaders['x-development-mode'] = 'true'
+        authHeaders['x-demo-user'] = 'true'
+        authHeaders['x-demo-user-id'] = 'demo-user-supervisor'
+        authHeaders['x-demo-user-role'] = 'OPS_DISTILLERY_SUPERVISOR'
+      } else {
+        console.error('🔐 No authentication available for MES backend')
+        return NextResponse.json(
+          { error: 'Backend authentication failed' },
+          { status: 500 }
+        )
+      }
+    }
+    
+    const response = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apollo-require-preflight': 'true',
+        'x-apollo-operation-name': 'GraphQLRequest',
+        ...authHeaders,
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      // Log the error for debugging
+      const errorText = await response.text()
+      console.error(`GraphQL request failed: ${response.status} ${response.statusText}`, errorText)
+      
+      // If it's an auth error, clear the cached token and retry once
+      if (response.status === 401 && mesToken) {
+        console.log('🔐 Auth error detected, clearing cached token and retrying...')
+        serviceAccountToken = null
+        tokenExpiry = 0
+        
+        // Retry with fresh token
+        const freshToken = await getServiceAccountToken()
+        if (freshToken) {
+          const retryResponse = await fetch(GRAPHQL_ENDPOINT, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apollo-require-preflight': 'true',
+              'x-apollo-operation-name': 'GraphQLRequest',
+              'authorization': `Bearer ${freshToken}`,
+            },
+            body: JSON.stringify(body),
+          })
+          
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json()
+            return NextResponse.json(retryData, {
+              status: retryResponse.status,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+          }
+        }
+      }
+      
+      throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  } catch (error) {
+    console.error('GraphQL proxy error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-auth-token',
+    },
+  })
+} 

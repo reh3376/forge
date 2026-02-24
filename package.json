@@ -1,0 +1,101 @@
+{
+  "name": "whk-recipe-configuration-monorepo",
+  "version": "1.0.0",
+  "description": "WHK Recipe Configuration Monorepo - Manufacturing Execution System",
+  "private": true,
+  "workspaces": [
+    "apps/whk-recipe-configuration",
+    "apps/mes-ui",
+    "apps/shared"
+  ],
+  "scripts": {
+    "dev": "npx turbo dev",
+    "dev:backend": "npx turbo dev --filter=whk-recipe-configuration",
+    "dev:backend:debug": "cd apps/whk-recipe-configuration && npm run start:dev:debug",
+    "dev:frontend": "npx turbo dev --filter=mes-ui",
+    "dev:shared": "npx turbo dev --filter=shared",
+    "build": "npx turbo build",
+    "build:backend": "npx turbo build --filter=whk-recipe-configuration",
+    "build:frontend": "npx turbo build --filter=mes-ui",
+    "build:shared": "npx turbo build --filter=shared",
+    "start": "npx turbo start",
+    "start:backend": "npx turbo start --filter=whk-recipe-configuration",
+    "start:frontend": "npx turbo start --filter=mes-ui",
+    "start:shared": "npx turbo start --filter=shared",
+    "test": "npx turbo test",
+    "test:backend": "npx turbo test --filter=whk-recipe-configuration",
+    "test:frontend": "npx turbo test --filter=mes-ui",
+    "test:shared": "npx turbo test --filter=shared",
+    "test:frontend:e2e": "npx turbo test:e2e --filter=mes-ui",
+    "test:frontend:e2e:ui": "cd apps/mes-ui && npm run test:e2e:ui",
+    "lint": "npx turbo lint",
+    "lint:backend": "turbo lint --filter=whk-recipe-configuration",
+    "lint:frontend": "turbo lint --filter=mes-ui",
+    "lint:shared": "turbo lint --filter=shared",
+    "lint:fix": "npx turbo lint:fix",
+    "format": "npx turbo format",
+    "clean": "npx turbo clean && rm -rf .turbo",
+    "dev:legacy": "concurrently \"npm run dev:shared:legacy\" \"npm run dev:backend:legacy\" \"npm run dev:frontend:legacy\"",
+    "dev:backend:legacy": "cd apps/whk-recipe-configuration && npm run start:dev:watch",
+    "dev:frontend:legacy": "cd apps/mes-ui && npm run dev",
+    "dev:shared:legacy": "cd apps/shared && npm run dev",
+    "build:legacy": "npm run build:shared:legacy && npm run build:backend:legacy && npm run build:frontend:legacy",
+    "build:backend:legacy": "cd apps/whk-recipe-configuration && npm run build",
+    "build:frontend:legacy": "cd apps/mes-ui && npm run build",
+    "build:shared:legacy": "cd apps/shared && npm run build",
+    "validate": "./scripts/validate-setup.sh",
+    "docker:up": "docker compose -f docker-compose.codex.yml up -d",
+    "docker:down": "docker compose -f docker-compose.codex.yml down",
+    "docker:logs": "docker compose -f docker-compose.codex.yml logs -f",
+    "db:init": "npm run db:migrate && npm run db:seed",
+    "db:seed": "cd apps/whk-recipe-configuration && npm run db:seed",
+    "db:migrate": "cd apps/whk-recipe-configuration && npm run db:migrate:dev",
+    "db:deploy": "cd apps/whk-recipe-configuration && npm run db:prod:deploy",
+    "db:studio": "cd apps/whk-recipe-configuration && npm run db:studio",
+    "prisma:generate": "cd apps/whk-recipe-configuration && npm run prisma:generate",
+    "install:all": "npm install --include=dev --workspaces",
+    "docs:erd": "cd apps/whk-recipe-configuration && npm run prisma:generate",
+    "docs:stakeholder": "node scripts/generate-stakeholder-docs.js",
+    "docs:stakeholder:html": "node scripts/generate-stakeholder-docs.js --html",
+    "docs:generate": "npm run docs:erd && npm run docs:stakeholder"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "syncpack": "^11.2.1",
+    "turbo": "^2.3.1"
+  },
+  "packageManager": "npm@10.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/whk-recipe-configuration.git"
+  },
+  "keywords": [
+    "manufacturing",
+    "mes",
+    "recipe-management",
+    "nestjs",
+    "nextjs",
+    "react",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "WHK Development Team",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "graphql": "^16.12.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0"
+  }
+}

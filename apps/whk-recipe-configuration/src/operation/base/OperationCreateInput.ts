@@ -32,6 +32,7 @@ import { EquipmentPhaseCreateNestedManyWithoutOperationsInput } from "./Equipmen
 import { OperationCreateNestedManyWithoutOperationsInput } from "./OperationCreateNestedManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
+import { RecipeParameterCreateNestedManyWithoutOperationsInput } from "./RecipeParameterCreateNestedManyWithoutOperationsInput";
 
 @InputType()
 class OperationCreateInput {
@@ -237,7 +238,19 @@ class OperationCreateInput {
   @Field(() => UnitProcedureWhereUniqueInput, {
     nullable: true,
   })
-  unitProcedure?: UnitProcedureWhereUniqueInput | null;
+  unitProcedure?: UnitProcedureWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterCreateNestedManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterCreateNestedManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => RecipeParameterCreateNestedManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  RecipeParameter?: RecipeParameterCreateNestedManyWithoutOperationsInput;
 }
 
 export { OperationCreateInput as OperationCreateInput };

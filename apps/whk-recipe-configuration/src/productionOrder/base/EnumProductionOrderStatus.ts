@@ -17,6 +17,7 @@ export enum EnumProductionOrderStatus {
   Initiated = "Initiated",
   InProgress = "InProgress",
   Complete = "Complete",
+  Cancelled = "Cancelled",
 }
 
 registerEnumType(EnumProductionOrderStatus, {

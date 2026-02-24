@@ -1,65 +1,56 @@
--- AlterTable
-ALTER TABLE "AdditiveActual" ADD COLUMN     "schemaVersion" TEXT;
+-- Idempotent add of "schemaVersion" to many tables (PostgreSQL)
+DO $$
+DECLARE
+  t text;
+  tables text[] := ARRAY[
+    'User',
+    'UnsConfiguration',
+    'UnsBrokerConfiguration',
+    'UnitLookup',
+    'ScheduleOrder',
+    'RecipeBomItem',
+    'RecipeBomActual',
+    'RecipeBom',
+    'ProductionOrderRecipeInstance',
+    'ProductionOrderBomItem',
+    'MashingProtocol',
+    'MashingProtocolStep',
+    'MashingProtocolStepActual',
+    'MessageQueue',
+    'ItemGroup',
+    'InventoryTransfer',
+    'InventoryLog',
+    'ItemReceipt',
+    'Inventory',
+    'Inventory',
+    'Lot',
+    'Batch',
+    'AdditiveActual',
+    'Bom',
+    'BomItem',
+    'PurchaseOrder',
+    'SalesOrder',
+    'Customer',
+    'Vendor',
+    'Test',
+    'Notification',
+    'Comment'
+    -- add any remaining tables you need here
+  ];
+BEGIN
+  FOREACH t IN ARRAY tables LOOP
+    -- Add column if it doesn't already exist
+    IF NOT EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name   = t
+        AND column_name  = 'schemaVersion'
+    ) THEN
+      EXECUTE format('ALTER TABLE %I ADD COLUMN %I TEXT', t, 'schemaVersion');
+    END IF;
 
--- AlterTable
-ALTER TABLE "Batch" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "BomItem" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "InventoryLog" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "InventoryTransfer" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "ItemGroup" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "MashingProtocol" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "MashingProtocolStep" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "MashingProtocolStepActual" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "MessageQueue" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "ProductionOrderBomItem" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "ProductionOrderRecipeInstance" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "RecipeBom" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "RecipeBomActual" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "RecipeBomItem" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "ScheduleOrder" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "Unit" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "UnitLookup" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "UnsBrokerConfiguration" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "UnsConfiguration" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "schemaVersion" TEXT;
-
--- AlterTable
-ALTER TABLE "Vendor" ADD COLUMN     "schemaVersion" TEXT;
+    -- Optional: backfill NULLs to a default value (e.g., 'v1')
+    -- EXECUTE format('UPDATE %I SET "schemaVersion" = COALESCE("schemaVersion", %L)', t, 'v1');
+  END LOOP;
+END$$;

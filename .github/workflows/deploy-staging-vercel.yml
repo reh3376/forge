@@ -1,0 +1,118 @@
+name: Deploy Staging to Vercel
+
+on:
+  push:
+    branches:
+      - staging
+      - main  # Also deploy main to staging for testing
+    paths:
+      - 'apps/mes-ui/**'
+      - 'apps/shared/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/deploy-staging-vercel.yml'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    name: Deploy Frontend to Vercel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get all history for proper Turbo cache
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/mes-ui
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared library
+        run: npx turbo build --filter=@whk/shared
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/mes-ui
+        env:
+          # Build-time environment variables
+          NEXT_PUBLIC_GRAPHQL_URL: ${{ secrets.STAGING_NGROK_URL }}/graphql
+          NEXT_PUBLIC_API_URL: ${{ secrets.STAGING_NGROK_URL }}
+          NEXT_PUBLIC_WEBSOCKET_URL: ${{ secrets.STAGING_NGROK_URL }}
+          NEXT_PUBLIC_APP_ENV: staging
+
+          # Azure AD configuration
+          NEXT_PUBLIC_AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+          NEXT_PUBLIC_AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          NEXT_PUBLIC_AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          NEXT_PUBLIC_AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          NEXT_PUBLIC_AZURE_REDIRECT_URI: ${{ secrets.STAGING_VERCEL_URL }}
+          NEXT_PUBLIC_AZURE_AUTHORITY: https://login.microsoftonline.com/${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "Deployed to: $url"
+        working-directory: ./apps/mes-ui
+
+      - name: Comment Deployment URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Staging Deployment**\n\nFrontend deployed to: ${{ steps.deploy.outputs.url }}\n\nBackend (ngrok): ${{ secrets.STAGING_NGROK_URL }}`
+            })
+
+      - name: Update Deployment Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+            echo "Frontend: ${{ steps.deploy.outputs.url }}"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+
+    steps:
+      - name: Deployment Success Notification
+        if: needs.deploy.result == 'success'
+        run: |
+          echo "✅ Staging deployment completed successfully"
+          # Add Slack/email notification here if desired
+
+      - name: Deployment Failure Notification
+        if: needs.deploy.result == 'failure'
+        run: |
+          echo "❌ Staging deployment failed"
+          # Add Slack/email notification here if desired
+          exit 1

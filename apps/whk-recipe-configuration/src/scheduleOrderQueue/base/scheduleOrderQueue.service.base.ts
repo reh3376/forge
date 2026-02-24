@@ -14,7 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ScheduleOrderQueue as PrismaScheduleOrderQueue,
-  UnitProcedure as PrismaUnitProcedure,
+  Asset as PrismaAsset,
   ScheduleOrder as PrismaScheduleOrder,
 } from "@prisma/client";
 
@@ -53,14 +53,15 @@ export class ScheduleOrderQueueServiceBase {
     return this.prisma.scheduleOrderQueue.delete(args);
   }
 
-  async getNextUnitProcedure(
-    parentId: string
-  ): Promise<PrismaUnitProcedure | null> {
+  async findAreas(
+    parentId: string,
+    args: Prisma.AssetFindManyArgs
+  ): Promise<PrismaAsset[]> {
     return this.prisma.scheduleOrderQueue
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: parentId },
       })
-      .nextUnitProcedure();
+      .areas(args);
   }
 
   async getScheduleOrder(

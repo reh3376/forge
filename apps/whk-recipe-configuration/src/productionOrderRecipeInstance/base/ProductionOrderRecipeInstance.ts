@@ -24,6 +24,7 @@ import { MashingProtocol } from "../../mashingProtocol/base/MashingProtocol";
 import { ProductionOrder } from "../../productionOrder/base/ProductionOrder";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
 
 @ObjectType()
 class ProductionOrderRecipeInstance {
@@ -94,6 +95,15 @@ class ProductionOrderRecipeInstance {
   @Type(() => RecipeBom)
   @IsOptional()
   recipeBom?: Array<RecipeBom>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [RecipeBomActual],
+  })
+  @ValidateNested()
+  @Type(() => RecipeBomActual)
+  @IsOptional()
+  recipeBomActuals?: Array<RecipeBomActual>;
 
   @ApiProperty({
     required: true,

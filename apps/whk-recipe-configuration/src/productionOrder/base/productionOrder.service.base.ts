@@ -14,15 +14,15 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   ProductionOrder as PrismaProductionOrder,
+  Item as PrismaItem,
   Lot as PrismaLot,
   ProductionOrderRecipeInstance as PrismaProductionOrderRecipeInstance,
   Bom as PrismaBom,
   Customer as PrismaCustomer,
-  Item as PrismaItem,
+  MillingBinConfiguration as PrismaMillingBinConfiguration,
   Recipe as PrismaRecipe,
-  RecipeGroup as PrismaRecipeGroup,
-  SalesOrder as PrismaSalesOrder,
   ScheduleOrder as PrismaScheduleOrder,
+  Units as PrismaUnits,
 } from "@prisma/client";
 
 export class ProductionOrderServiceBase {
@@ -58,6 +58,17 @@ export class ProductionOrderServiceBase {
     args: Prisma.ProductionOrderDeleteArgs
   ): Promise<PrismaProductionOrder> {
     return this.prisma.productionOrder.delete(args);
+  }
+
+  async findContainerItem(
+    parentId: string,
+    args: Prisma.ItemFindManyArgs
+  ): Promise<PrismaItem[]> {
+    return this.prisma.productionOrder
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .containerItem(args);
   }
 
   async findLots(
@@ -106,20 +117,22 @@ export class ProductionOrderServiceBase {
       .item();
   }
 
+  async getMillingBinConfiguration(
+    parentId: string
+  ): Promise<PrismaMillingBinConfiguration | null> {
+    return this.prisma.productionOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .millingBinConfiguration();
+  }
+
   async getRecipe(parentId: string): Promise<PrismaRecipe | null> {
     return this.prisma.productionOrder
       .findUnique({
         where: { id: parentId },
       })
       .recipe();
-  }
-
-  async getRecipeGroup(parentId: string): Promise<PrismaRecipeGroup | null> {
-    return this.prisma.productionOrder
-      .findUnique({
-        where: { id: parentId },
-      })
-      .recipeGroup();
   }
 
   async getScheduleOrder(
@@ -130,5 +143,13 @@ export class ProductionOrderServiceBase {
         where: { id: parentId },
       })
       .scheduleOrder();
+  }
+
+  async getUnits(parentId: string): Promise<PrismaUnits | null> {
+    return this.prisma.productionOrder
+      .findUnique({
+        where: { id: parentId },
+      })
+      .units();
   }
 }

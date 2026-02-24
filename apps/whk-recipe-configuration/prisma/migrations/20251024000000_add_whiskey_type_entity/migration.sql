@@ -86,6 +86,9 @@ BEGIN
     (generate_cuid(), NOW(), NOW(), 'FGB', 'Four Grain Bourbon', 'Bourbon whiskey made with four grain varieties', 'Bourbon', true, generate_cuid(), false, bourbon_whiskey_id);
 END $$;
 
+-- Temporarily disable immutable lot trigger to allow migration updates
+ALTER TABLE "Lot" DISABLE TRIGGER ALL;
+
 -- Migrate existing Lot enum values to WhiskeyType references
 DO $$
 DECLARE
@@ -120,6 +123,9 @@ BEGIN
     END IF;
   END LOOP;
 END $$;
+
+-- Re-enable triggers on Lot table after migration
+ALTER TABLE "Lot" ENABLE TRIGGER ALL;
 
 -- AddColumn to Recipe table for WhiskeyType reference
 ALTER TABLE "Recipe" ADD COLUMN "whiskeyTypeId" TEXT;

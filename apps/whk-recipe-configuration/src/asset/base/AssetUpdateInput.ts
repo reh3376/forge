@@ -18,10 +18,10 @@ import {
   IsOptional,
   IsEnum,
   ValidateNested,
+  IsInt,
+  Max,
   IsNumber,
   Min,
-  Max,
-  IsInt,
 } from "class-validator";
 
 import { EnumAssetAssetType } from "./EnumAssetAssetType";
@@ -33,8 +33,11 @@ import { InventoryLogUpdateManyWithoutAssetsInput } from "./InventoryLogUpdateMa
 import { InventoryTransferUpdateManyWithoutAssetsInput } from "./InventoryTransferUpdateManyWithoutAssetsInput";
 import { ItemReceiptUpdateManyWithoutAssetsInput } from "./ItemReceiptUpdateManyWithoutAssetsInput";
 import { LotUpdateManyWithoutAssetsInput } from "./LotUpdateManyWithoutAssetsInput";
+import { MillingBinConfigurationUpdateManyWithoutAssetsInput } from "./MillingBinConfigurationUpdateManyWithoutAssetsInput";
+import { OperatorShiftUpdateManyWithoutAssetsInput } from "./OperatorShiftUpdateManyWithoutAssetsInput";
 import { AssetWhereUniqueInput } from "./AssetWhereUniqueInput";
 import { PurchaseOrderUpdateManyWithoutAssetsInput } from "./PurchaseOrderUpdateManyWithoutAssetsInput";
+import { ScheduleOrderQueueUpdateManyWithoutAssetsInput } from "./ScheduleOrderQueueUpdateManyWithoutAssetsInput";
 import { EnumAssetStatus } from "./EnumAssetStatus";
 
 @InputType()
@@ -131,6 +134,18 @@ class AssetUpdateInput {
     nullable: true,
   })
   globalId?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Max(99999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  index?: number | null;
 
   @ApiProperty({
     required: false,
@@ -242,6 +257,18 @@ class AssetUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => MillingBinConfigurationUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => MillingBinConfigurationUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => MillingBinConfigurationUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  millingBinConfigurations?: MillingBinConfigurationUpdateManyWithoutAssetsInput;
+
+  @ApiProperty({
+    required: false,
     type: String,
   })
   @IsString()
@@ -251,6 +278,18 @@ class AssetUpdateInput {
     nullable: true,
   })
   name?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => OperatorShiftUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => OperatorShiftUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => OperatorShiftUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  operatorShifts?: OperatorShiftUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,
@@ -300,6 +339,18 @@ class AssetUpdateInput {
     nullable: true,
   })
   revision?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ScheduleOrderQueueUpdateManyWithoutAssetsInput,
+  })
+  @ValidateNested()
+  @Type(() => ScheduleOrderQueueUpdateManyWithoutAssetsInput)
+  @IsOptional()
+  @Field(() => ScheduleOrderQueueUpdateManyWithoutAssetsInput, {
+    nullable: true,
+  })
+  scheduleOrderQueues?: ScheduleOrderQueueUpdateManyWithoutAssetsInput;
 
   @ApiProperty({
     required: false,

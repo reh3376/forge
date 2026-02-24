@@ -84,7 +84,7 @@ export class BatchService extends BatchServiceBase {
             itemId: recipeBomItem.itemId,
             operation: recipeBomItem.operation,
             quantity: recipeBomItem.quantity,
-            units: recipeBomItem.units,
+            // units: recipeBomItem.units,
             updatedBy: recipeBomItem.updatedBy,
           },
         });
@@ -256,7 +256,6 @@ export class BatchService extends BatchServiceBase {
         customer: undefined,
         productionOrderRecipeInstance: undefined,
         parent: undefined,
-        recipe: undefined,
         lot: undefined,
       },
       include: {

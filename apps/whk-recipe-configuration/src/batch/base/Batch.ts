@@ -26,10 +26,12 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { BatchMaterialConsumption } from "../../batchMaterialConsumption/base/BatchMaterialConsumption";
+import { BatchParameterValue } from "../../batchParameterValue/base/BatchParameterValue";
+import { BatchTimeSeriesData } from "../../batchTimeSeriesData/base/BatchTimeSeriesData";
 import { Customer } from "../../customer/base/Customer";
 import { Lot } from "../../lot/base/Lot";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
-import { Recipe } from "../../recipe/base/Recipe";
 
 @ObjectType()
 class Batch {
@@ -60,6 +62,33 @@ class Batch {
   @MaxLength(64)
   @Field(() => String)
   batchId!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BatchMaterialConsumption],
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumption)
+  @IsOptional()
+  batchMaterialConsumptions?: Array<BatchMaterialConsumption>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BatchParameterValue],
+  })
+  @ValidateNested()
+  @Type(() => BatchParameterValue)
+  @IsOptional()
+  batchParameterValues?: Array<BatchParameterValue>;
+
+  @ApiProperty({
+    required: false,
+    type: () => [BatchTimeSeriesData],
+  })
+  @ValidateNested()
+  @Type(() => BatchTimeSeriesData)
+  @IsOptional()
+  batchTimeSeriesDataItems?: Array<BatchTimeSeriesData>;
 
   @ApiProperty({
     required: false,
@@ -144,15 +173,6 @@ class Batch {
     nullable: true,
   })
   quantity!: number | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => Recipe,
-  })
-  @ValidateNested()
-  @Type(() => Recipe)
-  @IsOptional()
-  recipe?: Recipe | null;
 
   @ApiProperty({
     required: false,

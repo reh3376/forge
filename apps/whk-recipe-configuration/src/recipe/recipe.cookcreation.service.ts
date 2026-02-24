@@ -404,13 +404,18 @@ export class RecipeCookCreationService {
 
   private isMaxCooksReached(
     lastCook: Operation | null,
-    productionOrder: ProductionOrder | null
+    productionOrder:
+      | (ProductionOrder & {
+          scheduleOrder?: { totalCooks?: number | null } | null;
+        })
+      | null
   ) {
     const executedCooks =
       lastCook?.procedureSequenceIndex !== undefined
         ? lastCook.procedureSequenceIndex + 1
         : 0;
-    const totalCooks = productionOrder?.totalCooks ?? 0;
+    // totalCooks moved from ProductionOrder to ScheduleOrder
+    const totalCooks = productionOrder?.scheduleOrder?.totalCooks ?? 0;
     this.logger.debug(
       `executedCooks: ${executedCooks}, totalCooks: ${totalCooks}`
     );

@@ -6,13 +6,14 @@ import * as common from "@nestjs/common";
 import { MashingProtocolStepActualResolverBase } from "./base/mashingProtocolStepActual.resolver.base";
 import { MashingProtocolStepActual } from "./base/MashingProtocolStepActual";
 import { MashingProtocolStepActualService } from "./mashingProtocolStepActual.service";
+import { InjectRolesBuilder } from "nest-access-control";
 
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => MashingProtocolStepActual)
 export class MashingProtocolStepActualResolver extends MashingProtocolStepActualResolverBase {
   constructor(
     protected readonly service: MashingProtocolStepActualService,
-    @nestAccessControl.InjectRolesBuilder()
+    @InjectRolesBuilder()
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {
     super(service, rolesBuilder);

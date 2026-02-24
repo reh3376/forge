@@ -386,6 +386,7 @@ export class InventoryTransferControllerBase {
         description: true,
         globalId: true,
         id: true,
+        index: true,
         name: true,
 
         parent: {

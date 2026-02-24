@@ -1,31 +1,37 @@
 import {
   EnumRecipeParameterRecipeSetpointType,
-  EnumEquipmentPhaseName,
-  EnumEquipmentPhaseStepType,
-  EnumOperationName,
-  EnumPhaseParameterSetpointType,
-  EnumPhaseParameterStaticName,
   EnumProductionOrderStatus,
   EnumScheduleOrderStatus,
   EnumUnitProcedureName,
   Item,
-  Operation,
-  PrismaClient,
   Recipe,
   RecipeGroup,
   RecipeParameter,
-  UnitProcedure,
   EnumRecipeWhiskeyType,
+  EnumMashingProtocolStepStepType,
+  Customer,
+  ProductionOrder,
+  ScheduleOrder,
 } from "@prisma/client";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { WhMessageBrokerTopics } from "../rabbitmq/topics";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { EnzymeDosingService } from "./enzyme.dosing";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { EnumRecipeBomItemOperation } from "../recipeBomItem/base/EnumRecipeBomItemOperation";
+import { PrismaService } from "../prisma/prisma.service";
+import { MashBillParser, GRAIN_ABBREVIATIONS } from "./mashbill-parser";
 
 // Define the BinAssignments interface to allow string or string[] values
 interface BinAssignments {
   [bin: string]: string | string[];
+}
+
+interface RecipeCreationResult {
+  recipe: Recipe;
+  recipeBom: any;
+  productionOrder?: ProductionOrder;
+  scheduleOrder?: ScheduleOrder;
 }
 
 @Injectable()
@@ -48,6 +54,7 @@ export class RecipeGenerator {
   private YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {};
   private MASHING_PROTOCOL: any[] = [];
   private RECIPE_PARAMETERS: any[] = [];
+  private SPECIALTY_ITEM_ID: string | undefined;
 
   private readonly MAX_QUANTITIES: { [key: string]: number } = {
     bin1: 6500,
@@ -59,15 +66,16 @@ export class RecipeGenerator {
   constructor(
     private readonly rabbitMQProducer: RabbitMQProducerService,
     private readonly enzymeDosingService: EnzymeDosingService,
+    private readonly prismaService: PrismaService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
   ) {
-    this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+    this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-v01`;
     if (this.BARREL_INFO !== "") {
-      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-v01`;
     } else {
-      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-R01`;
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-v01`;
     }
-    this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+    this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-v01`;
   }
 
   private normalizeRecipeParamName(name: string): string {
@@ -132,30 +140,193 @@ export class RecipeGenerator {
   }
 
   // Function to calculate grain quantities based on mash bill
+  // Supports both legacy format (75-21-00-04) and new format (68.5C-10.5R-21M)
   private calculateGrainQuantities(mashBill: string, totalGrainWeight: number) {
+    // Try to parse using new format first
+    const format = MashBillParser.detectFormat(`TEMP-${mashBill}-v01`);
+
+    if (format === "new" || mashBill.match(/\d+(?:\.\d+)?[A-Z]/)) {
+      // New format with grain abbreviations
+      const parsed = MashBillParser.parse(`TEMP-${mashBill}-v01`);
+      const quantities: { [key: string]: number } = {};
+
+      for (const component of parsed.components) {
+        const grainName =
+          component.grainName ||
+          GRAIN_ABBREVIATIONS[
+            component.char as keyof typeof GRAIN_ABBREVIATIONS
+          ] ||
+          component.char;
+        // Convert percentage to decimal (e.g., 68.5 -> 0.685)
+        quantities[grainName] = component.percentage / 100;
+      }
+
+      return quantities;
+    }
+
+    // Legacy format: corn-rye-wheat-malt[-specialty]
+    const parts = mashBill
+      .split("-")
+      .map((percent) => parseFloat(percent) / 100);
     const [
-      cornPercentRaw = 0,
-      ryePercentRaw = 0,
-      wheatPercentRaw = 0,
-      maltPercentRaw = 0,
-      specialtyPercentRaw = 0,
-    ] = this.getNormalizedMashBillValues(mashBill);
+      cornPercent = 0,
+      ryePercent = 0,
+      wheatPercent = 0,
+      maltPercent = 0,
+      specialtyPercent = 0,
+    ] = parts;
 
-    const cornPercent = cornPercentRaw / 100;
-    const ryePercent = ryePercentRaw / 100;
-    const wheatPercent = wheatPercentRaw / 100;
-    const maltPercent = maltPercentRaw / 100;
-    const specialtyPercent = specialtyPercentRaw / 100;
-
+    // Return percentages directly instead of absolute quantities
     return {
-      Corn: Math.round(totalGrainWeight * cornPercent),
-      Rye: Math.round(totalGrainWeight * ryePercent),
-      Wheat: Math.round(totalGrainWeight * wheatPercent),
-      Malt: Math.round(totalGrainWeight * maltPercent),
-      Specialty: Math.round(totalGrainWeight * specialtyPercent),
+      Corn: cornPercent,
+      Rye: ryePercent,
+      Wheat: wheatPercent,
+      Malt: maltPercent,
+      Specialty: specialtyPercent,
     };
   }
 
+  /**
+   * Preserve the splitting logic for use during order instantiation when total grain load is known
+   */
+  private splitGrainAdditionsForProduction(
+    grainType: string,
+    qtyInLbs: number,
+    binAssignments: BinAssignments
+  ): any[] {
+    this.logger.log(
+      `Splitting grain additions for ${grainType} with quantity ${qtyInLbs} lbs`
+    );
+
+    const SPLITS_RATIO = 0.6;
+    const splits: any[] = [];
+    let remainingQty = qtyInLbs;
+
+    // Handle PreMalt separately
+    if (grainType === "PreMalt") {
+      // PreMalt is typically 10% of malt quantity
+      splits.push({
+        action: "Add Grain",
+        grainType: "Malt", // PreMalt is handled as Malt
+        qty: qtyInLbs,
+      });
+      return splits;
+    }
+
+    // Get assigned bin for this grain type
+    let assignedBin = null;
+    for (const [bin, grains] of Object.entries(binAssignments)) {
+      if (
+        (typeof grains === "string" && grains === grainType) ||
+        (Array.isArray(grains) && grains.includes(grainType))
+      ) {
+        assignedBin = bin;
+        break;
+      }
+    }
+
+    if (!assignedBin) {
+      throw new Error(`No bin assigned for grain type ${grainType}`);
+    }
+
+    const maxBinQty = this.MAX_QUANTITIES[assignedBin];
+
+    // Always split if quantity is greater than bin capacity
+    if (qtyInLbs > maxBinQty) {
+      // Calculate first split quantity
+      const firstSplitQty = Math.min(
+        maxBinQty,
+        Math.floor(qtyInLbs * SPLITS_RATIO)
+      );
+
+      // Add first grain addition
+      splits.push({
+        action: "Add Grain",
+        grainType: grainType,
+        qty: firstSplitQty,
+      });
+
+      // Add hold after first addition
+      splits.push({
+        action: "Hold",
+        holdType: "Hold",
+        time: 2,
+      });
+
+      remainingQty -= firstSplitQty;
+
+      // Add remaining quantity as second addition
+      if (remainingQty > 0) {
+        splits.push({
+          action: "Add Grain",
+          grainType: grainType,
+          qty: remainingQty,
+        });
+      }
+    } else {
+      // Single addition for quantities within bin capacity
+      splits.push({
+        action: "Add Grain",
+        grainType: grainType,
+        qty: qtyInLbs,
+      });
+    }
+
+    return splits;
+  }
+
+  /**
+   * This method is preserved for recipe instance creation but not used during initial recipe creation
+   * It will be used when total grain load is known during order instantiation
+   */
+  private createGrainAdditionsWithSplits(
+    grainQuantities: { [key: string]: number },
+    totalGrainWeight: number,
+    binAssignments: BinAssignments,
+    hasPreMalt = false
+  ): any[] {
+    const mashingProtocolWithSplits: any[] = [];
+
+    // First add water and other initial steps if needed
+
+    // For each grain type, calculate the absolute weight and add to protocol with splits if needed
+    for (const [grainType, percentage] of Object.entries(grainQuantities)) {
+      if (percentage <= 0) continue;
+
+      // Calculate absolute weight in pounds
+      const qtyInLbs = totalGrainWeight * percentage;
+
+      // Get the splits for this grain type
+      const splitSteps = this.splitGrainAdditionsForProduction(
+        grainType,
+        qtyInLbs,
+        binAssignments
+      );
+
+      // Add the steps to the protocol
+      mashingProtocolWithSplits.push(...splitSteps);
+    }
+
+    // Handle PreMalt separately if needed
+    if (hasPreMalt && grainQuantities["Malt"] > 0) {
+      const preMaltQtyLbs = totalGrainWeight * grainQuantities["Malt"] * 0.1; // 10% of malt
+      const preMaltSteps = this.splitGrainAdditionsForProduction(
+        "PreMalt",
+        preMaltQtyLbs,
+        binAssignments
+      );
+
+      // Add PreMalt steps at the appropriate position (typically before other additions)
+      mashingProtocolWithSplits.unshift(...preMaltSteps);
+    }
+
+    return mashingProtocolWithSplits;
+  }
+
+  /**
+   * During recipe creation, we use a simplified version without splitting
+   * since we don't know the total grain weight at this point
+   */
   private splitGrainAdditions(
     grainType: string,
     qty: number,
@@ -164,157 +335,66 @@ export class RecipeGenerator {
     hasPreMalt = false
   ): any[] {
     this.logger.log(
-      `Grain type ${grainType} with qty ${qty} and bin assignments ${JSON.stringify(
-        binAssignments
-      )}`
+      `Creating grain addition for ${grainType} with percentage ${qty}`
     );
 
-    const SPLITS_RATIO = 0.8;
-    const MIN_SPLIT_QTY = 10; // Minimum quantity to allow a split to prevent excessive actions
-
-    const splits: any[] = [];
-    let remainingQty =
-      grainQuantities[grainType === "PreMalt" ? "Malt" : grainType];
-
-    // Handle PreMalt separately
-    if (grainType === "PreMalt") {
-      const preMaltQty = Math.round(remainingQty * 0.1);
-      if (preMaltQty > 0) {
-        splits.push({
-          action: "Add Grain",
-          grainType: "Malt",
-          qty: preMaltQty,
-        });
-        remainingQty -= preMaltQty;
-        this.logger.log(
-          `Allocated PreMalt Qty: ${preMaltQty}. Remaining Qty: ${remainingQty}`
-        );
-        return splits;
-      }
-    }
-
-    // Handle big malt
-    if (grainType === "Malt" && remainingQty > 0 && hasPreMalt) {
-      remainingQty = Math.round(remainingQty * 0.9);
+    // Ensure qty has a value and is not zero
+    if (!qty && qty !== 0) {
+      qty = grainQuantities[grainType] || 0;
       this.logger.log(
-        `Allocated 90% of Malt Qty: ${remainingQty}. Remaining Qty: ${remainingQty}`
+        `No quantity provided for ${grainType}, using calculated quantity: ${qty}`
       );
     }
 
-    // Convert binAssignments to an ordered array based on bin numbers
-    const orderedBins = Object.keys(binAssignments)
-      .sort((a, b) => {
-        const numA = parseInt(a.replace("bin", ""), 10);
-        const numB = parseInt(b.replace("bin", ""), 10);
-        return numA - numB;
-      })
-      .map((bin) => [bin, binAssignments[bin]] as [string, string | string[]]);
+    const splits: any[] = [];
 
-    while (remainingQty > 0) {
-      let splitOccurred = false;
-
-      for (const [binNum, binGrains] of orderedBins) {
-        const grains = Array.isArray(binGrains) ? binGrains : [binGrains];
-        this.logger.log(
-          `Checking bin ${binNum} for grains ${JSON.stringify(
-            grains
-          )} with max capacity of ${this.MAX_QUANTITIES[binNum]}`
-        );
-        const maxBinQty = this.MAX_QUANTITIES[binNum];
-        this.logger.log(
-          `Max bin capacity: ${maxBinQty}, remaining qty: ${remainingQty}. Grain type: ${grainType}`
-        );
-        const numGrainsInBin = grains.length;
-        this.logger.log(`Number of grains in bin ${binNum}: ${numGrainsInBin}`);
-        for (const binGrainType of grains) {
-          this.logger.log(
-            `Grain type in bin ${binNum}: ${binGrainType}, grain type: ${grainType}`
-          );
-          if (grainType === binGrainType) {
-            if (remainingQty > maxBinQty) {
-              this.logger.log(
-                `Match found for bin ${binNum} and grain type ${binGrainType}. Remaining qty: ${remainingQty}`
-              );
-
-              // Calculate the split quantity without exceeding the bin capacity
-              const splitQty = Math.min(
-                Math.round(remainingQty * SPLITS_RATIO),
-                maxBinQty
-              );
-
-              if (splitQty >= MIN_SPLIT_QTY) {
-                splits.push({
-                  action: "Add Grain",
-                  grainType: binGrainType,
-                  qty: splitQty,
-                });
-                remainingQty -= splitQty;
-                this.logger.log(
-                  `Added ${splitQty} of ${binGrainType} to bin ${binNum}. Remaining Qty: ${remainingQty}`
-                );
-                splitOccurred = true;
-              }
-
-              // Add Hold action if necessary
-              splits.push({
-                action: "Hold",
-                holdType: "Hold",
-                time: 2, // 2 minutes hold
-              });
-              this.logger.log(`Added Hold action for ${splitQty} qty.`);
-              splitOccurred = true;
-            } else {
-              if (remainingQty >= MIN_SPLIT_QTY) {
-                splits.push({
-                  action: "Add Grain",
-                  grainType: binGrainType,
-                  qty: remainingQty,
-                });
-                this.logger.log(
-                  `Final split: Added ${remainingQty} of ${binGrainType} to bin ${binNum}.`
-                );
-                remainingQty = 0;
-                splitOccurred = true;
-              }
-            }
-            break; // Exit the loop after processing a matching bin grain
-          } else {
-            // Skip grains that do not match the grain type
-            this.logger.log(
-              `Grain type ${binGrainType} in bin ${binNum} does not match grain type ${grainType}. Skipping.`
-            );
-          }
-        }
-      }
-
-      if (!splitOccurred) {
-        this.logger.log(
-          `No further splits could be made for grain type ${grainType}. Remaining qty: ${remainingQty}`
-        );
-        // Optionally, handle the remaining quantity here or log a warning
-        // For example, throw an error if grain can't be fully allocated
-        throw new Error(
-          `Unable to allocate all grains for ${grainType}. Remaining quantity: ${remainingQty}`
-        );
-      }
+    // Handle PreMalt separately
+    if (grainType === "PreMalt") {
+      const preMaltQty = grainQuantities["Malt"]
+        ? grainQuantities["Malt"] * 0.1
+        : 0; // 10% of malt percentage
+      splits.push({
+        action: "Add Grain",
+        grainType: "Malt", // PreMalt is handled as Malt
+        qty: preMaltQty,
+      });
+      return splits;
     }
+
+    // For initial recipe creation, we don't split - just add a single step
+    splits.push({
+      action: "Add Grain",
+      grainType: grainType,
+      qty: qty,
+    });
 
     return splits;
   }
 
-  private getEnzymeDosing(
+  private async getEnzymeDosing(
     enzymeName: string,
     totalGrainLoadLbs: number,
     mashBill: string
   ) {
-    return this.enzymeDosingService.calculateEnzymeDosing(
-      totalGrainLoadLbs,
-      mashBill,
-      enzymeName
-    );
+    // Use the normalized enzyme dosing calculation
+    const normalizedDosing =
+      await this.enzymeDosingService.calculateNormalizedEnzymeDosing(
+        mashBill,
+        enzymeName
+      );
+
+    if (normalizedDosing) {
+      // Convert back to original interface format for backward compatibility
+      return {
+        dose: normalizedDosing.ratio, // Already a unitless ratio
+        instructions: normalizedDosing.instructions,
+      };
+    }
+
+    return null;
   }
 
-  private setEnzymeDosing(mashingProtocol: any[]) {
+  private async setEnzymeDosing(mashingProtocol: any[]) {
     this.logger.log(`Mashing protocol: ${JSON.stringify(mashingProtocol)}`);
 
     // Create new protocol array to store modified steps
@@ -329,7 +409,7 @@ export class RecipeGenerator {
     for (const index of additiveIndices) {
       const step = newProtocol[index];
       const enzymeName = step.additiveType;
-      const dosing = this.getEnzymeDosing(
+      const dosing = await this.getEnzymeDosing(
         enzymeName,
         this.TOTAL_GRAIN_WEIGHT,
         this.MASH_BILL
@@ -346,44 +426,55 @@ export class RecipeGenerator {
   }
 
   private detectWhiskeyType(mashBill: string): EnumRecipeWhiskeyType {
-    // Convert to uppercase for consistent comparison
-    const upperMashBill = mashBill.toUpperCase();
+    // Use the new parser to handle both formats
+    const grainQuantities = this.calculateGrainQuantities(mashBill, 1);
 
-    const cornPercentage = this.calculateGrainPercentage("CORN", upperMashBill);
-    const ryePercentage = this.calculateGrainPercentage("RYE", upperMashBill);
-    const wheatPercentage = this.calculateGrainPercentage(
-      "WHEAT",
-      upperMashBill
-    );
-    const maltPercentage = this.calculateGrainPercentage("MALT", upperMashBill);
+    // Get percentages (multiply by 100 since quantities are decimals)
+    const cornPercent = (grainQuantities["Corn"] || 0) * 100;
+    const ryePercent = (grainQuantities["Rye"] || 0) * 100;
+    const wheatPercent = (grainQuantities["Wheat"] || 0) * 100;
+    const maltPercent = (grainQuantities["Malt"] || 0) * 100;
+    const maltedRyePercent = (grainQuantities["Malted Rye"] || 0) * 100;
 
-    // Bourbon variations (corn > 51%)
-    if (cornPercentage > 51) {
-      if (ryePercentage > 0 && wheatPercentage === 0) {
-        return EnumRecipeWhiskeyType.RyeBourbon;
-      }
-      if (wheatPercentage > 0 && ryePercentage === 0) {
+    // Combined rye percentage (regular rye + malted rye)
+    const totalRyePercent = ryePercent + maltedRyePercent;
+
+    // Check for primary grain types first (>51%)
+    if (totalRyePercent >= 51) {
+      return EnumRecipeWhiskeyType.RyeWhiskey;
+    }
+    if (wheatPercent >= 51) {
+      return EnumRecipeWhiskeyType.WheatWhiskey;
+    }
+    if (maltPercent >= 51) {
+      return EnumRecipeWhiskeyType.MaltWhiskey;
+    }
+
+    // Check for bourbon variations (corn > 51%)
+    if (cornPercent >= 51) {
+      // For Wheated Bourbon, wheat must be present and rye must be 0
+      if (wheatPercent > 0 && totalRyePercent === 0) {
         return EnumRecipeWhiskeyType.WheatedBourbon;
       }
-      if (wheatPercentage > 0 && ryePercentage > 0) {
+      // For Rye Bourbon, rye must be present and wheat must be 0
+      if (totalRyePercent > 0 && wheatPercent === 0) {
+        return EnumRecipeWhiskeyType.RyeBourbon;
+      }
+      // For Four Grain Bourbon, both rye and wheat must be present
+      if (totalRyePercent > 0 && wheatPercent > 0) {
         return EnumRecipeWhiskeyType.FourGrainBourbon;
       }
     }
 
-    // Rye whiskey (rye > 51%)
-    if (ryePercentage > 51) {
-      return EnumRecipeWhiskeyType.RyeWhiskey;
+    // Check for four grain whiskey (all grains present)
+    const grainCount = Object.values(grainQuantities).filter(
+      (v) => v > 0
+    ).length;
+    if (grainCount >= 4) {
+      return EnumRecipeWhiskeyType.FourGrainWhiskey;
     }
 
-    // Wheat whiskey (wheat > 51%)
-    if (wheatPercentage > 51) {
-      return EnumRecipeWhiskeyType.WheatWhiskey;
-    }
-
-    // Malt whiskey (malt > 51%)
-    if (maltPercentage > 51) {
-      return EnumRecipeWhiskeyType.MaltWhiskey;
-    }
+    // Default case
     return EnumRecipeWhiskeyType.RyeBourbon;
   }
 
@@ -424,17 +515,16 @@ export class RecipeGenerator {
   ): boolean {
     this.logger.log("Validating mashing protocol against mash bill...");
 
-    // Extract grains from mash bill
-    const [corn = 0, rye = 0, wheat = 0, malt = 0, specialty = 0] =
-      this.getNormalizedMashBillValues(mashBill);
+    // Use the new parser to extract grains from mash bill
+    const grainQuantities = this.calculateGrainQuantities(mashBill, 1);
     const mashBillGrains = new Set<string>();
 
     // Only add grains that have non-zero percentages
-    if (corn > 0) mashBillGrains.add("Corn");
-    if (rye > 0) mashBillGrains.add("Rye");
-    if (wheat > 0) mashBillGrains.add("Wheat");
-    if (malt > 0) mashBillGrains.add("Malt");
-    if (specialty > 0) mashBillGrains.add("Specialty");
+    for (const [grainName, quantity] of Object.entries(grainQuantities)) {
+      if (quantity > 0) {
+        mashBillGrains.add(grainName);
+      }
+    }
 
     // Collect all grains from mashing protocol
     const protocolGrains = new Set<string>();
@@ -547,6 +637,29 @@ export class RecipeGenerator {
     return true;
   }
 
+  private async getItemByItemNumber(client: PrismaService, itemNumber: string) {
+    try {
+      const item = await client.item.findFirst({
+        where: {
+          itemNumber: {
+            equals: itemNumber,
+            mode: "insensitive",
+          },
+        },
+      });
+
+      if (!item) {
+        this.logger.log(`Item with item number ${itemNumber} not found`);
+        return null;
+      }
+
+      return item;
+    } catch (error) {
+      this.logger.error(`Error finding item: ${error}`);
+      throw error;
+    }
+  }
+
   async createRecipeData(
     customerCode: string,
     mashBill: string,
@@ -563,9 +676,10 @@ export class RecipeGenerator {
     yeastItemNumbersQtys: { [key: string]: number },
     mashingProtocol: any[],
     recipeParameters: any[],
-    binAssignments: BinAssignments, // Updated type
-    specialtyItemNumber?: string
-  ): Promise<void> {
+    binAssignments: BinAssignments,
+    specialtyItemNumber?: string,
+    createOrders: boolean = false
+  ): Promise<RecipeCreationResult> {
     // Set the attributes
     this.CUSTOMER_CODE = customerCode.replace(/\n|\r/g, "");
     this.MASH_BILL = mashBill.replace(/\n|\r/g, "");
@@ -585,13 +699,13 @@ export class RecipeGenerator {
       ...p,
       name: this.normalizeRecipeParamName(p?.name),
     }));
-    this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+    this.RECIPE = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-v01`;
     if (this.BARREL_INFO !== "") {
-      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`;
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-v01`;
     } else {
-      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-R01`;
+      this.ITEM_NUMBER = `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-v01`;
     }
-    this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-R01`;
+    this.BOM_REVISION = `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}-v01`;
 
     console.info("Seeding database with custom seed for Mashing Recipe...");
 
@@ -602,37 +716,13 @@ export class RecipeGenerator {
       throw new Error("Invalid mashing protocol for given mash bill");
     }
 
-    // ------------------------------------ BOM CREATION ------------------------------------
-    // Base BOM Items
-    const waterItemId = "clyd1ofw2009yfd4504c6wt1w";
-    const backsetItemId = "clyd1oftx006jfd4514hrak80";
-    const viscofermItemId = "clyd1ofou0024fd45e71gyxcu";
-    const liquozymeItemId = "clzhhlwfj0f8ysuwb7whvgy9s";
-    const diazymeItemId = "clzhhlsx30f09mbc9r5mj02z7";
-    const termamylItemId = "clzelxl5v005osuwb3rfax6ix";
-    const saczymeItemId = "clyd1ofot0022fd45d8j321v4";
-    const laminexItemId = "clyd1ofoq001xfd45678b666b";
-    const maltItemId = "clyd1ofw0009ufd45hlzpnqa9";
-    const ryeItemId = "clyd1ofy600d9fd45p99px0c0";
-    const cornItemId = "clyd1ofw1009wfd45oghso7y5";
-    const wheatItemId = "cm0e1ocx0012xl6xv4i696cfh";
-    const citricItemId = "clyd1ofpw0032fd45omeixgvv";
-
-    // Look up specialty item ID if specialty item number is provided
-    const client = new PrismaClient();
-    let specialtyItemId: string | undefined;
-
-    // Extract specialty percentage from mash bill to validate requirements
+    // Validate specialty item requirement before proceeding
     const [, , , , specialtyPercentRaw = 0] = this.getNormalizedMashBillValues(
       this.MASH_BILL
     );
-
-    // Normalize the specialty item number once (trim and store)
     const normalizedSpecialtyItemNumber = specialtyItemNumber?.trim() || "";
 
-    // Validate that if mash bill requires specialty > 0, a specialty item number must be provided
     if (specialtyPercentRaw > 0 && !normalizedSpecialtyItemNumber) {
-      await client.$disconnect();
       throw new Error(
         `Specialty item with item number ${
           specialtyItemNumber || "(not provided)"
@@ -640,17 +730,49 @@ export class RecipeGenerator {
       );
     }
 
-    // Only perform lookup if specialty item number is provided
+    // Validate bin assignments
+    if (!this.validateBinAssignments(binAssignments)) {
+      throw new Error("Invalid bin assignments");
+    }
+
+    // Process the mashing protocol to get the quantities of each grain type
+    // But don't split the additions since we're using percentages
+    const grainQuantities: any = this.calculateGrainQuantities(
+      this.MASH_BILL,
+      this.TOTAL_GRAIN_WEIGHT
+    );
+
+    const hasPreMalt = this.MASHING_PROTOCOL.some(
+      (step) => step.action === "Add Grain" && step.grainType === "PreMalt"
+    );
+
+    this.logger.log(
+      `Grain quantities (percentages): ${JSON.stringify(grainQuantities)}`
+    );
+    const grainAdditions = mashingProtocol.filter(
+      (param) => param.action === "Add Grain"
+    );
+    this.logger.log(`Grain additions: ${JSON.stringify(grainAdditions)}`);
+
+    // For initial recipe creation, we use quantities directly from the mashing protocol
+    // No splitting needed since we're using percentages
+    // Keep the original mashing protocol without modifications
+    const finalizedMashingProtocol: any[] = await this.setEnzymeDosing(
+      mashingProtocol
+    );
+    this.logger.log(
+      `Finalized mashing protocol: ${JSON.stringify(finalizedMashingProtocol)}`
+    );
+
+    const client = this.prismaService;
+
+    // Look up specialty item ID if specialty item number is provided
     if (normalizedSpecialtyItemNumber) {
-      console.log(
+      this.logger.log(
         `Looking up specialty item with itemNumber: "${specialtyItemNumber}" (normalized: "${normalizedSpecialtyItemNumber}")`
       );
 
-      let specialtyItem = null;
-
-      // Step 1: Try exact match with case-insensitive mode on normalized value
-      console.log(`Trying exact match with case-insensitive mode`);
-      specialtyItem = await client.item.findFirst({
+      let specialtyItem = await client.item.findFirst({
         where: {
           itemNumber: {
             equals: normalizedSpecialtyItemNumber,
@@ -659,14 +781,10 @@ export class RecipeGenerator {
         },
       });
 
-      // Step 2: If original is different from normalized, try exact match on original value
       if (
         !specialtyItem &&
         specialtyItemNumber !== normalizedSpecialtyItemNumber
       ) {
-        console.log(
-          `Exact match not found, trying original value (with whitespace)`
-        );
         specialtyItem = await client.item.findFirst({
           where: {
             itemNumber: {
@@ -677,9 +795,7 @@ export class RecipeGenerator {
         });
       }
 
-      // Step 3: Try contains search with case-insensitive mode on normalized value
       if (!specialtyItem) {
-        console.log(`Still not found, trying contains search`);
         const allItems = await client.item.findMany({
           where: {
             itemNumber: {
@@ -689,398 +805,68 @@ export class RecipeGenerator {
           },
           take: 10,
         });
-        console.log(
-          `Items found with contains search:`,
-          allItems.map((i) => ({ id: i.id, itemNumber: i.itemNumber }))
-        );
         if (allItems.length > 0) {
           specialtyItem = allItems[0];
-          console.log(`Using first match from contains search`);
         }
       }
 
-      // Step 4: If still not found, throw error before any FG item lookups
       if (!specialtyItem) {
-        await client.$disconnect();
         throw new Error(
           `Specialty item with item number ${specialtyItemNumber} not found`
         );
       }
 
-      specialtyItemId = specialtyItem.id;
-      console.log(
+      this.SPECIALTY_ITEM_ID = specialtyItem.id;
+      this.logger.log(
         `Found specialty item: ${specialtyItem.id}, ${specialtyItem.itemNumber}`
       );
     }
-
-    // --------------------------- Processing Bin Assignments ---------------------------
-    // Validate bin assignments
-    if (!this.validateBinAssignments(binAssignments)) {
-      await client.$disconnect();
-      throw new Error("Invalid bin assignments");
-    }
-
-    // Process the mashing protocol to get the quantities of each grain type and to split the additions if necessary
-    const grainQuantities: any = this.calculateGrainQuantities(
-      this.MASH_BILL,
-      this.TOTAL_GRAIN_WEIGHT
-    );
-
-    const hasPreMalt = this.MASHING_PROTOCOL.some(
-      (step) => step.action === "Add Grain" && step.grainType === "PreMalt"
-    );
-
-    this.logger.log(`Grain quantities: ${JSON.stringify(grainQuantities)}`);
-    const grainAdditions = mashingProtocol.filter(
-      (param) => param.action === "Add Grain"
-    );
-    this.logger.log(`Grain additions: ${JSON.stringify(grainAdditions)}`);
-
-    const mashingProtocolWithSplits = this.MASHING_PROTOCOL.reduce(
-      (acc: any[], step) => {
-        if (step.action === "Add Grain") {
-          const grainType = step.grainType;
-          const qty = grainQuantities[grainType];
-          const splitSteps = this.splitGrainAdditions(
-            grainType,
-            qty,
-            binAssignments,
-            grainQuantities,
-            hasPreMalt
-          );
-          return [...acc, ...splitSteps];
-        }
-        return [...acc, step];
-      },
-      []
-    );
-
-    this.logger.log(
-      `Mashing protocol with splits: ${JSON.stringify(
-        mashingProtocolWithSplits
-      )}`
-    );
-
-    // Set the enzyme dosing
-    const finalizedMashingProtocol: any[] = this.setEnzymeDosing(
-      mashingProtocolWithSplits
-    );
-    this.logger.log(
-      `Finalized mashing protocol: ${JSON.stringify(finalizedMashingProtocol)}`
-    );
-
     console.log("Creating recipe...");
-    const itemNumber =
-      this.BARREL_INFO !== ""
-        ? `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.BARREL_INFO}-${this.FINAL_PROOF}-R01`
-        : `${this.CUSTOMER_CODE}-${this.MASH_BILL}-${this.FINAL_PROOF}-R01`;
-    console.log("itemNumber:", itemNumber);
-    // Create the base BOM and bom items
-    const fgItem = await client.item.findFirst({
-      where: {
-        itemNumber: itemNumber,
-      },
-    });
+    console.log("itemNumber:", this.ITEM_NUMBER);
 
-    if (!fgItem) {
-      console.log(`Item ${itemNumber} not found`);
-      throw new Error(`Item ${itemNumber} not found`);
+    const item = await this.getItemByItemNumber(client, this.ITEM_NUMBER);
+    if (!item) {
+      throw new Error(`Item ${this.ITEM_NUMBER} not found`);
     }
+    console.log(`Found item: ${item.id}, ${item.itemNumber}`);
 
-    // Check for existing BOM with the same revision
-    const existingBom = await client.bom.findFirst({
+    const customer = await client.customer.findFirst({
       where: {
-        bomRevision: this.BOM_REVISION,
+        name: this.CUSTOMER_NAME,
       },
     });
 
-    if (existingBom) {
-      console.log(
-        `BOM with revision ${this.BOM_REVISION} already exists. Skipping creation.`
-      );
+    if (!customer) {
+      throw new Error(`Customer '${this.CUSTOMER_NAME}' not found`);
+    }
+    console.log(`Found customer: ${customer.id}, ${customer.name}`);
+
+    // Create the initial recipe that will be used throughout the process
+    const existingRecipe = await client.recipe.findFirst({
+      where: {
+        Recipe: this.RECIPE,
+      },
+    });
+
+    let recipe: Recipe;
+    if (existingRecipe) {
+      console.log("Recipe already exists, using existing recipe...");
+      recipe = existingRecipe;
     } else {
-      console.log("Creating base BOM...");
-      const baseBom = await client.bom.create({
+      console.log("Creating new recipe...");
+      recipe = await client.recipe.create({
         data: {
-          bomRevision: this.BOM_REVISION,
-          bomName: `BOM-${this.CUSTOMER_CODE}-${this.MASH_BILL}`,
+          Recipe: this.RECIPE,
+          revision: 1,
           createdBy: this.USER,
-          item: {
-            connect: {
-              id: fgItem?.id,
-            },
+          whiskeyType:
+            EnumRecipeWhiskeyType[this.detectWhiskeyType(this.MASH_BILL)],
+          customer: {
+            connect: { id: customer.id },
           },
+          customerCode: this.CUSTOMER_CODE,
         },
       });
-      console.log(`Created base BOM: ${baseBom.id}`);
-      console.log(`Water id: ${waterItemId}`);
-      console.log(`Backset id: ${backsetItemId}`);
-      console.log(`Viscoferm id: ${viscofermItemId}`);
-      console.log(`Liquozyme id: ${liquozymeItemId}`);
-      console.log(`Diazyme id: ${diazymeItemId}`);
-      console.log(`Termamyl id: ${termamylItemId}`);
-      console.log(`Saczyme id: ${saczymeItemId}`);
-      console.log(`Malt id: ${maltItemId}`);
-      console.log(`Rye id: ${ryeItemId}`);
-      console.log(`Corn id: ${cornItemId}`);
-      console.log(`Wheat id: ${wheatItemId}`);
-      console.log(`Citric id: ${citricItemId}`);
-      // add the base bom items
-      await client.bomItem.createMany({
-        data: [
-          {
-            bomId: baseBom.id,
-            itemId: waterItemId,
-            quantity: this.WATER_QTY,
-            createdBy: this.USER,
-            isClassDefinition: true,
-          },
-          {
-            bomId: baseBom.id,
-            itemId: backsetItemId,
-            quantity: this.BACKSET_QTY,
-            createdBy: this.USER,
-            isClassDefinition: true,
-          },
-          {
-            bomId: baseBom.id,
-            itemId: citricItemId,
-            quantity: 0,
-            createdBy: this.USER,
-            isClassDefinition: true,
-          },
-        ],
-      });
-
-      // add the barrel bom items
-      if (this.BBL_ITEM_NUMBERS.length > 0) {
-        for (const itemNumber of this.BBL_ITEM_NUMBERS) {
-          const itemId = await client.item.findFirst({
-            where: {
-              itemNumber: itemNumber,
-            },
-          });
-          if (itemId) {
-            await client.bomItem.create({
-              data: {
-                bomId: baseBom.id,
-                itemId: itemId?.id,
-                quantity: 1 / this.BBL_ITEM_NUMBERS.length,
-                createdBy: this.USER,
-                isClassDefinition: true,
-              },
-            });
-          }
-        }
-      }
-
-      // add the yeast items
-      for (const [yeastItemNumber, quantity] of Object.entries(
-        this.YEAST_ITEM_NUMBERS_QTYS
-      )) {
-        const item = await client.item.findFirst({
-          where: {
-            itemNumber: yeastItemNumber,
-          },
-        });
-        if (item) {
-          await client.bomItem.create({
-            data: {
-              bomId: baseBom.id,
-              itemId: item.id,
-              quantity: this.YEAST_ITEM_NUMBERS_QTYS[yeastItemNumber],
-              createdBy: this.USER,
-              isClassDefinition: true,
-            },
-          });
-        } else {
-          console.log(
-            `Item not found for yeast item number: ${yeastItemNumber}`
-          );
-        }
-      }
-
-      // Add the bom items for the grains according to the mashingProtocol
-      // Add the bom items for the grains according to the mashingProtocol
-      for (const step of finalizedMashingProtocol) {
-        if (step.action === "Add Grain") {
-          let itemId;
-          let quantity: number;
-
-          switch (step.grainType) {
-            case "Corn":
-              itemId = cornItemId;
-              quantity = step.qty || 0;
-              break;
-            case "Rye":
-              itemId = ryeItemId;
-              quantity = step.qty || 0;
-              break;
-            case "Malt":
-              itemId = maltItemId;
-              quantity = step.qty || 0;
-              break;
-            case "Wheat":
-              itemId = wheatItemId;
-              quantity = step.qty || 0;
-              break;
-            case "Specialty":
-              itemId = specialtyItemId;
-              quantity = step.qty || 0;
-              break;
-            default:
-              console.log(`Unknown grain type: ${step.grainType}`);
-              continue;
-          }
-
-          if (itemId && quantity) {
-            await client.bomItem.create({
-              data: {
-                bomId: baseBom.id,
-                itemId: itemId,
-                quantity: quantity,
-                createdBy: this.USER,
-                isClassDefinition: true,
-              },
-            });
-            console.log(
-              `Added ${step.grainType} to BOM with quantity ${quantity}`
-            );
-          }
-        } else if (step.action === "Add Additive") {
-          let itemId;
-          let quantity;
-
-          switch (step.additiveType?.toLowerCase()) {
-            case "viscoferm":
-              itemId = viscofermItemId;
-              quantity = step.qty || 0;
-              break;
-            case "liquozyme":
-              itemId = liquozymeItemId;
-              quantity = step.qty || 0;
-              break;
-            case "diazyme":
-              itemId = diazymeItemId;
-              quantity = step.qty || 0;
-              break;
-            case "termamyl":
-              itemId = termamylItemId;
-              quantity = step.qty || 0;
-              break;
-            case "saczyme":
-              itemId = saczymeItemId;
-              quantity = step.qty || 0;
-              break;
-            case "laminex":
-              itemId = laminexItemId;
-              quantity = step.qty || 0;
-              break;
-          }
-
-          if (itemId && quantity) {
-            await client.bomItem.create({
-              data: {
-                bomId: baseBom.id,
-                itemId: itemId || "",
-                quantity: quantity || 0,
-                createdBy: this.USER,
-                isClassDefinition: true,
-              },
-            });
-            console.log(
-              `Added ${step.additiveType} to BOM with quantity ${quantity}`
-            );
-          }
-        }
-      }
-    }
-
-    // ------------------------------------ END OF BOM CREATION ------------------------------------
-
-    /*
-    1. Seed instance of unit procedures, using the main procedure instance
-    2. Seed instances of operations for each UP. Using the parameters to seed the number of operations per UP
-    3. Find the appropriate BOM for the mashing recipe
-    4. Using the structure of the mashing protocol to map the equipment phases to cook. 
-      a. Connect the correct phase parameters
-      b. Connect the step type if applicable.  
-      c. Map the bom components to the proper equipment phase
-
-    */
-
-    // Find Unit Procedure class definitions
-    const unitProcedureClassDefs = await client.unitProcedure.findMany({
-      where: {
-        isClassDef: true,
-        name: "Mashing01",
-      },
-    });
-
-    console.log("Unit Procedure Class Definitions:", unitProcedureClassDefs);
-
-    // Find the procedure instance for the mashing recipe
-    const mashingRecipeProcedure = await client.procedure.findFirst({
-      where: {
-        name: "Line1",
-        isClassDefinition: false,
-      },
-    });
-
-    if (!mashingRecipeProcedure) {
-      console.error("Mashing Recipe procedure instance not found");
-      return;
-    }
-
-    console.log(
-      "Found Mashing Recipe procedure instance:",
-      mashingRecipeProcedure.id
-    );
-
-    let mashInstance: UnitProcedure | null = null;
-    // Create instances of Unit Procedures
-    for (const classDef of unitProcedureClassDefs) {
-      const existingInstance = await client.unitProcedure.findFirst({
-        where: {
-          name: classDef.name,
-          isClassDef: false,
-          recipe: {
-            some: {
-              Recipe: this.RECIPE,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-      mashInstance = existingInstance;
-      if (!existingInstance) {
-        // if (true) {
-        const newInstance = await client.unitProcedure.create({
-          data: {
-            name: classDef.name,
-            path: classDef.path,
-            isClassDef: false,
-            classId: { connect: { id: classDef.id } },
-            revision: 0,
-            description: `Instance of ${classDef.name}`,
-            createdBy: "seed",
-            procedure: { connect: { id: mashingRecipeProcedure.id } },
-          },
-        });
-        console.log(`Created new Unit Procedure instance: ${newInstance.name}`);
-        if (newInstance.name.includes("Mashing01")) {
-          mashInstance = newInstance;
-        }
-      } else {
-        console.log(`Instance of ${classDef.name} already exists, skipping.`);
-        // mashIstance = existingInstance;
-      }
-      if (!mashInstance) {
-        console.log(`Mashing unit procedure instance not found`);
-        mashInstance = existingInstance;
-      }
     }
 
     // find the appropriate BOM / BOM Version
@@ -1090,437 +876,129 @@ export class RecipeGenerator {
       },
     });
 
-    // Seed operations based on number of cooks per ferm and number of cooks
-    const numberOfCooksPerFerm = 3; // This should be configurable or fetched from a setting
-    const totalNumberOfCooks = 1; // This should be configurable or fetched from a setting
-    const startCook = 0;
-
-    const operationClassDefs = await client.operation.findMany({
-      where: {
-        isClassDefinition: true,
-      },
-    });
-
-    console.log("Operation Class Definitions:", operationClassDefs);
-
-    if (!mashInstance) {
-      console.log(`Mashing unit procedure instance not found`);
-      return;
+    if (!bom) {
+      throw new Error(`BOM with revision ${this.BOM_REVISION} not found`);
     }
+
+    // Get the mashing unit procedure
     const mashingUnitProcedure = await client.unitProcedure.findFirst({
       where: {
-        id: mashInstance.id,
-        // name: EnumUnitProcedureName.Mashing01,
-        // isClassDef: false,
-        // procedure: { id: mashingRecipeProcedure.id }
-      },
-      orderBy: {
-        createdAt: "desc",
+        name: EnumUnitProcedureName.Mashing01,
       },
     });
 
     if (!mashingUnitProcedure) {
-      console.error("Mashing Unit Procedure instance not found");
-      return;
-    }
-    const newCookInstances: Operation[] = [];
-    for (
-      let cookIndex = startCook;
-      cookIndex < totalNumberOfCooks;
-      cookIndex++
-    ) {
-      const existingInstance = await client.operation.findFirst({
-        where: {
-          name: EnumOperationName.Cook,
-          isClassDefinition: false,
-          // unitProcedure: { id: mashingUnitProcedure.id },
-          unitProcedureId: mashInstance.id,
-          procedureSequenceIndex: cookIndex,
-        },
-      });
-      const cookClassDef = operationClassDefs.find(
-        (def) => def.name === EnumOperationName.Cook
-      );
-
-      if (cookClassDef) {
-        newCookInstances[cookIndex] = await client.operation.create({
-          data: {
-            name: EnumOperationName.Cook,
-            path: `${cookClassDef.path}/Cook${cookIndex + 1}`,
-            isClassDefinition: false,
-            classId: { connect: { id: cookClassDef.id } },
-            revision: 0,
-            description: `Instance of Cook for Cook ${cookIndex + 1}`,
-            createdBy: "seed",
-            unitProcedure: { connect: { id: mashingUnitProcedure.id } },
-            procedureSequenceIndex: cookIndex,
-            abbreviation: "MAS",
-          },
-        });
-        console.log(
-          `Created new Operation instance: ${
-            newCookInstances[cookIndex].name
-          } for Cook ${cookIndex + 1}`
-        );
-      } else {
-        console.log(
-          `Cook class definition not found, skipping Cook ${cookIndex + 1}`
-        );
-      }
+      throw new Error("Mashing unit procedure not found");
     }
 
-    for (
-      let cookIndex = startCook;
-      cookIndex < totalNumberOfCooks;
-      cookIndex++
-    ) {
-      // const fermIndex = Math.floor(cookIndex / numberOfCooksPerFerm);
-
-      const cookOperation = await client.operation.findFirst({
-        where: {
-          // name: EnumOperationName.Cook,
-          // isClassDefinition: false,
-          // unitProcedure: { id: mashingUnitProcedure.id },
-          // procedureSequenceIndex: cookIndex
-          id: newCookInstances[cookIndex].id,
-        },
-      });
-
-      if (!cookOperation) {
-        console.log(
-          `Cook operation not found for Cook ${
-            cookIndex + 1
-          }, skipping phase creation.`
-        );
-        continue;
-      }
-
-      // Map the provided phase names to the actual enum values
-      const phaseNameMap: { [key: string]: EnumEquipmentPhaseName } = {
-        "Add Liquid": EnumEquipmentPhaseName.LiquidAdd,
-        Hold: EnumEquipmentPhaseName.Hold,
-        "Add Grain": EnumEquipmentPhaseName.GrainAdd,
-        "Add Additive": EnumEquipmentPhaseName.AdditiveAdd,
-      };
-
-      // Update the MASHING_PROTOCOL with the mapped enum values
-      const mappedMASHING_PROTOCOL = finalizedMashingProtocol.map((phase) => ({
-        ...phase,
-        action: phaseNameMap[phase.action] || phase.action,
-      }));
-
-      for (const [phaseIndex, phase] of finalizedMashingProtocol.entries()) {
-        const existingPhase = await client.equipmentPhase.findFirst({
-          where: {
-            name:
-              phaseNameMap[phase.action] ||
-              (phase.action as EnumEquipmentPhaseName),
-            operation: {
-              id: newCookInstances[cookIndex].id,
-            },
-            operationSequenceIndex: phaseIndex,
-          },
-          include: {
-            operation: true,
-          },
-        });
-
-        if (!existingPhase) {
-          const cookOperation: Operation | null =
-            await client.operation.findFirst({
-              where: {
-                name: EnumOperationName.Cook,
-                isClassDefinition: false,
-                unitProcedure: { id: mashingUnitProcedure.id },
-                procedureSequenceIndex: cookIndex,
-              },
-              orderBy: { createdAt: "desc" },
-            });
-
-          if (cookOperation) {
-            const stepType =
-              phase.action === "Hold"
-                ? phase.holdType
-                : phase.action === "Add Grain"
-                ? phase.grainType
-                : phase.action === "Add Liquid"
-                ? phase.liquidType01
-                : undefined;
-            const newPhase = await client.equipmentPhase.create({
-              data: {
-                name:
-                  phaseNameMap[phase.action] ||
-                  (phase.action as EnumEquipmentPhaseName),
-                path: `${mashingUnitProcedure.path}/Cook${cookIndex + 1}/${
-                  phase.action
-                }`,
-                isClassDefinition: false,
-                revision: 0,
-                description: `Cook ${cookIndex + 1}`,
-                createdBy: "seed",
-                operation: {
-                  connect: {
-                    id: (cookOperation as Operation).id as string,
-                  },
-                },
-                stepType: stepType as EnumEquipmentPhaseStepType,
-                operationSequenceIndex: phaseIndex,
-              },
-            });
-            console.log(
-              `Created new Equipment Phase: ${newPhase.name} for Cook ${
-                cookIndex + 1
-              }`
-            );
-
-            // Add phase parameters based on the action
-            const parameterData: {
-              name: string;
-              value: number | string;
-              units: string;
-            }[] = [];
-            if (phase.temperature) {
-              parameterData.push({
-                name: "Temperature",
-                value: phase.temperature,
-                units: "°F",
-              });
-            }
-            if (phase.time) {
-              parameterData.push({
-                name: "Time",
-                value: phase.time,
-                units: "minutes",
-              });
-            }
-            for (const param of parameterData) {
-              await client.phaseParameter.create({
-                data: {
-                  name: param.name,
-                  staticName: param.name as EnumPhaseParameterStaticName,
-                  setpointNumericalValue: param.value as number,
-                  units: param.units,
-                  description: param.name,
-                  isClassDef: false,
-                  equipmentPhases: { connect: { id: newPhase.id } },
-                  createdBy: "seed",
-                  setpointType: EnumPhaseParameterSetpointType.Numeric,
-                },
-              });
-            }
-
-            // Initialize a flag to track if a BOM item has been linked for this phase
-            let bomItemLinked = false;
-
-            // Link BOM components to their equipment phases - these will be the "class definitions"
-            if (bom) {
-              const bomComponents = await client.bomItem.findMany({
-                where: {
-                  bom: { id: bom.id },
-                  isClassDefinition: true,
-                },
-                include: {
-                  item: true,
-                },
-              });
-
-              for (const component of bomComponents) {
-                if (
-                  (phase.action === "Add Grain" &&
-                    phase.grainType &&
-                    ((component.item.itemNumber
-                      .toLowerCase()
-                      .includes(phase.grainType.toLowerCase()) &&
-                      phase.grainType != "Corn") ||
-                      (phase.grainType === "Specialty" &&
-                        specialtyItemId &&
-                        component.itemId === specialtyItemId))) ||
-                  (phase.action === "Add Liquid" &&
-                    ((phase.liquidType01 &&
-                      component.item.itemNumber
-                        .toLowerCase()
-                        .includes(phase.liquidType01.toLowerCase())) ||
-                      (phase.liquidType02 &&
-                        component.item.itemNumber
-                          .toLowerCase()
-                          .includes(phase.liquidType02.toLowerCase()))))
-                ) {
-                  // Check if the quantity field is present in the phase object
-                  if (phase.qty !== undefined) {
-                    // Only match if the bomItem quantity equals the phase quantity
-                    if (component.quantity == phase.qty) {
-                      const updatedPhase = await client.equipmentPhase.update({
-                        where: { id: newPhase.id },
-                        data: {
-                          bomItem: {
-                            connect: { id: component.id },
-                          },
-                        },
-                        include: {
-                          bomItem: true,
-                        },
-                      });
-                      console.log(
-                        `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
-                      );
-                      bomItemLinked = true;
-                    } else {
-                      console.log(
-                        `Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`
-                      );
-                    }
-                  } else if (phase.notQty !== undefined) {
-                    // Only match if the bomItem quantity does not equal the phase notQty
-                    if (component.quantity != phase.notQty) {
-                      await client.equipmentPhase.update({
-                        where: { id: newPhase.id },
-                        data: {
-                          bomItem: {
-                            connect: { id: component.id },
-                          },
-                        },
-                      });
-                      console.log(
-                        `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
-                      );
-                      bomItemLinked = true;
-                    } else {
-                      console.log(
-                        `Skipped linking BOM component ${component.item.itemNumber} due to quantity match with notQty. NotQty: ${phase.notQty}, Actual: ${component.quantity}`
-                      );
-                    }
-                  } else {
-                    await client.equipmentPhase.update({
-                      where: { id: newPhase.id },
-                      data: {
-                        bomItem: {
-                          connect: { id: component.id },
-                        },
-                      },
-                    });
-                    console.log(
-                      `Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
-                    );
-                    bomItemLinked = true;
-                  }
-                } else if (phase.grainType == "Corn") {
-                  console.log(`Corn: ${component.item.itemNumber}`);
-                  if (
-                    component.item.itemNumber ===
-                    "COR-DLF02-US #2 Yellow Dent GMO"
-                  ) {
-                    // Check if the quantity field is present in the phase object
-                    if (phase.qty !== undefined) {
-                      // Only match if the bomItem quantity equals the phase quantity
-                      if (component.quantity == phase.qty) {
-                        await client.equipmentPhase.update({
-                          where: { id: newPhase.id },
-                          data: {
-                            bomItem: {
-                              connect: { id: component.id },
-                            },
-                          },
-                        });
-                        console.log(
-                          `Linked BOM component ${component.item.itemNumber} with quantity ${component.quantity} to Equipment Phase ${newPhase.name}`
-                        );
-                        bomItemLinked = true;
-                      } else {
-                        console.log(
-                          `Skipped linking BOM component ${component.item.itemNumber} due to quantity mismatch. Required: ${phase.qty}, Actual: ${component.quantity}`
-                        );
-                      }
-                    } else {
-                      await client.equipmentPhase.update({
-                        where: { id: newPhase.id },
-                        data: {
-                          bomItem: {
-                            connect: { id: component.id },
-                          },
-                        },
-                      });
-                      console.log(
-                        `Linked specific corn BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
-                      );
-                      bomItemLinked = true;
-                    }
-                  }
-                } else if (
-                  phase.action === "Add Additive" &&
-                  phase.additiveType &&
-                  component.item.itemNumber
-                    .toLowerCase()
-                    .includes(phase.additiveType.toLowerCase())
-                ) {
-                  console.log(`Add Additive: ${component.item.itemNumber}`);
-                  // if (phase.additiveType == "Teramyl") {
-                  //   console.log(`Teramyl: ${component.item.itemNumber}`);
-                  // } else if (phase.additiveType)
-                  await client.equipmentPhase.update({
-                    where: { id: newPhase.id },
-                    data: {
-                      bomItem: {
-                        connect: { id: component.id },
-                      },
-                    },
-                  });
-                  console.log(
-                    `Linked BOM component ${component.item.itemNumber} to Equipment Phase ${newPhase.name}`
-                  );
-                  bomItemLinked = true;
-                }
-                if (bomItemLinked && phase.action !== "Add Liquid") {
-                  break; // Exit the loop once a BOM item is linked
-                }
-              }
-            } else {
-              console.log(
-                "BOM not found, skipping linking BOM components to Equipment Phases"
-              );
-            }
-          }
-        } else {
-          console.log(
-            `Equipment Phase ${phase.action} already exists, skipping.`
-          );
-        }
-      }
-    }
-
-    // Get the item with the correct item number
-    const getItemByItemNumber = async (itemNumber: string) => {
-      const item = await client.item.findFirst({
-        where: {
-          itemNumber: {
-            equals: itemNumber,
-            mode: "insensitive",
-          },
-        },
-      });
-
-      if (!item) {
-        console.log(`Item with item number ${itemNumber} not found`);
-        return null;
-      }
-
-      return item;
-    };
-
-    const item = await getItemByItemNumber(this.ITEM_NUMBER);
-    if (item) {
-      console.log(`Found item: ${item.id}, ${item.itemNumber}`);
-    }
-
-    const customer = await client.customer.findFirst({
+    // First create the recipe BOM and items if needed
+    let recipeBom;
+    // Check if a recipe BOM already exists for this recipe
+    recipeBom = await client.recipeBom.findFirst({
       where: {
-        name: this.CUSTOMER_NAME,
+        recipe: {
+          some: {
+            id: recipe.id,
+          },
+        },
+        revision: this.BOM_REVISION,
       },
     });
 
-    if (customer) {
-      console.log(`Found customer: ${customer.id}, ${customer.name}`);
+    if (!recipeBom) {
+      console.log("Creating recipe BOM and items...");
+
+      // Calculate grain quantities directly from mash bill to ensure we have them
+      const grainQuantitiesFromMashBill = this.calculateGrainQuantities(
+        this.MASH_BILL,
+        this.TOTAL_GRAIN_WEIGHT
+      );
+
+      console.log(
+        `Grain quantities from mash bill: ${JSON.stringify(
+          grainQuantitiesFromMashBill
+        )}`
+      );
+
+      // Store the finalized protocol for use in createRecipeBomAndItems
+      this.MASHING_PROTOCOL = finalizedMashingProtocol;
+
+      // Pass grain quantities to createRecipeBomAndItems
+      recipeBom = await this.createRecipeBomAndItems(
+        client,
+        recipe.id,
+        grainQuantitiesFromMashBill
+      );
     } else {
-      console.log(`Customer '${this.CUSTOMER_NAME}' not found`);
+      console.log(
+        `Recipe BOM already exists for recipe ID: ${recipe.id}. Using existing recipe BOM.`
+      );
+    }
+
+    // Now that we have ensured BOM items exist, get them with item details
+    const recipeBomItems = await client.recipeBomItem.findMany({
+      where: {
+        recipeBomsId: recipeBom.id,
+      },
+      include: {
+        item: true, // Include full item details for better matching
+      },
+    });
+
+    console.log(`Found ${recipeBomItems.length} RecipeBomItems for linking`);
+
+    // Create the mashing protocol and link steps to the BOM items
+    await this.createMashingProtocolAndSteps(
+      client,
+      recipe.id,
+      finalizedMashingProtocol,
+      recipeBomItems
+    );
+
+    // Check for existing BOM with the same revision
+    const existingBom = await client.bom.findFirst({
+      where: {
+        bomRevision: this.BOM_REVISION,
+      },
+    });
+
+    // We've already established recipeBom exists, but now we need to create normalized BOM items if they don't exist
+    if (!existingBom) {
+      console.log("Creating normalized BOM items...");
+
+      // Get all recipe BOM items to convert to normalized BOM items
+      const allRecipeBomItems = await client.recipeBomItem.findMany({
+        where: {
+          recipeBomsId: recipeBom.id,
+        },
+        select: {
+          itemId: true,
+          quantity: true,
+          // units: true,
+        },
+      });
+
+      // Filter out any null values and ensure required fields are present
+      const validRecipeBomItems = allRecipeBomItems
+        .filter((item) => item.itemId !== null && item.quantity !== null)
+        .map((item) => ({
+          itemId: item.itemId as string,
+          quantity: item.quantity as number,
+          // units: item.units || "NA",
+        }));
+
+      // Create the normalized BOM
+      const normalizedBom = await this.createNormalizedBom(
+        client,
+        recipe.id,
+        validRecipeBomItems,
+        1 // Using 1 as the final good quantity since we're normalizing to 1 unit
+      );
+      console.log(`Created normalized BOM: ${normalizedBom.id}`);
+    } else {
+      console.log(
+        `BOM with revision ${this.BOM_REVISION} already exists. Skipping normalized BOM creation.`
+      );
     }
 
     let mashBillType = "Invalid"; // Default to "Invalid"
@@ -1574,12 +1052,6 @@ export class RecipeGenerator {
     console.log(`Grain type: ${determineMashBill(mashBill)}`);
 
     // Create or update the Recipe record and link it to the Mashing Unit Procedure
-    const existingRecipe = await client.recipe.findFirst({
-      where: {
-        Recipe: this.RECIPE,
-      },
-    });
-
     const newParams: RecipeParameter[] = [];
     for (const param of this.RECIPE_PARAMETERS) {
       const classParam = await client.recipeParameter.findFirst({
@@ -1623,63 +1095,28 @@ export class RecipeGenerator {
       })
     );
 
-    let recipe: Recipe;
-    if (existingRecipe) {
-      console.log("Mashing Recipe already exists, updating...");
-      recipe = await client.recipe.update({
-        where: { id: existingRecipe.id },
-        data: {
-          unitProcedures: {
-            connect: { id: mashingUnitProcedure.id },
-          },
-          targetProof: this.FINAL_PROOF,
+    // Update the recipe with additional data
+    recipe = await client.recipe.update({
+      where: { id: recipe.id },
+      data: {
+        unitProcedures: {
+          connect: { id: mashingUnitProcedure.id },
         },
-        include: {
-          item: true,
-          customer: true,
-          recipeGroup: true,
-          recipeBoms: true,
-          unitProcedures: true,
-          productionOrders: true,
+        parameters: {
+          connect: newParams.map((param) => ({ id: param.id })),
         },
-      });
-      console.log("Mashing Recipe updated successfully");
-    } else {
-      console.log("Creating new Mashing Recipe...");
-      recipe = await client.recipe.create({
-        data: {
-          Recipe: this.RECIPE,
-          revision: 1,
-          createdBy: this.USER,
-          whiskeyType:
-            EnumRecipeWhiskeyType[this.detectWhiskeyType(this.MASH_BILL)],
-          unitProcedures: {
-            connect: { id: mashingUnitProcedure.id },
-          },
-          customer: {
-            connect: { id: customer?.id },
-          },
-          item: {
-            connect: { id: (item as Item).id },
-          },
-          parameters: {
-            connect: newParams.map((param) => ({ id: param.id })),
-          },
-          customerCode: this.CUSTOMER_CODE,
-          targetProof: this.FINAL_PROOF,
-        },
-        include: {
-          item: true,
-          customer: true,
-          recipeGroup: true,
-          recipeBoms: true,
-          unitProcedures: true,
-          productionOrders: true,
-        },
-      });
-      console.log("New Mashing Recipe created successfully:", recipe.id);
-    }
+      },
+      include: {
+        customer: true,
+        recipeGroup: true,
+        recipeBoms: true,
+        unitProcedures: true,
+        productionOrders: true,
+      },
+    });
+    console.log("Recipe updated successfully:", recipe.id);
 
+    // Publish recipe to RabbitMQ
     console.log("Publishing Recipe to RabbitMQ...");
     await this.rabbitMQProducer.emitMessage(
       WhMessageBrokerTopics.WhWhk01Distillery01Recipe,
@@ -1689,7 +1126,7 @@ export class RecipeGenerator {
         data: recipe,
       }
     );
-    console.log("Production order published successfully");
+    console.log("Recipe published successfully");
 
     // Create a recipe group and add the recipe to it
     console.log("Creating recipe group and adding recipe...");
@@ -1730,296 +1167,125 @@ export class RecipeGenerator {
       );
     }
 
-    // Create a sample sales order
-    console.log("Creating sample sales order...");
+    // Initialize result object with recipe and recipeBom
+    const result: RecipeCreationResult = {
+      recipe,
+      recipeBom,
+    };
 
-    // Get the current date
-    const currentDate = new Date();
+    // Only create orders if createOrders flag is true
+    if (createOrders) {
+      console.log("createOrders flag is true, creating orders...");
 
-    // Calculate the day of the year
-    const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
-    const diff = currentDate.getTime() - startOfYear.getTime();
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
+      // Create a sample sales order
+      console.log("Creating sample sales order...");
 
-    console.log(`Current day of the year: ${dayOfYear}`);
+      // Get the current date and time
+      const now = new Date();
+      const dateStr = now.toISOString().slice(2, 10).replace(/-/g, ""); // Remove "20" from year
+      const timeStr = now.toTimeString().slice(0, 6).replace(/:/g, "");
+      const timestamp = `${dateStr}${timeStr}`;
 
-    // Get the most recent production order created today, if it exists
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const mostRecentSalesOrder = await client.salesOrder.findFirst({
-      where: {
-        createdAt: {
-          gte: today,
+      const newSalesOrder = await client.salesOrder.create({
+        data: {
+          item: {
+            connect: { id: (item as Item).id },
+          },
+          customer: {
+            connect: { id: customer?.id },
+          },
+          createdBy: this.USER,
+          quantity: this.ORDER_QTY,
+          name: `SO${timestamp}`,
         },
-        name: {
-          startsWith: "SO",
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    const salesOrderNumber = mostRecentSalesOrder?.name?.split("SO")[1] ?? "01";
-    const newSalesOrderNumber = parseInt(salesOrderNumber, 10) + 1;
+      });
 
-    if (mostRecentSalesOrder) {
-      console.log(
-        `Most recent sales order created today: ${
-          mostRecentSalesOrder.name ?? "Unknown"
-        }`
+      console.log("Sample sales order created successfully:", newSalesOrder.id);
+
+      // Create a sample schedule order first
+      console.log("Creating sample schedule order...");
+      const newScheduleOrder = await this.createScheduleOrder(
+        client,
+        recipe.id,
+        recipeGroup.id,
+        this.ORDER_QTY,
+        this.USER
       );
-    } else {
-      console.log("No sales orders created today.");
-    }
 
-    const newSalesOrder = await client.salesOrder.create({
-      data: {
-        item: {
-          connect: { id: (item as Item).id },
-        },
-        customer: {
-          connect: { id: customer?.id },
-        },
-        createdBy: this.USER,
-        // orderDate: new Date(),
-        // requestedShipDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        quantity: this.ORDER_QTY, // Adjust as needed
-        name: await (async () => {
-          const baseName = `SO${dayOfYear}${newSalesOrderNumber}`;
-          let suffix = 0;
-          let finalName = baseName;
-
-          while (
-            await client.salesOrder.findFirst({
-              where: { name: finalName },
-            })
-          ) {
-            suffix++;
-            finalName = `${baseName}-${suffix}`;
-          }
-
-          return finalName;
-        })(),
-        // units: "Barrels",
-      },
-    });
-
-    console.log("Sample sales order created successfully:", newSalesOrder.id);
-
-    // Update the salesOrder variable for use in production order creation
-    const salesOrder = newSalesOrder;
-
-    // Create a sample production order
-    console.log("Creating sample production order...");
-
-    // Get last two digits of year to include in name
-    const yearLastTwoDigits = currentDate.getFullYear().toString().slice(-2);
-    const productionOrderName = `PRO${yearLastTwoDigits}${dayOfYear}`;
-    const existingProductionOrder = await client.productionOrder.findFirst({
-      where: {
-        name: {
-          contains: productionOrderName,
-          mode: "insensitive",
-        },
-        bom: {
-          id: bom?.id,
-        },
-      },
-    });
-
-    // if (existingProductionOrder) {
-    //   console.log(`Production order ${productionOrderName} already exists, skipping creation.`);
-    // } else {
-    // Get the most recent production order created today, if it exists
-    today.setHours(0, 0, 0, 0);
-
-    const mostRecentProductionOrder = await client.productionOrder.findFirst({
-      where: {
-        createdAt: {
-          gte: today,
-        },
-        name: {
-          startsWith: "PRO",
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    const productionOrderNumber =
-      mostRecentProductionOrder?.name?.split("PRO")[1] ?? "01";
-    const newProductionOrderNumber = parseInt(productionOrderNumber, 10) + 1;
-
-    if (mostRecentProductionOrder) {
       console.log(
-        `Most recent production order created today: ${
-          mostRecentProductionOrder.name ?? "Unknown"
-        }`
+        "Sample schedule order created successfully:",
+        newScheduleOrder.id
       );
+
+      // Create a sample schedule order queue record
+      console.log("Creating sample schedule order queue record...");
+
+      const newScheduleOrderQueue = await this.createScheduleOrderQueue(
+        client,
+        newScheduleOrder.id,
+        mashingUnitProcedure.id,
+        this.USER
+      );
+
+      console.log(
+        "Sample schedule order queue record created successfully:",
+        newScheduleOrderQueue.id
+      );
+
+      // Now create the production order and link it to the schedule order
+      console.log("Creating sample production order...");
+
+      const newProductionOrder = await this.createProductionOrder(
+        client,
+        recipe.id,
+        (item as Item).id,
+        bom.id,
+        customer.id,
+        this.CUSTOMER_CODE,
+        this.ORDER_QTY,
+        this.BBLS_PER_FERM,
+        this.USER,
+        newScheduleOrder.id // Link to the schedule order
+      );
+
+      // Update the schedule order to link to the production order
+      await client.scheduleOrder.update({
+        where: { id: newScheduleOrder.id },
+        data: {
+          productionOrders: {
+            connect: { id: newProductionOrder.id },
+          },
+        },
+      });
+
+      // Push production order to RabbitMQ for processing
+      console.log("Publishing production order to RabbitMQ...");
+      await this.rabbitMQProducer.emitMessage(
+        WhMessageBrokerTopics.WhWhk01Distillery01Productionorder,
+        {
+          recordName: "ProductionOrder",
+          event_type: "create",
+          data: newProductionOrder,
+        }
+      );
+      console.log("Production order published successfully");
+
+      console.log(
+        "Sample production order created successfully:",
+        newProductionOrder.id
+      );
+
+      // Add orders to result
+      result.productionOrder = newProductionOrder;
+      result.scheduleOrder = newScheduleOrder;
     } else {
-      console.log("No production orders created today.");
+      console.log("createOrders flag is false, skipping order creation...");
     }
-
-    console.log("Creating new production order...");
-    const newProductionOrder = await client.productionOrder.create({
-      data: {
-        recipe: {
-          connect: { id: recipe.id },
-        },
-        item: {
-          connect: { id: (item as Item).id },
-        },
-        bom: {
-          connect: { id: bom?.id },
-        },
-        customer: {
-          connect: { id: customer?.id },
-        },
-        // salesOrder: {
-        //   connect: { id: salesOrder?.id }
-        // },
-        createdBy: this.USER,
-        status: EnumProductionOrderStatus.Initiated,
-        customerCode: this.CUSTOMER_CODE,
-        units: "Barrels",
-        quantity: this.ORDER_QTY,
-        name: await (async () => {
-          const baseName = `${productionOrderName}${newProductionOrderNumber}`;
-          let suffix = 0;
-          let finalName = baseName;
-
-          while (
-            await client.productionOrder.findFirst({
-              where: { name: finalName },
-            })
-          ) {
-            suffix++;
-            finalName = `${baseName}-${suffix}`;
-          }
-
-          return finalName;
-        })(),
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        totalCooks: Math.ceil(this.ORDER_QTY / this.BBLS_PER_FERM) * 3,
-        totalFermenters: Math.ceil(this.ORDER_QTY / this.BBLS_PER_FERM),
-        executedCooks: 0,
-        executedFermenters: 0,
-      },
-    });
-
-    // Push production order to RabbitMQ for processing
-    console.log("Publishing production order to RabbitMQ...");
-    await this.rabbitMQProducer.emitMessage(
-      WhMessageBrokerTopics.WhWhk01Distillery01Productionorder,
-      {
-        recordName: "ProductionOrder",
-        event_type: "create",
-        data: newProductionOrder,
-      }
-    );
-    console.log("Production order published successfully");
-
-    // Create a sample schedule order
-    console.log("Creating sample schedule order...");
-    const scheduleOrderName = `SHO${yearLastTwoDigits}${dayOfYear}`;
-    const newScheduleOrder = await client.scheduleOrder.create({
-      data: {
-        productionOrders: {
-          connect: { id: newProductionOrder.id },
-        },
-        status: EnumScheduleOrderStatus.Scheduled,
-        createdBy: this.USER,
-        estimatedStart: new Date(),
-        estimatedEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 7 days from now
-        recipeName: this.RECIPE,
-        productionOrderAllocation: this.ORDER_QTY,
-        recipeGroup: {
-          connect: { id: recipeGroup.id },
-        },
-        name: await (async () => {
-          const baseName = `${scheduleOrderName}${newProductionOrderNumber}`;
-          let suffix = 0;
-          let finalName = baseName;
-
-          while (
-            await client.scheduleOrder.findFirst({
-              where: { name: finalName },
-            })
-          ) {
-            suffix++;
-            finalName = `${baseName}-${suffix}`;
-          }
-
-          return finalName;
-        })(),
-      },
-    });
-
-    console.log(
-      "Sample schedule order created successfully:",
-      newScheduleOrder.id
-    );
-
-    console.log("Publishing schedule order to RabbitMQ...");
-    await this.rabbitMQProducer.emitMessage(
-      WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder,
-      {
-        recordName: "ScheduleOrder",
-        event_type: "create",
-        data: newScheduleOrder,
-      }
-    );
-    console.log("Schedule order published successfully");
-
-    // Create a sample schedule order queue record
-    console.log("Creating sample schedule order queue record...");
-
-    const maxQueueIndex = await client.scheduleOrderQueue.findFirst({
-      where: {
-        queueIndex: {
-          not: null,
-        },
-      },
-      orderBy: {
-        queueIndex: "desc",
-      },
-      select: {
-        queueIndex: true,
-      },
-    });
-
-    const newQueueIndex = (maxQueueIndex?.queueIndex ?? 0) + 1;
-
-    const newScheduleOrderQueue = await client.scheduleOrderQueue.create({
-      data: {
-        scheduleOrder: {
-          connect: { id: newScheduleOrder.id },
-        },
-        queueIndex: newQueueIndex,
-        createdBy: this.USER,
-        nextUnitProcedureName: EnumUnitProcedureName.Mashing01,
-        nextUnitProcedure: {
-          connect: { id: mashingUnitProcedure.id },
-        },
-      },
-    });
-
-    console.log(
-      "Sample schedule order queue record created successfully:",
-      newScheduleOrderQueue.id
-    );
-
-    console.log(
-      "Sample production order created successfully:",
-      newProductionOrder.id
-    );
-    // }
 
     // Close the Prisma client connection
     await client.$disconnect();
+
+    return result;
   }
 
   private validateGrainAssignmentsAgainstMashBill(
@@ -2075,42 +1341,1417 @@ export class RecipeGenerator {
   }
 
   private validateBinAssignments(binAssignments: BinAssignments): boolean {
-    // First validate the bin structure
-    const allowedBins = ["bin1", "bin2", "bin3"]; // Update as needed
+    const validGrains = [
+      "Corn",
+      "Rye",
+      "Wheat",
+      "Malt",
+      "PreMalt",
+      "Specialty",
+    ];
+
     for (const [bin, grains] of Object.entries(binAssignments)) {
-      if (!allowedBins.includes(bin)) {
-        this.logger.error(`Invalid bin: ${bin}`);
-        return false;
-      }
-      if (typeof grains === "string") {
-        // Single grain validation
-        if (!this.isValidGrain(grains)) {
-          this.logger.error(`Invalid grain: ${grains} in ${bin}`);
-          return false;
-        }
-      } else if (Array.isArray(grains)) {
-        // Multiple grains validation
+      if (Array.isArray(grains)) {
         for (const grain of grains) {
-          if (!this.isValidGrain(grain)) {
+          if (!validGrains.includes(grain)) {
             this.logger.error(`Invalid grain: ${grain} in ${bin}`);
             return false;
           }
         }
       } else {
-        this.logger.error(`Invalid grain type in ${bin}`);
+        if (!validGrains.includes(grains)) {
+          this.logger.error(`Invalid grain type in ${bin}`);
+          return false;
+        }
+      }
+    }
+
+    // Get all assigned grains
+    const assignedGrains = new Set<string>();
+    for (const grains of Object.values(binAssignments)) {
+      if (typeof grains === "string") {
+        assignedGrains.add(grains);
+      } else if (Array.isArray(grains)) {
+        grains.forEach((grain) => assignedGrains.add(grain));
+      }
+    }
+
+    // Check if all required grains from mash bill are assigned
+    const [corn, rye, wheat, malt, specialty] =
+      this.getNormalizedMashBillValues(this.MASH_BILL);
+    const requiredGrains = new Set<string>();
+    if (corn > 0) requiredGrains.add("Corn");
+    if (rye > 0) requiredGrains.add("Rye");
+    if (wheat > 0) requiredGrains.add("Wheat");
+    if (malt > 0) {
+      requiredGrains.add("Malt");
+      if (assignedGrains.has("PreMalt")) {
+        requiredGrains.add("PreMalt");
+      }
+    }
+    if (specialty > 0) requiredGrains.add("Specialty");
+
+    for (const grain of requiredGrains) {
+      if (!assignedGrains.has(grain)) {
+        this.logger.error(`Required grain ${grain} is not assigned to any bin`);
         return false;
       }
     }
 
-    // Then validate against mash bill
-    return this.validateGrainAssignmentsAgainstMashBill(
-      binAssignments,
-      this.MASH_BILL
-    );
+    return true;
   }
 
   private isValidGrain(grain: string): boolean {
-    const validGrains = ["Rye", "Corn", "Malt", "Wheat", "Specialty"]; // Extend as needed
+    const validGrains = ["Rye", "Corn", "Malt", "Wheat", "Specialty"];
     return validGrains.includes(grain);
+  }
+
+  private mapGrainTypeToStepType(
+    grainType: string
+  ): EnumMashingProtocolStepStepType {
+    const mapping: { [key: string]: EnumMashingProtocolStepStepType } = {
+      Corn: EnumMashingProtocolStepStepType.Corn,
+      Rye: EnumMashingProtocolStepStepType.Rye,
+      Wheat: EnumMashingProtocolStepStepType.Wheat,
+      Malt: EnumMashingProtocolStepStepType.Malt,
+      PreMalt: EnumMashingProtocolStepStepType.PreMalt,
+    };
+    return mapping[grainType] || EnumMashingProtocolStepStepType.Corn;
+  }
+
+  private mapActionToStepType(
+    action: string,
+    grainOrStep?: string | any
+  ): EnumMashingProtocolStepStepType {
+    // For grain additions, use the specific grain type mapping
+    if (action === "Add Grain" && typeof grainOrStep === "string") {
+      return this.mapGrainTypeToStepType(grainOrStep);
+    }
+
+    // For hold actions, check if we have additional step info
+    if (action === "Hold" && typeof grainOrStep === "object" && grainOrStep) {
+      if (grainOrStep.holdType === "Heat") {
+        return EnumMashingProtocolStepStepType.Hold;
+      } else if (grainOrStep.holdType === "Cool") {
+        return EnumMashingProtocolStepStepType.Hold;
+      }
+    }
+
+    // For other actions, use the general mapping
+    const mapping: { [key: string]: EnumMashingProtocolStepStepType } = {
+      Hold: EnumMashingProtocolStepStepType.Hold,
+      Heat: EnumMashingProtocolStepStepType.Hold,
+      Cool: EnumMashingProtocolStepStepType.Hold,
+      "Add Liquid": EnumMashingProtocolStepStepType.LiquidAdd,
+      "Add Additive": EnumMashingProtocolStepStepType.AdditiveAdd,
+      "Add Water": EnumMashingProtocolStepStepType.LiquidAdd,
+      "Add Backset": EnumMashingProtocolStepStepType.LiquidAdd,
+      Prompt: EnumMashingProtocolStepStepType.Prompt,
+    };
+
+    return mapping[action] || EnumMashingProtocolStepStepType.Hold;
+  }
+
+  private async createProductionOrder(
+    client: PrismaService,
+    recipeId: string,
+    itemId: string,
+    bomId: string,
+    customerId: string,
+    customerCode: string,
+    orderQty: number,
+    bblsPerFerm: number,
+    username: string,
+    scheduleOrderId?: string
+  ): Promise<ProductionOrder> {
+    const now = new Date();
+    const yearLastTwoDigits = now.getFullYear().toString().slice(-2);
+    const startOfYear = new Date(now.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor(
+      (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const productionOrderName = `PRO${yearLastTwoDigits}${dayOfYear}`;
+
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const mostRecent = await client.productionOrder.findFirst({
+      where: { createdAt: { gte: today }, name: { startsWith: "PRO" } },
+      orderBy: { createdAt: "desc" },
+    });
+    const seq = parseInt(mostRecent?.name?.split("PRO")[1] ?? "0", 10) + 1;
+
+    const name = await (async () => {
+      const baseName = `${productionOrderName}${seq}`;
+      let suffix = 0;
+      let finalName = baseName;
+      while (
+        await client.productionOrder.findFirst({ where: { name: finalName } })
+      ) {
+        suffix++;
+        finalName = `${baseName}-${suffix}`;
+      }
+      return finalName;
+    })();
+
+    const productionOrderData: any = {
+      name,
+      recipe: { connect: { id: recipeId } },
+      customer: { connect: { id: customerId } },
+      item: { connect: { id: itemId } },
+      bom: { connect: { id: bomId } },
+      status: EnumProductionOrderStatus.Initiated,
+      customerCode: customerCode,
+      units: "Barrels",
+      quantity: orderQty,
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      totalCooks: Math.ceil(orderQty / bblsPerFerm) * 3,
+      totalFermenters: Math.ceil(orderQty / bblsPerFerm),
+      executedCooks: 0,
+      executedFermenters: 0,
+      createdBy: username,
+    };
+
+    // Connect to schedule order if provided
+    if (scheduleOrderId) {
+      productionOrderData.scheduleOrder = { connect: { id: scheduleOrderId } };
+    }
+
+    const productionOrder = await client.productionOrder.create({
+      data: productionOrderData,
+    });
+
+    await this.rabbitMQProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Productionorder,
+      {
+        recordName: "ProductionOrder",
+        event_type: "create",
+        data: productionOrder,
+      }
+    );
+    return productionOrder;
+  }
+
+  private async createScheduleOrder(
+    client: PrismaService,
+    recipeId: string,
+    recipeGroupId: string,
+    orderQty: number,
+    username: string,
+    productionOrderId?: string
+  ): Promise<ScheduleOrder> {
+    const now = new Date();
+    const yearLastTwoDigits = now.getFullYear().toString().slice(-2);
+    const startOfYear = new Date(now.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor(
+      (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const scheduleOrderName = `SHO${yearLastTwoDigits}${dayOfYear}`;
+
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const mostRecent = await client.scheduleOrder.findFirst({
+      where: { createdAt: { gte: today }, name: { startsWith: "SHO" } },
+      orderBy: { createdAt: "desc" },
+    });
+    const seq = parseInt(mostRecent?.name?.split("SHO")[1] ?? "0", 10) + 1;
+
+    const name = await (async () => {
+      const baseName = `${scheduleOrderName}${seq}`;
+      let suffix = 0;
+      let finalName = baseName;
+      while (
+        await client.scheduleOrder.findFirst({ where: { name: finalName } })
+      ) {
+        suffix++;
+        finalName = `${baseName}-${suffix}`;
+      }
+      return finalName;
+    })();
+
+    // Get recipe name using the recipeId
+    const recipe = await client.recipe.findUnique({
+      where: { id: recipeId },
+    });
+
+    if (!recipe) {
+      throw new Error(`Recipe with ID ${recipeId} not found`);
+    }
+
+    // Constants for timing calculations
+    const COOK_DURATION_HOURS = 2.25;
+    const FERMENTATION_DAYS = 3;
+    const DISTILLATION_HOURS_PER_FERMENTER = 12;
+    const BARRELING_CAPACITY_PER_DAY = 500;
+
+    const totalFermenters = Math.ceil(orderQty / this.BBLS_PER_FERM);
+    const totalCooks = totalFermenters * 3;
+
+    const startDate = new Date();
+
+    const mashingTotalHours = totalCooks * COOK_DURATION_HOURS;
+    const mashingEndDate = new Date(startDate);
+    mashingEndDate.setHours(mashingEndDate.getHours() + mashingTotalHours);
+
+    const fermentationStartDate = new Date(startDate);
+    fermentationStartDate.setHours(
+      fermentationStartDate.getHours() + COOK_DURATION_HOURS
+    );
+
+    const fermentationDurationHours =
+      mashingTotalHours - COOK_DURATION_HOURS + FERMENTATION_DAYS * 24;
+
+    // Distillation starts after first cook + fermentation time
+    const distillationStartDate = new Date(startDate);
+    distillationStartDate.setHours(
+      distillationStartDate.getHours() +
+        COOK_DURATION_HOURS +
+        FERMENTATION_DAYS * 24
+    );
+
+    const distillationDurationHours =
+      totalFermenters * DISTILLATION_HOURS_PER_FERMENTER;
+
+    const barrelingStartDate = new Date(distillationStartDate);
+    const barrelingDay = barrelingStartDate.getDay();
+    if (barrelingDay === 0) {
+      barrelingStartDate.setDate(barrelingStartDate.getDate() + 1);
+    } else if (barrelingDay === 6) {
+      barrelingStartDate.setDate(barrelingStartDate.getDate() + 2);
+    }
+
+    const barrelingDays = Math.ceil(orderQty / BARRELING_CAPACITY_PER_DAY);
+    this.logger.log(
+      `Barreling will take ${barrelingDays} working days for ${orderQty} barrels`
+    );
+
+    const endDate = new Date(barrelingStartDate);
+    let remainingWorkDays = barrelingDays;
+    while (remainingWorkDays > 0) {
+      endDate.setDate(endDate.getDate() + 1);
+      const dayOfWeek = endDate.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        remainingWorkDays--;
+      }
+    }
+
+    const totalProductionDurationHours = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)
+    );
+
+    this.logger.log(`Schedule calculation:
+      - Order Quantity: ${orderQty} barrels
+      - Fermenters: ${totalFermenters}
+      - Mashing: ${mashingTotalHours} hours
+      - Fermentation: ${fermentationDurationHours} hours
+      - Distillation: ${distillationDurationHours} hours
+      - Barreling: ${barrelingDays} working days
+      - Total Duration: ${totalProductionDurationHours} hours`);
+
+    const scheduleOrderData: any = {
+      name,
+      recipeName: recipe.Recipe,
+      status: EnumScheduleOrderStatus.Scheduled,
+      createdBy: username,
+      estimatedStart: startDate,
+      estimatedEnd: endDate,
+      recipeGroup: { connect: { id: recipeGroupId } },
+      productionOrderAllocation: JSON.stringify({ barrels: orderQty }),
+
+      // Add all the estimated time fields
+      estimatedMashingStartTime: startDate,
+      estimatedMashingDuration: mashingTotalHours,
+
+      estimatedFermentationStartTime: fermentationStartDate,
+      estimatedFermentationDuration: fermentationDurationHours,
+
+      estimatedDistillationStartTime: distillationStartDate,
+      estimatedDistillationDuration: distillationDurationHours,
+
+      estimatedBarrelingStartTime: barrelingStartDate,
+      estimatedProcessingStartTime: startDate, // Same as overall start
+
+      estimatedTotalProductionDuration: totalProductionDurationHours,
+      duration: totalProductionDurationHours,
+      durationUnits: "Hours",
+
+      totalBarrels: orderQty,
+      totalProofGallons: orderQty * this.FINAL_PROOF, // Assuming final proof corresponds to proof gallons per barrel
+    };
+
+    // Connect to schedule order recipe if available
+    if (recipeId) {
+      scheduleOrderData.scheduleOrderRecipe = { connect: { id: recipeId } };
+    }
+
+    // Connect to production order if provided
+    if (productionOrderId) {
+      scheduleOrderData.productionOrders = {
+        connect: { id: productionOrderId },
+      };
+    }
+
+    const scheduleOrder = await client.scheduleOrder.create({
+      data: scheduleOrderData,
+    });
+
+    await this.rabbitMQProducer.emitMessage(
+      WhMessageBrokerTopics.WhWhk01Distillery01Scheduleorder,
+      {
+        recordName: "ScheduleOrder",
+        event_type: "create",
+        data: scheduleOrder,
+      }
+    );
+    return scheduleOrder;
+  }
+
+  /**
+   * Calculates the estimated end date for a schedule order based on operational constraints
+   * @param startDate The estimated start date
+   * @param orderQty The order quantity in barrels
+   * @param bblsPerFerm Barrels per fermentation
+   * @returns The calculated end date
+   */
+  private calculateEstimatedEndDate(
+    startDate: Date,
+    orderQty: number,
+    bblsPerFerm: number
+  ): Date {
+    this.logger.log(
+      `Calculating estimated end date for order quantity: ${orderQty}, barrels per fermentation: ${bblsPerFerm}`
+    );
+
+    // Constants based on operational constraints
+    const COOK_DURATION_HOURS = 2.25; // Each cook takes 2.25 hours
+    const FERMENTATION_LAG_DAYS = 3; // 3-day lag from mashing to distillation/barreling
+    const BARRELING_CAPACITY_PER_DAY = 500; // 500 barrels per day
+
+    // Calculate total cooks needed
+    const totalCooks = Math.ceil(orderQty / bblsPerFerm) * 3; // 3 cooks per fermenter
+
+    // Calculate total cooking time in hours
+    const totalCookingHours = totalCooks * COOK_DURATION_HOURS;
+    this.logger.log(
+      `Total cooking hours: ${totalCookingHours} for ${totalCooks} cooks`
+    );
+
+    // Add cooking time to start date to get mashing end date
+    const mashingEndDate = new Date(startDate);
+    mashingEndDate.setHours(mashingEndDate.getHours() + totalCookingHours);
+
+    // Add fermentation lag to get earliest possible barreling date
+    const earliestBarrelingDate = new Date(mashingEndDate);
+    earliestBarrelingDate.setDate(
+      earliestBarrelingDate.getDate() + FERMENTATION_LAG_DAYS
+    );
+
+    // Ensure barreling starts on a weekday (1-5 = Monday-Friday, 0,6 = Sunday/Saturday)
+    const barrelingStartDate = new Date(earliestBarrelingDate);
+    const dayOfWeek = barrelingStartDate.getDay();
+
+    if (dayOfWeek === 0) {
+      // Sunday
+      barrelingStartDate.setDate(barrelingStartDate.getDate() + 1); // Move to Monday
+    } else if (dayOfWeek === 6) {
+      // Saturday
+      barrelingStartDate.setDate(barrelingStartDate.getDate() + 2); // Move to Monday
+    }
+
+    // Calculate how many days of barreling are needed
+    const barrelingDays = Math.ceil(orderQty / BARRELING_CAPACITY_PER_DAY);
+    this.logger.log(
+      `Barreling will take ${barrelingDays} working days for ${orderQty} barrels`
+    );
+
+    // Calculate the final end date accounting for weekends
+    const endDate = new Date(barrelingStartDate);
+    let remainingWorkDays = barrelingDays;
+
+    while (remainingWorkDays > 0) {
+      endDate.setDate(endDate.getDate() + 1);
+      const dayOfWeek = endDate.getDay();
+
+      // Only count weekdays (Monday-Friday)
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        remainingWorkDays--;
+      }
+    }
+
+    this.logger.log(
+      `Estimated end date: ${endDate.toISOString()} (${Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      )} days total)`
+    );
+    return endDate;
+  }
+
+  private async createScheduleOrderQueue(
+    client: PrismaService,
+    scheduleOrderId: string,
+    unitProcedureId: string,
+    username: string
+  ): Promise<any> {
+    // Get the max queue index
+    const maxQueueIndex = await client.scheduleOrderQueue.aggregate({
+      _max: {
+        queueIndex: true,
+      },
+    });
+
+    const newQueueIndex = (maxQueueIndex._max.queueIndex ?? 0) + 1;
+
+    // Get the asset for the unit procedure first
+    const unitProcedure = await client.unitProcedure.findUnique({
+      where: { id: unitProcedureId },
+      include: { operations: true },
+    });
+
+    // Find appropriate assets by name
+    const assets = await client.asset.findMany({
+      where: {
+        name: {
+          contains: unitProcedure?.name || "Mashing",
+        },
+      },
+      take: 1,
+    });
+
+    const assetIds = assets.map((asset) => ({ id: asset.id }));
+
+    return client.scheduleOrderQueue.create({
+      data: {
+        scheduleOrder: { connect: { id: scheduleOrderId } },
+        queueIndex: newQueueIndex,
+        createdBy: username,
+        areas: {
+          connect: assetIds.length > 0 ? assetIds : undefined,
+        },
+      },
+    });
+  }
+
+  /**
+   * Creates a recipe BOM and associated BOM items in the database
+   * @param client Prisma client instance
+   * @param recipeId ID of the recipe to associate with the BOM
+   * @param grainQuantitiesFromMashBill Optional grain quantities from mash bill
+   * @returns The created recipe BOM
+   */
+  private async createRecipeBomAndItems(
+    client: PrismaService,
+    recipeId: string,
+    grainQuantitiesFromMashBill?: { [key: string]: number }
+  ): Promise<any> {
+    this.logger.log(`Creating recipe BOM for recipe ID: ${recipeId}`);
+    this.logger.log(`Current grain quantities in MASHING_PROTOCOL:`);
+
+    // Debug logging of grain quantities in mashing protocol
+    for (const step of this.MASHING_PROTOCOL) {
+      if (step.action === "Add Grain") {
+        this.logger.log(
+          `Grain: ${step.grainType}, Quantity: ${step.qty || "undefined"}`
+        );
+      }
+    }
+
+    // Create the recipe BOM
+    const recipeBom = await client.recipeBom.create({
+      data: {
+        recipe: {
+          connect: {
+            id: recipeId,
+          },
+        },
+        revision: this.BOM_REVISION,
+        master: true,
+        running: true,
+      },
+    });
+
+    this.logger.log(`Created recipe BOM: ${recipeBom.id}`);
+
+    // Base BOM Items
+    const waterItemId = "clyd1ofw2009yfd4504c6wt1w";
+    const backsetItemId = "clyd1oftx006jfd4514hrak80";
+    const viscofermItemId = "clyd1ofou0024fd45e71gyxcu";
+    const liquozymeItemId = "clzhhlwfj0f8ysuwb7whvgy9s";
+    const diazymeItemId = "clzhhlsx30f09mbc9r5mj02z7";
+    const termamylItemId = "clzelxl5v005osuwb3rfax6ix";
+    const saczymeItemId = "clyd1ofot0022fd45d8j321v4";
+    const laminexItemId = "clyd1ofoq001xfd45678b666b";
+    const maltItemId = "clyd1ofw0009ufd45hlzpnqa9";
+    const ryeItemId = "clyd1ofy600d9fd45p99px0c0";
+    const cornItemId = "clyd1ofw1009wfd45oghso7y5";
+    const wheatItemId = "cm0e1ocx0012xl6xv4i696cfh";
+    const citricItemId = "clyd1ofpw0032fd45omeixgvv";
+
+    // Add the base recipe BOM items
+    await client.recipeBomItem.createMany({
+      data: [
+        {
+          recipeBomsId: recipeBom.id,
+          itemId: waterItemId,
+          quantity: this.WATER_QTY || 0, // Ensure quantity is never null
+          createdBy: this.USER,
+          isClassDefinition: true,
+          operation: EnumRecipeBomItemOperation.Mashing01,
+          // units: "NA",
+        },
+        {
+          recipeBomsId: recipeBom.id,
+          itemId: backsetItemId,
+          quantity: this.BACKSET_QTY || 0, // Ensure quantity is never null
+          createdBy: this.USER,
+          isClassDefinition: true,
+          operation: EnumRecipeBomItemOperation.Mashing01,
+          // units: "NA",
+        },
+        {
+          recipeBomsId: recipeBom.id,
+          itemId: citricItemId,
+          quantity: 0,
+          createdBy: this.USER,
+          isClassDefinition: true,
+          operation: EnumRecipeBomItemOperation.Mashing01,
+          // units: "NA",
+        },
+      ],
+    });
+
+    // Add the barrel BOM items
+    if (this.BBL_ITEM_NUMBERS.length > 0) {
+      for (const itemNumber of this.BBL_ITEM_NUMBERS) {
+        const itemId = await client.item.findFirst({
+          where: {
+            itemNumber: itemNumber,
+          },
+        });
+        if (itemId) {
+          await client.recipeBomItem.create({
+            data: {
+              recipeBomsId: recipeBom.id,
+              itemId: itemId?.id,
+              quantity: 1 / this.BBL_ITEM_NUMBERS.length || 1, // Ensure quantity is never null
+              createdBy: this.USER,
+              isClassDefinition: true,
+              operation: EnumRecipeBomItemOperation.Mashing01,
+              // units: "NA",
+            },
+          });
+        } else {
+          this.logger.warn(
+            `Item not found for barrel item number: ${itemNumber}`
+          );
+        }
+      }
+    }
+
+    // Add the yeast items
+    for (const [yeastItemNumber, quantity] of Object.entries(
+      this.YEAST_ITEM_NUMBERS_QTYS
+    )) {
+      const item = await client.item.findFirst({
+        where: {
+          itemNumber: yeastItemNumber,
+        },
+      });
+      if (item) {
+        await client.recipeBomItem.create({
+          data: {
+            recipeBoms: { connect: { id: recipeBom.id } },
+            item: { connect: { id: item.id } },
+            quantity: this.YEAST_ITEM_NUMBERS_QTYS[yeastItemNumber] || 1, // Ensure quantity is never null
+            createdBy: this.USER,
+            isClassDefinition: true,
+            operation: EnumRecipeBomItemOperation.Mashing01,
+            displayUnits: { connect: { name: "Kilograms per Fermenter" } },
+          },
+        });
+      } else {
+        this.logger.warn(
+          `Item not found for yeast item number: ${yeastItemNumber}`
+        );
+      }
+    }
+
+    // Track grain quantities to ensure each grain type has at least one BOM item
+    const grainQuantities: { [key: string]: number } = {};
+    const grainItemIds: { [key: string]: string } = {
+      Corn: cornItemId,
+      Rye: ryeItemId,
+      Wheat: wheatItemId,
+      Malt: maltItemId,
+    };
+
+    // Add the BOM items for the grains according to the mashing protocol
+    for (const step of this.MASHING_PROTOCOL) {
+      if (step.action === "Add Grain") {
+        let itemId;
+        let quantity: number;
+
+        switch (step.grainType) {
+          case "Corn":
+            itemId = cornItemId;
+            // Use the percentage directly from the mash bill quantities
+            quantity =
+              step.qty ||
+              (grainQuantitiesFromMashBill &&
+                grainQuantitiesFromMashBill["Corn"]) ||
+              0;
+            // Track total for this grain type
+            grainQuantities["Corn"] = (grainQuantities["Corn"] || 0) + quantity;
+            break;
+          case "Rye":
+            itemId = ryeItemId;
+            // Use the percentage directly from the mash bill quantities
+            quantity =
+              step.qty ||
+              (grainQuantitiesFromMashBill &&
+                grainQuantitiesFromMashBill["Rye"]) ||
+              0;
+            // Track total for this grain type
+            grainQuantities["Rye"] = (grainQuantities["Rye"] || 0) + quantity;
+            break;
+          case "Malt":
+            itemId = maltItemId;
+            // Use the percentage directly from the mash bill quantities
+            quantity =
+              step.qty ||
+              (grainQuantitiesFromMashBill &&
+                grainQuantitiesFromMashBill["Malt"]) ||
+              0;
+            // Track total for this grain type
+            grainQuantities["Malt"] = (grainQuantities["Malt"] || 0) + quantity;
+            break;
+          case "Wheat":
+            itemId = wheatItemId;
+            // Use the percentage directly from the mash bill quantities
+            quantity =
+              step.qty ||
+              (grainQuantitiesFromMashBill &&
+                grainQuantitiesFromMashBill["Wheat"]) ||
+              0;
+            // Track total for this grain type
+            grainQuantities["Wheat"] =
+              (grainQuantities["Wheat"] || 0) + quantity;
+            break;
+          case "PreMalt":
+            itemId = maltItemId;
+            // For PreMalt, use a fraction of the Malt percentage
+            quantity =
+              step.qty ||
+              (grainQuantitiesFromMashBill &&
+                grainQuantitiesFromMashBill["Malt"] * 0.1) ||
+              0;
+            // Track total for this grain type (PreMalt counts as Malt)
+            grainQuantities["Malt"] = (grainQuantities["Malt"] || 0) + quantity;
+            break;
+          case "Specialty":
+            if (this.SPECIALTY_ITEM_ID) {
+              itemId = this.SPECIALTY_ITEM_ID;
+              quantity = step.qty;
+            } else {
+              this.logger.warn(
+                `Specialty grain type found but no specialty item ID set`
+              );
+              continue;
+            }
+            break;
+          default:
+            this.logger.warn(`Unknown grain type: ${step.grainType}`);
+            continue;
+        }
+
+        this.logger.log(
+          `Creating BOM item for ${step.grainType} with percentage quantity ${quantity}`
+        );
+
+        await client.recipeBomItem.create({
+          data: {
+            recipeBoms: { connect: { id: recipeBom.id } },
+            item: { connect: { id: itemId } },
+            quantity: quantity,
+            createdBy: this.USER,
+            isClassDefinition: true,
+            operation: EnumRecipeBomItemOperation.Mashing01,
+            displayUnits: { connect: { name: "Percent" } },
+            // units: "NA",
+          },
+        });
+      } else if (step.action === "Add Additive") {
+        let itemId;
+
+        switch (step.additiveType) {
+          case "Viscoferm":
+            itemId = viscofermItemId;
+            break;
+          case "Liquozyme":
+            itemId = liquozymeItemId;
+            break;
+          case "Diazyme":
+          case "DIAZYME":
+            itemId = diazymeItemId;
+            break;
+          case "Termamyl":
+            itemId = termamylItemId;
+            break;
+          case "Saczyme":
+            itemId = saczymeItemId;
+            break;
+          case "Laminex":
+            itemId = laminexItemId;
+            break;
+          case "Citric":
+            itemId = citricItemId;
+            break;
+          default:
+            this.logger.warn(`Unknown additive type: ${step.additiveType}`);
+            continue;
+        }
+
+        this.logger.log(
+          `Creating BOM item for ${step.additiveType} with ratio quantity ${
+            step.qty || 0
+          }`
+        );
+
+        await client.recipeBomItem.create({
+          data: {
+            recipeBoms: { connect: { id: recipeBom.id } },
+            item: { connect: { id: itemId } },
+            quantity: step.qty || 0, // This is now the unitless ratio (enzyme lbs / grain lbs)
+            createdBy: this.USER,
+            isClassDefinition: true,
+            operation: EnumRecipeBomItemOperation.Mashing01,
+            displayUnits: { connect: { name: "Pounds per Cook" } },
+          },
+        });
+      }
+    }
+
+    // Log grain quantities to check if they're correct
+    this.logger.log(
+      `Final grain quantities (as percentages) in BOM items: ${JSON.stringify(
+        grainQuantities
+      )}`
+    );
+
+    // Add fallback BOM items for any grains that weren't added but are in the mash bill
+    if (grainQuantitiesFromMashBill) {
+      for (const [grainType, quantity] of Object.entries(
+        grainQuantitiesFromMashBill
+      )) {
+        // Skip if we already added this grain type or if the quantity is 0
+        if (grainQuantities[grainType] || quantity <= 0) {
+          continue;
+        }
+
+        const itemId = grainItemIds[grainType];
+        if (!itemId) {
+          this.logger.warn(`No item ID for grain type: ${grainType}`);
+          continue;
+        }
+
+        this.logger.log(
+          `Creating fallback BOM item for ${grainType} with percentage quantity ${quantity}`
+        );
+
+        await client.recipeBomItem.create({
+          data: {
+            recipeBoms: { connect: { id: recipeBom.id } },
+            item: { connect: { id: itemId } },
+            quantity: quantity, // Using percentage directly
+            createdBy: this.USER,
+            isClassDefinition: true,
+            operation: EnumRecipeBomItemOperation.Mashing01,
+            displayUnits: { connect: { name: "Percent" } },
+            // units: "NA",
+          },
+        });
+
+        // Update the tracked quantities
+        grainQuantities[grainType] = quantity;
+      }
+    }
+
+    this.logger.log(`Recipe BOM and items created successfully`);
+    return recipeBom;
+  }
+
+  /**
+   * Creates a mashing protocol and its steps, linking them to recipe BOM items
+   * @param client Prisma client instance
+   * @param recipeId ID of the recipe
+   * @param mashingProtocol Array of mashing protocol steps
+   * @param recipeBomItems Array of recipe BOM items to link to steps
+   * @returns The created mashing protocol
+   */
+  private async createMashingProtocolAndSteps(
+    client: PrismaService,
+    recipeId: string,
+    mashingProtocol: any[],
+    recipeBomItems: any[]
+  ): Promise<any> {
+    this.logger.log(`Creating mashing protocol for recipe ID: ${recipeId}`);
+
+    const protocolName = `${this.RECIPE} Mashing Protocol`;
+
+    // Check if a mashing protocol already exists for this recipe OR with this name
+    const existingProtocol = await client.mashingProtocol.findFirst({
+      where: {
+        OR: [
+          {
+            recipes: {
+              some: {
+                id: recipeId,
+              },
+            },
+          },
+          {
+            name: protocolName,
+          },
+        ],
+      },
+      include: {
+        recipes: true, // Include recipes to check if this recipe is already connected
+      },
+    });
+
+    if (existingProtocol) {
+      this.logger.log(
+        `Mashing protocol already exists for recipe ID: ${recipeId} or with name: ${protocolName}, skipping creation`
+      );
+
+      // If the protocol exists but isn't connected to this recipe, connect it
+      const isRecipeConnected = existingProtocol.recipes?.some(
+        (r: any) => r.id === recipeId
+      );
+      if (!isRecipeConnected) {
+        await client.mashingProtocol.update({
+          where: { id: existingProtocol.id },
+          data: {
+            recipes: {
+              connect: { id: recipeId },
+            },
+          },
+        });
+        this.logger.log(
+          `Linked existing protocol ${existingProtocol.id} to recipe ${recipeId}`
+        );
+      }
+
+      // Get existing protocol steps to link with BOM items
+      const existingSteps = await client.mashingProtocolStep.findMany({
+        where: {
+          mashingProtocolId: existingProtocol.id,
+        },
+        orderBy: {
+          index: "asc",
+        },
+      });
+
+      this.logger.log(
+        `Found ${existingSteps.length} existing protocol steps to link with BOM items`
+      );
+
+      // Map the existing steps to their corresponding step data in the mashing protocol
+      const protocolSteps = [];
+      for (
+        let i = 0;
+        i < Math.min(existingSteps.length, mashingProtocol.length);
+        i++
+      ) {
+        const step = existingSteps[i];
+        const stepData = mashingProtocol[i];
+
+        protocolSteps.push({
+          step: step,
+          data: stepData,
+          index: i + 1,
+        });
+
+        this.logger.log(
+          `Mapped existing step ${step.id} (index: ${step.index}) to protocol data`
+        );
+      }
+
+      // Organize BOM items by type for matching
+      const grainBomItemsByType: { [key: string]: any[] } = {};
+      const liquidBomItemsByType: { [key: string]: any[] } = {};
+      const additiveBomItemsByType: { [key: string]: any[] } = {};
+
+      // Classify BOM items by type
+      for (const bomItem of recipeBomItems) {
+        if (!bomItem.item || !bomItem.item.itemNumber) {
+          this.logger.warn(
+            `BOM item missing item property or item number: ${JSON.stringify(
+              bomItem
+            )}`
+          );
+          continue;
+        }
+
+        const itemNumber = bomItem.item.itemNumber.toLowerCase();
+
+        // Check for grain types
+        if (itemNumber.includes("corn") || itemNumber.includes("cor")) {
+          if (!grainBomItemsByType["Corn"]) grainBomItemsByType["Corn"] = [];
+          grainBomItemsByType["Corn"].push(bomItem);
+        } else if (itemNumber.includes("wheat") || itemNumber.includes("wht")) {
+          if (!grainBomItemsByType["Wheat"]) grainBomItemsByType["Wheat"] = [];
+          grainBomItemsByType["Wheat"].push(bomItem);
+        } else if (itemNumber.includes("rye")) {
+          if (!grainBomItemsByType["Rye"]) grainBomItemsByType["Rye"] = [];
+          grainBomItemsByType["Rye"].push(bomItem);
+        } else if (itemNumber.includes("malt") || itemNumber.includes("bry")) {
+          if (!grainBomItemsByType["Malt"]) grainBomItemsByType["Malt"] = [];
+          grainBomItemsByType["Malt"].push(bomItem);
+        }
+        // Check for liquid types
+        else if (itemNumber.includes("water") || itemNumber.includes("h2o")) {
+          if (!liquidBomItemsByType["Water"])
+            liquidBomItemsByType["Water"] = [];
+          liquidBomItemsByType["Water"].push(bomItem);
+        } else if (itemNumber.includes("backset")) {
+          if (!liquidBomItemsByType["Backset"])
+            liquidBomItemsByType["Backset"] = [];
+          liquidBomItemsByType["Backset"].push(bomItem);
+        }
+        // Check for additive types
+        else if (itemNumber.includes("diazyme") || itemNumber.includes("dia")) {
+          if (!additiveBomItemsByType["Diazyme"])
+            additiveBomItemsByType["Diazyme"] = [];
+          additiveBomItemsByType["Diazyme"].push(bomItem);
+        } else if (
+          itemNumber.includes("liquozyme") ||
+          itemNumber.includes("liq")
+        ) {
+          if (!additiveBomItemsByType["Liquozyme"])
+            additiveBomItemsByType["Liquozyme"] = [];
+          additiveBomItemsByType["Liquozyme"].push(bomItem);
+        } else if (
+          itemNumber.includes("viscoferm") ||
+          itemNumber.includes("vis")
+        ) {
+          if (!additiveBomItemsByType["Viscoferm"])
+            additiveBomItemsByType["Viscoferm"] = [];
+          additiveBomItemsByType["Viscoferm"].push(bomItem);
+        } else if (
+          itemNumber.includes("laminex") ||
+          itemNumber.includes("lam")
+        ) {
+          if (!additiveBomItemsByType["Laminex"])
+            additiveBomItemsByType["Laminex"] = [];
+          additiveBomItemsByType["Laminex"].push(bomItem);
+        } else if (
+          itemNumber.includes("citric") ||
+          itemNumber.includes("cit")
+        ) {
+          if (!additiveBomItemsByType["Citric"])
+            additiveBomItemsByType["Citric"] = [];
+          additiveBomItemsByType["Citric"].push(bomItem);
+        }
+      }
+
+      // Sort BOM items by quantity (descending)
+      for (const grainType in grainBomItemsByType) {
+        grainBomItemsByType[grainType].sort(
+          (a, b) => (b.quantity || 0) - (a.quantity || 0)
+        );
+        this.logger.log(
+          `Sorted ${grainBomItemsByType[grainType].length} ${grainType} BOM items by quantity`
+        );
+      }
+
+      for (const liquidType in liquidBomItemsByType) {
+        liquidBomItemsByType[liquidType].sort(
+          (a, b) => (b.quantity || 0) - (a.quantity || 0)
+        );
+        this.logger.log(
+          `Sorted ${liquidBomItemsByType[liquidType].length} ${liquidType} BOM items by quantity`
+        );
+      }
+
+      for (const additiveType in additiveBomItemsByType) {
+        additiveBomItemsByType[additiveType].sort(
+          (a, b) => (b.quantity || 0) - (a.quantity || 0)
+        );
+        this.logger.log(
+          `Sorted ${additiveBomItemsByType[additiveType].length} ${additiveType} BOM items by quantity`
+        );
+      }
+
+      // Organize protocol steps by type
+      const grainStepsByType: { [key: string]: any[] } = {};
+      const liquidSteps: any[] = [];
+      const additiveStepsByType: { [key: string]: any[] } = {};
+
+      for (const stepInfo of protocolSteps) {
+        const step = stepInfo.data;
+
+        if (step.action === "Add Grain" && step.grainType) {
+          const grainType = step.grainType;
+          if (!grainStepsByType[grainType]) grainStepsByType[grainType] = [];
+          grainStepsByType[grainType].push(stepInfo);
+        } else if (step.action === "Add Liquid") {
+          liquidSteps.push(stepInfo);
+        } else if (step.action === "Add Additive" && step.additiveType) {
+          const additiveType = step.additiveType;
+          if (!additiveStepsByType[additiveType])
+            additiveStepsByType[additiveType] = [];
+          additiveStepsByType[additiveType].push(stepInfo);
+        }
+      }
+
+      // Sort steps by index
+      for (const grainType in grainStepsByType) {
+        grainStepsByType[grainType].sort((a, b) => a.index - b.index);
+        this.logger.log(
+          `Sorted ${grainStepsByType[grainType].length} ${grainType} protocol steps by index`
+        );
+      }
+
+      liquidSteps.sort((a, b) => a.index - b.index);
+
+      for (const additiveType in additiveStepsByType) {
+        additiveStepsByType[additiveType].sort((a, b) => a.index - b.index);
+        this.logger.log(
+          `Sorted ${additiveStepsByType[additiveType].length} ${additiveType} protocol steps by index`
+        );
+      }
+
+      // Clear existing links first to avoid duplicates
+      this.logger.log(
+        `Clearing existing links between protocol steps and BOM items`
+      );
+      for (const stepInfo of protocolSteps) {
+        try {
+          await client.mashingProtocolStep.update({
+            where: { id: stepInfo.step.id },
+            data: {
+              recipeBomItem: {
+                set: [], // Clear existing links
+              },
+            },
+          });
+        } catch (error) {
+          this.logger.error(
+            `Error clearing links for step: ${
+              error instanceof Error ? error.message : String(error)
+            }`
+          );
+        }
+      }
+
+      // Link grain steps to BOM items
+      for (const grainType in grainStepsByType) {
+        const steps = grainStepsByType[grainType];
+        const bomItems = grainBomItemsByType[grainType] || [];
+
+        this.logger.log(
+          `Linking ${bomItems.length} ${grainType} BOM items to ${steps.length} protocol steps`
+        );
+
+        // Match each step with a BOM item, starting with the largest BOM item
+        for (let i = 0; i < Math.min(steps.length, bomItems.length); i++) {
+          const stepInfo = steps[i];
+          const bomItem = bomItems[i];
+
+          this.logger.log(
+            `Linking ${grainType} step ${i + 1} to BOM item with quantity ${
+              bomItem.quantity
+            }`
+          );
+
+          try {
+            await client.mashingProtocolStep.update({
+              where: { id: stepInfo.step.id },
+              data: {
+                recipeBomItem: {
+                  connect: { id: bomItem.id },
+                },
+              },
+            });
+            this.logger.log(
+              `Successfully linked ${grainType} BOM item (qty: ${bomItem.quantity}) to step ${stepInfo.step.id}`
+            );
+          } catch (error) {
+            this.logger.error(
+              `Error linking BOM item to step: ${
+                error instanceof Error ? error.message : String(error)
+              }`
+            );
+          }
+        }
+      }
+
+      // Link liquid steps to BOM items
+      const waterBomItems = liquidBomItemsByType["Water"] || [];
+      const backsetBomItems = liquidBomItemsByType["Backset"] || [];
+
+      for (const stepInfo of liquidSteps) {
+        const step = stepInfo.data;
+        const liquidType1 = step.liquidType01?.toLowerCase();
+        const liquidType2 = step.liquidType02?.toLowerCase();
+
+        // Try to match Water
+        if (liquidType1 === "water" && waterBomItems.length > 0) {
+          const bomItem = waterBomItems.shift(); // Take the largest water BOM item
+          try {
+            await client.mashingProtocolStep.update({
+              where: { id: stepInfo.step.id },
+              data: {
+                recipeBomItem: {
+                  connect: { id: bomItem.id },
+                },
+              },
+            });
+            this.logger.log(
+              `Successfully linked Water BOM item (qty: ${bomItem.quantity}) to liquid step ${stepInfo.step.id}`
+            );
+          } catch (error) {
+            this.logger.error(
+              `Error linking Water BOM item to step: ${
+                error instanceof Error ? error.message : String(error)
+              }`
+            );
+          }
+        }
+
+        // Try to match Backset
+        if (liquidType2 === "backset" && backsetBomItems.length > 0) {
+          const bomItem = backsetBomItems.shift(); // Take the largest backset BOM item
+          try {
+            await client.mashingProtocolStep.update({
+              where: { id: stepInfo.step.id },
+              data: {
+                recipeBomItem: {
+                  connect: { id: bomItem.id },
+                },
+              },
+            });
+            this.logger.log(
+              `Successfully linked Backset BOM item (qty: ${bomItem.quantity}) to liquid step ${stepInfo.step.id}`
+            );
+          } catch (error) {
+            this.logger.error(
+              `Error linking Backset BOM item to step: ${
+                error instanceof Error ? error.message : String(error)
+              }`
+            );
+          }
+        }
+      }
+
+      // Link additive steps to BOM items
+      for (const additiveType in additiveStepsByType) {
+        const steps = additiveStepsByType[additiveType];
+        const normalizedAdditiveType =
+          additiveType.toLowerCase() === "diazyme"
+            ? "Diazyme"
+            : additiveType.toLowerCase() === "liquozyme"
+            ? "Liquozyme"
+            : additiveType.toLowerCase() === "viscoferm"
+            ? "Viscoferm"
+            : additiveType.toLowerCase() === "laminex"
+            ? "Laminex"
+            : additiveType.toLowerCase() === "citric"
+            ? "Citric"
+            : additiveType;
+
+        const bomItems = additiveBomItemsByType[normalizedAdditiveType] || [];
+
+        this.logger.log(
+          `Linking ${bomItems.length} ${additiveType} BOM items to ${steps.length} protocol steps`
+        );
+
+        // Match each step with a BOM item
+        for (let i = 0; i < Math.min(steps.length, bomItems.length); i++) {
+          const stepInfo = steps[i];
+          const bomItem = bomItems[i];
+
+          this.logger.log(
+            `Linking ${additiveType} step ${i + 1} to BOM item with quantity ${
+              bomItem.quantity
+            }`
+          );
+
+          try {
+            await client.mashingProtocolStep.update({
+              where: { id: stepInfo.step.id },
+              data: {
+                recipeBomItem: {
+                  connect: { id: bomItem.id },
+                },
+              },
+            });
+            this.logger.log(
+              `Successfully linked ${additiveType} BOM item (qty: ${bomItem.quantity}) to step ${stepInfo.step.id}`
+            );
+          } catch (error) {
+            this.logger.error(
+              `Error linking BOM item to step: ${
+                error instanceof Error ? error.message : String(error)
+              }`
+            );
+          }
+        }
+      }
+
+      return existingProtocol;
+    }
+
+    // Create new mashing protocol
+    this.logger.log(`Creating new mashing protocol ${protocolName}`);
+    const protocol = await client.mashingProtocol.create({
+      data: {
+        name: protocolName,
+        recipes: {
+          connect: { id: recipeId },
+        },
+        createdBy: this.USER,
+        isTemplate: false,
+        master: true,
+      },
+    });
+
+    // Create each step in the protocol
+    for (const [index, step] of mashingProtocol.entries()) {
+      const stepType = this.mapActionToStepType(
+        step.action,
+        step.action === "Add Grain" ? step.grainType : step
+      );
+
+      const stepData: any = {
+        mashingProtocol: { connect: { id: protocol.id } },
+        index: index + 1,
+        stepType: stepType,
+        createdBy: this.USER,
+      };
+
+      // Set step-specific properties based on action type
+      switch (step.action) {
+        case "Hold":
+          stepData.holdType = step.holdType || "Hold";
+          // Map the time property to stepTime for Hold steps
+          if (step.time !== undefined) {
+            stepData.stepTime = step.time;
+          }
+          break;
+        case "Add Grain":
+          // For grain steps, don't need additional properties
+          break;
+        case "Add Liquid":
+          // For liquid steps, could include liquid types or quantities
+          break;
+        case "Add Additive":
+          // For additive steps, could include additive types or dosing
+          break;
+        default:
+          break;
+      }
+
+      const createdStep = await client.mashingProtocolStep.create({
+        data: stepData,
+      });
+
+      // Link the step to appropriate BOM items if needed
+      // ... existing code for linking steps to BOM items ...
+    }
+
+    return protocol;
+  }
+
+  /**
+   * Calculates the normalized quantity for BOM items based on the final finished good quantity
+   * @param quantity Original quantity
+   * @param finalGoodQuantity The quantity of the final finished good (typically 1)
+   * @returns Normalized quantity for BOM
+   */
+  private normalizeQuantityForBom(
+    quantity: number,
+    finalGoodQuantity: number
+  ): number {
+    if (finalGoodQuantity <= 0) {
+      this.logger.warn(
+        `Invalid final good quantity: ${finalGoodQuantity}, using default of 1`
+      );
+      finalGoodQuantity = 1;
+    }
+
+    return quantity / finalGoodQuantity;
+  }
+
+  /**
+   * Creates a complete BOM with normalized quantities for all items
+   * @param client Prisma client instance
+   * @param recipeId ID of the recipe
+   * @param recipeBomItems Array of recipe BOM items to convert to BOM items
+   * @param finalGoodQuantity The quantity of the final finished good (typically 1)
+   * @returns Created recipe BOM with normalized items
+   */
+  private async createNormalizedBom(
+    client: PrismaService,
+    recipeId: string,
+    recipeBomItems: Array<{
+      itemId: string;
+      quantity: number;
+      units?: string;
+    }>,
+    finalGoodQuantity: number
+  ): Promise<any> {
+    this.logger.log(
+      `Creating normalized BOM for recipe ID: ${recipeId} with ${recipeBomItems.length} items`
+    );
+
+    // Find or create the recipe BOM
+    let recipeBom = await client.recipeBom.findFirst({
+      where: {
+        recipe: {
+          some: {
+            id: recipeId,
+          },
+        },
+        revision: this.BOM_REVISION,
+      },
+    });
+
+    if (!recipeBom) {
+      recipeBom = await client.recipeBom.create({
+        data: {
+          recipe: {
+            connect: {
+              id: recipeId,
+            },
+          },
+          revision: this.BOM_REVISION,
+        },
+      });
+    }
+
+    // Create all BOM items with normalized quantities
+    for (const recipeBomItem of recipeBomItems) {
+      const normalizedQuantity = this.normalizeQuantityForBom(
+        recipeBomItem.quantity,
+        finalGoodQuantity
+      );
+
+      await client.bomItem.create({
+        data: {
+          bom: { connect: { id: recipeBom.id } },
+          item: { connect: { id: recipeBomItem.itemId } },
+          quantity: normalizedQuantity,
+          createdBy: this.USER,
+          isClassDefinition: true,
+          units: recipeBomItem.units || "NA",
+        },
+      });
+    }
+
+    this.logger.log(
+      `Normalized BOM created successfully with ${recipeBomItems.length} items`
+    );
+    return recipeBom;
   }
 }

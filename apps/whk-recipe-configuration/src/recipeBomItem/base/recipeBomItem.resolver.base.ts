@@ -30,6 +30,7 @@ import { MashingProtocolStepFindManyArgs } from "../../mashingProtocolStep/base/
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
 import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
 import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
+import { Units } from "../../units/base/Units";
 import { Item } from "../../item/base/Item";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { RecipeBomItemService } from "../recipeBomItem.service";
@@ -113,6 +114,12 @@ export class RecipeBomItemResolverBase {
             }
           : undefined,
 
+        displayUnits: args.data.displayUnits
+          ? {
+              connect: args.data.displayUnits,
+            }
+          : undefined,
+
         item: args.data.item
           ? {
               connect: args.data.item,
@@ -153,6 +160,12 @@ export class RecipeBomItemResolverBase {
           classId: args.data.classId
             ? {
                 connect: args.data.classId,
+              }
+            : undefined,
+
+          displayUnits: args.data.displayUnits
+            ? {
+                connect: args.data.displayUnits,
               }
             : undefined,
 
@@ -280,6 +293,27 @@ export class RecipeBomItemResolverBase {
     @graphql.Parent() parent: RecipeBomItem
   ): Promise<RecipeBomItem | null> {
     const result = await this.service.getClassId(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Units, {
+    nullable: true,
+    name: "displayUnits",
+  })
+  @UseRoles({
+    resource: "Units",
+    action: "read",
+    possession: "any",
+  })
+  async getDisplayUnits(
+    @graphql.Parent() parent: RecipeBomItem
+  ): Promise<Units | null> {
+    const result = await this.service.getDisplayUnits(parent.id);
 
     if (!result) {
       return null;

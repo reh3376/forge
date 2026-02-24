@@ -44,8 +44,27 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   private schemaVersionMiddleware(): Prisma.Middleware {
+    // Models that don't have schemaVersion field
+    const excludedModels = [
+      "GrainCharacter",
+      "RecipeGrainCharacter",
+      "ItemGroup",
+      "AuditLog",
+      "FormulaLibrary",
+      "FormulaLibraryVersion",
+      "FormulaTestCase",
+      "FormulaExecutionLog",
+      "RecipeBomActual",
+      "RecipeParameterActual",
+      "MashingProtocolStepActual",
+    ];
+
     return async (params, next) => {
       if (params.action === "create" || params.action === "createMany") {
+        // Skip schemaVersion injection for excluded models
+        if (params.model && excludedModels.includes(params.model)) {
+          return next(params);
+        }
         let version: string | null = null;
         try {
           version = await this.getSchemaVersion();

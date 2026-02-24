@@ -19,4 +19,29 @@ export class MashingProtocolController extends MashingProtocolControllerBase {
   ) {
     super(service, rolesBuilder);
   }
+
+  // Add new endpoint for fetching templates
+  @common.Get("/templates")
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "read",
+    possession: "any",
+  })
+  async getTemplates() {
+    return this.service.findTemplates();
+  }
+
+  // Add endpoint for cloning a template
+  @common.Post("/clone-template/:id")
+  @UseRoles({
+    resource: "MashingProtocol",
+    action: "create",
+    possession: "any",
+  })
+  async cloneTemplate(
+    @common.Param("id") id: string,
+    @common.Body() data: { name: string; createdBy: string }
+  ) {
+    return this.service.cloneTemplate(id, data.name, data.createdBy);
+  }
 }

@@ -35,6 +35,9 @@ import { MashingProtocolWhereUniqueInput } from "../../mashingProtocol/base/Mash
 import { RecipeBomFindManyArgs } from "../../recipeBom/base/RecipeBomFindManyArgs";
 import { RecipeBom } from "../../recipeBom/base/RecipeBom";
 import { RecipeBomWhereUniqueInput } from "../../recipeBom/base/RecipeBomWhereUniqueInput";
+import { RecipeBomActualFindManyArgs } from "../../recipeBomActual/base/RecipeBomActualFindManyArgs";
+import { RecipeBomActual } from "../../recipeBomActual/base/RecipeBomActual";
+import { RecipeBomActualWhereUniqueInput } from "../../recipeBomActual/base/RecipeBomActualWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -351,13 +354,6 @@ export class ProductionOrderRecipeInstanceControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -456,6 +452,7 @@ export class ProductionOrderRecipeInstanceControllerBase {
         createdAt: true,
         createdBy: true,
         id: true,
+        isTemplate: true,
         master: true,
 
         masterMashingProtocol: {
@@ -465,6 +462,13 @@ export class ProductionOrderRecipeInstanceControllerBase {
         },
 
         name: true,
+
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -474,6 +478,8 @@ export class ProductionOrderRecipeInstanceControllerBase {
           },
         },
 
+        templateCategory: true,
+        templateDescription: true,
         updatedAt: true,
         updatedBy: true,
       },
@@ -578,6 +584,12 @@ export class ProductionOrderRecipeInstanceControllerBase {
           },
         },
 
+        productionOrderRecipeInstances: {
+          select: {
+            id: true,
+          },
+        },
+
         revision: true,
         running: true,
 
@@ -654,6 +666,123 @@ export class ProductionOrderRecipeInstanceControllerBase {
   ): Promise<void> {
     const data = {
       recipeBom: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProductionOrderRecipeInstance({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/recipeBomActuals")
+  @ApiNestedQuery(RecipeBomActualFindManyArgs)
+  @UseRoles({
+    resource: "RecipeBomActual",
+    action: "read",
+    possession: "any",
+  })
+  async findRecipeBomActuals(
+    @common.Req() request: Request,
+    @common.Param() params: ProductionOrderRecipeInstanceWhereUniqueInput
+  ): Promise<RecipeBomActual[]> {
+    const query = plainToClass(RecipeBomActualFindManyArgs, request.query);
+    const results = await this.service.findRecipeBomActuals(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        id: true,
+
+        mashingProtocolStepActual: {
+          select: {
+            id: true,
+          },
+        },
+
+        productionOrderRecipeInstance: {
+          select: {
+            id: true,
+          },
+        },
+
+        recipeBomItem: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+        updatedBy: true,
+        value: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/recipeBomActuals")
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "update",
+    possession: "any",
+  })
+  async connectRecipeBomActuals(
+    @common.Param() params: ProductionOrderRecipeInstanceWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        connect: body,
+      },
+    };
+    await this.service.updateProductionOrderRecipeInstance({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/recipeBomActuals")
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "update",
+    possession: "any",
+  })
+  async updateRecipeBomActuals(
+    @common.Param() params: ProductionOrderRecipeInstanceWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
+        set: body,
+      },
+    };
+    await this.service.updateProductionOrderRecipeInstance({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/recipeBomActuals")
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectRecipeBomActuals(
+    @common.Param() params: ProductionOrderRecipeInstanceWhereUniqueInput,
+    @common.Body() body: RecipeBomActualWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      recipeBomActuals: {
         disconnect: body,
       },
     };

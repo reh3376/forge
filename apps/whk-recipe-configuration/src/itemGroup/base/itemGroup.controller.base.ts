@@ -26,6 +26,12 @@ import { ItemGroup } from "./ItemGroup";
 import { ItemGroupFindManyArgs } from "./ItemGroupFindManyArgs";
 import { ItemGroupWhereUniqueInput } from "./ItemGroupWhereUniqueInput";
 import { ItemGroupUpdateInput } from "./ItemGroupUpdateInput";
+import { MillingBinConfigurationFindManyArgs } from "../../millingBinConfiguration/base/MillingBinConfigurationFindManyArgs";
+import { MillingBinConfiguration } from "../../millingBinConfiguration/base/MillingBinConfiguration";
+import { MillingBinConfigurationWhereUniqueInput } from "../../millingBinConfiguration/base/MillingBinConfigurationWhereUniqueInput";
+import { UnitsFindManyArgs } from "../../units/base/UnitsFindManyArgs";
+import { Units } from "../../units/base/Units";
+import { UnitsWhereUniqueInput } from "../../units/base/UnitsWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -165,5 +171,239 @@ export class ItemGroupControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/millingBinConfigurations")
+  @ApiNestedQuery(MillingBinConfigurationFindManyArgs)
+  @UseRoles({
+    resource: "MillingBinConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async findMillingBinConfigurations(
+    @common.Req() request: Request,
+    @common.Param() params: ItemGroupWhereUniqueInput
+  ): Promise<MillingBinConfiguration[]> {
+    const query = plainToClass(
+      MillingBinConfigurationFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findMillingBinConfigurations(params.id, {
+      ...query,
+      select: {
+        bin: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        id: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/millingBinConfigurations")
+  @UseRoles({
+    resource: "ItemGroup",
+    action: "update",
+    possession: "any",
+  })
+  async connectMillingBinConfigurations(
+    @common.Param() params: ItemGroupWhereUniqueInput,
+    @common.Body() body: MillingBinConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      millingBinConfigurations: {
+        connect: body,
+      },
+    };
+    await this.service.updateItemGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/millingBinConfigurations")
+  @UseRoles({
+    resource: "ItemGroup",
+    action: "update",
+    possession: "any",
+  })
+  async updateMillingBinConfigurations(
+    @common.Param() params: ItemGroupWhereUniqueInput,
+    @common.Body() body: MillingBinConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      millingBinConfigurations: {
+        set: body,
+      },
+    };
+    await this.service.updateItemGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/millingBinConfigurations")
+  @UseRoles({
+    resource: "ItemGroup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMillingBinConfigurations(
+    @common.Param() params: ItemGroupWhereUniqueInput,
+    @common.Body() body: MillingBinConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      millingBinConfigurations: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItemGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/unitsItems")
+  @ApiNestedQuery(UnitsFindManyArgs)
+  @UseRoles({
+    resource: "Units",
+    action: "read",
+    possession: "any",
+  })
+  async findUnitsItems(
+    @common.Req() request: Request,
+    @common.Param() params: ItemGroupWhereUniqueInput
+  ): Promise<Units[]> {
+    const query = plainToClass(UnitsFindManyArgs, request.query);
+    const results = await this.service.findUnitsItems(params.id, {
+      ...query,
+      select: {
+        abbreviation: true,
+        active: true,
+        archived: true,
+
+        baseUnit: {
+          select: {
+            id: true,
+          },
+        },
+
+        conversions: true,
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        isBaseUnit: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        mesConfiguredUnit: true,
+        name: true,
+        perOperation: true,
+        pluralAbbreviation: true,
+        pluralName: true,
+        revision: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/unitsItems")
+  @UseRoles({
+    resource: "ItemGroup",
+    action: "update",
+    possession: "any",
+  })
+  async connectUnitsItems(
+    @common.Param() params: ItemGroupWhereUniqueInput,
+    @common.Body() body: UnitsWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitsItems: {
+        connect: body,
+      },
+    };
+    await this.service.updateItemGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/unitsItems")
+  @UseRoles({
+    resource: "ItemGroup",
+    action: "update",
+    possession: "any",
+  })
+  async updateUnitsItems(
+    @common.Param() params: ItemGroupWhereUniqueInput,
+    @common.Body() body: UnitsWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitsItems: {
+        set: body,
+      },
+    };
+    await this.service.updateItemGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/unitsItems")
+  @UseRoles({
+    resource: "ItemGroup",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectUnitsItems(
+    @common.Param() params: ItemGroupWhereUniqueInput,
+    @common.Body() body: UnitsWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      unitsItems: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateItemGroup({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

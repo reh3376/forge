@@ -14,7 +14,7 @@ import {
   unlink,
 } from "fs";
 import { join } from "path";
-import { StorageServiceBase } from "src/storage/base/storage.service.base";
+import { StorageServiceBase } from "../../base/storage.service.base";
 
 @Injectable()
 export class LocalStorageService extends StorageServiceBase {

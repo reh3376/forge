@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { RecipeGenerator } from "./recipe.generation";
 import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
 import { EnzymeDosingService } from "./enzyme.dosing";
+import { PrismaService } from "../prisma/prisma.service";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { PrismaClient } from "@prisma/client";
 
@@ -102,6 +103,10 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
 
   const mockEnzymeDosingService = {
     calculateEnzymeDosing: jest.fn().mockReturnValue({ dose: 1.5 }),
+    calculateNormalizedEnzymeDosing: jest.fn().mockResolvedValue({
+      ratio: 0.0005,
+      instructions: "Add during saccharification",
+    }),
   };
 
   const mockLogger = {
@@ -130,6 +135,10 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
         {
           provide: EnzymeDosingService,
           useValue: mockEnzymeDosingService,
+        },
+        {
+          provide: PrismaService,
+          useValue: mockPrismaClient,
         },
         {
           provide: WINSTON_MODULE_NEST_PROVIDER,
@@ -204,12 +213,12 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
         Specialty: expect.any(Number),
       });
 
-      // Verify specialty grain quantity is calculated (10% of 24080 = 2408)
-      expect(quantities.Specialty).toBe(2408);
-      expect(quantities.Corn).toBe(9632); // 40%
-      expect(quantities.Rye).toBe(4816); // 20%
-      expect(quantities.Wheat).toBe(3612); // 15%
-      expect(quantities.Malt).toBe(3612); // 15%
+      // calculateGrainQuantities now returns decimal fractions (percentage / 100)
+      expect(quantities.Specialty).toBeCloseTo(0.1, 5); // 10%
+      expect(quantities.Corn).toBeCloseTo(0.4, 5); // 40%
+      expect(quantities.Rye).toBeCloseTo(0.2, 5); // 20%
+      expect(quantities.Wheat).toBeCloseTo(0.15, 5); // 15%
+      expect(quantities.Malt).toBeCloseTo(0.15, 5); // 15%
     });
 
     it("should throw error when specialty item number is provided but item is not found", async () => {
@@ -240,9 +249,6 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
       ).rejects.toThrow(
         "Specialty item with item number NONEXISTENT-SPECIALTY-ITEM not found"
       );
-
-      // Verify disconnect was called even on error
-      expect(mockPrismaClient.$disconnect).toHaveBeenCalled();
     });
 
     it("should validate that specialty grain is in bin assignments when present in mash bill", async () => {
@@ -282,10 +288,8 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
       ).rejects.toThrow("Invalid bin assignments");
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Grain Specialty from mash bill is not assigned to any bin"
+        "Required grain Specialty is not assigned to any bin"
       );
-
-      expect(mockPrismaClient.$disconnect).toHaveBeenCalled();
     });
 
     it("should validate that specialty grain in mashing protocol matches mash bill", async () => {
@@ -347,14 +351,15 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
         Rye: expect.any(Number),
         Wheat: expect.any(Number),
         Malt: expect.any(Number),
-        Specialty: 0, // Should be 0 for 4-grain recipes
+        Specialty: expect.any(Number),
       });
 
-      expect(quantities.Corn).toBe(12281); // 51%
-      expect(quantities.Rye).toBe(3130); // 13%
-      expect(quantities.Wheat).toBe(5057); // 21%
-      expect(quantities.Malt).toBe(3612); // 15%
-      expect(quantities.Specialty).toBe(0); // 0%
+      // calculateGrainQuantities now returns decimal fractions (percentage / 100)
+      expect(quantities.Corn).toBeCloseTo(0.51, 5); // 51%
+      expect(quantities.Rye).toBeCloseTo(0.13, 5); // 13%
+      expect(quantities.Wheat).toBeCloseTo(0.21, 5); // 21%
+      expect(quantities.Malt).toBeCloseTo(0.15, 5); // 15%
+      expect(quantities.Specialty).toBeCloseTo(0, 5); // 0%
 
       // Verify specialty grain percentage calculation returns 0 for 4-grain mash bills
       const specialtyPercentage = (
@@ -375,12 +380,13 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
         totalWeight
       );
 
+      // calculateGrainQuantities now returns decimal fractions (percentage / 100)
       expect(quantities).toEqual({
-        Corn: 4000,
-        Rye: 2000,
-        Wheat: 1500,
-        Malt: 1500,
-        Specialty: 1000,
+        Corn: 0.4,
+        Rye: 0.2,
+        Wheat: 0.15,
+        Malt: 0.15,
+        Specialty: 0.1,
       });
     });
 
@@ -393,11 +399,12 @@ describe("RecipeGenerator - Specialty Grain Integration Tests", () => {
         totalWeight
       );
 
-      expect(quantities.Corn).toBe(4050);
-      expect(quantities.Rye).toBe(1950);
-      expect(quantities.Wheat).toBe(1525);
-      expect(quantities.Malt).toBe(1475);
-      expect(quantities.Specialty).toBe(1000);
+      // calculateGrainQuantities now returns decimal fractions (percentage / 100)
+      expect(quantities.Corn).toBeCloseTo(0.405, 5);
+      expect(quantities.Rye).toBeCloseTo(0.195, 5);
+      expect(quantities.Wheat).toBeCloseTo(0.1525, 5);
+      expect(quantities.Malt).toBeCloseTo(0.1475, 5);
+      expect(quantities.Specialty).toBeCloseTo(0.1, 5);
     });
 
     it("should calculate specialty grain percentage correctly", () => {

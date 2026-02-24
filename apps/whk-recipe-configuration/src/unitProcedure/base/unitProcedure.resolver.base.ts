@@ -29,8 +29,6 @@ import { OperationFindManyArgs } from "../../operation/base/OperationFindManyArg
 import { Operation } from "../../operation/base/Operation";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
-import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
-import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { Bom } from "../../bom/base/Bom";
 import { Procedure } from "../../procedure/base/Procedure";
 import { UnitProcedureService } from "../unitProcedure.service";
@@ -228,28 +226,6 @@ export class UnitProcedureResolverBase {
     @graphql.Args() args: RecipeFindManyArgs
   ): Promise<Recipe[]> {
     const results = await this.service.findRecipe(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ScheduleOrderQueue], {
-    name: "scheduleOrderQueues",
-  })
-  @UseRoles({
-    resource: "ScheduleOrderQueue",
-    action: "read",
-    possession: "any",
-  })
-  async findScheduleOrderQueues(
-    @graphql.Parent() parent: UnitProcedure,
-    @graphql.Args() args: ScheduleOrderQueueFindManyArgs
-  ): Promise<ScheduleOrderQueue[]> {
-    const results = await this.service.findScheduleOrderQueues(parent.id, args);
 
     if (!results) {
       return [];

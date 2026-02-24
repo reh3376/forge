@@ -1,0 +1,330 @@
+---
+description: Orchestrates MCP servers to maximize development context and ensure seamless knowledge graph integration
+globs: **/*
+alwaysApply: true
+priority: 1
+---
+# 🧠 Memory MCP - Graphiti Integration (MANDATORY)
+
+## **🚨 CRITICAL REQUIREMENT**
+
+### **Every Development Action MUST Update Knowledge Graph**
+- **NEVER** complete a task without documenting in Graphiti
+- **ALWAYS** capture implementation decisions
+- **ALWAYS** link new knowledge to existing entities
+- **ALWAYS** store reusable patterns
+
+## **📋 Mandatory Integration Patterns**
+
+### **1. Task Initiation Pattern**
+```typescript
+// REQUIRED: Start every development session
+const currentTask = mcp_taskmaster-ai_next_task()
+
+// REQUIRED: Search existing knowledge BEFORE implementing
+const relatedNodes = mcp_graphiti-memory_search_memory_nodes(currentTask.title)
+const relatedFacts = mcp_graphiti-memory_search_memory_facts(currentTask.description)
+const similarPatterns = mcp_qdrant_qdrant-find(`similar to ${currentTask.description}`)
+```
+
+### **2. Implementation Documentation Pattern**
+```typescript
+// REQUIRED: Document during implementation
+mcp_graphiti-memory_add_memory({
+  name: `${currentTask.title} - Implementation Progress`,
+  episode_body: `
+    Task: ${currentTask.title}
+    Phase: Implementation
+    Approach: [specific technical approach]
+    Files modified: [list of files]
+    Key decisions: [architectural choices made]
+    Challenges encountered: [problems and solutions]
+    Dependencies discovered: [new dependencies found]
+  `,
+  source: "text"
+})
+```
+
+### **3. Cross-System Integration Pattern**
+```typescript
+// REQUIRED: Link systems and components
+mcp_graphiti-memory_add_memory({
+  name: "System Integration Point",
+  episode_body: JSON.stringify({
+    component: "ComponentName",
+    database_tables: ["table1", "table2"],
+    api_endpoints: ["/api/endpoint"],
+    business_process: "ProcessName",
+    implementation_details: "specific technical approach",
+    related_tasks: [currentTask.id],
+    integration_type: "database|api|ui|business_logic"
+  }),
+  source: "json"
+})
+```
+
+### **4. Bug Fix Documentation Pattern**
+```typescript
+// REQUIRED: Document all bug fixes
+mcp_graphiti-memory_add_memory({
+  name: `Bug Fix: ${bugTitle}`,
+  episode_body: `
+    Bug: ${bugDescription}
+    Root cause: ${rootCause}
+    Solution: ${solutionImplemented}
+    Files changed: ${filesModified}
+    Prevention: ${preventionStrategy}
+    Related systems: ${affectedSystems}
+  `,
+  source: "text"
+})
+```
+
+### **5. Feature Completion Pattern**
+```typescript
+// REQUIRED: Document completed features
+mcp_graphiti-memory_add_memory({
+  name: `Feature Complete: ${featureName}`,
+  episode_body: JSON.stringify({
+    feature: featureName,
+    implementation_approach: "detailed technical approach",
+    components_created: ["Component1", "Component2"],
+    apis_integrated: ["/api/endpoint1", "/api/endpoint2"],
+    database_changes: ["table1", "table2"],
+    business_value: "specific business outcome",
+    testing_strategy: "how feature was validated",
+    deployment_notes: "deployment considerations"
+  }),
+  source: "json"
+})
+```
+
+## **🔄 Knowledge Graph Workflow Integration**
+
+### **Development Session Flow**
+```typescript
+// 1. INITIATE: Get task and search knowledge
+const task = mcp_taskmaster-ai_next_task()
+const knowledge = mcp_graphiti-memory_search_memory_nodes(task.title)
+
+// 2. PLAN: Document implementation plan
+mcp_graphiti-memory_add_memory({
+  name: `${task.title} - Planning`,
+  episode_body: "Implementation plan based on existing knowledge..."
+})
+
+// 3. IMPLEMENT: Code the solution
+// ... your implementation work ...
+
+// 4. DOCUMENT: Update knowledge graph (MANDATORY)
+mcp_graphiti-memory_add_memory({
+  name: `${task.title} - Implementation`,
+  episode_body: "Detailed implementation findings..."
+})
+
+// 5. CORRELATE: Link to other systems
+mcp_graphiti-memory_add_memory({
+  name: "System Integration",
+  episode_body: JSON.stringify({...integrationDetails}),
+  source: "json"
+})
+
+// 6. FINALIZE: Update task status
+mcp_taskmaster-ai_set_task_status({id: task.id, status: "done"})
+```
+
+### **Knowledge Linking Patterns**
+```typescript
+// REQUIRED: Always link new knowledge to existing entities
+// Search for related entities BEFORE adding new memory
+const relatedEntities = mcp_graphiti-memory_search_memory_nodes("related concept")
+
+// Add new memory with explicit relationships
+mcp_graphiti-memory_add_memory({
+  name: "New Implementation",
+  episode_body: `
+    This implementation extends: ${relatedEntities.map(e => e.name).join(', ')}
+    New patterns established: [specific patterns]
+    Architectural decisions: [decisions made]
+    Future considerations: [what to consider next]
+  `
+})
+```
+
+## **📊 Knowledge Categories (MANDATORY)**
+
+### **Implementation Knowledge**
+```typescript
+// ALWAYS document these implementation aspects:
+- Technical approach and rationale
+- Architecture decisions and trade-offs
+- Code patterns and reusable components
+- Performance considerations
+- Security implications
+- Testing strategies
+```
+
+### **Integration Knowledge**
+```typescript
+// ALWAYS document these integration points:
+- Database schema changes
+- API endpoint modifications
+- Component relationships
+- Data flow patterns
+- Business process impacts
+- Cross-system dependencies
+```
+
+### **Operational Knowledge**
+```typescript
+// ALWAYS document these operational aspects:
+- Deployment considerations
+- Configuration requirements
+- Monitoring and alerting
+- Error handling strategies
+- Maintenance procedures
+- Troubleshooting guides
+```
+
+## **🎯 Manufacturing-Specific Patterns**
+
+### **Recipe Management Knowledge**
+```typescript
+// REQUIRED: Document recipe-related implementations
+mcp_graphiti-memory_add_memory({
+  name: "Recipe Management Implementation",
+  episode_body: JSON.stringify({
+    recipe_type: "IPA|Lager|Wheat",
+    components_affected: ["RecipeEditor", "IngredientManager"],
+    database_tables: ["recipes", "ingredients", "recipe_steps"],
+    business_process: "recipe creation and validation",
+    quality_controls: "validation rules implemented",
+    integration_points: ["ERP", "production_orders", "inventory"]
+  }),
+  source: "json"
+})
+```
+
+### **Production Order Knowledge**
+```typescript
+// REQUIRED: Document production-related implementations
+mcp_graphiti-memory_add_memory({
+  name: "Production Order Implementation",
+  episode_body: JSON.stringify({
+    production_type: "batch|continuous",
+    components_affected: ["ProductionScheduler", "BatchTracker"],
+    database_tables: ["production_orders", "batch_actual", "equipment_phases"],
+    business_process: "production planning and execution",
+    real_time_integration: "MQTT topics and data flow",
+    quality_controls: "batch validation and quality checks"
+  }),
+  source: "json"
+})
+```
+
+### **Enzyme Dosing Knowledge**
+```typescript
+// REQUIRED: Document enzyme-related implementations
+mcp_graphiti-memory_add_memory({
+  name: "Enzyme Dosing Implementation",
+  episode_body: JSON.stringify({
+    enzyme_types: ["alpha_amylase", "beta_glucanase"],
+    components_affected: ["EnzymeDosingPanel", "DosingCalculator"],
+    database_tables: ["enzyme_configurations", "additive_actual"],
+    business_process: "enzyme dosing and tracking",
+    calculation_logic: "dosing algorithms and formulas",
+    safety_controls: "dosing limits and validation"
+  }),
+  source: "json"
+})
+```
+
+## **🔍 Knowledge Search Patterns**
+
+### **Before Implementation**
+```typescript
+// REQUIRED: Search existing knowledge before starting
+const existingPatterns = mcp_graphiti-memory_search_memory_nodes("component type")
+const similarSolutions = mcp_graphiti-memory_search_memory_facts("similar problem")
+const relatedBugs = mcp_graphiti-memory_search_memory_facts("error pattern")
+```
+
+### **During Implementation**
+```typescript
+// REQUIRED: Continuously update knowledge during development
+mcp_graphiti-memory_add_memory({
+  name: `${task.title} - Progress Update`,
+  episode_body: `
+    Progress: [current status]
+    Discoveries: [new findings]
+    Challenges: [current obstacles]
+    Solutions: [approaches tried]
+    Next steps: [planned actions]
+  `
+})
+```
+
+### **After Implementation**
+```typescript
+// REQUIRED: Capture final knowledge and lessons learned
+mcp_graphiti-memory_add_memory({
+  name: `${task.title} - Completion Summary`,
+  episode_body: `
+    Final implementation: [what was built]
+    Key insights: [important learnings]
+    Reusable patterns: [patterns for future use]
+    Gotchas: [things to watch out for]
+    Recommendations: [suggestions for future work]
+  `
+})
+```
+
+## **📈 Knowledge Quality Metrics**
+
+### **Completeness Indicators**
+- [ ] Implementation approach documented
+- [ ] Architectural decisions captured
+- [ ] Integration points recorded
+- [ ] Business value articulated
+- [ ] Testing strategy documented
+- [ ] Deployment considerations noted
+
+### **Relationship Quality**
+- [ ] Linked to existing entities
+- [ ] Cross-system relationships established
+- [ ] Component dependencies mapped
+- [ ] Business process connections made
+
+### **Searchability Optimization**
+- [ ] Clear, descriptive names
+- [ ] Structured data for JSON entries
+- [ ] Consistent terminology used
+- [ ] Relevant keywords included
+
+## **🚨 Compliance Checklist**
+
+### **Before Task Completion:**
+- [ ] Searched existing knowledge graph
+- [ ] Documented implementation approach
+- [ ] Captured architectural decisions
+- [ ] Linked to related entities
+- [ ] Stored reusable patterns
+- [ ] Updated cross-system relationships
+
+### **Quality Validation:**
+- [ ] Knowledge is searchable by relevant terms
+- [ ] Relationships are properly established
+- [ ] Implementation details are complete
+- [ ] Business context is captured
+- [ ] Future considerations are noted
+
+---
+
+**Remember**: Graphiti MCP integration is not optional. Every development action must contribute to the persistent knowledge graph. This ensures that all implementation decisions, patterns, and insights are preserved for future development sessions and team knowledge sharing.
+
+This pattern ensures that knowledge accumulates naturally during development, creating a rich, searchable context that benefits both AI assistance and human developers across sessions.
+
+}])
+```
+
+This pattern ensures that knowledge accumulates naturally during development, creating a rich, searchable context that benefits both AI assistance and human developers across sessions.

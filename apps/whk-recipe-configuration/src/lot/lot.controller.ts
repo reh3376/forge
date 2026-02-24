@@ -15,10 +15,13 @@ import { Lot } from "./base/Lot";
 import { LotWhereUniqueInput } from "./base/LotWhereUniqueInput";
 import { LotUpdateInput } from "./base/LotUpdateInput";
 import { isRecordNotFoundError } from "../prisma.util";
+import { Logger } from "@nestjs/common";
 
 @swagger.ApiTags("lots")
 @common.Controller("lots")
 export class LotController extends LotControllerBase {
+  private readonly logger = new Logger(LotController.name);
+
   constructor(
     protected readonly service: LotService,
     @InjectRolesBuilder()
@@ -40,7 +43,7 @@ export class LotController extends LotControllerBase {
   })
   async create(@common.Body() data: LotCreateInput): Promise<LotCreateInput> {
     const sanitizedLotNumber = data.lotNumber?.replace(/\n|\r/g, "") ?? "";
-    console.log(`LotNumber: ${sanitizedLotNumber}`);
+    this.logger.debug(`LotNumber: ${sanitizedLotNumber}`);
 
     return this.service.createLot({
       data: {

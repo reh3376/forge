@@ -25,12 +25,11 @@ import { RecipeBomFindManyArgs } from "./RecipeBomFindManyArgs";
 import { RecipeBomFindUniqueArgs } from "./RecipeBomFindUniqueArgs";
 import { CreateRecipeBomArgs } from "./CreateRecipeBomArgs";
 import { UpdateRecipeBomArgs } from "./UpdateRecipeBomArgs";
-import { ProductionOrderRecipeInstanceFindManyArgs } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstanceFindManyArgs";
-import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeFindManyArgs } from "../../recipe/base/RecipeFindManyArgs";
 import { Recipe } from "../../recipe/base/Recipe";
 import { RecipeBomItemFindManyArgs } from "../../recipeBomItem/base/RecipeBomItemFindManyArgs";
 import { RecipeBomItem } from "../../recipeBomItem/base/RecipeBomItem";
+import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { RecipeBomService } from "../recipeBom.service";
 import { RecipeBomActualFindManyArgs } from "src/recipeBomActual/base/RecipeBomActualFindManyArgs";
 import { RecipeBomActual } from "@prisma/client";
@@ -108,6 +107,12 @@ export class RecipeBomResolverBase {
             }
           : undefined,
 
+        productionOrderRecipeInstances: args.data.productionOrderRecipeInstances
+          ? {
+              connect: args.data.productionOrderRecipeInstances,
+            }
+          : undefined,
+
         runningRecipeBom: args.data.runningRecipeBom
           ? {
               connect: args.data.runningRecipeBom,
@@ -136,6 +141,13 @@ export class RecipeBomResolverBase {
           masterRecipeBom: args.data.masterRecipeBom
             ? {
                 connect: args.data.masterRecipeBom,
+              }
+            : undefined,
+
+          productionOrderRecipeInstances: args.data
+            .productionOrderRecipeInstances
+            ? {
+                connect: args.data.productionOrderRecipeInstances,
               }
             : undefined,
 
@@ -168,31 +180,6 @@ export class RecipeBomResolverBase {
     @graphql.Args() args: RecipeBomFindManyArgs
   ): Promise<RecipeBom[]> {
     const results = await this.service.findMasterInstances(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
-    name: "productionOrderRecipeInstances",
-  })
-  @UseRoles({
-    resource: "ProductionOrderRecipeInstance",
-    action: "read",
-    possession: "any",
-  })
-  async findProductionOrderRecipeInstances(
-    @graphql.Parent() parent: RecipeBom,
-    @graphql.Args() args: ProductionOrderRecipeInstanceFindManyArgs
-  ): Promise<ProductionOrderRecipeInstance[]> {
-    const results = await this.service.findProductionOrderRecipeInstances(
-      parent.id,
-      args
-    );
 
     if (!results) {
       return [];
@@ -279,6 +266,26 @@ export class RecipeBomResolverBase {
     if (!result) {
       return null;
     }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ProductionOrderRecipeInstance], {
+    nullable: false,
+    name: "productionOrderRecipeInstances",
+  })
+  @UseRoles({
+    resource: "ProductionOrderRecipeInstance",
+    action: "read",
+    possession: "any",
+  })
+  async getProductionOrderRecipeInstances(
+    @graphql.Parent() parent: RecipeBom
+  ): Promise<ProductionOrderRecipeInstance[]> {
+    const result = await this.service.getProductionOrderRecipeInstances(
+      parent.id
+    );
+
     return result;
   }
 

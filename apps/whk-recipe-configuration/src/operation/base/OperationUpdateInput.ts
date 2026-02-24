@@ -32,6 +32,7 @@ import { EquipmentPhaseUpdateManyWithoutOperationsInput } from "./EquipmentPhase
 import { OperationUpdateManyWithoutOperationsInput } from "./OperationUpdateManyWithoutOperationsInput";
 import { EnumOperationName } from "./EnumOperationName";
 import { UnitProcedureWhereUniqueInput } from "../../unitProcedure/base/UnitProcedureWhereUniqueInput";
+import { RecipeParameterUpdateManyWithoutOperationsInput } from "./RecipeParameterUpdateManyWithoutOperationsInput";
 
 @InputType()
 class OperationUpdateInput {
@@ -253,6 +254,18 @@ class OperationUpdateInput {
     nullable: true,
   })
   unitProcedure?: UnitProcedureWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => RecipeParameterUpdateManyWithoutOperationsInput,
+  })
+  @ValidateNested()
+  @Type(() => RecipeParameterUpdateManyWithoutOperationsInput)
+  @IsOptional()
+  @Field(() => RecipeParameterUpdateManyWithoutOperationsInput, {
+    nullable: true,
+  })
+  RecipeParameter?: RecipeParameterUpdateManyWithoutOperationsInput;
 }
 
 export { OperationUpdateInput as OperationUpdateInput };

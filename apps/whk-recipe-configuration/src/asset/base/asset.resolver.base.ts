@@ -37,8 +37,14 @@ import { ItemReceiptFindManyArgs } from "../../itemReceipt/base/ItemReceiptFindM
 import { ItemReceipt } from "../../itemReceipt/base/ItemReceipt";
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
+import { MillingBinConfigurationFindManyArgs } from "../../millingBinConfiguration/base/MillingBinConfigurationFindManyArgs";
+import { MillingBinConfiguration } from "../../millingBinConfiguration/base/MillingBinConfiguration";
+import { OperatorShiftFindManyArgs } from "../../operatorShift/base/OperatorShiftFindManyArgs";
+import { OperatorShift } from "../../operatorShift/base/OperatorShift";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
 import { AssetService } from "../asset.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Asset)
@@ -377,6 +383,51 @@ export class AssetResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [MillingBinConfiguration], {
+    name: "millingBinConfigurations",
+  })
+  @UseRoles({
+    resource: "MillingBinConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async findMillingBinConfigurations(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: MillingBinConfigurationFindManyArgs
+  ): Promise<MillingBinConfiguration[]> {
+    const results = await this.service.findMillingBinConfigurations(
+      parent.id,
+      args
+    );
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [OperatorShift], { name: "operatorShifts" })
+  @UseRoles({
+    resource: "OperatorShift",
+    action: "read",
+    possession: "any",
+  })
+  async findOperatorShifts(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: OperatorShiftFindManyArgs
+  ): Promise<OperatorShift[]> {
+    const results = await this.service.findOperatorShifts(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [PurchaseOrder], { name: "purchaseOrders" })
   @UseRoles({
     resource: "PurchaseOrder",
@@ -388,6 +439,28 @@ export class AssetResolverBase {
     @graphql.Args() args: PurchaseOrderFindManyArgs
   ): Promise<PurchaseOrder[]> {
     const results = await this.service.findPurchaseOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [ScheduleOrderQueue], {
+    name: "scheduleOrderQueues",
+  })
+  @UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrderQueues(
+    @graphql.Parent() parent: Asset,
+    @graphql.Args() args: ScheduleOrderQueueFindManyArgs
+  ): Promise<ScheduleOrderQueue[]> {
+    const results = await this.service.findScheduleOrderQueues(parent.id, args);
 
     if (!results) {
       return [];

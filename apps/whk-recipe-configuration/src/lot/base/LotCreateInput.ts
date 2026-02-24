@@ -26,9 +26,11 @@ import {
   IsEnum,
 } from "class-validator";
 
-import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
+import { BatchMaterialConsumptionCreateNestedManyWithoutLotsInput } from "./BatchMaterialConsumptionCreateNestedManyWithoutLotsInput";
 import { Type } from "class-transformer";
+import { BatchCreateNestedManyWithoutLotsInput } from "./BatchCreateNestedManyWithoutLotsInput";
 import { BomItemCreateNestedManyWithoutLotsInput } from "./BomItemCreateNestedManyWithoutLotsInput";
+import { CommentCreateNestedManyWithoutLotsInput } from "./CommentCreateNestedManyWithoutLotsInput";
 import { ItemWhereUniqueInput } from "../../item/base/ItemWhereUniqueInput";
 import { AssetWhereUniqueInput } from "../../asset/base/AssetWhereUniqueInput";
 import { CustomerWhereUniqueInput } from "../../customer/base/CustomerWhereUniqueInput";
@@ -78,6 +80,18 @@ class LotCreateInput {
     nullable: true,
   })
   avgPGsFerm?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => BatchMaterialConsumptionCreateNestedManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => BatchMaterialConsumptionCreateNestedManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => BatchMaterialConsumptionCreateNestedManyWithoutLotsInput, {
+    nullable: true,
+  })
+  batchMaterialConsumptions?: BatchMaterialConsumptionCreateNestedManyWithoutLotsInput;
 
   @ApiProperty({
     required: true,
@@ -150,6 +164,18 @@ class LotCreateInput {
     nullable: true,
   })
   bomItems?: BomItemCreateNestedManyWithoutLotsInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => CommentCreateNestedManyWithoutLotsInput,
+  })
+  @ValidateNested()
+  @Type(() => CommentCreateNestedManyWithoutLotsInput)
+  @IsOptional()
+  @Field(() => CommentCreateNestedManyWithoutLotsInput, {
+    nullable: true,
+  })
+  comments?: CommentCreateNestedManyWithoutLotsInput;
 
   @ApiProperty({
     required: false,
@@ -650,9 +676,7 @@ class LotCreateInput {
   @ValidateNested()
   @Type(() => Object)
   @IsOptional()
-  @Field(() => Object, {
-    nullable: true,
-  })
+  // @Field(() => Object, { nullable: true }) // Commented out: GraphQL cannot handle Object type for Prisma nested input
   whiskeyTypeRelation?: Prisma.WhiskeyTypeCreateNestedOneWithoutLotsInput;
 }
 

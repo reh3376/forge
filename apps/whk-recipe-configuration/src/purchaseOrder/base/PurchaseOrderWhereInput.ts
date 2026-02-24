@@ -25,8 +25,8 @@ import { JsonFilter } from "../../util/JsonFilter";
 import { PurchaseOrderListRelationFilter } from "./PurchaseOrderListRelationFilter";
 import { PurchaseOrderWhereUniqueInput } from "./PurchaseOrderWhereUniqueInput";
 import { TestParameterListRelationFilter } from "../../testParameter/base/TestParameterListRelationFilter";
-import { EnumPurchaseOrderReceiptStatus } from "./EnumPurchaseOrderReceiptStatus";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { EnumPurchaseOrderStatus } from "./EnumPurchaseOrderStatus";
 import { VendorWhereUniqueInput } from "../../vendor/base/VendorWhereUniqueInput";
 
 @InputType()
@@ -238,23 +238,6 @@ class PurchaseOrderWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumPurchaseOrderReceiptStatus,
-  })
-  @IsEnum(EnumPurchaseOrderReceiptStatus)
-  @IsOptional()
-  @Field(() => EnumPurchaseOrderReceiptStatus, {
-    nullable: true,
-  })
-  receiptStatus?:
-    | "NotReceived"
-    | "ReceiptInProgress"
-    | "ReceiptComplete"
-    | "PurchaseOrderComplete"
-    | "InitializedNotReceived"
-    | "ReceivedTested";
-
-  @ApiProperty({
-    required: false,
     type: IntNullableFilter,
   })
   @Type(() => IntNullableFilter)
@@ -285,6 +268,17 @@ class PurchaseOrderWhereInput {
     nullable: true,
   })
   schemaVersion?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumPurchaseOrderStatus,
+  })
+  @IsEnum(EnumPurchaseOrderStatus)
+  @IsOptional()
+  @Field(() => EnumPurchaseOrderStatus, {
+    nullable: true,
+  })
+  status?: "Planned" | "Committed" | "Initiated" | "InProgress" | "Complete";
 
   @ApiProperty({
     required: false,

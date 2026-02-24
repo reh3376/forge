@@ -44,9 +44,18 @@ import { ItemReceiptWhereUniqueInput } from "../../itemReceipt/base/ItemReceiptW
 import { LotFindManyArgs } from "../../lot/base/LotFindManyArgs";
 import { Lot } from "../../lot/base/Lot";
 import { LotWhereUniqueInput } from "../../lot/base/LotWhereUniqueInput";
+import { MillingBinConfigurationFindManyArgs } from "../../millingBinConfiguration/base/MillingBinConfigurationFindManyArgs";
+import { MillingBinConfiguration } from "../../millingBinConfiguration/base/MillingBinConfiguration";
+import { MillingBinConfigurationWhereUniqueInput } from "../../millingBinConfiguration/base/MillingBinConfigurationWhereUniqueInput";
+import { OperatorShiftFindManyArgs } from "../../operatorShift/base/OperatorShiftFindManyArgs";
+import { OperatorShift } from "../../operatorShift/base/OperatorShift";
+import { OperatorShiftWhereUniqueInput } from "../../operatorShift/base/OperatorShiftWhereUniqueInput";
 import { PurchaseOrderFindManyArgs } from "../../purchaseOrder/base/PurchaseOrderFindManyArgs";
 import { PurchaseOrder } from "../../purchaseOrder/base/PurchaseOrder";
 import { PurchaseOrderWhereUniqueInput } from "../../purchaseOrder/base/PurchaseOrderWhereUniqueInput";
+import { ScheduleOrderQueueFindManyArgs } from "../../scheduleOrderQueue/base/ScheduleOrderQueueFindManyArgs";
+import { ScheduleOrderQueue } from "../../scheduleOrderQueue/base/ScheduleOrderQueue";
+import { ScheduleOrderQueueWhereUniqueInput } from "../../scheduleOrderQueue/base/ScheduleOrderQueueWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(DefaultAuthGuard, ACGuard)
@@ -88,6 +97,7 @@ export class AssetControllerBase {
         description: true,
         globalId: true,
         id: true,
+        index: true,
         name: true,
 
         parent: {
@@ -130,6 +140,7 @@ export class AssetControllerBase {
         description: true,
         globalId: true,
         id: true,
+        index: true,
         name: true,
 
         parent: {
@@ -173,6 +184,7 @@ export class AssetControllerBase {
         description: true,
         globalId: true,
         id: true,
+        index: true,
         name: true,
 
         parent: {
@@ -236,6 +248,7 @@ export class AssetControllerBase {
           description: true,
           globalId: true,
           id: true,
+          index: true,
           name: true,
 
           parent: {
@@ -316,13 +329,6 @@ export class AssetControllerBase {
         },
 
         quantity: true,
-
-        recipe: {
-          select: {
-            id: true,
-          },
-        },
-
         revision: true,
         totalDuration: true,
         updatedAt: true,
@@ -425,6 +431,7 @@ export class AssetControllerBase {
         description: true,
         globalId: true,
         id: true,
+        index: true,
         name: true,
 
         parent: {
@@ -1906,6 +1913,226 @@ export class AssetControllerBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/millingBinConfigurations")
+  @ApiNestedQuery(MillingBinConfigurationFindManyArgs)
+  @UseRoles({
+    resource: "MillingBinConfiguration",
+    action: "read",
+    possession: "any",
+  })
+  async findMillingBinConfigurations(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<MillingBinConfiguration[]> {
+    const query = plainToClass(
+      MillingBinConfigurationFindManyArgs,
+      request.query
+    );
+    const results = await this.service.findMillingBinConfigurations(params.id, {
+      ...query,
+      select: {
+        bin: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        id: true,
+
+        itemGroup: {
+          select: {
+            id: true,
+          },
+        },
+
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/millingBinConfigurations")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectMillingBinConfigurations(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: MillingBinConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      millingBinConfigurations: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/millingBinConfigurations")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateMillingBinConfigurations(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: MillingBinConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      millingBinConfigurations: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/millingBinConfigurations")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectMillingBinConfigurations(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: MillingBinConfigurationWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      millingBinConfigurations: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/operatorShifts")
+  @ApiNestedQuery(OperatorShiftFindManyArgs)
+  @UseRoles({
+    resource: "OperatorShift",
+    action: "read",
+    possession: "any",
+  })
+  async findOperatorShifts(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<OperatorShift[]> {
+    const query = plainToClass(OperatorShiftFindManyArgs, request.query);
+    const results = await this.service.findOperatorShifts(params.id, {
+      ...query,
+      select: {
+        asset: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        effectiveDate: true,
+        endTime: true,
+        expirationDate: true,
+        id: true,
+        isActive: true,
+        notes: true,
+        operator: true,
+        shiftType: true,
+        startTime: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/operatorShifts")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectOperatorShifts(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: OperatorShiftWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      operatorShifts: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/operatorShifts")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateOperatorShifts(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: OperatorShiftWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      operatorShifts: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/operatorShifts")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectOperatorShifts(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: OperatorShiftWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      operatorShifts: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/purchaseOrders")
   @ApiNestedQuery(PurchaseOrderFindManyArgs)
   @UseRoles({
@@ -1945,10 +2172,10 @@ export class AssetControllerBase {
           },
         },
 
-        receiptStatus: true,
         receivedQuantity: true,
         revision: true,
         schemaVersion: true,
+        status: true,
         totalOrderQuantity: true,
         transactionGroup: true,
         updatedAt: true,
@@ -2025,6 +2252,113 @@ export class AssetControllerBase {
   ): Promise<void> {
     const data = {
       purchaseOrders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/scheduleOrderQueues")
+  @ApiNestedQuery(ScheduleOrderQueueFindManyArgs)
+  @UseRoles({
+    resource: "ScheduleOrderQueue",
+    action: "read",
+    possession: "any",
+  })
+  async findScheduleOrderQueues(
+    @common.Req() request: Request,
+    @common.Param() params: AssetWhereUniqueInput
+  ): Promise<ScheduleOrderQueue[]> {
+    const query = plainToClass(ScheduleOrderQueueFindManyArgs, request.query);
+    const results = await this.service.findScheduleOrderQueues(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        createdBy: true,
+        globalId: true,
+        id: true,
+        queueIndex: true,
+
+        scheduleOrder: {
+          select: {
+            id: true,
+          },
+        },
+
+        schemaVersion: true,
+        updatedAt: true,
+        updatedBy: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/scheduleOrderQueues")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async connectScheduleOrderQueues(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
+        connect: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/scheduleOrderQueues")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async updateScheduleOrderQueues(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
+        set: body,
+      },
+    };
+    await this.service.updateAsset({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/scheduleOrderQueues")
+  @UseRoles({
+    resource: "Asset",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectScheduleOrderQueues(
+    @common.Param() params: AssetWhereUniqueInput,
+    @common.Body() body: ScheduleOrderQueueWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      scheduleOrderQueues: {
         disconnect: body,
       },
     };

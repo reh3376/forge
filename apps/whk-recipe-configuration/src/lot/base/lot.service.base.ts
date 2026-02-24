@@ -14,8 +14,10 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Lot as PrismaLot,
+  BatchMaterialConsumption as PrismaBatchMaterialConsumption,
   Batch as PrismaBatch,
   BomItem as PrismaBomItem,
+  Comment as PrismaComment,
   InventoryTransfer as PrismaInventoryTransfer,
   Item as PrismaItem,
   Asset as PrismaAsset,
@@ -48,6 +50,17 @@ export class LotServiceBase {
     return this.prisma.lot.delete(args);
   }
 
+  async findBatchMaterialConsumptions(
+    parentId: string,
+    args: Prisma.BatchMaterialConsumptionFindManyArgs
+  ): Promise<PrismaBatchMaterialConsumption[]> {
+    return this.prisma.lot
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .batchMaterialConsumptions(args);
+  }
+
   async findBatches(
     parentId: string,
     args: Prisma.BatchFindManyArgs
@@ -68,6 +81,17 @@ export class LotServiceBase {
         where: { id: parentId },
       })
       .bomItems(args);
+  }
+
+  async findComments(
+    parentId: string,
+    args: Prisma.CommentFindManyArgs
+  ): Promise<PrismaComment[]> {
+    return this.prisma.lot
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .comments(args);
   }
 
   async findInventoryTransfers(

@@ -1,0 +1,58 @@
+services:
+  mes-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Build-time environment variables (used during Next.js build)
+        NEXT_PUBLIC_MES_API_URL: ${NEXT_PUBLIC_MES_API_URL:-http://host.docker.internal:3000/api}
+        NEXT_PUBLIC_MES_GRAPHQL_URL: ${NEXT_PUBLIC_MES_GRAPHQL_URL:-http://host.docker.internal:3000/graphql}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://host.docker.internal:3000/health}
+        NEXT_PUBLIC_AZURE_AD_CLIENT_ID: ${NEXT_PUBLIC_AZURE_AD_CLIENT_ID}
+        NEXT_PUBLIC_AZURE_AD_TENANT_ID: ${NEXT_PUBLIC_AZURE_AD_TENANT_ID}
+        NEXT_PUBLIC_AZURE_CLIENT_ID: ${NEXT_PUBLIC_AZURE_CLIENT_ID}
+        NEXT_PUBLIC_AZURE_TENANT_ID: ${NEXT_PUBLIC_AZURE_TENANT_ID}
+        NEXT_PUBLIC_AZURE_REDIRECT_URI: ${NEXT_PUBLIC_AZURE_REDIRECT_URI:-http://localhost:4000}
+        NEXT_PUBLIC_AZURE_LOGOUT_URI: ${NEXT_PUBLIC_AZURE_LOGOUT_URI:-http://localhost:4000/}
+        NEXT_PUBLIC_AZURE_AUTHORITY: ${NEXT_PUBLIC_AZURE_AUTHORITY:-https://login.microsoftonline.com/common}
+        NEXT_PUBLIC_DISABLE_DEV_MODE: ${NEXT_PUBLIC_DISABLE_DEV_MODE:-true}
+        NEXT_PUBLIC_ENABLE_DEMO_USER: ${NEXT_PUBLIC_ENABLE_DEMO_USER:-false}
+        NEXT_PUBLIC_BACKEND_CONFIG: ${NEXT_PUBLIC_BACKEND_CONFIG:-local_mes}
+    ports:
+      - "${PORT:-4000}:4000"
+    environment:
+      # Runtime environment variables
+      - NODE_ENV=production
+      - PORT=4000
+      # These are also set at runtime for server-side code
+      - NEXT_PUBLIC_MES_API_URL=${NEXT_PUBLIC_MES_API_URL:-http://host.docker.internal:3000/api}
+      - NEXT_PUBLIC_MES_GRAPHQL_URL=${NEXT_PUBLIC_MES_GRAPHQL_URL:-http://host.docker.internal:3000/graphql}
+      - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL:-http://host.docker.internal:3000/health}
+      - NEXT_PUBLIC_AZURE_AD_CLIENT_ID=${NEXT_PUBLIC_AZURE_AD_CLIENT_ID}
+      - NEXT_PUBLIC_AZURE_AD_TENANT_ID=${NEXT_PUBLIC_AZURE_AD_TENANT_ID}
+      - NEXT_PUBLIC_AZURE_CLIENT_ID=${NEXT_PUBLIC_AZURE_CLIENT_ID}
+      - NEXT_PUBLIC_AZURE_TENANT_ID=${NEXT_PUBLIC_AZURE_TENANT_ID}
+      - NEXT_PUBLIC_AZURE_REDIRECT_URI=${NEXT_PUBLIC_AZURE_REDIRECT_URI:-http://localhost:4000}
+      - NEXT_PUBLIC_AZURE_LOGOUT_URI=${NEXT_PUBLIC_AZURE_LOGOUT_URI:-http://localhost:4000/}
+      - NEXT_PUBLIC_AZURE_AUTHORITY=${NEXT_PUBLIC_AZURE_AUTHORITY:-https://login.microsoftonline.com/common}
+      - NEXT_PUBLIC_DISABLE_DEV_MODE=${NEXT_PUBLIC_DISABLE_DEV_MODE:-true}
+      - NEXT_PUBLIC_ENABLE_DEMO_USER=${NEXT_PUBLIC_ENABLE_DEMO_USER:-false}
+      - NEXT_PUBLIC_BACKEND_CONFIG=${NEXT_PUBLIC_BACKEND_CONFIG:-local_mes}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4000/api/_health/ready",
+        ]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Load environment variables from .env file
+    env_file:
+      - .env

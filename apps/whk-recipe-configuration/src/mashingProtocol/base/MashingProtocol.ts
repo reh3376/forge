@@ -18,11 +18,14 @@ import {
   IsBoolean,
   IsOptional,
   ValidateNested,
+  IsEnum,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { MashingProtocolStepActual } from "../../mashingProtocolStepActual/base/MashingProtocolStepActual";
 import { ProductionOrderRecipeInstance } from "../../productionOrderRecipeInstance/base/ProductionOrderRecipeInstance";
 import { Recipe } from "../../recipe/base/Recipe";
 import { MashingProtocolStep } from "../../mashingProtocolStep/base/MashingProtocolStep";
+import { EnumMashingProtocolTemplateCategory } from "./EnumMashingProtocolTemplateCategory";
 
 @ObjectType()
 class MashingProtocol {
@@ -50,6 +53,26 @@ class MashingProtocol {
   @IsString()
   @Field(() => String)
   id!: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Field(() => Boolean, {
+    nullable: true,
+  })
+  isTemplate!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [MashingProtocolStepActual],
+  })
+  @ValidateNested()
+  @Type(() => MashingProtocolStepActual)
+  @IsOptional()
+  mashingProtocolStepActuals?: Array<MashingProtocolStepActual>;
 
   @ApiProperty({
     required: false,
@@ -91,12 +114,12 @@ class MashingProtocol {
 
   @ApiProperty({
     required: false,
-    type: () => [ProductionOrderRecipeInstance],
+    type: () => ProductionOrderRecipeInstance,
   })
   @ValidateNested()
   @Type(() => ProductionOrderRecipeInstance)
   @IsOptional()
-  productionOrderRecipeInstances?: Array<ProductionOrderRecipeInstance>;
+  productionOrderRecipeInstances?: ProductionOrderRecipeInstance | null;
 
   @ApiProperty({
     required: false,
@@ -156,6 +179,36 @@ class MashingProtocol {
   @Type(() => MashingProtocolStep)
   @IsOptional()
   steps?: Array<MashingProtocolStep>;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumMashingProtocolTemplateCategory,
+  })
+  @IsEnum(EnumMashingProtocolTemplateCategory)
+  @IsOptional()
+  @Field(() => EnumMashingProtocolTemplateCategory, {
+    nullable: true,
+  })
+  templateCategory?:
+    | "RyeBourbon"
+    | "WheatedBourbon"
+    | "FourGrainBourbon"
+    | "RyeWhiskey"
+    | "WheatWhiskey"
+    | "MaltWhiskey"
+    | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  templateDescription!: string | null;
 
   @ApiProperty({
     required: true,
