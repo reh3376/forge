@@ -292,18 +292,6 @@ interface MSALConfig {
 }
 ```
 
-## Manufacturing Data Encryption (`components/ui/production-data-encryption.tsx`)
-
-### Data Classification Types
-```typescript
-interface EncryptionDemo {
-  dataType: 'recipe' | 'batch' | 'quality' | 'personnel'
-  classification: 'public' | 'internal' | 'confidential' | 'restricted'
-  encryptionMethod: string
-  keyRotation: boolean
-}
-```
-
 ## Input Validation (`components/ui/manufacturing-input-validation.tsx`)
 
 ### Manufacturing Data Validation
@@ -355,7 +343,6 @@ interface ManufacturingData {
 ### 6. Authentication and Security
 - MSAL configuration typing for Azure AD
 - Proper typing for authentication states
-- Security classification types for data encryption
 
 ## Best Practices Followed
 
