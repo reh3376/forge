@@ -73,18 +73,6 @@ export const navigationGuards: NavigationGuard[] = [
     requiredPermissions: ['canEditUsers'],
     fallbackPath: '/users',
     message: 'You do not have permission to edit users.'
-  },
-  {
-    path: '/security-demo',
-    requiredPermissions: ['canViewSecurity'],
-    fallbackPath: '/',
-    message: 'You do not have permission to view security settings.'
-  },
-  {
-    path: '/security-demo/edit',
-    requiredPermissions: ['canEditSecurity'],
-    fallbackPath: '/security-demo',
-    message: 'You do not have permission to edit security settings.'
   }
 ]
 
