@@ -34,11 +34,26 @@ export function createSocketAuthMiddleware(options: {
   allowDemo?: boolean
   requireAuth?: boolean
 } = {}) {
-  const { 
-    jwtSecret = process.env['JWT_SECRET'] || 'your-secret-key',
+  const {
+    jwtSecret: providedJwtSecret,
     allowDemo = process.env.NODE_ENV === 'development',
     requireAuth = true
   } = options
+
+  // Resolve JWT secret: caller-provided > env var > dev fallback
+  const envJwtSecret = process.env['JWT_SECRET']
+  const defaultJwtSecret = process.env.NODE_ENV === 'development'
+    ? 'dev-only-insecure-key-DO-NOT-USE-IN-PRODUCTION'
+    : undefined
+
+  const jwtSecret = providedJwtSecret || envJwtSecret || defaultJwtSecret
+
+  if (!jwtSecret && process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production')
+  }
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET environment variable is required')
+  }
 
   return (socket: AuthenticatedSocket, next: (err?: Error) => void) => {
     try {

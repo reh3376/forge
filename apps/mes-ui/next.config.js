@@ -39,6 +39,7 @@ const nextConfig = {
   // Skip prerendering for problematic pages during static export
   experimental: {
     missingSuspenseWithCSRBailout: false,
+    instrumentationHook: true,
   },
 
   // Configure which routes to skip during export
