@@ -3,8 +3,27 @@ import { NextRequest, NextResponse } from 'next/server'
 // Backend configuration
 const GRAPHQL_ENDPOINT = process.env['NEXT_PUBLIC_MES_GRAPHQL_URL'] || 'http://localhost:3000/graphql'
 const MES_API_BASE = process.env['NEXT_PUBLIC_MES_API_URL'] || 'http://localhost:3000/api'
-const MES_USERNAME = process.env['MES_USERNAME'] || 'mes'
-const MES_PASSWORD = process.env['MES_PASSWORD'] || 'password'
+
+// Validate credentials in production
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env['MES_USERNAME'] && !process.env['MES_BACKEND_USER']) {
+    throw new Error('MES_USERNAME or MES_BACKEND_USER environment variable is required in production')
+  }
+  if (!process.env['MES_PASSWORD'] && !process.env['MES_BACKEND_PASSWORD']) {
+    throw new Error('MES_PASSWORD or MES_BACKEND_PASSWORD environment variable is required in production')
+  }
+}
+
+// SECURITY: Only use fallback in development mode
+const defaultUsername = process.env.NODE_ENV === 'development' ? 'mes' : undefined
+const defaultPassword = process.env.NODE_ENV === 'development' ? 'dev-only-insecure-password' : undefined
+
+const MES_USERNAME = process.env['MES_BACKEND_USER'] || process.env['MES_USERNAME'] || defaultUsername
+const MES_PASSWORD = process.env['MES_BACKEND_PASSWORD'] || process.env['MES_PASSWORD'] || defaultPassword
+
+if (!MES_USERNAME || !MES_PASSWORD) {
+  throw new Error('MES service account credentials are not configured. Set MES_USERNAME/MES_PASSWORD or MES_BACKEND_USER/MES_BACKEND_PASSWORD')
+}
 
 // Cache for service account token
 let serviceAccountToken: string | null = null
