@@ -2,504 +2,291 @@
 
 ## Overview
 
-The BOM (Bill of Materials) Consumption Tracking feature allows plant floor operators to record material usage against active production orders using mobile devices. This system ensures accurate inventory tracking, lot traceability, and compliance with FIFO (First In, First Out) guidelines.
+The BOM (Bill of Materials) Consumption Tracking feature allows plant floor operators to record material usage against active production orders. Operators scan or enter lot numbers, and the system validates inventory, checks FIFO compliance, and records the consumption with a full audit trail.
 
 ## Access
 
 ### Location
+
 Navigate to: **Operations → BOM Consumption**
 
-Or use the direct URL: `/operations/bom-consumption`
+Direct URL: `/operations/bom-consumption`
 
 ### Required Permissions
-- **Production Operator** role or higher
-- **Production Manager** role for editing historical records
-- **Admin** role for full access
 
-## Key Features
+| Role | Record Consumption | Edit Records |
+|------|:-:|:-:|
+| Production Operator | ✅ | ❌ |
+| Production Manager | ✅ | ✅ |
+| Admin | ✅ | ✅ |
 
-- ✅ Mobile-friendly interface optimized for smartphones and tablets
-- ✅ QR code scanning for lot numbers and inventory IDs
-- ✅ Real-time consumption tracking with progress indicators
-- ✅ FIFO compliance warnings
-- ✅ Complete consumption history with audit trails
-- ✅ Edit capability for corrections
-- ✅ Offline detection and warning
+## Workflow Overview
 
-## Getting Started
+```
+Select Schedule Order
+        ↓
+  View BOM Items
+        ↓
+  Click "Record" on a BOM item
+        ↓
+  Record Consumption Sheet opens
+        ↓
+  Enter / Scan Lot Number → Lookup validates inventory
+        ↓
+  Enter Quantity Consumed
+        ↓
+  Click "Record Consumption"
+        ↓
+  Inventory updated + Audit trail created
+```
+
+## Step-by-Step Instructions
 
 ### Step 1: Select a Schedule Order
 
 1. Open the BOM Consumption page
-2. Click the **Select Schedule Order** dropdown
-3. Choose an active schedule order from the list
+2. Select an active schedule order from the dropdown
    - Format: `SO-####-### - Recipe Name`
-4. The recipe details and BOM items will appear
+3. The BOM items list loads below
 
 ### Step 2: View BOM Items
 
-Once a schedule order is selected, you'll see:
-- **Recipe Info Card**: Recipe name, revision, and status
-- **BOM Items List**: All materials required for this order
-- **Progress Indicators**: Visual bars showing consumption status
-
-Each BOM item card displays:
+Each BOM item card shows:
 - **Item Name & Number**: Material identification
-- **Planned Quantity**: Total amount required
-- **Consumed**: Amount already used
-- **Remaining**: Amount still needed
-- **Progress Bar**: Visual completion indicator
+- **Planned Quantity**: Total required (e.g., `500.00 lbs`)
+- **Progress**: How much has been consumed vs. planned
 
-### Step 3: Record Consumption
+### Step 3: Open the Consumption Sheet
 
-To record material usage:
+Click the **Record** button on the BOM item you are consuming.
 
-1. Locate the BOM item you're consuming
-2. Click the **Scan & Record** button
-3. The consumption recording sheet opens with a 3-step flow
+A side sheet opens on the right with the following sections:
 
-#### Step 1: Scan Lot Code
+#### Material Info
 
-**Using QR Scanner:**
-1. Click **Open Scanner**
-2. Allow camera access if prompted
-3. Point camera at QR code
-4. Hold steady until scan completes
+Displays the item's required quantity and item number for reference.
 
-**Manual Entry (Fallback):**
-1. Click **Manual Entry** tab
-2. Type or paste the lot number or inventory ID
-3. Click **Submit Code**
+#### Lot Number
 
-**What Happens Next:**
-- System validates the lot exists and matches the item
-- Displays lot details:
-  - Lot number or inventory ID
-  - Storage location
-  - Available quantity
-  - FIFO recommendation status
+Enter or scan the lot number using one of three methods:
 
-⚠️ **FIFO Warning:** If the scanned lot is not the oldest available, you'll see a warning. It's recommended to use FIFO-first inventory when possible.
+| Method | How to Use |
+|--------|-----------|
+| **Type manually** | Click the text field and type the lot number or inventory ID, then press **Enter** or click outside the field |
+| **Search button** | Type a value and click the magnifying glass icon to trigger lookup |
+| **QR / Barcode scanner** | Click the QR code icon to open the scanner modal |
 
-#### Step 2: Enter Quantity
+After entering a lot number, the system automatically looks up the inventory record and displays:
+- Lot number
+- Storage location (silo or bin)
+- Available quantity
+- FIFO recommendation status
 
-1. Enter the amount consumed in the **Quantity Consumed** field
-2. **Quick Actions** (optional):
-   - Click **25%**, **50%**, or **75%** for quick fill
-   - Click **Use Remaining** to fill exact remaining amount
-3. Add optional notes (e.g., "Partial bag", "Adjusted for spillage")
+> ⚠️ **FIFO Warning**: If the scanned lot is not the oldest available for this item, a yellow alert appears. You can still proceed, but consider using the FIFO-recommended lot and documenting the reason in Notes.
 
-**Validation:**
-- ✅ **Green**: Quantity is valid
-- 🔴 **Red (Blocking)**: Exceeds available inventory
-- 🟡 **Yellow (Warning)**: Over-consumption vs. planned amount
-- 🔵 **Blue (Info)**: Less than remaining planned amount
+> 🔴 **Lot Not Found**: If the code does not match any inventory record for this item, a red alert appears. Verify the code and try again.
 
-4. Click **Continue to Review**
+#### Quantity Consumed
 
-#### Step 3: Confirm & Submit
+Enter the amount consumed. The unit abbreviation (e.g., `lbs`, `bu`) is shown to the right. The planned quantity is shown below the field for reference.
 
-Review the summary:
-- **BOM Item**: Material name and number
-- **Lot Information**: Source lot and location
-- **Consumption Details**: Quantity and timestamp
-- **Summary Stats**: After-recording totals
+#### Notes (Optional)
 
-1. Verify all information is correct
-2. Click **Confirm** to record consumption
-3. Success message appears
-4. Sheet closes automatically after 2 seconds
+Add any relevant context — for example: `Partial bag`, `Quality hold`, `Adjusted for spillage`.
 
-**Result:**
-- Consumption record is saved
-- BOM item progress bar updates
-- Available inventory decreases
-- Audit trail is created
+#### Submit
+
+- **Cancel**: Closes the sheet without saving
+- **Record Consumption**: Saves the record, deducts inventory, and creates an audit entry
+
+The **Record Consumption** button is disabled until both a lot number and a quantity are provided.
+
+---
+
+## Using the QR / Barcode Scanner
+
+Clicking the QR code icon opens a scanner modal with two modes:
+
+### Camera Mode
+
+- Uses the device's rear-facing camera
+- Hold the QR code or barcode 4–6 inches from the lens
+- A finder overlay shows the scan area
+- Flashlight (torch) button is available for low-light environments
+- **Requires HTTPS** — on a plain HTTP connection (e.g., `http://10.0.22.10`), camera mode is automatically disabled and the modal switches to Manual Entry
+
+### Manual Entry Mode (Keyboard-Wedge)
+
+- A text field is automatically focused when this mode is active
+- Compatible with **Keyence** and other USB/Bluetooth handheld barcode scanners that act as keyboard-wedge devices — just scan and the scanner types the code and presses Enter automatically
+- Can also be used to type a code by hand
+- Click **Submit** or press **Enter** to confirm
+
+> **Note:** When you click the QR icon from the Consumption Sheet, the scanner opens in **Manual Entry** mode by default so that handheld scanners work immediately without any extra steps.
+
+---
 
 ## Viewing Consumption History
 
-To view all consumption records for a BOM item:
+To see all consumption records for a BOM item:
 
-1. Locate the BOM item on the main page
-2. Click the **History** button
-   - Button shows record count: `History (3)`
-   - Disabled if no records exist
-3. History sheet opens
+1. Locate the BOM item card
+2. Click the **History** button (shows record count when records exist)
+3. A history sheet opens showing all records sorted newest to oldest
 
-### History Sheet Features
+Each record shows:
+- Quantity consumed
+- Lot number or inventory ID
+- Date and time consumed
+- Created by
+- Notes (if any)
+- **Edited** badge if the record has been modified
 
-**Summary Section:**
-- Planned quantity
-- Total consumed
-- Remaining amount
-
-**Consumption Records:**
-- Grouped by lot number
-- Sorted newest to oldest
-- Each record shows:
-  - Quantity consumed
-  - Consumption date and time
-  - Lot number or inventory ID
-  - Optional notes
-  - Created by (user)
-  - Edit status ("Edited" badge if modified)
+---
 
 ## Editing Consumption Records
 
-To correct an existing record:
+> Requires **Production Manager** or **Admin** role.
 
-1. Open the consumption history
-2. Find the record to edit
-3. Click the **Edit** icon (pencil)
-4. Edit dialog opens
+1. Open the history sheet for the BOM item
+2. Find the record to edit and click the pencil (edit) icon
+3. Modify the editable fields:
+   - Quantity consumed
+   - Consumed at (date/time)
+   - Notes
+4. Click **Save Changes**
 
-**Editable Fields:**
-- Quantity consumed
-- Consumed at (date/time)
-- Notes
+All edits are tracked — the record shows who last edited it and when. Inventory quantities are adjusted automatically based on the quantity delta.
 
-**Original Record Info:**
-- Displays original values for reference
-- Shows who created the record
+---
 
-5. Make changes
-6. Click **Save Changes**
+## Warnings and Errors Reference
 
-**Important:**
-- All edits are tracked in the audit trail
-- "Last edited by" information is recorded
-- "Edited" badge appears on the record card
+| Message | Meaning | Action |
+|---------|---------|--------|
+| **FIFO Warning** (yellow) | A different lot has an older FIFO index | Use the recommended lot if possible; document reason in Notes if not |
+| **Lot Not Found** (red) | No inventory found matching this code + item | Verify the code; try manual entry; contact supervisor |
+| **Failed to Record** (red toast) | Server-side error saving the record | Check network connection; retry; contact IT if persists |
 
-## Understanding Warnings and Errors
-
-### FIFO Warnings (Yellow)
-**Message:** "This is not the oldest lot. Consider using FIFO inventory first."
-
-**Meaning:** There's older inventory available for this item.
-
-**Action:**
-- Use the recommended lot if possible
-- If you must use this lot, document the reason in notes
-- System allows you to proceed
-
-### Insufficient Inventory (Red)
-**Message:** "Insufficient Inventory: The quantity entered exceeds available quantity in this lot."
-
-**Meaning:** Not enough material in the scanned lot.
-
-**Action:**
-- Reduce quantity to available amount
-- Or scan a different lot
-- Cannot proceed until resolved
-
-### Over Consumption (Yellow)
-**Message:** "Over Consumption: Total consumption will exceed planned quantity."
-
-**Meaning:** You're using more than originally planned.
-
-**Action:**
-- Verify quantity is correct
-- Add note explaining why (e.g., "Recipe adjustment", "Waste")
-- System allows you to proceed
-
-### Lot Not Found (Red)
-**Message:** "Lot Not Found: The scanned code does not match any lot or inventory record."
-
-**Meaning:** Invalid or non-existent lot code.
-
-**Action:**
-- Verify the code is correct
-- Try scanning again
-- Use manual entry to type carefully
-- Contact supervisor if lot should exist
-
-## Offline Mode
-
-If you lose internet connection:
-
-**What Happens:**
-- Red banner appears at top: "No Internet Connection"
-- Existing data remains visible
-- New scans and recordings will fail
-
-**What to Do:**
-- Wait for connection to restore
-- Or move to area with better signal
-- When back online, green banner confirms: "Back Online"
-
-**Future Enhancement:** Offline mode with queue-and-sync capability is planned.
-
-## Best Practices
-
-### For Accurate Tracking
-
-1. **Scan immediately** when consuming material
-   - Don't wait until end of shift
-   - Real-time data is more accurate
-
-2. **Use FIFO** whenever possible
-   - Follow system recommendations
-   - Helps with inventory rotation
-
-3. **Add notes** for unusual situations
-   - Over/under consumption
-   - Quality issues
-   - Equipment problems
-
-4. **Verify quantities** before confirming
-   - Double-check the amount
-   - Use scale when available
-
-### For Efficiency
-
-1. **Use quick actions**
-   - 25%, 50%, 75% buttons for common amounts
-   - "Use Remaining" for final consumption
-
-2. **Manual entry** as backup
-   - If QR code is damaged
-   - If camera isn't working
-   - Type lot number carefully
-
-3. **Expand cards** to see recent history
-   - Quick reference without opening full history
-   - Shows last 3 consumption records
+---
 
 ## Troubleshooting
 
-### Camera Won't Open
+### Camera won't open / "Camera requires HTTPS"
 
-**Problem:** "Camera permission denied" message
+**Cause**: The browser blocks camera access on non-HTTPS connections (e.g., `http://10.0.22.10`).
 
-**Solutions:**
-1. Check browser permissions:
-   - iOS Safari: Settings → Safari → Camera
-   - Android Chrome: Settings → Site Settings → Camera
-2. Grant camera access to the website
-3. Reload the page
-4. Use manual entry as fallback
+**Solution**: Use **Manual Entry** mode instead. Handheld scanners (Keyence, etc.) work perfectly in manual mode — the scanner types the barcode into the field and presses Enter automatically.
 
-### Scan Not Working
+### Camera permission denied
 
-**Problem:** QR code won't scan
+**Cause**: The browser does not have permission to access the camera.
 
-**Solutions:**
-1. Ensure adequate lighting
-2. Hold camera 4-6 inches from code
-3. Keep camera and code steady
-4. Clean camera lens if dirty
-5. Try manual entry of lot number
+**Solutions**:
+1. iOS Safari: **Settings → Safari → Camera** → Allow
+2. Android Chrome: tap the lock icon in the address bar → **Permissions → Camera** → Allow
+3. After granting permission, reload the page
+4. Or use Manual Entry mode as a fallback
 
-### Wrong Lot Scanned
+### QR code won't scan
 
-**Problem:** Scanned wrong lot by mistake
+1. Ensure adequate lighting (use the torch button)
+2. Hold camera 4–6 inches from the code
+3. Keep the device and label steady
+4. Clean the camera lens if smudged
+5. Switch to **Manual Entry** and type the lot number
 
-**Solutions:**
-1. Click **Back** button in the sheet
-2. Returns to scan step
-3. Scan correct lot
-4. Or close sheet and start over
+### Lot lookup returns "Not Found" but lot should exist
 
-### Need to Edit Recent Record
+1. Confirm the item being consumed is the correct item for this lot
+2. Check whether the lot has zero remaining quantity (it will not appear in lookup results)
+3. Try the internal inventory UUID if you have it (instead of the lot number)
+4. Contact your supervisor to verify the lot exists in the system
 
-**Problem:** Just recorded wrong quantity
+### "Record Consumption" button stays disabled
 
-**Solutions:**
-1. Click **History** button immediately
-2. Find the record (will be at top)
-3. Click **Edit** icon
-4. Correct the quantity
-5. Add note explaining the change
+The button requires both fields:
+- A non-empty lot number (it does not need to be validated, but must be entered)
+- A non-empty quantity value
 
-### Page Won't Load
+Check that both fields have values.
 
-**Problem:** "Failed to load schedule orders" error
+### Record saved with wrong quantity
 
-**Solutions:**
-1. Check internet connection (look for offline banner)
-2. Click refresh/reload in browser
-3. Try logging out and back in
-4. Contact IT if persists
+1. Click **History** on the BOM item immediately
+2. Find the record at the top (most recent)
+3. Click the edit icon (requires Production Manager role or higher)
+4. Correct the quantity and add a note explaining the change
+5. Click **Save Changes**
 
-## Mobile Tips
+---
 
-### For Phones
+## Best Practices
 
-- **One-handed operation**: Most buttons are at bottom for easy thumb reach
-- **Landscape mode**: Works but portrait is optimized
-- **Notifications**: Keep browser open to avoid losing progress
-- **Screen lock**: Adjust timeout to avoid interruptions
+1. **Scan at the time of consumption** — real-time data is more accurate than end-of-shift entry
+2. **Follow FIFO recommendations** — use the system's suggested lot when possible
+3. **Add notes for unusual situations** — over/under consumption, quality issues, substitutions
+4. **Verify quantity before submitting** — double-check against your scale or measurement
 
-### For Tablets
-
-- **Two-column layout**: Automatically activates on larger screens
-- **Side sheets**: Replace bottom sheets for better use of space
-- **Stylus support**: Works with Apple Pencil or similar
-- **Split screen**: Can view reference documents alongside
+---
 
 ## Keyboard Shortcuts
 
-When using a keyboard (tablet or desktop):
+| Key | Action |
+|-----|--------|
+| **Enter** (in lot number field) | Trigger lot lookup |
+| **Enter** (in scanner modal) | Submit manual code |
+| **Escape** | Close scanner modal or sheet |
+| **Tab** | Move between form fields |
 
-- **Enter**: Submits forms (manual entry, quantity input)
-- **Escape**: Closes dialogs and sheets
-- **Tab**: Navigate between fields
-- **Space**: Activates focused button
-
-## Privacy & Audit Trail
-
-### What's Recorded
-
-Every consumption record includes:
-- **User ID**: Who recorded the consumption
-- **Timestamp**: When it was recorded
-- **Consumed At**: When material was actually used
-- **Lot/Inventory ID**: Source of material
-- **Quantity**: Amount consumed
-- **Notes**: Optional user comments
-
-### Edit Tracking
-
-When a record is edited:
-- **Updated By**: Who made the edit
-- **Updated At**: When the edit occurred
-- **Original Values**: Preserved in database
-- **Audit Log**: Complete history available to managers
-
-### Data Security
-
-- All data transmitted over HTTPS
-- User authentication required
-- Role-based access control
-- Audit logs cannot be deleted
-
-## Support
-
-### Getting Help
-
-**For operational questions:**
-- Contact your production supervisor
-- Reference this user guide
-- Check the troubleshooting section
-
-**For technical issues:**
-- Report to IT support desk
-- Include screenshots if possible
-- Note any error messages
-
-**For feature requests:**
-- Submit through normal feedback channels
-- Explain the use case
-- Suggest improvement
-
-### Training
-
-New operators should:
-1. Read this complete user guide
-2. Practice with supervisor present
-3. Record test consumption (non-production)
-4. Ask questions before independent use
+---
 
 ## Glossary
 
-**BOM (Bill of Materials)**: List of all materials required for a recipe
+| Term | Definition |
+|------|-----------|
+| **BOM** | Bill of Materials — the list of all raw materials required for a recipe |
+| **Schedule Order** | A production order that has been placed in the execution queue |
+| **Lot Number** | Supplier-assigned identifier for a batch of material |
+| **Inventory ID** | Internal UUID for a specific inventory record (can be encoded in a QR code) |
+| **FIFO** | First In, First Out — using oldest inventory first to prevent spoilage and maintain traceability |
+| **Consumption** | Recording that a quantity of raw material was used in production |
+| **Audit Trail** | Immutable log of who recorded or edited each consumption entry and when |
 
-**Schedule Order**: A production order scheduled for execution
+---
 
-**Recipe Instance**: Active copy of a master recipe for a specific production run
+## Technical Notes
 
-**Lot Number**: Supplier-provided identifier for a batch of material
+### Lot Lookup Logic
 
-**Inventory ID**: Internal system identifier for inventory record
+When a code is entered, the backend applies a two-step lookup:
 
-**FIFO**: First In, First Out - inventory management method
+1. **UUID check** — if the code matches a CUID or UUID v4 pattern, it looks up the inventory record directly by ID and verifies the item matches
+2. **Lot number search** — otherwise, searches for inventory records with `lotNumber = code AND itemId = <item> AND currentQuantity > 0`, ordered by `fifoIndex ASC` (oldest first)
 
-**Consumption**: The act of using raw material in production
+The `isRecommended` flag is `true` only when the returned inventory record has the lowest `fifoIndex` among all non-zero-quantity records for the same item and storage asset.
 
-**Actual**: Recorded quantity used (vs. planned quantity)
+### Inventory Deduction
 
-**Audit Trail**: Complete history of who did what and when
+When a consumption is recorded against an inventory ID, `Inventory.currentQuantity` is decremented immediately. If the inventory update fails (e.g., a transient DB error), the consumption record is still saved — inventory can be reconciled separately.
+
+For **edits**, the system calculates the delta (`new quantity - old quantity`) and adjusts inventory accordingly:
+- Positive delta → additional deduction
+- Negative delta → inventory restored
+
+### Audit Trail
+
+Every consumption record is created with `createdBy` (the logged-in user's email). Edits update `updatedBy` and `updatedAt`, and the change is also written to the central audit log via `AuditService.logChange()` with old and new field values.
+
+---
 
 ## Related Features
 
-### Next Steps After Consumption Tracking
-
-Once material is consumed:
-1. **Production Execution**: Complete process steps
-2. **Yield Recording**: Record output quantities
-3. **Quality Checks**: Document quality metrics
-4. **Order Completion**: Finalize the production order
-
-### Integration Points
-
-- **NetSuite ERP**: Consumption syncs to financial system
-- **Inventory Management**: Available quantities update
-- **Lot Traceability**: Complete chain of custody
-- **Production Reporting**: Consumption appears in reports
-
-## Updates and Releases
-
-### Current Version: 1.0.0 (January 2025)
-
-**Features:**
-- Mobile BOM consumption tracking
-- QR code scanning
-- Lot lookup and validation
-- FIFO compliance checking
-- Consumption history and editing
-- Offline detection
-
-### Planned Enhancements
-
-**Version 1.1 (Q1 2025):**
-- Offline mode with sync
-- Barcode scanning (1D barcodes)
-- Voice input for quantities
-- Photo attachments
-
-**Version 1.2 (Q2 2025):**
-- Batch consumption recording
-- Scale integration
-- Analytics dashboard
-- Mobile app (native iOS/Android)
-
-### Changelog
-
-**1.0.0 - January 15, 2025**
-- Initial release
-- Core consumption tracking workflow
-- Mobile-optimized interface
-- E2E testing complete
+- **Silo Inventory**: Source inventory for grain receipts and their FIFO indexes
+- **Schedule Order Queue**: Determines which orders appear in the active order list
+- **Production Reporting**: Consumption actuals feed into production yield reports
+- **NetSuite ERP Sync**: Consumption data flows to financial system for cost accounting
 
 ---
 
-## Quick Reference Card
-
-### Recording Consumption (Quick Steps)
-
-1. ⚙️ Select schedule order
-2. 📱 Click "Scan & Record" on item
-3. 📷 Scan QR code (or enter manually)
-4. 🔢 Enter quantity consumed
-5. ✅ Review and confirm
-
-### Common Actions
-
-| Action | Steps |
-|--------|-------|
-| **Record consumption** | Select order → Click "Scan & Record" → Scan → Enter quantity → Confirm |
-| **View history** | Find item → Click "History" button |
-| **Edit record** | Open history → Find record → Click edit icon → Make changes → Save |
-| **Check FIFO** | Look for yellow "FIFO Warning" banner after scan |
-| **Use remaining** | In quantity step → Click "Use Remaining" button |
-
-### Important Numbers
-
-- **Minimum quantity**: 0.01
-- **Camera distance**: 4-6 inches from QR code
-- **Auto-refresh interval**: 30 seconds
-- **Edit timeout**: Unlimited (records can always be edited)
-
----
-
-*For more information, contact the MES Support Team or your production supervisor.*
+*For technical issues, contact IT support. For operational questions, contact your production supervisor.*

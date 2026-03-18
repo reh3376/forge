@@ -24,6 +24,11 @@ export class RecipeBomActualResolver extends RecipeBomActualResolverBase {
     super(service, rolesBuilder);
   }
 
+  /**
+   * Validate a scanned code (UUID or lot number) against a specific item.
+   * Returns inventory details and whether this is the FIFO-recommended lot.
+   * Called on every lot number change in the consumption sheet UI.
+   */
   @graphql.Query(() => LotLookupResult)
   @UseRoles({
     resource: "RecipeBomActual",
@@ -37,6 +42,12 @@ export class RecipeBomActualResolver extends RecipeBomActualResolverBase {
     return this.service.lookupLotOrInventory(code, itemId);
   }
 
+  /**
+   * Record a BOM consumption entry.
+   * Validates the BOM item and recipe instance exist, checks available inventory
+   * when an inventoryId is provided, creates the RecipeBomActual record via
+   * ScheduleOrderRecipeInstanceService, then decrements Inventory.currentQuantity.
+   */
   @graphql.Mutation(() => RecipeBomActual)
   @UseRoles({
     resource: "RecipeBomActual",
@@ -49,6 +60,12 @@ export class RecipeBomActualResolver extends RecipeBomActualResolverBase {
     return this.service.recordBomConsumption(input);
   }
 
+  /**
+   * Correct an existing BOM consumption record.
+   * Partial update — only provided fields are changed. When quantityActual changes,
+   * inventory is adjusted by the delta. All changes are written to the audit log.
+   * Requires Production Manager role or higher.
+   */
   @graphql.Mutation(() => RecipeBomActual)
   @UseRoles({
     resource: "RecipeBomActual",
