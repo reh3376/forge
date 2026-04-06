@@ -1,0 +1,385 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "scanner-gateway",
+    "name": "Scanner Gateway Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "OT",
+    "protocol": "grpc+protobuf"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": false,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 10000,
+    "shutdown_timeout_ms": 5000,
+    "health_check_interval_ms": 10000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called \u2014 initiates ScannerService gRPC server on configured listen address"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "gRPC server bound and accepting connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (10s) or port bind failure"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "No device heartbeats received within 3\u00d7 health_check_interval"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "Device heartbeat received"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "No device connectivity for 10\u00d7 health_check_interval"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers server restart"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful gRPC server shutdown, drain pending batches"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "gateway_listen_host",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Host address for the ScannerService gRPC server (Android-facing). Binds to all interfaces by default.",
+        "default": "0.0.0.0"
+      },
+      {
+        "name": "gateway_listen_port",
+        "type": "integer",
+        "required": true,
+        "secret": false,
+        "description": "Port for the ScannerService gRPC server (Android-facing).",
+        "default": "50060",
+        "validation": {
+          "min": 1,
+          "max": 65535
+        }
+      },
+      {
+        "name": "wms_adapter_id",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "Adapter ID of the WMS spoke for barrel scan routing. Must match a registered Forge adapter.",
+        "default": "whk-wms"
+      },
+      {
+        "name": "ims_adapter_id",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Adapter ID of the IMS spoke for asset scan routing. When null, INSPECTION/INVENTORY route to WMS only and asset operations are unroutable.",
+        "default": "bosc-ims"
+      },
+      {
+        "name": "qms_adapter_id",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Adapter ID of the QMS spoke for sample scan routing. Future \u2014 when null, SAMPLE_COLLECT/SAMPLE_BIND are unroutable."
+      },
+      {
+        "name": "device_token_secret",
+        "type": "string",
+        "required": true,
+        "secret": true,
+        "description": "Secret key for signing and verifying device authentication tokens. HMAC-SHA256 symmetric key."
+      },
+      {
+        "name": "max_batch_size",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Maximum number of scan events per SubmitScanBatch RPC call. Batches exceeding this are rejected.",
+        "default": "500",
+        "validation": {
+          "min": 1,
+          "max": 5000
+        }
+      }
+    ],
+    "auth_methods": [
+      "device_token",
+      "mtls"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/scanner-gateway/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "scan_id",
+      "scan_type",
+      "barcode_value",
+      "device_id",
+      "operator_id",
+      "location"
+    ],
+    "optional_context_fields": [
+      "warehouse_job_id",
+      "batch_id",
+      "asset_id",
+      "firmware_version",
+      "signal_strength",
+      "battery_level"
+    ],
+    "data_sources": [
+      {
+        "name": "submit_scan_batch",
+        "source_type": "grpc_server_stream",
+        "endpoint": "scanner.v1.ScannerService.SubmitScanBatch",
+        "description": "Batch scan event submission from Android devices. Each batch contains 1-max_batch_size ScanEvent messages with barcode value, scan type, operator, device, and location. Gateway translates each event to a ContextualRecord.",
+        "entities": [
+          "ScanEvent",
+          "SubmitScanBatchRequest",
+          "SubmitScanBatchResponse",
+          "ScanRejection"
+        ],
+        "collection_mode": "push"
+      },
+      {
+        "name": "pull_delta",
+        "source_type": "grpc_server_unary",
+        "endpoint": "scanner.v1.ScannerService.PullDelta",
+        "description": "Device-initiated delta pull. Android devices request changes since their last sync timestamp - barrel movements, status updates, job assignments. Scoped by DeltaScope (ASSIGNED_JOBS, LOCATION_BARRELS, ALL).",
+        "entities": [
+          "PullDeltaRequest",
+          "PullDeltaResponse",
+          "DeltaRecord"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "name": "heartbeat",
+        "source_type": "grpc_server_unary",
+        "endpoint": "scanner.v1.ScannerService.Heartbeat",
+        "description": "Device health heartbeat. Reports battery level, GPS coordinates, firmware version, scan count since last heartbeat. Gateway uses this for device fleet health monitoring.",
+        "entities": [
+          "HeartbeatRequest",
+          "HeartbeatResponse",
+          "DeviceCommand"
+        ],
+        "collection_mode": "push"
+      },
+      {
+        "name": "register_device",
+        "source_type": "grpc_server_unary",
+        "endpoint": "scanner.v1.ScannerService.RegisterDevice",
+        "description": "Device registration and identity provisioning. Each Keyence BT-A500GA receives a device_id, auth token, and permitted scan types upon first registration.",
+        "entities": [
+          "RegisterDeviceRequest",
+          "RegisterDeviceResponse"
+        ],
+        "collection_mode": "push"
+      },
+      {
+        "name": "scan_event_stream",
+        "source_type": "grpc_server_stream",
+        "endpoint": "scanner.v1.ScannerService.SubmitScanBatch (subscription)",
+        "description": "Subscribe-mode view of SubmitScanBatch \u2014 scan events are pushed to hub subscribers as they arrive from devices. Same data as push mode but framed as a continuous subscription for tag-based filtering.",
+        "entities": [
+          "ScanEvent"
+        ],
+        "collection_mode": "subscribe"
+      }
+    ],
+    "sample_record": {
+      "record_id": "scanner-gateway:scan-20260406-001",
+      "source_adapter": "scanner-gateway",
+      "collected_at": "2026-04-06T14:30:00Z",
+      "context": {
+        "scan_id": "scan-20260406-001",
+        "scan_type": "barrel.entry",
+        "barcode_value": "WHK-BBL-12345",
+        "device_id": "DEV-KEYENCE-001",
+        "operator_id": "OP-RECV-01",
+        "location": "Warehouse-A/Bay-3"
+      },
+      "payload": {
+        "scan_id": "scan-20260406-001",
+        "scan_type": "SCAN_TYPE_ENTRY",
+        "barcode_value": "WHK-BBL-12345",
+        "device_id": "DEV-KEYENCE-001",
+        "operator_id": "OP-RECV-01",
+        "location_string": "Warehouse-A/Bay-3",
+        "scanned_at": "2026-04-06T14:29:55Z",
+        "warehouse_job_id": "JOB-2026-0042"
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "ScanEvent.scan_id",
+        "context_field": "scan_id",
+        "description": "Unique scan event identifier assigned by the gateway upon receipt."
+      },
+      {
+        "source_field": "ScanEvent.scan_type",
+        "context_field": "scan_type",
+        "transform": "normalize:SCAN_TYPE_ prefix stripped, mapped to dotted domain path (barrel.entry, asset.receive, sample.collect)",
+        "description": "Normalized scan type from scanner.v1.ScanType enum (12 values across 3 domains)."
+      },
+      {
+        "source_field": "ScanEvent.barcode_value",
+        "context_field": "barcode_value",
+        "description": "Raw barcode/QR content captured by the scanner. May contain barrel ID, asset tag, or sample label depending on scan type."
+      },
+      {
+        "source_field": "ScanEvent.device_id",
+        "context_field": "device_id",
+        "description": "Registered device identifier (e.g., DEV-KEYENCE-001). Maps to equipment_id in RecordContext."
+      },
+      {
+        "source_field": "ScanEvent.operator_id",
+        "context_field": "operator_id",
+        "description": "Operator badge or login ID. Maps to operator_id in RecordContext."
+      },
+      {
+        "source_field": "ScanEvent.location_string",
+        "context_field": "location",
+        "description": "Human-readable location string (Warehouse-A/Bay-3). Maps to area in RecordContext."
+      },
+      {
+        "source_field": "ScanEvent.warehouse_job_id",
+        "context_field": "warehouse_job_id",
+        "description": "Associated WMS job ID when scan is part of a warehouse operation. Maps to batch_id in RecordContext."
+      },
+      {
+        "source_field": "ScanEvent.batch_id",
+        "context_field": "batch_id",
+        "description": "Production batch ID for QMS sample scans."
+      },
+      {
+        "source_field": "ScanEvent.asset_id",
+        "context_field": "asset_id",
+        "description": "IMS asset identifier for asset-type scans (ASSET_RECEIVE, ASSET_MOVE, ASSET_INSTALL)."
+      }
+    ],
+    "routing_rules": [
+      {
+        "scan_types": [
+          "ENTRY",
+          "DUMP",
+          "WITHDRAWAL",
+          "RELOCATION",
+          "LABEL_VERIFICATION"
+        ],
+        "target_spoke": "wms_adapter_id",
+        "description": "WMS barrel operations \u2014 single-target routing to WMS spoke."
+      },
+      {
+        "scan_types": [
+          "INSPECTION",
+          "INVENTORY"
+        ],
+        "target_spokes": [
+          "wms_adapter_id",
+          "ims_adapter_id"
+        ],
+        "description": "Dual-target routing \u2014 barrel tracking (WMS) and asset compliance (IMS)."
+      },
+      {
+        "scan_types": [
+          "ASSET_RECEIVE",
+          "ASSET_MOVE",
+          "ASSET_INSTALL"
+        ],
+        "target_spoke": "ims_adapter_id",
+        "description": "IMS asset operations \u2014 single-target routing to IMS spoke."
+      },
+      {
+        "scan_types": [
+          "SAMPLE_COLLECT",
+          "SAMPLE_BIND"
+        ],
+        "target_spoke": "qms_adapter_id",
+        "description": "QMS sample operations \u2014 single-target routing to QMS spoke (future)."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 500,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 15000,
+      "retryable_errors": [
+        "UNAVAILABLE",
+        "DEADLINE_EXCEEDED",
+        "RESOURCE_EXHAUSTED"
+      ]
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 30000
+    },
+    "scan_rejection": {
+      "strategy": "per_event_rejection",
+      "description": "Individual scan events within a batch may be rejected (ScanRejection) without failing the entire batch. Rejected scans are returned to the device for retry or operator intervention.",
+      "rejection_reasons": [
+        "UNKNOWN_BARCODE",
+        "INVALID_SCAN_TYPE",
+        "DEVICE_NOT_REGISTERED",
+        "BATCH_SIZE_EXCEEDED",
+        "DUPLICATE_SCAN"
+      ]
+    },
+    "dead_letter": {
+      "enabled": true,
+      "destination": "forge://dead-letter/scanner-gateway",
+      "retention_days": 30,
+      "description": "Undeliverable scan events (unroutable scan type, all target spokes down) are sent to dead letter queue for manual review."
+    }
+  },
+  "integrity": {
+    "state": "draft",
+    "created_at": "2026-04-06",
+    "spec_author": "forge-platform",
+    "notes": "Phase 1 scaffold. Two-tier architecture: Android devices \u2192 ScannerService gRPC server (gateway) \u2192 Forge Hub. Multi-spoke routing based on ScanType classification. First Forge edge device adapter. Backfill not supported \u2014 scan events are ephemeral, authoritative records live in target spokes.",
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827"
+  }
+}

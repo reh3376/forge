@@ -1,0 +1,117 @@
+{
+  "description": "A material, component, or finished good.\n\nItems are master data \u2014 they describe WHAT something is, not\nWHERE it is (that's inventory) or HOW MUCH exists (that's lot\nquantity).",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "item_number": {
+      "description": "Primary item identifier (SKU, part number).",
+      "title": "Item Number",
+      "type": "string"
+    },
+    "name": {
+      "description": "Human-readable item name.",
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Detailed item description.",
+      "title": "Description"
+    },
+    "category": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Item classification or class (e.g. 'raw_material', 'barrel', 'finished_good').",
+      "title": "Category"
+    },
+    "unit_of_measure": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Default unit of measure for this item.",
+      "title": "Unit Of Measure"
+    },
+    "vendor_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to primary vendor BusinessEntity (by source_id).",
+      "title": "Vendor Id"
+    },
+    "external_ids": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Map of external system IDs (e.g. {'erp': 'ITEM-1234', 'global': 'abc'}).",
+      "title": "External Ids",
+      "type": "object"
+    },
+    "is_active": {
+      "default": true,
+      "description": "Whether this item is currently active in the system.",
+      "title": "Is Active",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "item_number",
+    "name"
+  ],
+  "title": "MaterialItem",
+  "type": "object"
+}

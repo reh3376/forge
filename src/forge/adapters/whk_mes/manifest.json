@@ -1,0 +1,56 @@
+{
+  "adapter_id": "whk-mes",
+  "name": "Whiskey House Manufacturing Execution System Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "graphql+amqp+mqtt",
+  "tier": "MES_MOM",
+  "capabilities": {
+    "read": true,
+    "write": true,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-mes/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "production_order_id",
+      "batch_id",
+      "recipe_id",
+      "equipment_id",
+      "event_timestamp",
+      "event_type"
+    ]
+  },
+  "health_check_interval_ms": 15000,
+  "connection_params": [
+    {"name": "graphql_url", "description": "MES GraphQL API endpoint", "required": true, "secret": false},
+    {"name": "rabbitmq_url", "description": "RabbitMQ AMQP connection URL", "required": true, "secret": false},
+    {"name": "azure_tenant_id", "description": "Azure Entra ID tenant ID", "required": true, "secret": false},
+    {"name": "azure_client_id", "description": "Azure Entra ID application (client) ID", "required": true, "secret": false},
+    {"name": "azure_client_secret", "description": "Azure Entra ID client secret", "required": true, "secret": true},
+    {"name": "rabbitmq_vhost", "description": "RabbitMQ virtual host", "required": false, "secret": false, "default": "/"},
+    {"name": "rabbitmq_consumer_group", "description": "RabbitMQ consumer group ID", "required": false, "secret": false, "default": "forge-mes-adapter"},
+    {"name": "mqtt_host", "description": "Primary MQTT broker host", "required": false, "secret": false},
+    {"name": "mqtt_port", "description": "MQTT broker port", "required": false, "secret": false, "default": "1883"},
+    {"name": "mqtt_username", "description": "MQTT broker username", "required": false, "secret": true},
+    {"name": "mqtt_password", "description": "MQTT broker password", "required": false, "secret": true},
+    {"name": "mqtt_ca_cert", "description": "CA certificate (PEM) for MQTTS", "required": false, "secret": true},
+    {"name": "mqtt_client_cert", "description": "Client certificate (PEM) for mTLS", "required": false, "secret": true},
+    {"name": "mqtt_client_key", "description": "Client private key (PEM) for mTLS", "required": false, "secret": true},
+    {"name": "azure_vault_name", "description": "Azure Key Vault name for secrets", "required": false, "secret": false},
+    {"name": "redis_url", "description": "Redis URL for cache coordination", "required": false, "secret": false},
+    {"name": "graphql_timeout_ms", "description": "GraphQL request timeout (ms)", "required": false, "secret": false, "default": "10000"},
+    {"name": "mqtt_buffer_max_seconds", "description": "MQTT message buffer during reconnection (seconds)", "required": false, "secret": false, "default": "60"}
+  ],
+  "auth_methods": ["azure_entra_id", "bearer_token", "certificate"],
+  "metadata": {
+    "spoke": "whk-mes",
+    "hub_module": "forge.adapters.whk_mes",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-mes",
+    "source_framework": "NestJS + Next.js 15",
+    "isa_88_compliance": "Procedure > Unit Procedure > Operation > Equipment Phase > Phase Parameter"
+  }
+}

@@ -1,0 +1,542 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/facts/v0.1.0",
+  "title": "FACTS — Forge Adapter Conformance Test Specification",
+  "description": "Spec-first governance schema for Forge adapters. Defines what every adapter MUST declare about its identity, capabilities, lifecycle, connection, data contract, context mapping, and error handling. The runner enforces conformance — silent ignore is prohibited.",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "adapter_identity",
+    "capabilities",
+    "lifecycle",
+    "connection",
+    "data_contract",
+    "context_mapping",
+    "error_handling"
+  ],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.1.0",
+      "description": "FACTS schema version this spec conforms to."
+    },
+
+    "adapter_identity": {
+      "type": "object",
+      "description": "How the adapter identifies itself. Maps to AdapterManifest core fields.",
+      "required": ["adapter_id", "name", "version", "type", "tier", "protocol"],
+      "properties": {
+        "adapter_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "Unique kebab-case identifier (e.g., 'whk-wms', 'opcua-generic')."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Human-readable adapter name."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semantic version of this adapter spec (major.minor.patch)."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["INGESTION", "BIDIRECTIONAL", "WRITE_ONLY", "DISCOVERY_ONLY"],
+          "description": "Primary adapter function. Most adapters are INGESTION."
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["OT", "MES_MOM", "ERP_BUSINESS", "HISTORIAN", "DOCUMENT"],
+          "description": "ISA-95 data tier. Maps to AdapterTier enum."
+        },
+        "protocol": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Wire protocol(s) used (e.g., 'graphql', 'opcua', 'graphql+amqp+mqtt')."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "capabilities": {
+      "type": "object",
+      "description": "What the adapter can do. Each true capability implies a corresponding interface mixin. Maps to AdapterCapabilities.",
+      "required": ["read"],
+      "properties": {
+        "read": {
+          "type": "boolean",
+          "description": "Adapter can collect/poll data (AdapterBase.collect). Must be true for INGESTION type."
+        },
+        "write": {
+          "type": "boolean",
+          "default": false,
+          "description": "Adapter can write back to the source system (WritableAdapter mixin)."
+        },
+        "subscribe": {
+          "type": "boolean",
+          "default": false,
+          "description": "Adapter can subscribe to real-time events (SubscriptionProvider mixin)."
+        },
+        "backfill": {
+          "type": "boolean",
+          "default": false,
+          "description": "Adapter can fetch historical data ranges (BackfillProvider mixin)."
+        },
+        "discover": {
+          "type": "boolean",
+          "default": false,
+          "description": "Adapter can discover available tags/entities (DiscoveryProvider mixin)."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "lifecycle": {
+      "type": "object",
+      "description": "Behavioral requirements for adapter lifecycle. Every adapter must implement configure/start/stop/health from AdapterLifecycle.",
+      "required": [
+        "startup_timeout_ms",
+        "shutdown_timeout_ms",
+        "health_check_interval_ms",
+        "restart_policy"
+      ],
+      "properties": {
+        "startup_timeout_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 300000,
+          "description": "Maximum time allowed for configure() + start() to complete."
+        },
+        "shutdown_timeout_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 60000,
+          "description": "Maximum time allowed for stop() to complete gracefully."
+        },
+        "health_check_interval_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 300000,
+          "description": "How often health() is called. Maps to AdapterManifest.health_check_interval_ms."
+        },
+        "restart_policy": {
+          "type": "string",
+          "enum": ["always", "on_failure", "never"],
+          "description": "What happens when the adapter enters FAILED state."
+        },
+        "state_transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "trigger"],
+            "properties": {
+              "from": {
+                "type": "string",
+                "enum": ["REGISTERED", "CONNECTING", "HEALTHY", "DEGRADED", "FAILED", "STOPPED"]
+              },
+              "to": {
+                "type": "string",
+                "enum": ["REGISTERED", "CONNECTING", "HEALTHY", "DEGRADED", "FAILED", "STOPPED"]
+              },
+              "trigger": {
+                "type": "string",
+                "description": "What causes this transition (e.g., 'start() called', 'health check timeout')."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Optional explicit state machine definition for this adapter."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "connection": {
+      "type": "object",
+      "description": "How to connect to the source system. Maps to AdapterManifest.connection_params and auth_methods.",
+      "required": ["params", "auth_methods"],
+      "properties": {
+        "params": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "description": "Parameter name (snake_case)."
+              },
+              "type": {
+                "type": "string",
+                "enum": ["string", "integer", "boolean", "url", "path"],
+                "description": "Parameter value type."
+              },
+              "required": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether this parameter must be provided."
+              },
+              "secret": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether this parameter contains sensitive data (passwords, tokens, keys)."
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable parameter description."
+              },
+              "default": {
+                "type": "string",
+                "description": "Default value if not provided."
+              },
+              "validation": {
+                "type": "object",
+                "properties": {
+                  "pattern": {
+                    "type": "string",
+                    "description": "Regex pattern the value must match."
+                  },
+                  "min": {
+                    "type": "number",
+                    "description": "Minimum value (for integer type)."
+                  },
+                  "max": {
+                    "type": "number",
+                    "description": "Maximum value (for integer type)."
+                  },
+                  "enum": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Allowed values."
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "description": "Connection parameters the adapter requires."
+        },
+        "auth_methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["none", "bearer_token", "api_key", "basic", "oauth2", "certificate", "azure_entra_id"]
+          },
+          "minItems": 1,
+          "description": "Authentication methods the adapter supports."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "data_contract": {
+      "type": "object",
+      "description": "What the adapter produces. Maps to DataContract model. Defines the shape and content of ContextualRecord output.",
+      "required": ["schema_ref", "output_format", "context_fields"],
+      "properties": {
+        "schema_ref": {
+          "type": "string",
+          "pattern": "^forge://",
+          "description": "URI reference to the output data schema (e.g., 'forge://schemas/whk-wms-barrel/v1')."
+        },
+        "output_format": {
+          "type": "string",
+          "enum": ["contextual_record", "raw"],
+          "default": "contextual_record",
+          "description": "Output record format. contextual_record = Forge ContextualRecord with full context."
+        },
+        "context_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Field name from RecordContext that this adapter MUST populate on every record."
+          },
+          "minItems": 1,
+          "description": "Required context fields. Every emitted ContextualRecord must have these populated."
+        },
+        "optional_context_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Context fields the adapter MAY populate when available."
+        },
+        "data_sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source_type", "description", "entities"],
+            "properties": {
+              "source_type": {
+                "type": "string",
+                "enum": ["graphql_query", "graphql_mutation", "graphql_subscription", "rest_get", "rest_post", "rabbitmq", "mqtt", "websocket", "file", "database"],
+                "description": "Type of data source."
+              },
+              "endpoint": {
+                "type": "string",
+                "description": "Endpoint path, topic pattern, or connection target."
+              },
+              "description": {
+                "type": "string",
+                "description": "What data this source provides."
+              },
+              "entities": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1,
+                "description": "Business entities this source produces (e.g., 'Barrel', 'ProductionOrder')."
+              },
+              "collection_mode": {
+                "type": "string",
+                "enum": ["poll", "subscribe", "backfill", "write"],
+                "description": "How the adapter interacts with this source."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Catalog of data sources the adapter reads from or writes to."
+        },
+        "sample_record": {
+          "type": "object",
+          "description": "Example ContextualRecord showing expected output shape with populated context fields."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "context_mapping": {
+      "type": "object",
+      "description": "How source system fields map to Forge RecordContext fields. This is Forge's core differentiator — every record carries operational context.",
+      "required": ["mappings"],
+      "properties": {
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source_field", "context_field"],
+            "properties": {
+              "source_field": {
+                "type": "string",
+                "description": "Dot-notation path in the source system (e.g., 'barrel.lot.id', 'productionOrder.id')."
+              },
+              "context_field": {
+                "type": "string",
+                "description": "Target RecordContext field (e.g., 'lot_id', 'batch_id', 'equipment_id')."
+              },
+              "transform": {
+                "type": "string",
+                "description": "Optional transformation to apply (e.g., 'lowercase', 'prefix:whk-', 'split:.')."
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable explanation of what this mapping represents."
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "description": "Source field → context field mappings."
+        },
+        "enrichment_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target_field", "rule_type", "description"],
+            "properties": {
+              "target_field": {
+                "type": "string",
+                "description": "RecordContext field to enrich."
+              },
+              "rule_type": {
+                "type": "string",
+                "enum": ["timestamp_to_shift", "location_to_area", "lookup", "computed", "static"],
+                "description": "Type of enrichment rule."
+              },
+              "config": {
+                "type": "object",
+                "description": "Rule-specific configuration.",
+                "additionalProperties": true
+              },
+              "description": {
+                "type": "string",
+                "description": "What this enrichment does."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Rules for deriving context fields that aren't direct mappings (e.g., shift from timestamp)."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "error_handling": {
+      "type": "object",
+      "description": "How the adapter must behave on failure. Governs retry, circuit breaking, and dead letter behavior.",
+      "required": ["retry_policy", "circuit_breaker"],
+      "properties": {
+        "retry_policy": {
+          "type": "object",
+          "required": ["max_retries", "initial_delay_ms", "backoff_strategy"],
+          "properties": {
+            "max_retries": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20,
+              "description": "Maximum retry attempts before giving up."
+            },
+            "initial_delay_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "Delay before first retry."
+            },
+            "backoff_strategy": {
+              "type": "string",
+              "enum": ["constant", "linear", "exponential"],
+              "description": "How delay grows between retries."
+            },
+            "max_delay_ms": {
+              "type": "integer",
+              "minimum": 1000,
+              "description": "Maximum delay between retries (caps exponential growth)."
+            }
+          },
+          "additionalProperties": false
+        },
+        "circuit_breaker": {
+          "type": "object",
+          "required": ["failure_threshold", "half_open_after_ms"],
+          "properties": {
+            "failure_threshold": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Consecutive failures before circuit opens."
+            },
+            "half_open_after_ms": {
+              "type": "integer",
+              "minimum": 1000,
+              "description": "Time before attempting recovery (half-open state)."
+            },
+            "success_threshold": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "description": "Consecutive successes in half-open state to close circuit."
+            }
+          },
+          "additionalProperties": false
+        },
+        "dead_letter": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether failed records are sent to a dead letter topic."
+            },
+            "topic": {
+              "type": "string",
+              "description": "Dead letter topic name (e.g., 'forge.dead-letter.whk-wms')."
+            },
+            "max_age_hours": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "How long dead letter records are retained."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Dead letter queue configuration for failed records."
+        },
+        "health_degradation": {
+          "type": "object",
+          "properties": {
+            "degraded_after_failures": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Consecutive health check failures before state → DEGRADED."
+            },
+            "failed_after_failures": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Consecutive health check failures before state → FAILED."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Rules for health state degradation."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Free-form adapter-specific metadata. Not validated by the runner — use for human context.",
+      "additionalProperties": true
+    },
+
+    "integrity": {
+      "type": "object",
+      "description": "Self-contained spec integrity block (FHTS Layer 1). Hash governance for AI agent oversight.",
+      "properties": {
+        "hash_method": {
+          "type": "string",
+          "enum": ["sha256-c14n-v1", "sha256-jcs"],
+          "default": "sha256-c14n-v1",
+          "description": "Hash algorithm. sha256-c14n-v1 is normative."
+        },
+        "spec_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of canonical JSON (excluding this field)."
+        },
+        "hash_state": {
+          "type": "string",
+          "enum": ["approved", "modified", "pending_review", "reverted", "unknown"],
+          "default": "unknown",
+          "description": "Governance state — tracks whether changes have been reviewed and approved."
+        },
+        "previous_hash": {
+          "type": ["string", "null"],
+          "description": "Hash before most recent change. Enables single-step drift detection."
+        },
+        "approved_by": {
+          "type": "string",
+          "description": "Identifier of actor who approved current hash state."
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 timestamp of approval."
+        },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["previous_hash", "new_hash", "changed_at", "source"],
+            "properties": {
+              "previous_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "new_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "changed_at": { "type": "string", "format": "date-time" },
+              "source": { "type": "string", "enum": ["manual", "ci", "agent", "revert", "spec_update"] },
+              "changed_by": { "type": "string" },
+              "change_type": { "type": "string", "enum": ["structural", "content", "config", "revert"] },
+              "reason": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Last 3 hash changes for audit trail and AI agent governance."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

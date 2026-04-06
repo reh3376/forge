@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "EventCategory": {
+      "description": "High-level category for operational events.",
+      "enum": [
+        "PRODUCTION",
+        "QUALITY",
+        "LOGISTICS",
+        "MAINTENANCE",
+        "SAFETY",
+        "COMPLIANCE"
+      ],
+      "title": "EventCategory",
+      "type": "string"
+    },
+    "EventSeverity": {
+      "description": "Severity level for operational events.",
+      "enum": [
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL"
+      ],
+      "title": "EventSeverity",
+      "type": "string"
+    }
+  },
+  "description": "An immutable record of something that happened.\n\nEvents reference the entity they happened to (entity_type + entity_id),\nthe asset where it happened, and the operator who caused or observed it.",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "event_type": {
+      "description": "Source-system event type (e.g. 'Entry', 'Transfer', 'StateChange').",
+      "title": "Event Type",
+      "type": "string"
+    },
+    "event_subtype": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional sub-classification (e.g. EventReason in WMS).",
+      "title": "Event Subtype"
+    },
+    "category": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EventCategory"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "High-level event category."
+    },
+    "severity": {
+      "$ref": "#/$defs/EventSeverity",
+      "default": "INFO",
+      "description": "Event severity level."
+    },
+    "entity_type": {
+      "description": "Type of entity this event relates to (e.g. 'manufacturing_unit', 'lot').",
+      "title": "Entity Type",
+      "type": "string"
+    },
+    "entity_id": {
+      "description": "Source ID of the entity this event relates to.",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "asset_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to PhysicalAsset where event occurred (by source_id).",
+      "title": "Asset Id"
+    },
+    "operator_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "User or operator who caused/observed the event.",
+      "title": "Operator Id"
+    },
+    "event_time": {
+      "description": "When the event occurred in the source system.",
+      "format": "date-time",
+      "title": "Event Time",
+      "type": "string"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Outcome or result of the event (free text or code).",
+      "title": "Result"
+    },
+    "work_order_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to associated WorkOrder if applicable.",
+      "title": "Work Order Id"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "event_type",
+    "entity_type",
+    "entity_id",
+    "event_time"
+  ],
+  "title": "OperationalEvent",
+  "type": "object"
+}

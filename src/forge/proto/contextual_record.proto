@@ -1,0 +1,128 @@
+// Forge Platform — ContextualRecord and component messages
+// Maps 1:1 to forge.core.models.contextual_record (Pydantic v2)
+//
+// This is the PRIMARY streaming unit — every piece of data that enters
+// Forge is wrapped in a ContextualRecord. These messages are the payload
+// of the Collect() and Subscribe() gRPC streams.
+
+syntax = "proto3";
+
+package forge.v1;
+
+import "google/protobuf/timestamp.proto";
+import "forge/v1/enums.proto";
+
+option go_package = "github.com/reh3376/forge/proto/v1";
+
+// ---------------------------------------------------------------------------
+// RecordSource — which adapter and system produced this record
+// Maps to: forge.core.models.contextual_record.RecordSource
+// ---------------------------------------------------------------------------
+
+message RecordSource {
+  string adapter_id = 1;       // e.g. "whk-wms", "whk-mes"
+  string system = 2;           // e.g. "whk-wms-prod", "ignition-prod"
+  string tag_path = 3;         // optional: e.g. "Area1/Fermenter3/Temperature"
+  string connection_id = 4;    // optional: for connection multiplexing
+}
+
+// ---------------------------------------------------------------------------
+// RecordTimestamp — triple-timestamp for full temporal context
+// Maps to: forge.core.models.contextual_record.RecordTimestamp
+// ---------------------------------------------------------------------------
+
+message RecordTimestamp {
+  // When the value was generated at the source system (REQUIRED)
+  google.protobuf.Timestamp source_time = 1;
+
+  // When the source system's server processed it (optional)
+  google.protobuf.Timestamp server_time = 2;
+
+  // When Forge received it (set by hub on ingestion)
+  google.protobuf.Timestamp ingestion_time = 3;
+}
+
+// ---------------------------------------------------------------------------
+// RecordValue — the actual value with engineering context
+// Maps to: forge.core.models.contextual_record.RecordValue
+//
+// Design note: Pydantic uses `raw: Any`. Protobuf has no direct equivalent.
+// We use `oneof typed_value` with explicit variants to preserve type fidelity
+// on the wire. The `json_value` string variant handles complex types (dicts,
+// lists, nested objects) by JSON-encoding them. The serialization layer
+// (Python/TS) is responsible for choosing the right variant.
+// ---------------------------------------------------------------------------
+
+message RecordValue {
+  // The raw value — exactly one variant is set
+  oneof typed_value {
+    double   number_value  = 1;  // float, int (widened to double)
+    string   string_value  = 2;  // text
+    bool     bool_value    = 3;  // boolean
+    bytes    bytes_value   = 4;  // binary blobs
+    string   json_value    = 5;  // JSON-encoded dicts, lists, nested objects
+    int64    integer_value = 6;  // exact integer (no float precision loss)
+  }
+
+  // Engineering context
+  string engineering_units = 10;   // e.g. "°F", "PSI", "gal"
+  QualityCode quality = 11;        // OPC UA-inspired quality code
+  string data_type = 12;           // Python type hint: "float64", "string", etc.
+
+  // reserved 7-9 for future typed_value extensions
+}
+
+// ---------------------------------------------------------------------------
+// RecordContext — operational context that travels with every record
+// Maps to: forge.core.models.contextual_record.RecordContext
+//
+// This is what makes Forge different from a raw data pipeline. Every
+// record carries enough context for correct interpretation.
+// ---------------------------------------------------------------------------
+
+message RecordContext {
+  string equipment_id = 1;
+  string area = 2;
+  string site = 3;
+  string batch_id = 4;
+  string lot_id = 5;
+  string recipe_id = 6;
+  string operating_mode = 7;
+  string shift = 8;
+  string operator_id = 9;
+
+  // Extensible key-value pairs for adapter-specific context.
+  // Complex values should be JSON-encoded strings.
+  map<string, string> extra = 15;
+
+  // reserved 10-14 for future standard context fields
+}
+
+// ---------------------------------------------------------------------------
+// RecordLineage — provenance chain
+// Maps to: forge.core.models.contextual_record.RecordLineage
+// ---------------------------------------------------------------------------
+
+message RecordLineage {
+  string schema_ref = 1;               // e.g. "forge://schemas/whk-wms/v0.1.0"
+  string adapter_id = 2;               // producing adapter
+  string adapter_version = 3;          // adapter version at capture time
+  repeated string transformation_chain = 4;  // ordered list of transforms applied
+}
+
+// ---------------------------------------------------------------------------
+// ContextualRecord — the fundamental data unit in Forge
+// Maps to: forge.core.models.contextual_record.ContextualRecord
+//
+// This is the PRIMARY message type in the Collect() and Subscribe()
+// gRPC streams. Every piece of data that enters Forge is one of these.
+// ---------------------------------------------------------------------------
+
+message ContextualRecord {
+  string record_id = 1;          // UUID as string (matches Pydantic UUID serialization)
+  RecordSource source = 2;
+  RecordTimestamp timestamp = 3;
+  RecordValue value = 4;
+  RecordContext context = 5;
+  RecordLineage lineage = 6;
+}

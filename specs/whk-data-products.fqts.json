@@ -1,0 +1,143 @@
+{
+  "$schema": "forge://governance/fqts/v0.1.0",
+  "spec_id": "whk-data-products-fqts",
+  "version": "0.1.0",
+  "description": "FQTS quality specifications for WHK curated data products",
+  "owner": "reh3376",
+  "created_at": "2026-04-06T00:00:00Z",
+  "data_products": [
+    {
+      "product_id": "production-context",
+      "name": "Production Context Dataset",
+      "description": "Batch/lot records with process parameters, material genealogy, equipment state, quality results — all normalized and time-aligned",
+      "source_adapters": ["whk-wms", "whk-mes"],
+      "quality_rules": [
+        {
+          "rule": "completeness",
+          "fields": ["equipment_id", "batch_id", "lot_id"],
+          "threshold": 0.95,
+          "description": "95% of records must have equipment, batch, and lot context"
+        },
+        {
+          "rule": "freshness",
+          "max_age_hours": 1,
+          "description": "Most recent record must be within 1 hour"
+        },
+        {
+          "rule": "range",
+          "metric": "temperature",
+          "min": -40.0,
+          "max": 200.0,
+          "unit": "°C",
+          "threshold": 0.99,
+          "description": "99% of temperature values must be within -40°C to 200°C"
+        },
+        {
+          "rule": "consistency",
+          "field_a": "batch_id",
+          "field_b": "lot_id",
+          "threshold": 0.95,
+          "description": "When batch_id is set, lot_id should also be set 95% of the time"
+        }
+      ],
+      "slos": [
+        {
+          "metric": "completeness",
+          "target": 95.0,
+          "measurement": "percentage of records with all required context fields",
+          "window": "1h"
+        },
+        {
+          "metric": "freshness",
+          "target": 99.0,
+          "measurement": "percentage of time most recent record is within 1 hour",
+          "window": "24h"
+        },
+        {
+          "metric": "accuracy",
+          "target": 99.0,
+          "measurement": "percentage of values within expected ranges",
+          "window": "1h"
+        }
+      ]
+    },
+    {
+      "product_id": "inventory-production-linkage",
+      "name": "Inventory-Production Linkage",
+      "description": "WMS inventory movements linked to MES production orders with material genealogy",
+      "source_adapters": ["whk-wms", "whk-mes"],
+      "quality_rules": [
+        {
+          "rule": "completeness",
+          "fields": ["lot_id", "equipment_id"],
+          "threshold": 0.90,
+          "description": "90% of linkage records must have lot and equipment context"
+        },
+        {
+          "rule": "consistency",
+          "field_a": "lot_id",
+          "field_b": "equipment_id",
+          "threshold": 0.90,
+          "description": "When lot_id is set, equipment_id should also be set"
+        }
+      ],
+      "slos": [
+        {
+          "metric": "completeness",
+          "target": 90.0,
+          "measurement": "percentage of linkage records with required fields",
+          "window": "1h"
+        },
+        {
+          "metric": "freshness",
+          "target": 95.0,
+          "measurement": "percentage of time most recent record is within 4 hours",
+          "window": "24h"
+        }
+      ]
+    },
+    {
+      "product_id": "equipment-utilization",
+      "name": "Equipment Utilization Dataset",
+      "description": "Equipment state timeline with batch context, shift context, maintenance windows",
+      "source_adapters": ["whk-mes"],
+      "quality_rules": [
+        {
+          "rule": "completeness",
+          "fields": ["equipment_id", "operating_mode"],
+          "threshold": 0.98,
+          "description": "98% of records must have equipment ID and operating mode"
+        },
+        {
+          "rule": "freshness",
+          "max_age_hours": 0.5,
+          "description": "Most recent record must be within 30 minutes"
+        },
+        {
+          "rule": "consistency",
+          "field_a": "equipment_id",
+          "field_b": "area",
+          "threshold": 0.95,
+          "description": "When equipment_id is set, area should also be set"
+        }
+      ],
+      "slos": [
+        {
+          "metric": "completeness",
+          "target": 98.0,
+          "measurement": "percentage of records with equipment and operating mode",
+          "window": "1h"
+        },
+        {
+          "metric": "freshness",
+          "target": 99.0,
+          "measurement": "percentage of time most recent record is within 30 minutes",
+          "window": "24h"
+        }
+      ]
+    }
+  ],
+  "evaluation_schedule": "continuous",
+  "notification_channels": ["forge-alerts"],
+  "conformance_tests": 15
+}

@@ -1,0 +1,24 @@
+# buf.gen.yaml — Code generation configuration
+# Run: buf generate
+version: v2
+plugins:
+  # Python protobuf stubs
+  - remote: buf.build/protocolbuffers/python
+    out: ../proto_gen
+    opt:
+      - paths=source_relative
+
+  # Python gRPC stubs
+  - remote: buf.build/grpc/python
+    out: ../proto_gen
+    opt:
+      - paths=source_relative
+
+  # TypeScript (for sidecar)
+  - remote: buf.build/community/stephenh-ts-proto
+    out: ../../../sidecars/proto_gen
+    opt:
+      - paths=source_relative
+      - outputServices=grpc-js
+      - esModuleInterop=true
+      - env=node

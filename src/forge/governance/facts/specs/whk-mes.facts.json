@@ -1,0 +1,736 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "whk-mes",
+    "name": "Whiskey House Manufacturing Execution System Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "MES_MOM",
+    "protocol": "graphql+amqp+mqtt"
+  },
+  "capabilities": {
+    "read": true,
+    "write": true,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 45000,
+    "shutdown_timeout_ms": 20000,
+    "health_check_interval_ms": 15000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called — initiates GraphQL, AMQP, and MQTT broker connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "GraphQL introspection, RabbitMQ channel, and at least one MQTT broker connected"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "DEGRADED",
+        "trigger": "GraphQL + RabbitMQ connected but MQTT broker(s) unreachable — partial data collection possible"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (45s) — GraphQL or RabbitMQ unreachable"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "Any protocol health check fails 3 consecutive times or MQTT certificate expiry warning"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "All protocol health checks pass — includes MQTT broker reconnection"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (8) or all MQTT brokers lost"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection with MQTT certificate refresh"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful MQTT unsubscribe, AMQP channel close, buffer flush"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called — flush buffered MQTT messages, then graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called — forced shutdown, discard in-flight MQTT buffer"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "graphql_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "MES GraphQL API endpoint (e.g., http://localhost:3000/graphql). Backend serves 71 resolver modules with production order, recipe, batch, equipment, and quality endpoints.",
+        "validation": {
+          "pattern": "^https?://.+/graphql$"
+        }
+      },
+      {
+        "name": "rabbitmq_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "RabbitMQ AMQP connection URL (e.g., amqp://user:pass@localhost:5672). Hosts 34 entity fanout exchanges for ERP sync and domain events.",
+        "validation": {
+          "pattern": "^amqps?://.+"
+        }
+      },
+      {
+        "name": "rabbitmq_vhost",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ virtual host.",
+        "default": "/"
+      },
+      {
+        "name": "rabbitmq_consumer_group",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ consumer group ID for subscription queues.",
+        "default": "forge-mes-adapter"
+      },
+      {
+        "name": "mqtt_host",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Primary MQTT broker host. Dynamic brokers loaded from UNS config at runtime — this is the bootstrap broker for initial connection."
+      },
+      {
+        "name": "mqtt_port",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "MQTT broker port. 1883 for plain MQTT, 8883 for MQTTS (TLS).",
+        "default": "1883",
+        "validation": {
+          "min": 1,
+          "max": 65535
+        }
+      },
+      {
+        "name": "mqtt_username",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "MQTT broker username. Used for username/password and hybrid auth methods."
+      },
+      {
+        "name": "mqtt_password",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "MQTT broker password."
+      },
+      {
+        "name": "mqtt_ca_cert",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "CA certificate (PEM) for verifying MQTT broker identity. Required for MQTTS connections."
+      },
+      {
+        "name": "mqtt_client_cert",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "Client certificate (PEM) for mutual TLS authentication with MQTT broker."
+      },
+      {
+        "name": "mqtt_client_key",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "Client private key (PEM) for mTLS. Paired with mqtt_client_cert."
+      },
+      {
+        "name": "azure_tenant_id",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "Azure Entra ID tenant ID for JWT-based authentication and Key Vault access."
+      },
+      {
+        "name": "azure_client_id",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "Azure Entra ID application (client) ID for this adapter's service principal."
+      },
+      {
+        "name": "azure_client_secret",
+        "type": "string",
+        "required": true,
+        "secret": true,
+        "description": "Azure Entra ID client secret for service-to-service authentication."
+      },
+      {
+        "name": "azure_vault_name",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Azure Key Vault name for secrets management. MQTT credentials, JWT secrets, and API keys are stored here. Falls back to env vars if unavailable."
+      },
+      {
+        "name": "redis_url",
+        "type": "url",
+        "required": false,
+        "secret": false,
+        "description": "Redis connection URL (e.g., redis://localhost:6379). Used for cache coordination — not required for core data collection.",
+        "validation": {
+          "pattern": "^rediss?://.+"
+        }
+      },
+      {
+        "name": "graphql_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Timeout for individual GraphQL requests.",
+        "default": "10000",
+        "validation": {
+          "min": 1000,
+          "max": 60000
+        }
+      },
+      {
+        "name": "mqtt_buffer_max_seconds",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Maximum seconds to buffer MQTT messages during broker reconnection. Prevents data loss during transient failures.",
+        "default": "60",
+        "validation": {
+          "min": 10,
+          "max": 300
+        }
+      }
+    ],
+    "auth_methods": [
+      "azure_entra_id",
+      "bearer_token",
+      "certificate"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-mes/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "production_order_id",
+      "batch_id",
+      "recipe_id",
+      "equipment_id",
+      "event_timestamp",
+      "event_type"
+    ],
+    "optional_context_fields": [
+      "lot_id",
+      "shift_id",
+      "operator_id",
+      "schedule_order_id",
+      "work_order_id",
+      "whiskey_type",
+      "equipment_phase",
+      "process_step",
+      "quality_result_id",
+      "material_id"
+    ],
+    "data_sources": [
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Production order lifecycle and scheduling. Production order creation, schedule order queuing, recipe instance binding, BOM management, and order state tracking.",
+        "entities": [
+          "ProductionOrder",
+          "ProductionOrderBomItem",
+          "ProductionOrderRecipeInstance",
+          "ScheduleOrder",
+          "ScheduleOrderRecipeInstance",
+          "ScheduleOrderQueue"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Recipe management and configuration. Master recipes, recipe groups, BOM definitions, recipe parameters, grain character profiles, and mashbill composition.",
+        "entities": [
+          "Recipe",
+          "RecipeGroup",
+          "RecipeBom",
+          "RecipeBomItem",
+          "RecipeBomActual",
+          "RecipeParameter",
+          "RecipeGrainCharacter"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Batch execution and manufacturing data. Batch tracking, deviations, material consumption, parameter configurations, parameter values, and time-series process data.",
+        "entities": [
+          "Batch",
+          "BatchDeviation",
+          "BatchMaterialConsumption",
+          "BatchParameterConfiguration",
+          "BatchParameterValue",
+          "BatchTimeSeriesData"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Mashing protocol execution. Protocol definitions, step definitions, step actuals, step parameter definitions, step parameter actuals, and mashing execution state.",
+        "entities": [
+          "MashingProtocol",
+          "MashingProtocolStep",
+          "MashingProtocolStepActual",
+          "MashingStepParameterDefinition",
+          "MashingStepParameterActual",
+          "MashingExecution"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Step execution and SFC (Shop Floor Control). Step execution lifecycle (start, pause, resume, hold, abort, complete), equipment allocation, and separation events.",
+        "entities": [
+          "StepExecution",
+          "SeparationEvent",
+          "FifoAllocation",
+          "EquipmentStateTransition",
+          "ChangeoverAreaState"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Equipment and operations hierarchy. ISA-88 procedural model: Procedure → Unit Procedure → Operation → Equipment Phase → Phase Parameter. Includes instructions and test parameters.",
+        "entities": [
+          "Procedure",
+          "UnitProcedure",
+          "Operation",
+          "EquipmentPhase",
+          "PhaseParameter",
+          "Instruction",
+          "TestParameter"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Inventory and materials management. Item master data, item groups, receipts, BOM definitions, inventory levels, inventory logs, transfers, lots, and asset tracking.",
+        "entities": [
+          "Item",
+          "ItemGroup",
+          "ItemReceipt",
+          "Bom",
+          "BomItem",
+          "Inventory",
+          "InventoryLog",
+          "InventoryTransfer",
+          "Lot",
+          "Asset"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Quality testing and formula engine. Test definitions, test parameters, enzyme configurations, formula library with versioning, formula functions, formula variables, test case execution, and yield estimation.",
+        "entities": [
+          "Test",
+          "EnzymeConfiguration",
+          "EnzymeCalculationRule",
+          "FormulaLibrary",
+          "FormulaLibraryVersion",
+          "FormulaFunction",
+          "FormulaVariable",
+          "FormulaTestCase",
+          "FormulaExecutionLog"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Business entities and orders. Customers, vendors, purchase orders, sales orders, and whiskey type definitions.",
+        "entities": [
+          "Customer",
+          "Vendor",
+          "PurchaseOrder",
+          "SalesOrder",
+          "WhiskeyType"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Audit, monitoring, and system. Audit logs, operator shifts, production metrics, dashboards, widgets, notifications, comments, and system configuration.",
+        "entities": [
+          "AuditLog",
+          "OperatorShift",
+          "ProductionMetric",
+          "Dashboard",
+          "Widget",
+          "Notification",
+          "Comment",
+          "SystemConfiguration",
+          "User"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_mutation",
+        "endpoint": "/graphql",
+        "description": "Write-back mutations for operational state changes. Forge may push decisions into production order lifecycle, step execution control, and recipe parameter adjustments.",
+        "entities": [
+          "StepExecution",
+          "MashingExecution",
+          "BatchParameterValue",
+          "ProductionOrder",
+          "ScheduleOrderRecipeInstance"
+        ],
+        "collection_mode": "write"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "wh.whk01.distillery01.*",
+        "description": "34 entity fanout exchanges for ERP sync and domain events. Shared exchange topology with WMS spoke. Covers production orders, recipes, batches, equipment phases, schedule orders, items, inventory, lots, tests, BOM, and more. Message format: {event_type, data, recordName, sourceSystem}.",
+        "entities": [
+          "ProductionOrder",
+          "Recipe",
+          "Batch",
+          "ScheduleOrder",
+          "EquipmentPhase",
+          "PhaseParameter",
+          "Operation",
+          "UnitProcedure",
+          "Item",
+          "ItemReceipt",
+          "Inventory",
+          "InventoryTransfer",
+          "Lot",
+          "Bom",
+          "BomItem",
+          "Test",
+          "TestParameter",
+          "PurchaseOrder",
+          "SalesOrder",
+          "Customer",
+          "Vendor",
+          "WhiskeyType",
+          "Asset",
+          "Barrel",
+          "BarrelEvent"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "mqtt",
+        "endpoint": "production/{entityType}/{eventType}",
+        "description": "MQTT domain events via UNS (Unified Namespace). Dynamic multi-broker topology with configurable publish rules. Covers step execution events, mashing execution events, production events (30+ event types), and equipment state transitions. Topic templates resolved at publish time. QoS 1, configurable retain.",
+        "entities": [
+          "StepExecution",
+          "MashingExecution",
+          "ProductionEvent",
+          "EquipmentStateTransition",
+          "BatchTimeSeriesData"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "mqtt",
+        "endpoint": "{broker.baseTopicPath}",
+        "description": "Raw MQTT tag data from equipment. UNS broker subscriptions with topic ACL enforcement. Messages stored in MqttMessage model with tag mapping to entity fields via MqttTagMapping rules. Supports wildcard subscriptions.",
+        "entities": [
+          "MqttMessage",
+          "MqttTagMapping",
+          "MqttEventPublishRule"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "websocket",
+        "endpoint": "/mqtt",
+        "description": "Socket.io WebSocket gateway for real-time MQTT message forwarding. Emits mqtt:event, mqtt:status, mqtt:connection_status. Rate-limited: 60 msg/min per client, 3 connections per user.",
+        "entities": [
+          "MqttMessage",
+          "MqttConnectionStatus",
+          "MqttAuthenticationEvent"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/_health/*",
+        "description": "Health check endpoints: liveness, readiness, database, API, and complete system health. Used by adapter health() implementation.",
+        "entities": [
+          "SystemHealth"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/mqtt/status",
+        "description": "MQTT broker connection status. Returns current connection state for all configured UNS brokers.",
+        "entities": [
+          "MqttConnectionStatus"
+        ],
+        "collection_mode": "poll"
+      }
+    ],
+    "sample_record": {
+      "record_id": "whk-mes:batch:evt-20260406-001",
+      "source_adapter": "whk-mes",
+      "collected_at": "2026-04-06T15:00:00Z",
+      "context": {
+        "production_order_id": "PRO-2026-WB-0042",
+        "batch_id": "BATCH-2026-0042-001",
+        "recipe_id": "RCP-WHEATED-BOURBON-003",
+        "equipment_id": "MASH-TUN-01",
+        "event_timestamp": "2026-04-06T14:58:30Z",
+        "event_type": "mashing_step_completed",
+        "lot_id": "LOT-2026-WB-0042",
+        "operator_id": "USR-0023",
+        "schedule_order_id": "SO-2026-0042",
+        "equipment_phase": "Mashing",
+        "process_step": "Saccharification Rest"
+      },
+      "payload": {
+        "batch_id": "BATCH-2026-0042-001",
+        "step_name": "Saccharification Rest",
+        "step_duration_minutes": 45,
+        "target_temperature_f": 152,
+        "actual_temperature_f": 151.8,
+        "ph": 5.4,
+        "gravity_reading": 1.065,
+        "mashbill": "Wheated Bourbon #3",
+        "grain_bill": {
+          "corn": 70,
+          "wheat": 16,
+          "malted_barley": 14
+        },
+        "equipment_phase": "Mashing",
+        "deviation": null
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "productionOrder.id",
+        "context_field": "production_order_id",
+        "description": "Production order — the primary unit of work in MES. Drives the entire manufacturing execution from recipe selection through batch completion."
+      },
+      {
+        "source_field": "batch.id",
+        "context_field": "batch_id",
+        "description": "Batch execution instance. Each production order may produce one or more batches. Execution-level tracking of the manufacturing process."
+      },
+      {
+        "source_field": "recipe.id",
+        "context_field": "recipe_id",
+        "description": "Master recipe that defines how to make the product. Links to RecipeBom (ingredients), RecipeParameter (process settings), and MashingProtocol (step definitions)."
+      },
+      {
+        "source_field": "equipmentPhase.equipment.id",
+        "context_field": "equipment_id",
+        "description": "Equipment performing the current operation. ISA-88 hierarchy: Equipment → Phase → Operation → Procedure."
+      },
+      {
+        "source_field": "event.timestamp",
+        "context_field": "event_timestamp",
+        "description": "When the source event occurred. For MQTT time-series data, this is the equipment timestamp, not the broker receive time."
+      },
+      {
+        "source_field": "event.type",
+        "context_field": "event_type",
+        "description": "Domain event type. MES has 30+ event types: PhaseStarted, StepCompleted, BatchStatusChanged, ParameterOverride, SampleTaken, DeviationDetected, etc."
+      },
+      {
+        "source_field": "lot.id",
+        "context_field": "lot_id",
+        "description": "Lot traceability. Shared field name with WMS spec — enables cross-spoke lot tracking from production (MES) through storage (WMS)."
+      },
+      {
+        "source_field": "event.user.id",
+        "context_field": "operator_id",
+        "description": "Operator who triggered the event. Links to MES User model with role-based permissions."
+      },
+      {
+        "source_field": "scheduleOrder.id",
+        "context_field": "schedule_order_id",
+        "description": "Schedule order that placed this production order in the queue. Links to queue position and timeline calculation."
+      },
+      {
+        "source_field": "productionOrder.id",
+        "context_field": "work_order_id",
+        "description": "Aliases production_order_id as work_order_id for cross-spoke compatibility. WMS uses warehouseJob.id for this field."
+      },
+      {
+        "source_field": "recipe.whiskeyType.name",
+        "context_field": "whiskey_type",
+        "description": "Whiskey type classification (e.g., Bourbon, Rye, Wheated Bourbon). Links to WhiskeyType master data."
+      },
+      {
+        "source_field": "equipmentPhase.name",
+        "context_field": "equipment_phase",
+        "description": "Current ISA-88 equipment phase name (e.g., Mashing, Fermentation, Distillation). Identifies where in the process this event occurred."
+      },
+      {
+        "source_field": "stepExecution.step.name",
+        "context_field": "process_step",
+        "description": "Current process step within a phase (e.g., Saccharification Rest, Protein Rest). Finer granularity than equipment_phase."
+      },
+      {
+        "source_field": "test.id",
+        "context_field": "quality_result_id",
+        "description": "Quality test result ID. Links to Test model with parameters, enzyme calculations, and formula evaluations."
+      },
+      {
+        "source_field": "item.id",
+        "context_field": "material_id",
+        "description": "Material/item being consumed or produced. Links to Item master data, ItemGroup, and inventory tracking."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "shift_id",
+        "rule_type": "timestamp_to_shift",
+        "config": {
+          "source_field": "event_timestamp",
+          "shift_definitions": {
+            "day": {
+              "start": "06:00",
+              "end": "18:00"
+            },
+            "night": {
+              "start": "18:00",
+              "end": "06:00"
+            }
+          },
+          "timezone": "America/Kentucky/Louisville"
+        },
+        "description": "Derive shift from event timestamp using WHK distillery shift schedule. Same shift definitions as WMS spec for cross-spoke consistency."
+      },
+      {
+        "target_field": "event_type",
+        "rule_type": "lookup",
+        "config": {
+          "source_field": "mqttEventPublishRule.entityType_eventType",
+          "lookup_table": "domain_event_to_forge_event",
+          "fallback": "unknown"
+        },
+        "description": "Map MES domain event types (StepExecution::step_started, ProductionEvent::PhaseCompleted, etc.) to normalized Forge event type identifiers."
+      },
+      {
+        "target_field": "equipment_id",
+        "rule_type": "lookup",
+        "config": {
+          "source_field": "mqtt.topic",
+          "lookup_table": "mqtt_topic_to_equipment",
+          "pattern": "mes/equipment/{equipment_id}/events"
+        },
+        "description": "Extract equipment ID from MQTT topic path when processing raw equipment tag data. Topic template pattern resolution."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 45000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.whk-mes",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 8
+    }
+  },
+  "metadata": {
+    "spoke": "mes",
+    "hub_module": "forge-adapters",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-mes",
+    "source_language": "TypeScript",
+    "source_framework": "NestJS + Next.js 15",
+    "source_database": "PostgreSQL (Prisma ORM, 96 models)",
+    "source_messaging": "RabbitMQ (34 entity exchanges) + MQTT (UNS multi-broker, dynamic topics)",
+    "erp_integration": "NetSuite (via RabbitMQ sync topics, shared with WMS)",
+    "equipment_integration": "MQTT via UNS (Unified Namespace) — dynamic broker configs, TLS/mTLS, topic ACLs",
+    "isa_88_compliance": "Procedural model: Procedure → Unit Procedure → Operation → Equipment Phase → Phase Parameter",
+    "cross_spoke_fields": [
+      "lot_id",
+      "shift_id",
+      "work_order_id",
+      "event_timestamp",
+      "event_type",
+      "operator_id"
+    ],
+    "mqtt_features": "Multi-broker, hot-reload (30s), cert rotation, topic ACL, message buffering (60s), domain event publish rules",
+    "deployment": "Docker Compose (server + migrate + db + redis + rabbitmq + mosquitto + jaeger + OTEL)",
+    "notes": "Second Forge spoke adapter. MES has write capability — Forge may push decisions back into production order lifecycle. MQTT equipment data is real-time and high-volume; buffering and circuit breaking are critical."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "567b2ae2cfb03d9e012479c7528335392d365606aa9c70783e3e454c7ac68e5c",
+    "hash_state": "approved",
+    "previous_hash": null,
+    "approved_by": "reh3376",
+    "approved_at": "2026-04-06T10:25:51Z",
+    "change_history": [
+      {
+        "previous_hash": "968a178c29f1f4d9ca59fe57a2c30019631252abe14f4e592f142dff0dbdc443",
+        "new_hash": "567b2ae2cfb03d9e012479c7528335392d365606aa9c70783e3e454c7ac68e5c",
+        "changed_at": "2026-04-06T10:25:51Z",
+        "source": "manual",
+        "changed_by": "reh3376",
+        "change_type": "structural",
+        "reason": "Initial MES FACTS spec — Sprint 3 of FACTS development plan"
+      }
+    ]
+  }
+}

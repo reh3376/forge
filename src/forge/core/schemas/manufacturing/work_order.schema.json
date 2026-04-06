@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "WorkOrderPriority": {
+      "description": "Priority level for work orders.",
+      "enum": [
+        "LOW",
+        "NORMAL",
+        "HIGH",
+        "URGENT"
+      ],
+      "title": "WorkOrderPriority",
+      "type": "string"
+    },
+    "WorkOrderStatus": {
+      "description": "Status of a work order.",
+      "enum": [
+        "DRAFT",
+        "PENDING",
+        "SCHEDULED",
+        "IN_PROGRESS",
+        "PAUSED",
+        "COMPLETE",
+        "CANCELLED"
+      ],
+      "title": "WorkOrderStatus",
+      "type": "string"
+    }
+  },
+  "description": "An assignable unit of work.\n\nSupports hierarchy (parent_id), scheduling (planned_start/end),\nand decomposition (order_type for categorization).",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "title": {
+      "description": "Human-readable work order title.",
+      "title": "Title",
+      "type": "string"
+    },
+    "order_type": {
+      "description": "Type classification (e.g. 'INVENTORY_CHECK', 'TRANSFER', 'FILL').",
+      "title": "Order Type",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/WorkOrderStatus",
+      "default": "PENDING",
+      "description": "Current work order status."
+    },
+    "priority": {
+      "$ref": "#/$defs/WorkOrderPriority",
+      "default": "NORMAL",
+      "description": "Priority level."
+    },
+    "parent_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to parent WorkOrder for decomposed jobs.",
+      "title": "Parent Id"
+    },
+    "assigned_asset_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to PhysicalAsset where work is performed.",
+      "title": "Assigned Asset Id"
+    },
+    "assigned_operator_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "User or operator assigned to this work.",
+      "title": "Assigned Operator Id"
+    },
+    "planned_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Scheduled start time.",
+      "title": "Planned Start"
+    },
+    "planned_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Scheduled end time.",
+      "title": "Planned End"
+    },
+    "actual_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Actual start time.",
+      "title": "Actual Start"
+    },
+    "actual_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Actual end time.",
+      "title": "Actual End"
+    },
+    "production_order_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to associated ProductionOrder if applicable.",
+      "title": "Production Order Id"
+    },
+    "lot_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to associated Lot if applicable.",
+      "title": "Lot Id"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "title",
+    "order_type"
+  ],
+  "title": "WorkOrder",
+  "type": "object"
+}

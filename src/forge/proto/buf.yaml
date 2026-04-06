@@ -1,0 +1,15 @@
+# buf.yaml — Buf configuration for Forge proto files
+# Run: buf lint, buf build, buf generate
+version: v2
+modules:
+  - path: .
+    name: buf.build/reh3376/forge
+lint:
+  use:
+    - STANDARD
+  except:
+    # We use short package names (forge.v1) not directory-based
+    - PACKAGE_DIRECTORY_MATCH
+breaking:
+  use:
+    - FILE

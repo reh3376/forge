@@ -1,0 +1,238 @@
+{
+  "$defs": {
+    "SampleOutcome": {
+      "description": "Result of a quality sample evaluation.",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE",
+        "PENDING"
+      ],
+      "title": "SampleOutcome",
+      "type": "string"
+    },
+    "SampleResult": {
+      "description": "An individual measurement within a quality sample.",
+      "properties": {
+        "forge_id": {
+          "description": "Forge-internal unique identifier.",
+          "format": "uuid",
+          "title": "Forge Id",
+          "type": "string"
+        },
+        "source_system": {
+          "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+          "title": "Source System",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Primary key of this entity in the source system.",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "captured_at": {
+          "description": "UTC timestamp when this snapshot was captured by Forge.",
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Source-system-specific fields that don't map to core schema.",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "parameter_name": {
+          "description": "Name of the measured parameter.",
+          "title": "Parameter Name",
+          "type": "string"
+        },
+        "measured_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Numeric result of the measurement.",
+          "title": "Measured Value"
+        },
+        "measured_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Text result for boolean or categorical measurements.",
+          "title": "Measured Text"
+        },
+        "unit_of_measure": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Engineering unit for the measurement.",
+          "title": "Unit Of Measure"
+        },
+        "lower_limit": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specification lower limit.",
+          "title": "Lower Limit"
+        },
+        "upper_limit": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specification upper limit.",
+          "title": "Upper Limit"
+        },
+        "outcome": {
+          "$ref": "#/$defs/SampleOutcome",
+          "default": "PENDING",
+          "description": "Whether this result passed or failed."
+        }
+      },
+      "required": [
+        "source_system",
+        "source_id",
+        "parameter_name"
+      ],
+      "title": "SampleResult",
+      "type": "object"
+    }
+  },
+  "description": "A quality measurement event.\n\nA sample is taken from an entity (barrel, batch, lot) at a\nspecific time and place. It may contain multiple results\n(different parameters measured on the same sample).",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "sample_type": {
+      "description": "Type/category of sample (e.g. 'proof_check', 'grain_analysis').",
+      "title": "Sample Type",
+      "type": "string"
+    },
+    "entity_type": {
+      "description": "Type of entity sampled (e.g. 'manufacturing_unit', 'lot').",
+      "title": "Entity Type",
+      "type": "string"
+    },
+    "entity_id": {
+      "description": "Source ID of the entity that was sampled.",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "sampled_by": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "User or operator who took the sample.",
+      "title": "Sampled By"
+    },
+    "sampled_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When the sample was taken.",
+      "title": "Sampled At"
+    },
+    "asset_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to PhysicalAsset where sample was taken.",
+      "title": "Asset Id"
+    },
+    "results": {
+      "description": "Individual measurement results for this sample.",
+      "items": {
+        "$ref": "#/$defs/SampleResult"
+      },
+      "title": "Results",
+      "type": "array"
+    },
+    "overall_outcome": {
+      "$ref": "#/$defs/SampleOutcome",
+      "default": "PENDING",
+      "description": "Aggregate outcome across all results."
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "sample_type",
+    "entity_type",
+    "entity_id"
+  ],
+  "title": "QualitySample",
+  "type": "object"
+}

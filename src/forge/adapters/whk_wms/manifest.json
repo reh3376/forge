@@ -1,0 +1,46 @@
+{
+  "adapter_id": "whk-wms",
+  "name": "Whiskey House Warehouse Management System Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "graphql+amqp",
+  "tier": "MES_MOM",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-wms/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "equipment_id",
+      "lot_id",
+      "batch_id",
+      "operator_id",
+      "shift",
+      "operating_mode"
+    ]
+  },
+  "health_check_interval_ms": 30000,
+  "connection_params": [
+    {"name": "graphql_url", "description": "WMS GraphQL endpoint", "required": true, "secret": false},
+    {"name": "rabbitmq_url", "description": "AMQP connection URL", "required": true, "secret": false},
+    {"name": "azure_tenant_id", "description": "Azure Entra ID tenant", "required": true, "secret": false},
+    {"name": "azure_client_id", "description": "Azure app registration ID", "required": true, "secret": false},
+    {"name": "azure_client_secret", "description": "Azure client secret", "required": true, "secret": true},
+    {"name": "api_key", "description": "API key for inventory endpoints", "required": false, "secret": true},
+    {"name": "rabbitmq_vhost", "description": "RabbitMQ virtual host", "required": false, "secret": false, "default": "/"},
+    {"name": "graphql_timeout_ms", "description": "GraphQL timeout (ms)", "required": false, "secret": false, "default": "10000"},
+    {"name": "redis_url", "description": "Optional Redis cache URL", "required": false, "secret": false}
+  ],
+  "auth_methods": ["azure_entra_id", "bearer_token", "api_key"],
+  "metadata": {
+    "spoke": "whk-wms",
+    "hub_module": "forge.adapters.whk_wms",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-wms",
+    "source_lines": 507000
+  }
+}

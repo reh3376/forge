@@ -1,0 +1,110 @@
+{
+  "$defs": {
+    "EntityType": {
+      "description": "Type of business entity.",
+      "enum": [
+        "CUSTOMER",
+        "VENDOR",
+        "PARTNER",
+        "INTERNAL"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    }
+  },
+  "description": "An external party: customer, vendor, or partner.\n\nSupports hierarchical relationships (parent/child customers) via\nparent_id. External system IDs stored in external_ids dict for\ncross-system reconciliation.",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "entity_type": {
+      "$ref": "#/$defs/EntityType"
+    },
+    "name": {
+      "description": "Entity name.",
+      "title": "Name",
+      "type": "string"
+    },
+    "parent_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to parent entity for hierarchies (by source_id).",
+      "title": "Parent Id"
+    },
+    "external_ids": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Map of external system IDs (e.g. {'erp': 'C-12345', 'global': 'abc'}).",
+      "title": "External Ids",
+      "type": "object"
+    },
+    "contact_info": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Contact details (e.g. {'email': '...', 'phone': '...'}).",
+      "title": "Contact Info",
+      "type": "object"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Primary location or address.",
+      "title": "Location"
+    },
+    "is_active": {
+      "default": true,
+      "description": "Whether this entity is currently active.",
+      "title": "Is Active",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "entity_type",
+    "name"
+  ],
+  "title": "BusinessEntity",
+  "type": "object"
+}

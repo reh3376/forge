@@ -1,0 +1,402 @@
+{
+  "$schema": "forge://governance/ftts/v0.1.0",
+  "spec_version": "0.1.0",
+
+  "transport_identity": {
+    "transport_id": "grpc-hardened-transport",
+    "name": "Forge Hardened gRPC Transport",
+    "version": "0.1.0",
+    "protocol": "grpc+protobuf",
+    "proto_package": "forge.v1"
+  },
+
+  "proto_contract": {
+    "proto_files": [
+      {
+        "file": "enums.proto",
+        "purpose": "All proto enum definitions (QualityCode, AdapterState, AdapterTier, etc.)",
+        "message_count": 0,
+        "enum_count": 14
+      },
+      {
+        "file": "contextual_record.proto",
+        "purpose": "ContextualRecord and its component messages (RecordSource, RecordTimestamp, RecordValue, RecordContext, RecordLineage)",
+        "message_count": 6,
+        "enum_count": 0
+      },
+      {
+        "file": "adapter.proto",
+        "purpose": "Adapter domain messages (AdapterManifest, AdapterHealth, AdapterCapabilities, ConnectionParam, DataContract)",
+        "message_count": 5,
+        "enum_count": 0
+      },
+      {
+        "file": "adapter_service.proto",
+        "purpose": "AdapterService gRPC service definition with all RPC methods and request/response messages",
+        "message_count": 17,
+        "enum_count": 0
+      }
+    ],
+    "service_name": "AdapterService",
+    "message_types": [
+      "ContextualRecord",
+      "RecordSource",
+      "RecordTimestamp",
+      "RecordValue",
+      "RecordContext",
+      "RecordLineage",
+      "AdapterManifest",
+      "AdapterHealth",
+      "AdapterCapabilities",
+      "ConnectionParam",
+      "DataContract",
+      "RegisterRequest",
+      "RegisterResponse",
+      "ConfigureRequest",
+      "ConfigureResponse",
+      "StartRequest",
+      "StartResponse",
+      "StopRequest",
+      "StopResponse",
+      "HealthRequest",
+      "CollectRequest",
+      "SubscribeRequest",
+      "UnsubscribeRequest",
+      "UnsubscribeResponse",
+      "WriteRequest",
+      "WriteResponse",
+      "BackfillRequest",
+      "DiscoverRequest",
+      "DiscoverResponse",
+      "TagDescriptor",
+      "IngestResponse"
+    ],
+    "enum_types": [
+      "QualityCode",
+      "AdapterState",
+      "AdapterTier",
+      "UnitStatus",
+      "LifecycleState",
+      "AssetType",
+      "AssetOperationalState",
+      "EventSeverity",
+      "EventCategory",
+      "EntityType",
+      "WorkOrderStatus",
+      "WorkOrderPriority",
+      "OrderStatus",
+      "SampleOutcome"
+    ]
+  },
+
+  "wire_format": {
+    "encoding": "protobuf-binary",
+    "compilation_required": true,
+    "compilation_tool": "grpcio-tools",
+    "json_forbidden": true,
+    "schema_enforced": true,
+    "stub_location": "src/forge/proto_gen/forge/v1/"
+  },
+
+  "serialization_bridge": {
+    "bridge_module": "forge.transport.proto_bridge",
+    "round_trip_lossless": true,
+    "type_mappings": [
+      {
+        "pydantic_type": "ContextualRecord",
+        "proto_type": "forge.v1.ContextualRecord",
+        "to_proto_fn": "contextual_record_to_proto",
+        "from_proto_fn": "proto_to_contextual_record"
+      },
+      {
+        "pydantic_type": "AdapterManifest",
+        "proto_type": "forge.v1.AdapterManifest",
+        "to_proto_fn": "manifest_to_proto",
+        "from_proto_fn": "proto_to_manifest"
+      },
+      {
+        "pydantic_type": "AdapterHealth",
+        "proto_type": "forge.v1.AdapterHealth",
+        "to_proto_fn": "health_to_proto",
+        "from_proto_fn": "proto_to_health"
+      },
+      {
+        "pydantic_type": "RecordSource",
+        "proto_type": "forge.v1.RecordSource",
+        "to_proto_fn": "record_source_to_proto",
+        "from_proto_fn": "proto_to_record_source"
+      },
+      {
+        "pydantic_type": "RecordTimestamp",
+        "proto_type": "forge.v1.RecordTimestamp",
+        "to_proto_fn": "record_timestamp_to_proto",
+        "from_proto_fn": "proto_to_record_timestamp"
+      },
+      {
+        "pydantic_type": "RecordValue",
+        "proto_type": "forge.v1.RecordValue",
+        "to_proto_fn": "record_value_to_proto",
+        "from_proto_fn": "proto_to_record_value"
+      },
+      {
+        "pydantic_type": "RecordContext",
+        "proto_type": "forge.v1.RecordContext",
+        "to_proto_fn": "record_context_to_proto",
+        "from_proto_fn": "proto_to_record_context"
+      },
+      {
+        "pydantic_type": "RecordLineage",
+        "proto_type": "forge.v1.RecordLineage",
+        "to_proto_fn": "record_lineage_to_proto",
+        "from_proto_fn": "proto_to_record_lineage"
+      },
+      {
+        "pydantic_type": "AdapterCapabilities",
+        "proto_type": "forge.v1.AdapterCapabilities",
+        "to_proto_fn": "capabilities_to_proto",
+        "from_proto_fn": "proto_to_capabilities"
+      },
+      {
+        "pydantic_type": "ConnectionParam",
+        "proto_type": "forge.v1.ConnectionParam",
+        "to_proto_fn": "connection_param_to_proto",
+        "from_proto_fn": "proto_to_connection_param"
+      },
+      {
+        "pydantic_type": "DataContract",
+        "proto_type": "forge.v1.DataContract",
+        "to_proto_fn": "data_contract_to_proto",
+        "from_proto_fn": "proto_to_data_contract"
+      }
+    ],
+    "enum_mappings": [
+      {
+        "python_enum": "QualityCode",
+        "proto_enum": "forge.v1.QualityCode",
+        "direction": "bidirectional"
+      },
+      {
+        "python_enum": "AdapterState",
+        "proto_enum": "forge.v1.AdapterState",
+        "direction": "bidirectional"
+      },
+      {
+        "python_enum": "AdapterTier",
+        "proto_enum": "forge.v1.AdapterTier",
+        "direction": "bidirectional"
+      }
+    ],
+    "typed_value_variants": [
+      "number_value",
+      "integer_value",
+      "string_value",
+      "bool_value",
+      "bytes_value",
+      "json_value"
+    ],
+    "timestamp_format": "google.protobuf.Timestamp (seconds + nanos)"
+  },
+
+  "server_requirements": {
+    "server_module": "forge.transport.grpc_server",
+    "servicer_class": "ForgeAdapterServiceServicer",
+    "uses_compiled_registration": true,
+    "uses_compiled_servicer_base": true,
+    "port_zero_testing": true,
+    "graceful_shutdown": true
+  },
+
+  "client_requirements": {
+    "channel_module": "forge.transport.grpc_channel",
+    "channel_class": "GrpcChannel",
+    "uses_compiled_stub": true,
+    "transport_channel_compatible": true,
+    "in_memory_fallback": "InMemoryChannel"
+  },
+
+  "rpc_contract": {
+    "rpcs": [
+      {
+        "method": "Register",
+        "type": "unary_unary",
+        "request_type": "RegisterRequest",
+        "response_type": "RegisterResponse",
+        "plane": "control",
+        "description": "Register an adapter with the hub, providing its manifest"
+      },
+      {
+        "method": "Configure",
+        "type": "unary_unary",
+        "request_type": "ConfigureRequest",
+        "response_type": "ConfigureResponse",
+        "plane": "control",
+        "description": "Configure a registered adapter with connection parameters"
+      },
+      {
+        "method": "Start",
+        "type": "unary_unary",
+        "request_type": "StartRequest",
+        "response_type": "StartResponse",
+        "plane": "control",
+        "description": "Start an adapter's data collection/production"
+      },
+      {
+        "method": "Stop",
+        "type": "unary_unary",
+        "request_type": "StopRequest",
+        "response_type": "StopResponse",
+        "plane": "control",
+        "description": "Stop an adapter with optional graceful drain"
+      },
+      {
+        "method": "Health",
+        "type": "unary_unary",
+        "request_type": "HealthRequest",
+        "response_type": "AdapterHealth",
+        "plane": "control",
+        "description": "Query adapter health status"
+      },
+      {
+        "method": "Collect",
+        "type": "unary_stream",
+        "request_type": "CollectRequest",
+        "response_type": "ContextualRecord",
+        "plane": "data",
+        "description": "Server-streaming: hub pulls records from spoke"
+      },
+      {
+        "method": "Subscribe",
+        "type": "unary_stream",
+        "request_type": "SubscribeRequest",
+        "response_type": "ContextualRecord",
+        "plane": "data",
+        "description": "Server-streaming: hub subscribes to real-time records from spoke"
+      },
+      {
+        "method": "Unsubscribe",
+        "type": "unary_unary",
+        "request_type": "UnsubscribeRequest",
+        "response_type": "UnsubscribeResponse",
+        "plane": "data",
+        "description": "Cancel an active subscription"
+      },
+      {
+        "method": "Write",
+        "type": "unary_unary",
+        "request_type": "WriteRequest",
+        "response_type": "WriteResponse",
+        "plane": "capability",
+        "description": "Write data back to a spoke system"
+      },
+      {
+        "method": "Backfill",
+        "type": "unary_stream",
+        "request_type": "BackfillRequest",
+        "response_type": "ContextualRecord",
+        "plane": "capability",
+        "description": "Server-streaming: backfill historical records from spoke"
+      },
+      {
+        "method": "Discover",
+        "type": "unary_unary",
+        "request_type": "DiscoverRequest",
+        "response_type": "DiscoverResponse",
+        "plane": "capability",
+        "description": "Discover available tags/data points on a spoke system"
+      },
+      {
+        "method": "Ingest",
+        "type": "stream_unary",
+        "request_type": "ContextualRecord",
+        "response_type": "IngestResponse",
+        "plane": "data",
+        "description": "Client-streaming: spoke pushes ContextualRecords to hub"
+      }
+    ],
+    "metadata_protocol": {
+      "headers": [
+        {
+          "key": "x-forge-adapter-id",
+          "purpose": "Identifies the adapter sending data",
+          "required": false
+        },
+        {
+          "key": "x-forge-session-id",
+          "purpose": "Identifies the active session for record routing",
+          "required": false
+        }
+      ]
+    }
+  },
+
+  "error_protocol": {
+    "uses_grpc_status_codes": true,
+    "status_code_mapping": [
+      {
+        "condition": "Unhandled exception in RPC handler",
+        "grpc_code": "INTERNAL"
+      },
+      {
+        "condition": "Configure or Start called before Register",
+        "grpc_code": "FAILED_PRECONDITION"
+      },
+      {
+        "condition": "No active sessions for Ingest",
+        "grpc_code": "FAILED_PRECONDITION"
+      },
+      {
+        "condition": "Unknown adapter_id in request",
+        "grpc_code": "NOT_FOUND"
+      },
+      {
+        "condition": "Invalid request message fields",
+        "grpc_code": "INVALID_ARGUMENT"
+      }
+    ]
+  },
+
+  "conformance_tests": {
+    "total": 73,
+    "categories": {
+      "proto_wire_format": 2,
+      "control_plane_register": 1,
+      "control_plane_lifecycle": 1,
+      "control_plane_precondition": 1,
+      "data_plane_stream_records": 1,
+      "data_plane_stream_large_batch": 1,
+      "data_plane_stream_empty": 1,
+      "data_plane_value_types": 1,
+      "transport_adapter_lifecycle": 1,
+      "live_grpc_integration": 10,
+      "serialization_round_trip": 53
+    }
+  },
+
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": null,
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "approved_by": null,
+    "approved_at": null,
+    "change_history": []
+  },
+
+  "metadata": {
+    "created": "2026-04-06",
+    "author": "reh3376",
+    "supersedes": "adapter-transport.facts.json (transport sections)",
+    "design_decisions": [
+      "Binary protobuf on the wire — JSON serialization is prohibited",
+      "Compiled stubs via grpcio-tools — hand-rolled serialization forbidden",
+      "Proto files are governance artifacts — changes require FTTS spec review",
+      "RecordValue.raw uses oneof typed_value with 6 variants (not google.protobuf.Any)",
+      "Client-streaming Ingest RPC for spoke→hub record push (correct data flow direction)",
+      "Server-streaming Collect/Subscribe/Backfill for hub→spoke pull",
+      "InMemoryChannel for testing without real gRPC — same TransportChannel interface",
+      "GrpcTransportAdapter wraps existing adapters with zero adapter code changes",
+      "Session identity via gRPC metadata headers (x-forge-adapter-id, x-forge-session-id)",
+      "Pydantic↔Proto bridge uses actual message objects, not dicts — type fidelity preserved"
+    ]
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "$defs": {
+    "OrderStatus": {
+      "description": "Status of a production order.",
+      "enum": [
+        "DRAFT",
+        "PLANNED",
+        "RELEASED",
+        "IN_PROGRESS",
+        "PAUSED",
+        "COMPLETE",
+        "CLOSED",
+        "CANCELLED"
+      ],
+      "title": "OrderStatus",
+      "type": "string"
+    }
+  },
+  "description": "A manufacturing order that authorizes production.\n\nTracks the lifecycle from draft through completion, with\nquantity targets and schedule bounds.",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "order_number": {
+      "description": "Human-readable order identifier.",
+      "title": "Order Number",
+      "type": "string"
+    },
+    "recipe_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to ProcessDefinition to execute (by source_id).",
+      "title": "Recipe Id"
+    },
+    "customer_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to ordering BusinessEntity (by source_id).",
+      "title": "Customer Id"
+    },
+    "status": {
+      "$ref": "#/$defs/OrderStatus",
+      "default": "DRAFT",
+      "description": "Order lifecycle status."
+    },
+    "product_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Product classification being produced.",
+      "title": "Product Type"
+    },
+    "planned_quantity": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Target production quantity.",
+      "title": "Planned Quantity"
+    },
+    "actual_quantity": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Actual quantity produced so far.",
+      "title": "Actual Quantity"
+    },
+    "unit_of_measure": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Unit for quantities.",
+      "title": "Unit Of Measure"
+    },
+    "planned_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Scheduled start date.",
+      "title": "Planned Start"
+    },
+    "planned_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Scheduled end date.",
+      "title": "Planned End"
+    },
+    "actual_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Actual start date.",
+      "title": "Actual Start"
+    },
+    "actual_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Actual completion date.",
+      "title": "Actual End"
+    },
+    "lot_ids": {
+      "description": "References to Lots produced by this order.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Lot Ids",
+      "type": "array"
+    },
+    "priority": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Queue priority (lower = higher priority).",
+      "title": "Priority"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "order_number"
+  ],
+  "title": "ProductionOrder",
+  "type": "object"
+}

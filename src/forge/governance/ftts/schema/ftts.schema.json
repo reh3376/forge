@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://governance/ftts/v0.1.0",
+  "title": "Forge Transport Test Specification (FTTS)",
+  "description": "Governs the gRPC + Protobuf transport layer between Forge hub and spoke modules. Ensures compiled binary protobuf on the wire, schema-enforced message types, round-trip fidelity, and proper gRPC patterns.",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "transport_identity",
+    "proto_contract",
+    "wire_format",
+    "serialization_bridge",
+    "server_requirements",
+    "client_requirements",
+    "rpc_contract",
+    "error_protocol",
+    "conformance_tests"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.1.0",
+      "description": "FTTS schema version. Must match exactly."
+    },
+
+    "transport_identity": {
+      "type": "object",
+      "description": "Identifies this transport layer.",
+      "required": ["transport_id", "name", "version", "protocol", "proto_package"],
+      "properties": {
+        "transport_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "Unique transport identifier (kebab-case)."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Human-readable transport name."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semver version string."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Wire protocol identifier (e.g. 'grpc+protobuf')."
+        },
+        "proto_package": {
+          "type": "string",
+          "description": "Protobuf package name (e.g. 'forge.v1')."
+        }
+      }
+    },
+
+    "proto_contract": {
+      "type": "object",
+      "description": "Declares the proto file inventory — what .proto files define the contract.",
+      "required": ["proto_files", "service_name", "message_types", "enum_types"],
+      "properties": {
+        "proto_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["file", "purpose"],
+            "properties": {
+              "file": { "type": "string", "description": "Proto file name (e.g. 'enums.proto')." },
+              "purpose": { "type": "string", "description": "What this file defines." },
+              "message_count": { "type": "integer", "minimum": 0 },
+              "enum_count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "service_name": {
+          "type": "string",
+          "description": "The gRPC service name (e.g. 'AdapterService')."
+        },
+        "message_types": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "All proto message type names that must exist."
+        },
+        "enum_types": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "All proto enum type names that must exist."
+        }
+      }
+    },
+
+    "wire_format": {
+      "type": "object",
+      "description": "Wire format requirements — what goes on the TCP connection.",
+      "required": ["encoding", "compilation_required", "json_forbidden", "schema_enforced"],
+      "properties": {
+        "encoding": {
+          "type": "string",
+          "enum": ["protobuf-binary", "protobuf-json", "json"],
+          "description": "Required wire encoding. 'protobuf-binary' means compiled stubs."
+        },
+        "compilation_required": {
+          "type": "boolean",
+          "description": "If true, proto stubs MUST be compiled (not hand-rolled)."
+        },
+        "compilation_tool": {
+          "type": "string",
+          "description": "Required compilation tool (e.g. 'grpcio-tools')."
+        },
+        "json_forbidden": {
+          "type": "boolean",
+          "description": "If true, JSON serialization on the wire is prohibited."
+        },
+        "schema_enforced": {
+          "type": "boolean",
+          "description": "If true, the gRPC framework enforces schema at deserialization."
+        },
+        "stub_location": {
+          "type": "string",
+          "description": "Path to compiled stub output directory."
+        }
+      }
+    },
+
+    "serialization_bridge": {
+      "type": "object",
+      "description": "Governs the Pydantic ↔ Proto message conversion boundary.",
+      "required": ["bridge_module", "round_trip_lossless", "type_mappings", "enum_mappings"],
+      "properties": {
+        "bridge_module": {
+          "type": "string",
+          "description": "Python module path for the bridge (e.g. 'forge.transport.proto_bridge')."
+        },
+        "round_trip_lossless": {
+          "type": "boolean",
+          "description": "If true, Pydantic → Proto → Pydantic must not lose data."
+        },
+        "type_mappings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["pydantic_type", "proto_type", "to_proto_fn", "from_proto_fn"],
+            "properties": {
+              "pydantic_type": { "type": "string" },
+              "proto_type": { "type": "string" },
+              "to_proto_fn": { "type": "string", "description": "Function that converts Pydantic → Proto." },
+              "from_proto_fn": { "type": "string", "description": "Function that converts Proto → Pydantic." }
+            }
+          },
+          "description": "Every Pydantic model that crosses the wire must have a mapping."
+        },
+        "enum_mappings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["python_enum", "proto_enum", "direction"],
+            "properties": {
+              "python_enum": { "type": "string" },
+              "proto_enum": { "type": "string" },
+              "direction": { "type": "string", "enum": ["bidirectional", "to_proto_only", "from_proto_only"] }
+            }
+          },
+          "description": "Every enum that crosses the wire must have a bidirectional mapping."
+        },
+        "typed_value_variants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "RecordValue.raw oneof variants (e.g. 'number_value', 'string_value')."
+        },
+        "timestamp_format": {
+          "type": "string",
+          "description": "How datetimes are represented on the wire."
+        }
+      }
+    },
+
+    "server_requirements": {
+      "type": "object",
+      "description": "Requirements for the hub-side gRPC server implementation.",
+      "required": ["server_module", "servicer_class", "uses_compiled_registration", "uses_compiled_servicer_base"],
+      "properties": {
+        "server_module": {
+          "type": "string",
+          "description": "Python module containing the server (e.g. 'forge.transport.grpc_server')."
+        },
+        "servicer_class": {
+          "type": "string",
+          "description": "The concrete servicer class name."
+        },
+        "uses_compiled_registration": {
+          "type": "boolean",
+          "description": "If true, server must use add_AdapterServiceServicer_to_server from compiled stubs."
+        },
+        "uses_compiled_servicer_base": {
+          "type": "boolean",
+          "description": "If true, servicer must inherit from compiled AdapterServiceServicer."
+        },
+        "port_zero_testing": {
+          "type": "boolean",
+          "description": "If true, server must support port=0 for OS-assigned ports in testing."
+        },
+        "graceful_shutdown": {
+          "type": "boolean",
+          "description": "If true, server must support graceful shutdown with a grace period."
+        }
+      }
+    },
+
+    "client_requirements": {
+      "type": "object",
+      "description": "Requirements for the spoke-side gRPC client implementation.",
+      "required": ["channel_module", "channel_class", "uses_compiled_stub"],
+      "properties": {
+        "channel_module": {
+          "type": "string",
+          "description": "Python module containing the channel (e.g. 'forge.transport.grpc_channel')."
+        },
+        "channel_class": {
+          "type": "string",
+          "description": "The GrpcChannel class name."
+        },
+        "uses_compiled_stub": {
+          "type": "boolean",
+          "description": "If true, client must use AdapterServiceStub from compiled stubs."
+        },
+        "transport_channel_compatible": {
+          "type": "boolean",
+          "description": "If true, channel must implement TransportChannel ABC."
+        },
+        "in_memory_fallback": {
+          "type": "string",
+          "description": "Class name of the in-memory test channel (e.g. 'InMemoryChannel')."
+        }
+      }
+    },
+
+    "rpc_contract": {
+      "type": "object",
+      "description": "The RPC contract — which methods exist, their streaming type, and metadata protocol.",
+      "required": ["rpcs", "metadata_protocol"],
+      "properties": {
+        "rpcs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["method", "type", "request_type", "response_type", "plane"],
+            "properties": {
+              "method": { "type": "string", "description": "RPC method name." },
+              "type": {
+                "type": "string",
+                "enum": ["unary_unary", "unary_stream", "stream_unary", "stream_stream"],
+                "description": "gRPC streaming type."
+              },
+              "request_type": { "type": "string", "description": "Proto request message type." },
+              "response_type": { "type": "string", "description": "Proto response message type." },
+              "plane": {
+                "type": "string",
+                "enum": ["control", "data", "capability"],
+                "description": "Which logical plane this RPC belongs to."
+              },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "metadata_protocol": {
+          "type": "object",
+          "description": "gRPC metadata headers used for session identification.",
+          "required": ["headers"],
+          "properties": {
+            "headers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["key", "purpose"],
+                "properties": {
+                  "key": { "type": "string" },
+                  "purpose": { "type": "string" },
+                  "required": { "type": "boolean", "default": false }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "error_protocol": {
+      "type": "object",
+      "description": "Error handling requirements for gRPC transport.",
+      "required": ["uses_grpc_status_codes", "status_code_mapping"],
+      "properties": {
+        "uses_grpc_status_codes": {
+          "type": "boolean",
+          "description": "If true, errors must use proper gRPC status codes (not HTTP codes)."
+        },
+        "status_code_mapping": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["condition", "grpc_code"],
+            "properties": {
+              "condition": { "type": "string", "description": "When this status is set." },
+              "grpc_code": { "type": "string", "description": "gRPC status code name (e.g. 'INTERNAL')." }
+            }
+          }
+        }
+      }
+    },
+
+    "conformance_tests": {
+      "type": "object",
+      "description": "Declares the test suite that validates this transport spec.",
+      "required": ["total", "categories"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of conformance tests."
+        },
+        "categories": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 1 },
+          "description": "Test categories and counts."
+        }
+      }
+    },
+
+    "integrity": {
+      "type": "object",
+      "description": "FHTS Layer 1 integrity block — hash governance.",
+      "properties": {
+        "hash_method": { "type": "string" },
+        "spec_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "hash_state": { "type": "string", "enum": ["approved", "modified", "pending_review", "reverted", "unknown"] },
+        "previous_hash": { "type": ["string", "null"] },
+        "approved_by": { "type": "string" },
+        "approved_at": { "type": "string" },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["previous_hash", "new_hash", "changed_at"],
+            "properties": {
+              "previous_hash": { "type": "string" },
+              "new_hash": { "type": "string" },
+              "changed_at": { "type": "string" },
+              "source": { "type": "string" },
+              "changed_by": { "type": "string" },
+              "change_type": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Free-form metadata (no schema validation)."
+    }
+  }
+}

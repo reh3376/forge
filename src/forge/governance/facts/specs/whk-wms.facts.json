@@ -1,0 +1,557 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "whk-wms",
+    "name": "Whiskey House Warehouse Management System Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "MES_MOM",
+    "protocol": "graphql+amqp"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 30000,
+    "shutdown_timeout_ms": 15000,
+    "health_check_interval_ms": 30000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called — initiates GraphQL + AMQP connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "GraphQL introspection succeeds and RabbitMQ channel opens"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (30s)"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "GraphQL or RabbitMQ health check fails 3 consecutive times"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "Both GraphQL and RabbitMQ health checks pass"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (10)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called — forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "graphql_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "WMS GraphQL API endpoint (e.g., http://localhost:3020/graphql). Backend serves 150+ queries and 190+ mutations.",
+        "validation": {
+          "pattern": "^https?://.+/graphql$"
+        }
+      },
+      {
+        "name": "rabbitmq_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "RabbitMQ AMQP connection URL (e.g., amqp://guest:guest@localhost:5672). Hosts 22+ warehouse entity fanout exchanges and 14 printer automation exchanges.",
+        "validation": {
+          "pattern": "^amqps?://.+"
+        }
+      },
+      {
+        "name": "azure_tenant_id",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "Azure Entra ID tenant ID for OAuth2 authentication."
+      },
+      {
+        "name": "azure_client_id",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "Azure Entra ID application (client) ID registered for this adapter."
+      },
+      {
+        "name": "azure_client_secret",
+        "type": "string",
+        "required": true,
+        "secret": true,
+        "description": "Azure Entra ID client secret for service-to-service auth."
+      },
+      {
+        "name": "api_key",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "API key for inventory upload and other key-authenticated endpoints."
+      },
+      {
+        "name": "rabbitmq_vhost",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ virtual host.",
+        "default": "/"
+      },
+      {
+        "name": "graphql_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Timeout for individual GraphQL requests.",
+        "default": "10000",
+        "validation": {
+          "min": 1000,
+          "max": 60000
+        }
+      },
+      {
+        "name": "redis_url",
+        "type": "url",
+        "required": false,
+        "secret": false,
+        "description": "Redis connection URL (e.g., redis://localhost:6379). Used for cache coordination — not required for core data collection.",
+        "validation": {
+          "pattern": "^rediss?://.+"
+        }
+      }
+    ],
+    "auth_methods": [
+      "azure_entra_id",
+      "bearer_token",
+      "api_key"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-wms/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "manufacturing_unit_id",
+      "lot_id",
+      "physical_asset_id",
+      "business_entity_id",
+      "event_timestamp",
+      "event_type"
+    ],
+    "optional_context_fields": [
+      "work_order_id",
+      "shift_id",
+      "operator_id",
+      "warehouse_location_id",
+      "transfer_id",
+      "production_run_id"
+    ],
+    "data_sources": [
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Core barrel inventory and lifecycle. 150+ queries spanning barrel tracking, lot management, transfers, ownership, storage locations, fill/dump operations, and gauge/weight history.",
+        "entities": [
+          "Barrel",
+          "BarrelOwnership",
+          "BarrelAction",
+          "BarrelActionType",
+          "BarrelType",
+          "BarrelFill",
+          "BarrelDump",
+          "BarrelGauge",
+          "BarrelWeight"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Lot lifecycle and traceability. Lot creation, mashbill tracking, distillation records, and lot-to-barrel relationships.",
+        "entities": [
+          "Lot",
+          "LotType",
+          "Mashbill",
+          "MashbillIngredient",
+          "DistillationRecord"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Customer and business entity management. Customer profiles, contacts, ownership portfolios, and contract terms.",
+        "entities": [
+          "Customer",
+          "CustomerContact",
+          "CustomerContract",
+          "CustomerPricing"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Warehouse topology and storage. Buildings, floors, ricks, rick positions, and barrel placement tracking.",
+        "entities": [
+          "Warehouse",
+          "Building",
+          "Floor",
+          "Rick",
+          "RickPosition",
+          "StorageLocation"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Transfer and movement operations. Barrel transfers between warehouses, staging, truck loading, and warehouse job workflows.",
+        "entities": [
+          "Transfer",
+          "TransferBarrel",
+          "WarehouseJob",
+          "WarehouseJobTask",
+          "StagingArea"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Financial and transactional data. Invoicing, payments, transaction reconciliation, and inventory valuation.",
+        "entities": [
+          "Invoice",
+          "InvoiceLineItem",
+          "Payment",
+          "Reconciliation",
+          "InventoryValuation"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Audit trail and event logging. System events, user actions, barrel history, and change tracking across all entities.",
+        "entities": [
+          "AuditLog",
+          "BarrelHistory",
+          "EventLog",
+          "UserAction"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Production and manufacturing tracking. Sample management, quality testing, production run tracking.",
+        "entities": [
+          "Sample",
+          "SampleTest",
+          "ProductionRun",
+          "QualityResult"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Configuration and master data. System settings, label templates, printer configurations, user/role management.",
+        "entities": [
+          "SystemConfig",
+          "LabelTemplate",
+          "PrinterConfig",
+          "User",
+          "Role",
+          "Permission"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_subscription",
+        "endpoint": "/graphql",
+        "description": "Real-time subscriptions for printer status updates, ERP sync progress, and barrel state changes.",
+        "entities": [
+          "PrinterStatus",
+          "SyncProgress",
+          "BarrelStateChange"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "wh.whk01.distillery01.*",
+        "description": "22 warehouse entity fanout exchanges following pattern wh.whk01.distillery01.{entityType}. Covers barrels, lots, customers, warehouses, transfers, invoices, fills, dumps, gauges, weights, ownership, and more. Message format: {event_type, data, recordName, sourceSystem}.",
+        "entities": [
+          "Barrel",
+          "Lot",
+          "Customer",
+          "Warehouse",
+          "Transfer",
+          "Fill",
+          "Dump",
+          "Gauge",
+          "Weight",
+          "Ownership",
+          "Invoice",
+          "WarehouseJob"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "print.*",
+        "description": "14 printer automation exchanges: print.jobs, print.status, print.queue, and related label printing events for barrel identification and tracking labels.",
+        "entities": [
+          "PrintJob",
+          "PrintStatus",
+          "PrintQueue",
+          "LabelEvent"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "uns.barrel.state",
+        "description": "Unified Namespace barrel state topic exchange — real-time barrel state machine transitions published for cross-system consumption.",
+        "entities": [
+          "BarrelState"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/inventory/*",
+        "description": "REST API for bulk inventory operations, upload endpoints, and system health checks.",
+        "entities": [
+          "InventoryUpload",
+          "SystemHealth"
+        ],
+        "collection_mode": "poll"
+      }
+    ],
+    "sample_record": {
+      "record_id": "whk-wms:barrel:evt-20260406-001",
+      "source_adapter": "whk-wms",
+      "collected_at": "2026-04-06T14:30:00Z",
+      "context": {
+        "manufacturing_unit_id": "BRL-2024-000142",
+        "lot_id": "LOT-2024-WB-0087",
+        "physical_asset_id": "WH01-B03-F02-R15-P04",
+        "business_entity_id": "CUST-00042",
+        "event_timestamp": "2026-04-06T14:29:55Z",
+        "event_type": "barrel.fill.completed",
+        "warehouse_location_id": "WH01-B03-F02",
+        "operator_id": "USR-0017"
+      },
+      "payload": {
+        "barrel_id": "BRL-2024-000142",
+        "lot_id": "LOT-2024-WB-0087",
+        "fill_date": "2026-04-06",
+        "proof_gallons": 53.2,
+        "barrel_type": "NEW_CHARRED_OAK",
+        "mashbill": "Wheated Bourbon #3",
+        "warehouse": "Warehouse 01",
+        "building": "Building 03",
+        "floor": 2,
+        "rick": 15,
+        "position": 4
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "barrel.id",
+        "context_field": "manufacturing_unit_id",
+        "description": "Each barrel is the primary manufacturing unit in whiskey production — the atomic unit of inventory."
+      },
+      {
+        "source_field": "barrel.lot.id",
+        "context_field": "lot_id",
+        "description": "Lot (distillation batch) that produced the liquid in this barrel. Key traceability link."
+      },
+      {
+        "source_field": "barrel.storageLocation.compositeKey",
+        "context_field": "physical_asset_id",
+        "transform": "concat:warehouse-building-floor-rick-position",
+        "description": "Composite physical location: warehouse → building → floor → rick → position. Identifies where the barrel physically sits."
+      },
+      {
+        "source_field": "barrel.ownership.customer.id",
+        "context_field": "business_entity_id",
+        "description": "Customer who owns the liquid in this barrel. Drives financial and contractual context."
+      },
+      {
+        "source_field": "event.timestamp",
+        "context_field": "event_timestamp",
+        "description": "When the source event occurred (not when Forge ingested it). Source of truth for temporal ordering."
+      },
+      {
+        "source_field": "event.type",
+        "context_field": "event_type",
+        "transform": "prefix:barrel.",
+        "description": "Business event type (e.g., fill.completed, transfer.initiated, gauge.recorded). Namespaced with barrel. prefix."
+      },
+      {
+        "source_field": "warehouseJob.id",
+        "context_field": "work_order_id",
+        "description": "Warehouse job (work order) that triggered this operation — links to transfer, regauge, or inventory tasks."
+      },
+      {
+        "source_field": "event.user.id",
+        "context_field": "operator_id",
+        "description": "User who performed the action in WMS. Operator traceability."
+      },
+      {
+        "source_field": "barrel.storageLocation.warehouse.id",
+        "context_field": "warehouse_location_id",
+        "description": "Warehouse-level location. Coarser than physical_asset_id for warehouse-level aggregation."
+      },
+      {
+        "source_field": "transfer.id",
+        "context_field": "transfer_id",
+        "description": "Transfer operation ID when barrel is being moved between warehouses."
+      },
+      {
+        "source_field": "barrel.lot.productionRun.id",
+        "context_field": "production_run_id",
+        "description": "Production run that created the lot. Links WMS barrel data back to MES production context."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "shift_id",
+        "rule_type": "timestamp_to_shift",
+        "config": {
+          "source_field": "event_timestamp",
+          "shift_definitions": {
+            "day": {
+              "start": "06:00",
+              "end": "18:00"
+            },
+            "night": {
+              "start": "18:00",
+              "end": "06:00"
+            }
+          },
+          "timezone": "America/Kentucky/Louisville"
+        },
+        "description": "Derive shift from event timestamp using WHK distillery shift schedule (day/night). Enables shift-level production analysis."
+      },
+      {
+        "target_field": "physical_asset_id",
+        "rule_type": "location_to_area",
+        "config": {
+          "source_fields": [
+            "warehouse.id",
+            "building.id",
+            "floor.number",
+            "rick.number",
+            "position.number"
+          ],
+          "separator": "-",
+          "format": "{warehouse}-{building}-F{floor}-R{rick}-P{position}"
+        },
+        "description": "Compose hierarchical physical location from warehouse topology components into ISA-95 physical asset identifier."
+      },
+      {
+        "target_field": "event_type",
+        "rule_type": "lookup",
+        "config": {
+          "source_field": "rabbitmq.exchange_name",
+          "lookup_table": "exchange_to_event_type",
+          "fallback": "unknown"
+        },
+        "description": "Map RabbitMQ exchange names to normalized Forge event types. Different from GraphQL event mapping which carries explicit types."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 60000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.whk-wms",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 10
+    }
+  },
+  "metadata": {
+    "spoke": "wms",
+    "hub_module": "forge-adapters",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-wms",
+    "source_loc": "507000+",
+    "source_language": "TypeScript",
+    "source_framework": "NestJS + Next.js 14",
+    "source_database": "PostgreSQL (Prisma ORM, 93 models)",
+    "source_messaging": "RabbitMQ (22 entity exchanges + 14 printer exchanges)",
+    "erp_integration": "NetSuite (via RabbitMQ sync topics)",
+    "deployment": "Docker Compose (3 backend instances + nginx LB)",
+    "notes": "First Forge spoke adapter. WMS is a production system — adapter must not impact WMS availability or performance. Read-only ingestion only."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "ace250ed52c3d8b3bfb0995f351302c3620a6a90b54c8eba42290c7de1d40b20",
+    "hash_state": "approved",
+    "previous_hash": null,
+    "approved_by": "reh3376",
+    "approved_at": "2026-04-06T10:16:58Z",
+    "change_history": [
+      {
+        "previous_hash": "fccc0f071e5b4877a29ded4098126d9d660bf84e1f777cb2c17ee18164975677",
+        "new_hash": "ace250ed52c3d8b3bfb0995f351302c3620a6a90b54c8eba42290c7de1d40b20",
+        "changed_at": "2026-04-06T10:16:58Z",
+        "source": "manual",
+        "changed_by": "reh3376",
+        "change_type": "structural",
+        "reason": "Initial WMS FACTS spec — Sprint 2 of FACTS development plan"
+      }
+    ]
+  }
+}

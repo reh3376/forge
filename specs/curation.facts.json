@@ -1,0 +1,82 @@
+{
+  "$schema": "forge://governance/facts/v0.1.0",
+  "spec_id": "curation-service-facts",
+  "version": "0.1.0",
+  "description": "FACTS spec for the forge-curation service endpoints",
+  "owner": "reh3376",
+  "created_at": "2026-04-06T00:00:00Z",
+  "adapter_id": "forge-curation",
+  "adapter_name": "Forge Curation Service",
+  "adapter_version": "0.1.0",
+  "protocol": "http",
+  "endpoints": [
+    {
+      "path": "/healthz",
+      "method": "GET",
+      "description": "Health check endpoint",
+      "expected_status": 200,
+      "expected_body": {
+        "status": "healthy",
+        "service": "forge-curation"
+      }
+    },
+    {
+      "path": "/curate",
+      "method": "POST",
+      "description": "Submit ContextualRecords for curation against a registered data product",
+      "request_schema": "CurateRequest",
+      "response_schema": "CurateResponse",
+      "expected_status": 200
+    },
+    {
+      "path": "/products",
+      "method": "GET",
+      "description": "List all registered data products",
+      "response_schema": "ProductResponse[]",
+      "expected_status": 200
+    },
+    {
+      "path": "/products/{product_id}",
+      "method": "GET",
+      "description": "Get a specific data product definition",
+      "response_schema": "ProductResponse",
+      "expected_status": 200
+    },
+    {
+      "path": "/products",
+      "method": "POST",
+      "description": "Register a new data product",
+      "request_schema": "CreateProductRequest",
+      "response_schema": "ProductResponse",
+      "expected_status": 201
+    },
+    {
+      "path": "/products/{product_id}/publish",
+      "method": "PUT",
+      "description": "Publish a DRAFT data product",
+      "response_schema": "ProductResponse",
+      "expected_status": 200
+    },
+    {
+      "path": "/products/{product_id}/lineage",
+      "method": "GET",
+      "description": "Get lineage entries for a data product",
+      "response_schema": "LineageResponse[]",
+      "expected_status": 200
+    },
+    {
+      "path": "/products/{product_id}/quality",
+      "method": "GET",
+      "description": "Get latest quality report for a data product",
+      "response_schema": "QualityReportResponse",
+      "expected_status": 200
+    }
+  ],
+  "design_decisions": [
+    "In-memory storage abstractions — ProductStore and LineageStore ABCs with InMemory implementations",
+    "Composable pipeline steps — each CurationStep is independent and testable",
+    "Quality evaluation is inline — runs as part of every curation batch, not deferred",
+    "Lineage is per-output-record — each curated record has full provenance chain"
+  ],
+  "conformance_tests": 25
+}

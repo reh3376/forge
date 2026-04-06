@@ -1,0 +1,90 @@
+{
+  "adapter_id": "scanner-gateway",
+  "name": "Scanner Gateway Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "grpc+protobuf",
+  "tier": "OT",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": false,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/scanner-gateway/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "scan_id",
+      "scan_type",
+      "barcode_value",
+      "device_id",
+      "operator_id",
+      "location"
+    ]
+  },
+  "health_check_interval_ms": 10000,
+  "connection_params": [
+    {
+      "name": "gateway_listen_host",
+      "description": "Host for the ScannerService gRPC server (Android-facing)",
+      "required": false,
+      "secret": false,
+      "default": "0.0.0.0"
+    },
+    {
+      "name": "gateway_listen_port",
+      "description": "Port for the ScannerService gRPC server (Android-facing)",
+      "required": true,
+      "secret": false,
+      "default": "50060"
+    },
+    {
+      "name": "wms_adapter_id",
+      "description": "Adapter ID of the WMS spoke for barrel scan routing",
+      "required": true,
+      "secret": false,
+      "default": "whk-wms"
+    },
+    {
+      "name": "ims_adapter_id",
+      "description": "Adapter ID of the IMS spoke for asset scan routing",
+      "required": false,
+      "secret": false,
+      "default": "bosc-ims"
+    },
+    {
+      "name": "qms_adapter_id",
+      "description": "Adapter ID of the QMS spoke for sample scan routing (future)",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "device_token_secret",
+      "description": "Secret key for signing device authentication tokens",
+      "required": true,
+      "secret": true
+    },
+    {
+      "name": "max_batch_size",
+      "description": "Maximum number of scan events per batch submission",
+      "required": false,
+      "secret": false,
+      "default": "500"
+    }
+  ],
+  "auth_methods": ["device_token", "mtls"],
+  "metadata": {
+    "spoke": "scanner-gateway",
+    "hub_module": "forge.adapters.scanner_gateway",
+    "source_repo": "https://github.com/reh3376/whk-wms-android",
+    "source_framework": "Kotlin Android + Keyence SDK",
+    "proto_package": "scanner.v1",
+    "edge_device_type": "Keyence BT-A500GA handheld scanner",
+    "scan_types": 12,
+    "routing_targets": ["whk-wms", "bosc-ims", "qms (future)"],
+    "offline_capable": true,
+    "notes": "First Forge edge device adapter. Two-tier: Android → Gateway → Hub. Multi-spoke routing based on scan type."
+  }
+}

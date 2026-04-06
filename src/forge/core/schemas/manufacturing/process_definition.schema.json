@@ -1,0 +1,270 @@
+{
+  "$defs": {
+    "ProcessStep": {
+      "description": "A single step within a process definition.\n\nSteps may be nested (parent_step_id) to represent ISA-88\nprocedural hierarchies: Procedure \u2192 UnitProcedure \u2192 Operation \u2192\nPhase.",
+      "properties": {
+        "forge_id": {
+          "description": "Forge-internal unique identifier.",
+          "format": "uuid",
+          "title": "Forge Id",
+          "type": "string"
+        },
+        "source_system": {
+          "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+          "title": "Source System",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Primary key of this entity in the source system.",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "captured_at": {
+          "description": "UTC timestamp when this snapshot was captured by Forge.",
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Source-system-specific fields that don't map to core schema.",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "step_number": {
+          "description": "Ordinal position within the parent process or step.",
+          "title": "Step Number",
+          "type": "integer"
+        },
+        "name": {
+          "description": "Step name or operation name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "step_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Classification (e.g. 'operation', 'phase', 'hold').",
+          "title": "Step Type"
+        },
+        "parent_step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reference to parent step for hierarchical processes.",
+          "title": "Parent Step Id"
+        },
+        "duration_minutes": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Expected duration in minutes.",
+          "title": "Duration Minutes"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "description": "Key parameters for this step (setpoints, targets).",
+          "title": "Parameters",
+          "type": "object"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable description of this step.",
+          "title": "Description"
+        }
+      },
+      "required": [
+        "source_system",
+        "source_id",
+        "step_number",
+        "name"
+      ],
+      "title": "ProcessStep",
+      "type": "object"
+    }
+  },
+  "description": "A recipe, protocol, or procedure for making something.\n\nCarries enough structure for adapters to represent both simple\n(WMS JSON recipe) and complex (MES ISA-88 hierarchy) definitions.",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "name": {
+      "description": "Recipe or protocol name.",
+      "title": "Name",
+      "type": "string"
+    },
+    "version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Version identifier.",
+      "title": "Version"
+    },
+    "product_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Product classification this recipe produces.",
+      "title": "Product Type"
+    },
+    "is_published": {
+      "default": false,
+      "description": "Whether this definition is approved for production use.",
+      "title": "Is Published",
+      "type": "boolean"
+    },
+    "customer_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to owning BusinessEntity if customer-specific.",
+      "title": "Customer Id"
+    },
+    "steps": {
+      "description": "Ordered list of process steps (may be empty for simple recipes).",
+      "items": {
+        "$ref": "#/$defs/ProcessStep"
+      },
+      "title": "Steps",
+      "type": "array"
+    },
+    "parameters": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "description": "Top-level recipe parameters (setpoints, targets).",
+      "title": "Parameters",
+      "type": "object"
+    },
+    "bill_of_materials": {
+      "description": "List of material requirements (item_id, quantity, unit).",
+      "items": {
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "type": "object"
+      },
+      "title": "Bill Of Materials",
+      "type": "array"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Human-readable recipe description.",
+      "title": "Description"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "name"
+  ],
+  "title": "ProcessDefinition",
+  "type": "object"
+}

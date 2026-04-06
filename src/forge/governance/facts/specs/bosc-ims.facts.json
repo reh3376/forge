@@ -1,0 +1,448 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "bosc-ims",
+    "name": "BOSC Inventory Management System Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "MES_MOM",
+    "protocol": "grpc+protobuf"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 15000,
+    "shutdown_timeout_ms": 10000,
+    "health_check_interval_ms": 15000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called \u2014 initiates gRPC channel to BOSC IMS Go core"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "gRPC channel established and health ping succeeds"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (15s) or gRPC connection refused"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "gRPC health check fails 3 consecutive times"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "gRPC health check passes"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (10)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful gRPC channel shutdown"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "grpc_host",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "BOSC IMS gRPC server host. The Go core runs a gRPC server on port 50050 with 7 registered services.",
+        "default": "localhost"
+      },
+      {
+        "name": "grpc_port",
+        "type": "integer",
+        "required": true,
+        "secret": false,
+        "description": "BOSC IMS gRPC server port.",
+        "default": "50050",
+        "validation": {
+          "min": 1,
+          "max": 65535
+        }
+      },
+      {
+        "name": "use_tls",
+        "type": "boolean",
+        "required": false,
+        "secret": false,
+        "description": "Enable TLS for the gRPC connection to the Go core.",
+        "default": "false"
+      },
+      {
+        "name": "tls_ca_cert",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Path to CA certificate for TLS verification."
+      },
+      {
+        "name": "tls_client_cert",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Path to client certificate for mTLS authentication."
+      },
+      {
+        "name": "tls_client_key",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "Path to client private key for mTLS authentication."
+      },
+      {
+        "name": "spoke_id",
+        "type": "string",
+        "required": true,
+        "secret": false,
+        "description": "Spoke identity for Forge metadata headers (x-forge-adapter-id).",
+        "default": "bosc_ims_primary"
+      },
+      {
+        "name": "connect_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "gRPC channel connection timeout.",
+        "default": "5000",
+        "validation": {
+          "min": 1000,
+          "max": 30000
+        }
+      },
+      {
+        "name": "request_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Per-RPC request timeout.",
+        "default": "10000",
+        "validation": {
+          "min": 1000,
+          "max": 60000
+        }
+      }
+    ],
+    "auth_methods": [
+      "mtls",
+      "none"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/bosc-ims/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "asset_id",
+      "event_type",
+      "location_id",
+      "part_id",
+      "disposition",
+      "actor_id"
+    ],
+    "optional_context_fields": [
+      "system_state",
+      "asset_state",
+      "event_id",
+      "reason_code",
+      "actor_role",
+      "source_spoke_id",
+      "station_id",
+      "lot_id",
+      "supplier_id",
+      "schema_version"
+    ],
+    "data_sources": [
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.AssetService",
+        "description": "Asset lifecycle management. 11 RPCs: ReceiveAsset, GetAsset, ActivateAsset, TransitionState, InstallIntoParent, RemoveFromParent, ProcessScanEvent, ShipAsset, MarkValidationComplete, ExportDPP, ExportAAS.",
+        "entities": [
+          "Asset",
+          "TransactionEvent",
+          "ScanEvent"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.InventoryService",
+        "description": "Inventory location hierarchy and receiving. 5 RPCs: CreateLocation, GetLocation, ListLocations, CreateReceipt, GetReceipt.",
+        "entities": [
+          "InventoryLocation",
+          "Receipt",
+          "ReceiptLine",
+          "StockTransfer"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.ComplianceService",
+        "description": "Compliance enforcement and graph intelligence. 14 RPCs including schema registration, test record submission, document upload, compliance gap analysis, assembly tree queries, and lot contamination chain tracing.",
+        "entities": [
+          "SchemaRegistry",
+          "ComplianceTestRecord",
+          "ComplianceDocument"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.CatalogService",
+        "description": "Part catalog with compliance profiles. 4 RPCs: CreatePart, GetPart, GetPartByNumber, UpdatePart.",
+        "entities": [
+          "Part",
+          "ComplianceProfile"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.SupplierService",
+        "description": "Supplier management. 4 RPCs: CreateSupplier, GetSupplier, ListSuppliers, UpdateSupplier.",
+        "entities": [
+          "Supplier"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.IntelligenceService",
+        "description": "AI/ML model inference from Python sidecar. 5 RPCs: InspectAssetCV, PredictMarketPrice, ProposeRemovalPlan, SubmitRLFeedback, ParseTextIntent.",
+        "entities": [
+          "InspectAssetCVResponse",
+          "PredictPriceResponse",
+          "ProposeRemovalPlanResponse"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_unary",
+        "endpoint": "bosc.v1.StateMachineAdminService",
+        "description": "State machine configuration and audit. 6 RPCs for listing/updating state definitions, transition rules, constraints, and audit logs.",
+        "entities": [
+          "StateDefinition",
+          "TransitionRule",
+          "StateConstraint",
+          "AuditLogEntry"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "grpc_stream",
+        "endpoint": "bosc.v1.AssetService.StreamTransactionEvents",
+        "description": "Server-streaming RPC for real-time TransactionEvent delivery (Phase 3 \u2014 to be added to Go core). Replaces Kafka hub egress with direct gRPC streaming.",
+        "entities": [
+          "TransactionEvent"
+        ],
+        "collection_mode": "subscribe"
+      }
+    ],
+    "sample_record": {
+      "record_id": "bosc-ims:evt-20260406-001",
+      "source_adapter": "bosc-ims",
+      "collected_at": "2026-04-06T14:30:00Z",
+      "context": {
+        "asset_id": "clxyz123abc456def789",
+        "event_type": "asset.received",
+        "location_id": "LOC-RECV-01",
+        "part_id": "PART-BOLT-A286-0001",
+        "disposition": "QUARANTINED",
+        "actor_id": "USR-RECV-TECH-01"
+      },
+      "payload": {
+        "event_id": "cl_evt_abc123",
+        "asset_id": "clxyz123abc456def789",
+        "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
+        "occurred_at": "2026-04-06T14:29:55Z",
+        "security_context": {
+          "actor_role": "receiving_technician",
+          "source_station_id": "RECV-STATION-01",
+          "source_spoke_id": "bosc_ims_primary"
+        },
+        "payload": {
+          "part_id": "PART-BOLT-A286-0001",
+          "supplier_id": "SUP-PRECISION-CAST-01",
+          "quantity": 50,
+          "unit_of_measure": "EA",
+          "po_number": "PO-2026-0042"
+        }
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "TransactionEvent.asset_id",
+        "context_field": "asset_id",
+        "description": "CUIDv2 identifier of the asset affected by this event. Primary traceability key."
+      },
+      {
+        "source_field": "TransactionEvent.event_type",
+        "context_field": "event_type",
+        "transform": "normalize:TRANSACTION_TYPE_ prefix stripped, lowercased, dotted",
+        "description": "Normalized event type from BOSC's 19-value TransactionType enum."
+      },
+      {
+        "source_field": "Asset.current_location_id",
+        "context_field": "location_id",
+        "description": "Current inventory location of the asset. Hierarchical: warehouse \u2192 aisle \u2192 rack \u2192 bin."
+      },
+      {
+        "source_field": "Asset.part_id",
+        "context_field": "part_id",
+        "description": "Catalog part identifier (CUIDv2 \u2192 Part entity). Links to compliance profiles."
+      },
+      {
+        "source_field": "Asset.disposition",
+        "context_field": "disposition",
+        "description": "Current disposition state (data-driven, not hardcoded enum). First of three state dimensions."
+      },
+      {
+        "source_field": "TransactionEvent.actor_id",
+        "context_field": "actor_id",
+        "description": "User or system actor who caused this event. Audit trail anchor."
+      },
+      {
+        "source_field": "Asset.system_state",
+        "context_field": "system_state",
+        "description": "Operational state dimension (ACTIVE, SUSPENDED, etc.). Second of three state dimensions."
+      },
+      {
+        "source_field": "Asset.asset_state",
+        "context_field": "asset_state",
+        "description": "Physical state dimension (NEW, INSTALLED, SCRAPPED, etc.). Third of three state dimensions."
+      },
+      {
+        "source_field": "TransactionEvent.event_id",
+        "context_field": "event_id",
+        "description": "CUIDv2 event identifier. Unique, append-only \u2014 never reused or deleted."
+      },
+      {
+        "source_field": "TransactionEvent.reason_code",
+        "context_field": "reason_code",
+        "description": "Structured reason for state changes and removals."
+      },
+      {
+        "source_field": "SecurityContext.actor_role",
+        "context_field": "actor_role",
+        "description": "ABAC role of the actor (e.g., receiving_technician, qa_inspector)."
+      },
+      {
+        "source_field": "SecurityContext.source_spoke_id",
+        "context_field": "source_spoke_id",
+        "description": "Spoke that originated this event (for cross-spoke event tracing)."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "event_type",
+        "rule_type": "enum_normalize",
+        "config": {
+          "source_field": "TransactionEvent.event_type",
+          "strip_prefix": "TRANSACTION_TYPE_",
+          "case": "lower",
+          "separator": ".",
+          "namespace": "bosc"
+        },
+        "description": "Normalize BOSC TransactionType enum names to dotted Forge event types (e.g., TRANSACTION_TYPE_ASSET_RECEIVED \u2192 asset.received)."
+      },
+      {
+        "target_field": "three_dimensional_state",
+        "rule_type": "composite",
+        "config": {
+          "source_fields": [
+            "Asset.disposition",
+            "Asset.system_state",
+            "Asset.asset_state"
+          ],
+          "format": "{disposition}|{system_state}|{asset_state}"
+        },
+        "description": "Compose the three independent state dimensions into a single composite state string for cross-dimensional analysis."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 60000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.bosc-ims",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 10
+    }
+  },
+  "metadata": {
+    "spoke": "bosc-ims",
+    "hub_module": "forge.adapters.bosc_ims",
+    "source_repo": "https://github.com/reh3376/bosc_ims",
+    "source_language": "Go + Python + TypeScript",
+    "source_framework": "Go gRPC core + Python intelligence sidecar + Next.js frontend",
+    "source_database": "TimescaleDB (event log) + Neo4j (compliance graph)",
+    "source_messaging": "Redpanda (internal event pipeline, outbox pattern)",
+    "proto_package": "bosc.v1",
+    "proto_files": 16,
+    "grpc_services": 7,
+    "total_rpcs": 45,
+    "state_model": "Three-dimensional: disposition \u00d7 system_state \u00d7 asset_state (data-driven, loaded from DB)",
+    "event_model": "Append-only TransactionEvent with 19 types, SecurityContext, and typed payloads",
+    "id_format": "CUIDv2 (TEXT columns, never UUID)",
+    "isa_95_compliance": "Material Class > Material Definition > Material Lot > Material Sublot",
+    "notes": "First gRPC-native Forge adapter. BOSC IMS already speaks binary protobuf \u2014 adapter translates between bosc.v1 and forge.v1 proto contracts. Not in production \u2014 can be modified freely."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "ff29a4e51c482e7acc2e7cfc57f307fd474b5b6d2eba3a1e4319af226033a4a4",
+    "hash_state": "approved",
+    "previous_hash": null,
+    "approved_by": null,
+    "approved_at": null,
+    "change_history": []
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/fats/v0.1.0",
+  "title": "FATS — Forge API Test Specification",
+  "description": "Spec-first governance schema for Forge HTTP API endpoints. Defines what every API endpoint MUST provide — the runner enforces conformance.",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "endpoint",
+    "method",
+    "authentication",
+    "request",
+    "response",
+    "rate_limit"
+  ],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.1.0",
+      "description": "FATS schema version this spec conforms to."
+    },
+    "endpoint": {
+      "type": "string",
+      "pattern": "^/",
+      "description": "URL path of the endpoint (must start with /)."
+    },
+    "method": {
+      "type": "string",
+      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      "description": "HTTP method."
+    },
+    "authentication": {
+      "type": "object",
+      "required": ["required", "schemes"],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether authentication is required."
+        },
+        "schemes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["bearer", "api_key", "basic", "none"]
+          },
+          "minItems": 1,
+          "description": "Accepted authentication schemes."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Authentication requirements."
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string",
+          "default": "application/json"
+        },
+        "body_schema_ref": {
+          "type": "string",
+          "description": "JSON Schema $ref for the request body."
+        },
+        "required_headers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "required_query_params": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      },
+      "additionalProperties": false,
+      "description": "Request envelope spec."
+    },
+    "response": {
+      "type": "object",
+      "required": ["success_status", "error_format"],
+      "properties": {
+        "success_status": {
+          "type": "integer",
+          "description": "Expected HTTP status on success."
+        },
+        "body_schema_ref": {
+          "type": "string",
+          "description": "JSON Schema $ref for the response body."
+        },
+        "error_format": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["rfc7807", "forge_standard"],
+              "description": "Error response format."
+            }
+          },
+          "additionalProperties": false
+        },
+        "max_latency_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum acceptable p95 latency in milliseconds."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Response envelope spec."
+    },
+    "rate_limit": {
+      "type": "object",
+      "required": ["requests_per_minute"],
+      "properties": {
+        "requests_per_minute": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Max requests per minute (0 = unlimited)."
+        },
+        "burst": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "description": "Burst allowance."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Rate limiting requirements."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "forge://schemas/facts/v1.0.0",
+  "spec_id": "adapter-transport",
+  "spec_version": "0.1.0",
+  "description": "FACTS spec for Forge adapter gRPC transport layer — validates that Pydantic models round-trip through Protobuf-compatible serialization without data loss",
+  "spec_hash": null,
+  "approved_by": null,
+
+  "identity": {
+    "transport_id": "grpc-protobuf",
+    "name": "Forge Adapter gRPC Transport",
+    "version": "0.1.0",
+    "protocol": "grpc+protobuf",
+    "proto_package": "forge.v1"
+  },
+
+  "proto_files": {
+    "count": 4,
+    "files": [
+      "enums.proto",
+      "contextual_record.proto",
+      "adapter.proto",
+      "adapter_service.proto"
+    ]
+  },
+
+  "service_definition": {
+    "service_name": "AdapterService",
+    "rpc_count": 11,
+    "rpcs": {
+      "control_plane": ["Register", "Configure", "Start", "Stop", "Health"],
+      "data_plane": ["Collect", "Subscribe", "Unsubscribe"],
+      "capabilities": ["Write", "Backfill", "Discover"]
+    },
+    "streaming_rpcs": ["Collect", "Subscribe", "Backfill"]
+  },
+
+  "message_types": {
+    "core_streaming": [
+      "ContextualRecord",
+      "RecordSource",
+      "RecordTimestamp",
+      "RecordValue",
+      "RecordContext",
+      "RecordLineage"
+    ],
+    "control_plane": [
+      "AdapterManifest",
+      "AdapterHealth",
+      "AdapterCapabilities",
+      "ConnectionParam",
+      "DataContract"
+    ],
+    "request_response": [
+      "RegisterRequest", "RegisterResponse",
+      "ConfigureRequest", "ConfigureResponse",
+      "StartRequest", "StartResponse",
+      "StopRequest", "StopResponse",
+      "HealthRequest",
+      "CollectRequest",
+      "SubscribeRequest",
+      "UnsubscribeRequest", "UnsubscribeResponse",
+      "WriteRequest", "WriteResponse",
+      "BackfillRequest",
+      "DiscoverRequest", "DiscoverResponse",
+      "TagDescriptor"
+    ]
+  },
+
+  "enum_types": {
+    "count": 14,
+    "enums": [
+      "QualityCode", "AdapterState", "AdapterTier",
+      "UnitStatus", "LifecycleState",
+      "AssetType", "AssetOperationalState",
+      "EventSeverity", "EventCategory",
+      "EntityType",
+      "WorkOrderStatus", "WorkOrderPriority",
+      "OrderStatus", "SampleOutcome"
+    ]
+  },
+
+  "serialization_requirements": {
+    "round_trip_lossless": true,
+    "typed_value_variants": [
+      "number_value (double)",
+      "integer_value (int64)",
+      "string_value",
+      "bool_value",
+      "bytes_value",
+      "json_value (JSON-encoded complex types)"
+    ],
+    "timestamp_format": "google.protobuf.Timestamp (seconds + nanos)",
+    "enum_format": "proto3 int values with UNSPECIFIED = 0",
+    "uuid_format": "string",
+    "map_format": "map<string, string> with JSON encoding for complex values"
+  },
+
+  "conformance_tests": {
+    "total": 50,
+    "categories": {
+      "contextual_record_round_trip": 7,
+      "record_value_typed_values": 18,
+      "timestamp_edge_cases": 3,
+      "context_edge_cases": 3,
+      "manifest_round_trip": 7,
+      "health_round_trip": 4,
+      "hub_server_lifecycle": 10,
+      "spoke_client_lifecycle": 13,
+      "transport_adapter_wrapping": 6,
+      "public_api_errors": 2
+    }
+  },
+
+  "python_package": {
+    "location": "src/forge/transport/",
+    "modules": [
+      "serialization.py",
+      "hub_server.py",
+      "spoke_client.py",
+      "transport_adapter.py"
+    ],
+    "dependencies_added": ["grpcio>=1.60.0", "protobuf>=5.27.0"]
+  },
+
+  "typescript_sidecar": {
+    "location": "sidecars/whk-sidecar/",
+    "modules": [
+      "src/types.ts",
+      "src/grpc-client.ts",
+      "src/adapter-bridge.ts",
+      "src/index.ts"
+    ],
+    "dependencies": ["@grpc/grpc-js", "@grpc/proto-loader", "google-protobuf"]
+  },
+
+  "design_decisions": [
+    "RecordValue.raw uses oneof typed_value with 6 variants (not google.protobuf.Any)",
+    "Server-streaming for Collect/Subscribe/Backfill (hub pulls from spoke)",
+    "Unary RPCs for control plane and Write/Discover",
+    "InMemoryChannel for testing without real gRPC — same interface, in-process dispatch",
+    "GrpcTransportAdapter wraps existing adapters with zero adapter code changes",
+    "Proto files are governance artifacts — changes follow same review as FACTS specs",
+    "Transport-layer wire format rules governed by FTTS framework (grpc-hardened-transport.ftts.json)"
+  ],
+
+  "related_specs": {
+    "ftts": {
+      "spec_file": "grpc-hardened-transport.ftts.json",
+      "relationship": "FTTS governs the binary protobuf wire format, compiled stubs, and serialization bridge that this FACTS spec's transport layer depends on"
+    }
+  }
+}

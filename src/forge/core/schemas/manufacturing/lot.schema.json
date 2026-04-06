@@ -1,0 +1,155 @@
+{
+  "description": "A material grouping with traceability.\n\nLots may be hierarchical (parent/child) for sub-lot tracking.",
+  "properties": {
+    "forge_id": {
+      "description": "Forge-internal unique identifier.",
+      "format": "uuid",
+      "title": "Forge Id",
+      "type": "string"
+    },
+    "source_system": {
+      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "title": "Source System",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Primary key of this entity in the source system.",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "captured_at": {
+      "description": "UTC timestamp when this snapshot was captured by Forge.",
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Source-system-specific fields that don't map to core schema.",
+      "title": "Metadata",
+      "type": "object"
+    },
+    "lot_number": {
+      "description": "Human-readable lot identifier.",
+      "title": "Lot Number",
+      "type": "string"
+    },
+    "product_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Product classification (e.g. whiskey type code).",
+      "title": "Product Type"
+    },
+    "recipe_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to ProcessDefinition (by source_id).",
+      "title": "Recipe Id"
+    },
+    "production_order_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to originating ProductionOrder (by source_id).",
+      "title": "Production Order Id"
+    },
+    "customer_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to furnishing/owning BusinessEntity (by source_id).",
+      "title": "Customer Id"
+    },
+    "status": {
+      "default": "CREATED",
+      "description": "Lot lifecycle status (CREATED, STARTED, VERIFIED, COMPLETE, etc.).",
+      "title": "Status",
+      "type": "string"
+    },
+    "quantity": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Total quantity in this lot.",
+      "title": "Quantity"
+    },
+    "unit_of_measure": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Unit for quantity (e.g. 'bbl', 'gallons', 'kg').",
+      "title": "Unit Of Measure"
+    },
+    "parent_lot_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Reference to parent lot for sub-lot hierarchies.",
+      "title": "Parent Lot Id"
+    },
+    "unit_count": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of manufacturing units (barrels, containers) in this lot.",
+      "title": "Unit Count"
+    }
+  },
+  "required": [
+    "source_system",
+    "source_id",
+    "lot_number"
+  ],
+  "title": "Lot",
+  "type": "object"
+}

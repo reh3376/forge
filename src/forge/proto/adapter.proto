@@ -1,0 +1,93 @@
+// Forge Platform — Adapter control plane messages
+// Maps to: forge.core.models.adapter (Pydantic v2)
+//
+// These messages handle adapter registration, configuration, health
+// monitoring, and capability negotiation. They are NOT high-volume
+// streaming messages — they're control plane RPCs.
+
+syntax = "proto3";
+
+package forge.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "forge/v1/enums.proto";
+
+option go_package = "github.com/reh3376/forge/proto/v1";
+
+// ---------------------------------------------------------------------------
+// AdapterCapabilities — what this adapter can do
+// Maps to: forge.core.models.adapter.AdapterCapabilities
+// ---------------------------------------------------------------------------
+
+message AdapterCapabilities {
+  bool read = 1;
+  bool write = 2;
+  bool subscribe = 3;
+  bool backfill = 4;
+  bool discover = 5;
+}
+
+// ---------------------------------------------------------------------------
+// ConnectionParam — a parameter required to connect to the source system
+// Maps to: forge.core.models.adapter.ConnectionParam
+// ---------------------------------------------------------------------------
+
+message ConnectionParam {
+  string name = 1;
+  string description = 2;
+  bool required = 3;
+  bool secret = 4;
+  string default_value = 5;     // "default" is a proto reserved word
+}
+
+// ---------------------------------------------------------------------------
+// DataContract — what this adapter produces
+// Maps to: forge.core.models.adapter.DataContract
+// ---------------------------------------------------------------------------
+
+message DataContract {
+  string schema_ref = 1;                   // e.g. "forge://schemas/whk-wms/v0.1.0"
+  string output_format = 2;               // e.g. "contextual_record"
+  repeated string context_fields = 3;     // required context fields
+}
+
+// ---------------------------------------------------------------------------
+// AdapterManifest — adapter self-description
+// Maps to: forge.core.models.adapter.AdapterManifest
+//
+// The manifest is the adapter's registration document. It declares what
+// the adapter is, what it can do, what it produces, and what it needs.
+// Validated against the FACTS schema at registration time.
+// ---------------------------------------------------------------------------
+
+message AdapterManifest {
+  string adapter_id = 1;                  // unique identifier, e.g. "whk-wms"
+  string name = 2;                        // human-readable name
+  string version = 3;                     // semver string
+  string type = 4;                        // e.g. "INGESTION"
+  string protocol = 5;                    // e.g. "graphql+amqp", "graphql+amqp+mqtt"
+  AdapterTier tier = 6;
+  AdapterCapabilities capabilities = 7;
+  DataContract data_contract = 8;
+  int32 health_check_interval_ms = 9;
+  repeated ConnectionParam connection_params = 10;
+  repeated string auth_methods = 11;      // e.g. ["azure_entra_id", "bearer_token"]
+  google.protobuf.Struct metadata = 12;   // flexible key-value metadata
+}
+
+// ---------------------------------------------------------------------------
+// AdapterHealth — current health status of an adapter instance
+// Maps to: forge.core.models.adapter.AdapterHealth
+// ---------------------------------------------------------------------------
+
+message AdapterHealth {
+  string adapter_id = 1;
+  AdapterState state = 2;
+  google.protobuf.Timestamp last_check = 3;
+  google.protobuf.Timestamp last_healthy = 4;
+  string error_message = 5;
+  int64 records_collected = 6;
+  int64 records_failed = 7;
+  double uptime_seconds = 8;
+}
