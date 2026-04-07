@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -49,8 +49,8 @@ def _make_record_dict() -> dict:
             tag_path="Area1/Fermenter3/Temperature",
         ),
         timestamp=RecordTimestamp(
-            source_time=datetime.now(UTC),
-            ingestion_time=datetime.now(UTC),
+            source_time=datetime.now(timezone.utc),
+            ingestion_time=datetime.now(timezone.utc),
         ),
         value=RecordValue(
             raw=78.4,

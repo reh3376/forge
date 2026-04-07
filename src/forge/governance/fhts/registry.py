@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import json
 import threading
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -146,7 +146,7 @@ class FHTSRegistry:
         """Persist registry to disk as formatted JSON."""
         with self._lock:
             rf = RegistryFile(
-                updated_at=datetime.now(UTC).isoformat(),
+                updated_at=datetime.now(timezone.utc).isoformat(),
                 files=list(self._files.values()),
             )
             registry_path = self._base_path / self.REGISTRY_FILENAME
@@ -204,7 +204,7 @@ class FHTSRegistry:
         into history (maintaining the last ``MAX_HASH_HISTORY`` entries).
         """
         with self._lock:
-            now = datetime.now(UTC).isoformat()
+            now = datetime.now(timezone.utc).isoformat()
 
             if path in self._files:
                 existing = self._files[path]
@@ -256,7 +256,7 @@ class FHTSRegistry:
                 msg = f"File not tracked: {path}"
                 raise KeyError(msg)
 
-            now = datetime.now(UTC).isoformat()
+            now = datetime.now(timezone.utc).isoformat()
             record.history.insert(
                 0,
                 RegistryHistoryEntry(
@@ -305,7 +305,7 @@ class FHTSRegistry:
                     msg = f"Target hash not in history: {target_hash[:16]}…"
                     raise ValueError(msg)
 
-            now = datetime.now(UTC).isoformat()
+            now = datetime.now(timezone.utc).isoformat()
             record.history.insert(
                 0,
                 RegistryHistoryEntry(
@@ -334,7 +334,7 @@ class FHTSRegistry:
                 msg = f"File not tracked: {path}"
                 raise KeyError(msg)
 
-            now = datetime.now(UTC).isoformat()
+            now = datetime.now(timezone.utc).isoformat()
             record.approved_by = approved_by
             record.approved_at = now
             # Status stays as-is (verified/mismatch) — approval is orthogonal
@@ -357,7 +357,7 @@ class FHTSRegistry:
                 raise KeyError(msg)
 
             full_path = self._base_path / path
-            now = datetime.now(UTC).isoformat()
+            now = datetime.now(timezone.utc).isoformat()
 
             try:
                 spec = json.loads(full_path.read_text(encoding="utf-8"))

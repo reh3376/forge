@@ -17,8 +17,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
-from enum import StrEnum
+from datetime import datetime, timedelta, timezone
+from forge._compat import StrEnum
 from typing import Any
 
 from forge.core.models.contextual_record import ContextualRecord
@@ -51,7 +51,7 @@ class QualityReport:
     """Aggregate quality report for a batch of records."""
 
     product_id: str
-    evaluated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    evaluated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     record_count: int = 0
     results: list[QualityResult] = field(default_factory=list)
 
@@ -193,11 +193,11 @@ class FreshnessRule(QualityRule):
                 measurement="No records to evaluate",
             )
 
-        now = self._reference_time or datetime.now(UTC)
+        now = self._reference_time or datetime.now(timezone.utc)
         most_recent = max(records, key=lambda r: r.timestamp.source_time)
         source_time = most_recent.timestamp.source_time
         if source_time.tzinfo is None:
-            source_time = source_time.replace(tzinfo=UTC)
+            source_time = source_time.replace(tzinfo=timezone.utc)
 
         age = now - source_time
         passed = age <= self._max_age

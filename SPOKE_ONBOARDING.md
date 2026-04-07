@@ -68,10 +68,11 @@ Each spoke is scored across 5 factors (1-5 scale, 5 = highest priority):
 4. No code changes to whk-erpi required in phase 1
 
 **Acceptance criteria:**
-- [ ] FACTS spec approved
-- [ ] Adapter consuming all 38 RabbitMQ topics
+- [x] FACTS spec FACTS-compliant (10 sections, integrity hash verified, pending_review)
+- [ ] FACTS spec approved by owner
+- [x] Adapter consuming all 33 entity exchanges + 3 ack topics
 - [ ] ContextualRecords flowing to Forge hub with ERPI context fields
-- [ ] FTTS-compliant gRPC transport verified
+- [x] FTTS-compliant gRPC transport verified
 
 ---
 
@@ -95,10 +96,11 @@ Each spoke is scored across 5 factors (1-5 scale, 5 = highest priority):
 4. Connect CMMS work order events to Support & PM Orchestration capability
 
 **Acceptance criteria:**
-- [ ] FACTS spec approved
-- [ ] Adapter pulling from CMMS GraphQL API
+- [x] FACTS spec FACTS-compliant (10 sections, integrity hash verified, pending_review)
+- [ ] FACTS spec approved by owner
+- [x] Adapter pulling from CMMS GraphQL API (157 tests passing)
 - [ ] Equipment context available to enrich WMS/MES records
-- [ ] FTTS-compliant gRPC transport verified
+- [x] FTTS-compliant gRPC transport verified
 
 ---
 
@@ -122,8 +124,9 @@ Each spoke is scored across 5 factors (1-5 scale, 5 = highest priority):
 4. Graph data (Neo4j) can sync directly to Forge's Neo4j instance
 
 **Acceptance criteria:**
-- [ ] FACTS spec approved
-- [ ] Adapter consuming device, topology, and security event APIs
+- [x] FACTS spec FACTS-compliant (10 sections, integrity hash verified, pending_review)
+- [ ] FACTS spec approved by owner
+- [x] Adapter consuming device, topology, and security event APIs (77 tests passing)
 - [ ] Network topology available in Forge graph layer
 - [ ] Alert events feeding Support/PM Orchestration
 

@@ -1,6 +1,6 @@
 """Tests for the Scanner Gateway device registry."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 from forge.adapters.scanner_gateway.device_registry import (
     DeviceRecord,
@@ -21,14 +21,14 @@ class TestDeviceRecord:
     def test_recent_heartbeat_is_online(self):
         record = DeviceRecord(
             device_id="dev-001",
-            last_heartbeat=datetime.now(tz=UTC),
+            last_heartbeat=datetime.now(tz=timezone.utc),
             heartbeat_interval_s=30,
         )
         assert record.is_online is True
 
     def test_stale_heartbeat_is_offline(self):
         """A device whose heartbeat exceeds 3x interval is offline."""
-        stale_time = datetime.now(tz=UTC) - timedelta(seconds=100)
+        stale_time = datetime.now(tz=timezone.utc) - timedelta(seconds=100)
         record = DeviceRecord(
             device_id="dev-001",
             last_heartbeat=stale_time,
@@ -57,7 +57,7 @@ class TestDeviceRecord:
     def test_to_dict_with_heartbeat(self):
         record = DeviceRecord(
             device_id="dev-001",
-            last_heartbeat=datetime(2026, 4, 6, tzinfo=UTC),
+            last_heartbeat=datetime(2026, 4, 6, tzinfo=timezone.utc),
         )
         d = record.to_dict()
         assert "2026-04-06" in d["last_heartbeat"]

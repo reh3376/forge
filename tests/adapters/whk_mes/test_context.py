@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from forge.adapters.whk_mes.context import (
     build_record_context,
@@ -17,22 +17,22 @@ class TestDeriveShift:
 
     def test_daytime_utc(self):
         # 14:00 UTC -> ~10:00 Louisville (EDT) -> day
-        ts = datetime(2026, 4, 6, 14, 0, tzinfo=UTC)
+        ts = datetime(2026, 4, 6, 14, 0, tzinfo=timezone.utc)
         assert derive_shift(ts) == "day"
 
     def test_nighttime_utc(self):
         # 02:00 UTC -> ~22:00 Louisville previous day -> night
-        ts = datetime(2026, 4, 6, 2, 0, tzinfo=UTC)
+        ts = datetime(2026, 4, 6, 2, 0, tzinfo=timezone.utc)
         assert derive_shift(ts) == "night"
 
     def test_morning_boundary(self):
         # 10:00 UTC -> ~06:00 Louisville (EDT) -> day (exact boundary)
-        ts = datetime(2026, 4, 6, 10, 0, tzinfo=UTC)
+        ts = datetime(2026, 4, 6, 10, 0, tzinfo=timezone.utc)
         assert derive_shift(ts) == "day"
 
     def test_evening_boundary(self):
         # 22:00 UTC -> ~18:00 Louisville (EDT) -> night (exact boundary)
-        ts = datetime(2026, 4, 6, 22, 0, tzinfo=UTC)
+        ts = datetime(2026, 4, 6, 22, 0, tzinfo=timezone.utc)
         assert derive_shift(ts) == "night"
 
     def test_naive_timestamp_assumed_utc(self):
@@ -42,7 +42,7 @@ class TestDeriveShift:
 
     def test_late_night_utc(self):
         # 23:30 UTC -> ~19:30 Louisville -> night
-        ts = datetime(2026, 4, 6, 23, 30, tzinfo=UTC)
+        ts = datetime(2026, 4, 6, 23, 30, tzinfo=timezone.utc)
         assert derive_shift(ts) == "night"
 
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 import pytest
 from tests.curation.conftest import make_record_batch
@@ -59,7 +59,7 @@ class TestCompletenessRule:
 
 class TestFreshnessRule:
     def test_fresh_records(self) -> None:
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
         records = make_record_batch(count=5, base_time=now - timedelta(minutes=5))
         rule = FreshnessRule(max_age=timedelta(hours=1), reference_time=now)
         result = rule.evaluate(records)
@@ -67,7 +67,7 @@ class TestFreshnessRule:
         assert result.score > 0.9
 
     def test_stale_records(self) -> None:
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
         records = make_record_batch(
             count=5,
             base_time=now - timedelta(hours=3),
@@ -83,7 +83,7 @@ class TestFreshnessRule:
         assert not result.passed
 
     def test_score_decay(self) -> None:
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
         # Records at exactly max_age → score should be ~0.5
         records = make_record_batch(
             count=1,
@@ -129,7 +129,7 @@ class TestRangeRule:
     def test_no_numeric_records(self) -> None:
         records = [ContextualRecord(
             source=RecordSource(adapter_id="test", system="test"),
-            timestamp=RecordTimestamp(source_time=datetime.now(UTC)),
+            timestamp=RecordTimestamp(source_time=datetime.now(timezone.utc)),
             value=RecordValue(raw="string_value", data_type="string"),
             lineage=RecordLineage(
                 schema_ref="x", adapter_id="test", adapter_version="0.1.0",

@@ -1,0 +1,230 @@
+# Forge Platform — F04 Development Stack
+# Usage: docker compose -f deploy/docker/docker-compose.yml up -d
+#
+# Tier 1: Infrastructure (PostgreSQL, TimescaleDB, Neo4j, Redis, Kafka, MinIO)
+# Tier 2: Init container (schema migrations, runs once then exits)
+# Tier 3: Application (Hub API with gRPC + REST, Curation sub-mount)
+#
+# Ports:
+#   8000  — Hub REST API
+#   50051 — Hub gRPC (spoke transport)
+#   5432  — PostgreSQL
+#   5433  — TimescaleDB
+#   7474  — Neo4j Browser
+#   7687  — Neo4j Bolt
+#   6379  — Redis
+#   9092  — Kafka
+#   9000  — MinIO API
+#   9001  — MinIO Console
+
+services:
+
+  # ==================================================================
+  # Tier 1: Infrastructure
+  # ==================================================================
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-forge}
+      POSTGRES_USER: ${POSTGRES_USER:-forge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - forge-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-forge}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_DB: ${TIMESCALE_DB:-forge_ts}
+      POSTGRES_USER: ${TIMESCALE_USER:-forge}
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-changeme}
+    ports:
+      - "${TIMESCALE_PORT:-5433}:5432"
+    volumes:
+      - forge-ts-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TIMESCALE_USER:-forge}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-changeme}
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - forge-neo4j-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - forge-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  kafka:
+    image: bitnami/kafka:3.7
+    environment:
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    volumes:
+      - forge-kafka-data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-forge}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - forge-minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ==================================================================
+  # Tier 2: Init Container (runs once, then exits)
+  # ==================================================================
+
+  forge-init:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.forge
+    entrypoint: ["/bin/bash", "/app/deploy/docker/init-entrypoint.sh"]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-forge}
+      POSTGRES_USER: ${POSTGRES_USER:-forge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      TIMESCALE_HOST: timescaledb
+      TIMESCALE_PORT: "5432"
+      TIMESCALE_DB: ${TIMESCALE_DB:-forge_ts}
+      TIMESCALE_USER: ${TIMESCALE_USER:-forge}
+      TIMESCALE_PASSWORD: ${TIMESCALE_PASSWORD:-changeme}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_HOST: neo4j
+      NEO4J_USER: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-changeme}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    volumes:
+      # Mount init script from host (for dev iteration)
+      - ../../deploy/docker/init-entrypoint.sh:/app/deploy/docker/init-entrypoint.sh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  # ==================================================================
+  # Tier 3: Application Services
+  # ==================================================================
+
+  forge-hub:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.forge
+    ports:
+      - "${FORGE_API_PORT:-8000}:8000"
+      - "${FORGE_GRPC_PORT:-50051}:50051"
+    environment:
+      # Storage — Docker service names, not localhost
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-forge}
+      POSTGRES_USER: ${POSTGRES_USER:-forge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      TIMESCALE_HOST: timescaledb
+      TIMESCALE_PORT: "5432"
+      TIMESCALE_DB: ${TIMESCALE_DB:-forge_ts}
+      TIMESCALE_USER: ${TIMESCALE_USER:-forge}
+      TIMESCALE_PASSWORD: ${TIMESCALE_PASSWORD:-changeme}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-changeme}
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-forge}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # API
+      FORGE_API_HOST: "0.0.0.0"
+      FORGE_API_PORT: "8000"
+      FORGE_GRPC_PORT: "50051"
+      FORGE_GRPC_ENABLED: "true"
+      # Features
+      FORGE_AUTH_ENABLED: "false"
+      FORGE_OTEL_ENABLED: "false"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      forge-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  forge-pg-data:
+  forge-ts-data:
+  forge-neo4j-data:
+  forge-redis-data:
+  forge-kafka-data:
+  forge-minio-data:

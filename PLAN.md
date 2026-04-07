@@ -4,7 +4,7 @@
 **Created:** 2026-04-05
 **Updated:** 2026-04-07 — aligned with WHK Digital Strategy v4r0
 **Owner:** reh3376
-**Status:** ACTIVE DEVELOPMENT (D1+D2+D3 scaffold complete, 898 tests passing)
+**Status:** ACTIVE DEVELOPMENT (D1+D2+D3 scaffold complete, 1771 tests passing)
 
 ---
 
@@ -338,6 +338,7 @@ D3: Project Scaffold
 | K9 | Container orchestration | Docker Compose (dev), K8s (prod) | **Both** (compose for dev, K8s ready) |
 | K10 | License model | Proprietary, AGPL, Apache 2.0, BSL | **TBD** (commercial intent) |
 | K11 | Module Builder SDK | Standalone SDK library, embedded in core, CLI-only scaffolder | **TBD** — SDK that codifies the adapter pattern (AdapterBase, ContextBuilder, GrpcTransportAdapter, FACTS templates, `forge module init` scaffolder) so new spokes get a paved path instead of copying prior adapters. Investigate after D3.8 proves the pattern across 3+ spoke types. |
+| K12 | DB Orchestration Strategy | Federated (query across spoke DBs), Centralized (migrate all to Forge Core), Hybrid (shadow + eventual convergence) | **Hybrid (Observe → Shadow → Own)** — Three-phase migration: adapters read spoke DBs (current), Shadow Writer mirrors to Forge Core DB, eventual ownership transfer. Primary purpose: maximize data reliability for model training (SME-in-the-loop) → fully autonomous operations. See `docs/DB_ORCHESTRATION_FRAMEWORK.md` v0.3.0. |
 
 ---
 
@@ -391,19 +392,20 @@ If context is lost (compaction, new session, crash):
 - [x] D3.5: MES Adapter (F33 — 11 mappers, ISA-88 pattern, 188 tests)
 - [x] D3.6: gRPC Transport (F34 — compiled proto stubs, live gRPC, FTTS governance, 175 tests)
 - [x] D3.7: Curation Service (F40 — normalization, aggregation, data products, lineage, quality, 130 tests)
-- [ ] D3.8: Remaining Spoke Adapters (see Spoke Onboarding Priority Plan)
-- [ ] D3.9: Docker Compose (F01 shell exists, full F04 stack pending)
-- [ ] D3.10: Module Builder SDK (K11 — codify adapter pattern into reusable library + CLI scaffolder)
-- [ ] D3.11: Production Verification (F90+)
+- [~] D3.8: Remaining Spoke Adapters — Tier-2 FACTS specs finalized (ERPI, CMMS, NMS all FACTS-compliant with verified integrity hashes). See Spoke Onboarding Priority Plan for remaining tiers.
+- [x] D3.9: DB Orchestration Framework (K12 — Schema Registry, Data Router, Shadow Writer, Access Controller, Backfill Engine, 143 tests)
+- [x] D3.10: Docker Compose (F04 — Hub API service, health orchestrator, Dockerfile, init container, full compose stack, 38 tests)
+- [x] D3.11: Module Builder SDK (K11 — ManifestBuilder, 7 code generators, ModuleScaffolder, `forge module init/list/validate` CLI, 83 tests, comprehensive docs)
+- [ ] D3.12: Production Verification (F90+)
 
 ### Spoke Onboarding Status (ordered by priority — see `SPOKE_ONBOARDING.md`)
 | # | Module | Adapter Status | FACTS Spec | FTTS Compliant | Priority |
 |---|--------|---------------|------------|----------------|----------|
 | 5 | WMS | **Complete** (Path 3) | whk-wms.facts.json (48 tests) | Yes | — (done) |
 | 6 | MES | **Complete** (Path 4) | whk-mes.facts.json (64 tests) | Yes | — (done) |
-| 9 | ERP Connector | Not started | — | — | P1 — 38 RabbitMQ topics already flowing |
-| 4 | CMMS | Not started | — | — | P2 — identical NestJS stack, equipment context |
-| 10 | NMS | Not started | — | — | P3 — Python-native, closest stack match |
+| 9 | ERP Connector | **Adapter complete** (98 tests passing) | **FACTS-compliant** (whk-erpi.facts.json, hash verified) | Yes | P1 — done |
+| 4 | CMMS | **Adapter complete** (157 tests passing, 4 skipped) | **FACTS-compliant** (whk-cmms.facts.json, hash verified) | Yes | P2 — done |
+| 10 | NMS | **Adapter complete** (77 tests passing) | **FACTS-compliant** (whk-nms.facts.json, hash verified) | Yes | P3 — done |
 | + | Scanner | Adapter built | — | Pending | P4 — config only, opportunistic |
 | 2 | NextTrend | Not started | — | — | P5 — Rust, needs ILP bridge |
 | 7 | IMS | Not started | — | — | P6 — Go+gRPC, validates non-Python pattern |

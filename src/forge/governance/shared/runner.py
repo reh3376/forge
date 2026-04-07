@@ -17,8 +17,8 @@ from __future__ import annotations
 import abc
 import hashlib
 import json
-from datetime import UTC, datetime
-from enum import StrEnum
+from datetime import datetime, timezone
+from forge._compat import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
@@ -349,7 +349,7 @@ def add_spec_hash(
 
     # If hash changed, push old value into history
     if old_hash and old_hash != computed:
-        now = datetime.now(UTC).isoformat()
+        now = datetime.now(timezone.utc).isoformat()
         history_entry = {
             "previous_hash": old_hash,
             "new_hash": computed,
@@ -393,7 +393,7 @@ def approve_spec_hash(
         msg = "Cannot approve: spec has no hash. Run add_spec_hash first."
         raise ValueError(msg)
 
-    now = datetime.now(UTC).isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     integrity["hash_state"] = "approved"
     integrity["approved_by"] = approved_by
     integrity["approved_at"] = now
@@ -443,7 +443,7 @@ def revert_spec_hash(
         raise ValueError(msg)
 
     # Push current into history as a revert entry
-    now = datetime.now(UTC).isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     revert_entry = {
         "previous_hash": current_hash,
         "new_hash": target_hash,
@@ -492,7 +492,7 @@ class FxTSReport(BaseModel):
     runner_version: str
     target: str  # what was checked (adapter_id, endpoint path, etc.)
     started_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC)
+        default_factory=lambda: datetime.now(timezone.utc)
     )
     finished_at: datetime | None = None
     verdicts: list[FxTSVerdict] = Field(default_factory=list)
@@ -724,5 +724,5 @@ class FxTSRunner(abc.ABC):
         verdicts = await self._run_checks(target, **kwargs)
         report.verdicts.extend(verdicts)
 
-        report.finished_at = datetime.now(UTC)
+        report.finished_at = datetime.now(timezone.utc)
         return report

@@ -116,8 +116,9 @@ def init(
 
     typer.echo("\nForge initialized. Next steps:")
     typer.echo("  1. Review .env and adjust settings")
-    typer.echo("  2. Run: docker compose up -d")
-    typer.echo("  3. Run: forge health")
+    typer.echo("  2. Infrastructure only: docker compose up -d")
+    typer.echo("  3. Full F04 stack:     docker compose -f deploy/docker/docker-compose.yml up -d")
+    typer.echo("  4. Run: forge health")
 
 
 # ---------------------------------------------------------------------------
@@ -194,6 +195,15 @@ governance_app = typer.Typer(
     no_args_is_help=True,
 )
 app.add_typer(governance_app, name="governance")
+
+
+# ---------------------------------------------------------------------------
+# Module Builder subcommand group
+# ---------------------------------------------------------------------------
+
+from forge.sdk.module_builder.cli import module_app  # noqa: E402
+
+app.add_typer(module_app, name="module")
 
 
 @governance_app.command("run")
@@ -330,6 +340,8 @@ KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 # --- API ---
 FORGE_API_HOST=0.0.0.0
 FORGE_API_PORT=8000
+FORGE_GRPC_PORT=50051
+FORGE_GRPC_ENABLED=true
 
 # --- Features ---
 FORGE_AUTH_ENABLED=false

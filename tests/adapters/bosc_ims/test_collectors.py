@@ -153,10 +153,10 @@ class TestCollectEvents:
 
     @pytest.mark.asyncio()
     async def test_incremental_since(self):
-        from datetime import UTC, datetime
+        from datetime import datetime, timezone
 
         client = _make_client()
-        since = datetime(2026, 4, 6, 14, 30, tzinfo=UTC)
+        since = datetime(2026, 4, 6, 14, 30, tzinfo=timezone.utc)
         records = [
             r async for r in collect_events(
                 client,

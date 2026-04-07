@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -139,7 +139,7 @@ def derive_shift(event_time: datetime) -> str:
     consistency -- both spokes use the same shift definitions.
     """
     if event_time.tzinfo is None:
-        event_time = event_time.replace(tzinfo=UTC)
+        event_time = event_time.replace(tzinfo=timezone.utc)
     local_time = event_time.astimezone(_LOUISVILLE_TZ)
     hour = local_time.hour
     if _DAY_SHIFT_START_HOUR <= hour < _DAY_SHIFT_END_HOUR:

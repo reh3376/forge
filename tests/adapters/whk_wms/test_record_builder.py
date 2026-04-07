@@ -1,6 +1,6 @@
 """Tests for the WMS record builder."""
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from forge.adapters.whk_wms.record_builder import (
     _assess_quality,
@@ -62,7 +62,7 @@ class TestExtractSourceTime:
         assert result.year == 2026
 
     def test_timestamp_datetime_object(self):
-        dt = datetime(2026, 4, 6, 14, 30, tzinfo=UTC)
+        dt = datetime(2026, 4, 6, 14, 30, tzinfo=timezone.utc)
         raw = {"timestamp": dt}
         assert _extract_source_time(raw) == dt
 

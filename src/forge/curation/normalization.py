@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 from forge.core.models.contextual_record import ContextualRecord, RecordValue
 
@@ -230,9 +230,9 @@ class TimeBucketer:
     def bucket(self, dt: datetime) -> datetime:
         """Floor a datetime to the nearest window boundary (UTC)."""
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=UTC)
+            dt = dt.replace(tzinfo=timezone.utc)
 
-        epoch = datetime(2000, 1, 1, tzinfo=UTC)
+        epoch = datetime(2000, 1, 1, tzinfo=timezone.utc)
         delta = dt - epoch
         window_seconds = self.window.total_seconds()
         bucket_num = int(delta.total_seconds() // window_seconds)

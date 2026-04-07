@@ -12,7 +12,7 @@ governance pipeline (FACTS validation → storage → curation).
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from forge.core.models.contextual_record import (
@@ -51,7 +51,7 @@ def build_contextual_record(
     """
     # ── Timestamps ─────────────────────────────────────────────
     source_time = _extract_source_time(raw_event)
-    now = datetime.now(tz=UTC)
+    now = datetime.now(tz=timezone.utc)
     timestamp = RecordTimestamp(
         source_time=source_time or now,
         server_time=_extract_server_time(raw_event),

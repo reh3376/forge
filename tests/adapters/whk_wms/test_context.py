@@ -1,6 +1,6 @@
 """Tests for the WMS context mapper and enrichment rules."""
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from forge.adapters.whk_wms.context import (
     build_record_context,
@@ -18,27 +18,27 @@ class TestDeriveShift:
 
     def test_day_shift_morning(self):
         # 10 AM Louisville = day shift
-        dt = datetime(2026, 4, 6, 14, 0, 0, tzinfo=UTC)  # ~10 AM EDT
+        dt = datetime(2026, 4, 6, 14, 0, 0, tzinfo=timezone.utc)  # ~10 AM EDT
         assert derive_shift(dt) == "day"
 
     def test_night_shift_evening(self):
         # 11 PM Louisville = night shift
-        dt = datetime(2026, 4, 7, 3, 0, 0, tzinfo=UTC)  # ~11 PM EDT
+        dt = datetime(2026, 4, 7, 3, 0, 0, tzinfo=timezone.utc)  # ~11 PM EDT
         assert derive_shift(dt) == "night"
 
     def test_night_shift_early_morning(self):
         # 2 AM Louisville = night shift
-        dt = datetime(2026, 4, 6, 6, 0, 0, tzinfo=UTC)  # ~2 AM EDT
+        dt = datetime(2026, 4, 6, 6, 0, 0, tzinfo=timezone.utc)  # ~2 AM EDT
         assert derive_shift(dt) == "night"
 
     def test_day_shift_boundary_start(self):
         # Exactly 06:00 Louisville = day shift
-        dt = datetime(2026, 4, 6, 10, 0, 0, tzinfo=UTC)  # 06:00 EDT
+        dt = datetime(2026, 4, 6, 10, 0, 0, tzinfo=timezone.utc)  # 06:00 EDT
         assert derive_shift(dt) == "day"
 
     def test_night_shift_boundary_start(self):
         # Exactly 18:00 Louisville = night shift
-        dt = datetime(2026, 4, 6, 22, 0, 0, tzinfo=UTC)  # 18:00 EDT
+        dt = datetime(2026, 4, 6, 22, 0, 0, tzinfo=timezone.utc)  # 18:00 EDT
         assert derive_shift(dt) == "night"
 
     def test_naive_timestamp_assumed_utc(self):

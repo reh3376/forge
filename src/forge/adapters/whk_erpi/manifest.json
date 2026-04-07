@@ -1,0 +1,79 @@
+{
+  "adapter_id": "whk-erpi",
+  "name": "Whiskey House ERP Integration Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "amqp+rest+graphql",
+  "tier": "ERP_BUSINESS",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-erpi/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_type",
+      "sync_state",
+      "event_timestamp"
+    ]
+  },
+  "health_check_interval_ms": 30000,
+  "connection_params": [
+    {
+      "name": "rabbitmq_url",
+      "description": "RabbitMQ AMQP URL (e.g. amqp://guest:guest@localhost:5672). Hosts 33 entity fanout exchanges.",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "erpi_rest_url",
+      "description": "ERPI REST API base URL (e.g. http://localhost:3000/api). Used for backfill and health checks.",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "erpi_graphql_url",
+      "description": "ERPI GraphQL endpoint for enrichment queries. Optional — used when RabbitMQ messages lack full entity context.",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "jwt_token",
+      "description": "JWT bearer token for authenticated REST/GraphQL requests.",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "rabbitmq_consumer_group",
+      "description": "Consumer group for queue naming. Must be unique to Forge.",
+      "required": false,
+      "secret": false,
+      "default": "forge-erpi"
+    },
+    {
+      "name": "rabbitmq_vhost",
+      "description": "RabbitMQ virtual host.",
+      "required": false,
+      "secret": false,
+      "default": "/"
+    }
+  ],
+  "auth_methods": [
+    "jwt_bearer",
+    "none"
+  ],
+  "metadata": {
+    "spoke": "erpi",
+    "hub_module": "forge.adapters.whk_erpi",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-erpi",
+    "external_contract": "asyncapi://whk-asyncapi-types/v1.0.0"
+  }
+}

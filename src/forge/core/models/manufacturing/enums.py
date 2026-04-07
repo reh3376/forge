@@ -6,7 +6,7 @@ classification fields. Adapters map source-system-specific values
 enums during ingestion.
 """
 
-from enum import StrEnum
+from forge._compat import StrEnum
 
 # ── Manufacturing Unit ──────────────────────────────────────────────
 

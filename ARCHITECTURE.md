@@ -2,7 +2,7 @@
 
 **Manufacturing Decision Infrastructure**
 
-*Version 0.1 — April 2026*
+*Version 0.2 — April 2026 (aligned with WHK Digital Strategy v4r0)*
 
 ---
 
@@ -95,6 +95,42 @@ These are architectural laws that must not be violated:
 - **Serving is API-first** — all data access goes through versioned APIs defined by FATS specs. No direct database coupling from consuming applications.
 - **Observability is built-in** — every service, adapter, and pipeline emits structured telemetry (metrics, logs, traces) via OpenTelemetry, governed by FOTS specs.
 - **Fail-open where safe, fail-closed where not** — optional enrichment stages degrade gracefully; security, governance, and spec conformance checks fail closed.
+
+### Module Map (WHK Reference Implementation)
+
+The WHK deployment is the reference implementation of Forge. Each module evolves from (or replaces) an existing WHK production system. These are not abstract adapter tiers — they are named systems with known repositories, tech stacks, and data patterns. See `PLAN.md` for full details and `SPOKE_ONBOARDING.md` for onboarding priority.
+
+| # | Module | Source Repository | Role |
+|---|--------|-------------------|------|
+| 1 | **OT Module** | Custom (new build) | Direct PLC connectivity, tag acquisition, alarming, control writes. Replaces Ignition SCADA. |
+| 2 | **NextTrend** | `TheThoughtagen/nexttrend` | Time-series historian (Rust+QuestDB). Replaces Canary/PI. |
+| 3 | **OT UI Builder** | Future | User-built HMI screens. Replaces Ignition Perspective. |
+| 4 | **CMMS** | `reh3376/whk-cmms` | PM scheduling, work orders, asset registry. |
+| 5 | **WMS** | `WhiskeyHouse/whk-wms` | Barrel tracking, ownership, transfers, lot management. |
+| 6 | **MES** | `WhiskeyHouse/whk-mes` | Production orders, recipes, scheduling, quality, ERP sync. |
+| 7 | **IMS** | `reh3376/bosc_ims` | Aerospace supply chain inventory. Compliance-enforcing spoke. |
+| 8 | **QMS** | New build | Document control, CAPA, audits, GRC. Replaces Intellect QMS. |
+| 9 | **ERP Connector** | `WhiskeyHouse/whk-erpi` | Bidirectional NetSuite sync. 38 RabbitMQ topics. |
+| 10 | **NMS** | `WhiskeyHouse/net-topology` | SNMP/LLDP discovery, topology visualization, security events. |
+| + | **Scanner Gateway** | `WhiskeyHouse/whk-wms-android` | OT-tier QR scanner adapter. |
+
+### Core Capabilities (cross-cutting)
+
+Two capabilities span all modules and are not standalone applications:
+
+**Support & Project Management Orchestration** — Cross-module ticket lifecycle and workflow orchestration. An NMS alert can trigger a CMMS work order, which may surface a QMS deviation, which can place an MES production hold — all with a unified audit trail. This is the human-in-the-loop touchpoint across domain boundaries.
+
+**WorkOS Identity & Access Layer** — Unified authentication and authorization across all modules, replacing the current mix of Azure Entra ID, JWT, and NextAuth. Built on WorkOS AuthKit: enterprise SSO (SAML/OIDC), SCIM directory sync, RBAC progressing to fine-grained authorization (resource-hierarchical permissions), audit logs (ISO 27001 A.12.4), and feature flags.
+
+### Integration Backbone
+
+- **gRPC+Protobuf** for hub↔spoke transport. Compiled binary protobuf over the wire (never JSON-over-gRPC). `GrpcTransportAdapter` wraps any `AdapterBase` with zero code changes. Governed by FTTS (Forge Transport Test Specification).
+- **RabbitMQ topic exchange** (proto-UNS) for event-driven module integration. The existing `wh.whk01.distillery01.*` hierarchy already connects ERPI, CMMS, WMS, and MES.
+- **Kafka** is the target enterprise event bus as volume and consumer count grow.
+
+### Ignition Replacement Strategy
+
+Ignition SCADA and the Ignition Global middleware (1,539 Jython files) are being replaced by the Forge OT Module. During migration, adapters bridge existing Ignition screens while the OT Module takes over tag acquisition, alarming, and control writes incrementally. Target: complete Ignition decommission by 2027.
 
 ---
 
@@ -393,6 +429,8 @@ Every FxTS framework follows the same four-layer architecture:
 | **FSTS** | Forge Security Test Specification | Security controls, PII handling, access control, audit trail | Hard-fail | USTS |
 | **FOTS** | Forge Observability Test Specification | Pipeline health, data freshness, latency, SLO compliance | Soft-fail | UOBS/UOTS |
 | **FPTS** | Forge Performance Test Specification | Throughput and latency benchmarks under load | Soft-fail | UBTS |
+| **FHTS** | Forge Hash Test Specification | Cross-cutting hash governance, change tracking, approval workflow | Hard-fail | UNTS (adapted) |
+| **FTTS** | Forge Transport Test Specification | gRPC+Protobuf wire format, compiled stubs, RPC contract, error protocol | Hard-fail | (new) |
 
 ### Schema-Runner Parity Rule
 
@@ -725,8 +763,8 @@ For reports and dashboards that compare entities (plants, shifts, operators, pro
 
 | Control | Implementation |
 |---------|----------------|
-| **Identity** | SSO (OIDC/SAML), MFA required for all human access |
-| **Authorization** | RBAC + ABAC, scope-based API access, row-level security where applicable |
+| **Identity** | WorkOS AuthKit: SSO (OIDC/SAML), SCIM directory sync, MFA required for all human access |
+| **Authorization** | RBAC progressing to FGA (resource-hierarchical via WorkOS), scope-based API access, row-level security where applicable |
 | **Network** | Micro-segmentation, mutual TLS between services, no implicit trust |
 | **Audit** | Immutable audit trail for all data access, governance changes, and decisions |
 | **Secrets** | Vault-based secret management, no secrets in code or config files |
@@ -738,6 +776,9 @@ For reports and dashboards that compare entities (plants, shifts, operators, pro
 |-------------|----------------------|
 | **21 CFR Part 11** | E-signatures, audit trails, version control, access control, data integrity |
 | **ISO 9001 / ISO 22000** | Documented information control, traceability, corrective action linkage |
+| **ISO 27001** | Information security controls, access management, audit logs (via WorkOS), incident response |
+| **ISO 42001** | AI management system: model governance, risk assessment, transparency, human oversight |
+| **ISO 14001 / ISO 45001** | Environmental and occupational safety data tracking, compliance evidence collection |
 | **GDPR / Privacy** | PII classification, data retention policies, right to deletion, anonymization |
 | **SOX (if applicable)** | Financial data segregation, access controls, change audit |
 
@@ -880,11 +921,19 @@ How we will know Forge is working:
 
 ---
 
-## 15. What This Is Not
+## 15. What This Is — and What It Is Not
 
-Forge is not:
+**Forge is** a modular manufacturing decision infrastructure platform. It connects, governs, and curates data from domain-specific systems (WMS, MES, ERP, CMMS, etc.) to enable better business decisions.
 
-- **A replacement for MES, ERP, or QMS.** Those systems continue to operate — WHK already has production WMS (`whk-wms`, 507K LOC TypeScript) and MES (`whk-mes`) instances. Forge connects them, governs the data flows between them, and makes their combined context available for better decisions. These existing systems are the first spoke integration targets.
+**For most spoke systems, Forge does not replace them.** WHK's production WMS (507K LOC), MES (50+ models), CMMS, and ERP Connector continue to operate as domain applications. Forge connects them through adapters, governs the data flows between them, and makes their combined context available for better decisions.
+
+**For certain vendor-locked systems, Forge does replace them.** When an existing system cannot meet Forge's integration, governance, or extensibility requirements — and the cost of adapting it exceeds the cost of replacement — Forge builds a native module. Two replacements are planned:
+
+- **Ignition SCADA/HMI → Forge OT Module** — Ignition's gateway-centric architecture, Jython scripting limitation, and lack of spec-first governance make it unsuitable as the long-term OT interface. The OT Module provides direct PLC connectivity, eliminating the gateway dependency.
+- **Intellect QMS → Forge QMS Module** — Intellect's HTTP Basic Auth, absence of event systems, and $19k+/year licensing make it unsuitable for cross-module compliance workflows. The QMS Module provides native document control, CAPA, and GRC within the Forge ecosystem.
+
+**Forge is not:**
+
 - **A dashboard platform.** Dashboards are consuming applications that sit on top of Forge. Forge provides the governed data products they need; it does not compete with BI tools.
 - **An AI/ML platform.** AI and ML models are consuming applications that access Forge's data products via APIs. Forge provides the context-rich, governed training data they need; it does not manage model lifecycle.
 - **A data lake.** Forge is a governed data platform with strict schema, quality, and lineage requirements. It is the opposite of "dump everything into a lake and figure it out later."
@@ -894,4 +943,4 @@ Forge is not:
 *This document is a living design. It will evolve as implementation reveals what works and what needs adjustment. The principles are durable; the specifics are expected to iterate.*
 
 **Document Owner:** reh3376
-**Version:** 0.1 — April 2026
+**Version:** 0.2 — April 2026 (aligned with WHK Digital Strategy v4r0)

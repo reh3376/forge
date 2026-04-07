@@ -24,7 +24,7 @@
       {
         "from": "REGISTERED",
         "to": "CONNECTING",
-        "trigger": "start() called — initiates RabbitMQ + REST connections"
+        "trigger": "start() called \u2014 initiates RabbitMQ + REST connections"
       },
       {
         "from": "CONNECTING",
@@ -59,17 +59,17 @@
       {
         "from": "HEALTHY",
         "to": "STOPPED",
-        "trigger": "stop() called — graceful shutdown"
+        "trigger": "stop() called \u2014 graceful shutdown"
       },
       {
         "from": "DEGRADED",
         "to": "STOPPED",
-        "trigger": "stop() called — graceful shutdown"
+        "trigger": "stop() called \u2014 graceful shutdown"
       },
       {
         "from": "FAILED",
         "to": "STOPPED",
-        "trigger": "stop() called — forced shutdown"
+        "trigger": "stop() called \u2014 forced shutdown"
       }
     ]
   },
@@ -100,7 +100,7 @@
         "type": "url",
         "required": false,
         "secret": false,
-        "description": "ERPI GraphQL endpoint (e.g., http://localhost:3000/graphql). Optional — used for enrichment queries when RabbitMQ messages lack full entity context.",
+        "description": "ERPI GraphQL endpoint (e.g., http://localhost:3000/graphql). Optional \u2014 used for enrichment queries when RabbitMQ messages lack full entity context.",
         "validation": {
           "pattern": "^https?://.+/graphql$"
         }
@@ -145,24 +145,27 @@
       "event_type",
       "operation_type",
       "sync_state",
-      "event_timestamp"
+      "transaction_initiator",
+      "data_flow_direction",
+      "entity_category"
     ],
     "optional_context_fields": [
+      "event_timestamp",
       "schema_version",
-      "transaction_initiator",
       "lot_id",
       "production_order_id",
       "recipe_id",
       "equipment_phase_id",
       "vendor_id",
       "customer_id",
+      "message_id",
       "netsuite_record_id"
     ],
     "data_sources": [
       {
         "source_type": "rabbitmq",
         "endpoint": "wh.whk01.distillery01.*",
-        "description": "33 entity fanout exchanges following UNS pattern. Primary data source — covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-erpi-<entity>) without affecting existing ERPI consumers.",
+        "description": "33 entity fanout exchanges following UNS pattern. Primary data source \u2014 covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-erpi-<entity>) without affecting existing ERPI consumers.",
         "entities": [
           "PurchaseOrder",
           "ProductionOrder",
@@ -228,7 +231,7 @@
       {
         "source_type": "graphql_query",
         "endpoint": "/graphql",
-        "description": "GraphQL API for complex entity queries with nested relations. 124KB auto-generated schema covering all entities. Used for enrichment — e.g., fetching full recipe tree when a RecipeParameter update arrives.",
+        "description": "GraphQL API for complex entity queries with nested relations. 124KB auto-generated schema covering all entities. Used for enrichment \u2014 e.g., fetching full recipe tree when a RecipeParameter update arrives.",
         "entities": [
           "All 40 Prisma entities with relations"
         ],
@@ -238,24 +241,52 @@
     "cross_module_data_flows": [
       {
         "flow_name": "erp_master_data_to_mes",
-        "direction": "NetSuite → ERPI → MES",
-        "entities": ["Recipe", "RecipeParameter", "RecipeGroup", "Bom", "BomItem", "Item", "ItemGroup", "Vendor", "Customer"],
+        "direction": "NetSuite \u2192 ERPI \u2192 MES",
+        "entities": [
+          "Recipe",
+          "RecipeParameter",
+          "RecipeGroup",
+          "Bom",
+          "BomItem",
+          "Item",
+          "ItemGroup",
+          "Vendor",
+          "Customer"
+        ],
         "indicator_field": "transactionInitiator",
         "indicator_value": "ERP",
         "description": "ERP-originated master data that MES depends on for recipe definitions and production planning. The Forge adapter preserves the ERP origin to maintain decision context."
       },
       {
         "flow_name": "mes_execution_to_erp",
-        "direction": "MES → ERPI → NetSuite",
-        "entities": ["ProductionOrderUnitProcedure", "UnitProcedure", "Operation", "EquipmentPhase", "ProductionSchedule", "ScheduleOrder", "ScheduleQueue", "ItemReceipt"],
+        "direction": "MES \u2192 ERPI \u2192 NetSuite",
+        "entities": [
+          "ProductionOrderUnitProcedure",
+          "UnitProcedure",
+          "Operation",
+          "EquipmentPhase",
+          "ProductionSchedule",
+          "ScheduleOrder",
+          "ScheduleQueue",
+          "ItemReceipt"
+        ],
         "indicator_field": "transactionInitiator",
         "indicator_value": "WH",
         "description": "Manufacturing execution data flowing to ERP for financial posting. ProductionOrderUnitProcedure has a special handler that posts directly to NetSuite. ItemReceipt has a 1-week delayed posting threshold."
       },
       {
         "flow_name": "wms_inventory_to_erp",
-        "direction": "WMS → ERPI → NetSuite",
-        "entities": ["Barrel", "BarrelEvent", "BarrelReceipt", "Lot", "Kit", "Inventory", "InventoryTransfer", "Location"],
+        "direction": "WMS \u2192 ERPI \u2192 NetSuite",
+        "entities": [
+          "Barrel",
+          "BarrelEvent",
+          "BarrelReceipt",
+          "Lot",
+          "Kit",
+          "Inventory",
+          "InventoryTransfer",
+          "Location"
+        ],
         "indicator_field": "transactionInitiator",
         "indicator_value": "WH",
         "description": "Warehouse inventory movements flowing to ERP for stock reconciliation and financial tracking."
@@ -299,7 +330,7 @@
         "source_field": "data.data.transactionInitiator",
         "context_field": "transaction_initiator",
         "transform": "uppercase",
-        "description": "Which system originated this data: 'WH' (manufacturing floor) or 'ERP' (NetSuite). Critical for decision context — determines authoritative source."
+        "description": "Which system originated this data: 'WH' (manufacturing floor) or 'ERP' (NetSuite). Critical for decision context \u2014 determines authoritative source."
       },
       {
         "source_field": "data.data.transactionStatus",
@@ -352,7 +383,7 @@
           "lookup_field": "sourceGlobalId",
           "return_field": "netsuiteRecordId"
         },
-        "description": "When available, attach the NetSuite internal record ID from the outbox. Enables direct NetSuite ↔ Forge entity correlation."
+        "description": "When available, attach the NetSuite internal record ID from the outbox. Enables direct NetSuite \u2194 Forge entity correlation."
       },
       {
         "target_field": "data_flow_direction",
@@ -402,12 +433,12 @@
     "external_contract": "AsyncAPI (whk-asyncapi-types submodule, compile-time type generation)",
     "deployment": "Docker Compose (PostgreSQL, Redis, RabbitMQ, Jaeger)",
     "cross_module_dependencies": "MES (recipe/production data), WMS (barrel/inventory data)",
-    "notes": "ERPI is the enterprise data backbone — 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated."
+    "notes": "ERPI is the enterprise data backbone \u2014 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated."
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": null,
-    "hash_state": "draft",
+    "spec_hash": "aef433522673556137018acf7c71a3203b75450638cb935ab43ab077d960bdc3",
+    "hash_state": "pending_review",
     "previous_hash": null,
     "approved_by": null,
     "approved_at": null,
@@ -419,7 +450,16 @@
         "source": "discovery",
         "changed_by": "claude-opus",
         "change_type": "initial",
-        "reason": "Initial ERPI FACTS spec drafted from spoke discovery (DISCOVERY.md). Pending owner approval."
+        "reason": "Initial ERPI FACTS spec drafted from spoke discovery (DISCOVERY.md)."
+      },
+      {
+        "previous_hash": null,
+        "new_hash": "aef433522673556137018acf7c71a3203b75450638cb935ab43ab077d960bdc3",
+        "changed_at": "2026-04-07T18:00:00Z",
+        "source": "compliance",
+        "changed_by": "claude-opus",
+        "change_type": "structural",
+        "reason": "D3.8 FTTS compliance: added missing context fields (transaction_initiator, data_flow_direction, entity_category, message_id) to match implemented adapter code. Moved event_timestamp to optional (not always present in RabbitMQ messages)."
       }
     ]
   }

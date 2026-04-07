@@ -1,0 +1,29 @@
+# Forge Docker build context exclusions
+.git
+.github
+.ruff_cache
+.mypy_cache
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+
+# Test and dev artifacts
+tests/
+reports/
+benchmarks/
+docs/
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+
+# Virtual environments (host-side)
+.venv/
+venv/
+
+# Coverage
+htmlcov/
+.coverage

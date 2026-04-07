@@ -18,7 +18,7 @@ regardless of the number of records.
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from forge.adapters.bosc_ims.context import build_record_context
@@ -112,7 +112,7 @@ async def collect_locations(
         ContextualRecord for each InventoryLocation.
     """
     locations = await client.list_locations()
-    now = datetime.now(tz=UTC)
+    now = datetime.now(tz=timezone.utc)
 
     for loc in locations:
         try:
@@ -180,7 +180,7 @@ async def collect_suppliers(
         ContextualRecord for each Supplier.
     """
     suppliers = await client.list_suppliers()
-    now = datetime.now(tz=UTC)
+    now = datetime.now(tz=timezone.utc)
 
     for supplier in suppliers:
         try:
@@ -288,7 +288,7 @@ async def collect_compliance(
     Yields:
         ContextualRecord for each asset's compliance status.
     """
-    now = datetime.now(tz=UTC)
+    now = datetime.now(tz=timezone.utc)
 
     for asset_id in asset_ids:
         try:

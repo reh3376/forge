@@ -17,7 +17,7 @@ Forge OperationalEvent fields:
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from forge.core.models.manufacturing.enums import EventCategory, EventSeverity
@@ -72,7 +72,7 @@ def map_barrel_event(raw: dict[str, Any]) -> OperationalEvent | None:
         raw.get("eventTime") or raw.get("event_time") or raw.get("timestamp")
     )
     if event_time is None:
-        event_time = datetime.now(tz=UTC)
+        event_time = datetime.now(tz=timezone.utc)
     return OperationalEvent(
         source_system=_SOURCE_SYSTEM,
         source_id=str(event_id),

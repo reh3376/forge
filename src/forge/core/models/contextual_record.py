@@ -9,7 +9,7 @@ the fermenter is in production, CIP, startup, or idle mode.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import StrEnum
+from forge._compat import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 

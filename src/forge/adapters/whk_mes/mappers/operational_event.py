@@ -21,7 +21,7 @@ Forge OperationalEvent fields:
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from forge.core.models.manufacturing.enums import EventCategory, EventSeverity
@@ -87,7 +87,7 @@ def map_step_event(raw: dict[str, Any]) -> OperationalEvent | None:
         or raw.get("createdAt")
     )
     if event_time is None:
-        event_time = datetime.now(tz=UTC)
+        event_time = datetime.now(tz=timezone.utc)
     # Determine the entity this step belongs to
     batch_id = raw.get("batchId") or raw.get("batch_id")
     entity_type = "batch" if batch_id else "step_execution"
@@ -141,7 +141,7 @@ def map_production_event(raw: dict[str, Any]) -> OperationalEvent | None:
         raw.get("timestamp") or raw.get("createdAt") or raw.get("created_at")
     )
     if event_time is None:
-        event_time = datetime.now(tz=UTC)
+        event_time = datetime.now(tz=timezone.utc)
     # Entity association
     batch_id = raw.get("batchId") or raw.get("batch_id")
     production_order_id = raw.get("productionOrderId") or raw.get("production_order_id")

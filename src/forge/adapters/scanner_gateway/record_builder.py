@@ -8,7 +8,7 @@ as the primary data and scan metadata as context.
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from forge.core.models.contextual_record import (
@@ -25,11 +25,11 @@ from forge.core.models.contextual_record import (
 def _parse_timestamp(raw: Any) -> datetime:
     """Parse a timestamp from various scanner event formats."""
     if raw is None:
-        return datetime.now(tz=UTC)
+        return datetime.now(tz=timezone.utc)
 
     if isinstance(raw, datetime):
         if raw.tzinfo is None:
-            return raw.replace(tzinfo=UTC)
+            return raw.replace(tzinfo=timezone.utc)
         return raw
 
     if isinstance(raw, dict):
@@ -37,20 +37,20 @@ def _parse_timestamp(raw: Any) -> datetime:
         nanos = raw.get("nanos", 0)
         return datetime.fromtimestamp(
             seconds + nanos / 1e9,
-            tz=UTC,
+            tz=timezone.utc,
         )
 
     if isinstance(raw, (int, float)):
-        return datetime.fromtimestamp(raw, tz=UTC)
+        return datetime.fromtimestamp(raw, tz=timezone.utc)
 
     raw_str = str(raw)
     try:
         dt = datetime.fromisoformat(raw_str.replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=UTC)
+            dt = dt.replace(tzinfo=timezone.utc)
         return dt
     except ValueError:
-        return datetime.now(tz=UTC)
+        return datetime.now(tz=timezone.utc)
 
 
 def _scan_tag_path(scan_event: dict[str, Any]) -> str:
@@ -85,7 +85,7 @@ def build_contextual_record(
         A fully-populated ContextualRecord.
     """
     source_time = _parse_timestamp(scan_event.get("scanned_at"))
-    now = datetime.now(tz=UTC)
+    now = datetime.now(tz=timezone.utc)
 
     # The scan event payload is the full event minus internal fields
     payload = {

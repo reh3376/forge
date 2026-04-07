@@ -80,7 +80,7 @@ class TestMockClientEvents:
 
     @pytest.mark.asyncio()
     async def test_list_recent_events_with_since(self):
-        from datetime import UTC, datetime
+        from datetime import datetime, timezone
 
         client = MockBoscImsClient()
         client.seed_events([
@@ -93,7 +93,7 @@ class TestMockClientEvents:
                 "occurred_at": "2026-04-06T15:00:00+00:00",
             },
         ])
-        since = datetime(2026, 4, 6, 0, 0, tzinfo=UTC)
+        since = datetime(2026, 4, 6, 0, 0, tzinfo=timezone.utc)
         events = await client.list_recent_events(since=since)
         assert len(events) == 1
         assert events[0]["event_id"] == "evt-new"
