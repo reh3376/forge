@@ -2,8 +2,9 @@
 
 **Working Name:** Forge (Manufacturing Decision Infrastructure Platform)
 **Created:** 2026-04-05
+**Updated:** 2026-04-07 — aligned with WHK Digital Strategy v4r0
 **Owner:** reh3376
-**Status:** PLANNING
+**Status:** ACTIVE DEVELOPMENT (D1+D2+D3 scaffold complete, 898 tests passing)
 
 ---
 
@@ -13,7 +14,7 @@
 An industry-general, hub-and-spoke modular data infrastructure platform for manufacturing that **collects, governs, stores, curates, and serves data** from the systems that generate it (PLC, SCADA, HMI, MES, WMS, IMS, QMS, ERP, Historian) and serves it back out to those systems and monitoring/observability platforms as they need it.
 
 ### Why It Exists
-Manufacturing enterprises make **confidently wrong decisions** because data is fragmented across dozens of systems. No single system preserves the full context needed for sound inference. The cost is recurring and distributed: yield loss, misdirected root-cause analysis, manual reconciliation, excess inventory, expedites, and erosion of trust in data. (See: BBD Papers Part 1 & Part 2, WHK Digital Strategy 2026-v3r1.)
+Manufacturing enterprises make **confidently wrong decisions** because data is fragmented across dozens of systems. No single system preserves the full context needed for sound inference. The cost is recurring and distributed: yield loss, misdirected root-cause analysis, manual reconciliation, excess inventory, expedites, and erosion of trust in data. (See: BBD Papers Part 1 & Part 2, WHK Digital Strategy 2026-v4r0.)
 
 ### What Makes It Novel
 1. **Decision-quality as primary design objective** — not data movement or dashboards
@@ -28,17 +29,52 @@ Manufacturing enterprises make **confidently wrong decisions** because data is f
 ### Relationship to MDEMG
 MDEMG is the **developer's cognitive substrate** — the tool used by developers to build Forge. MDEMG is NOT a component of Forge. Forge is the much larger product that MDEMG helps create. Architectural patterns from MDEMG (UxTS governance, plugin system, pipeline registry, multi-stage retrieval, Docker Compose composition) serve as proven design inspirations adapted to a different domain.
 
-### Existing Production Systems (WHK)
-WHK already has base versions of key spoke systems in production:
+### Forge Module Map (from WHK Digital Strategy v4r0)
 
-| System | Repo | Status | Notes |
-|--------|------|--------|-------|
-| **WMS** (Warehouse Management) | `https://github.com/WhiskeyHouse/whk-wms.git` | Production | 507K LOC TypeScript |
-| **MES** (Manufacturing Execution) | `https://github.com/WhiskeyHouse/whk-mes.git` | Production | Base version |
+Each Forge module evolves from (or replaces) an existing WHK production system. The WHK deployment is the reference implementation for an industry-general platform.
 
-These are the **first integration targets** for Forge adapters. Forge does not replace them — it connects to them, governs the data flows between them, and makes their combined context available for better decisions. The WHK deployment is the reference implementation for an industry-general platform.
+| # | Module | Source Repository | Tech Stack | Role |
+|---|--------|-------------------|------------|------|
+| 1 | **OT Module** | Custom (new build) | Python, opcua-asyncio | Direct L83 PLC connectivity, tag acquisition, alarming, control writes. Replaces Ignition SCADA. |
+| 2 | **NextTrend** | `TheThoughtagen/nexttrend` | Rust (Axum, QuestDB) | Time-series historian. MQTT/SparkplugB/OPC-UA ingestion, trending UI. Replaces Canary/PI. |
+| 3 | **OT UI Builder** | Future | TBD | User-built HMI screens, dashboards, P&ID graphics. Replaces Ignition Perspective. |
+| 4 | **CMMS** | `reh3376/whk-cmms` | NestJS 10, Prisma, PostgreSQL | PM scheduling, work orders, asset registry, inventory. |
+| 5 | **WMS** | `WhiskeyHouse/whk-wms` | TypeScript, NestJS+Next.js | Barrel tracking, ownership, transfers, lot management. 507K LOC. |
+| 6 | **MES** | `WhiskeyHouse/whk-mes` | NestJS+Next.js 15, Turborepo | Production orders, recipes, scheduling, quality, ERP sync. 50+ models. |
+| 7 | **IMS** | `reh3376/bosc_ims` | Go+gRPC, Python sidecar | Aerospace supply chain inventory. Compliance-enforcing spoke. |
+| 8 | **QMS** | New build (reference repos) | TBD | Document control, CAPA, audits, GRC. Replaces Intellect QMS ($19k/yr). |
+| 9 | **ERP Connector** | `WhiskeyHouse/whk-erpi` | NestJS 11, TypeScript | Bidirectional NetSuite sync. 38 RabbitMQ topics, outbox pattern. |
+| 10 | **NMS** | `WhiskeyHouse/net-topology` | Python FastAPI, Neo4j, TimescaleDB | SNMP/LLDP discovery, topology viz, FortiAnalyzer, 717+ devices. |
+| + | **Scanner Gateway** | `WhiskeyHouse/whk-wms-android` | Android | OT-tier QR scanner adapter. Spoke adapter already built. |
 
-### Design Principles (from WHK Digital Strategy)
+**Additional reference repos (not standalone modules):**
+- `WhiskeyHouse/whk-ignition-scada` — Current Ignition 8.x SCADA (being replaced by OT Module)
+- `WhiskeyHouse/whk-distillery01-ignition-global` — Ignition Global middleware, 1,539 Jython files (being replaced)
+- `WhiskeyHouse/intellect-integration-service` — MCP+REST gateway to Intellect QMS (design reference for Forge QMS)
+- `reh3376/iso-planning` — 5-standard IMS compliance planning (scope reference for QMS Module)
+
+### Forge Core Capabilities (cross-cutting, not standalone modules)
+
+In addition to domain modules, Forge provides two cross-cutting capabilities:
+
+**1. Support & Project Management Orchestration**
+Cross-module ticket lifecycle and workflow orchestration. An NMS alert can trigger a CMMS work order, which may surface a QMS deviation, which can place an MES production hold — all with a unified audit trail for ISO compliance. Consumes domain events from all modules via RabbitMQ/Kafka.
+
+**2. WorkOS Identity & Access Layer**
+Unified auth across all Forge modules, replacing fragmented Azure Entra/JWT/NextAuth. Built on WorkOS AuthKit: enterprise SSO (SAML/OIDC), SCIM directory sync, RBAC progressing to FGA (resource-hierarchical permissions), audit logs (ISO 27001 A.12.4), feature flags. Near-zero cost at WHK-internal scale (1M MAU free).
+
+### Integration Backbone
+
+- **gRPC+Protobuf transport** for hub↔spoke data movement. Compiled binary protobuf over the wire (never JSON-over-gRPC). The `GrpcTransportAdapter` wraps existing adapters with zero code changes.
+- **RabbitMQ topic exchange** (proto-UNS) for event-driven integration between modules. The existing topic hierarchy `wh.whk01.distillery01.*` already connects ERPI, CMMS, WMS, and MES.
+- **Kafka** is the target enterprise event bus as volume grows.
+- **FxTS governance** (11 spec families) ensures every adapter, data model, and transport contract is spec-first.
+
+### Ignition Replacement Strategy
+
+Ignition SCADA (`whk-ignition-scada`) and Ignition Global middleware (`whk-distillery01-ignition-global`, 1,539 Jython files) are the current OT interface. The Forge OT Module replaces both with direct PLC connectivity via a custom hardened OPC-UA Python library. During migration, Forge adapters bridge existing Ignition screens while Forge OT takes over incrementally. Target: complete Ignition decommission by 2027.
+
+### Design Principles (from WHK Digital Strategy v4r0)
 1. Decision quality first
 2. Data ownership and openness
 3. Integration first
@@ -318,37 +354,67 @@ D3: Project Scaffold
 
 If context is lost (compaction, new session, crash):
 
-1. Read this file: `mnt/Digital Strategy/forge-platform/PLAN.md`
-2. Read the architecture doc (when written): `mnt/Digital Strategy/forge-platform/ARCHITECTURE.md`
-3. Read the phase plan (when written): `mnt/Digital Strategy/forge-platform/PHASES.md`
+1. Read this file: `~/forge/PLAN.md` (or `mnt/forge/PLAN.md` in Cowork)
+2. Read the architecture doc: `~/forge/ARCHITECTURE.md`
+3. Read the phase plan: `~/forge/PHASES.md`
 4. Check auto-memory: `mnt/.auto-memory/MEMORY.md`
-5. Check project scaffold state: `mnt/Digital Strategy/forge-platform/src/`
-6. Resume from the last completed phase marker in this document
+5. Check project scaffold state: `~/forge/src/`
+6. Read the WHK Digital Strategy: `mnt/Digital Strategy/WHK Digital Strategy 2026-v4r0.docx`
+7. Resume from the last completed phase marker in this document
+
+**Repo:** `https://github.com/reh3376/forge.git`
 
 ---
 
 ## 10. Phase Completion Tracking
 
-### D1: Architecture Document
-- [ ] D1.1: Foundation Sections
-- [ ] D1.2: Data Flow Architecture
-- [ ] D1.3: Serving & Decision Support
-- [ ] D1.4: Cross-Cutting Concerns
-- [ ] D1.5: Review & Refine
+### D1: Architecture Document — COMPLETE
+- [x] D1.1: Foundation Sections
+- [x] D1.2: Data Flow Architecture
+- [x] D1.3: Serving & Decision Support
+- [x] D1.4: Cross-Cutting Concerns
+- [x] D1.5: Review & Refine
 
-### D2: Development Plan
-- [ ] D2.1: Phase Registry Design
-- [ ] D2.2: Phase Detail
-- [ ] D2.3: Timeline & Resources
+### D2: Development Plan — COMPLETE
+- [x] D2.1: Phase Registry Design
+- [x] D2.2: Phase Detail
+- [x] D2.3: Timeline & Resources
 
-### D3: Project Scaffold
-- [ ] D3.1: Project Structure
-- [ ] D3.2: Core Interfaces & Types
-- [ ] D3.3: First FxTS Framework
-- [ ] D3.4: Example Adapter
-- [ ] D3.5: Docker Compose
-- [ ] D3.6: Verification
+### D3: Project Scaffold — IN PROGRESS (898 tests passing)
+- [x] D3.1: Project Structure (F01)
+- [x] D3.2: Core Interfaces & Types (F02 — 10 entity families, 12 context fields, 91 tests)
+- [x] D3.3: First FxTS Framework (F12 — FACTS schema+runner, 244 tests)
+- [x] D3.4: WMS Adapter (F32 — 9 mappers, context builder, 127 tests)
+- [x] D3.5: MES Adapter (F33 — 11 mappers, ISA-88 pattern, 188 tests)
+- [x] D3.6: gRPC Transport (F34 — compiled proto stubs, live gRPC, FTTS governance, 175 tests)
+- [x] D3.7: Curation Service (F40 — normalization, aggregation, data products, lineage, quality, 130 tests)
+- [ ] D3.8: Remaining Spoke Adapters (see Spoke Onboarding Priority Plan)
+- [ ] D3.9: Docker Compose (F01 shell exists, full F04 stack pending)
+- [ ] D3.10: Production Verification (F90+)
+
+### Spoke Onboarding Status
+| # | Module | Adapter Status | FACTS Spec | FTTS Compliant | Notes |
+|---|--------|---------------|------------|----------------|-------|
+| 5 | WMS | Complete (Path 3) | whk-wms.facts.json (48 tests) | Yes | First vertical slice |
+| 6 | MES | Complete (Path 4) | whk-mes.facts.json (64 tests) | Yes | Second vertical slice |
+| + | Scanner | Adapter built | — | Pending | Already a spoke |
+| 4 | CMMS | Not started | — | — | NestJS, straightforward |
+| 9 | ERP Connector | Not started | — | — | 38 RabbitMQ topics already |
+| 7 | IMS | Not started | — | — | Go+gRPC, needs bridge |
+| 10 | NMS | Not started | — | — | Python, closest stack match |
+| 2 | NextTrend | Not started | — | — | Rust, needs ILP bridge |
+| 1 | OT Module | Not started (new build) | — | — | Replaces Ignition |
+| 3 | OT UI Builder | Not started (future) | — | — | Depends on OT Module |
+| 8 | QMS | Not started (new build) | — | — | Replaces Intellect |
 
 ---
 
-*This plan is the single source of truth for the Forge platform development effort. Update completion markers as work progresses. All deliverables are saved to `mnt/Digital Strategy/forge-platform/`.*
+## 11. Spoke Onboarding Priority Plan
+
+See separate document: `SPOKE_ONBOARDING.md` (to be created).
+
+Priority factors: existing adapter pattern maturity, RabbitMQ integration readiness, business value, dependency chain, and team capacity. Each spoke requires explicit approval before implementation begins.
+
+---
+
+*This plan is the single source of truth for the Forge platform development effort. Update completion markers as work progresses. All deliverables are saved to the forge repo (`https://github.com/reh3376/forge.git`) and the Digital Strategy project folder.*
