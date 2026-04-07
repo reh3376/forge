@@ -47,6 +47,8 @@ Each Forge module evolves from (or replaces) an existing WHK production system. 
 | 10 | **NMS** | `WhiskeyHouse/net-topology` | Python FastAPI, Neo4j, TimescaleDB | SNMP/LLDP discovery, topology viz, FortiAnalyzer, 717+ devices. |
 | + | **Scanner Gateway** | `WhiskeyHouse/whk-wms-android` | Android | OT-tier QR scanner adapter. Spoke adapter already built. |
 
+> **All source repositories above are reference implementations / templates.** They may require structural changes to ensure a cohesive Forge module architecture. The planned Module Builder SDK (K11) will define the canonical module structure; existing repos will be refactored to conform as they are onboarded.
+
 **Additional reference repos (not standalone modules):**
 - `WhiskeyHouse/whk-ignition-scada` — Current Ignition 8.x SCADA (being replaced by OT Module)
 - `WhiskeyHouse/whk-distillery01-ignition-global` — Ignition Global middleware, 1,539 Jython files (being replaced)
@@ -335,6 +337,7 @@ D3: Project Scaffold
 | K8 | Governance spec format | JSON, YAML, TOML | **JSON** (consistent with UxTS pattern) |
 | K9 | Container orchestration | Docker Compose (dev), K8s (prod) | **Both** (compose for dev, K8s ready) |
 | K10 | License model | Proprietary, AGPL, Apache 2.0, BSL | **TBD** (commercial intent) |
+| K11 | Module Builder SDK | Standalone SDK library, embedded in core, CLI-only scaffolder | **TBD** — SDK that codifies the adapter pattern (AdapterBase, ContextBuilder, GrpcTransportAdapter, FACTS templates, `forge module init` scaffolder) so new spokes get a paved path instead of copying prior adapters. Investigate after D3.8 proves the pattern across 3+ spoke types. |
 
 ---
 
@@ -390,22 +393,23 @@ If context is lost (compaction, new session, crash):
 - [x] D3.7: Curation Service (F40 — normalization, aggregation, data products, lineage, quality, 130 tests)
 - [ ] D3.8: Remaining Spoke Adapters (see Spoke Onboarding Priority Plan)
 - [ ] D3.9: Docker Compose (F01 shell exists, full F04 stack pending)
-- [ ] D3.10: Production Verification (F90+)
+- [ ] D3.10: Module Builder SDK (K11 — codify adapter pattern into reusable library + CLI scaffolder)
+- [ ] D3.11: Production Verification (F90+)
 
-### Spoke Onboarding Status
-| # | Module | Adapter Status | FACTS Spec | FTTS Compliant | Notes |
-|---|--------|---------------|------------|----------------|-------|
-| 5 | WMS | Complete (Path 3) | whk-wms.facts.json (48 tests) | Yes | First vertical slice |
-| 6 | MES | Complete (Path 4) | whk-mes.facts.json (64 tests) | Yes | Second vertical slice |
-| + | Scanner | Adapter built | — | Pending | Already a spoke |
-| 4 | CMMS | Not started | — | — | NestJS, straightforward |
-| 9 | ERP Connector | Not started | — | — | 38 RabbitMQ topics already |
-| 7 | IMS | Not started | — | — | Go+gRPC, needs bridge |
-| 10 | NMS | Not started | — | — | Python, closest stack match |
-| 2 | NextTrend | Not started | — | — | Rust, needs ILP bridge |
-| 1 | OT Module | Not started (new build) | — | — | Replaces Ignition |
-| 3 | OT UI Builder | Not started (future) | — | — | Depends on OT Module |
-| 8 | QMS | Not started (new build) | — | — | Replaces Intellect |
+### Spoke Onboarding Status (ordered by priority — see `SPOKE_ONBOARDING.md`)
+| # | Module | Adapter Status | FACTS Spec | FTTS Compliant | Priority |
+|---|--------|---------------|------------|----------------|----------|
+| 5 | WMS | **Complete** (Path 3) | whk-wms.facts.json (48 tests) | Yes | — (done) |
+| 6 | MES | **Complete** (Path 4) | whk-mes.facts.json (64 tests) | Yes | — (done) |
+| 9 | ERP Connector | Not started | — | — | P1 — 38 RabbitMQ topics already flowing |
+| 4 | CMMS | Not started | — | — | P2 — identical NestJS stack, equipment context |
+| 10 | NMS | Not started | — | — | P3 — Python-native, closest stack match |
+| + | Scanner | Adapter built | — | Pending | P4 — config only, opportunistic |
+| 2 | NextTrend | Not started | — | — | P5 — Rust, needs ILP bridge |
+| 7 | IMS | Not started | — | — | P6 — Go+gRPC, validates non-Python pattern |
+| 1 | OT Module | Not started (new build) | — | — | P7 — replaces Ignition (largest effort) |
+| 8 | QMS | Not started (new build) | — | — | P8 — replaces Intellect (regulatory scope) |
+| 3 | OT UI Builder | Not started (future) | — | — | P9 — depends on OT Module maturity |
 
 ---
 

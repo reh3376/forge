@@ -277,6 +277,8 @@ Future ──── OT UI Builder ───────┘  (depends on OT Modul
 
 Every spoke onboarding follows this checklist:
 
+> **Note:** All source repos are reference implementations / templates. Structural changes to align with Forge module conventions are expected during onboarding. Once the Module Builder SDK (PLAN.md K11) is available, new spokes should scaffold from the SDK rather than copying prior adapters.
+
 1. **Approval gate** — Spoke compliance plan reviewed and approved by owner
 2. **Discovery** — Document existing APIs, data models, event streams, and auth patterns
 3. **FACTS spec** — Write adapter conformance spec BEFORE implementation (spec-first)
