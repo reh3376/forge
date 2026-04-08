@@ -1,0 +1,104 @@
+{
+  "adapter_id": "next-trend",
+  "name": "NextTrend Historian Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "rest+sse",
+  "tier": "HISTORIAN",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/next-trend/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "tag_name",
+      "tag_id",
+      "data_type",
+      "unit",
+      "quality"
+    ]
+  },
+  "health_check_interval_ms": 15000,
+  "connection_params": [
+    {
+      "name": "api_base_url",
+      "description": "NextTrend REST API base URL (e.g., http://localhost:3011/api/v1)",
+      "required": true,
+      "secret": false,
+      "default": "http://localhost:3011/api/v1"
+    },
+    {
+      "name": "api_key",
+      "description": "NextTrend API key (ntv1_ prefix). Requires at least read:tags and read:history scopes.",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "username",
+      "description": "NextTrend username for JWT authentication. Used when api_key is not provided.",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "password",
+      "description": "NextTrend password for JWT authentication.",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "poll_interval_ms",
+      "description": "Interval between tag value collection polls.",
+      "required": false,
+      "secret": false,
+      "default": "5000"
+    },
+    {
+      "name": "history_query_limit",
+      "description": "Maximum data points per history query.",
+      "required": false,
+      "secret": false,
+      "default": "10000"
+    },
+    {
+      "name": "tag_prefix_filter",
+      "description": "Only collect tags matching this path prefix (e.g., WH/WHK01/). Empty means all tags.",
+      "required": false,
+      "secret": false,
+      "default": ""
+    },
+    {
+      "name": "connect_timeout_ms",
+      "description": "HTTP connection timeout for NextTrend API requests.",
+      "required": false,
+      "secret": false,
+      "default": "5000"
+    },
+    {
+      "name": "request_timeout_ms",
+      "description": "HTTP request timeout for NextTrend API requests.",
+      "required": false,
+      "secret": false,
+      "default": "30000"
+    }
+  ],
+  "auth_methods": [
+    "api_key",
+    "bearer_token"
+  ],
+  "metadata": {
+    "spoke": "next-trend",
+    "hub_module": "forge.adapters.next_trend",
+    "source_repo": "https://github.com/TheThoughtagen/nexttrend",
+    "source_language": "Rust",
+    "source_framework": "Axum + QuestDB + tokio",
+    "source_database": "QuestDB (ILP writes, PGWire reads)",
+    "deployment": "Docker Compose (historian + web + QuestDB)",
+    "production_url": "https://trend.whiskeyhouse.com",
+    "notes": "First HISTORIAN-tier Forge adapter. Cross-language spoke: Python adapter wraps Rust REST API. Supports live SSE streaming and historical backfill via time-range queries."
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "next-trend",
+    "name": "NextTrend Historian Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "HISTORIAN",
+    "protocol": "rest+sse"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 15000,
+    "shutdown_timeout_ms": 5000,
+    "health_check_interval_ms": 15000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called — initiates HTTP health check against NextTrend /healthz"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "NextTrend /healthz returns 200 OK"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "DEGRADED",
+        "trigger": "NextTrend API unreachable on start — allows degraded operation"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "3 consecutive health check failures against NextTrend API"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "NextTrend API health check succeeds"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "10 consecutive health check failures"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection attempt"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called — clears caches, tokens, and subscriptions"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called — forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "api_base_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "NextTrend REST API base URL. Axum-based server typically on port 3011. Supports /tags, /sse, /healthz, /readyz endpoints.",
+        "default": "http://localhost:3011/api/v1",
+        "validation": {
+          "pattern": "^https?://.+/api/v[0-9]+"
+        }
+      },
+      {
+        "name": "api_key",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "NextTrend API key with ntv1_ prefix. SHA-512 verified server-side. Requires scopes: read:tags, read:history. Preferred over JWT for machine-to-machine auth.",
+        "validation": {
+          "pattern": "^ntv1_[a-f0-9]{64}$"
+        }
+      },
+      {
+        "name": "username",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "NextTrend username for JWT authentication. Used when api_key is not provided. Obtains Bearer token via POST /auth/login."
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "NextTrend password for JWT authentication."
+      },
+      {
+        "name": "poll_interval_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Interval between tag value collection polls.",
+        "default": "5000",
+        "validation": {
+          "min": 500,
+          "max": 300000
+        }
+      },
+      {
+        "name": "history_query_limit",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Maximum data points per history query. NextTrend default is 10000 with LTTB downsampling at 2000.",
+        "default": "10000",
+        "validation": {
+          "min": 100,
+          "max": 100000
+        }
+      },
+      {
+        "name": "tag_prefix_filter",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Only collect tags matching this slash-separated path prefix (e.g., WH/WHK01/). Empty means all tags.",
+        "default": ""
+      },
+      {
+        "name": "connect_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "HTTP connection timeout for NextTrend API requests.",
+        "default": "5000",
+        "validation": {
+          "min": 500,
+          "max": 30000
+        }
+      },
+      {
+        "name": "request_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "HTTP request timeout for NextTrend API requests. History queries with large result sets may need higher timeouts.",
+        "default": "30000",
+        "validation": {
+          "min": 1000,
+          "max": 120000
+        }
+      }
+    ],
+    "auth_methods": [
+      "api_key",
+      "bearer_token"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/next-trend/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "tag_name",
+      "tag_id",
+      "data_type",
+      "unit",
+      "quality"
+    ],
+    "optional_context_fields": [
+      "quality_code",
+      "source",
+      "retention_tier",
+      "asset_id",
+      "description",
+      "area"
+    ],
+    "data_sources": [
+      {
+        "name": "tag_history",
+        "source_type": "rest_get",
+        "endpoint": "/tags/{name}/history",
+        "description": "Time-series history query with start/end range, optional sample_by downsampling, LTTB decimation, and fill modes. Returns timestamped value+quality arrays. QuestDB PGWire backend with dialect-aware SQL.",
+        "entities": [
+          "TagValue",
+          "HistoryResponse"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "name": "tag_browse",
+        "source_type": "rest_get",
+        "endpoint": "/tags/browse",
+        "description": "Hierarchical tag browser. Returns folders and tags at a given prefix level. Slash-separated paths (WH/WHK01/Distillery01/). Used for discovery and tag enumeration.",
+        "entities": [
+          "TagMeta",
+          "BrowseResponse"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "name": "tag_list",
+        "source_type": "rest_get",
+        "endpoint": "/tags",
+        "description": "Paginated tag list with search and prefix filtering. Returns tag metadata: id, name, data_type, unit, description, source, retention_tier, asset_id.",
+        "entities": [
+          "TagMeta"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "name": "live_sse",
+        "source_type": "websocket",
+        "endpoint": "/sse/tags",
+        "description": "Server-Sent Events stream for live tag values. 1-second tick rate per subscribed tag. Event format: {tag, value, ts, quality}. Supports JWT query param auth for EventSource clients.",
+        "entities": [
+          "TagValue",
+          "SSEEvent"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "name": "tag_crud",
+        "source_type": "rest_get",
+        "endpoint": "/tags, /tags/{id}",
+        "description": "Tag metadata CRUD. GET (list/detail), POST (create), PATCH (update), DELETE (soft-delete). Used for tag registration and metadata sync, not data collection.",
+        "entities": [
+          "TagMeta"
+        ],
+        "collection_mode": "poll"
+      }
+    ],
+    "sample_record": {
+      "record_id": "next-trend:WH/WHK01/Distillery01/Temperature:a1b2c3d4e5f6",
+      "source_adapter": "next-trend",
+      "collected_at": "2026-04-07T12:00:00Z",
+      "context": {
+        "tag_name": "WH/WHK01/Distillery01/Temperature",
+        "tag_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "data_type": "Float64",
+        "unit": "°F",
+        "quality": "GOOD",
+        "quality_code": 192
+      },
+      "payload": {
+        "ts": "2026-04-07T11:59:55+00:00",
+        "value": 145.7,
+        "quality": 192
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "TagMeta.name",
+        "context_field": "tag_name",
+        "description": "Slash-separated tag path from NextTrend (e.g., WH/WHK01/Distillery01/Temperature). Primary identifier for historian data points."
+      },
+      {
+        "source_field": "TagMeta.id",
+        "context_field": "tag_id",
+        "description": "UUID assigned by NextTrend. Maps to equipment_id in RecordContext for asset correlation."
+      },
+      {
+        "source_field": "TagMeta.data_type",
+        "context_field": "data_type",
+        "description": "Value data type: Float64, Int64, String, Boolean. Determines normalization and quality assessment logic."
+      },
+      {
+        "source_field": "TagMeta.unit",
+        "context_field": "unit",
+        "transform": "passthrough",
+        "description": "Engineering units (°F, PSI, GPM, RPM). Stored in RecordValue.unit and context.extra for downstream unit conversion."
+      },
+      {
+        "source_field": "TagValue.quality",
+        "context_field": "quality",
+        "transform": "normalize:OPC-UA code (192→GOOD, 64→UNCERTAIN, 0→BAD) to Forge QualityCode enum",
+        "description": "OPC UA quality code from NextTrend. Numeric code preserved in quality_code, label in quality."
+      },
+      {
+        "source_field": "TagMeta.name (first 2 path segments)",
+        "context_field": "area",
+        "transform": "split:/,take:2,join:/",
+        "description": "Derived area from tag path hierarchy. WH/WHK01/Distillery01/Temp → WH/WHK01. Maps to RecordContext.area."
+      },
+      {
+        "source_field": "TagMeta.source",
+        "context_field": "source",
+        "description": "Original data source identifier (e.g., Ignition tag path, OPC UA node). Preserved for provenance tracking."
+      },
+      {
+        "source_field": "TagMeta.asset_id",
+        "context_field": "asset_id",
+        "description": "NextTrend asset UUID. Links tag to an equipment asset for cross-system correlation."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 500,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 15000,
+      "retryable_errors": [
+        "CONNECTION_REFUSED",
+        "TIMEOUT",
+        "HTTP_502",
+        "HTTP_503",
+        "HTTP_429"
+      ]
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 30000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "destination": "forge://dead-letter/next-trend",
+      "retention_days": 30,
+      "description": "Tag values that fail translation or have unmappable data types are sent to dead letter for manual review."
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 10
+    }
+  },
+  "metadata": {
+    "spoke": "next-trend",
+    "hub_module": "forge.adapters.next_trend",
+    "source_repo": "https://github.com/TheThoughtagen/nexttrend",
+    "source_language": "Rust",
+    "source_framework": "Axum 0.7 + tokio + QuestDB",
+    "source_database": "QuestDB (ILP writes via questdb-rs, PGWire reads via tokio-postgres)",
+    "deployment": "Docker Compose (historian + web + QuestDB) behind Traefik reverse proxy",
+    "production_url": "https://trend.whiskeyhouse.com",
+    "api_port": 3011,
+    "tag_path_format": "slash-separated (WH/WHK01/Distillery01/Tag)",
+    "quality_standard": "OPC UA (192=GOOD, 64=UNCERTAIN, 0=BAD)",
+    "supported_aggregations": ["sample_by (1m/5m/1h/1d)", "LTTB downsampling", "fill (linear/null/prev/none)"],
+    "notes": "First HISTORIAN-tier Forge adapter. Cross-language spoke: Python adapter wraps Rust REST API. 4-crate workspace (core, storage, api, ingest). Replaces Canary/OSIsoft PI. ~14K tags imported from Canary, live ingest via MQTT/SparkplugB/OPC UA."
+  },
+  "integrity": {
+    "state": "draft",
+    "created_at": "2026-04-07",
+    "spec_author": "forge-platform",
+    "notes": "Phase 1 scaffold. REST+SSE adapter for time-series tag data. First historian-tier spoke and first cross-language (Python↔Rust) adapter. Backfill supported via history endpoint time-range queries.",
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "13c01d4a7583093b1ffabfdb2a848a39f6a96d5dbcf965e2385c7b46ec48e75b"
+  }
+}

@@ -77,7 +77,7 @@
     }
   ],
   "auth_methods": [
-    "jwt_bearer",
+    "bearer_token",
     "none"
   ],
   "metadata": {

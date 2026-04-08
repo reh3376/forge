@@ -130,8 +130,8 @@
       }
     ],
     "auth_methods": [
-      "jwt_bearer",
-      "none (rabbitmq auth is in connection URL)"
+      "bearer_token",
+      "none"
     ]
   },
   "data_contract": {
@@ -305,6 +305,8 @@
         "sync_state": "PENDING",
         "event_timestamp": "2026-04-07T10:29:55Z",
         "transaction_initiator": "ERP",
+        "data_flow_direction": "inbound_from_erp",
+        "entity_category": "inventory",
         "schema_version": "1.0.0"
       },
       "payload": {
@@ -371,12 +373,23 @@
         "source_field": "data.data.recipe.id OR data.data.recipeId",
         "context_field": "recipe_id",
         "description": "Recipe reference for recipe-related entities (RecipeParameter, RecipeGroup, Bom)."
+      },
+      {
+        "source_field": "data.data.category",
+        "context_field": "entity_category",
+        "description": "Business category of the entity (e.g., 'Raw Material', 'Finished Good', 'WIP'). Used for decision routing and cross-module classification."
+      },
+      {
+        "source_field": "(static)",
+        "context_field": "source_system",
+        "transform": "static:erpi",
+        "description": "Identifies the originating spoke adapter. Always 'erpi' for records from this adapter."
       }
     ],
     "enrichment_rules": [
       {
         "target_field": "netsuite_record_id",
-        "rule_type": "outbox_lookup",
+        "rule_type": "lookup",
         "config": {
           "source_field": "cross_system_id",
           "lookup_source": "NetSuiteOutbox",
@@ -387,7 +400,7 @@
       },
       {
         "target_field": "data_flow_direction",
-        "rule_type": "derived",
+        "rule_type": "computed",
         "config": {
           "source_field": "transaction_initiator",
           "mapping": {
@@ -437,11 +450,11 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "aef433522673556137018acf7c71a3203b75450638cb935ab43ab077d960bdc3",
-    "hash_state": "pending_review",
-    "previous_hash": null,
-    "approved_by": null,
-    "approved_at": null,
+    "spec_hash": "85479c89667b40bb25bab8343477434936881e858f34d44b66321f6aac585c06",
+    "hash_state": "approved",
+    "previous_hash": "aef433522673556137018acf7c71a3203b75450638cb935ab43ab077d960bdc3",
+    "approved_by": "forge-governance-audit",
+    "approved_at": "2026-04-08T00:00:00Z",
     "change_history": [
       {
         "previous_hash": null,

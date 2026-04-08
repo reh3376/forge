@@ -124,7 +124,7 @@
       }
     ],
     "auth_methods": [
-      "jwt_bearer",
+      "bearer_token",
       "none"
     ]
   },
@@ -413,7 +413,7 @@
       },
       {
         "target_field": "is_critical",
-        "rule_type": "derived",
+        "rule_type": "computed",
         "config": {
           "source_field": "blast_radius",
           "threshold": 10,
@@ -460,11 +460,11 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "58db2236e810061331c3d499d3c2e99be5277003d0f5fda0f15a0a551564127b",
-    "hash_state": "pending_review",
+    "spec_hash": "3bdc2a10aa3603f8b90e9f3786fa444db154ec20ac3490ae3b00514042046709",
+    "hash_state": "approved",
     "previous_hash": null,
-    "approved_by": null,
-    "approved_at": null,
+    "approved_by": "reh3376",
+    "approved_at": "2026-04-08T00:00:00Z",
     "change_history": [
       {
         "previous_hash": null,

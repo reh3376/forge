@@ -4,7 +4,7 @@
 **Created:** 2026-04-05
 **Updated:** 2026-04-07 — aligned with WHK Digital Strategy v4r0
 **Owner:** reh3376
-**Status:** ACTIVE DEVELOPMENT (D1+D2+D3 complete, 1835 tests passing)
+**Status:** ACTIVE DEVELOPMENT (D1+D2+D3 complete, 1899 tests passing)
 
 ---
 
@@ -402,14 +402,14 @@ If context is lost (compaction, new session, crash):
 | # | Module | Adapter Status | FACTS Spec | FTTS Compliant | Priority |
 |---|--------|---------------|------------|----------------|----------|
 | 5 | WMS | **Complete** (Path 3) | whk-wms.facts.json (48 tests) | Yes | — (done) |
-| 6 | MES | **Complete** (Path 4) | whk-mes.facts.json (64 tests) | Yes | — (done) |
-| 9 | ERP Connector | **Adapter complete** (98 tests passing) | **FACTS-compliant** (whk-erpi.facts.json, hash verified) | Yes | P1 — done |
-| 4 | CMMS | **Adapter complete** (157 tests passing, 4 skipped) | **FACTS-compliant** (whk-cmms.facts.json, hash verified) | Yes | P2 — done |
-| 10 | NMS | **Adapter complete** (77 tests passing) | **FACTS-compliant** (whk-nms.facts.json, hash verified) | Yes | P3 — done |
-| + | Scanner | Adapter built | — | Pending | P4 — config only, opportunistic |
-| 2 | NextTrend | Not started | — | — | P5 — Rust, needs ILP bridge |
-| 7 | IMS | Not started | — | — | P6 — Go+gRPC, validates non-Python pattern |
-| 1 | OT Module | Not started (new build) | — | — | P7 — replaces Ignition (largest effort) |
+| 6 | MES | **Complete** (188 tests passing) | **FACTS-compliant** (35/35 checks, hash verified) | Yes | — done (audit confirmed) |
+| 9 | ERP Connector | **Adapter complete** (98 tests passing) | **FACTS-compliant** (34/34 checks, hash verified — audit: auth vocab, enrichment types, sample coverage, mapping coverage fixed) | Yes | P1 — done |
+| 4 | CMMS | **Adapter complete** (157 tests passing, 4 skipped) | **FACTS-compliant** (34/34 checks, hash verified — audit: auth vocab, enrichment type, hash state fixed) | Yes | P2 — done |
+| 10 | NMS | **Adapter complete** (77 tests passing) | **FACTS-compliant** (34/34 checks, hash verified) | Yes | P3 — done (P6 audit: spec fixes applied) |
+| + | Scanner | **Adapter complete** (147 tests passing) | **FACTS-compliant** (scanner-gateway.facts.json, hash verified) | Yes | P4 — done |
+| 2 | NextTrend | **Complete** | 64 tests passing | FACTS-compliant (33/33 checks, hash verified) | P5 — done. First HISTORIAN tier, cross-language (Python↔Rust REST+SSE) |
+| 7 | IMS (BOSC) | **Complete** (131 tests passing) | **FACTS-compliant** (34/34 checks, hash verified) | Yes | — done. First gRPC+protobuf native adapter, Go backend |
+| 1 | OT Module | **Planning complete** (v2.0 sprint plan, 7 phases, 22-26 sprints). Research: competitive analysis, 9-type tag engine, Python 3.12+ scripting engine, i3X browse API. | Pending (Phase 1) | Pending | P7 — replaces Ignition (largest effort). See `docs/p7-ot-module/` |
 | 8 | QMS | Not started (new build) | — | — | P8 — replaces Intellect (regulatory scope) |
 | 3 | OT UI Builder | Not started (future) | — | — | P9 — depends on OT Module maturity |
 
