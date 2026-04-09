@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -175,7 +175,7 @@ class ScannerGatewayAdapter(
             await self._handler.start()
 
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.now(tz=timezone.utc)
+        self._last_healthy = datetime.now(tz=UTC)
         logger.info(
             "Scanner Gateway started (state=%s, listen=%s, devices=%d)",
             self._state,
@@ -211,7 +211,7 @@ class ScannerGatewayAdapter(
                     self._state = AdapterState.DEGRADED
             else:
                 self._consecutive_failures = 0
-                self._last_healthy = datetime.now(tz=timezone.utc)
+                self._last_healthy = datetime.now(tz=UTC)
                 self._state = AdapterState.HEALTHY
 
         return AdapterHealth(

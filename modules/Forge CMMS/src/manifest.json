@@ -1,0 +1,89 @@
+{
+  "adapter_id": "whk-cmms",
+  "name": "Whiskey House CMMS Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "graphql+rest+amqp",
+  "tier": "MES_MOM",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-cmms/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_context",
+      "asset_id",
+      "asset_path",
+      "work_order_type",
+      "priority_level",
+      "maintenance_status"
+    ]
+  },
+  "health_check_interval_ms": 30000,
+  "connection_params": [
+    {
+      "name": "cmms_graphql_url",
+      "description": "CMMS GraphQL endpoint (e.g. http://localhost:3000/graphql). Primary data source for work orders, assets, maintenance requests.",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "cmms_rest_url",
+      "description": "CMMS REST API base URL (e.g. http://localhost:3000/api). Secondary source for kits, vendors, locations.",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "rabbitmq_url",
+      "description": "RabbitMQ AMQP URL (e.g. amqp://guest:guest@localhost:5672). Optional — required for subscription to ERPI master data (item, vendor).",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "jwt_token",
+      "description": "JWT bearer token for authenticated GraphQL/REST requests.",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "rabbitmq_consumer_group",
+      "description": "Consumer group ID for RabbitMQ queue naming. Must be unique to Forge.",
+      "required": false,
+      "secret": false,
+      "default": "forge-cmms"
+    },
+    {
+      "name": "rabbitmq_vhost",
+      "description": "RabbitMQ virtual host.",
+      "required": false,
+      "secret": false,
+      "default": "/"
+    },
+    {
+      "name": "poll_interval_seconds",
+      "description": "GraphQL polling interval for work orders, assets, maintenance requests (10-3600 seconds).",
+      "required": false,
+      "secret": false,
+      "default": "60"
+    }
+  ],
+  "auth_methods": [
+    "jwt_bearer",
+    "none"
+  ],
+  "metadata": {
+    "spoke": "cmms",
+    "hub_module": "forge.adapters.whk_cmms",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-cmms",
+    "external_contract": "asyncapi://whk-asyncapi-types/v1.0.0"
+  }
+}

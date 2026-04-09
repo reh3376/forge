@@ -1,6 +1,6 @@
 """Tests for the Scanner Gateway record builder."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from forge.adapters.scanner_gateway.record_builder import (
     _parse_timestamp,
@@ -42,14 +42,14 @@ class TestParseTimestamp:
         assert result.tzinfo is not None
 
     def test_datetime_passthrough_with_tz(self):
-        dt = datetime(2026, 4, 6, 14, 30, tzinfo=timezone.utc)
+        dt = datetime(2026, 4, 6, 14, 30, tzinfo=UTC)
         result = _parse_timestamp(dt)
         assert result == dt
 
     def test_naive_datetime_gets_utc(self):
         dt = datetime(2026, 4, 6, 14, 30)
         result = _parse_timestamp(dt)
-        assert result.tzinfo == timezone.utc
+        assert result.tzinfo == UTC
 
 
 # ── Scan Tag Path ────────────────────────────────────────────────

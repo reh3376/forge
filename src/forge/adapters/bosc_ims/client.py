@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -309,13 +309,13 @@ def _event_timestamp(event: dict[str, Any]) -> datetime:
     """Extract a comparable timestamp from an event dict."""
     raw = event.get("occurred_at")
     if raw is None:
-        return datetime.min.replace(tzinfo=timezone.utc)
+        return datetime.min.replace(tzinfo=UTC)
     if isinstance(raw, datetime):
         if raw.tzinfo is None:
-            return raw.replace(tzinfo=timezone.utc)
+            return raw.replace(tzinfo=UTC)
         return raw
     try:
         raw_str = str(raw).replace("Z", "+00:00")
         return datetime.fromisoformat(raw_str)
     except (ValueError, TypeError):
-        return datetime.min.replace(tzinfo=timezone.utc)
+        return datetime.min.replace(tzinfo=UTC)

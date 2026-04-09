@@ -9,7 +9,7 @@ is not enough — human judgment needs structured challenge.
 from __future__ import annotations
 
 from datetime import datetime
-from forge._compat import StrEnum
+from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 

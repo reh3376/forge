@@ -1,0 +1,495 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "whk-cmms",
+    "name": "Whiskey House CMMS Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "MES_MOM",
+    "protocol": "graphql+rest+amqp"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 30000,
+    "shutdown_timeout_ms": 15000,
+    "health_check_interval_ms": 30000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called \u2014 initiates GraphQL + RabbitMQ connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "GraphQL endpoint accessible and RabbitMQ (if configured) connects"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (30s)"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "GraphQL or RabbitMQ health check fails 3 consecutive times"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "Both GraphQL and RabbitMQ (if subscribed) health checks pass"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (10)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful shutdown"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "cmms_graphql_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "CMMS GraphQL endpoint (e.g., http://localhost:3000/graphql). Primary data source for maintenance entities: assets, work orders, work requests, kits, inventory locations, investigations.",
+        "validation": {
+          "pattern": "^https?://.+/graphql$"
+        }
+      },
+      {
+        "name": "cmms_rest_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "CMMS REST API base URL (e.g., http://localhost:3000/api). Secondary source for reference data: vendors, items, users.",
+        "validation": {
+          "pattern": "^https?://.+/api$"
+        }
+      },
+      {
+        "name": "rabbitmq_url",
+        "type": "url",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ AMQP URL (e.g., amqp://guest:guest@localhost:5672). Optional \u2014 required only if CMMS will subscribe to ERPI master data topics (item, vendor, inventory).",
+        "validation": {
+          "pattern": "^amqps?://.+"
+        }
+      },
+      {
+        "name": "jwt_token",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "JWT bearer token for authenticated GraphQL/REST requests. Not required if CMMS has unauthenticated endpoints."
+      },
+      {
+        "name": "rabbitmq_consumer_group",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Consumer group ID for RabbitMQ queue naming. Must be unique to Forge to avoid stealing messages from other consumers.",
+        "default": "forge-cmms"
+      },
+      {
+        "name": "rabbitmq_vhost",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ virtual host.",
+        "default": "/"
+      },
+      {
+        "name": "poll_interval_seconds",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "GraphQL polling interval for work orders, assets, maintenance requests (10-3600 seconds).",
+        "default": 60,
+        "validation": {
+          "minimum": 10,
+          "maximum": 3600
+        }
+      }
+    ],
+    "auth_methods": [
+      "jwt_bearer",
+      "none"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-cmms/v0.1.0",
+    "external_contract_ref": "asyncapi://whk-asyncapi-types/v1.0.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_context",
+      "entity_category"
+    ],
+    "optional_context_fields": [
+      "asset_id",
+      "asset_path",
+      "work_order_type",
+      "work_request_type",
+      "priority_level",
+      "maintenance_status",
+      "maintenance_role_approval",
+      "operations_supervisor_approval",
+      "kit_id",
+      "location_path",
+      "cron_schedule",
+      "erp_id",
+      "scheduled_start",
+      "estimated_duration",
+      "message_id"
+    ],
+    "data_sources": [
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Primary source: GraphQL polling of core maintenance entities. Assets with ISA-95 hierarchy, work orders with lifecycle tracking, work requests with dual-approval governance.",
+        "entities": [
+          "Asset",
+          "WorkOrder",
+          "WorkRequest",
+          "WorkOrderType",
+          "WorkRequestType"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Inventory management: maintenance kits (pre-assembled item sets), inventory locations, and inventory investigations (physical count vs. digital count reconciliation).",
+        "entities": [
+          "Kit",
+          "InventoryLocation",
+          "InventoryInvestigation"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "Reference data: items, vendors, and users. Cross-referenced with ERPI master data for cost tracking and vendor management.",
+        "entities": [
+          "Item",
+          "Vendor",
+          "User"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/{entity}",
+        "description": "REST API for historical backfill and reference lookups. Covers all 11 Prisma entities.",
+        "entities": [
+          "Asset",
+          "WorkOrder",
+          "WorkRequest",
+          "Item",
+          "Vendor",
+          "Kit"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "wh.whk01.distillery01.*",
+        "description": "ERPI master data topics for inventory enrichment. Items, vendors, purchase orders, production orders, and inventory transfers.",
+        "entities": [
+          "Item",
+          "Vendor",
+          "Inventory",
+          "InventoryTransfer",
+          "PurchaseOrder",
+          "ProductionOrder",
+          "ScheduleOrder"
+        ],
+        "collection_mode": "subscribe"
+      }
+    ],
+    "cross_module_data_flows": [
+      {
+        "flow_name": "erpi_master_data_to_cmms",
+        "direction": "ERPI \u2192 CMMS",
+        "entities": [
+          "Item",
+          "Vendor",
+          "PurchaseOrder"
+        ],
+        "description": "ERP-originated master data enriches maintenance cost tracking with item pricing, vendor information, and purchase order references."
+      },
+      {
+        "flow_name": "cmms_maintenance_windows_to_mes",
+        "direction": "CMMS \u2192 MES",
+        "entities": [
+          "WorkOrder"
+        ],
+        "description": "Scheduled maintenance windows (from WorkOrder.scheduledStart/End) must be communicated to MES for production scheduling constraints."
+      },
+      {
+        "flow_name": "cmms_inventory_to_wms",
+        "direction": "CMMS \u2192 WMS",
+        "entities": [
+          "InventoryInvestigation"
+        ],
+        "description": "Inventory audit reconciliation coordinates with warehouse operations for physical count verification."
+      }
+    ],
+    "sample_record": {
+      "record_id": "whk-cmms:workorder:evt-20260407-001",
+      "source_adapter": "whk-cmms",
+      "collected_at": "2026-04-07T14:30:00Z",
+      "context": {
+        "cross_system_id": "WO-2026-00142",
+        "source_system": "whk-cmms",
+        "entity_type": "WorkOrder",
+        "event_type": "create",
+        "operation_context": "maintenance",
+        "entity_category": "equipment_maintenance",
+        "asset_id": "ASSET-PUMP-001",
+        "asset_path": "WHK01/Distillery01/Utility01/Pump01",
+        "work_order_type": "preventive",
+        "priority_level": "medium",
+        "maintenance_status": "Scheduled",
+        "scheduled_start": "2026-04-08T09:00:00Z",
+        "estimated_duration": "PT4H"
+      },
+      "payload": {
+        "id": "WO-2026-00142",
+        "name": "Quarterly Pump Inspection \u2014 Pump01",
+        "assetId": "ASSET-PUMP-001",
+        "assetPath": "WHK01/Distillery01/Utility01/Pump01",
+        "workOrderType": "preventive",
+        "priority": "medium",
+        "status": "Scheduled",
+        "scheduledStart": "2026-04-08T09:00:00Z",
+        "estimatedDuration": "PT4H",
+        "cronSchedule": "0 9 1 */3 *",
+        "kitId": "KIT-PUMP-INSPECT-001"
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "entity.globalId OR entity.id",
+        "context_field": "cross_system_id",
+        "description": "Unique identifier from CMMS. Uses globalId for ERP-synced entities, falls back to local CUID for CMMS-native entities."
+      },
+      {
+        "source_field": "(constant)",
+        "context_field": "source_system",
+        "transform": "constant:whk-cmms",
+        "description": "Fixed source system identifier."
+      },
+      {
+        "source_field": "entity.__typename OR model_name",
+        "context_field": "entity_type",
+        "description": "Prisma model name: Asset, WorkOrder, WorkRequest, Kit, Item, Vendor, InventoryLocation, InventoryInvestigation."
+      },
+      {
+        "source_field": "event.type OR operation_type",
+        "context_field": "event_type",
+        "description": "Business event type: create, update, delete, status_change."
+      },
+      {
+        "source_field": "(constant)",
+        "context_field": "operation_context",
+        "transform": "constant:maintenance",
+        "description": "Fixed operation context \u2014 all CMMS data is maintenance domain."
+      },
+      {
+        "source_field": "entity_type \u2192 category_map",
+        "context_field": "entity_category",
+        "transform": "lookup:{Asset: equipment_maintenance, WorkOrder: maintenance, WorkRequest: maintenance, Kit: inventory, Item: inventory, Vendor: procurement, InventoryLocation: inventory, InventoryInvestigation: audit}",
+        "description": "Maps entity type to maintenance domain category for cross-module analysis."
+      },
+      {
+        "source_field": "entity.assetId OR entity.asset.id",
+        "context_field": "asset_id",
+        "description": "ISA-95 equipment identifier. Present for work orders and assets. Links to CMMS asset registry."
+      },
+      {
+        "source_field": "entity.assetPath",
+        "context_field": "asset_path",
+        "transform": "path_normalize:WHK01/Distillery01/...",
+        "description": "ISA-95 equipment hierarchy path (e.g., WHK01/Distillery01/Utility01/Pump01). Hierarchical physical location for the maintained asset."
+      },
+      {
+        "source_field": "entity.workOrderType.name",
+        "context_field": "work_order_type",
+        "transform": "lowercase",
+        "description": "Maintenance type: preventive, corrective, predictive. Determines scheduling and priority logic."
+      },
+      {
+        "source_field": "entity.priority",
+        "context_field": "priority_level",
+        "description": "Maintenance priority: low, medium, high, critical. Drives scheduling precedence."
+      },
+      {
+        "source_field": "entity.status",
+        "context_field": "maintenance_status",
+        "description": "Work order lifecycle status: Scheduled, Active, Completed, Cancelled."
+      },
+      {
+        "source_field": "entity.maintenanceRoleApproval",
+        "context_field": "maintenance_role_approval",
+        "description": "Boolean \u2014 maintenance supervisor has approved this work request."
+      },
+      {
+        "source_field": "entity.operationsSupervisorApproval",
+        "context_field": "operations_supervisor_approval",
+        "description": "Boolean \u2014 operations supervisor has approved this work request. Both approvals required before scheduling."
+      },
+      {
+        "source_field": "entity.kitId OR entity.kit.id",
+        "context_field": "kit_id",
+        "description": "Maintenance kit reference \u2014 pre-assembled item sets for specific maintenance tasks."
+      },
+      {
+        "source_field": "entity.inventoryLocation.path",
+        "context_field": "location_path",
+        "description": "Inventory storage location path for kit items and spare parts."
+      },
+      {
+        "source_field": "entity.cronSchedule",
+        "context_field": "cron_schedule",
+        "description": "Cron expression for recurring preventive maintenance (e.g., '0 9 1 */3 *' = quarterly at 9am)."
+      },
+      {
+        "source_field": "entity.erpId",
+        "context_field": "erp_id",
+        "description": "NetSuite ERP identifier for cross-system reconciliation."
+      },
+      {
+        "source_field": "entity.scheduledStart",
+        "context_field": "scheduled_start",
+        "description": "Planned maintenance start time. Critical for MES production scheduling coordination."
+      },
+      {
+        "source_field": "entity.estimatedDuration",
+        "context_field": "estimated_duration",
+        "description": "Expected maintenance duration (ISO 8601 duration). Used with scheduled_start to define maintenance windows."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "entity_category",
+        "rule_type": "lookup",
+        "config": {
+          "source_field": "entity_type",
+          "lookup_table": "cmms_entity_to_category",
+          "fallback": "maintenance"
+        },
+        "description": "Auto-classify CMMS entities into maintenance domain categories."
+      },
+      {
+        "target_field": "asset_path",
+        "rule_type": "hierarchy_resolve",
+        "config": {
+          "source_field": "asset_id",
+          "hierarchy_source": "cmms_asset_tree",
+          "format": "{site}/{area}/{unit}/{equipment}"
+        },
+        "description": "Resolve flat asset ID to ISA-95 hierarchical equipment path by traversing CMMS asset parent chain."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 60000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.whk-cmms",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 10
+    }
+  },
+  "metadata": {
+    "spoke": "cmms",
+    "hub_module": "forge-adapters",
+    "source_repo": "https://github.com/reh3376/whk-cmms",
+    "source_language": "TypeScript",
+    "source_framework": "NestJS 10",
+    "source_database": "PostgreSQL (Prisma ORM, 11 models)",
+    "source_messaging": "RabbitMQ (via ERPI master data topics)",
+    "erp_integration": "NetSuite (indirect, via ERPI for item/vendor sync)",
+    "deployment": "Docker Compose",
+    "cross_module_dependencies": "ERPI (master data), MES (maintenance window scheduling), WMS (inventory reconciliation)",
+    "notes": "Smallest spoke codebase. Equipment context from CMMS enriches every other module \u2014 assets, work orders, and maintenance status are cross-cutting operational data. Dual-approval governance (maintenance supervisor + operations supervisor) is a key business rule. Phase 1 adapter is read-only via GraphQL polling."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "859c9f65c2fb284b154f918f0e9d2f7864765563c24872b1cbc9111e89aa90c2",
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "approved_by": null,
+    "approved_at": null,
+    "change_history": [
+      {
+        "previous_hash": null,
+        "new_hash": null,
+        "changed_at": "2026-04-07T00:00:00Z",
+        "source": "discovery",
+        "changed_by": "claude-opus",
+        "change_type": "initial",
+        "reason": "Initial CMMS FACTS spec drafted from spoke discovery."
+      },
+      {
+        "previous_hash": null,
+        "new_hash": "859c9f65c2fb284b154f918f0e9d2f7864765563c24872b1cbc9111e89aa90c2",
+        "changed_at": "2026-04-07T18:00:00Z",
+        "source": "compliance",
+        "changed_by": "claude-opus",
+        "change_type": "structural",
+        "reason": "D3.8 FTTS compliance: restructured from non-standard format to FACTS-compliant 10-section schema. Added context_mapping (18 field mappings), error_handling (retry+circuit breaker+dead letter), metadata (deployment details), integrity (hash tracking). Migrated domain_mappings, governance, known_patterns, phase_1_limitations, and related_adapters into standard FACTS sections."
+      }
+    ]
+  }
+}

@@ -8,7 +8,7 @@ for correct business interpretation.
 from __future__ import annotations
 
 from datetime import datetime
-from forge._compat import StrEnum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field

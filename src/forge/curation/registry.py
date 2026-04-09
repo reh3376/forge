@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
@@ -36,7 +36,7 @@ class DataProductVersion:
     version: str = "0.1.0"
     schema: DataProductSchema | None = None
     fields: list[DataProductField] = field(default_factory=list)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     notes: str = ""
 
 
@@ -181,7 +181,7 @@ class DataProductRegistry:
             raise ValueError(msg)
 
         product.status = DataProductStatus.PUBLISHED
-        product.updated_at = datetime.now(timezone.utc)
+        product.updated_at = datetime.now(UTC)
         self._store.save(product)
         return product
 
@@ -196,7 +196,7 @@ class DataProductRegistry:
             raise ValueError(msg)
 
         product.status = DataProductStatus.DEPRECATED
-        product.updated_at = datetime.now(timezone.utc)
+        product.updated_at = datetime.now(UTC)
         self._store.save(product)
         return product
 
@@ -211,7 +211,7 @@ class DataProductRegistry:
             raise ValueError(msg)
 
         product.status = DataProductStatus.RETIRED
-        product.updated_at = datetime.now(timezone.utc)
+        product.updated_at = datetime.now(UTC)
         self._store.save(product)
         return product
 
@@ -234,7 +234,7 @@ class DataProductRegistry:
         if schema_ref:
             schema = DataProductSchema(schema_ref=schema_ref, version=version)
             product.schema = schema
-            product.updated_at = datetime.now(timezone.utc)
+            product.updated_at = datetime.now(UTC)
             self._store.save(product)
 
         ver = DataProductVersion(

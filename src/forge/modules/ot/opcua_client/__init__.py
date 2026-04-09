@@ -33,6 +33,7 @@ Usage::
 """
 
 from forge.modules.ot.opcua_client.client import OpcUaClient
+from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,
     CertificateError,
@@ -76,6 +77,9 @@ from forge.modules.ot.opcua_client.types import (
 __all__ = [
     # Client
     "OpcUaClient",
+    # Paths
+    "NormalizedPath",
+    "PathNormalizer",
     # Types
     "AccessLevel",
     "BrowseResult",

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class DeviceRecord:
     operator_id: str | None = None
     site_id: str | None = None
     registered_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc),
+        default_factory=lambda: datetime.now(tz=UTC),
     )
     last_heartbeat: datetime | None = None
     heartbeat_interval_s: int = 30  # Expected heartbeat interval
@@ -55,7 +55,7 @@ class DeviceRecord:
         if self.last_heartbeat is None:
             return False
         elapsed = (
-            datetime.now(tz=timezone.utc) - self.last_heartbeat
+            datetime.now(tz=UTC) - self.last_heartbeat
         ).total_seconds()
         return elapsed < self.heartbeat_interval_s * 3
 
@@ -112,7 +112,7 @@ class DeviceRegistry:
         after an app restart or network reconnect.
         """
         existing = self._devices.get(device_id)
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
 
         if existing is not None:
             # Update fields that may change on re-registration
@@ -166,7 +166,7 @@ class DeviceRegistry:
             logger.warning("Heartbeat from unknown device: %s", device_id)
             return None
 
-        record.last_heartbeat = datetime.now(tz=timezone.utc)
+        record.last_heartbeat = datetime.now(tz=UTC)
 
         # Update optional telemetry
         if battery_pct is not None:

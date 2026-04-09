@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.adapters.scanner_gateway.device_registry import DeviceRegistry  # noqa: TC001
@@ -64,7 +64,7 @@ class HeartbeatResponse:
 
     def __init__(self, acknowledged: bool = True) -> None:
         self.acknowledged = acknowledged
-        self.server_time = datetime.now(tz=timezone.utc).isoformat()
+        self.server_time = datetime.now(tz=UTC).isoformat()
 
 
 class RegisterDeviceResponse:
@@ -250,7 +250,7 @@ class MockScannerServiceHandler(ScannerServiceHandler):
         accepted = 0
         rejected = 0
         errors: list[str] = []
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
 
         for scan in scans:
             # Validate required fields
