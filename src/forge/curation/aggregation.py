@@ -15,8 +15,8 @@ from __future__ import annotations
 import statistics
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from forge._compat import StrEnum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -172,8 +172,8 @@ def aggregate_records(
                 ),
                 timestamp=RecordTimestamp(
                     source_time=bucket_time,
-                    server_time=datetime.now(timezone.utc),
-                    ingestion_time=datetime.now(timezone.utc),
+                    server_time=datetime.now(UTC),
+                    ingestion_time=datetime.now(UTC),
                 ),
                 value=RecordValue(
                     raw=agg_value,

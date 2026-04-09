@@ -1,0 +1,86 @@
+{
+  "adapter_id": "ot-module",
+  "name": "Forge OT/SCADA Module — OPC-UA Adapter",
+  "version": "0.1.0",
+  "type": "ACQUISITION",
+  "protocol": "opcua",
+  "tier": "OT_SCADA",
+  "capabilities": {
+    "read": true,
+    "write": true,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/ot-module/v0.1.0",
+    "output_format": "tag_value",
+    "context_fields": [
+      "tag_path",
+      "quality_code",
+      "source_timestamp",
+      "server_timestamp",
+      "data_type",
+      "node_class"
+    ]
+  },
+  "health_check_interval_ms": 10000,
+  "connection_params": [
+    {"name": "endpoint_url", "description": "OPC-UA server endpoint (opc.tcp://host:port)", "required": true, "secret": false},
+    {"name": "security_policy", "description": "SecurityPolicy: None, Basic256Sha256, Aes128Sha256RsaOaep", "required": false, "secret": false, "default": "None"},
+    {"name": "security_mode", "description": "MessageSecurityMode: None, Sign, SignAndEncrypt", "required": false, "secret": false, "default": "None"},
+    {"name": "client_certificate_path", "description": "DER-encoded client certificate (required for non-None policy)", "required": false, "secret": false},
+    {"name": "client_private_key_path", "description": "PEM-encoded client private key", "required": false, "secret": true},
+    {"name": "server_certificate_path", "description": "Trusted server certificate (DER), TOFU if omitted", "required": false, "secret": false},
+    {"name": "namespace_map", "description": "OPC-UA namespace index → connection name mapping", "required": true, "secret": false},
+    {"name": "site_prefix", "description": "Site prefix for Forge-normalized tag paths", "required": false, "secret": false, "default": "WH"},
+    {"name": "session_timeout_ms", "description": "OPC-UA session timeout", "required": false, "secret": false, "default": "30000"},
+    {"name": "reconnect_max_attempts", "description": "Max reconnection attempts before FAILED", "required": false, "secret": false, "default": "5"},
+    {"name": "reconnect_base_delay_ms", "description": "Base delay for exponential backoff", "required": false, "secret": false, "default": "1000"},
+    {"name": "subscribe_interval_ms", "description": "Default subscription monitoring interval", "required": false, "secret": false, "default": "500"}
+  ],
+  "auth_methods": ["anonymous", "certificate", "username_password"],
+  "state_machine": {
+    "states": ["DISCONNECTED", "CONNECTING", "CONNECTED", "RECONNECTING", "FAILED"],
+    "initial_state": "DISCONNECTED",
+    "terminal_states": ["DISCONNECTED", "FAILED"]
+  },
+  "target_systems": [
+    "Allen-Bradley ControlLogix L82E v36+",
+    "Allen-Bradley ControlLogix L83E v36+"
+  ],
+  "i3x_api": {
+    "endpoints": [
+      "/ot/namespaces",
+      "/ot/objecttypes",
+      "/ot/objects",
+      "/ot/objects/value",
+      "/ot/objects/history",
+      "/ot/subscriptions"
+    ],
+    "compliance": "CESMII i3X REST shape"
+  },
+  "tag_engine": {
+    "tag_types": [
+      "Standard (OPC)",
+      "Memory",
+      "Expression",
+      "Query",
+      "Derived",
+      "Reference",
+      "Computed",
+      "Event",
+      "Virtual"
+    ],
+    "note": "9-type tag engine — 6 standard types matching Ignition + 3 Forge-exclusive (Computed, Event, Virtual)"
+  },
+  "facts_spec_ref": "forge://governance/facts/specs/ot-module.facts.json",
+  "metadata": {
+    "spoke": "ot-module",
+    "hub_module": "forge.modules.ot",
+    "source_repo": "https://github.com/reh3376/forge",
+    "source_lines": 2000,
+    "replaces": "Ignition SCADA (OPC-UA tag provider + historian)",
+    "thin_wrapper": "asyncua owns wire protocol; Forge owns types + operational concerns"
+  }
+}

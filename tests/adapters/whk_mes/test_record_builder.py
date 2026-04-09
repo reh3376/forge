@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from forge.adapters.whk_mes.record_builder import (
     _assess_quality,
@@ -91,7 +91,7 @@ class TestExtractSourceTime:
         assert result is not None
 
     def test_datetime_object(self):
-        ts = datetime(2026, 4, 6, 14, 30, tzinfo=timezone.utc)
+        ts = datetime(2026, 4, 6, 14, 30, tzinfo=UTC)
         raw = {"timestamp": ts}
         assert _extract_source_time(raw) == ts
 

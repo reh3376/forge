@@ -20,7 +20,7 @@ correctness violation that governance tests must catch.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.core.models.contextual_record import (
@@ -109,7 +109,7 @@ def wrap_egress_event(
         "spoke_id": spoke_id,
         "spoke_version": spoke_version,
         "inner_event": event,
-        "emitted_at": datetime.now(tz=timezone.utc).isoformat(),
+        "emitted_at": datetime.now(tz=UTC).isoformat(),
     }
 
 
@@ -149,7 +149,7 @@ def build_egress_record(
     # Parse timestamps
     emitted_raw = egress_event.get("emitted_at")
     occurred_raw = inner.get("occurred_at")
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     source_time = _parse_iso(occurred_raw) or now
     emit_time = _parse_iso(emitted_raw) or now
@@ -246,7 +246,7 @@ def build_intelligence_event(
         "type": type_value,
         "type_name": intelligence_type,
         "payload": payload,
-        "generated_at": datetime.now(tz=timezone.utc).isoformat(),
+        "generated_at": datetime.now(tz=UTC).isoformat(),
     }
 
 
@@ -261,7 +261,7 @@ def _parse_iso(raw: Any) -> datetime | None:
         raw_str = str(raw).replace("Z", "+00:00")
         dt = datetime.fromisoformat(raw_str)
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
+            dt = dt.replace(tzinfo=UTC)
         return dt
     except (ValueError, TypeError):
         return None

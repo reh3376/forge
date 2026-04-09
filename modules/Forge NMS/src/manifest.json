@@ -1,0 +1,81 @@
+{
+  "adapter_id": "whk-nms",
+  "name": "Whiskey House Network Management System Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "rest+websocket",
+  "tier": "MES_MOM",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-nms/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_context",
+      "device_ip",
+      "device_type",
+      "device_role",
+      "device_category",
+      "is_critical",
+      "is_ot_device",
+      "severity",
+      "health_status",
+      "blast_radius",
+      "baseline_status"
+    ]
+  },
+  "health_check_interval_ms": 30000,
+  "connection_params": [
+    {
+      "name": "nms_api_url",
+      "description": "NMS REST API base URL (e.g. http://localhost:8000/api/v1). Hosts 13 device/event/topology endpoints.",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "nms_ws_url",
+      "description": "NMS WebSocket URL for real-time event streaming (e.g. ws://localhost:8000/api/v1/events/stream). Optional — if not provided, REST polling only.",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "jwt_token",
+      "description": "JWT bearer token for authenticated REST/WebSocket requests.",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "poll_interval_seconds",
+      "description": "Polling interval for REST endpoints in seconds. Default: 60.",
+      "required": false,
+      "secret": false,
+      "default": "60"
+    },
+    {
+      "name": "verify_ssl",
+      "description": "Verify SSL certificates for HTTPS connections. Default: true.",
+      "required": false,
+      "secret": false,
+      "default": "true"
+    }
+  ],
+  "auth_methods": [
+    "jwt_bearer",
+    "none"
+  ],
+  "metadata": {
+    "spoke": "nms",
+    "hub_module": "forge.adapters.whk_nms",
+    "source_repo": "https://github.com/WhiskeyHouse/net-topology",
+    "external_contract": "openapi://nms-api/v1.0.0"
+  }
+}
