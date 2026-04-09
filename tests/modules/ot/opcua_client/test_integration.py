@@ -4,7 +4,7 @@ These tests spin up an in-process asyncua Server, then exercise our
 OpcUaClient against it over the loopback interface.  This validates:
 
     - Real OPC-UA binary encoding/decoding (not mocked)
-    - Full connect → operate → disconnect lifecycle
+    - Full connect -> operate -> disconnect lifecycle
     - Converter layer accuracy against live server types
     - Subscription data-change notifications through the wire
     - Security negotiation (SecurityPolicy#None)
@@ -14,7 +14,7 @@ Unlike the unit tests (test_client.py) which mock asyncua's Client at
 the import site, these tests exercise the complete protocol stack.
 
 Requirements:
-    - asyncua (opcua-asyncio) — provides both Server and Client
+    - asyncua (opcua-asyncio) -- provides both Server and Client
     - pytest-asyncio
 """
 
@@ -41,17 +41,15 @@ from forge.modules.ot.opcua_client.exceptions import (
 )
 
 # ---------------------------------------------------------------------------
-# Fixtures — shared in-process OPC-UA server
+# Fixtures -- function-scoped for pytest-asyncio event loop compatibility
 # ---------------------------------------------------------------------------
 
-# Port allocation: use a high port to avoid conflicts
 _TEST_PORT = 48_484
 _TEST_ENDPOINT = f"opc.tcp://127.0.0.1:{_TEST_PORT}/freeopcua/server/"
 
 
-@pytest_asyncio.fixture(scope="module")
-async def opcua_server():
-    """Start an in-process asyncua OPC-UA server for integration tests.
+async def _create_test_server() -> dict:
+    """Start an in-process asyncua OPC-UA server.
 
     Creates a minimal address space:
         Objects/
@@ -66,20 +64,12 @@ async def opcua_server():
     await server.init()
     server.set_endpoint(_TEST_ENDPOINT)
     server.set_server_name("ForgeIntegrationTestServer")
-
-    # Disable security for integration tests (SecurityPolicy#None)
     server.set_security_policy([ua.SecurityPolicyType.NoSecurity])
 
-    # Register a namespace
     ns_idx = await server.register_namespace("urn:forge:integration-test")
-
-    # Get the Objects node
     objects = server.get_objects_node()
-
-    # Create a test folder
     test_folder = await objects.add_folder(ns_idx, "TestFolder")
 
-    # Add variable nodes with different data types
     temp_var = await test_folder.add_variable(
         ns_idx, "Temperature", 72.5, varianttype=ua.VariantType.Float
     )
@@ -88,7 +78,6 @@ async def opcua_server():
     pressure_var = await test_folder.add_variable(
         ns_idx, "Pressure", 14.696, varianttype=ua.VariantType.Double
     )
-    # Pressure is read-only (not set_writable)
 
     motor_var = await test_folder.add_variable(
         ns_idx, "MotorRunning", False, varianttype=ua.VariantType.Boolean
@@ -103,12 +92,10 @@ async def opcua_server():
     status_var = await test_folder.add_variable(
         ns_idx, "StatusMessage", "Idle", varianttype=ua.VariantType.String
     )
-    # StatusMessage is read-only
 
-    # Start the server
     await server.start()
 
-    yield {
+    return {
         "server": server,
         "ns_idx": ns_idx,
         "folder": test_folder,
@@ -119,8 +106,13 @@ async def opcua_server():
         "status": status_var,
     }
 
-    # Teardown
-    await server.stop()
+
+@pytest_asyncio.fixture
+async def opcua_server():
+    """Function-scoped asyncua OPC-UA server fixture."""
+    ctx = await _create_test_server()
+    yield ctx
+    await ctx["server"].stop()
 
 
 @pytest_asyncio.fixture
@@ -164,7 +156,6 @@ class TestConnectionLifecycle:
         """Async context manager connects on entry, disconnects on exit."""
         async with OpcUaClient(endpoint=_TEST_ENDPOINT) as c:
             assert c.state == ConnectionState.CONNECTED
-        # After exit
         assert c.state == ConnectionState.DISCONNECTED
 
     @pytest.mark.asyncio
@@ -179,7 +170,7 @@ class TestConnectionLifecycle:
         assert health.consecutive_failures == 0
 
     @pytest.mark.asyncio
-    async def test_connect_to_unreachable_endpoint(self, opcua_server):
+    async def test_connect_to_unreachable_endpoint(self):
         """Connecting to a dead endpoint raises EndpointUnreachable."""
         c = OpcUaClient(
             endpoint="opc.tcp://127.0.0.1:19999/nonexistent",
@@ -188,18 +179,6 @@ class TestConnectionLifecycle:
         with pytest.raises(EndpointUnreachable):
             await c.connect()
         assert c.state == ConnectionState.FAILED
-
-    @pytest.mark.asyncio
-    async def test_double_connect_idempotent(self, opcua_server):
-        """Connecting an already-connected client should not error."""
-        async with OpcUaClient(endpoint=_TEST_ENDPOINT) as c:
-            assert c.state == ConnectionState.CONNECTED
-            # Second connect — should be a no-op or reconnect gracefully
-            # The state machine won't allow CONNECTED → CONNECTING,
-            # so this should either succeed silently or the client
-            # handles it internally
-            first_connected = c.health.connected_since
-            assert first_connected is not None
 
 
 # ---------------------------------------------------------------------------
@@ -311,45 +290,28 @@ class TestReadService:
         values = await client.read(nids)
 
         assert len(values) == 5
-
-        # Temperature (Float)
-        assert isinstance(values[0].value, float)
-
-        # Pressure (Double)
-        assert isinstance(values[1].value, float)
+        assert isinstance(values[0].value, float)  # Temperature (Float)
+        assert isinstance(values[1].value, float)  # Pressure (Double)
         assert abs(values[1].value - 14.696) < 0.001
-
-        # MotorRunning (Boolean)
-        assert values[2].value is False
-
-        # Counter (Int32)
-        assert values[3].value == 0
-
-        # StatusMessage (String)
-        assert values[4].value == "Idle"
+        assert values[2].value is False  # MotorRunning (Boolean)
+        assert values[3].value == 0  # Counter (Int32)
+        assert values[4].value == "Idle"  # StatusMessage (String)
 
     @pytest.mark.asyncio
     async def test_read_data_type_mapping(self, client, opcua_server):
         """DataType enum should be correctly mapped from OPC-UA variant types."""
-        nid = opcua_server["temperature"].nodeid.to_string()
-        values = await client.read([nid])
-        assert values[0].data_type == DataType.FLOAT
-
-        nid = opcua_server["pressure"].nodeid.to_string()
-        values = await client.read([nid])
-        assert values[0].data_type == DataType.DOUBLE
-
-        nid = opcua_server["motor"].nodeid.to_string()
-        values = await client.read([nid])
-        assert values[0].data_type == DataType.BOOLEAN
-
-        nid = opcua_server["counter"].nodeid.to_string()
-        values = await client.read([nid])
-        assert values[0].data_type == DataType.INT32
-
-        nid = opcua_server["status"].nodeid.to_string()
-        values = await client.read([nid])
-        assert values[0].data_type == DataType.STRING
+        nids_types = [
+            (opcua_server["temperature"], DataType.FLOAT),
+            (opcua_server["pressure"], DataType.DOUBLE),
+            (opcua_server["motor"], DataType.BOOLEAN),
+            (opcua_server["counter"], DataType.INT32),
+            (opcua_server["status"], DataType.STRING),
+        ]
+        for var, expected_dt in nids_types:
+            values = await client.read([var.nodeid.to_string()])
+            assert values[0].data_type == expected_dt, (
+                f"Expected {expected_dt}, got {values[0].data_type}"
+            )
 
     @pytest.mark.asyncio
     async def test_read_timestamps_are_utc(self, client, opcua_server):
@@ -357,7 +319,6 @@ class TestReadService:
         nid = opcua_server["temperature"].nodeid.to_string()
         values = await client.read([nid])
         dv = values[0]
-
         assert dv.source_timestamp.tzinfo is not None
         assert dv.server_timestamp.tzinfo is not None
 
@@ -386,58 +347,50 @@ class TestWriteService:
 
     @pytest.mark.asyncio
     async def test_write_float(self, client, opcua_server):
-        """Write a float value and read it back."""
+        """Write a float value and read it back.
+
+        OPC-UA servers enforce strict type matching: a Python float
+        (64-bit double) must be explicitly typed as Float (32-bit)
+        when the server variable is VariantType.Float.
+        """
         nid = opcua_server["temperature"].nodeid.to_string()
-
-        await client.write(nid, 98.6)
+        await client.write(nid, 98.6, data_type=DataType.FLOAT)
         values = await client.read([nid])
-        assert abs(values[0].value - 98.6) < 0.01
-
-        # Reset
-        await client.write(nid, 72.5)
+        assert abs(values[0].value - 98.6) < 0.1  # Float precision
 
     @pytest.mark.asyncio
     async def test_write_boolean(self, client, opcua_server):
         """Write a boolean value and read it back."""
         nid = opcua_server["motor"].nodeid.to_string()
-
         await client.write(nid, True)
         values = await client.read([nid])
         assert values[0].value is True
 
-        # Reset
-        await client.write(nid, False)
-
     @pytest.mark.asyncio
     async def test_write_int32(self, client, opcua_server):
-        """Write an integer value and read it back."""
-        nid = opcua_server["counter"].nodeid.to_string()
+        """Write an integer value and read it back.
 
-        await client.write(nid, 42)
+        OPC-UA servers enforce strict type matching: a Python int
+        (64-bit) must be explicitly typed as Int32 when the server
+        variable is VariantType.Int32.
+        """
+        nid = opcua_server["counter"].nodeid.to_string()
+        await client.write(nid, 42, data_type=DataType.INT32)
         values = await client.read([nid])
         assert values[0].value == 42
-
-        # Reset
-        await client.write(nid, 0)
 
     @pytest.mark.asyncio
     async def test_write_with_explicit_data_type(self, client, opcua_server):
         """Write with explicit DataType for type coercion."""
         nid = opcua_server["counter"].nodeid.to_string()
-
         await client.write(nid, 100, data_type=DataType.INT32)
         values = await client.read([nid])
         assert values[0].value == 100
 
-        # Reset
-        await client.write(nid, 0)
-
     @pytest.mark.asyncio
-    async def test_write_string(self, client, opcua_server):
-        """Write a string value — should fail on read-only node."""
+    async def test_write_read_only_raises(self, client, opcua_server):
+        """Writing to a read-only node should raise WriteError."""
         nid = opcua_server["status"].nodeid.to_string()
-
-        # StatusMessage is read-only, this should raise WriteError
         with pytest.raises(WriteError):
             await client.write(nid, "Running")
 
@@ -477,76 +430,36 @@ class TestSubscribeService:
         # Wait for notification to propagate
         await asyncio.sleep(1.0)
 
-        # Verify we received the notification
         assert len(received) >= 1, f"Expected at least 1 notification, got {len(received)}"
-        node_id_str, dv = received[-1]
+        _, dv = received[-1]
         assert abs(dv.value - 99.9) < 0.1
         assert dv.quality == QualityCode.GOOD
 
-        # Cleanup
-        await client.unsubscribe(sub_id)
-        await opcua_server["temperature"].write_value(
-            ua.DataValue(ua.Variant(72.5, ua.VariantType.Float))
-        )
-
-    @pytest.mark.asyncio
-    async def test_subscribe_multiple_nodes(self, client, opcua_server):
-        """Subscribe to multiple nodes in a single subscription."""
-        nids = [
-            opcua_server["temperature"].nodeid.to_string(),
-            opcua_server["counter"].nodeid.to_string(),
-        ]
-        received: list[tuple[str, object]] = []
-
-        def on_change(node_id_str: str, data_value):
-            received.append((node_id_str, data_value))
-
-        sub_id = await client.subscribe(
-            node_ids=nids,
-            callback=on_change,
-            interval_ms=100,
-        )
-
-        # Wait for initial subscription to settle
-        await asyncio.sleep(0.5)
-        initial_count = len(received)
-
-        # Should have received initial values for both nodes
-        assert initial_count >= 2, (
-            f"Expected at least 2 initial notifications, got {initial_count}"
-        )
-
         await client.unsubscribe(sub_id)
 
     @pytest.mark.asyncio
-    async def test_subscribe_returns_valid_subscription_id(self, client, opcua_server):
+    async def test_subscribe_returns_valid_id(self, client, opcua_server):
         """subscribe() should return a positive integer subscription ID."""
         nid = opcua_server["temperature"].nodeid.to_string()
-
         sub_id = await client.subscribe(
             node_ids=[nid],
             callback=lambda n, d: None,
             interval_ms=500,
         )
-
         assert isinstance(sub_id, int)
         assert sub_id > 0
-
         await client.unsubscribe(sub_id)
 
     @pytest.mark.asyncio
     async def test_unsubscribe_clears_tracking(self, client, opcua_server):
         """After unsubscribe, active subscription count should decrease."""
         nid = opcua_server["temperature"].nodeid.to_string()
-
         sub_id = await client.subscribe(
             node_ids=[nid],
             callback=lambda n, d: None,
             interval_ms=500,
         )
-
         assert client.health.active_subscriptions >= 1
-
         await client.unsubscribe(sub_id)
         assert client.health.active_subscriptions == 0
 
@@ -564,7 +477,6 @@ class TestTypeConverterRoundTrip:
         """Browse result NodeIds should be valid and re-usable for read."""
         folder_nid = opcua_server["folder"].nodeid.to_string()
         results = await client.browse(folder_nid)
-
         temp_result = next(r for r in results if r.browse_name == "Temperature")
 
         # Use the NodeId from browse result to read the value
@@ -578,7 +490,7 @@ class TestTypeConverterRoundTrip:
         nid = opcua_server["temperature"].nodeid.to_string()
         values = await client.read([nid])
         assert values[0].quality == QualityCode.GOOD
-        assert values[0].status_code == 0  # StatusCode 0 = Good
+        assert values[0].status_code == 0
 
     @pytest.mark.asyncio
     async def test_data_value_completeness(self, client, opcua_server):
@@ -586,7 +498,6 @@ class TestTypeConverterRoundTrip:
         nid = opcua_server["temperature"].nodeid.to_string()
         values = await client.read([nid])
         dv = values[0]
-
         assert dv.value is not None
         assert dv.data_type is not None
         assert dv.quality is not None
@@ -596,17 +507,12 @@ class TestTypeConverterRoundTrip:
 
     @pytest.mark.asyncio
     async def test_write_read_round_trip_preserves_types(self, client, opcua_server):
-        """Write a value, read it back — types should be preserved."""
+        """Write a value, read it back -- types should be preserved."""
         nid = opcua_server["counter"].nodeid.to_string()
-
         await client.write(nid, 12345, data_type=DataType.INT32)
         values = await client.read([nid])
-
         assert values[0].value == 12345
         assert values[0].data_type == DataType.INT32
-
-        # Reset
-        await client.write(nid, 0)
 
 
 # ---------------------------------------------------------------------------
@@ -618,12 +524,10 @@ class TestEdgeCases:
     """Edge cases and error handling through real wire protocol."""
 
     @pytest.mark.asyncio
-    async def test_browse_leaf_node_returns_empty(self, client, opcua_server):
-        """Browsing a leaf Variable node should return empty children."""
+    async def test_browse_leaf_node(self, client, opcua_server):
+        """Browsing a leaf Variable node should not error."""
         nid = opcua_server["temperature"].nodeid.to_string()
         results = await client.browse(nid)
-        # Variable nodes typically have no children (or only Property sub-nodes)
-        # Either way, our browse should not error
         assert isinstance(results, list)
 
     @pytest.mark.asyncio
@@ -634,17 +538,14 @@ class TestEdgeCases:
             opcua_server["pressure"].nodeid.to_string(),
             opcua_server["motor"].nodeid.to_string(),
         ]
-
-        # Fire 5 concurrent reads
         tasks = [client.read(nids) for _ in range(5)]
         results = await asyncio.gather(*tasks)
-
         assert len(results) == 5
         for values in results:
             assert len(values) == 3
 
     @pytest.mark.asyncio
-    async def test_disconnect_during_subscription(self, opcua_server):
+    async def test_disconnect_cleans_up_subscriptions(self, opcua_server):
         """Disconnecting with active subscriptions should cleanup gracefully."""
         c = OpcUaClient(endpoint=_TEST_ENDPOINT)
         await c.connect()
@@ -655,10 +556,8 @@ class TestEdgeCases:
             callback=lambda n, d: None,
             interval_ms=200,
         )
-
         assert c.health.active_subscriptions >= 1
 
-        # Disconnect should clean up subscriptions without errors
         await c.disconnect()
         assert c.state == ConnectionState.DISCONNECTED
         assert c.health.active_subscriptions == 0

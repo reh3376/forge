@@ -1,0 +1,834 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "ot-module",
+    "name": "Forge OT/SCADA Module — OPC-UA Adapter",
+    "version": "0.5.0",
+    "type": "BIDIRECTIONAL",
+    "tier": "OT_SCADA",
+    "protocol": "opcua+mqtt+amqp"
+  },
+  "capabilities": {
+    "read": true,
+    "write": true,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 15000,
+    "shutdown_timeout_ms": 10000,
+    "health_check_interval_ms": 10000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "DISCONNECTED",
+        "to": "CONNECTING",
+        "trigger": "connect() called — initiates OPC-UA TCP socket and secure channel"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "CONNECTED",
+        "trigger": "Secure channel established, session activated, security policy negotiated"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded or security negotiation rejected"
+      },
+      {
+        "from": "CONNECTED",
+        "to": "RECONNECTING",
+        "trigger": "Socket error, session timeout, or health check detects stale connection"
+      },
+      {
+        "from": "RECONNECTING",
+        "to": "CONNECTED",
+        "trigger": "New secure channel and session established with exponential backoff"
+      },
+      {
+        "from": "RECONNECTING",
+        "to": "FAILED",
+        "trigger": "Max reconnect attempts exhausted (default 5, with exponential backoff)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers fresh connection attempt"
+      },
+      {
+        "from": "CONNECTED",
+        "to": "DISCONNECTED",
+        "trigger": "disconnect() called — graceful session close and channel teardown"
+      },
+      {
+        "from": "RECONNECTING",
+        "to": "DISCONNECTED",
+        "trigger": "disconnect() called — abort reconnect loop"
+      },
+      {
+        "from": "FAILED",
+        "to": "DISCONNECTED",
+        "trigger": "disconnect() called — reset state to idle"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "endpoint_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "OPC-UA server endpoint (e.g., opc.tcp://10.4.2.10:4840). Allen-Bradley ControlLogix L82E/L83E with v36+ firmware exposes OPC-UA natively on port 4840.",
+        "validation": {
+          "pattern": "^opc\\.tcp://.+:\\d+$"
+        }
+      },
+      {
+        "name": "security_policy",
+        "type": "enum",
+        "required": false,
+        "secret": false,
+        "description": "OPC-UA SecurityPolicy. None for OT VLAN with network-level isolation; Basic256Sha256 or Aes128Sha256RsaOaep for certificate-based auth.",
+        "default": "None",
+        "validation": {
+          "allowed_values": [
+            "None",
+            "Basic256Sha256",
+            "Aes128Sha256RsaOaep"
+          ]
+        }
+      },
+      {
+        "name": "security_mode",
+        "type": "enum",
+        "required": false,
+        "secret": false,
+        "description": "OPC-UA MessageSecurityMode. Must match the server's endpoint configuration.",
+        "default": "None",
+        "validation": {
+          "allowed_values": [
+            "None",
+            "Sign",
+            "SignAndEncrypt"
+          ]
+        }
+      },
+      {
+        "name": "client_certificate_path",
+        "type": "path",
+        "required": false,
+        "secret": false,
+        "description": "Path to DER-encoded client certificate. Required when security_policy is not None."
+      },
+      {
+        "name": "client_private_key_path",
+        "type": "path",
+        "required": false,
+        "secret": true,
+        "description": "Path to PEM-encoded client private key. Required when security_policy is not None."
+      },
+      {
+        "name": "server_certificate_path",
+        "type": "path",
+        "required": false,
+        "secret": false,
+        "description": "Path to trusted server certificate (DER). If omitted, server cert is accepted on first connect (TOFU model)."
+      },
+      {
+        "name": "namespace_map",
+        "type": "object",
+        "required": true,
+        "secret": false,
+        "description": "Maps OPC-UA namespace indices to PLC connection names. Keys are namespace integers, values are connection identifiers (e.g., {\"2\": \"WHK01\", \"3\": \"WHK02\"}).",
+        "validation": {
+          "pattern": "^\\{(\"\\d+\"\\s*:\\s*\"[^\"]+\"(,\\s*)?)+\\}$"
+        }
+      },
+      {
+        "name": "site_prefix",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Site prefix for Forge-normalized tag paths. Prepended to all normalized paths (e.g., WH → WH/WHK01/Distillery01/Tag).",
+        "default": "WH"
+      },
+      {
+        "name": "session_timeout_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "OPC-UA session timeout in milliseconds. Server may negotiate a different value.",
+        "default": "30000",
+        "validation": {
+          "min": 5000,
+          "max": 300000
+        }
+      },
+      {
+        "name": "reconnect_max_attempts",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Maximum reconnection attempts before transitioning to FAILED state.",
+        "default": "5",
+        "validation": {
+          "min": 1,
+          "max": 100
+        }
+      },
+      {
+        "name": "reconnect_base_delay_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Base delay for exponential backoff between reconnection attempts.",
+        "default": "1000",
+        "validation": {
+          "min": 100,
+          "max": 30000
+        }
+      },
+      {
+        "name": "subscribe_interval_ms",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "Default monitoring interval for OPC-UA subscriptions. Overridable per-subscription.",
+        "default": "500",
+        "validation": {
+          "min": 50,
+          "max": 60000
+        }
+      }
+    ],
+    "auth_methods": [
+      "anonymous",
+      "certificate",
+      "username_password"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/ot-module/v0.3.0",
+    "output_format": "tag_value",
+    "context_fields": [
+      "tag_path",
+      "quality_code",
+      "source_timestamp",
+      "server_timestamp",
+      "data_type",
+      "node_class"
+    ],
+    "optional_context_fields": [
+      "namespace_index",
+      "connection_name",
+      "access_level",
+      "engineering_units",
+      "eu_range_low",
+      "eu_range_high",
+      "status_code",
+      "alarm_id",
+      "alarm_state",
+      "alarm_priority",
+      "alarm_type",
+      "alarm_name",
+      "alarm_setpoint",
+      "alarm_deadband",
+      "alarm_action",
+      "alarm_previous_state",
+      "alarm_equipment_id",
+      "alarm_area",
+      "alarm_operator",
+      "write_request_id",
+      "write_status",
+      "write_role",
+      "write_requestor",
+      "write_old_value",
+      "write_new_value",
+      "write_readback_matched",
+      "write_interlock_rule_id",
+      "write_batch_id",
+      "write_reason"
+    ],
+    "data_sources": [
+      {
+        "source_type": "opcua_browse",
+        "endpoint": "/ot/namespaces, /ot/objecttypes, /ot/objects",
+        "description": "i3X-compliant address space discovery. Browse namespaces, object types, and individual objects in the PLC address space. Returns hierarchical node structure with node class, data type, and access level metadata.",
+        "entities": [
+          "Namespace",
+          "ObjectType",
+          "Object",
+          "Variable",
+          "Folder"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "opcua_read",
+        "endpoint": "/ot/objects/value",
+        "description": "Current value read from one or more OPC-UA nodes. Returns DataValue with value, quality code (GOOD/UNCERTAIN/BAD/NOT_AVAILABLE), source timestamp, and server timestamp. Supports batch reads.",
+        "entities": [
+          "DataValue"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "opcua_subscribe",
+        "endpoint": "/ot/subscriptions",
+        "description": "Server-sent event stream for OPC-UA monitored items. Subscribes to value changes at configurable intervals (default 500ms). Delivers DataValue change notifications via SSE to connected consumers.",
+        "entities": [
+          "MonitoredItem",
+          "Subscription",
+          "DataValue"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "opcua_history_read",
+        "endpoint": "/ot/objects/history",
+        "description": "Historical data read from PLC historian (if configured). Allen-Bradley ControlLogix supports trend objects with configurable sample rates. Returns time-series DataValue arrays with quality and timestamp.",
+        "entities": [
+          "HistoricalDataValue"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "opcua_write",
+        "endpoint": "/ot/objects/value (PUT)",
+        "description": "Write values to writable OPC-UA nodes. Enforces strict type matching — Python types are coerced to the exact OPC-UA VariantType declared by the server node (e.g., Float not Double, Int32 not Int64). Write access is gated by the node's AccessLevel flags.",
+        "entities": [
+          "WriteResult"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "alarm_mqtt",
+        "endpoint": "whk/whk01/{area}/ot/alarms/{alarm_id}",
+        "description": "ISA-18.2 alarm state changes published as retained MQTT messages (QoS 1). Payload includes alarm_id, name, state, previous_state, action, priority, tag_path, value, setpoint, timestamp, equipment_id, area. Empty payload clears retained message when alarm returns to NORMAL. Topic pattern enables per-area and per-alarm subscriptions.",
+        "entities": [
+          "AlarmEvent",
+          "AlarmInstance"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "alarm_mqtt_ack",
+        "endpoint": "whk/whk01/{area}/ot/alarms/{alarm_id}/ack",
+        "description": "Remote alarm acknowledgment via MQTT. Publish JSON with operator and optional auth_token fields to acknowledge an active alarm from dashboards or mobile clients. Subscribes to whk/whk01/+/ot/alarms/+/ack wildcard pattern.",
+        "entities": [
+          "AlarmAckRequest"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "alarm_rest_api",
+        "endpoint": "/alarms/active, /alarms/history, /alarms/config, /alarms/{id}/ack, /alarms/{id}/shelve, /alarms/{id}/reset, /alarms/stats",
+        "description": "Full CRUD REST API for alarm management. Query active alarms (filter by area, priority), event journal history, alarm configuration registration, and operator actions (acknowledge, shelve, unshelve, suppress, disable, reset). Stats endpoint exposes engine metrics.",
+        "entities": [
+          "AlarmInstance",
+          "AlarmEvent",
+          "AlarmConfig",
+          "AlarmStats"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "alarm_rabbitmq",
+        "endpoint": "exchange: forge.alarms, routing_key: alarm.{action}.{priority}",
+        "description": "Structured alarm events published to RabbitMQ for cross-module workflows. Routing key format alarm.TRIGGER.HIGH enables selective binding. Used by CMMS adapter for auto-work-order creation on CRITICAL/HIGH triggers.",
+        "entities": [
+          "AlarmEvent"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "alarm_contextual_record",
+        "endpoint": "forge.contextual_records pipeline",
+        "description": "Alarm events produce ContextualRecords with alarm-specific context fields (priority, action, tag_path, equipment_id). Feeds the Forge decision-quality pipeline. record_type: alarm_event, source_module: ot.",
+        "entities": [
+          "ContextualRecord"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "control_write",
+        "endpoint": "ControlWriteEngine.execute()",
+        "description": "4-layer defense chain for safe PLC writes: Type/Range Validation → Safety Interlocks → Role-Based Authorization → OPC-UA Write + Read-Back Confirmation. Every write attempt produces a WriteResult with full decision chain audit. Supports FLOAT, DOUBLE, INT16, INT32, INT64, BOOLEAN, STRING data types.",
+        "entities": [
+          "WriteRequest",
+          "WriteResult",
+          "TagWriteConfig",
+          "InterlockRule",
+          "WritePermission"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "control_write_audit",
+        "endpoint": "WriteAuditLogger → AuditSink pipeline",
+        "description": "Every control write (confirmed, rejected, or failed) is dispatched to configured audit sinks: ContextualRecordAuditSink (record_type: control_write_audit), MqttAuditSink ({prefix}/{area}/ot/control/audit/{request_id}), LogAuditSink (structured logging). WriteAuditQuery provides filtered journal access.",
+        "entities": [
+          "WriteResult",
+          "ContextualRecord"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "recipe_write",
+        "endpoint": "RecipeWriteAdapter.execute_recipe_write()",
+        "description": "MES Recipe Integration: Translates recipe parameter payloads into batched control writes. Per-equipment RecipeWriteConfig maps parameter names to PLC tag paths. Automated writes use ENGINEER role, share a batch_id for audit grouping. Partial failure tracking — individual parameter results aggregated into RecipeWriteResult.",
+        "entities": [
+          "RecipeWriteConfig",
+          "RecipeParameterMapping",
+          "RecipeWriteResult"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "ignition_bridge_poll",
+        "endpoint": "POST /system/tag/read (Ignition REST API)",
+        "description": "Ignition Bridge Adapter: Polls Ignition 8.x REST API for tag values during parallel operation validation. Converts Ignition bracket-notation paths to Forge-normalized paths. Produces ContextualRecords with source.system='ignition-bridge' for dual-write comparison against OT Module direct OPC-UA values.",
+        "entities": [
+          "IgnitionTagValue",
+          "IgnitionTagResponse"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "ignition_bridge_browse",
+        "endpoint": "GET /system/tag/browse (Ignition REST API)",
+        "description": "Ignition tag tree discovery: Recursively browses the Ignition tag provider hierarchy for tag enumeration. Used to auto-populate the bridge adapter's active tag list and identify coverage gaps during migration.",
+        "entities": [
+          "TagMapping"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "dual_write_validation",
+        "endpoint": "DualWriteValidator.compare_batch()",
+        "description": "Parallel Operation Validation: Compares OT Module direct values against Ignition Bridge values for the same tags. Detects value mismatches (float tolerance), quality discrepancies, timestamp drift, and coverage gaps. Produces ConsistencyReport for Gate 5 evaluation (<1% discrepancy required).",
+        "entities": [
+          "ComparisonResult",
+          "ConsistencyReport",
+          "BridgeHealthDashboard"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "script_engine",
+        "endpoint": "ScriptEngine.discover() / load_all() / start()",
+        "description": "Python 3.12+ scripting engine replacing Ignition Jython 2.7. Discovers .py files, imports via importlib, collects decorated handlers (timer, tag_change, alarm, lifecycle, api.route) via TriggerRegistry, wires to runtime event sources. Supports hot-reload via file watcher. 11 forge.* SDK modules provide the scripting API surface.",
+        "entities": [
+          "ScriptModule",
+          "HandlerRegistration",
+          "TriggerType"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "script_sandbox",
+        "endpoint": "ScriptSandbox (PEP 302 meta-path finder)",
+        "description": "Import allowlist enforcement via custom meta-path finder. Blocks dangerous modules (subprocess, ctypes, socket, shell execution). Configurable CPU time limit (default 5s) and memory limit (default 256MB). Allows stdlib, selected third-party packages, and all forge.* modules.",
+        "entities": [
+          "SandboxConfig",
+          "AllowedModule"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "script_rbac",
+        "endpoint": "ScriptRBAC.check_tag_write() / check_db_write()",
+        "description": "Area-based and tag-pattern permissions for script execution. Default DENY policy — every forge.tag.write() and forge.db.query() checked against granted permissions. Permissions scoped by script identity, target tag pattern (fnmatch), and area.",
+        "entities": [
+          "ScriptPermission",
+          "PermissionCheckResult"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "script_audit",
+        "endpoint": "ScriptAuditTrail.record_tag_write() / record_db_query()",
+        "description": "Append-only audit ring buffer (10K entries) recording every forge.tag.write() and forge.db.query() with full causal chain: script name, function, timestamp, operation type, target, parameters, execution context, caller identity. Queryable with filters.",
+        "entities": [
+          "AuditEntry",
+          "ScriptExecutionContext"
+        ],
+        "collection_mode": "on_demand"
+      },
+      {
+        "source_type": "script_api_routes",
+        "endpoint": "@forge.api.route decorated handlers",
+        "description": "WebDev endpoint migration: Ignition WebDev resources (192 files across 10 endpoint groups) converted to @forge.api.route decorated Python functions. Supports GET/POST/PUT/DELETE with path parameters, query parameters, and JSON body. Replaces com.inductiveautomation.webdev resource pattern.",
+        "entities": [
+          "ApiRouteHandler",
+          "HttpRequest",
+          "HttpResponse"
+        ],
+        "collection_mode": "on_demand"
+      }
+    ],
+    "sample_alarm_record": {
+      "record_id": "ot-module:alarm:evt-20260409-001",
+      "source_adapter": "ot-module",
+      "collected_at": "2026-04-09T14:30:00Z",
+      "context": {
+        "alarm_id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+        "alarm_state": "ACTIVE_UNACK",
+        "alarm_previous_state": "NORMAL",
+        "alarm_action": "TRIGGER",
+        "alarm_priority": "HIGH",
+        "alarm_type": "HI",
+        "alarm_name": "WH/WHK01/Distillery01/Utility01/TIT_2010/Out_PV:HI",
+        "tag_path": "WH/WHK01/Distillery01/Utility01/TIT_2010/Out_PV",
+        "alarm_setpoint": 180.0,
+        "alarm_deadband": 2.0,
+        "alarm_equipment_id": "TIT_2010",
+        "alarm_area": "Distillery01"
+      },
+      "payload": {
+        "value": 185.3,
+        "setpoint": 180.0,
+        "description": "High temperature alarm",
+        "mqtt_topic": "whk/whk01/Distillery01/ot/alarms/a1b2c3d4-5678-90ab-cdef-1234567890ab",
+        "rabbitmq_routing_key": "alarm.TRIGGER.HIGH"
+      }
+    },
+    "sample_control_write_record": {
+      "record_id": "ot-module:write:evt-20260409-002",
+      "source_adapter": "ot-module",
+      "collected_at": "2026-04-09T15:00:00Z",
+      "context": {
+        "write_request_id": "f1e2d3c4-5678-90ab-cdef-1234567890ef",
+        "write_status": "CONFIRMED",
+        "write_role": "ENGINEER",
+        "write_requestor": "mes-recipe-engine",
+        "write_batch_id": "batch-po001-20260409",
+        "write_reason": "Recipe download: R-BOURBON-01",
+        "tag_path": "WH/WHK01/Distillery01/TIT_2010/SP",
+        "data_type": "FLOAT",
+        "write_old_value": 155.0,
+        "write_new_value": 165.0,
+        "write_readback_matched": true,
+        "write_interlock_rule_id": "",
+        "area": "Distillery01",
+        "equipment_id": "Distillery01/TIT_2010"
+      },
+      "payload": {
+        "validation_passed": true,
+        "interlock_passed": true,
+        "auth_passed": true,
+        "engineering_units": "°F",
+        "production_order_id": "PO-001",
+        "recipe_id": "R-BOURBON-01"
+      }
+    },
+    "sample_record": {
+      "record_id": "ot-module:tag:evt-20260408-001",
+      "source_adapter": "ot-module",
+      "collected_at": "2026-04-08T10:30:00Z",
+      "context": {
+        "tag_path": "WH/WHK01/Distillery01/Utility01/LIT_6050B/Out_PV",
+        "quality_code": "GOOD",
+        "source_timestamp": "2026-04-08T10:29:59.842Z",
+        "server_timestamp": "2026-04-08T10:29:59.850Z",
+        "data_type": "Float",
+        "node_class": "Variable",
+        "namespace_index": 2,
+        "connection_name": "WHK01",
+        "access_level": 3,
+        "engineering_units": "gallons",
+        "status_code": 0
+      },
+      "payload": {
+        "value": 847.3,
+        "tag_path_opcua": "ns=2;s=Distillery01.Utility01.LIT_6050B.Out_PV",
+        "tag_path_ignition": "[WHK01]Distillery01/Utility01/LIT_6050B/Out_PV",
+        "tag_path_forge": "WH/WHK01/Distillery01/Utility01/LIT_6050B/Out_PV"
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "node.value",
+        "context_field": "tag_path",
+        "transform": "normalize_path",
+        "description": "OPC-UA node identifier normalized to Forge slash-separated path. Bidirectional: Forge→OPC-UA (ns=N;s=dot.path), Forge→Ignition ([conn]slash/path)."
+      },
+      {
+        "source_field": "node.status_code",
+        "context_field": "quality_code",
+        "transform": "status_code_to_quality",
+        "description": "OPC-UA StatusCode (uint32) mapped to Forge QualityCode via severity bits 30-31. Good=00, Uncertain=01, Bad=10/11."
+      },
+      {
+        "source_field": "node.source_timestamp",
+        "context_field": "source_timestamp",
+        "description": "When the PLC/device last updated this value. Source of truth for temporal ordering in the tag engine."
+      },
+      {
+        "source_field": "node.server_timestamp",
+        "context_field": "server_timestamp",
+        "description": "When the OPC-UA server processed the read/notification. Used for clock-skew detection between PLC and server."
+      },
+      {
+        "source_field": "node.data_type",
+        "context_field": "data_type",
+        "description": "OPC-UA VariantType mapped to Forge DataType enum. Covers CIP types from Allen-Bradley ControlLogix: BOOL, SINT, INT, DINT, LINT, REAL, LREAL, STRING."
+      },
+      {
+        "source_field": "node.node_class",
+        "context_field": "node_class",
+        "description": "OPC-UA NodeClass (Object, Variable, Method, etc.). Only Variable nodes hold tag values; Object nodes are containers."
+      },
+      {
+        "source_field": "node.namespace_index",
+        "context_field": "namespace_index",
+        "description": "OPC-UA namespace index. Mapped to connection name via namespace_map configuration parameter."
+      },
+      {
+        "source_field": "namespace_map[namespace_index]",
+        "context_field": "connection_name",
+        "transform": "namespace_lookup",
+        "description": "PLC connection name derived from namespace_map (e.g., ns=2 → WHK01). Used as the second segment in Forge-normalized paths."
+      },
+      {
+        "source_field": "node.access_level",
+        "context_field": "access_level",
+        "description": "OPC-UA AccessLevel bitfield. Bit 0=CurrentRead, Bit 1=CurrentWrite, Bit 2=HistoryRead. Determines whether the node is readable, writable, or has historian data."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "tag_path",
+        "rule_type": "path_normalization",
+        "config": {
+          "source_format": "opcua_node_id",
+          "target_format": "forge_normalized",
+          "site_prefix_field": "site_prefix",
+          "namespace_map_field": "namespace_map",
+          "opcua_separator": "."
+        },
+        "description": "Normalize OPC-UA node identifiers (ns=N;s=dot.separated) to Forge slash-separated paths (WH/WHK01/slash/separated). Bidirectional conversion maintained by PathNormalizer."
+      },
+      {
+        "target_field": "engineering_units",
+        "rule_type": "opcua_property_read",
+        "config": {
+          "property_node": "EngineeringUnits",
+          "property_type": "EUInformation",
+          "fields": ["displayName", "unitId"]
+        },
+        "description": "Read EngineeringUnits property from OPC-UA node if available. Allen-Bradley PLCs may not expose this property — falls back to null."
+      },
+      {
+        "target_field": "eu_range_low",
+        "rule_type": "opcua_property_read",
+        "config": {
+          "property_node": "EURange",
+          "property_type": "Range",
+          "field": "low"
+        },
+        "description": "Engineering unit range low bound. Used for tag scaling and alarm threshold context."
+      },
+      {
+        "target_field": "eu_range_high",
+        "rule_type": "opcua_property_read",
+        "config": {
+          "property_node": "EURange",
+          "property_type": "Range",
+          "field": "high"
+        },
+        "description": "Engineering unit range high bound. Used for tag scaling and alarm threshold context."
+      },
+      {
+        "target_field": "alarm_state",
+        "rule_type": "isa_18_2_state_machine",
+        "config": {
+          "states": ["NORMAL", "ACTIVE_UNACK", "ACTIVE_ACK", "CLEAR_UNACK", "SUPPRESSED", "SHELVED", "OUT_OF_SERVICE"],
+          "actions": ["TRIGGER", "CLEAR", "ACKNOWLEDGE", "SUPPRESS", "UNSUPPRESS", "SHELVE", "UNSHELVE", "DISABLE", "ENABLE", "RESET"],
+          "transition_table": "table-driven (state, action) → new_state"
+        },
+        "description": "ISA-18.2 alarm state from table-driven state machine. Administrative states (SUPPRESSED, SHELVED, OUT_OF_SERVICE) overlay lifecycle states and track return-state for correct un-admin behavior."
+      },
+      {
+        "target_field": "alarm_priority",
+        "rule_type": "enum_mapping",
+        "config": {
+          "values": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "DIAGNOSTIC"],
+          "rank_order": "CRITICAL=0, HIGH=1, MEDIUM=2, LOW=3, DIAGNOSTIC=4"
+        },
+        "description": "ISA-18.2 alarm priority with integer rank for sorting. Active alarm queries return results ordered by priority rank (most severe first)."
+      },
+      {
+        "target_field": "alarm_type",
+        "rule_type": "enum_mapping",
+        "config": {
+          "values": ["HI", "HIHI", "LO", "LOLO", "DIGITAL", "RATE_OF_CHANGE", "QUALITY", "COMMUNICATION", "CUSTOM"]
+        },
+        "description": "Alarm detection type. Threshold alarms (HI/HIHI/LO/LOLO) support deadband and delay. ROC computes rate per second. Quality triggers on non-GOOD. Communication triggers on PLC connection loss."
+      },
+      {
+        "target_field": "write_status",
+        "rule_type": "enum_mapping",
+        "config": {
+          "values": ["CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION", "REJECTED_INTERLOCK", "REJECTED_AUTH", "FAILED_WRITE", "FAILED_READBACK", "PENDING"]
+        },
+        "description": "Control write outcome status. CONFIRMED = write succeeded + read-back matched. UNCONFIRMED = write sent but read-back didn't match. REJECTED_* = pre-write defense layer blocked. FAILED_* = OPC-UA transport error."
+      },
+      {
+        "target_field": "write_role",
+        "rule_type": "enum_mapping",
+        "config": {
+          "values": ["OPERATOR", "ENGINEER", "ADMIN"],
+          "rank_order": "OPERATOR=0, ENGINEER=1, ADMIN=2"
+        },
+        "description": "Operator role for control write authorization. Hierarchy: ADMIN > ENGINEER > OPERATOR. ADMIN can bypass interlocks with reason. Automated recipe writes default to ENGINEER."
+      },
+      {
+        "target_field": "write_interlock_rule_id",
+        "rule_type": "interlock_evaluation",
+        "config": {
+          "conditions": ["EQUALS", "NOT_EQUALS", "GREATER_THAN", "LESS_THAN", "IN_RANGE", "IS_TRUE", "IS_FALSE"],
+          "pattern_matching": "fnmatch on target_tag_pattern",
+          "bypass_requires": "interlock_bypass=True AND reason AND role >= bypass_min_role"
+        },
+        "description": "Safety interlock rule that blocked (or was bypassed for) the write. Uses fnmatch patterns on tag paths, reads live check_tag values to evaluate conditions. Fail-open on unreachable check tags."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000,
+      "jitter": true
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 30000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.ot-module",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 5
+    }
+  },
+  "opcua_specifics": {
+    "supported_security_policies": [
+      "http://opcfoundation.org/UA/SecurityPolicy#None",
+      "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256",
+      "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep"
+    ],
+    "excluded_security_policies": [
+      {
+        "policy": "http://opcfoundation.org/UA/SecurityPolicy#Basic256",
+        "reason": "SHA-1 based, deprecated in OPC-UA 1.04"
+      }
+    ],
+    "supported_data_types": [
+      "Boolean", "SByte", "Int16", "Int32", "Int64",
+      "Byte", "UInt16", "UInt32", "UInt64",
+      "Float", "Double", "String", "DateTime",
+      "ByteString", "XmlElement", "NodeId",
+      "Variant", "ExtensionObject"
+    ],
+    "quality_code_mapping": {
+      "severity_bits_30_31_00": "GOOD",
+      "severity_bits_30_31_01": "UNCERTAIN",
+      "severity_bits_30_31_10": "BAD",
+      "severity_bits_30_31_11": "BAD",
+      "null_status_code": "NOT_AVAILABLE"
+    },
+    "tag_path_formats": {
+      "forge": "WH/WHK01/Distillery01/Utility01/LIT_6050B/Out_PV",
+      "opcua": "ns=2;s=Distillery01.Utility01.LIT_6050B.Out_PV",
+      "ignition": "[WHK01]Distillery01/Utility01/LIT_6050B/Out_PV"
+    },
+    "target_plc_firmware": "Allen-Bradley ControlLogix L82E/L83E v36+",
+    "thin_wrapper_pattern": {
+      "wire_protocol_owner": "asyncua",
+      "type_system_owner": "forge (Pydantic)",
+      "boundary": "6 converter functions in converters.py"
+    }
+  },
+  "metadata": {
+    "spoke": "ot-module",
+    "hub_module": "forge-modules",
+    "source_repo": "https://github.com/reh3376/forge",
+    "source_loc": "8000+",
+    "source_language": "Python 3.12+",
+    "source_framework": "asyncua (OPC-UA asyncio client)",
+    "source_database": "N/A (real-time protocol adapter, not database-backed)",
+    "deployment": "Forge module — loaded by Forge Core runtime",
+    "target_systems": [
+      "Allen-Bradley ControlLogix L82E (Distillery)",
+      "Allen-Bradley ControlLogix L83E (Granary, Stillage, CIP)"
+    ],
+    "replaces": "Ignition SCADA (OPC-UA tag provider + historian + alarm pipeline)",
+    "notes": "First OT-tier Forge adapter. Thin wrapper over asyncua — asyncua owns binary wire protocol, Forge owns type system and operational concerns. 6 converter functions form the boundary. Integration-tested against in-process asyncua.Server over loopback. Phase 3 adds ISA-18.2 alarm engine with 7-state machine, 9 alarm types, event-sourced journal, cross-module MQTT/RabbitMQ/CMMS/scripting integration, and embedded MQTT 3.1.1 broker. Phase 4 adds 4-layer control write defense chain (validation → interlocks → RBAC → write+read-back), audit trail with pluggable sinks, and MES recipe write integration with batch tracking. Phase 5 adds Ignition Bridge Adapter for parallel operation validation: read-only REST API polling, Ignition↔Forge tag path mapping, dual-write consistency checking (<1% Gate 5 threshold), latency comparison, coverage gap analysis, failover readiness, and operator acceptance checklist. Phase 6 adds script migration infrastructure: Python 3.12+ ScriptEngine (importlib discovery, TriggerRegistry decorators, hot-reload), ScriptSandbox (PEP 302 import allowlist, CPU/memory limits), ScriptRBAC (area+tag-pattern permissions, default DENY), ScriptAuditTrail (append-only ring buffer), and 11 forge.* SDK modules covering all 52 unique system.* API calls across 430 hand-written Ignition scripts."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "pending-rehash-after-script-migration-additions",
+    "hash_state": "draft",
+    "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
+    "approved_by": null,
+    "approved_at": null,
+    "change_history": [
+      {
+        "previous_hash": null,
+        "new_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
+        "changed_at": "2026-04-08T10:30:00Z",
+        "source": "manual",
+        "changed_by": "claude-opus",
+        "change_type": "initial",
+        "reason": "Initial OT Module FACTS spec — Epic 1.3.3 of P7 OT Module Sprint Plan"
+      },
+      {
+        "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
+        "new_hash": "pending-rehash-after-alarm-additions",
+        "changed_at": "2026-04-09T14:30:00Z",
+        "source": "manual",
+        "changed_by": "claude-opus",
+        "change_type": "feature",
+        "reason": "Phase 3 Alarm Engine: ISA-18.2 state machine, alarm detection (HI/HIHI/LO/LOLO/digital/ROC/quality/comm), event-sourced journal, cross-module integration (MQTT alarm topics, RabbitMQ events, CMMS work orders, ContextualRecords, scripting dispatch), REST API, MQTT remote acknowledge. Added 5 new data sources, 10 new context fields, 3 enrichment rules, alarm sample record."
+      },
+      {
+        "previous_hash": "pending-rehash-after-alarm-additions",
+        "new_hash": "pending-rehash-after-control-write-additions",
+        "changed_at": "2026-04-09T16:00:00Z",
+        "source": "manual",
+        "changed_by": "claude-opus",
+        "change_type": "feature",
+        "reason": "Phase 4 Control Write Interface: 4-layer defense chain (WriteValidator, InterlockEngine, WriteAuthorizer, ControlWriteEngine with read-back), audit trail (WriteAuditLogger, 3 sink types: ContextualRecord, MQTT, Log), MES recipe integration (RecipeWriteAdapter with batch tracking), WriteRole RBAC (OPERATOR/ENGINEER/ADMIN), safety interlock patterns (fnmatch, 7 conditions, bypass with reason). Added 3 new data sources, 10 new context fields, 3 enrichment rules, control write sample record."
+      },
+      {
+        "previous_hash": "pending-rehash-after-control-write-additions",
+        "new_hash": "pending-rehash-after-bridge-adapter-additions",
+        "changed_at": "2026-04-09T20:00:00Z",
+        "source": "manual",
+        "changed_by": "claude-opus",
+        "change_type": "feature",
+        "reason": "Phase 5 Ignition Bridge Adapter: Read-only REST API polling adapter for parallel operation validation. IgnitionRestClient (batch reads, auth, retry), TagMapper (Ignition bracket↔Forge normalized paths, include/exclude filtering), IgnitionBridgeAdapter (AdapterBase + DiscoveryProvider, source.system='ignition-bridge'), DualWriteValidator (value/quality/timestamp comparison, configurable tolerances, ConsistencyReport with Gate 5 evaluation), BridgeHealthDashboard (side-by-side metrics, failover readiness, 8-item operator acceptance checklist). Added 3 new data sources (ignition_bridge_poll, ignition_bridge_browse, dual_write_validation)."
+      },
+      {
+        "previous_hash": "pending-rehash-after-bridge-adapter-additions",
+        "new_hash": "pending-rehash-after-script-migration-additions",
+        "changed_at": "2026-04-09T22:00:00Z",
+        "source": "manual",
+        "changed_by": "claude-opus",
+        "change_type": "feature",
+        "reason": "Phase 6 Script Migration: Python 3.12+ scripting engine replacing Ignition Jython 2.7. ScriptEngine (importlib discovery, TriggerRegistry decorators, hot-reload file watcher), ScriptSandbox (PEP 302 import allowlist, CPU/memory limits), ScriptRBAC (area+tag-pattern permissions, default DENY), ScriptAuditTrail (append-only 10K ring buffer), 6 new forge.* SDK modules (date, dataset, perspective, file, util, security) completing the 11-module API surface covering all 52 unique system.* calls. 120 new tests. Added 5 new data sources (script_engine, script_sandbox, script_rbac, script_audit, script_api_routes). API mapping reference: docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md."
+      }
+    ]
+  }
+}
