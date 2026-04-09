@@ -1,0 +1,489 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "whk-nms",
+    "name": "Whiskey House Network Management System Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "MES_MOM",
+    "protocol": "rest+websocket"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 30000,
+    "shutdown_timeout_ms": 15000,
+    "health_check_interval_ms": 30000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called \u2014 initiates REST API + optional WebSocket connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "REST /health/detailed returns OK for all components"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (30s)"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "REST health check fails 3 consecutive times or WebSocket disconnects"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "REST health check passes and WebSocket (if configured) reconnects"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (10)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful shutdown"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called \u2014 forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "nms_api_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "NMS REST API base URL (e.g., http://localhost:8000/api/v1). FastAPI backend with 75+ endpoints covering devices, topology, SNMP, security, alerts, SPOF detection.",
+        "validation": {
+          "pattern": "^https?://.+"
+        }
+      },
+      {
+        "name": "nms_ws_url",
+        "type": "url",
+        "required": false,
+        "secret": false,
+        "description": "WebSocket event stream URL (e.g., ws://localhost:8000/api/v1/events/stream). Optional \u2014 if not provided, adapter falls back to REST polling only.",
+        "validation": {
+          "pattern": "^wss?://.+"
+        }
+      },
+      {
+        "name": "jwt_token",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "JWT bearer token for authenticated requests. Optional \u2014 NMS may run without auth."
+      },
+      {
+        "name": "poll_interval_seconds",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "REST polling interval in seconds for device, topology, and alert queries.",
+        "default": 60,
+        "validation": {
+          "minimum": 10,
+          "maximum": 3600
+        }
+      },
+      {
+        "name": "verify_ssl",
+        "type": "boolean",
+        "required": false,
+        "secret": false,
+        "description": "Verify SSL certificates for HTTPS connections.",
+        "default": true
+      }
+    ],
+    "auth_methods": [
+      "jwt_bearer",
+      "none"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-nms/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_context"
+    ],
+    "optional_context_fields": [
+      "device_ip",
+      "device_name",
+      "device_type",
+      "device_role",
+      "device_category",
+      "is_critical",
+      "is_ot_device",
+      "location",
+      "poll_tier",
+      "network_role",
+      "severity",
+      "health_status",
+      "blast_radius",
+      "baseline_status"
+    ],
+    "data_sources": [
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/devices",
+        "description": "Discovered network devices (717+). Full inventory with NMS spec fields: vendor, model, role, lifecycle, location. Paginated.",
+        "entities": [
+          "Device",
+          "DeviceMetadata"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/interfaces/{device_id}",
+        "description": "Network interfaces per device: physical, LAG, subinterface, SVI, loopback, tunnel, management.",
+        "entities": [
+          "Interface"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/lldp/links",
+        "description": "Physical links from LLDP discovery (411+ deduplicated links). Endpoint-to-endpoint connections.",
+        "entities": [
+          "Link",
+          "LldpNeighbor"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/topology/graph",
+        "description": "Subnet-based topology graph from Neo4j. Device nodes with CONNECTS_TO relationships and subnet groupings.",
+        "entities": [
+          "TopologyNode",
+          "TopologyEdge",
+          "Subnet"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/snmp/traps",
+        "description": "SNMP trap events from network devices. PySNMP UDP listener captures and stores trap data.",
+        "entities": [
+          "TrapEvent"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/snmp/poll/{device_id}/latest",
+        "description": "SNMP polling metrics per device. Tier-based: critical (30s), high (60s), standard (300s).",
+        "entities": [
+          "SnmpMetric"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/alerts/rules",
+        "description": "Infrastructure alert rules and triggered events. Configurable thresholds per device/metric.",
+        "entities": [
+          "AlertRule",
+          "Alert"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/security/events",
+        "description": "FortiAnalyzer security events: threats, blocks, anomalies. JSON-RPC integration with FortiAnalyzer.",
+        "entities": [
+          "SecurityEvent"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/spof/active",
+        "description": "Active single points of failure in network topology. Blast radius calculation per critical device.",
+        "entities": [
+          "SpofDetection"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/v1/baseline/devices",
+        "description": "Devices with baseline anomalies (suspicious/blocked). Network behavior deviation detection.",
+        "entities": [
+          "BaselineAnomaly"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "websocket",
+        "endpoint": "/api/v1/events/stream",
+        "description": "Real-time event stream for SNMP traps, poll results, and alert triggers. WebSocket with JSON payloads.",
+        "entities": [
+          "TrapEvent",
+          "PollEvent",
+          "AlertEvent"
+        ],
+        "collection_mode": "subscribe"
+      }
+    ],
+    "sample_record": {
+      "record_id": "whk-nms:device:evt-20260407-001",
+      "source_adapter": "whk-nms",
+      "collected_at": "2026-04-07T14:30:00Z",
+      "context": {
+        "cross_system_id": "10.0.1.1",
+        "source_system": "whk-nms",
+        "entity_type": "network_device",
+        "event_type": "device_discovery",
+        "operation_context": "network_monitoring",
+        "device_ip": "10.0.1.1",
+        "device_type": "FortiGate-600E",
+        "device_role": "firewall",
+        "device_category": "net_core",
+        "is_critical": true,
+        "is_ot_device": false,
+        "location": "MDF-01",
+        "health_status": "healthy",
+        "blast_radius": 47
+      },
+      "payload": {
+        "id": "dev-001",
+        "ip_address": "10.0.1.1",
+        "hostname": "fw-core-01",
+        "vendor": "Fortinet",
+        "model": "FortiGate-600E",
+        "os_version": "7.2.8",
+        "role": "firewall",
+        "location": "MDF-01",
+        "snmp_enabled": true,
+        "lldp_enabled": true,
+        "interface_count": 48,
+        "link_count": 24
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "device.id OR device.ip_address",
+        "context_field": "cross_system_id",
+        "description": "Unique device identifier. Uses device ID when available, falls back to IP address. Primary correlation key for NMS entities."
+      },
+      {
+        "source_field": "(constant)",
+        "context_field": "source_system",
+        "transform": "constant:whk-nms",
+        "description": "Fixed source system identifier."
+      },
+      {
+        "source_field": "entity.__type OR 'network_device'",
+        "context_field": "entity_type",
+        "description": "Entity type: network_device (default), interface, link, trap_event, alert, security_event, spof_detection, baseline_anomaly."
+      },
+      {
+        "source_field": "event_type OR collection_source",
+        "context_field": "event_type",
+        "description": "Event type: device_discovery, snmp_trap, infrastructure_alert, security_event, spof_detection, baseline_anomaly, topology_snapshot."
+      },
+      {
+        "source_field": "(constant)",
+        "context_field": "operation_context",
+        "transform": "constant:network_monitoring",
+        "description": "Fixed operation context \u2014 all NMS data is network monitoring domain."
+      },
+      {
+        "source_field": "device.ip_address",
+        "context_field": "device_ip",
+        "description": "Device management IP address. Primary network identifier."
+      },
+      {
+        "source_field": "device.hostname",
+        "context_field": "device_name",
+        "description": "Device hostname or FQDN."
+      },
+      {
+        "source_field": "device.vendor + device.model",
+        "context_field": "device_type",
+        "transform": "concat:{vendor}-{model}",
+        "description": "Combined vendor-model identifier (e.g., 'FortiGate-600E', 'Cisco-C9300')."
+      },
+      {
+        "source_field": "device.role",
+        "context_field": "device_role",
+        "description": "Network role: firewall, switch, router, access_point, server, printer, etc."
+      },
+      {
+        "source_field": "device.type \u2192 category_map",
+        "context_field": "device_category",
+        "transform": "lookup:{FortiGate: net_core, Cisco: net_core, Extreme: it_core, Rockwell: ot_control, PLC: ot_control}",
+        "description": "Maps device type/vendor to infrastructure category: net_core, it_core, ot_control, ot_device, it_endpoint."
+      },
+      {
+        "source_field": "device.is_critical OR spof.blast_radius > 10",
+        "context_field": "is_critical",
+        "description": "Whether the device is classified as critical infrastructure. Derived from SPOF analysis (blast_radius > 10) or explicit flag."
+      },
+      {
+        "source_field": "device.category == 'ot_*'",
+        "context_field": "is_ot_device",
+        "description": "Whether the device is an OT (Operational Technology) device: PLCs, SCADA RTUs, HMI panels."
+      },
+      {
+        "source_field": "device.location",
+        "context_field": "location",
+        "description": "Physical location: MDF, IDF, plant floor, control room. Maps to building/room for physical access tracking."
+      },
+      {
+        "source_field": "snmp_config.poll_tier",
+        "context_field": "poll_tier",
+        "description": "SNMP polling frequency tier: critical (30s), high (60s), standard (300s). Determines monitoring resolution."
+      },
+      {
+        "source_field": "topology.role_analysis",
+        "context_field": "network_role",
+        "description": "Topological role: upstream (toward internet), downstream (toward endpoints), isolated (no links). Derived from LLDP topology."
+      },
+      {
+        "source_field": "event.severity",
+        "context_field": "severity",
+        "description": "Event severity: critical, high, medium, low, info. Applies to traps, alerts, and security events."
+      },
+      {
+        "source_field": "device.health_status",
+        "context_field": "health_status",
+        "description": "Current device health: healthy, degraded, down, unknown. Derived from SNMP polling results."
+      },
+      {
+        "source_field": "spof.blast_radius",
+        "context_field": "blast_radius",
+        "description": "SPOF blast radius \u2014 number of downstream devices affected if this device fails. Higher values indicate more critical infrastructure."
+      },
+      {
+        "source_field": "baseline.status",
+        "context_field": "baseline_status",
+        "description": "Network baseline compliance: normal, suspicious, blocked. Deviation from established traffic/behavior patterns."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "device_category",
+        "rule_type": "lookup",
+        "config": {
+          "source_field": "device_type",
+          "lookup_table": "nms_vendor_to_category",
+          "fallback": "unknown"
+        },
+        "description": "Auto-classify devices by vendor/model into infrastructure categories (net_core, ot_control, it_endpoint, etc.)."
+      },
+      {
+        "target_field": "is_critical",
+        "rule_type": "derived",
+        "config": {
+          "source_field": "blast_radius",
+          "threshold": 10,
+          "operator": "gt"
+        },
+        "description": "Auto-flag devices as critical when their SPOF blast radius exceeds 10 downstream devices."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 60000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.whk-nms",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 10
+    }
+  },
+  "metadata": {
+    "spoke": "nms",
+    "hub_module": "forge-adapters",
+    "source_repo": "https://github.com/WhiskeyHouse/net-topology",
+    "source_language": "Python",
+    "source_framework": "FastAPI + Uvicorn",
+    "source_database": "PostgreSQL 16 (primary, yoyo-migrations) + Neo4j 5 (graph) + Redis 7 (cache)",
+    "source_messaging": "None (REST polling + WebSocket streaming)",
+    "erp_integration": "None",
+    "deployment": "Docker Compose (PostgreSQL, Neo4j, Redis, Celery Beat)",
+    "cross_module_dependencies": "OT Module (equipment topology enrichment), QMS (security compliance events), Support Orchestration (alert-to-incident workflow)",
+    "notes": "NMS is the first Python-native spoke \u2014 adapter runs directly inside Forge without a TypeScript sidecar. Closest tech stack match to Forge core (Python, FastAPI, Neo4j, TimescaleDB). Graph data (Neo4j device topology) can sync directly to Forge's Neo4j instance. 717+ devices discovered, 411 physical links, 75+ REST endpoints."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "58db2236e810061331c3d499d3c2e99be5277003d0f5fda0f15a0a551564127b",
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "approved_by": null,
+    "approved_at": null,
+    "change_history": [
+      {
+        "previous_hash": null,
+        "new_hash": null,
+        "changed_at": "2026-04-07T00:00:00Z",
+        "source": "discovery",
+        "changed_by": "claude-opus",
+        "change_type": "initial",
+        "reason": "Initial NMS specification drafted from spoke discovery. Used non-standard schema (specification_type format)."
+      },
+      {
+        "previous_hash": null,
+        "new_hash": "58db2236e810061331c3d499d3c2e99be5277003d0f5fda0f15a0a551564127b",
+        "changed_at": "2026-04-07T18:00:00Z",
+        "source": "compliance",
+        "changed_by": "claude-opus",
+        "change_type": "structural",
+        "reason": "D3.8 FTTS compliance: complete rewrite from non-standard specification_type schema to FACTS-compliant 10-section format. Mapped 14 REST endpoints and WebSocket stream to data_sources. Defined 19 context field mappings matching implemented adapter code. Added lifecycle state machine, connection params, error handling, and integrity tracking."
+      }
+    ]
+  }
+}

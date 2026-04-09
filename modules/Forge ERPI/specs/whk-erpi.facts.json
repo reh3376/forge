@@ -1,0 +1,426 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "whk-erpi",
+    "name": "Whiskey House ERP Integration Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "ERP_BUSINESS",
+    "protocol": "amqp+rest+graphql"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 30000,
+    "shutdown_timeout_ms": 15000,
+    "health_check_interval_ms": 30000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called — initiates RabbitMQ + REST connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "RabbitMQ channel opens and REST /api/health returns 200"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (30s)"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "RabbitMQ or REST health check fails 3 consecutive times"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "Both RabbitMQ and REST health checks pass"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (10)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called — forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "rabbitmq_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "RabbitMQ AMQP connection URL (e.g., amqp://guest:guest@localhost:5672). Hosts 33 entity fanout exchanges following wh.whk01.distillery01.* pattern, plus 3 acknowledgment topics.",
+        "validation": {
+          "pattern": "^amqps?://.+"
+        }
+      },
+      {
+        "name": "erpi_rest_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "ERPI REST API base URL (e.g., http://localhost:3000/api). Used for backfill polling and health checks.",
+        "validation": {
+          "pattern": "^https?://.+/api$"
+        }
+      },
+      {
+        "name": "erpi_graphql_url",
+        "type": "url",
+        "required": false,
+        "secret": false,
+        "description": "ERPI GraphQL endpoint (e.g., http://localhost:3000/graphql). Optional — used for enrichment queries when RabbitMQ messages lack full entity context.",
+        "validation": {
+          "pattern": "^https?://.+/graphql$"
+        }
+      },
+      {
+        "name": "jwt_token",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "JWT bearer token for authenticated REST/GraphQL requests. Not required for RabbitMQ consumption."
+      },
+      {
+        "name": "rabbitmq_consumer_group",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Consumer group ID for RabbitMQ queue naming. Must be unique to Forge to avoid stealing messages from ERPI's own consumers.",
+        "default": "forge-erpi"
+      },
+      {
+        "name": "rabbitmq_vhost",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ virtual host.",
+        "default": "/"
+      }
+    ],
+    "auth_methods": [
+      "jwt_bearer",
+      "none (rabbitmq auth is in connection URL)"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-erpi/v0.1.0",
+    "external_contract_ref": "asyncapi://whk-asyncapi-types/v1.0.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_type",
+      "sync_state",
+      "event_timestamp"
+    ],
+    "optional_context_fields": [
+      "schema_version",
+      "transaction_initiator",
+      "lot_id",
+      "production_order_id",
+      "recipe_id",
+      "equipment_phase_id",
+      "vendor_id",
+      "customer_id",
+      "netsuite_record_id"
+    ],
+    "data_sources": [
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "wh.whk01.distillery01.*",
+        "description": "33 entity fanout exchanges following UNS pattern. Primary data source — covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-erpi-<entity>) without affecting existing ERPI consumers.",
+        "entities": [
+          "PurchaseOrder",
+          "ProductionOrder",
+          "Asset",
+          "Item",
+          "ItemReceipt",
+          "Inventory",
+          "InventoryTransfer",
+          "SalesOrder",
+          "Account",
+          "Bom",
+          "BomItem",
+          "Recipe",
+          "RecipeParameter",
+          "RecipeGroup",
+          "ProductionOrderUnitProcedure",
+          "Barrel",
+          "ItemGroup",
+          "Kit",
+          "Lot",
+          "Location",
+          "BarrelEvent",
+          "UnitProcedure",
+          "Operation",
+          "EquipmentPhase",
+          "ProductionSchedule",
+          "ScheduleOrder",
+          "ScheduleQueue",
+          "BarrelReceipt",
+          "Batch",
+          "Vendor"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "message_acknowledgment",
+        "description": "Business-level acknowledgments for processed messages. Includes messageId, status, timestamp, service, and optional error details.",
+        "entities": [
+          "MessageAcknowledgment"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rabbitmq",
+        "endpoint": "erpi.netsuite.operation.*",
+        "description": "NetSuite operation outcome topics. erpi.netsuite.operation.ack for success, erpi.netsuite.operation.error for failures. Provides ERP sync health observability.",
+        "entities": [
+          "NetSuiteOperationAck",
+          "NetSuiteOperationError"
+        ],
+        "collection_mode": "subscribe"
+      },
+      {
+        "source_type": "rest_get",
+        "endpoint": "/api/{entity}",
+        "description": "REST API for backfill and enrichment. Auto-generated CRUD for 30+ entities via Amplication. Used for initial data load and gap-filling when RabbitMQ messages are insufficient.",
+        "entities": [
+          "All 30+ Prisma entities"
+        ],
+        "collection_mode": "poll"
+      },
+      {
+        "source_type": "graphql_query",
+        "endpoint": "/graphql",
+        "description": "GraphQL API for complex entity queries with nested relations. 124KB auto-generated schema covering all entities. Used for enrichment — e.g., fetching full recipe tree when a RecipeParameter update arrives.",
+        "entities": [
+          "All 40 Prisma entities with relations"
+        ],
+        "collection_mode": "poll"
+      }
+    ],
+    "cross_module_data_flows": [
+      {
+        "flow_name": "erp_master_data_to_mes",
+        "direction": "NetSuite → ERPI → MES",
+        "entities": ["Recipe", "RecipeParameter", "RecipeGroup", "Bom", "BomItem", "Item", "ItemGroup", "Vendor", "Customer"],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "ERP",
+        "description": "ERP-originated master data that MES depends on for recipe definitions and production planning. The Forge adapter preserves the ERP origin to maintain decision context."
+      },
+      {
+        "flow_name": "mes_execution_to_erp",
+        "direction": "MES → ERPI → NetSuite",
+        "entities": ["ProductionOrderUnitProcedure", "UnitProcedure", "Operation", "EquipmentPhase", "ProductionSchedule", "ScheduleOrder", "ScheduleQueue", "ItemReceipt"],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "WH",
+        "description": "Manufacturing execution data flowing to ERP for financial posting. ProductionOrderUnitProcedure has a special handler that posts directly to NetSuite. ItemReceipt has a 1-week delayed posting threshold."
+      },
+      {
+        "flow_name": "wms_inventory_to_erp",
+        "direction": "WMS → ERPI → NetSuite",
+        "entities": ["Barrel", "BarrelEvent", "BarrelReceipt", "Lot", "Kit", "Inventory", "InventoryTransfer", "Location"],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "WH",
+        "description": "Warehouse inventory movements flowing to ERP for stock reconciliation and financial tracking."
+      }
+    ],
+    "sample_record": {
+      "record_id": "whk-erpi:item:evt-20260407-001",
+      "source_adapter": "whk-erpi",
+      "collected_at": "2026-04-07T10:30:00Z",
+      "context": {
+        "cross_system_id": "ITEM-NS-00412",
+        "source_system": "erpi",
+        "entity_type": "Item",
+        "event_type": "create",
+        "operation_type": "CREATE",
+        "sync_state": "PENDING",
+        "event_timestamp": "2026-04-07T10:29:55Z",
+        "transaction_initiator": "ERP",
+        "schema_version": "1.0.0"
+      },
+      "payload": {
+        "globalId": "ITEM-NS-00412",
+        "name": "Corn - #2 Yellow Dent",
+        "type": "Inventory",
+        "category": "Raw Material",
+        "unitOfMeasure": "LB",
+        "transactionInitiator": "ERP",
+        "transactionStatus": "PENDING",
+        "transactionType": "CREATE"
+      }
+    }
+  },
+  "context_mapping": {
+    "mappings": [
+      {
+        "source_field": "data.data.globalId",
+        "context_field": "cross_system_id",
+        "description": "Unique cross-system identifier assigned by the originating system (NetSuite internalId or WHK CUID). Primary correlation key for entity identity across Forge modules."
+      },
+      {
+        "source_field": "data.data.transactionInitiator",
+        "context_field": "transaction_initiator",
+        "transform": "uppercase",
+        "description": "Which system originated this data: 'WH' (manufacturing floor) or 'ERP' (NetSuite). Critical for decision context — determines authoritative source."
+      },
+      {
+        "source_field": "data.data.transactionStatus",
+        "context_field": "sync_state",
+        "description": "ERP synchronization state: PENDING (not yet sent), SENT (transmitted), CONFIRMED (acknowledged by target). Tracks data reliability."
+      },
+      {
+        "source_field": "data.data.transactionType",
+        "context_field": "operation_type",
+        "description": "CRUD operation type: CREATE, UPDATE, DELETE. Combined with entity_type gives the full event semantic."
+      },
+      {
+        "source_field": "data.event_type",
+        "context_field": "event_type",
+        "description": "Business event type from message envelope: create, update, delete, large_quantity_update."
+      },
+      {
+        "source_field": "data.recordName",
+        "context_field": "entity_type",
+        "description": "Entity type name (e.g., 'Item', 'Recipe', 'Barrel'). Maps to Prisma model name."
+      },
+      {
+        "source_field": "data.data.schemaVersion",
+        "context_field": "schema_version",
+        "description": "Message schema version for backward compatibility tracking."
+      },
+      {
+        "source_field": "data.data.lot.id OR data.data.lotId",
+        "context_field": "lot_id",
+        "description": "Lot identifier when entity is lot-bearing (ItemReceipt, Barrel, BarrelEvent). Links to material genealogy."
+      },
+      {
+        "source_field": "data.data.productionOrder.id OR data.data.productionOrderId",
+        "context_field": "production_order_id",
+        "description": "Production order reference for manufacturing entities (UnitProcedure, Operation, EquipmentPhase)."
+      },
+      {
+        "source_field": "data.data.recipe.id OR data.data.recipeId",
+        "context_field": "recipe_id",
+        "description": "Recipe reference for recipe-related entities (RecipeParameter, RecipeGroup, Bom)."
+      }
+    ],
+    "enrichment_rules": [
+      {
+        "target_field": "netsuite_record_id",
+        "rule_type": "outbox_lookup",
+        "config": {
+          "source_field": "cross_system_id",
+          "lookup_source": "NetSuiteOutbox",
+          "lookup_field": "sourceGlobalId",
+          "return_field": "netsuiteRecordId"
+        },
+        "description": "When available, attach the NetSuite internal record ID from the outbox. Enables direct NetSuite ↔ Forge entity correlation."
+      },
+      {
+        "target_field": "data_flow_direction",
+        "rule_type": "derived",
+        "config": {
+          "source_field": "transaction_initiator",
+          "mapping": {
+            "ERP": "inbound_from_erp",
+            "WH": "outbound_to_erp"
+          }
+        },
+        "description": "Derive human-readable data flow direction from transaction initiator. Used for cross-module flow analysis and decision context."
+      }
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 1000,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 30000
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 60000,
+      "success_threshold": 2
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge.dead-letter.whk-erpi",
+      "max_age_hours": 168
+    },
+    "health_degradation": {
+      "degraded_after_failures": 3,
+      "failed_after_failures": 10
+    }
+  },
+  "metadata": {
+    "spoke": "erpi",
+    "hub_module": "forge-adapters",
+    "source_repo": "https://github.com/WhiskeyHouse/whk-erpi",
+    "source_language": "TypeScript",
+    "source_framework": "NestJS 11",
+    "source_database": "PostgreSQL (Prisma ORM, 40 models)",
+    "source_messaging": "RabbitMQ (33 entity exchanges + 3 ack topics, fanout pattern)",
+    "erp_integration": "NetSuite (OAuth 1.0, REST/RESTlet, bidirectional sync via outbox pattern)",
+    "external_contract": "AsyncAPI (whk-asyncapi-types submodule, compile-time type generation)",
+    "deployment": "Docker Compose (PostgreSQL, Redis, RabbitMQ, Jaeger)",
+    "cross_module_dependencies": "MES (recipe/production data), WMS (barrel/inventory data)",
+    "notes": "ERPI is the enterprise data backbone — 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated."
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": null,
+    "hash_state": "draft",
+    "previous_hash": null,
+    "approved_by": null,
+    "approved_at": null,
+    "change_history": [
+      {
+        "previous_hash": null,
+        "new_hash": null,
+        "changed_at": "2026-04-07T00:00:00Z",
+        "source": "discovery",
+        "changed_by": "claude-opus",
+        "change_type": "initial",
+        "reason": "Initial ERPI FACTS spec drafted from spoke discovery (DISCOVERY.md). Pending owner approval."
+      }
+    ]
+  }
+}

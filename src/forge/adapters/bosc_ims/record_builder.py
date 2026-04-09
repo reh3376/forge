@@ -14,7 +14,7 @@ The builder handles:
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.adapters.bosc_ims.context import build_record_context
@@ -39,11 +39,11 @@ def _parse_timestamp(raw: Any) -> datetime:
       - None → current time
     """
     if raw is None:
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
 
     if isinstance(raw, datetime):
         if raw.tzinfo is None:
-            return raw.replace(tzinfo=timezone.utc)
+            return raw.replace(tzinfo=UTC)
         return raw
 
     if isinstance(raw, dict):
@@ -52,21 +52,21 @@ def _parse_timestamp(raw: Any) -> datetime:
         nanos = raw.get("nanos", 0)
         return datetime.fromtimestamp(
             seconds + nanos / 1e9,
-            tz=timezone.utc,
+            tz=UTC,
         )
 
     if isinstance(raw, (int, float)):
-        return datetime.fromtimestamp(raw, tz=timezone.utc)
+        return datetime.fromtimestamp(raw, tz=UTC)
 
     # String — try ISO 8601
     raw_str = str(raw)
     try:
         dt = datetime.fromisoformat(raw_str.replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
+            dt = dt.replace(tzinfo=UTC)
         return dt
     except ValueError:
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
 
 
 def _serialize_payload(event: dict[str, Any]) -> str:
@@ -123,7 +123,7 @@ def build_contextual_record(
         A fully-populated ContextualRecord.
     """
     source_time = _parse_timestamp(raw_event.get("occurred_at"))
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     return ContextualRecord(
         source=RecordSource(
@@ -176,7 +176,7 @@ def build_asset_record(
     source_time = _parse_timestamp(
         asset.get("updated_at") or asset.get("created_at"),
     )
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     return ContextualRecord(
         source=RecordSource(

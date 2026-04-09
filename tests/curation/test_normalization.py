@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -118,23 +118,23 @@ class TestUnitRegistry:
 class TestTimeBucketer:
     def test_5min_bucket(self) -> None:
         bucketer = TimeBucketer.from_name("5min")
-        dt = datetime(2026, 4, 5, 14, 33, 45, tzinfo=timezone.utc)
-        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 14, 30, 0, tzinfo=timezone.utc)
+        dt = datetime(2026, 4, 5, 14, 33, 45, tzinfo=UTC)
+        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 14, 30, 0, tzinfo=UTC)
 
     def test_1hr_bucket(self) -> None:
         bucketer = TimeBucketer.from_name("1hr")
-        dt = datetime(2026, 4, 5, 14, 59, 59, tzinfo=timezone.utc)
-        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 14, 0, 0, tzinfo=timezone.utc)
+        dt = datetime(2026, 4, 5, 14, 59, 59, tzinfo=UTC)
+        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 14, 0, 0, tzinfo=UTC)
 
     def test_1min_bucket(self) -> None:
         bucketer = TimeBucketer.from_name("1min")
-        dt = datetime(2026, 4, 5, 14, 30, 45, 500000, tzinfo=timezone.utc)
-        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 14, 30, 0, tzinfo=timezone.utc)
+        dt = datetime(2026, 4, 5, 14, 30, 45, 500000, tzinfo=UTC)
+        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 14, 30, 0, tzinfo=UTC)
 
     def test_1day_bucket(self) -> None:
         bucketer = TimeBucketer.from_name("1day")
-        dt = datetime(2026, 4, 5, 23, 59, 59, tzinfo=timezone.utc)
-        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 0, 0, 0, tzinfo=timezone.utc)
+        dt = datetime(2026, 4, 5, 23, 59, 59, tzinfo=UTC)
+        assert bucketer.bucket(dt) == datetime(2026, 4, 5, 0, 0, 0, tzinfo=UTC)
 
     def test_naive_datetime_treated_as_utc(self) -> None:
         bucketer = TimeBucketer.from_name("5min")

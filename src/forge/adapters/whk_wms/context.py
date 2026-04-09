@@ -20,7 +20,7 @@ Enrichment rules:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -67,7 +67,7 @@ def derive_shift(event_time: datetime) -> str:
     If the timestamp is timezone-naive, it is assumed UTC.
     """
     if event_time.tzinfo is None:
-        event_time = event_time.replace(tzinfo=timezone.utc)
+        event_time = event_time.replace(tzinfo=UTC)
     local_time = event_time.astimezone(_LOUISVILLE_TZ)
     hour = local_time.hour
     if _DAY_SHIFT_START_HOUR <= hour < _DAY_SHIFT_END_HOUR:

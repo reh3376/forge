@@ -1,0 +1,407 @@
+{
+  "spec_version": "0.1.0",
+  "adapter_identity": {
+    "adapter_id": "whk-cmms",
+    "name": "Whiskey House CMMS Adapter",
+    "version": "0.1.0",
+    "type": "INGESTION",
+    "tier": "MES_MOM",
+    "protocol": "graphql+rest+amqp"
+  },
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 30000,
+    "shutdown_timeout_ms": 15000,
+    "health_check_interval_ms": 30000,
+    "restart_policy": "on_failure",
+    "state_transitions": [
+      {
+        "from": "REGISTERED",
+        "to": "CONNECTING",
+        "trigger": "start() called — initiates GraphQL + RabbitMQ connections"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "HEALTHY",
+        "trigger": "GraphQL endpoint accessible and RabbitMQ (if configured) connects"
+      },
+      {
+        "from": "CONNECTING",
+        "to": "FAILED",
+        "trigger": "startup_timeout_ms exceeded (30s)"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "DEGRADED",
+        "trigger": "GraphQL or RabbitMQ health check fails 3 consecutive times"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "HEALTHY",
+        "trigger": "Both GraphQL and RabbitMQ (if subscribed) health checks pass"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "FAILED",
+        "trigger": "Health check failures exceed failed_after_failures (10)"
+      },
+      {
+        "from": "FAILED",
+        "to": "CONNECTING",
+        "trigger": "restart_policy on_failure triggers reconnection"
+      },
+      {
+        "from": "HEALTHY",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "DEGRADED",
+        "to": "STOPPED",
+        "trigger": "stop() called — graceful shutdown"
+      },
+      {
+        "from": "FAILED",
+        "to": "STOPPED",
+        "trigger": "stop() called — forced shutdown"
+      }
+    ]
+  },
+  "connection": {
+    "params": [
+      {
+        "name": "cmms_graphql_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "CMMS GraphQL endpoint (e.g., http://localhost:3000/graphql). Primary data source for maintenance entities: assets, work orders, work requests, kits, inventory locations, investigations.",
+        "validation": {
+          "pattern": "^https?://.+/graphql$"
+        }
+      },
+      {
+        "name": "cmms_rest_url",
+        "type": "url",
+        "required": true,
+        "secret": false,
+        "description": "CMMS REST API base URL (e.g., http://localhost:3000/api). Secondary source for reference data: vendors, items, users.",
+        "validation": {
+          "pattern": "^https?://.+/api$"
+        }
+      },
+      {
+        "name": "rabbitmq_url",
+        "type": "url",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ AMQP URL (e.g., amqp://guest:guest@localhost:5672). Optional — required only if CMMS will subscribe to ERPI master data topics (item, vendor, inventory).",
+        "validation": {
+          "pattern": "^amqps?://.+"
+        }
+      },
+      {
+        "name": "jwt_token",
+        "type": "string",
+        "required": false,
+        "secret": true,
+        "description": "JWT bearer token for authenticated GraphQL/REST requests. Not required if CMMS has unauthenticated endpoints."
+      },
+      {
+        "name": "rabbitmq_consumer_group",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "Consumer group ID for RabbitMQ queue naming. Must be unique to Forge to avoid stealing messages from other consumers.",
+        "default": "forge-cmms"
+      },
+      {
+        "name": "rabbitmq_vhost",
+        "type": "string",
+        "required": false,
+        "secret": false,
+        "description": "RabbitMQ virtual host.",
+        "default": "/"
+      },
+      {
+        "name": "poll_interval_seconds",
+        "type": "integer",
+        "required": false,
+        "secret": false,
+        "description": "GraphQL polling interval for work orders, assets, maintenance requests (10-3600 seconds).",
+        "default": 60,
+        "validation": {
+          "minimum": 10,
+          "maximum": 3600
+        }
+      }
+    ],
+    "auth_methods": [
+      "jwt_bearer",
+      "none"
+    ]
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/whk-cmms/v0.1.0",
+    "external_contract_ref": "asyncapi://whk-asyncapi-types/v1.0.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "cross_system_id",
+      "source_system",
+      "entity_type",
+      "event_type",
+      "operation_context",
+      "asset_id",
+      "asset_path",
+      "work_order_type",
+      "priority_level",
+      "maintenance_status",
+      "maintenance_role_approval",
+      "operations_supervisor_approval",
+      "kit_id",
+      "location_path",
+      "cron_schedule",
+      "erp_id",
+      "scheduled_start",
+      "estimated_duration"
+    ],
+    "optional_context_fields": [
+      "maintenance_role_approval",
+      "operations_supervisor_approval",
+      "kit_id",
+      "location_path",
+      "cron_schedule",
+      "erp_id",
+      "scheduled_start",
+      "estimated_duration"
+    ]
+  },
+  "data_sources": [
+    {
+      "name": "CMMS GraphQL",
+      "type": "graphql",
+      "mode": "poll",
+      "description": "Primary source: GraphQL polling of CMMS maintenance entities. Polls at configurable interval (default 60s).",
+      "entities": [
+        "Asset",
+        "WorkOrder",
+        "WorkRequest",
+        "Kit",
+        "InventoryLocation",
+        "InventoryInvestigation",
+        "WorkOrderType",
+        "WorkRequestType",
+        "Item",
+        "Vendor",
+        "User"
+      ]
+    },
+    {
+      "name": "CMMS REST API",
+      "type": "rest",
+      "mode": "backfill",
+      "description": "Secondary source: REST API for historical data and reference lookups.",
+      "entities": [
+        "Asset",
+        "WorkOrder",
+        "Item",
+        "Vendor"
+      ]
+    },
+    {
+      "name": "ERPI RabbitMQ",
+      "type": "amqp",
+      "mode": "subscribe",
+      "description": "Tertiary source: RabbitMQ subscription to ERPI master data topics for inventory enrichment.",
+      "topics": [
+        "wh.whk01.distillery01.item",
+        "wh.whk01.distillery01.vendor",
+        "wh.whk01.distillery01.inventory",
+        "wh.whk01.distillery01.inventorytransfer",
+        "wh.whk01.distillery01.purchaseorder",
+        "wh.whk01.distillery01.productionorder",
+        "wh.whk01.distillery01.scheduleorder"
+      ]
+    }
+  ],
+  "cross_module_flows": [
+    {
+      "direction": "inbound",
+      "source_module": "ERPI",
+      "data_flow": "ERPI → CMMS (item, vendor, purchase order master data)",
+      "topics": [
+        "wh.whk01.distillery01.item",
+        "wh.whk01.distillery01.vendor",
+        "wh.whk01.distillery01.purchaseorder"
+      ],
+      "purpose": "Enrich maintenance cost tracking with master item data and vendor information"
+    },
+    {
+      "direction": "outbound",
+      "destination_module": "MES",
+      "data_flow": "CMMS → MES (maintenance windows, asset state, approval status)",
+      "purpose": "Production scheduling must account for scheduled maintenance windows that block equipment"
+    },
+    {
+      "direction": "outbound",
+      "destination_module": "WMS",
+      "data_flow": "CMMS → WMS (inventory investigations, physical counts)",
+      "purpose": "Inventory audit reconciliation coordinates with warehouse operations"
+    }
+  ],
+  "domain_mappings": [
+    {
+      "cmms_entity": "Asset",
+      "forge_domain": "ManufacturingUnit",
+      "forge_fields": [
+        "tag_path (from assetPath)",
+        "unit_type (from assetType)",
+        "parent_id (hierarchical)",
+        "metadata.asset_make",
+        "metadata.asset_model",
+        "metadata.oem_manufacturer",
+        "metadata.in_service_date",
+        "metadata.out_of_service_date"
+      ]
+    },
+    {
+      "cmms_entity": "WorkOrder",
+      "forge_domain": "WorkOrder",
+      "forge_fields": [
+        "title (from name)",
+        "order_type: 'maintenance'",
+        "status (Scheduled → SCHEDULED, Active → IN_PROGRESS, Completed → COMPLETE)",
+        "metadata.priority",
+        "metadata.asset_id",
+        "metadata.kit_id",
+        "metadata.scheduled_start",
+        "metadata.estimated_duration",
+        "metadata.cron_schedule"
+      ]
+    },
+    {
+      "cmms_entity": "WorkRequest",
+      "forge_domain": "WorkOrder",
+      "forge_fields": [
+        "title (from issueDescription)",
+        "order_type: 'maintenance_request'",
+        "status (Pending → DRAFT, Approved → SCHEDULED, Rejected → CANCELLED)",
+        "metadata.priority",
+        "metadata.asset_id",
+        "metadata.maintenance_role_approval",
+        "metadata.operations_supervisor_approval"
+      ]
+    },
+    {
+      "cmms_entity": "Item",
+      "forge_domain": "MaterialItem",
+      "forge_fields": [
+        "item_number (from itemPartNo or globalId)",
+        "name (from itemName)",
+        "category (from itemClass)",
+        "unit_of_measure",
+        "vendor_id",
+        "external_ids.global (globalId)",
+        "external_ids.erp_id (erpId)"
+      ]
+    },
+    {
+      "cmms_entity": "Kit",
+      "forge_domain": "MaterialItem (composite)",
+      "forge_fields": [
+        "name (from kitName)",
+        "category: 'kit'",
+        "metadata.items (array of item references)",
+        "metadata.item_quantities_used"
+      ]
+    },
+    {
+      "cmms_entity": "Vendor",
+      "forge_domain": "BusinessEntity",
+      "forge_fields": [
+        "entity_type: VENDOR",
+        "name",
+        "metadata.contact_information",
+        "metadata.additional_details"
+      ]
+    },
+    {
+      "cmms_entity": "InventoryInvestigation",
+      "forge_domain": "OperationalEvent",
+      "forge_fields": [
+        "event_type: 'inventory_audit'",
+        "location (from inventoryLocation)",
+        "metadata.physical_count",
+        "metadata.digital_count",
+        "metadata.discrepancy (computed)"
+      ]
+    }
+  ],
+  "governance": {
+    "approval_workflows": [
+      {
+        "entity": "WorkRequest",
+        "flow": "WorkRequest → maintenanceRoleApproval → operationsSupervisorApproval → WorkOrder",
+        "description": "Maintenance requests must be approved by maintenance supervisor, then operations supervisor before scheduling"
+      }
+    ],
+    "data_retention": {
+      "work_orders": "5 years (archive after completion)",
+      "work_requests": "2 years",
+      "assets": "Lifecycle (in_service_date to out_of_service_date)",
+      "inventory_investigations": "1 year"
+    },
+    "audit_trail": [
+      "All work order status transitions logged",
+      "Maintenance tech assignments tracked with timestamps",
+      "Approval decisions captured with user ID and timestamp",
+      "Cost calculations auditable via actualDuration and costCalculation fields"
+    ]
+  },
+  "known_patterns": {
+    "periodic_maintenance": {
+      "description": "WorkOrders and WorkRequests can have cronSchedule (e.g., '0 9 * * 0' = every Monday 9am) for preventive maintenance.",
+      "example": "Asset pump requires inspection every 30 days — cronSchedule generates recurring WorkOrders automatically"
+    },
+    "maintenance_kits": {
+      "description": "WorkOrders reference Kits, which contain pre-assembled sets of items for specific maintenance tasks.",
+      "example": "Oil change kit includes filter, gasket, drain pan — allocated to work order for cost tracking"
+    },
+    "approval_governance": {
+      "description": "WorkRequests require dual approval (maintenance supervisor + operations supervisor) before scheduling to prevent conflicts with production.",
+      "example": "Operator requests emergency bearing replacement; maintenance supervisor approves urgency; operations supervisor schedules maintenance window"
+    },
+    "production_impact": {
+      "description": "Scheduled maintenance windows (from WorkOrder.scheduledStart/End) must be communicated to MES for production scheduling constraints.",
+      "example": "Distillery scheduled for maintenance 2024-04-15 08:00-12:00 UTC blocks ProductionOrders with those timestamps"
+    }
+  },
+  "phase_1_limitations": {
+    "read_only": true,
+    "no_graphql_mutations": "Phase 1 reads CMMS state only; cannot create/update work orders, assets, or requests via Forge",
+    "no_rabbitmq_publishing": "Phase 1 subscribes to ERPI topics only; cannot publish CMMS events to RabbitMQ",
+    "graphql_polling": "Phase 2 will add live polling; Phase 1 uses inject_records() for testing"
+  },
+  "related_adapters": [
+    {
+      "adapter_id": "whk-erpi",
+      "relationship": "ERPI provides master item and vendor data via RabbitMQ topics; CMMS enriches maintenance cost tracking with this data",
+      "data_flow": "ERPI item/vendor topics → CMMS RabbitMQ subscriptions"
+    },
+    {
+      "adapter_id": "whk-mes",
+      "relationship": "MES must account for CMMS maintenance windows when scheduling production orders",
+      "data_flow": "CMMS scheduled maintenance windows → MES production scheduling constraints"
+    },
+    {
+      "adapter_id": "whk-wms",
+      "relationship": "WMS coordinates with CMMS on inventory investigations and physical counts",
+      "data_flow": "CMMS inventory investigations ↔ WMS barrel inventory reconciliation"
+    }
+  ]
+}

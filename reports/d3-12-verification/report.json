@@ -1,0 +1,54 @@
+{
+  "title": "D3.12 Production Verification Report",
+  "timestamp": "2026-04-07T15:12:03.470227+00:00",
+  "python_version": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+  "suites": {
+    "pipeline_e2e": {
+      "name": "End-to-End Pipeline",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 19,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.3
+    },
+    "hub_api": {
+      "name": "Hub API Integration",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 11,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.37
+    },
+    "facts_governance": {
+      "name": "FACTS Governance Pipeline",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 19,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.19
+    },
+    "sdk_roundtrip": {
+      "name": "Module Builder SDK Round-Trip",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 15,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.22
+    }
+  },
+  "summary": {
+    "verification_passed": 64,
+    "verification_failed": 0,
+    "verification_errors": 0,
+    "all_green": true,
+    "verdict": "PASS \u2014 All D3 integration contracts verified"
+  }
+}
