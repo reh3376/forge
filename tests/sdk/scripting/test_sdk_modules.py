@@ -1,15 +1,15 @@
 """Tests for forge.* SDK modules (tag, db, net, log, alarm)."""
 
-import pytest
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
-from forge.sdk.scripting.modules.tag import TagModule, TagReadResult, BrowseNode
+import pytest
+
+from forge.sdk.scripting.modules.alarm import AlarmInfo, AlarmModule
 from forge.sdk.scripting.modules.db import DbModule, QueryResult, register_named_query
-from forge.sdk.scripting.modules.net import NetModule, HttpResponse
-from forge.sdk.scripting.modules.log import LogModule, ForgeLogger
-from forge.sdk.scripting.modules.alarm import AlarmModule, AlarmInfo
-
+from forge.sdk.scripting.modules.log import ForgeLogger, LogModule
+from forge.sdk.scripting.modules.net import HttpResponse
+from forge.sdk.scripting.modules.tag import BrowseNode, TagModule, TagReadResult
 
 # ===========================================================================
 # forge.tag
@@ -63,7 +63,12 @@ class TestTagModule:
     @pytest.mark.asyncio
     async def test_browse(self, tag_mod, mock_registry):
         mock_registry.browse.return_value = [
-            {"path": "WH/WHK01/Distillery01", "name": "Distillery01", "is_folder": True, "has_children": True},
+            {
+                "path": "WH/WHK01/Distillery01",
+                "name": "Distillery01",
+                "is_folder": True,
+                "has_children": True,
+            },
         ]
         nodes = await tag_mod.browse("WH/WHK01")
         assert len(nodes) == 1
@@ -226,7 +231,7 @@ class TestAlarmModule:
         mod = AlarmModule()
         with pytest.raises(RuntimeError, match="not bound"):
             import asyncio
-            asyncio.get_event_loop().run_until_complete(mod.get_active())
+            asyncio.run(mod.get_active())
 
     @pytest.mark.asyncio
     async def test_get_active(self):

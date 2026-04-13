@@ -111,6 +111,25 @@ services:
       start_period: 15s
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-forge}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-changeme}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
+    volumes:
+      - forge-rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
@@ -156,6 +175,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-forge}:${RABBITMQ_PASS:-changeme}@rabbitmq:5672/${RABBITMQ_VHOST:-/}
+      RABBITMQ_HOST: rabbitmq
     volumes:
       # Mount init script from host (for dev iteration)
       - ../../deploy/docker/init-entrypoint.sh:/app/deploy/docker/init-entrypoint.sh:ro
@@ -169,6 +190,8 @@ services:
       redis:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   # ==================================================================
@@ -202,6 +225,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-forge}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-forge}:${RABBITMQ_PASS:-changeme}@rabbitmq:5672/${RABBITMQ_VHOST:-/}
       # API
       FORGE_API_HOST: "0.0.0.0"
       FORGE_API_PORT: "8000"
@@ -209,6 +233,10 @@ services:
       FORGE_GRPC_ENABLED: "true"
       # Features
       FORGE_AUTH_ENABLED: "false"
+      FORGE_JWT_SECRET: "${FORGE_JWT_SECRET:-forge-dev-secret-do-not-use-in-prod}"
+      FORGE_JWT_ALGORITHM: "${FORGE_JWT_ALGORITHM:-HS256}"
+      FORGE_API_KEYS: "${FORGE_API_KEYS:-}"
+      FORGE_RATE_LIMIT_REDIS: "false"
       FORGE_OTEL_ENABLED: "false"
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:8000/healthz"]
@@ -227,4 +255,5 @@ volumes:
   forge-neo4j-data:
   forge-redis-data:
   forge-kafka-data:
+  forge-rabbitmq-data:
   forge-minio-data:

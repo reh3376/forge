@@ -77,11 +77,16 @@ def init(
         bool,
         typer.Option("--defaults", help="Accept all defaults without prompting"),
     ] = False,
+    scan_ports: Annotated[
+        bool,
+        typer.Option("--scan-ports/--no-scan-ports", help="Scan for free ports"),
+    ] = True,
 ) -> None:
     """Initialize a new Forge instance.
 
     Creates configuration files, Docker Compose stack, and
-    directory structure for a Forge deployment.
+    directory structure for a Forge deployment. Scans for free
+    ports to avoid conflicts with other services.
     """
     target = target.resolve()
     typer.echo(f"Initializing Forge in {target} ...")
@@ -101,10 +106,16 @@ def init(
         (target / d).mkdir(parents=True, exist_ok=True)
         typer.echo(f"  Created {d}/")
 
+    # Scan for free ports
+    port_assignments = _DEFAULT_PORTS.copy()
+    if scan_ports:
+        typer.echo("  Scanning for free ports ...")
+        port_assignments = _scan_free_ports()
+
     # Write default .env
     env_file = target / ".env"
     if not env_file.exists() or defaults:
-        env_content = _default_env()
+        env_content = _default_env(port_assignments)
         env_file.write_text(env_content)
         typer.echo("  Created .env")
 
@@ -243,6 +254,96 @@ def governance_run(
     typer.echo("All checks passed.")
 
 
+# ---------------------------------------------------------------------------
+# Migrate subcommand group
+# ---------------------------------------------------------------------------
+
+migrate_app = typer.Typer(
+    name="migrate",
+    help="Database migration commands.",
+    no_args_is_help=True,
+)
+app.add_typer(migrate_app, name="migrate")
+
+
+@migrate_app.command("up")
+def migrate_up(
+    target: Annotated[
+        str,
+        typer.Option("--target", help="Target database: postgres, timescale, neo4j, or all"),
+    ] = "all",
+) -> None:
+    """Apply all pending migrations."""
+    import logging
+
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    from forge.storage.migrations.run import run_alembic, run_all, run_neo4j
+
+    typer.echo(f"Running migrations (target={target}) ...")
+    if target == "all":
+        run_all("upgrade")
+    elif target == "neo4j":
+        run_neo4j("upgrade")
+    else:
+        run_alembic("upgrade", target=target)
+    typer.echo("Migrations applied.")
+
+
+@migrate_app.command("status")
+def migrate_status(
+    target: Annotated[
+        str,
+        typer.Option("--target", help="Target database: postgres, timescale, neo4j, or all"),
+    ] = "all",
+) -> None:
+    """Show migration status."""
+    import logging
+
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    from forge.storage.migrations.run import run_alembic, run_all, run_neo4j
+
+    if target == "all":
+        run_all("current")
+    elif target == "neo4j":
+        run_neo4j("current")
+    else:
+        run_alembic("current", target=target)
+
+
+@migrate_app.command("down")
+def migrate_down(
+    steps: Annotated[
+        int,
+        typer.Option("--steps", help="Number of migrations to roll back"),
+    ] = 1,
+    target: Annotated[
+        str,
+        typer.Option("--target", help="Target database: postgres, timescale, neo4j, or all"),
+    ] = "all",
+) -> None:
+    """Roll back migrations."""
+    import logging
+
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    from forge.storage.migrations.run import run_alembic, run_all, run_neo4j
+
+    typer.echo(f"Rolling back {steps} migration(s) (target={target}) ...")
+    if target == "all":
+        run_all("downgrade", steps=steps)
+    elif target == "neo4j":
+        run_neo4j("downgrade", steps=steps)
+    else:
+        run_alembic("downgrade", target=target, steps=steps)
+    typer.echo("Rollback complete.")
+
+
+# ---------------------------------------------------------------------------
+# Governance subcommand group (continued)
+# ---------------------------------------------------------------------------
+
 @governance_app.command("validate-spec")
 def governance_validate_spec(
     spec_file: Annotated[
@@ -292,44 +393,114 @@ def governance_validate_spec(
 
 
 # ---------------------------------------------------------------------------
+# Port scanning
+# ---------------------------------------------------------------------------
+
+_DEFAULT_PORTS: dict[str, int] = {
+    "POSTGRES_PORT": 5432,
+    "TIMESCALE_PORT": 5433,
+    "NEO4J_HTTP_PORT": 7474,
+    "NEO4J_BOLT_PORT": 7687,
+    "REDIS_PORT": 6379,
+    "KAFKA_PORT": 9092,
+    "RABBITMQ_PORT": 5672,
+    "RABBITMQ_MGMT_PORT": 15672,
+    "MINIO_API_PORT": 9000,
+    "MINIO_CONSOLE_PORT": 9001,
+    "FORGE_API_PORT": 8000,
+    "FORGE_GRPC_PORT": 50051,
+}
+
+
+def _is_port_free(port: int) -> bool:
+    """Check if a TCP port is available for binding."""
+    import socket
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind(("127.0.0.1", port))
+            return True
+        except OSError:
+            return False
+
+
+def _find_free_port(preferred: int, range_start: int = 10000, range_end: int = 65000) -> int:
+    """Find a free port, preferring the default.
+
+    If the preferred port is free, use it. Otherwise scan upward
+    from range_start.
+    """
+    if _is_port_free(preferred):
+        return preferred
+    for port in range(range_start, range_end):
+        if _is_port_free(port):
+            return port
+    return preferred  # fallback
+
+
+def _scan_free_ports() -> dict[str, int]:
+    """Scan and assign free ports for all Forge services."""
+    assigned: dict[str, int] = {}
+    used: set[int] = set()
+    for name, default_port in _DEFAULT_PORTS.items():
+        if _is_port_free(default_port) and default_port not in used:
+            assigned[name] = default_port
+            used.add(default_port)
+        else:
+            port = _find_free_port(default_port)
+            assigned[name] = port
+            used.add(port)
+    return assigned
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _default_env() -> str:
+def _default_env(ports: dict[str, int] | None = None) -> str:
     """Generate a default .env for Forge."""
-    return """\
+    p = ports or _DEFAULT_PORTS
+    return f"""\
 # Forge Platform Configuration
 # Generated by: forge init
 
 # --- Storage ---
 POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
+POSTGRES_PORT={p.get('POSTGRES_PORT', 5432)}
 POSTGRES_DB=forge
 POSTGRES_USER=forge
 POSTGRES_PASSWORD=changeme
 
 TIMESCALE_HOST=localhost
-TIMESCALE_PORT=5433
+TIMESCALE_PORT={p.get('TIMESCALE_PORT', 5433)}
 TIMESCALE_DB=forge_ts
 TIMESCALE_USER=forge
 TIMESCALE_PASSWORD=changeme
 
-NEO4J_URI=bolt://localhost:7687
+NEO4J_URI=bolt://localhost:{p.get('NEO4J_BOLT_PORT', 7687)}
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=changeme
 
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://localhost:{p.get('REDIS_PORT', 6379)}/0
 
-MINIO_ENDPOINT=localhost:9000
+MINIO_ENDPOINT=localhost:{p.get('MINIO_API_PORT', 9000)}
 MINIO_ACCESS_KEY=forge
 MINIO_SECRET_KEY=changeme
 
 # --- Kafka ---
-KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+KAFKA_BOOTSTRAP_SERVERS=localhost:{p.get('KAFKA_PORT', 9092)}
+
+# --- RabbitMQ ---
+RABBITMQ_URL=amqp://forge:changeme@localhost:{p.get('RABBITMQ_PORT', 5672)}/
+RABBITMQ_USER=forge
+RABBITMQ_PASS=changeme
+RABBITMQ_VHOST=/
+RABBITMQ_PORT={p.get('RABBITMQ_PORT', 5672)}
+RABBITMQ_MGMT_PORT={p.get('RABBITMQ_MGMT_PORT', 15672)}
 
 # --- API ---
 FORGE_API_HOST=0.0.0.0
-FORGE_API_PORT=8000
+FORGE_API_PORT={p.get('FORGE_API_PORT', 8000)}
 
 # --- Features ---
 FORGE_AUTH_ENABLED=false
@@ -420,6 +591,22 @@ services:
       interval: 10s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-forge}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-changeme}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
+    volumes:
+      - forge-rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      retries: 5
+
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
@@ -442,5 +629,6 @@ volumes:
   forge-neo4j-data:
   forge-redis-data:
   forge-kafka-data:
+  forge-rabbitmq-data:
   forge-minio-data:
 """

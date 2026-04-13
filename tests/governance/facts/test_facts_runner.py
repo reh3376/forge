@@ -70,7 +70,7 @@ def verdict_status():
 
 def _run(coro):
     """Helper to run an async coroutine synchronously."""
-    return asyncio.get_event_loop().run_until_complete(coro)
+    return asyncio.run(coro)
 
 
 def _minimal_spec(**overrides: Any) -> dict[str, Any]:
