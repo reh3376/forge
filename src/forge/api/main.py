@@ -13,7 +13,6 @@ The gRPC server for spoke communication runs on a separate port
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 import time
@@ -35,6 +34,7 @@ from forge.api.health import (
 )
 from forge.core.models.adapter import AdapterHealth, AdapterManifest, AdapterState
 from forge.storage.config import StorageConfig
+from forge.storage.factory import StorageFactory  # noqa: TC001
 
 logger = logging.getLogger(__name__)
 
@@ -120,12 +120,15 @@ class _AdapterRegistry:
 
 def create_app(
     storage_config: StorageConfig | None = None,
+    storage_factory: StorageFactory | None = None,
 ) -> FastAPI:
     """Create the Forge Hub API application.
 
     Args:
         storage_config: Override for storage configuration.
             Defaults to ``StorageConfig.from_env()``.
+        storage_factory: Optional StorageFactory for real backends.
+            When provided, the curation sub-app uses real stores.
     """
     config = storage_config or StorageConfig.from_env()
     registry = _AdapterRegistry()
@@ -147,7 +150,7 @@ def create_app(
     grpc_port = int(os.getenv("FORGE_GRPC_PORT", "50051"))
 
     @asynccontextmanager
-    async def lifespan(app: FastAPI):  # noqa: ARG001
+    async def lifespan(app: FastAPI):
         """Startup / shutdown lifecycle."""
         nonlocal grpc_server
 
@@ -282,7 +285,19 @@ def create_app(
     try:
         from forge.curation.service import create_curation_app
 
-        curation_app = create_curation_app()
+        curation_kwargs: dict[str, Any] = {}
+        if storage_factory is not None:
+            from forge.curation.lineage import LineageTracker
+            from forge.curation.registry import DataProductRegistry
+
+            curation_kwargs["registry"] = DataProductRegistry(
+                store=storage_factory.product_store(),
+            )
+            curation_kwargs["lineage_tracker"] = LineageTracker(
+                store=storage_factory.lineage_store(),
+            )
+
+        curation_app = create_curation_app(**curation_kwargs)
         app.mount("/curation", curation_app)
         logger.info("Curation sub-application mounted at /curation")
     except Exception:

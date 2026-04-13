@@ -13,7 +13,6 @@ from forge.storage.backfill import (
     BackfillTablePlan,
 )
 
-
 # ── BackfillStatus ─────────────────────────────────────────────
 
 
@@ -306,7 +305,7 @@ class TestBackfillEngineAsync:
                 estimated_rows=10_000,
             )
         )
-        progress = asyncio.get_event_loop().run_until_complete(
+        progress = asyncio.run(
             engine.run_table("whk-wms", "public.Barrel")
         )
         assert progress.status == BackfillStatus.COMPLETE
@@ -316,7 +315,7 @@ class TestBackfillEngineAsync:
     def test_run_table_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill plan"):
-            asyncio.get_event_loop().run_until_complete(
+            asyncio.run(
                 engine.run_table("whk-wms", "nonexistent")
             )
 
@@ -342,7 +341,7 @@ class TestBackfillEngineAsync:
                 estimated_rows=5_000,
             )
         )
-        summary = asyncio.get_event_loop().run_until_complete(
+        summary = asyncio.run(
             engine.run_spoke("whk-wms")
         )
         assert summary.overall_status == BackfillStatus.COMPLETE
@@ -352,7 +351,7 @@ class TestBackfillEngineAsync:
     def test_run_spoke_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill plans"):
-            asyncio.get_event_loop().run_until_complete(
+            asyncio.run(
                 engine.run_spoke("nonexistent")
             )
 
@@ -382,7 +381,7 @@ class TestBackfillEngineAsync:
                 depends_on=["public.Customer"],
             )
         )
-        summary = asyncio.get_event_loop().run_until_complete(
+        summary = asyncio.run(
             engine.run_spoke("whk-wms")
         )
         assert summary.tables_complete == 2
@@ -406,7 +405,7 @@ class TestBackfillEngineValidation:
                 estimated_rows=10_000,
             )
         )
-        asyncio.get_event_loop().run_until_complete(
+        asyncio.run(
             engine.run_table("whk-wms", "public.Barrel")
         )
         progress = engine.validate_table("whk-wms", "public.Barrel")

@@ -5,20 +5,17 @@ i3X router without a running server.
 """
 
 import pytest
-import pytest_asyncio
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from forge.modules.ot.i3x.router import create_i3x_router
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
+from forge.modules.ot.tag_engine.builtin_templates import create_builtin_registry
 from forge.modules.ot.tag_engine.models import (
     MemoryTag,
     StandardTag,
-    ExpressionTag,
-    TagType,
 )
 from forge.modules.ot.tag_engine.registry import TagRegistry
-from forge.modules.ot.tag_engine.builtin_templates import create_builtin_registry
-from forge.modules.ot.i3x.router import create_i3x_router
 
 
 @pytest.fixture
@@ -91,7 +88,7 @@ def _populate_registry(registry: TagRegistry):
             "WH/WHK01/Distillery01/LIT_6050B/Out_PV", 45.2, QualityCode.GOOD
         )
 
-    asyncio.get_event_loop().run_until_complete(_add())
+    asyncio.run(_add())
 
 
 # ---------------------------------------------------------------------------

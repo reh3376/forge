@@ -83,6 +83,17 @@ class KafkaConfig:
 
 
 @dataclass(frozen=True)
+class RabbitMQConfig:
+    """RabbitMQ connection configuration."""
+
+    url: str = "amqp://forge:changeme@localhost:5672/"
+    vhost: str = "/"
+    consumer_group: str = "forge-hub"
+    prefetch_count: int = 100
+    connection_timeout: float = 10.0
+
+
+@dataclass(frozen=True)
 class StorageConfig:
     """Unified storage configuration for all Forge engines.
 
@@ -96,6 +107,7 @@ class StorageConfig:
     redis: RedisConfig = field(default_factory=RedisConfig)
     minio: MinioConfig = field(default_factory=MinioConfig)
     kafka: KafkaConfig = field(default_factory=KafkaConfig)
+    rabbitmq: RabbitMQConfig = field(default_factory=RabbitMQConfig)
 
     @classmethod
     def from_env(cls) -> StorageConfig:
@@ -131,6 +143,17 @@ class StorageConfig:
             kafka=KafkaConfig(
                 bootstrap_servers=os.getenv(
                     "KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"
+                ),
+            ),
+            rabbitmq=RabbitMQConfig(
+                url=os.getenv(
+                    "RABBITMQ_URL", "amqp://forge:changeme@localhost:5672/"
+                ),
+                vhost=os.getenv("RABBITMQ_VHOST", "/"),
+                consumer_group=os.getenv("RABBITMQ_CONSUMER_GROUP", "forge-hub"),
+                prefetch_count=int(os.getenv("RABBITMQ_PREFETCH_COUNT", "100")),
+                connection_timeout=float(
+                    os.getenv("RABBITMQ_CONNECTION_TIMEOUT", "10.0")
                 ),
             ),
         )

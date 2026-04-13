@@ -1,11 +1,9 @@
 """Tests for the store-and-forward SQLite buffer."""
 
 import asyncio
+from datetime import UTC, datetime
+
 import pytest
-import tempfile
-from datetime import datetime, timezone
-from pathlib import Path
-from uuid import uuid4
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -18,7 +16,6 @@ from forge.core.models.contextual_record import (
 )
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -26,7 +23,7 @@ from forge.modules.ot.context.store_forward import StoreForwardBuffer
 
 def _make_record(tag_path: str = "WH/WHK01/Distillery01/TIT_2010/Out_PV") -> ContextualRecord:
     """Create a minimal ContextualRecord for testing."""
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     return ContextualRecord(
         source=RecordSource(
             adapter_id="forge-ot-module",
@@ -226,7 +223,7 @@ class TestPrune:
         async def mock_send(records):
             pass
 
-        asyncio.get_event_loop().run_until_complete(buf.flush(mock_send))
+        asyncio.run(buf.flush(mock_send))
         assert buf.pending_count() == 0
 
         pruned = buf.prune()

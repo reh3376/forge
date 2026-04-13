@@ -14,18 +14,17 @@ Design notes:
 from __future__ import annotations
 
 import enum
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
-
 
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
 
 
-class QualityCode(str, enum.Enum):
+class QualityCode(enum.StrEnum):
     """Forge quality codes mapped from OPC-UA StatusCode severity bits.
 
     OPC-UA StatusCode is a 32-bit value where bits 30-31 indicate severity:
@@ -57,7 +56,7 @@ class QualityCode(str, enum.Enum):
         return cls.BAD  # Bad (bits 30-31 = 10 or 11)
 
 
-class DataType(str, enum.Enum):
+class DataType(enum.StrEnum):
     """Data types supported by OPC-UA, focused on CIP types from ControlLogix.
 
     Allen-Bradley ControlLogix PLCs expose these types via OPC-UA:
@@ -100,7 +99,7 @@ class DataType(str, enum.Enum):
     EXTENSION_OBJECT = "ExtensionObject"
 
 
-class NodeClass(str, enum.Enum):
+class NodeClass(enum.StrEnum):
     """OPC-UA node classes — determines what kind of entity a node represents.
 
     The browse service returns NodeClass for every discovered node.
@@ -136,7 +135,7 @@ class AccessLevel(int, enum.Flag):
     TIMESTAMP_WRITE = 64
 
 
-class ConnectionState(str, enum.Enum):
+class ConnectionState(enum.StrEnum):
     """OPC-UA client connection state machine.
 
     State transitions:
@@ -230,11 +229,11 @@ class DataValue(BaseModel):
         description="Raw OPC-UA StatusCode (uint32) for protocol-level detail",
     )
     source_timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Timestamp from the source (PLC clock)",
     )
     server_timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Timestamp from the OPC-UA server",
     )
 
@@ -242,7 +241,7 @@ class DataValue(BaseModel):
     @classmethod
     def _ensure_utc(cls, v: datetime) -> datetime:
         if v is not None and v.tzinfo is None:
-            return v.replace(tzinfo=timezone.utc)
+            return v.replace(tzinfo=UTC)
         return v
 
 

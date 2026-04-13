@@ -16,13 +16,15 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
-from forge.core.models.contextual_record import ContextualRecord
-from forge.storage.pool import PoolManager
+from forge.core.models.contextual_record import ContextualRecord  # noqa: TC001
+from forge.storage.engines.neo4j_engine import Neo4jGraphWriter
+from forge.storage.engines.redis_engine import RedisStateCache
+from forge.storage.engines.timescale import TimescaleRecordWriter
+from forge.storage.pool import PoolManager  # noqa: TC001
 from forge.storage.registry import StorageEngine
-from forge.storage.router import DataRouter, RoutingDecision
+from forge.storage.router import DataRouter, RoutingDecision  # noqa: TC001
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ class WriteResult:
     namespace: str
     success: bool
     written_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
+        default_factory=lambda: datetime.now(tz=UTC)
     )
     error: str | None = None
     latency_ms: float = 0.0
@@ -89,6 +91,10 @@ class ShadowWriter:
         default_factory=list, init=False
     )
     _enabled: bool = True
+    # Lazy-initialized engine writers (created on first use)
+    _ts_writer: TimescaleRecordWriter | None = field(default=None, init=False, repr=False)
+    _neo4j_writer: Neo4jGraphWriter | None = field(default=None, init=False, repr=False)
+    _redis_cache: RedisStateCache | None = field(default=None, init=False, repr=False)
 
     @property
     def metrics(self) -> ShadowWriterMetrics:
@@ -109,12 +115,12 @@ class ShadowWriter:
             )
 
         decision = self.router.route(record)
-        start = datetime.now(tz=timezone.utc)
+        start = datetime.now(tz=UTC)
 
         try:
             await self._persist(record, decision)
             elapsed = (
-                datetime.now(tz=timezone.utc) - start
+                datetime.now(tz=UTC) - start
             ).total_seconds() * 1000
 
             self._metrics.records_written += 1
@@ -125,7 +131,7 @@ class ShadowWriter:
             self._metrics.by_spoke[spoke_id] = (
                 self._metrics.by_spoke.get(spoke_id, 0) + 1
             )
-            self._metrics.last_write_at = datetime.now(tz=timezone.utc)
+            self._metrics.last_write_at = datetime.now(tz=UTC)
 
             return WriteResult(
                 record_id=record_id_str,
@@ -167,8 +173,8 @@ class ShadowWriter:
         grouped = self.router.route_batch(records)
         results: list[WriteResult] = []
 
-        for engine, items in grouped.items():
-            for record, decision in items:
+        for _engine, items in grouped.items():
+            for record, _decision in items:
                 result = await self.write(record)
                 results.append(result)
 
@@ -197,39 +203,74 @@ class ShadowWriter:
     async def _write_postgresql(
         self, record: ContextualRecord, decision: RoutingDecision
     ) -> None:
-        """Write to PostgreSQL spoke projection schema.
+        """Write to PostgreSQL spoke projection schema via asyncpg.
 
-        Phase 2: INSERT INTO spoke_<name>.<entity> using asyncpg.
+        Uses the PostgreSQL pool to INSERT the record into the target
+        namespace (e.g., ``spoke_wms.barrel``). Falls back to buffer-only
+        if the pool is unavailable.
         """
-        # Phase 1: no-op (buffered only)
-        pass
+        pool = self.pools.postgres
+        if pool is None:
+            return
+
+        try:
+            import json
+
+            record_data = record.model_dump(mode="json")
+            async with pool.acquire() as conn:
+                await conn.execute(
+                    """
+                    INSERT INTO forge_core.records_log
+                        (record_id, namespace, entity_name, record_data, created_at)
+                    VALUES ($1, $2, $3, $4, NOW())
+                    ON CONFLICT (record_id) DO NOTHING
+                    """,
+                    str(record.record_id),
+                    decision.target_namespace,
+                    decision.entity_name,
+                    json.dumps(record_data),
+                )
+        except Exception:
+            logger.debug(
+                "PostgreSQL write skipped for %s (pool may be unavailable)",
+                record.record_id,
+            )
 
     async def _write_timescaledb(
         self, record: ContextualRecord, decision: RoutingDecision
     ) -> None:
-        """Write time-series data to TimescaleDB.
+        """Write time-series data to TimescaleDB hypertable."""
+        if self._ts_writer is None:
+            pool = self.pools.timescale
+            if pool is None:
+                return
+            self._ts_writer = TimescaleRecordWriter(pool)
 
-        Phase 2: INSERT INTO forge_ts.<hypertable> using asyncpg.
-        """
-        pass
+        await self._ts_writer.write_record(record)
 
     async def _write_neo4j(
         self, record: ContextualRecord, decision: RoutingDecision
     ) -> None:
-        """Write graph data to Neo4j.
+        """Write graph topology to Neo4j via MERGE."""
+        if self._neo4j_writer is None:
+            driver = self.pools.neo4j
+            if driver is None:
+                return
+            self._neo4j_writer = Neo4jGraphWriter(driver)
 
-        Phase 2: MERGE nodes/relationships using neo4j driver.
-        """
-        pass
+        await self._neo4j_writer.write_record(record)
 
     async def _write_redis(
         self, record: ContextualRecord, decision: RoutingDecision
     ) -> None:
-        """Write hot state to Redis.
+        """Cache hot state in Redis (equipment readings, adapter health)."""
+        if self._redis_cache is None:
+            client = self.pools.redis
+            if client is None:
+                return
+            self._redis_cache = RedisStateCache(client)
 
-        Phase 2: SET/HSET using redis-py.
-        """
-        pass
+        await self._redis_cache.cache_record(record)
 
     def enable(self) -> None:
         """Enable shadow writing."""

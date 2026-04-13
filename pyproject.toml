@@ -24,6 +24,9 @@ dependencies = [
     "jsonschema>=4.23.0",
     "grpcio>=1.60.0",
     "protobuf>=5.27.0",
+    "aio-pika>=9.0.0",
+    "minio>=7.2.0",
+    "pyjwt[crypto]>=2.9.0",
 ]
 
 [project.optional-dependencies]
