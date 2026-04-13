@@ -10,17 +10,15 @@ Integration tests against a real server are in tests/integration/.
 
 from __future__ import annotations
 
-import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from asyncua import ua
 
 from forge.modules.ot.opcua_client.client import (
-    OpcUaClient,
-    SubscriptionCallback,
     _VALID_TRANSITIONS,
+    OpcUaClient,
     _build_security_string,
     _convert_data_value,
     _convert_node_id,
@@ -28,7 +26,6 @@ from forge.modules.ot.opcua_client.client import (
     _forge_node_id_to_ua,
 )
 from forge.modules.ot.opcua_client.exceptions import (
-    BrowseError,
     ConfigurationError,
     ConnectionError,
     EndpointUnreachable,
@@ -37,20 +34,16 @@ from forge.modules.ot.opcua_client.exceptions import (
     WriteError,
 )
 from forge.modules.ot.opcua_client.security import (
-    MessageSecurityMode,
     SecurityConfig,
-    SecurityPolicy,
 )
 from forge.modules.ot.opcua_client.types import (
     ConnectionState,
     DataType,
-    DataValue,
     NodeClass,
     NodeId,
     OpcUaEndpoint,
     QualityCode,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -111,10 +104,10 @@ class TestTypeConverters:
         assert _convert_quality(sc) == QualityCode.UNCERTAIN
 
     def test_convert_data_value(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ua_dv = ua.DataValue(
             Value=ua.Variant(72.5, ua.VariantType.Double),
-            StatusCode_=ua.StatusCode(0),
+            StatusCode=ua.StatusCode(0),
             SourceTimestamp=now,
             ServerTimestamp=now,
         )
@@ -125,7 +118,7 @@ class TestTypeConverters:
         assert forge_dv.status_code == 0
 
     def test_convert_data_value_none(self) -> None:
-        ua_dv = ua.DataValue(Value=None, StatusCode_=ua.StatusCode(0x80000000))
+        ua_dv = ua.DataValue(Value=None, StatusCode=ua.StatusCode(0x80000000))
         forge_dv = _convert_data_value(ua_dv)
         assert forge_dv.value is None
         assert forge_dv.quality == QualityCode.BAD
@@ -185,7 +178,7 @@ class TestClientConstruction:
         assert client.endpoint is ep
 
     def test_invalid_url_scheme(self) -> None:
-        with pytest.raises(ConfigurationError, match="opc.tcp://"):
+        with pytest.raises(ConfigurationError, match=r"opc\.tcp://"):
             OpcUaClient(endpoint="http://10.4.2.10:4840")
 
     def test_default_security(self) -> None:
@@ -347,7 +340,9 @@ class TestBrowseService:
         dt_node = AsyncMock()
         dt_node.read_browse_name.return_value = ua.QualifiedName("Double", 0)
         mock_ua_client.get_node.side_effect = lambda nid: (
-            dt_node if (hasattr(nid, "Identifier") and nid.Identifier == ua.ObjectIds.Double) else MagicMock()
+            dt_node
+            if (hasattr(nid, "Identifier") and nid.Identifier == ua.ObjectIds.Double)
+            else MagicMock()
         )
 
         child1.read_attribute.return_value = MagicMock(
@@ -386,11 +381,11 @@ class TestReadService:
 
     @pytest.mark.asyncio
     async def test_read_single_value(self, mock_ua_client) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         mock_node = AsyncMock()
         mock_node.read_data_value.return_value = ua.DataValue(
             Value=ua.Variant(72.5, ua.VariantType.Double),
-            StatusCode_=ua.StatusCode(0),
+            StatusCode=ua.StatusCode(0),
             SourceTimestamp=now,
             ServerTimestamp=now,
         )
@@ -513,18 +508,18 @@ class TestHistoryReadService:
 
     @pytest.mark.asyncio
     async def test_history_read_returns_values(self, mock_ua_client) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         mock_node = AsyncMock()
         mock_node.read_raw_history.return_value = [
             ua.DataValue(
                 Value=ua.Variant(70.0, ua.VariantType.Double),
-                StatusCode_=ua.StatusCode(0),
+                StatusCode=ua.StatusCode(0),
                 SourceTimestamp=now,
                 ServerTimestamp=now,
             ),
             ua.DataValue(
                 Value=ua.Variant(71.5, ua.VariantType.Double),
-                StatusCode_=ua.StatusCode(0),
+                StatusCode=ua.StatusCode(0),
                 SourceTimestamp=now,
                 ServerTimestamp=now,
             ),

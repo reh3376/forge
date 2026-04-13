@@ -1,12 +1,13 @@
 """Tests for Forge Storage configuration."""
 
-import os
+import pytest
 
 from forge.storage.config import (
     KafkaConfig,
     MinioConfig,
     Neo4jConfig,
     PostgresConfig,
+    RabbitMQConfig,
     RedisConfig,
     StorageConfig,
     TimescaleConfig,
@@ -30,11 +31,8 @@ class TestPostgresConfig:
 
     def test_immutable(self):
         cfg = PostgresConfig()
-        try:
+        with pytest.raises(AttributeError):
             cfg.host = "other"
-            assert False, "Should not allow mutation"
-        except AttributeError:
-            pass
 
 
 class TestTimescaleConfig:
@@ -74,26 +72,45 @@ class TestKafkaConfig:
         assert cfg.bootstrap_servers == "localhost:9092"
 
 
+class TestRabbitMQConfig:
+    def test_defaults(self):
+        cfg = RabbitMQConfig()
+        assert cfg.url == "amqp://forge:changeme@localhost:5672/"
+        assert cfg.vhost == "/"
+        assert cfg.consumer_group == "forge-hub"
+        assert cfg.prefetch_count == 100
+        assert cfg.connection_timeout == 10.0
+
+    def test_immutable(self):
+        cfg = RabbitMQConfig()
+        with pytest.raises(AttributeError):
+            cfg.url = "other"
+
+
 class TestStorageConfig:
     def test_default_construction(self):
         cfg = StorageConfig()
         assert cfg.postgres.host == "localhost"
         assert cfg.timescale.port == 5433
         assert cfg.neo4j.uri == "bolt://localhost:7687"
+        assert cfg.rabbitmq.vhost == "/"
 
     def test_from_env(self, monkeypatch):
         monkeypatch.setenv("POSTGRES_HOST", "pg.production.local")
         monkeypatch.setenv("POSTGRES_PORT", "5555")
         monkeypatch.setenv("NEO4J_URI", "bolt://neo4j.prod:7687")
         monkeypatch.setenv("REDIS_URL", "redis://redis.prod:6380/1")
+        monkeypatch.setenv("RABBITMQ_URL", "amqp://prod:secret@rmq.prod:5672/forge")
 
         cfg = StorageConfig.from_env()
         assert cfg.postgres.host == "pg.production.local"
         assert cfg.postgres.port == 5555
         assert cfg.neo4j.uri == "bolt://neo4j.prod:7687"
         assert cfg.redis.url == "redis://redis.prod:6380/1"
+        assert cfg.rabbitmq.url == "amqp://prod:secret@rmq.prod:5672/forge"
 
     def test_from_env_defaults(self):
         cfg = StorageConfig.from_env()
         assert cfg.postgres.host == "localhost"
         assert cfg.kafka.bootstrap_servers == "localhost:9092"
+        assert "localhost" in cfg.rabbitmq.url

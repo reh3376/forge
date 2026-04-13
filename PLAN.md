@@ -335,7 +335,7 @@ D3: Project Scaffold
 | K6 | API framework | FastAPI, Flask, Django | **FastAPI** (async, OpenAPI native) |
 | K7 | CLI framework | Click, Typer, argparse | **Typer** (modern, type-hint driven) |
 | K8 | Governance spec format | JSON, YAML, TOML | **JSON** (consistent with UxTS pattern) |
-| K9 | Container orchestration | Docker Compose (dev), K8s (prod) | **Both** (compose for dev, K8s ready) |
+| K9 | Container orchestration | Docker Compose (dev), K8s (prod) | **Both** (compose for dev, K8s ready). **Note:** Docker Compose is acceptable during development only. As Forge transitions to production-ready, a full Kubernetes Pod-based deployment solution must be developed (Helm charts, manifests, operators). All services must remain 12-factor compliant for K8s portability. |
 | K10 | License model | Proprietary, AGPL, Apache 2.0, BSL | **TBD** (commercial intent) |
 | K11 | Module Builder SDK | Standalone SDK library, embedded in core, CLI-only scaffolder | **TBD** — SDK that codifies the adapter pattern (AdapterBase, ContextBuilder, GrpcTransportAdapter, FACTS templates, `forge module init` scaffolder) so new spokes get a paved path instead of copying prior adapters. Investigate after D3.8 proves the pattern across 3+ spoke types. |
 | K12 | DB Orchestration Strategy | Federated (query across spoke DBs), Centralized (migrate all to Forge Core), Hybrid (shadow + eventual convergence) | **Hybrid (Observe → Shadow → Own)** — Three-phase migration: adapters read spoke DBs (current), Shadow Writer mirrors to Forge Core DB, eventual ownership transfer. Primary purpose: maximize data reliability for model training (SME-in-the-loop) → fully autonomous operations. See `docs/DB_ORCHESTRATION_FRAMEWORK.md` v0.3.0. |

@@ -15,7 +15,7 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 _CHECK_TIMEOUT = 3.0
 
 
-class ComponentStatus(str, Enum):
+class ComponentStatus(StrEnum):
     OK = "ok"
     DEGRADED = "degraded"
     UNREACHABLE = "unreachable"
@@ -118,7 +118,7 @@ class HealthOrchestrator:
             result = await asyncio.wait_for(fn(), timeout=_CHECK_TIMEOUT)
             result.latency_ms = (time.monotonic() - t0) * 1000
             return result
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return ComponentHealth(
                 name=name,
                 status=ComponentStatus.UNREACHABLE,
@@ -237,6 +237,57 @@ async def check_kafka(bootstrap_servers: str) -> ComponentHealth:
     )
     return ComponentHealth(
         name="kafka",
+        status=ComponentStatus.OK,
+        message="connected",
+        details=details,
+    )
+
+
+async def check_rabbitmq(url: str) -> ComponentHealth:
+    """Check RabbitMQ connectivity via aio-pika."""
+    import aio_pika
+
+    connection = await aio_pika.connect_robust(url, timeout=_CHECK_TIMEOUT)
+    try:
+        channel = await connection.channel()
+        # Declare a passive check on the default exchange
+        await channel.declare_exchange(
+            "", aio_pika.ExchangeType.DIRECT, passive=True,
+        )
+        return ComponentHealth(
+            name="rabbitmq",
+            status=ComponentStatus.OK,
+            message="connected",
+        )
+    finally:
+        await connection.close()
+
+
+async def check_minio(
+    endpoint: str, access_key: str, secret_key: str, secure: bool = False,
+) -> ComponentHealth:
+    """Check MinIO connectivity.
+
+    Uses the minio SDK — this is a synchronous call wrapped in
+    run_in_executor to avoid blocking the event loop.
+    """
+    import functools
+
+    from minio import Minio
+
+    def _probe() -> dict[str, Any]:
+        client = Minio(
+            endpoint, access_key=access_key, secret_key=secret_key, secure=secure,
+        )
+        buckets = client.list_buckets()
+        return {"bucket_count": len(buckets)}
+
+    loop = asyncio.get_running_loop()
+    details = await loop.run_in_executor(
+        None, functools.partial(_probe),
+    )
+    return ComponentHealth(
+        name="minio",
         status=ComponentStatus.OK,
         message="connected",
         details=details,
