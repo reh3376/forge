@@ -1,14 +1,14 @@
 # Forge Platform
 
-**Industry-general manufacturing decision infrastructure.** Forge is a hub-and-spoke platform that transforms raw operational data from manufacturing systems into decision-quality information — structured, governed, and actionable.
+**General industrial / manufacturing decision matrix infrastructure.** Forge is a hub-and-spoke platform that transforms raw operational data from manufacturing systems into decision-quality information — structured, governed, and actionable.
 
 ---
 
 ## What Forge Does
 
-Manufacturing runs on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, and more. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources.
+Forge solves Industry / Manufacturing dataOPS.  ORganizations runs on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, ... . These systms are usually highly customized by use case. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources. Additionally, Forge Core curates datasets for various ML and AI use cases: Human in the loop semi-atonomous decision making, expterise specific training, and many of analytics, observability, monitoring purposes.
 
-**The core thesis**: Bad decisions in manufacturing don't come from lack of data — they come from lack of data *quality*, *context*, and *correlation*. Forge addresses all three.
+**The core thesis**: Bad decisions in manufacturing don't come from lack of data — they come from lack of data *quality*, *context*, and *correlation*. Forge addresses all three. Poor decision are far more costly than generally realized, the costs is frequently spread across many units, and the root cause of a confidently wrong decision is rarely captured.
 
 ## Architecture
 
@@ -39,7 +39,7 @@ Manufacturing runs on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP
 
 ### Hub (this repo)
 
-The hub owns the data model, governance layer, storage orchestration, and gRPC transport. Every spoke connects through the hub — spokes never talk directly to each other.
+The hub owns the primary security / auth, data models, governance layer, storage orchestration, and gRPC transport. Every spoke connects through the hub — spokes never talk directly to each other.  Although spokes can publish to a Forge broker for real-time / near-real-time data. 
 
 ### Spokes (Modules/Adapters)
 
@@ -49,14 +49,17 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Language | Python 3.12+ |
+| Language Core | Go >= 1.26 |
+| Language - scripting / sidecar| Python 3.12+ |
 | Transport | gRPC + Protobuf (compiled binary, never JSON-over-gRPC) |
-| Package Management | UV |
-| Linting | Ruff |
-| Testing | pytest (3,275 tests) |
+| <Add Go package management, Linting, and Testing tools here |
+| PY Package Management | UV |
+| PY Linting | Ruff |
+| PY Testing | pytest (3,275 tests) |
 | Databases | PostgreSQL (hub), TimescaleDB (metrics), Neo4j (graph) |
 | Messaging | RabbitMQ (AMQP), MQTT 3.1.1 (embedded broker) |
 | OPC-UA | asyncua (asyncio client) |
+| i3X Restful API wrapper for OPC-UA |
 
 ## Project Structure
 
