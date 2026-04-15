@@ -1,0 +1,15 @@
+version: v2
+plugins:
+  # Go protobuf stubs
+  - remote: buf.build/protocolbuffers/go
+    out: gen
+    opt:
+      - paths=source_relative
+
+  # Connect-Go service stubs (gRPC + Connect protocol)
+  - remote: buf.build/connectrpc/go
+    out: gen
+    opt:
+      - paths=source_relative
+inputs:
+  - directory: proto
