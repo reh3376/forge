@@ -1,0 +1,219 @@
+// Forge Platform — AdapterService gRPC service definition
+//
+// This is the contract between hub and spoke sidecars. The hub runs
+// an AdapterServiceServicer (Python gRPC server). Spoke sidecars call
+// these RPCs to register, stream data, and receive commands.
+//
+// Architecture:
+//   Spoke Sidecar ──gRPC──► Hub Server
+//     (TS/Python)            (Python)
+//
+// The service is split into three logical groups:
+//   1. Control plane: Register, Configure, Start, Stop, Health
+//   2. Data plane: Collect (server-streaming), Subscribe (server-streaming)
+//   3. Capabilities: Write, Backfill, Discover, Unsubscribe
+
+syntax = "proto3";
+
+package forge.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "forge/v1/contextual_record.proto";
+import "forge/v1/adapter.proto";
+
+option go_package = "github.com/reh3376/forge/gen/forge/v1;forgev1";
+
+// ---------------------------------------------------------------------------
+// Request / Response messages for each RPC
+// ---------------------------------------------------------------------------
+
+// --- Control plane ---
+
+message RegisterRequest {
+  AdapterManifest manifest = 1;
+}
+
+message RegisterResponse {
+  bool accepted = 1;
+  string message = 2;            // human-readable status or rejection reason
+  string session_id = 3;         // hub-assigned session ID for this adapter
+}
+
+message ConfigureRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  // Connection parameters — secrets are decrypted by hub before sending
+  map<string, string> params = 3;
+}
+
+message ConfigureResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StartRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+}
+
+message StartResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StopRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  bool graceful = 3;             // true = flush buffers before stopping
+}
+
+message StopResponse {
+  bool success = 1;
+  string message = 2;
+  int64 records_flushed = 3;     // how many records were flushed during shutdown
+}
+
+message HealthRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+}
+
+// --- Data plane ---
+
+message CollectRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  int32 max_batch_size = 3;      // hint: max records per stream chunk (0 = no limit)
+}
+
+message SubscribeRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  repeated string tags = 3;      // tag paths to subscribe to
+}
+
+message UnsubscribeRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  string subscription_id = 3;
+}
+
+message UnsubscribeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// --- Ingestion (spoke → hub push) ---
+
+message IngestResponse {
+  int64 records_received = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+// --- Capabilities ---
+
+message WriteRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  string tag_path = 3;           // target tag/point in source system
+
+  // The value to write — uses same oneof as RecordValue
+  oneof typed_value {
+    double   number_value  = 10;
+    string   string_value  = 11;
+    bool     bool_value    = 12;
+    bytes    bytes_value   = 13;
+    string   json_value    = 14;
+    int64    integer_value = 15;
+  }
+
+  bool confirm = 20;             // request readback confirmation
+}
+
+message WriteResponse {
+  bool success = 1;
+  string message = 2;
+  // If confirm was true, this is the readback value
+  ContextualRecord readback = 3;
+}
+
+message BackfillRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+  repeated string tags = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+  int32 max_records = 6;         // 0 = no limit
+}
+
+message DiscoverRequest {
+  string adapter_id = 1;
+  string session_id = 2;
+}
+
+message DiscoverResponse {
+  repeated TagDescriptor tags = 1;
+}
+
+// A tag/point available in the source system
+message TagDescriptor {
+  string tag_path = 1;           // e.g. "Area1/Fermenter3/Temperature"
+  string data_type = 2;          // e.g. "float64", "string", "bool"
+  string description = 3;
+  string engineering_units = 4;  // e.g. "°F", "PSI"
+  google.protobuf.Struct metadata = 5;  // adapter-specific tag metadata
+}
+
+// ---------------------------------------------------------------------------
+// AdapterService — the hub ↔ spoke contract
+// ---------------------------------------------------------------------------
+
+service AdapterService {
+  // ── Control plane ──────────────────────────────────────────────────────
+
+  // Register a new adapter with the hub. Returns session_id on success.
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+
+  // Configure the adapter with connection parameters.
+  rpc Configure(ConfigureRequest) returns (ConfigureResponse);
+
+  // Begin active operation (connect to source, start polling/subscribing).
+  rpc Start(StartRequest) returns (StartResponse);
+
+  // Graceful shutdown — flush buffers, close connections.
+  rpc Stop(StopRequest) returns (StopResponse);
+
+  // Return current health status. Called periodically by hub.
+  rpc Health(HealthRequest) returns (AdapterHealth);
+
+  // ── Data plane ─────────────────────────────────────────────────────────
+
+  // Spoke pushes collected ContextualRecords to hub for ingestion.
+  // Client-streaming: spoke sends a stream of records, hub returns summary.
+  // adapter_id and session_id are passed via gRPC metadata headers:
+  //   x-forge-adapter-id, x-forge-session-id
+  rpc Ingest(stream ContextualRecord) returns (IngestResponse);
+
+  // Hub requests records from spoke (pull model). Server-streaming.
+  rpc Collect(CollectRequest) returns (stream ContextualRecord);
+
+  // Subscribe to real-time value changes. Server-streaming.
+  rpc Subscribe(SubscribeRequest) returns (stream ContextualRecord);
+
+  // Cancel an active subscription.
+  rpc Unsubscribe(UnsubscribeRequest) returns (UnsubscribeResponse);
+
+  // ── Capability RPCs (conditional on manifest) ──────────────────────────
+
+  // Write a value back to the source system (WritableAdapter).
+  rpc Write(WriteRequest) returns (WriteResponse);
+
+  // Retrieve historical records for a time range (BackfillProvider).
+  // Server-streaming for large result sets.
+  rpc Backfill(BackfillRequest) returns (stream ContextualRecord);
+
+  // List available tags/points in the source system (DiscoveryProvider).
+  rpc Discover(DiscoverRequest) returns (DiscoverResponse);
+}
