@@ -1,0 +1,6 @@
+# Build artifacts
+bin/
+
+# IDE
+.idea/
+*.iml

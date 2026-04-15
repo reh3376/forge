@@ -38,6 +38,8 @@ htmlcov/
 
 # Generated protobuf (keep proto source, ignore generated)
 gen/
+# Go proto stubs are committed (required for go build)
+!go/gen/
 
 # Reports (generated artifacts)
 reports/*.html

@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package scanner.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option java_package = "com.whk.scanner.v1";
+option java_multiple_files = true;
+option go_package = "github.com/reh3376/forge/gen/scanner/v1;scannerv1";
+
+// ScannerService — lightweight edge device contract.
+//
+// This is intentionally minimal. Edge devices (Android scanners) speak
+// this simple contract; the Scanner Gateway Adapter handles translation
+// to forge.v1.AdapterService for the hub and routes scan events to the
+// appropriate spoke (WMS, IMS, QMS) based on scan context.
+service ScannerService {
+  // Submit a batch of scan events from the device.
+  rpc SubmitScanBatch(SubmitScanBatchRequest) returns (SubmitScanBatchResponse);
+
+  // Pull delta updates (reference data changes since last sync).
+  rpc PullDelta(PullDeltaRequest) returns (PullDeltaResponse);
+
+  // Device heartbeat and status report.
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+
+  // One-time device registration with the Forge gateway.
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+}
+
+// ── Scan Event Messages ──────────────────────────────────────────
+
+// A single scan event captured by the edge device.
+message ScanEvent {
+  string scan_id = 1;          // CUID generated on-device
+  string barcode_value = 2;    // Raw QR/barcode content
+  ScanType scan_type = 3;      // Classification of this scan
+  string operator_id = 4;      // Authenticated user performing the scan
+  string device_id = 5;        // Registered device identifier
+  string location_string = 6;  // Free-text or structured location
+  google.protobuf.Timestamp scanned_at = 7;
+  google.protobuf.Struct metadata = 8;  // Scan-type-specific fields
+
+  // Optional fields for specific scan types
+  string warehouse_job_id = 9;   // For WMS barrel operations
+  string batch_id = 10;          // For QMS sample tracking
+  string asset_id = 11;          // For IMS asset tracking
+}
+
+// Classification of scan events — determines spoke routing.
+enum ScanType {
+  SCAN_TYPE_UNSPECIFIED = 0;
+
+  // WMS barrel operations (existing)
+  SCAN_TYPE_ENTRY = 1;
+  SCAN_TYPE_DUMP = 2;
+  SCAN_TYPE_WITHDRAWAL = 3;
+  SCAN_TYPE_RELOCATION = 4;
+  SCAN_TYPE_INSPECTION = 5;
+  SCAN_TYPE_INVENTORY = 6;
+  SCAN_TYPE_LABEL_VERIFICATION = 7;
+
+  // IMS asset operations (future)
+  SCAN_TYPE_ASSET_RECEIVE = 8;
+  SCAN_TYPE_ASSET_MOVE = 9;
+  SCAN_TYPE_ASSET_INSTALL = 10;
+
+  // QMS sample operations (future)
+  SCAN_TYPE_SAMPLE_COLLECT = 11;
+  SCAN_TYPE_SAMPLE_BIND = 12;
+}
+
+// ── Batch Submit ─────────────────────────────────────────────────
+
+message SubmitScanBatchRequest {
+  repeated ScanEvent events = 1;
+  string device_id = 2;
+  string sync_token = 3;  // Idempotency token to prevent duplicate submission
+}
+
+message SubmitScanBatchResponse {
+  int32 accepted_count = 1;
+  int32 rejected_count = 2;
+  repeated ScanRejection rejections = 3;
+  string next_sync_token = 4;
+}
+
+message ScanRejection {
+  string scan_id = 1;
+  string reason = 2;
+  string error_code = 3;
+}
+
+// ── Delta Pull ───────────────────────────────────────────────────
+
+message PullDeltaRequest {
+  string device_id = 1;
+  string last_sync_token = 2;
+  repeated DeltaScope scopes = 3;  // What types of reference data to pull
+}
+
+enum DeltaScope {
+  DELTA_SCOPE_UNSPECIFIED = 0;
+  DELTA_SCOPE_STORAGE_LOCATIONS = 1;
+  DELTA_SCOPE_BARRELS = 2;
+  DELTA_SCOPE_WAREHOUSE_JOBS = 3;
+  DELTA_SCOPE_ASSETS = 4;         // IMS asset catalog
+  DELTA_SCOPE_SAMPLE_TEMPLATES = 5; // QMS sample definitions
+}
+
+message PullDeltaResponse {
+  string sync_token = 1;
+  repeated DeltaRecord records = 2;
+  bool has_more = 3;
+}
+
+message DeltaRecord {
+  string id = 1;
+  DeltaScope scope = 2;
+  DeltaAction action = 3;
+  google.protobuf.Struct data = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+enum DeltaAction {
+  DELTA_ACTION_UNSPECIFIED = 0;
+  DELTA_ACTION_UPSERT = 1;
+  DELTA_ACTION_DELETE = 2;
+}
+
+// ── Heartbeat ────────────────────────────────────────────────────
+
+message HeartbeatRequest {
+  string device_id = 1;
+  DeviceStatus status = 2;
+  google.protobuf.Timestamp device_time = 3;
+  int32 pending_scan_count = 4;  // Unsynced scans in local outbox
+  double battery_level = 5;      // 0.0 - 1.0
+  string app_version = 6;
+}
+
+message HeartbeatResponse {
+  bool acknowledged = 1;
+  google.protobuf.Timestamp server_time = 2;
+  repeated DeviceCommand commands = 3;  // Optional commands from gateway
+}
+
+enum DeviceStatus {
+  DEVICE_STATUS_UNSPECIFIED = 0;
+  DEVICE_STATUS_ONLINE = 1;
+  DEVICE_STATUS_SCANNING = 2;
+  DEVICE_STATUS_SYNCING = 3;
+  DEVICE_STATUS_ERROR = 4;
+  DEVICE_STATUS_LOW_BATTERY = 5;
+}
+
+message DeviceCommand {
+  string command_id = 1;
+  string command_type = 2;  // e.g., "force_sync", "clear_cache", "update_config"
+  google.protobuf.Struct payload = 3;
+}
+
+// ── Device Registration ──────────────────────────────────────────
+
+message RegisterDeviceRequest {
+  string device_model = 1;      // e.g., "Keyence BT-A500GA"
+  string serial_number = 2;     // Hardware serial
+  string app_version = 3;       // Android app version
+  string requested_spoke_id = 4; // Primary spoke this device serves
+}
+
+message RegisterDeviceResponse {
+  string device_id = 1;        // Forge-assigned device identity
+  string device_token = 2;     // Authentication token for subsequent RPCs
+  repeated string allowed_scan_types = 3; // Scan types this device may submit
+  google.protobuf.Timestamp registered_at = 4;
+}
