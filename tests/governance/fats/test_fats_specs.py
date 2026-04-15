@@ -31,7 +31,7 @@ def validator(fats_schema):
 
 
 class TestFatsSpecsExist:
-    """Verify all 7 expected spec files exist."""
+    """Verify all 21 expected spec files exist."""
 
     EXPECTED_SPECS = [  # noqa: RUF012
         "healthz.json",
@@ -49,6 +49,14 @@ class TestFatsSpecsExist:
         "v1_registry_add_version.json",
         "v1_registry_versions.json",
         "v1_registry_compatibility.json",
+        # F21 — Context Engine
+        "v1_context_enrich.json",
+        "v1_context_equipment_register.json",
+        "v1_context_equipment_list.json",
+        "v1_context_equipment_get.json",
+        "v1_context_batches_active.json",
+        "v1_context_modes_set.json",
+        "v1_context_shifts_resolve.json",
     ]
 
     def test_all_expected_specs_present(self):
@@ -57,7 +65,7 @@ class TestFatsSpecsExist:
             assert name in existing, f"Missing FATS spec: {name}"
 
     def test_spec_count(self):
-        assert len(SPEC_FILES) >= 14
+        assert len(SPEC_FILES) >= 21
 
 
 @pytest.mark.parametrize(

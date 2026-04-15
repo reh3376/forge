@@ -1,0 +1,21 @@
+{
+  "spec_version": "0.1.0",
+  "endpoint": "/v1/context/batches/active",
+  "method": "GET",
+  "authentication": {
+    "required": true,
+    "schemes": ["bearer", "api_key"]
+  },
+  "request": {},
+  "response": {
+    "success_status": 200,
+    "error_format": {
+      "type": "rfc7807"
+    },
+    "max_latency_ms": 1000
+  },
+  "rate_limit": {
+    "requests_per_minute": 120,
+    "burst": 20
+  }
+}
