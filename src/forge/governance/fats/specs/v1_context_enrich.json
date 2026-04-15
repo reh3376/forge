@@ -1,0 +1,23 @@
+{
+  "spec_version": "0.1.0",
+  "endpoint": "/v1/context/enrich",
+  "method": "POST",
+  "authentication": {
+    "required": true,
+    "schemes": ["bearer", "api_key"]
+  },
+  "request": {
+    "content_type": "application/json"
+  },
+  "response": {
+    "success_status": 200,
+    "error_format": {
+      "type": "rfc7807"
+    },
+    "max_latency_ms": 500
+  },
+  "rate_limit": {
+    "requests_per_minute": 300,
+    "burst": 50
+  }
+}
