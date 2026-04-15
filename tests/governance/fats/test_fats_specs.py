@@ -41,6 +41,14 @@ class TestFatsSpecsExist:
         "v1_adapters_register.json",
         "v1_records_ingest.json",
         "v1_info.json",
+        # F20 — Schema Registry
+        "v1_registry_register.json",
+        "v1_registry_list.json",
+        "v1_registry_get.json",
+        "v1_registry_delete.json",
+        "v1_registry_add_version.json",
+        "v1_registry_versions.json",
+        "v1_registry_compatibility.json",
     ]
 
     def test_all_expected_specs_present(self):
@@ -49,7 +57,7 @@ class TestFatsSpecsExist:
             assert name in existing, f"Missing FATS spec: {name}"
 
     def test_spec_count(self):
-        assert len(SPEC_FILES) >= 7
+        assert len(SPEC_FILES) >= 14
 
 
 @pytest.mark.parametrize(
