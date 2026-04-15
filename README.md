@@ -6,7 +6,7 @@
 
 ## What Forge Does
 
-Forge solves Industry / Manufacturing dataOPS.  ORganizations runs on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, ... . These systms are usually highly customized by use case. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources. Additionally, Forge Core curates datasets for various ML and AI use cases: Human in the loop semi-atonomous decision making, expterise specific training, and many of analytics, observability, monitoring purposes.
+Forge solves Industry / Manufacturing dataOPS.  Organizations runs on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, ... . These systms are usually highly customized by use case. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources. Additionally, Forge Core curates datasets for various ML and AI use cases: Human in the loop semi-atonomous decision making, expterise specific training, and many of analytics, observability, monitoring purposes.
 
 **The core thesis**: Bad decisions in manufacturing don't come from lack of data — they come from lack of data *quality*, *context*, and *correlation*. Forge addresses all three. Poor decision are far more costly than generally realized, the costs is frequently spread across many units, and the root cause of a confidently wrong decision is rarely captured.
 
@@ -49,7 +49,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Language Core | Go >= 1.26 |
+| Language Core | Go >= 1.24 |
 | Language - scripting / sidecar| Python 3.12+ |
 | Transport | gRPC + Protobuf (compiled binary, never JSON-over-gRPC) |
 | <Add Go package management, Linting, and Testing tools here |
