@@ -1,5 +1,7 @@
 # Forge Platform — Adapter Integration Roadmap
 
+> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `modules/Forge MES` (backend + frontend). References to whk-mes below are historical and left unchanged.
+
 **Created:** 2026-04-06
 **Owner:** reh3376
 **Status:** PLANNING

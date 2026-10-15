@@ -1,0 +1,12 @@
+export { EnzymeConfiguration, EnumEnzymeCategory } from "./EnzymeConfiguration";
+export { EnzymeConfigurationCreateInput } from "./EnzymeConfigurationCreateInput";
+export { EnzymeConfigurationUpdateInput } from "./EnzymeConfigurationUpdateInput";
+export { EnzymeConfigurationWhereInput } from "./EnzymeConfigurationWhereInput";
+export { EnzymeConfigurationWhereUniqueInput } from "./EnzymeConfigurationWhereUniqueInput";
+export { EnzymeConfigurationFindManyArgs } from "./EnzymeConfigurationFindManyArgs";
+export { EnzymeConfigurationFindUniqueArgs } from "./EnzymeConfigurationFindUniqueArgs";
+export { EnzymeConfigurationCountArgs } from "./EnzymeConfigurationCountArgs";
+export { CreateEnzymeConfigurationArgs } from "./CreateEnzymeConfigurationArgs";
+export { UpdateEnzymeConfigurationArgs } from "./UpdateEnzymeConfigurationArgs";
+export { DeleteEnzymeConfigurationArgs } from "./DeleteEnzymeConfigurationArgs";
+export { EnzymeConfigurationResolverBase } from "./enzymeConfiguration.resolver.base";

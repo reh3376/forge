@@ -1,7 +1,7 @@
 """Tests for the WHK ERPI adapter lifecycle, collection, and capabilities.
 
 Follows the same testing pattern as test_whk_wms_adapter.py and
-test_whk_mes_adapter.py: inject raw message dicts, verify ContextualRecords.
+test_forge_mes_adapter.py: inject raw message dicts, verify ContextualRecords.
 """
 
 from __future__ import annotations

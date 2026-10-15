@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Units" ALTER COLUMN "updatedBy" SET DATA TYPE TEXT;

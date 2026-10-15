@@ -129,18 +129,18 @@ func TestBusinessEntityConstruction(t *testing.T) {
 
 func TestProcessDefinitionConstruction(t *testing.T) {
 	pd := mfg.ProcessDefinition{
-		ManufacturingModelBase: mfg.NewBase("whk-mes", "R-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-mes", "R-001"),
 		Name:                   "Bourbon Mash Recipe",
 		Version:                "2.0",
 		IsPublished:            true,
 		Steps: []mfg.ProcessStep{
 			{
-				ManufacturingModelBase: mfg.NewBase("whk-mes", "S-001"),
+				ManufacturingModelBase: mfg.NewBase("forge-mes", "S-001"),
 				StepNumber:             1,
 				Name:                   "Milling",
 			},
 			{
-				ManufacturingModelBase: mfg.NewBase("whk-mes", "S-002"),
+				ManufacturingModelBase: mfg.NewBase("forge-mes", "S-002"),
 				StepNumber:             2,
 				Name:                   "Mashing",
 			},
@@ -214,7 +214,7 @@ func TestQualitySampleConstruction(t *testing.T) {
 
 func TestProductionOrderConstruction(t *testing.T) {
 	po := mfg.ProductionOrder{
-		ManufacturingModelBase: mfg.NewBase("whk-mes", "PO-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-mes", "PO-001"),
 		OrderNumber:            "PO-2026-001",
 		Status:                 mfg.OrderStatusInProgress,
 		LotIDs:                 []string{"L-001", "L-002"},

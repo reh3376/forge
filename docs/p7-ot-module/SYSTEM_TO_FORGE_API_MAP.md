@@ -1,5 +1,7 @@
 # system.* → forge.* API Mapping Reference
 
+> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `modules/Forge MES` (backend + frontend). References to whk-mes below are historical and left unchanged.
+
 **Version**: 1.0.0
 **Phase**: P7 OT Module — Phase 6 (Script Migration)
 **Scope**: All 52 unique `system.*` API calls found across 430 hand-written Ignition Jython 2.7 scripts in `whk-distillery01-ignition-global`

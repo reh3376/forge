@@ -1,0 +1,503 @@
+# Product Requirements Document (PRD): Configurable Enzyme Dosing System
+
+## Executive Summary
+
+The current enzyme dosing system in the WHK Recipe Configuration application has hardcoded enzyme definitions, dosing rates, and calculation logic embedded in the `EnzymeDosingService`. This PRD outlines the requirements to make the enzyme dosing system fully configurable by operations administrators through a database-driven approach that leverages the existing Item entity infrastructure.
+
+## Current State Analysis
+
+### Hardcoded Elements in `EnzymeDosingService`
+
+**1. Static Enzyme List (Lines 16-67)**
+```typescript
+private enzymeList: Enzyme[] = [
+  {
+    category: "Liquifaction",
+    name: "Termamyl SC DS",
+    dosePerMetricTon: 0.13,
+    instructions: "with water/backset before grain",
+  },
+  // ... 9 more hardcoded enzymes
+];
+```
+
+**2. Enzyme Mapping Dictionary (Lines 70-82)**
+```typescript
+private enzymeMapping: { [key: string]: string } = {
+  termamyl: "Termamyl SC DS",
+  liquozyme: "Liquozyme PRO HP DI",
+  // ... hardcoded aliases
+};
+```
+
+**3. Business Logic Constants (Line 14)**
+```typescript
+private static METRIC_TON_DIVISOR = 2205;
+```
+
+**4. Hardcoded Business Rules**
+- Citric acid exclusion logic (Lines 89-92)
+- Category-specific calculation methods (Lines 130-145)
+- Special viscosity enzyme handling for rye/wheat (Lines 146-155)
+
+## Business Requirements
+
+### Primary Goals
+1. **Enable dynamic enzyme management** - Operations admins can add/modify enzymes without code deployments
+2. **Integrate with existing item system** - Leverage current Item entities for enzyme identification
+3. **Maintain calculation accuracy** - Preserve existing dosing calculation logic while making it configurable
+4. **Support audit trails** - Track all configuration changes for compliance
+5. **Preserve API compatibility** - Existing recipe generation and dosing endpoints continue to work
+
+### User Stories
+
+**Operations Administrator:**
+- As an operations admin, I want to add new enzyme items to the system when we source from new suppliers
+- As an operations admin, I want to configure dosing rates and instructions for each enzyme item
+- As an operations admin, I want to modify enzyme categories and calculation methods
+- As an operations admin, I want to view audit trails of all enzyme configuration changes
+
+**Recipe Developer:**
+- As a recipe developer, I want enzyme dosing calculations to use current configured rates automatically
+- As a recipe developer, I want to reference enzymes by their existing item numbers in recipes
+- As a recipe developer, I want clear error messages when enzyme configurations are missing
+
+**System Administrator:**
+- As a system admin, I want to configure global calculation parameters (metric ton divisor, precision)
+- As a system admin, I want to enable/disable specific business rules (citric exclusion, etc.)
+
+## Technical Requirements
+
+### 1. Database Schema Design
+
+#### New Models
+
+**EnzymeConfiguration Model**
+```prisma
+model EnzymeConfiguration {
+  id                String                    @id @default(cuid())
+  globalId          String?                   @unique @default(cuid())
+  item              Item                      @relation(fields: [itemId], references: [id])
+  itemId            String                    @unique // One enzyme config per item
+  category          EnumEnzymeCategory
+  dosePerMetricTon  Float
+  instructions      String
+  active            Boolean                   @default(true)
+  createdAt         DateTime                  @default(now())
+  createdBy         String
+  updatedAt         DateTime                  @updatedAt
+  updatedBy         String?
+  schemaVersion     String?                   @default("0001-a")
+  
+  // Relationships
+  calculationRules  EnzymeCalculationRule[]
+  
+  @@map("enzyme_configurations")
+}
+```
+
+**EnzymeCalculationRule Model**
+```prisma
+model EnzymeCalculationRule {
+  id                     String                @id @default(cuid())
+  globalId               String?               @unique @default(cuid())
+  enzymeConfiguration    EnzymeConfiguration   @relation(fields: [enzymeConfigurationId], references: [id])
+  enzymeConfigurationId  String
+  grainType              EnumGrainType?        // null = applies to all grains
+  calculationMethod      EnumCalculationMethod @default(TOTAL_GRAIN)
+  multiplier             Float                 @default(1.0)
+  active                 Boolean               @default(true)
+  createdAt              DateTime              @default(now())
+  createdBy              String
+  updatedAt              DateTime              @updatedAt
+  updatedBy              String?
+  
+  @@map("enzyme_calculation_rules")
+}
+```
+
+**SystemConfiguration Model** (if not exists)
+```prisma
+model SystemConfiguration {
+  id                String    @id @default(cuid())
+  globalId          String?   @unique @default(cuid())
+  key               String    @unique
+  value             String
+  dataType          String    @default("string")
+  description       String?
+  category          String?
+  active            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  createdBy         String
+  updatedAt         DateTime  @updatedAt
+  updatedBy         String?
+  
+  @@map("system_configurations")
+}
+```
+
+#### New Enums
+```prisma
+enum EnumEnzymeCategory {
+  LIQUIFACTION
+  SACCHARIFICATION
+  VISCOSITY
+}
+
+enum EnumGrainType {
+  CORN
+  RYE
+  WHEAT
+  MALT
+}
+
+enum EnumCalculationMethod {
+  TOTAL_GRAIN      // Standard calculation using total grain weight
+  GRAIN_SPECIFIC   // Calculation based on specific grain type weight (for viscosity enzymes)
+  CUSTOM           // Future extensibility
+}
+```
+
+#### Item Model Extension
+```prisma
+model Item {
+  // ... existing fields ...
+  enzymeConfiguration   EnzymeConfiguration?  // One-to-one relationship
+  // ... rest of existing fields ...
+}
+```
+
+### 2. Service Layer Refactoring
+
+#### Updated EnzymeDosingService
+```typescript
+@Injectable()
+export class EnzymeDosingService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly systemConfigService: SystemConfigurationService,
+    private readonly logger: Logger
+  ) {}
+
+  async getEnzymeConfigurationByItemName(itemName: string): Promise<EnzymeConfiguration | null> {
+    // Check system configuration for citric exclusion
+    const excludeCitric = await this.systemConfigService.getBooleanValue('EXCLUDE_CITRIC_FROM_DOSING', true);
+    if (excludeCitric && itemName.toLowerCase().includes('citric')) {
+      this.logger.log(`Citric enzyme detected: ${itemName}. Skipping dosing calculation.`);
+      return null;
+    }
+
+    return await this.prisma.enzymeConfiguration.findFirst({
+      where: {
+        item: {
+          itemName: { equals: itemName, mode: 'insensitive' }
+        },
+        active: true
+      },
+      include: {
+        item: true,
+        calculationRules: { where: { active: true } }
+      }
+    });
+  }
+
+  async calculateEnzymeDosing(
+    totalGrainLoadLbs: number,
+    mashBill: string,
+    enzymeIdentifier: string
+  ): Promise<{ dose: number; instructions: string } | null> {
+    
+    const enzymeConfig = await this.getEnzymeConfigurationByItemName(enzymeIdentifier);
+    if (!enzymeConfig) {
+      // Try by item number as fallback
+      const configByNumber = await this.getEnzymeConfigurationByItemNumber(enzymeIdentifier);
+      if (!configByNumber) {
+        throw new Error(`Enzyme configuration not found for: "${enzymeIdentifier}"`);
+      }
+      return this.performCalculation(configByNumber, totalGrainLoadLbs, mashBill);
+    }
+
+    return this.performCalculation(enzymeConfig, totalGrainLoadLbs, mashBill);
+  }
+
+  private async performCalculation(
+    enzymeConfig: EnzymeConfiguration,
+    totalGrainLoadLbs: number,
+    mashBill: string
+  ): Promise<{ dose: number; instructions: string }> {
+    const metricTonDivisor = await this.systemConfigService.getNumberValue('METRIC_TON_DIVISOR', 2205);
+    const precision = await this.systemConfigService.getNumberValue('ENZYME_CALCULATION_PRECISION', 3);
+    
+    const mashBillParts = this.parseMashBill(mashBill);
+    const dose = await this.calculateDoseByRules(enzymeConfig, totalGrainLoadLbs, mashBillParts, metricTonDivisor);
+
+    return {
+      dose: parseFloat(dose.toFixed(precision)),
+      instructions: enzymeConfig.instructions
+    };
+  }
+}
+```
+
+#### New SystemConfigurationService
+```typescript
+@Injectable()
+export class SystemConfigurationService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getValue(key: string, defaultValue?: string): Promise<string | null> {
+    const config = await this.prisma.systemConfiguration.findUnique({
+      where: { key, active: true }
+    });
+    return config?.value ?? defaultValue ?? null;
+  }
+
+  async getNumberValue(key: string, defaultValue?: number): Promise<number> {
+    const value = await this.getValue(key);
+    return value ? parseFloat(value) : (defaultValue ?? 0);
+  }
+
+  async getBooleanValue(key: string, defaultValue?: boolean): Promise<boolean> {
+    const value = await this.getValue(key);
+    return value ? value.toLowerCase() === 'true' : (defaultValue ?? false);
+  }
+
+  async setValue(key: string, value: string, updatedBy: string): Promise<void> {
+    await this.prisma.systemConfiguration.upsert({
+      where: { key },
+      update: { value, updatedBy, updatedAt: new Date() },
+      create: { key, value, createdBy: updatedBy }
+    });
+  }
+}
+```
+
+### 3. API Layer Updates
+
+#### New EnzymeConfiguration Controller
+```typescript
+@Controller('enzyme-configurations')
+@ApiTags('Enzyme Configurations')
+export class EnzymeConfigurationController {
+  constructor(private readonly service: EnzymeConfigurationService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List all enzyme configurations' })
+  async findAll(@Query() filters: EnzymeConfigurationFiltersDto) {
+    return this.service.findAll(filters);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create enzyme configuration' })
+  async create(@Body() data: CreateEnzymeConfigurationDto) {
+    return this.service.create(data);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update enzyme configuration' })
+  async update(@Param('id') id: string, @Body() data: UpdateEnzymeConfigurationDto) {
+    return this.service.update(id, data);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Deactivate enzyme configuration' })
+  async remove(@Param('id') id: string) {
+    return this.service.deactivate(id);
+  }
+}
+```
+
+### 4. Admin UI Requirements
+
+#### Enzyme Configuration Management Interface
+
+**List View:**
+- Searchable/filterable table of all enzyme configurations
+- Columns: Item Name, Item Number, Category, Dose Rate, Status, Last Modified
+- Bulk operations: activate/deactivate, export
+- Quick filters: by category, active status
+
+**Create/Edit Form:**
+- Item selection dropdown (filtered to enzyme items)
+- Category selection (Liquifaction, Saccharification, Viscosity)
+- Dose per metric ton (numeric input with validation)
+- Instructions (rich text editor)
+- Calculation rules section (expandable)
+- Form validation and error handling
+
+**Calculation Rules Management:**
+- Add/remove calculation rules per enzyme
+- Grain type selection (optional)
+- Calculation method selection
+- Multiplier configuration
+- Rule precedence ordering
+
+#### System Configuration Interface
+
+**Configuration Categories:**
+- Enzyme Dosing Settings
+- Calculation Parameters
+- Business Rules
+
+**Key-Value Editor:**
+- Grouped by category
+- Data type validation
+- Description tooltips
+- Change history/audit trail
+
+### 5. Data Migration Strategy
+
+#### Phase 1: Database Setup
+```sql
+-- Create new tables
+-- Add foreign key constraints
+-- Create indexes for performance
+
+-- Seed system configurations
+INSERT INTO system_configurations (key, value, dataType, description, category, createdBy) VALUES
+('METRIC_TON_DIVISOR', '2205', 'number', 'Conversion factor from pounds to metric tons', 'enzyme_dosing', 'system'),
+('EXCLUDE_CITRIC_FROM_DOSING', 'true', 'boolean', 'Skip dosing calculations for citric acid', 'enzyme_dosing', 'system'),
+('ENZYME_CALCULATION_PRECISION', '3', 'number', 'Decimal places for enzyme dose calculations', 'enzyme_dosing', 'system');
+```
+
+#### Phase 2: Enzyme Item Creation
+```sql
+-- Create enzyme items if they don't exist
+INSERT INTO items (itemName, itemNumber, itemType, itemGroup, createdBy, erpId) VALUES
+('Termamyl SC DS', 'RM-ENZ-LQF-001', 'Raw Material', 'Enzyme', 'system', 'RM-ENZ-LQF-001'),
+('Liquozyme PRO HP DI', 'RM-ENZ-LQF-002', 'Raw Material', 'Enzyme', 'system', 'RM-ENZ-LQF-002'),
+-- ... all existing enzymes
+ON CONFLICT (erpId) DO NOTHING;
+```
+
+#### Phase 3: Enzyme Configuration Migration
+```sql
+-- Create enzyme configurations linked to items
+INSERT INTO enzyme_configurations (itemId, category, dosePerMetricTon, instructions, createdBy)
+SELECT 
+  i.id,
+  'LIQUIFACTION',
+  0.13,
+  'with water/backset before grain',
+  'system'
+FROM items i 
+WHERE i.itemNumber = 'RM-ENZ-LQF-001';
+-- ... repeat for all enzymes
+```
+
+#### Phase 4: Service Layer Migration
+- Deploy updated EnzymeDosingService with database lookups
+- Maintain backward compatibility during transition
+- Add comprehensive logging for debugging
+
+#### Phase 5: Cleanup
+- Remove hardcoded enzyme arrays from service
+- Remove hardcoded mapping dictionary
+- Update documentation
+
+### 6. Integration Points
+
+#### Recipe Generation Scripts
+Current scripts like `seed.prod.mashRecipe.GSC.00950005.ts` reference items by name:
+```typescript
+const YEAST_ITEM_NUMBERS_QTYS: { [key: string]: number } = {
+  "YEA-FER01-Yeast (USW6)": 10,
+};
+```
+
+Enzyme dosing will work similarly - no changes needed to recipe generation scripts.
+
+#### RecipeBom Service Integration
+The existing `calculateEnzymeDosing` endpoint will continue to work but will use database configurations instead of hardcoded values.
+
+### 7. Validation & Testing Requirements
+
+#### Data Validation Rules
+- Enzyme configuration must reference valid, active Item
+- Dose per metric ton must be positive number
+- Instructions cannot be empty
+- Only one enzyme configuration per item
+- Calculation rules must have valid grain types and methods
+
+#### Testing Strategy
+- **Unit Tests:** All calculation methods with various scenarios
+- **Integration Tests:** Database operations and API endpoints
+- **Migration Tests:** Verify data migration accuracy
+- **Performance Tests:** Ensure dosing calculations remain fast
+- **Backward Compatibility Tests:** Existing recipe generation continues to work
+
+### 8. Performance Considerations
+
+#### Database Optimization
+- Index on `enzyme_configurations.itemId`
+- Index on `items.itemName` and `items.itemNumber`
+- Index on `system_configurations.key`
+
+#### Caching Strategy
+- Cache frequently accessed system configurations
+- Cache enzyme configurations with TTL
+- Invalidate cache on configuration updates
+
+### 9. Security & Compliance
+
+#### Access Control
+- Only operations admins can modify enzyme configurations
+- Audit trail for all configuration changes
+- Role-based access to admin interfaces
+
+#### Data Integrity
+- Foreign key constraints prevent orphaned configurations
+- Soft deletes for audit trail preservation
+- Validation prevents invalid dosing rates
+
+## Success Criteria
+
+### Functional Requirements
+- [ ] All hardcoded enzyme data moved to database
+- [ ] Operations admins can manage enzyme configurations via UI
+- [ ] Existing recipe generation scripts continue to work unchanged
+- [ ] Enzyme dosing calculations maintain accuracy
+- [ ] System configurations control global behavior
+
+### Performance Requirements
+- [ ] Enzyme dosing calculations complete within 500ms
+- [ ] Admin interface loads within 2 seconds
+- [ ] Database queries optimized with proper indexing
+
+### Usability Requirements
+- [ ] Operations admins can manage enzymes without technical assistance
+- [ ] Clear validation messages and error handling
+- [ ] Comprehensive audit trail for compliance
+
+## Risk Mitigation
+
+### Data Migration Risks
+- **Risk:** Data loss during migration
+- **Mitigation:** Comprehensive backup strategy, rollback procedures, parallel testing
+
+### Performance Risks
+- **Risk:** Slower calculations due to database lookups
+- **Mitigation:** Proper indexing, caching strategy, performance testing
+
+### User Adoption Risks
+- **Risk:** Operations team struggles with new interface
+- **Mitigation:** Training sessions, documentation, gradual rollout
+
+## Timeline & Dependencies
+
+### Dependencies
+- Existing Item entity structure
+- System configuration infrastructure (if not exists)
+- Admin UI framework
+- Database migration tools
+
+### Estimated Timeline
+- **Phase 1 (Database Setup):** 1 week
+- **Phase 2 (Service Refactoring):** 2 weeks  
+- **Phase 3 (Admin UI):** 3 weeks
+- **Phase 4 (Testing & Migration):** 2 weeks
+- **Phase 5 (Deployment & Training):** 1 week
+
+**Total Estimated Duration:** 9 weeks
+
+This PRD provides a comprehensive roadmap for making the enzyme dosing system configurable while leveraging the existing Item infrastructure and maintaining system reliability. 

@@ -386,7 +386,7 @@ pytest tests/governance/facts/test_whk_wms_spec.py -v
 
 When multiple adapters share context (e.g., WMS and MES both produce `lot_id`, `shift_id`), their FACTS specs should use identical field names and compatible definitions. The `metadata.cross_spoke_fields` list documents shared fields.
 
-Current shared fields between `whk-wms` and `whk-mes`:
+Current shared fields between `whk-wms` and `forge-mes`:
 - `lot_id`, `shift_id`, `operator_id`, `event_timestamp`, `event_type`, `work_order_id`
 
 Shift definitions must match: same timezone, same day/night boundaries.
@@ -398,6 +398,6 @@ Shift definitions must match: same timezone, same day/night boundaries.
 | Adapter | File | Data Sources | Capabilities | Tests |
 |---------|------|-------------|--------------|-------|
 | `whk-wms` | `specs/whk-wms.facts.json` | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | read, subscribe, backfill, discover | 48 |
-| `whk-mes` | `specs/whk-mes.facts.json` | 17 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST) | read, write, subscribe, backfill, discover | 64 |
+| `forge-mes` | `specs/forge-mes.facts.json` | 17 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST) | read, write, subscribe, backfill, discover | 64 |
 
 These serve as reference implementations. When writing a new spec, start from the one closest to your adapter's architecture and modify it.

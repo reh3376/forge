@@ -11,7 +11,7 @@ facts/
 │   └── facts.schema.json          # JSON Schema draft 2020-12 (10 top-level properties)
 ├── specs/
 │   ├── whk-wms.facts.json         # WMS adapter spec (14 data sources)
-│   └── whk-mes.facts.json         # MES adapter spec (17 data sources)
+│   └── forge-mes.facts.json         # MES adapter spec (17 data sources)
 └── runners/
     └── facts_runner.py            # FACTSRunner — static + live checks
 ```

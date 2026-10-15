@@ -211,7 +211,7 @@ class TestAccessControllerCheck:
     def test_check_wrong_module(self):
         ac = AccessController()
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
-        assert ac.check("whk-mes", "mod_wms", AccessLevel.WRITE) is False
+        assert ac.check("forge-mes", "mod_wms", AccessLevel.WRITE) is False
 
 
 # ── AccessController.list_grants ───────────────────────────────
@@ -223,7 +223,7 @@ class TestAccessControllerListGrants:
     def test_list_all_grants(self):
         ac = AccessController()
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
-        ac.grant("whk-mes", "mod_mes", AccessLevel.WRITE)
+        ac.grant("forge-mes", "mod_mes", AccessLevel.WRITE)
         grants = ac.list_grants()
         assert len(grants) == 2
 
@@ -231,7 +231,7 @@ class TestAccessControllerListGrants:
         ac = AccessController()
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
         ac.grant("whk-wms", "forge_canonical", AccessLevel.READ)
-        ac.grant("whk-mes", "mod_mes", AccessLevel.WRITE)
+        ac.grant("forge-mes", "mod_mes", AccessLevel.WRITE)
         grants = ac.list_grants("whk-wms")
         assert len(grants) == 2
         assert all(g.module_id == "whk-wms" for g in grants)
@@ -260,9 +260,9 @@ class TestAccessControllerListModulesForSchema:
     def test_list_modules_for_schema(self):
         ac = AccessController()
         ac.grant("whk-wms", "forge_canonical", AccessLevel.READ)
-        ac.grant("whk-mes", "forge_canonical", AccessLevel.READ)
+        ac.grant("forge-mes", "forge_canonical", AccessLevel.READ)
         modules = ac.list_modules_for_schema("forge_canonical")
-        assert set(modules) == {"whk-wms", "whk-mes"}
+        assert set(modules) == {"whk-wms", "forge-mes"}
 
     def test_list_modules_excludes_inactive(self):
         ac = AccessController()
@@ -337,7 +337,7 @@ class TestAccessControllerSetupDefaults:
         ac = AccessController()
         ac.setup_default_grants()
         assert ac.check("whk-wms", "mod_wms", AccessLevel.WRITE)
-        assert ac.check("whk-mes", "mod_mes", AccessLevel.WRITE)
+        assert ac.check("forge-mes", "mod_mes", AccessLevel.WRITE)
         assert ac.check("whk-erpi", "mod_erpi", AccessLevel.WRITE)
         assert ac.check("whk-cmms", "mod_cmms", AccessLevel.WRITE)
         assert ac.check("whk-nms", "mod_nms", AccessLevel.WRITE)
@@ -346,13 +346,13 @@ class TestAccessControllerSetupDefaults:
     def test_setup_each_module_gets_read_on_canonical(self):
         ac = AccessController()
         ac.setup_default_grants()
-        for mod in ("whk-wms", "whk-mes", "whk-erpi", "whk-cmms", "whk-nms", "whk-ims"):
+        for mod in ("whk-wms", "forge-mes", "whk-erpi", "whk-cmms", "whk-nms", "whk-ims"):
             assert ac.check(mod, "forge_canonical", AccessLevel.READ)
 
     def test_setup_modules_cannot_write_canonical(self):
         ac = AccessController()
         ac.setup_default_grants()
-        for mod in ("whk-wms", "whk-mes", "whk-erpi"):
+        for mod in ("whk-wms", "forge-mes", "whk-erpi"):
             assert ac.check(mod, "forge_canonical", AccessLevel.WRITE) is False
 
     def test_setup_cross_module_isolation(self):
@@ -360,7 +360,7 @@ class TestAccessControllerSetupDefaults:
         ac.setup_default_grants()
         # WMS should NOT have access to MES schema
         assert ac.check("whk-wms", "mod_mes", AccessLevel.READ) is False
-        assert ac.check("whk-mes", "mod_wms", AccessLevel.WRITE) is False
+        assert ac.check("forge-mes", "mod_wms", AccessLevel.WRITE) is False
 
 
 # ── AccessController.audit_log ─────────────────────────────────
@@ -417,7 +417,7 @@ class TestAccessControllerGrantCount:
     def test_grant_count_after_grants(self):
         ac = AccessController()
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
-        ac.grant("whk-mes", "mod_mes", AccessLevel.WRITE)
+        ac.grant("forge-mes", "mod_mes", AccessLevel.WRITE)
         assert ac.grant_count == 2
 
     def test_grant_count_excludes_revoked(self):

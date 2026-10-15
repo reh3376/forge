@@ -1,0 +1,451 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer base {
+  :root {
+    /* Material-Inspired Light Theme */
+    --background: 0 0% 98%;
+    --foreground: 200 19% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 19% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 19% 18%;
+    --primary: 262 52% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 173 58% 39%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 216 12% 96%;
+    --muted-foreground: 200 7% 55%;
+    --accent: 339 60% 52%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 14% 92%;
+    --input: 214 14% 92%;
+    --ring: 262 52% 47%;
+    --chart-1: 262 52% 47%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 339 60% 52%;
+    --chart-4: 43 74% 56%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.75rem;
+    
+    /* Manufacturing-specific colors */
+    --production-active: 120 100% 25%;
+    --production-idle: 39 100% 50%;
+    --production-error: 0 84.2% 60.2%;
+    --production-maintenance: 280 100% 50%;
+    --quality-good: 120 100% 25%;
+    --quality-warning: 39 100% 50%;
+    --quality-critical: 0 84.2% 60.2%;
+    --equipment-running: 120 100% 25%;
+    --equipment-stopped: 0 50% 40%;
+    --equipment-alarm: 0 100% 50%;
+  }
+  .dark {
+    /* Material-Inspired Dark Theme */
+    --background: 200 7% 8%;
+    --foreground: 0 0% 95%;
+    --card: 200 7% 11%;
+    --card-foreground: 0 0% 95%;
+    --popover: 200 7% 11%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 267 84% 81%;
+    --primary-foreground: 200 7% 11%;
+    --secondary: 173 58% 70%;
+    --secondary-foreground: 200 7% 11%;
+    --muted: 200 7% 14%;
+    --muted-foreground: 200 7% 60%;
+    --accent: 339 90% 68%;
+    --accent-foreground: 200 7% 11%;
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 7% 18%;
+    --input: 200 7% 18%;
+    --ring: 267 84% 81%;
+    --chart-1: 267 84% 81%;
+    --chart-2: 173 58% 70%;
+    --chart-3: 339 90% 68%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    
+    /* Manufacturing-specific colors for dark mode */
+    --production-active: 120 100% 35%;
+    --production-idle: 39 100% 60%;
+    --production-error: 0 84.2% 70%;
+    --production-maintenance: 280 100% 60%;
+    --quality-good: 120 100% 35%;
+    --quality-warning: 39 100% 60%;
+    --quality-critical: 0 84.2% 70%;
+    --equipment-running: 120 100% 35%;
+    --equipment-stopped: 0 60% 50%;
+    --equipment-alarm: 0 100% 60%;
+  }
+
+  .high-contrast {
+    /* High Contrast Theme for Factory Environments */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 85%;
+    --accent: 60 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 30%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 100%;
+    --chart-1: 0 100% 50%;
+    --chart-2: 60 100% 50%;
+    --chart-3: 120 100% 50%;
+    --chart-4: 240 100% 50%;
+    --chart-5: 300 100% 50%;
+    
+    /* High Contrast Manufacturing Colors */
+    --production-active: 120 100% 50%;
+    --production-idle: 60 100% 50%;
+    --production-error: 0 100% 50%;
+    --production-maintenance: 300 100% 50%;
+    --quality-good: 120 100% 50%;
+    --quality-warning: 60 100% 50%;
+    --quality-critical: 0 100% 50%;
+    --equipment-running: 120 100% 50%;
+    --equipment-stopped: 0 100% 30%;
+    --equipment-alarm: 0 100% 70%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Material-inspired typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl;
+  }
+  
+  h2 {
+    @apply text-3xl;
+  }
+  
+  h3 {
+    @apply text-2xl;
+  }
+  
+  h4 {
+    @apply text-xl;
+  }
+  
+  /* Material elevation shadows */
+  .elevation-1 {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+  
+  .elevation-2 {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+  
+  .elevation-3 {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  }
+  
+  .elevation-4 {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  }
+  
+  .elevation-5 {
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  }
+  
+  /* Material ripple effect base */
+  .ripple {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.1;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .ripple:active::before {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+@layer utilities {
+  /* Manufacturing Status Colors */
+  .text-production-active {
+    color: hsl(var(--production-active));
+  }
+  .text-production-idle {
+    color: hsl(var(--production-idle));
+  }
+  .text-production-error {
+    color: hsl(var(--production-error));
+  }
+  .text-production-maintenance {
+    color: hsl(var(--production-maintenance));
+  }
+  
+  .bg-production-active {
+    background-color: hsl(var(--production-active));
+  }
+  .bg-production-idle {
+    background-color: hsl(var(--production-idle));
+  }
+  .bg-production-error {
+    background-color: hsl(var(--production-error));
+  }
+  .bg-production-maintenance {
+    background-color: hsl(var(--production-maintenance));
+  }
+  
+  /* Quality Status Colors */
+  .text-quality-good {
+    color: hsl(var(--quality-good));
+  }
+  .text-quality-warning {
+    color: hsl(var(--quality-warning));
+  }
+  .text-quality-critical {
+    color: hsl(var(--quality-critical));
+  }
+  
+  .bg-quality-good {
+    background-color: hsl(var(--quality-good));
+  }
+  .bg-quality-warning {
+    background-color: hsl(var(--quality-warning));
+  }
+  .bg-quality-critical {
+    background-color: hsl(var(--quality-critical));
+  }
+  
+  /* Equipment Status Colors */
+  .text-equipment-running {
+    color: hsl(var(--equipment-running));
+  }
+  .text-equipment-stopped {
+    color: hsl(var(--equipment-stopped));
+  }
+  .text-equipment-alarm {
+    color: hsl(var(--equipment-alarm));
+  }
+  
+  .bg-equipment-running {
+    background-color: hsl(var(--equipment-running));
+  }
+  .bg-equipment-stopped {
+    background-color: hsl(var(--equipment-stopped));
+  }
+  .bg-equipment-alarm {
+    background-color: hsl(var(--equipment-alarm));
+  }
+  
+  /* High Visibility Text for Factory Environments */
+  .text-factory-high-visibility {
+    font-weight: 600;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Status Indicators */
+  .status-indicator {
+    @apply inline-block w-3 h-3 rounded-full mr-2;
+  }
+  
+  .status-indicator-running {
+    @apply status-indicator bg-equipment-running;
+  }
+  
+  .status-indicator-stopped {
+    @apply status-indicator bg-equipment-stopped;
+  }
+  
+  .status-indicator-alarm {
+    @apply status-indicator bg-equipment-alarm;
+  }
+
+  /* Layout System Styles */
+  .layout-container {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Sidebar positioning is handled by React component logic */
+  
+  /* Sidebar visibility is controlled by React component logic */
+  
+  .layout-split-view {
+    @apply flex-row;
+  }
+  
+  /* Smooth transitions for layout changes */
+  .main-content {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Ensure main content area transitions smoothly when layout changes */
+  .layout-container > div > div:last-child {
+    transition: padding-left 300ms ease-in-out, padding-right 300ms ease-in-out;
+  }
+  
+  /* Split view resizer */
+  .split-view-resizer {
+    @apply w-1 bg-border hover:bg-primary/20 cursor-col-resize transition-colors;
+  }
+  
+  .split-view-resizer:hover {
+    @apply bg-primary/30;
+  }
+
+  /* Ensure full-width layouts have no unwanted margins */
+  .layout-full-width main {
+    @apply w-full;
+  }
+  
+  .layout-full-width .container {
+    @apply max-w-none mx-0;
+  }
+  
+  /* Remove any default margins that might cause gaps */
+  .layout-container {
+    @apply m-0 p-0;
+  }
+  
+  /* Layout-specific styles for better visibility */
+  .layout-sidebar-left .sidebar {
+    @apply border-r-2 border-primary/20;
+  }
+  
+  .layout-sidebar-right .sidebar {
+    @apply border-l-2 border-primary/20;
+  }
+  
+  .layout-full-width {
+    @apply bg-muted/5;
+  }
+  
+  .layout-split-view {
+    @apply bg-accent/5;
+  }
+  
+  /* Debug styles to make layout changes visible */
+  [data-layout="sidebar-left"] {
+    --layout-indicator: "Sidebar Left";
+  }
+  
+  [data-layout="sidebar-right"] {
+    --layout-indicator: "Sidebar Right";
+  }
+  
+  [data-layout="full-width"] {
+    --layout-indicator: "Full Width";
+  }
+  
+  [data-layout="split-view"] {
+    --layout-indicator: "Split View";
+  }
+  
+  /* Enhanced layout-specific backgrounds for visibility */
+  [data-layout="sidebar-left"] {
+    @apply bg-gradient-to-br from-background to-blue-50/20 dark:to-blue-950/20;
+  }
+  
+  [data-layout="sidebar-right"] {
+    @apply bg-gradient-to-bl from-background to-green-50/20 dark:to-green-950/20;
+  }
+  
+  [data-layout="full-width"] {
+    @apply bg-gradient-to-b from-background to-purple-50/20 dark:to-purple-950/20;
+  }
+  
+  [data-layout="split-view"] {
+    @apply bg-gradient-to-r from-background via-orange-50/20 to-background dark:via-orange-950/20;
+  }
+  
+  /* Sidebar state styles */
+  .sidebar[data-open="true"] {
+    @apply shadow-lg;
+  }
+  
+  .sidebar[data-open="false"] {
+    @apply shadow-sm;
+  }
+  
+  /* Layout transition effects */
+  .layout-sidebar-left,
+  .layout-sidebar-right,
+  .layout-full-width,
+  .layout-split-view {
+    @apply transition-all duration-500 ease-in-out;
+  }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    /* Ensure content doesn't get cut off by sidebar on mobile */
+    .layout-container main {
+      @apply w-full;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    
+    /* Better mobile padding for cards */
+    .bg-card {
+      @apply mx-2;
+    }
+    
+    /* Responsive grid improvements */
+    .grid {
+      @apply gap-4;
+    }
+  }
+  
+  /* Content area adjustments for different layouts */
+  .layout-full-width main {
+    @apply max-w-none;
+  }
+  
+  .layout-sidebar-left main,
+  .layout-sidebar-right main {
+    /* Remove conflicting max-width constraints - let component handle this */
+  }
+  
+  .layout-split-view main {
+    @apply max-w-none;
+    /* Split view content should not have padding as it's handled by the component */
+  }
+}

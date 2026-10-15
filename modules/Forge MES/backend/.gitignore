@@ -1,0 +1,33 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+ 
+/node_modules
+/dist
+.DS_Store
+/uploads
+
+# test coverage
+/coverage/*
+!/coverage/coverage-final.json
+
+# Docker container dirs
+/etcd_data/*
+
+# Files that should be generated at runtime
+schema.graphql
+#package-lock.json
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
+
+newrelic.js
+
+nr-security-home/*
+newrelic_agent.log
+
+# Local TLS certs (generated for dev only)
+/.certs/
+prisma/ERD.md
+prisma/ERD.svg
+prisma/ERD.svgwhk-mes-20250904.sql
