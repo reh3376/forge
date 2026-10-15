@@ -157,6 +157,16 @@ def _get_typed_value(msg: record_msg.RecordValue) -> Any:
     return None
 
 
+def dt_to_timestamp(dt: datetime | None) -> Timestamp | None:
+    """Public wrapper: datetime -> google.protobuf.Timestamp (None passes through)."""
+    return _dt_to_timestamp(dt)
+
+
+def timestamp_to_dt(ts: Timestamp | None) -> datetime | None:
+    """Public wrapper: google.protobuf.Timestamp -> aware datetime."""
+    return _timestamp_to_dt(ts)
+
+
 def set_typed_value(msg: Any, raw: Any) -> None:
     """Set the ``typed_value`` oneof on any message that carries it.
 

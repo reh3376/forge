@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING, Any
 from forge.transport.serialization import proto_to_pydantic
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
+    from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
 
     from forge.core.models.contextual_record import ContextualRecord
     from forge.transport.spoke_client import TransportChannel
@@ -148,6 +148,59 @@ class SpokeCallbackClient:
         """``Health`` RPC answered by the spoke itself."""
         return await self.channel.send_unary(
             "Health", {"adapter_id": self.adapter_id, "session_id": self.session_id}
+        )
+
+    # -- pull RPCs (FB-061) ---------------------------------------------------
+
+    async def backfill(
+        self,
+        start: datetime,
+        end: datetime,
+        *,
+        tags: Iterable[str] = (),
+        max_records: int = 0,
+    ) -> AsyncIterator[ContextualRecord]:
+        """``Backfill`` RPC: the spoke replays ``[start, end]`` as records."""
+        stream = self.channel.receive_stream(
+            "Backfill",
+            {
+                "adapter_id": self.adapter_id,
+                "session_id": self.session_id,
+                "tags": list(tags),
+                "start_time": start,
+                "end_time": end,
+                "max_records": int(max_records),
+            },
+        )
+        async for item in stream:
+            yield proto_to_pydantic(item, "ContextualRecord")
+
+    async def subscribe(
+        self, tags: Iterable[str] = ()
+    ) -> tuple[str, AsyncIterator[ContextualRecord]]:
+        """``Subscribe`` RPC: ``(subscription_id, records)``."""
+        stream = self.channel.receive_stream(
+            "Subscribe",
+            {"adapter_id": self.adapter_id, "session_id": self.session_id, "tags": list(tags)},
+        )
+        first = await anext(stream, None)
+        subscription_id = str((first or {}).get("subscription_id") or "")
+
+        async def records() -> AsyncIterator[ContextualRecord]:
+            async for item in stream:
+                yield proto_to_pydantic(item, "ContextualRecord")
+
+        return subscription_id, records()
+
+    async def unsubscribe(self, subscription_id: str) -> dict[str, Any]:
+        """``Unsubscribe`` RPC. Returns ``{success, message}``."""
+        return await self.channel.send_unary(
+            "Unsubscribe",
+            {
+                "adapter_id": self.adapter_id,
+                "session_id": self.session_id,
+                "subscription_id": subscription_id,
+            },
         )
 
     async def close(self) -> None:
@@ -276,6 +329,53 @@ class WriteDispatcher:
         try:
             client = await self._client(target)
             return await client.discover()
+        except Exception as exc:
+            target.last_error = f"{type(exc).__name__}: {exc}"
+            self._drop_channel(adapter_id)
+            raise WriteDispatchError("transport", target.last_error) from exc
+
+    # -- pull RPCs (FB-061) ---------------------------------------------------
+
+    async def backfill(
+        self,
+        adapter_id: str,
+        start: datetime,
+        end: datetime,
+        *,
+        tags: Iterable[str] = (),
+        max_records: int = 0,
+    ) -> AsyncIterator[ContextualRecord]:
+        """Replay ``[start, end]`` from the spoke (``Backfill``)."""
+        target = self._resolve(adapter_id, require_write=False)
+        try:
+            client = await self._client(target)
+            async for record in client.backfill(start, end, tags=tags, max_records=max_records):
+                yield record
+        except WriteDispatchError:
+            raise
+        except Exception as exc:
+            target.last_error = f"{type(exc).__name__}: {exc}"
+            self._drop_channel(adapter_id)
+            raise WriteDispatchError("transport", target.last_error) from exc
+
+    async def subscribe(
+        self, adapter_id: str, tags: Iterable[str] = ()
+    ) -> tuple[str, AsyncIterator[ContextualRecord]]:
+        """Open a ``Subscribe`` stream: ``(subscription_id, records)``."""
+        target = self._resolve(adapter_id, require_write=False)
+        try:
+            client = await self._client(target)
+            return await client.subscribe(tags)
+        except Exception as exc:
+            target.last_error = f"{type(exc).__name__}: {exc}"
+            self._drop_channel(adapter_id)
+            raise WriteDispatchError("transport", target.last_error) from exc
+
+    async def unsubscribe(self, adapter_id: str, subscription_id: str) -> dict[str, Any]:
+        target = self._resolve(adapter_id, require_write=False)
+        try:
+            client = await self._client(target)
+            return await client.unsubscribe(subscription_id)
         except Exception as exc:
             target.last_error = f"{type(exc).__name__}: {exc}"
             self._drop_channel(adapter_id)

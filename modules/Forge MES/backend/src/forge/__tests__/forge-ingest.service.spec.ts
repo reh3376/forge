@@ -151,3 +151,29 @@ describe("ForgeIngestService", () => {
     svc.stop();
   });
 });
+
+describe("ForgeIngestService.onRecord (FB-061)", () => {
+  it("hands every queued record to listeners, isolates listener failures", () => {
+    const svc = new ForgeIngestService(
+      makeConfig(),
+      new FakeClient() as unknown as ForgeHubClient,
+      new FakeClock()
+    );
+    const seen: string[] = [];
+    const release = svc.onRecord((r) => seen.push(r.context.extra.entity_id));
+    svc.onRecord(() => {
+      throw new Error("listener exploded");
+    });
+    expect(svc.getStatus().subscribers).toBe(2);
+
+    svc.enqueueDomainEvent(event(1));
+    svc.enqueueDomainEvent(event(2));
+    expect(seen).toEqual(["s1", "s2"]);
+    expect(svc.getStatus().queued).toBe(2); // the failing listener did not block queueing
+
+    release();
+    svc.enqueueDomainEvent(event(3));
+    expect(seen).toEqual(["s1", "s2"]);
+    expect(svc.getStatus().subscribers).toBe(1);
+  });
+});

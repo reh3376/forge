@@ -10,6 +10,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { FORGE_CONFIG, ForgeConfig, loadForgeConfig } from "./forge.config";
 import { ForgeController } from "./forge.controller";
 import { ForgeHubClient } from "./forge-hub.client";
+import { ForgeBackfillService } from "./forge-backfill.service";
 import { ForgeHubService } from "./forge-hub.service";
 import { ForgeIngestService } from "./forge-ingest.service";
 import { ForgeSpokeServer } from "./forge-spoke.server";
@@ -38,6 +39,7 @@ import { ForgeWriteService } from "./forge-write.service";
     },
     ForgeIngestService,
     ForgeWriteService,
+    ForgeBackfillService,
     ForgeSpokeServer,
     ForgeHubService,
   ],
@@ -46,6 +48,7 @@ import { ForgeWriteService } from "./forge-write.service";
     ForgeHubClient,
     ForgeIngestService,
     ForgeWriteService,
+    ForgeBackfillService,
     ForgeSpokeServer,
     ForgeHubService,
   ],

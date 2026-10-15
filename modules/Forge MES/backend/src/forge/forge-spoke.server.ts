@@ -6,8 +6,13 @@
  *
  * Every inbound call must carry the adapter id this backend registered with
  * and the session id the hub issued on Register; anything else is
- * PERMISSION_DENIED. The hub-to-spoke pull RPCs (Collect, Subscribe,
- * Backfill, ...) are answered UNIMPLEMENTED (BACKLOG FB-061).
+ * PERMISSION_DENIED.
+ *
+ * Pull RPCs (BACKLOG FB-061): `Backfill` replays the audit log for a time
+ * range (ForgeBackfillService) as a server stream; `Subscribe` mirrors the
+ * ingest queue to the hub as a server stream (the subscription id travels in
+ * the initial metadata `subscription-id`) until `Unsubscribe` or the hub
+ * cancels. `Collect` and the hub-hosted half stay UNIMPLEMENTED.
  */
 import * as grpc from "@grpc/grpc-js";
 import * as fs from "fs";
@@ -17,8 +22,15 @@ import {
   Logger,
   OnModuleDestroy,
   OnModuleInit,
+  Optional,
 } from "@nestjs/common";
+import { ContextualRecordMessage } from "./contextual-record.mapper";
 import { FORGE_CONFIG, ForgeConfig } from "./forge.config";
+import {
+  BackfillStatus,
+  ForgeBackfillSource,
+  matchesTagFilter,
+} from "./forge-backfill.service";
 import { ForgeIngestService } from "./forge-ingest.service";
 import {
   ForgeWriteService,
@@ -26,7 +38,7 @@ import {
   WriteRejectedError,
   WriteStats,
 } from "./forge-write.service";
-import { getAdapterService, toStruct, toTimestamp } from "./proto";
+import { fromTimestamp, getAdapterService, toStruct, toTimestamp } from "./proto";
 
 export interface SpokeServerStatus {
   enabled: boolean;
@@ -39,6 +51,16 @@ export interface SpokeServerStatus {
   deniedCalls: number;
   unimplementedCalls: number;
   lastError?: string;
+  /** Pull RPCs (FB-061). */
+  backfill: BackfillStatus & { streams: number; recordsStreamed: number };
+  subscriptions: SubscriptionStatus[];
+}
+
+export interface SubscriptionStatus {
+  id: string;
+  tags: string[];
+  startedAt: string;
+  delivered: number;
 }
 
 export type WriteValueKind =
@@ -53,7 +75,7 @@ export type WriteValueKind =
 /** Identity recorded on writes the hub performs (the hub has no requester field). */
 export const HUB_REQUESTER = "forge-hub";
 
-/** RPCs this server does not implement (hub-to-spoke pull + the hub-hosted half). */
+/** RPCs this server does not implement (the hub-hosted half and Collect). */
 const UNSERVED_RPCS = [
   "Register",
   "Configure",
@@ -61,10 +83,30 @@ const UNSERVED_RPCS = [
   "Stop",
   "Ingest",
   "Collect",
-  "Subscribe",
-  "Unsubscribe",
-  "Backfill",
 ] as const;
+
+type BackfillRequestWire = {
+  adapter_id?: string;
+  session_id?: string;
+  tags?: string[];
+  start_time?: { seconds?: string | number; nanos?: number } | null;
+  end_time?: { seconds?: string | number; nanos?: number } | null;
+  max_records?: number | string;
+};
+
+type SubscribeRequestWire = {
+  adapter_id?: string;
+  session_id?: string;
+  tags?: string[];
+};
+
+interface LiveSubscription {
+  id: string;
+  tags: string[];
+  startedAt: number;
+  delivered: number;
+  end: () => void;
+}
 
 type WriteRequestWire = {
   adapter_id?: string;
@@ -134,11 +176,16 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
   private unimplementedCalls = 0;
   private lastError?: string;
   private readonly startedAt = Date.now();
+  private backfillStreams = 0;
+  private backfillRecords = 0;
+  private subscriptionSeq = 0;
+  private readonly subscriptions = new Map<string, LiveSubscription>();
 
   constructor(
     @Inject(FORGE_CONFIG) private readonly config: ForgeConfig,
     private readonly writes: ForgeWriteService,
-    private readonly ingest: ForgeIngestService
+    private readonly ingest: ForgeIngestService,
+    @Optional() private readonly backfill?: ForgeBackfillSource & { getStatus(): BackfillStatus }
   ) {}
 
   get enabled(): boolean {
@@ -193,6 +240,7 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     const server = this.server;
     if (!server) return;
     this.server = undefined;
+    for (const sub of [...this.subscriptions.values()]) sub.end();
     await new Promise<void>((resolve) => {
       const timer = setTimeout(() => {
         server.forceShutdown();
@@ -229,6 +277,22 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       deniedCalls: this.deniedCalls,
       unimplementedCalls: this.unimplementedCalls,
       lastError: this.lastError,
+      backfill: {
+        ...(this.backfill?.getStatus() ?? {
+          enabled: false,
+          runs: 0,
+          recordsReplayed: 0,
+          rowsScanned: 0,
+        }),
+        streams: this.backfillStreams,
+        recordsStreamed: this.backfillRecords,
+      },
+      subscriptions: [...this.subscriptions.values()].map((s) => ({
+        id: s.id,
+        tags: [...s.tags],
+        startedAt: new Date(s.startedAt).toISOString(),
+        delivered: s.delivered,
+      })),
     };
   }
 
@@ -250,6 +314,13 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       Write: unary((req) => this.handleWrite(req as WriteRequestWire)),
       Discover: unary((req) => this.handleDiscover(req)),
       Health: unary((req) => this.handleHealth(req)),
+      Unsubscribe: unary((req) => this.handleUnsubscribe(req)),
+      Backfill: (call: grpc.ServerWritableStream<BackfillRequestWire, unknown>) => {
+        void this.handleBackfill(call);
+      },
+      Subscribe: (call: grpc.ServerWritableStream<SubscribeRequestWire, unknown>) => {
+        this.handleSubscribe(call);
+      },
     };
     for (const name of UNSERVED_RPCS) {
       impl[name] = (call: unknown, cb?: grpc.sendUnaryData<unknown>) => {
@@ -318,6 +389,87 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       ),
       uptime_seconds: (Date.now() - this.startedAt) / 1000,
     };
+  }
+
+  // -- pull RPCs (FB-061) ----------------------------------------------------
+
+  private async handleBackfill(
+    call: grpc.ServerWritableStream<BackfillRequestWire, unknown>
+  ): Promise<void> {
+    let sent = 0;
+    try {
+      this.assertSession(call.request);
+      if (!this.backfill) {
+        throw {
+          code: grpc.status.UNIMPLEMENTED,
+          details: "backfill source is not configured on this spoke",
+        } as grpc.ServiceError;
+      }
+      this.backfillStreams++;
+      const range = {
+        start: fromTimestamp(call.request.start_time),
+        end: fromTimestamp(call.request.end_time),
+        tags: (call.request.tags ?? []).map(String),
+        maxRecords: Number(call.request.max_records ?? 0) || 0,
+      };
+      for await (const record of this.backfill.replay(range)) {
+        if (call.cancelled) break;
+        call.write(record);
+        sent++;
+      }
+      this.backfillRecords += sent;
+      call.end();
+    } catch (err) {
+      this.backfillRecords += sent;
+      call.emit("error", this.toServiceError(err));
+    }
+  }
+
+  private handleSubscribe(
+    call: grpc.ServerWritableStream<SubscribeRequestWire, unknown>
+  ): void {
+    try {
+      this.assertSession(call.request);
+    } catch (err) {
+      call.emit("error", this.toServiceError(err));
+      return;
+    }
+    const id = `sub-${++this.subscriptionSeq}`;
+    const tags = (call.request.tags ?? []).map(String);
+    const metadata = new grpc.Metadata();
+    metadata.set("subscription-id", id);
+    call.sendMetadata(metadata);
+    const entry: LiveSubscription = { id, tags, startedAt: Date.now(), delivered: 0, end: () => undefined };
+    const release = this.ingest.onRecord((record: ContextualRecordMessage) => {
+      if (!matchesTagFilter(record.source.tag_path, tags)) return;
+      call.write(record);
+      entry.delivered++;
+    });
+    let ended = false;
+    entry.end = () => {
+      if (ended) return;
+      ended = true;
+      release();
+      this.subscriptions.delete(id);
+      call.end();
+    };
+    this.subscriptions.set(id, entry);
+    call.on("cancelled", () => {
+      if (ended) return;
+      ended = true;
+      release();
+      this.subscriptions.delete(id);
+    });
+    this.logger.log(`Subscription ${id} opened by the hub (tags=${tags.join(",") || "*"})`);
+  }
+
+  private async handleUnsubscribe(req: Record<string, unknown>): Promise<Record<string, unknown>> {
+    this.assertSession(req);
+    const id = String(req.subscription_id ?? "");
+    const entry = this.subscriptions.get(id);
+    if (!entry) return { success: false, message: `unknown subscription '${id}'` };
+    entry.end();
+    return { success: true, message: `subscription '${id}' ended after ${entry.delivered} record(s)` };
   }
 
   private assertSession(req: { adapter_id?: unknown; session_id?: unknown }): void {

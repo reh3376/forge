@@ -46,6 +46,19 @@ class TransportChannel(ABC):
     async def close(self) -> None:
         """Close the channel."""
 
+    def receive_stream(
+        self, method: str, request: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Open a server-streaming RPC (``Backfill``, ``Subscribe``) and yield
+        response dicts (FB-061).
+
+        For ``Subscribe`` the first item is a control dict
+        ``{"subscription_id": ...}``; every later item is a record dict.
+        Channels that do not serve pull RPCs keep the default.
+        """
+        msg = f"{type(self).__name__} does not serve server-streaming RPC {method}"
+        raise NotImplementedError(msg)
+
 
 @dataclass
 class SpokeClient:
@@ -215,6 +228,14 @@ class InMemoryChannel(TransportChannel):
             return await self._servicer.health(
                 request["adapter_id"], request["session_id"],
             )
+        if method == "Unsubscribe":
+            handler = getattr(self._servicer, "unsubscribe", None)
+            if handler is None:
+                msg = "Servicer does not serve Unsubscribe"
+                raise ValueError(msg)
+            return await handler(
+                request["adapter_id"], request["session_id"], request.get("subscription_id", "")
+            )
         if method in ("Write", "Discover"):
             # Spoke-hosted RPCs (FB-054): dispatched to a servicer that
             # plays the spoke, i.e. exposes write()/discover().
@@ -254,6 +275,41 @@ class InMemoryChannel(TransportChannel):
         else:
             msg = f"Streaming not implemented for method: {method}"
             raise ValueError(msg)
+
+    async def receive_stream(
+        self, method: str, request: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Backfill / Subscribe against a fake spoke exposing ``backfill()`` /
+        ``subscribe()`` async generators (FB-061)."""
+        if self._closed:
+            msg = "Channel is closed"
+            raise RuntimeError(msg)
+        if method == "Backfill":
+            handler = getattr(self._servicer, "backfill", None)
+            if handler is None:
+                msg = "Servicer does not serve Backfill"
+                raise ValueError(msg)
+            stream = handler(
+                request["adapter_id"],
+                request["session_id"],
+                list(request.get("tags") or []),
+                request.get("start_time"),
+                request.get("end_time"),
+                int(request.get("max_records") or 0),
+            )
+        elif method == "Subscribe":
+            handler = getattr(self._servicer, "subscribe", None)
+            if handler is None:
+                msg = "Servicer does not serve Subscribe"
+                raise ValueError(msg)
+            stream = handler(
+                request["adapter_id"], request["session_id"], list(request.get("tags") or [])
+            )
+        else:
+            msg = f"Server streaming not implemented for method: {method}"
+            raise ValueError(msg)
+        async for item in stream:
+            yield item
 
     async def close(self) -> None:
         self._closed = True
