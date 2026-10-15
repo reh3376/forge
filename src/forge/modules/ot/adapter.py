@@ -11,15 +11,28 @@ mixins (read, write, subscribe, backfill, discover). It wires together:
 
 The adapter follows the standard Forge lifecycle:
     configure(params) → start() → collect()/subscribe() → stop()
+
+Control path (FB-065): when ``configure`` receives ``control_config`` (a
+dict) or ``control_config_path`` (a JSON file) and the adapter was built
+with :class:`~forge.modules.ot.control.runtime.ControlDependencies`, it
+composes a :class:`~forge.modules.ot.control.runtime.ControlRuntime`
+(write engine, recipe adapter, PLC CIP runner, changeover orchestrator and
+MQTT ingress). ``start``/``stop`` drive it, and hub writes to Standard
+tags go through its four-layer write engine.
 """
 
 from __future__ import annotations
 
 import asyncio
+import inspect
 import logging
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
 from typing import Any, Callable
+
+from forge.modules.ot.control.config import load_control_config, parse_control_config
+from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
+from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -38,7 +51,7 @@ from forge.core.models.adapter import (
 )
 from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.context.record_builder import build_ot_record
-from forge.modules.ot.context.resolvers import EnrichmentPipeline
+from forge.modules.ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
 from forge.modules.ot.tag_engine.models import BaseTag, TagValue
 from forge.modules.ot.tag_engine.registry import TagRegistry
@@ -89,15 +102,25 @@ class OTModuleAdapter(
         registry: TagRegistry,
         enrichment: EnrichmentPipeline | None = None,
         buffer: StoreForwardBuffer | None = None,
+        *,
+        control: ControlDependencies | None = None,
     ) -> None:
         super().__init__()
         self._registry = registry
+        self._enrichment_injected = enrichment is not None
         self._enrichment = enrichment or EnrichmentPipeline()
         self._buffer = buffer
+        self._control_deps = control
+        self._control: ControlRuntime | None = None
         self._subscriptions: dict[str, _Subscription] = {}
         self._next_sub_id: int = 0
         self._started_at: datetime | None = None
         self._hub_connected: bool = True
+
+    @property
+    def control_runtime(self) -> ControlRuntime | None:
+        """The composed control path, once ``configure`` has built it."""
+        return self._control
 
     # ------------------------------------------------------------------
     # AdapterLifecycle
@@ -109,7 +132,9 @@ class OTModuleAdapter(
         For the OT Module, params can include:
             - buffer_db_path: SQLite buffer path
             - max_buffer_age_hours: Retention period
-            - area_rules: List of AreaRule dicts
+            - area_rules: List of AreaRule dicts (pattern, area, site)
+            - control_config: OTControlConfig document (dict)
+            - control_config_path: path to an OTControlConfig JSON file
         """
         self._state = AdapterState.CONNECTING
 
@@ -119,13 +144,43 @@ class OTModuleAdapter(
                 max_age_hours=params.get("max_buffer_age_hours", 72.0),
             )
 
+        rules = params.get("area_rules")
+        if rules and not self._enrichment_injected:
+            self._enrichment = EnrichmentPipeline(
+                area_resolver=AreaResolver([AreaRule.model_validate(r) for r in rules]),
+                equipment_resolver=self._enrichment.equipment_resolver,
+                batch_resolver=self._enrichment.batch_resolver,
+                mode_resolver=self._enrichment.mode_resolver,
+            )
+
+        document = params.get("control_config")
+        path = params.get("control_config_path")
+        if document or path:
+            if self._control_deps is None:
+                msg = (
+                    "control_config given but the adapter was built without "
+                    "ControlDependencies (write_dispatcher)"
+                )
+                raise ValueError(msg)
+            if self._control is not None and self._control.started:
+                await self._control.stop()
+            config = parse_control_config(document) if document else load_control_config(path)
+            self._control = ControlRuntime(config, self._control_deps, registry=self._registry)
+            logger.info("OT control runtime composed: %s", config.describe())
+
     async def start(self) -> None:
         """Begin active operation."""
         if self._buffer:
             self._buffer.open()
 
-        # Register for tag change notifications
-        await self._registry.on_change(self._on_tag_change)
+        # Register for tag change notifications (TagRegistry.on_change is
+        # synchronous; test doubles may hand back an awaitable).
+        registration = self._registry.on_change(self._on_tag_change)
+        if inspect.isawaitable(registration):
+            await registration
+
+        if self._control is not None:
+            await self._control.start()
 
         self._state = AdapterState.HEALTHY
         self._started_at = datetime.now(timezone.utc)
@@ -134,6 +189,9 @@ class OTModuleAdapter(
     async def stop(self) -> None:
         """Graceful shutdown."""
         self._state = AdapterState.STOPPED
+
+        if self._control is not None:
+            await self._control.stop()
 
         # Flush remaining buffered records
         if self._buffer and self._buffer.is_open:
@@ -168,7 +226,6 @@ class OTModuleAdapter(
 
         Called periodically by the hub to collect current state.
         """
-        stats = await self._registry.get_stats()
         all_paths = await self._registry.list_paths()
 
         for path in all_paths:
@@ -233,24 +290,58 @@ class OTModuleAdapter(
     ) -> bool:
         """Write a value to a tag (Memory tag or PLC via OPC-UA).
 
-        For Memory tags, writes directly to the registry.
-        For Standard tags, delegates to the OpcUaProvider.
+        Memory tags are written straight into the registry. Every other tag
+        goes through the control runtime's four-layer write engine
+        (validation → interlocks → authorisation → OPC-UA write + read-back),
+        so a hub-originated write is held to the same rules as a recipe
+        download. Without a control runtime there is no PLC path.
         """
         tag = await self._registry.get_definition(tag_path)
         if tag is None:
             return False
 
         # Memory tags: direct write
-        from forge.modules.ot.tag_engine.models import MemoryTag, TagType
         from forge.modules.ot.opcua_client.types import QualityCode
+        from forge.modules.ot.tag_engine.models import MemoryTag
 
         if isinstance(tag, MemoryTag):
-            return await self._registry.update_value(
-                tag_path, value, QualityCode.GOOD
-            )
+            await self._registry.update_value(tag_path, value, QualityCode.GOOD)
+            return True
 
-        # Standard tags would go through OpcUaProvider — deferred to wiring
-        logger.warning("Write to non-Memory tag '%s' not yet wired to provider", tag_path)
+        if self._control is None:
+            logger.warning(
+                "Write to '%s' refused: no control runtime (configure with control_config)",
+                tag_path,
+            )
+            return False
+
+        config = self._control.validator.get_config(tag_path)
+        request = WriteRequest(
+            tag_path=tag_path,
+            value=value,
+            data_type=config.data_type if config is not None else DataType.FLOAT,
+            requestor=self._control.config.requested_by,
+            role=WriteRole.ENGINEER,
+            reason="hub write",
+            area=getattr(tag, "area", "") or "",
+            equipment_id=getattr(tag, "equipment_id", "") or "",
+        )
+        result = await self._control.engine.execute(request)
+        if result.status == WriteStatus.CONFIRMED:
+            return True
+        if result.status == WriteStatus.UNCONFIRMED and not confirm:
+            return True
+        logger.warning(
+            "Write to '%s' %s: %s",
+            tag_path,
+            result.status.value,
+            result.validation_error
+            or result.interlock_error
+            or result.auth_error
+            or result.write_error
+            or result.readback_error
+            or "read-back mismatch",
+        )
         return False
 
     # ------------------------------------------------------------------

@@ -17,13 +17,12 @@ Design decisions:
 
 from __future__ import annotations
 
-import asyncio
-import fnmatch
+import inspect
 import json
 import logging
-import re
-from dataclasses import dataclass, field
-from typing import Any, Callable, Awaitable
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +180,7 @@ class MqttSubscriber:
                 continue
 
             try:
-                if asyncio.iscoroutinefunction(sub.handler):
+                if inspect.iscoroutinefunction(sub.handler):
                     await sub.handler(msg)
                 else:
                     sub.handler(msg)

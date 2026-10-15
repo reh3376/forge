@@ -421,7 +421,7 @@ class TestListeners:
         req = _make_request(value=100.0)
         result = await engine.execute(req)
 
-        await engine.notify_listeners(result)
+        # execute() notifies every listener itself (FB-065).
         listener.on_write_result.assert_called_once_with(result)
 
     @pytest.mark.asyncio
@@ -434,8 +434,7 @@ class TestListeners:
         engine.add_listener(bad_listener)
         engine.add_listener(good_listener)
 
-        result = await engine.execute(_make_request(value=100.0))
-        await engine.notify_listeners(result)
+        await engine.execute(_make_request(value=100.0))
 
         # Bad listener threw, but good listener still called
         good_listener.on_write_result.assert_called_once()
