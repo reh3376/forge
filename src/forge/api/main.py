@@ -3,11 +3,12 @@
 This is the main application that ``docker compose`` runs.  It provides:
 
     /v1/health          — Aggregated infrastructure health
-    /v1/adapters        — Adapter registry and lifecycle
+    /v1/adapters        — Adapter registry and lifecycle (durable, FB-060)
+    /v1/ingest/log      — Ingest log (one row per batch, forge_core.records_log)
     /v1/records         — Record ingestion (REST passthrough)
     /v1/adapters/{id}/write — Hub → spoke write-back (FB-054)
     /v1/writes          — Write-back targets and counters
-    /api/v1/ot/...      — OT module control + i3X browse when FORGE_OT_CONTROL_CONFIG is set (FB-065)
+    /api/v1/ot/...      — OT module control + i3X browse (FORGE_OT_CONTROL_CONFIG, FB-065)
     /curation/...       — Curation sub-app (products, lineage, quality)
 
 The gRPC server for spoke communication runs on a separate port
@@ -23,7 +24,7 @@ from contextlib import asynccontextmanager
 from functools import partial
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge.api.health import (
@@ -35,8 +36,12 @@ from forge.api.health import (
     check_redis,
     check_timescaledb,
 )
-from forge.core.models.adapter import AdapterHealth, AdapterManifest, AdapterState
+from forge.api.registry import AdapterRegistry
+from forge.core.models.adapter import (
+    AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
+)
 from forge.ingest import IngestPipeline, build_pipeline_from_storage
+from forge.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
 from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
@@ -65,13 +70,6 @@ class IngestResponse(BaseModel):
     errors: list[str] = Field(default_factory=list)
 
 
-class AdapterListItem(BaseModel):
-    adapter_id: str
-    name: str
-    state: str
-    records_collected: int = 0
-
-
 class WriteRequestModel(BaseModel):
     """One hub → spoke write: a tag path and the value to put there."""
 
@@ -97,51 +95,8 @@ _WRITE_HTTP_STATUS = {
 }
 
 
-# ---------------------------------------------------------------------------
-# In-memory adapter registry (production: backed by PostgreSQL)
-# ---------------------------------------------------------------------------
-
-
-class _AdapterRegistry:
-    """Lightweight in-memory adapter registry.
-
-    In the full production deployment this is backed by PostgreSQL.
-    For the F04 dev stack the in-memory version is sufficient.
-    """
-
-    def __init__(self) -> None:
-        self._adapters: dict[str, AdapterManifest] = {}
-        self._health: dict[str, AdapterHealth] = {}
-        self._state: dict[str, AdapterState] = {}
-
-    def register(self, manifest: AdapterManifest) -> None:
-        self._adapters[manifest.adapter_id] = manifest
-        self._state[manifest.adapter_id] = AdapterState.REGISTERED
-        self._health[manifest.adapter_id] = AdapterHealth(
-            adapter_id=manifest.adapter_id,
-            state=AdapterState.REGISTERED,
-        )
-
-    def list_all(self) -> list[AdapterListItem]:
-        items = []
-        for aid, manifest in self._adapters.items():
-            health = self._health.get(aid)
-            items.append(AdapterListItem(
-                adapter_id=aid,
-                name=manifest.name,
-                state=self._state.get(aid, AdapterState.REGISTERED).value,
-                records_collected=health.records_collected if health else 0,
-            ))
-        return items
-
-    def get_health(self, adapter_id: str) -> AdapterHealth | None:
-        return self._health.get(adapter_id)
-
-    def update_health(self, adapter_id: str, health: AdapterHealth) -> None:
-        self._health[adapter_id] = health
-
-    def get_manifest(self, adapter_id: str) -> AdapterManifest | None:
-        return self._adapters.get(adapter_id)
+# Backwards-compatible name for the registry (now durable, FB-060).
+_AdapterRegistry = AdapterRegistry
 
 
 # ---------------------------------------------------------------------------
@@ -154,6 +109,7 @@ def create_app(
     storage_factory: StorageFactory | None = None,
     ingest_pipeline: IngestPipeline | None = None,
     write_dispatcher: WriteDispatcher | None = None,
+    adapter_registry_store: AdapterRegistryStore | None = None,
 ) -> FastAPI:
     """Create the Forge Hub API application.
 
@@ -167,9 +123,15 @@ def create_app(
         write_dispatcher: Override for the hub → spoke write dispatcher.
             Defaults to one that dials each spoke's ``grpc_callback_url``
             and consults the registry for ``capabilities.write``.
+        adapter_registry_store: Where registrations, heartbeats and the
+            ingest log are persisted (FB-060). Defaults to the storage
+            factory's PostgreSQL store, or in-memory without one.
     """
     config = storage_config or StorageConfig.from_env()
-    registry = _AdapterRegistry()
+    store = adapter_registry_store
+    if store is None and storage_factory is not None:
+        store = storage_factory.adapter_registry_store()
+    registry = AdapterRegistry(store=store)
     # One ingest pipeline serves both transports (gRPC Ingest and REST /v1/records).
     if ingest_pipeline is not None:
         pipeline = ingest_pipeline
@@ -226,6 +188,14 @@ def create_app(
 
         logger.info("Forge Hub API starting ...")
 
+        # Durable registry (FB-060): restore spokes seen before, persist what
+        # was registered while building the app (hosted OT module).
+        restored = await registry.load()
+        await registry.flush()
+        logger.info(
+            "Adapter registry: %d restored, store=%s", restored, registry.describe()["store"]
+        )
+
         # Start gRPC server for spoke communication
         grpc_enabled = os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true"
         if grpc_enabled:
@@ -235,9 +205,10 @@ def create_app(
 
                 servicer = HubIngestServicer(
                     pipeline,
-                    on_registered=registry.register,
-                    on_health=registry.update_health,
+                    on_registered=registry.registered,
+                    on_health=registry.health_reported,
                     write_dispatcher=dispatcher,
+                    ingest_log=registry.log_batch,
                 )
                 runtime["servicer"] = servicer
                 grpc_server = GrpcServer(servicer, port=grpc_port)
@@ -267,6 +238,7 @@ def create_app(
             await grpc_server.stop()
             logger.info("gRPC server stopped")
         await dispatcher.close()
+        await registry.flush()
 
         logger.info("Forge Hub API shut down")
 
@@ -317,8 +289,8 @@ def create_app(
 
     @app.post("/v1/adapters/register")
     async def register_adapter(manifest: AdapterManifest) -> dict[str, str]:
-        """Register a new adapter."""
-        registry.register(manifest)
+        """Register a new adapter (persisted, FB-060)."""
+        await registry.registered(manifest)
         logger.info("Adapter registered: %s", manifest.adapter_id)
         return {"status": "registered", "adapter_id": manifest.adapter_id}
 
@@ -329,6 +301,22 @@ def create_app(
         if health is None:
             raise HTTPException(404, f"Adapter '{adapter_id}' not found")
         return health.model_dump(mode="json")
+
+    @app.get("/v1/adapters/{adapter_id}/ingest-log")
+    async def adapter_ingest_log(
+        adapter_id: str, limit: int = Query(default=100, ge=1, le=1000)
+    ) -> list[dict[str, Any]]:
+        """Batches ingested from one adapter, newest first (``forge_core.records_log``)."""
+        if registry.get_manifest(adapter_id) is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not found")
+        return await registry.ingest_log(adapter_id, limit=limit)
+
+    @app.get("/v1/ingest/log")
+    async def ingest_log(
+        adapter_id: str | None = None, limit: int = Query(default=100, ge=1, le=1000)
+    ) -> list[dict[str, Any]]:
+        """The ingest log across adapters, newest first."""
+        return await registry.ingest_log(adapter_id, limit=limit)
 
     # ------------------------------------------------------------------
     # Record ingestion (REST passthrough)
@@ -358,6 +346,8 @@ def create_app(
         outcome = await pipeline.ingest(
             records, adapter_id=request.adapter_id, manifest=manifest
         )
+        if outcome.received or parse_errors:
+            await registry.log_batch(request.adapter_id, "rest", outcome)
         logger.info(
             "REST ingest from adapter '%s': %s", request.adapter_id, outcome.summary()
         )
@@ -432,6 +422,7 @@ def create_app(
             "grpc_port": grpc_port,
             "grpc_enabled": os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true",
             "adapters_registered": len(registry.list_all()),
+            "adapter_registry": registry.describe(),
             "ot_module": ot_host.status() if ot_host is not None else None,
         }
 

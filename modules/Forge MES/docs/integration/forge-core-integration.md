@@ -333,7 +333,7 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Item | Backlog |
 |---|---|
 | Hub persists ingested records (replace `InMemoryServicer`) | FB-053 (done) |
-| Durable adapter registry and ingest audit log on the hub | FB-060 |
+| Durable adapter registry and ingest audit log on the hub | FB-060 (done) |
 | Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
 | Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 |
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |

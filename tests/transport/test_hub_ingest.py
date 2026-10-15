@@ -19,7 +19,7 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
+from forge.ingest.pipeline import IngestOutcome, IngestPipeline, InMemoryRecordSink
 from forge.transport.grpc_channel import GrpcChannel
 from forge.transport.grpc_server import GrpcServer
 from forge.transport.hub_ingest import HubIngestServicer
@@ -255,3 +255,55 @@ class TestLiveIngest:
         bad.data_contract.schema_ref = "forge://schemas/forge-mes/v9"
         with pytest.raises(RuntimeError, match="FACTS conformance failed"):
             await client.register(bad)
+
+
+# ---------------------------------------------------------------------------
+# Durable registry hooks (FB-060)
+# ---------------------------------------------------------------------------
+
+
+class TestRegistryHooks:
+    async def test_async_callbacks_are_awaited_and_batches_logged(self) -> None:
+        seen: list[str] = []
+        logged: list[tuple[str, str, IngestOutcome]] = []
+
+        async def on_registered(manifest: AdapterManifest) -> None:
+            seen.append(f"registered:{manifest.adapter_id}")
+
+        async def on_health(adapter_id: str, health: AdapterHealth) -> None:
+            seen.append(f"health:{adapter_id}:{health.state.value}")
+
+        async def ingest_log(adapter_id: str, session_id: str, outcome: IngestOutcome) -> None:
+            logged.append((adapter_id, session_id, outcome))
+
+        sink = InMemoryRecordSink()
+        servicer = HubIngestServicer(
+            IngestPipeline(fallback_sink=sink),
+            batch_size=2,
+            on_registered=on_registered,
+            on_health=on_health,
+            ingest_log=ingest_log,
+        )
+        sid = await _session(servicer)
+        assert seen == ["registered:forge-mes"]
+        for i in range(3):
+            await servicer.receive_record(sid, pydantic_to_proto(mes_record(i)))
+        await servicer.health("forge-mes", sid)
+        assert seen[-1] == "health:forge-mes:HEALTHY"
+        assert len(logged) == 1 and logged[0][:2] == ("forge-mes", sid)
+        assert logged[0][2].received == 2 and logged[0][2].persisted == 2
+        await servicer.stop("forge-mes", sid, graceful=True)
+        assert len(logged) == 2 and logged[1][2].received == 1
+        assert await servicer.flush_all() == 0 and len(logged) == 2  # empty flushes are not logged
+
+    async def test_failing_log_hook_never_blocks_ingestion(self) -> None:
+        def boom(adapter_id: str, session_id: str, outcome: IngestOutcome) -> None:
+            raise RuntimeError("log store down")
+
+        sink = InMemoryRecordSink()
+        servicer = HubIngestServicer(
+            IngestPipeline(fallback_sink=sink), batch_size=1, ingest_log=boom
+        )
+        sid = await _session(servicer)
+        await servicer.receive_record(sid, pydantic_to_proto(mes_record()))
+        assert len(sink) == 1
