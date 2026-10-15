@@ -53,6 +53,15 @@ from forge.modules.ot.control.changeover_orchestrator import (
     RecipeSnapshot,
     parse_recipe_payload,
 )
+from forge.modules.ot.control.cip_runner import CipRunStatus, PlcCipRunner, PlcCipSpec
+from forge.modules.ot.control.config import (
+    ChangeoverAreaSpec,
+    ConfigError,
+    MqttIngressSettings,
+    OTControlConfig,
+    load_control_config,
+    parse_control_config,
+)
 from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.mes_changeover import (
     CHANGEOVER_AREAS,
@@ -62,6 +71,7 @@ from forge.modules.ot.control.mes_changeover import (
     transition_from,
 )
 from forge.modules.ot.control.models import (
+    DataType,
     InterlockCondition,
     InterlockRule,
     TagWriteConfig,
@@ -77,6 +87,7 @@ from forge.modules.ot.control.recipe_integration import (
     RecipeWriteConfig,
     RecipeWriteResult,
 )
+from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime, RegistryTagIO
 from forge.modules.ot.control.validation import WriteValidator
 from forge.modules.ot.control.write_engine import ControlWriteEngine
 
@@ -84,25 +95,36 @@ __all__ = [
     "CHANGEOVER_AREAS",
     "CHANGEOVER_COMMANDS",
     "AreaChangeoverConfig",
+    "ChangeoverAreaSpec",
     "ChangeoverOrchestrator",
     "ChangeoverSequenceError",
     "CipPolicy",
     "CipResult",
+    "CipRunStatus",
     "CipRunner",
+    "ConfigError",
     "ContextualRecordAuditSink",
+    "ControlDependencies",
+    "ControlRuntime",
     "ControlWriteEngine",
+    "DataType",
     "InterlockCondition",
     "InterlockEngine",
     "InterlockRule",
     "LogAuditSink",
     "MesChangeoverClient",
     "MqttAuditSink",
+    "MqttIngressSettings",
+    "OTControlConfig",
     "OrchestrationEvent",
+    "PlcCipRunner",
+    "PlcCipSpec",
     "RecipeParameterMapping",
     "RecipeSnapshot",
     "RecipeWriteAdapter",
     "RecipeWriteConfig",
     "RecipeWriteResult",
+    "RegistryTagIO",
     "TagWriteConfig",
     "WriteAuditLogger",
     "WriteAuditQuery",
@@ -114,6 +136,8 @@ __all__ = [
     "WriteStatus",
     "WriteValidator",
     "changeover_tag",
+    "load_control_config",
+    "parse_control_config",
     "parse_recipe_payload",
     "transition_from",
 ]

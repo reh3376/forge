@@ -205,25 +205,35 @@ write attempt (delivered, refused or undeliverable) becomes a
 `ContextualRecord` on `ot.changeover.<area>.<command>` handed to the
 `record_sink` for the audit trail (FB-060).
 
-```python
-from forge.modules.ot.control import (
-    AreaChangeoverConfig, ChangeoverOrchestrator, CipPolicy, MesChangeoverClient,
-)
+Running it (BACKLOG FB-065). The OT module is hosted in the hub process:
+set `FORGE_OT_CONTROL_CONFIG` to an `OTControlConfig` JSON document
+(example: `deploy/ot/ot-control.example.json`) and, optionally,
+`FORGE_OT_TAGS_DIR` to a directory of `*.tags.json` definitions. The hub then
+builds `OTModuleHost` → `OTModuleAdapter(control=ControlDependencies(...))` →
+`ControlRuntime`, which composes from the one document:
 
-orchestrator = ChangeoverOrchestrator(
-    MesChangeoverClient(app.state.write_dispatcher),
-    recipe_write_adapter,                      # RecipeWriteAdapter with per-equipment mappings
-    areas=[
-        AreaChangeoverConfig("cooker", equipment_id="Distillery01/COOKER_01",
-                             cooker_number="1", cip_policy=CipPolicy.RUNNER),
-        AreaChangeoverConfig("barreling", equipment_id="Barreling/LINE_01",
-                             cooker_number="B1", cip_policy=CipPolicy.SKIP, auto_start=True),
-    ],
-    cip_runner=plc_cip_sequence,               # async run(area, config) -> CipResult
-    record_sink=app.state.ingest_pipeline,     # anything with write_batch(records)
-)
-orchestrator.bind(mqtt_subscriber)             # whk/+/+/changeover/state, whk/+/+/recipe/next
-```
+| Section | Becomes |
+|---|---|
+| `write_tags` | `WriteValidator` (type/range per PLC tag) |
+| `interlocks`, `permissions` | `InterlockEngine`, `WriteAuthorizer` |
+| `recipes` | `RecipeWriteAdapter` with per-equipment parameter → tag mappings |
+| `changeover_areas[].cip` | `PlcCipRunner`: start tag written through the write engine, state tag polled until Complete/Faulted, `equipment/cipState` published (retained) |
+| `changeover_areas` | `ChangeoverOrchestrator` + `MesChangeoverClient(app.state.write_dispatcher)` |
+| `mqtt.mode` | `local` (embedded Forge broker, replays retained state on start), `external` (aiomqtt with reconnect) or `none` |
+
+Cross-references are checked at start-up (a recipe mapping or CIP start tag
+that is not in `write_tags`, an area whose equipment has no recipe entry).
+Every control write result is journaled, logged and published on
+`<root>/<site>/<area>/ot/control/audit/<request_id>`; every MES write attempt
+becomes a ContextualRecord in the hub ingest pipeline.
+
+REST (`/api/v1/ot`): `GET control/status`, `GET control/tags`,
+`GET control/writes?tag_path=&status=&area=&since=`, `GET changeover`,
+`GET changeover/{area}`, `GET changeover/{area}/events`,
+`POST changeover/{area}/confirm-start {operator_id}`,
+`POST changeover/{area}/retry-recipe`, `POST changeover/{area}/resume`
+(409 when the area's MES state does not allow the action, 404 unknown area,
+503 before the runtime exists). `GET /v1/info` reports the hosted module.
 
 ## Configuration
 
@@ -322,7 +332,9 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
 | Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 |
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
-| CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 |
+| CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 (done) |
+| PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 |
+| Control write audit records into the hub store | FB-066 |
 | Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |
 | Dead-letter sink for exhausted batches | FB-056 |

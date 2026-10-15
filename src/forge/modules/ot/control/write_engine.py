@@ -155,24 +155,26 @@ class ControlWriteEngine:
         # Layer 1: Type/Range Validation
         self._validator.validate(request, result)
         if not result.validation_passed:
-            self._record(result)
-            return result
+            return await self._finish(result)
 
         # Layer 2: Safety Interlocks (async — reads live tags)
         await self._interlocks.check(request, result)
         if not result.interlock_passed:
-            self._record(result)
-            return result
+            return await self._finish(result)
 
         # Layer 3: Role-Based Authorization
         self._authorizer.authorize(request, result)
         if not result.auth_passed:
-            self._record(result)
-            return result
+            return await self._finish(result)
 
         # Layer 4: OPC-UA Write + Read-Back
         await self._write_and_readback(request, result)
+        return await self._finish(result)
+
+    async def _finish(self, result: WriteResult) -> WriteResult:
+        """Journal the outcome and tell every listener (audit trail)."""
         self._record(result)
+        await self.notify_listeners(result)
         return result
 
     # -- Layer 4: Write + Read-Back ------------------------------------------
@@ -253,14 +255,16 @@ class ControlWriteEngine:
     # -- Journal & notification ----------------------------------------------
 
     def _record(self, result: WriteResult) -> None:
-        """Append to journal and notify listeners."""
+        """Append to the bounded journal."""
         self._journal.append(result)
-        # Listener notification is fire-and-forget; actual async dispatch
-        # happens in the audit layer.  Here we just queue it.
-        # (In production, this would use an event bus or asyncio.create_task.)
 
     async def notify_listeners(self, result: WriteResult) -> None:
-        """Notify all write listeners.  Called by the audit layer."""
+        """Notify all write listeners.
+
+        ``execute`` calls this for every attempt (FB-065); it stays public
+        so a replayed or externally produced result can be audited too.
+        A failing listener never affects the write outcome.
+        """
         for listener in self._listeners:
             try:
                 await listener.on_write_result(result)

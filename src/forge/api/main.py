@@ -7,6 +7,7 @@ This is the main application that ``docker compose`` runs.  It provides:
     /v1/records         — Record ingestion (REST passthrough)
     /v1/adapters/{id}/write — Hub → spoke write-back (FB-054)
     /v1/writes          — Write-back targets and counters
+    /api/v1/ot/...      — OT module control + i3X browse when FORGE_OT_CONTROL_CONFIG is set (FB-065)
     /curation/...       — Curation sub-app (products, lineage, quality)
 
 The gRPC server for spoke communication runs on a separate port
@@ -189,6 +190,20 @@ def create_app(
     runtime: dict[str, Any] = {}
     start_time = time.monotonic()
 
+    # OT module hosted in-process (FB-065) when a control config is named.
+    ot_host = None
+    ot_config_path = os.getenv("FORGE_OT_CONTROL_CONFIG", "").strip()
+    if ot_config_path:
+        from forge.modules.ot.host import OTModuleHost
+
+        ot_host = OTModuleHost(
+            config_path=ot_config_path,
+            tags_dir=os.getenv("FORGE_OT_TAGS_DIR", "").strip() or None,
+            write_dispatcher=dispatcher,
+            record_sink=pipeline,
+        )
+        registry.register(ot_host.adapter.manifest)
+
     # Build health orchestrator with all infrastructure checks
     health_orch = HealthOrchestrator(start_time=start_time)
     health_orch.register("postgres", partial(check_postgres, config.postgres.dsn))
@@ -232,12 +247,18 @@ def create_app(
                 logger.exception("Failed to start gRPC server — spoke transport disabled")
                 grpc_server = None
 
+        if ot_host is not None:
+            await ot_host.start()
+            logger.info("OT module hosted in-process (config %s)", ot_host.config_path)
+
         logger.info("Forge Hub API ready (REST port %s, gRPC port %s)",
                      os.getenv("FORGE_API_PORT", "8000"), grpc_port)
 
         yield
 
         # Shutdown
+        if ot_host is not None:
+            await ot_host.stop()
         if grpc_server is not None:
             servicer = runtime.get("servicer")
             if servicer is not None:
@@ -258,6 +279,9 @@ def create_app(
     app.state.ingest_pipeline = pipeline
     app.state.adapter_registry = registry
     app.state.write_dispatcher = dispatcher
+    app.state.ot_module = None
+    if ot_host is not None:
+        ot_host.mount(app)
 
     # ------------------------------------------------------------------
     # Health endpoints
@@ -408,6 +432,7 @@ def create_app(
             "grpc_port": grpc_port,
             "grpc_enabled": os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true",
             "adapters_registered": len(registry.list_all()),
+            "ot_module": ot_host.status() if ot_host is not None else None,
         }
 
     # ------------------------------------------------------------------

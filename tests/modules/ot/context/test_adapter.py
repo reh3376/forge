@@ -327,3 +327,103 @@ class TestHubConnectivity:
         assert flushed == 1
         assert buf.pending_count() == 0
         buf.close()
+
+
+# ---------------------------------------------------------------------------
+# Control runtime composition (FB-065)
+# ---------------------------------------------------------------------------
+
+
+class TestControlComposition:
+    SP = "WH/WHK01/Cooker01/TIT_2010/SP"
+
+    def _control_doc(self):
+        return {
+            "mqtt": {"mode": "none"},
+            "write_tags": [
+                {"tag_path": self.SP, "data_type": "FLOAT", "min_value": 0, "max_value": 212}
+            ],
+            "permissions": [{"area_pattern": "*", "tag_pattern": "*", "min_role": "ENGINEER"}],
+        }
+
+    class _Plc:
+        def __init__(self):
+            self.values = {}
+
+        async def write_tag(self, path, value):
+            self.values[path] = value
+
+        async def read_tag(self, path):
+            return self.values.get(path)
+
+    @pytest.mark.asyncio
+    async def test_control_config_without_dependencies_is_rejected(self, adapter):
+        with pytest.raises(ValueError, match="ControlDependencies"):
+            await adapter.configure({"control_config": self._control_doc()})
+
+    @pytest.mark.asyncio
+    async def test_control_runtime_follows_the_adapter_lifecycle(self, mock_registry):
+        from forge.modules.ot.control import ControlDependencies
+
+        plc = self._Plc()
+        adapter = OTModuleAdapter(
+            registry=mock_registry,
+            control=ControlDependencies(write_dispatcher=AsyncMock(), tag_io=plc),
+        )
+        assert adapter.control_runtime is None
+        await adapter.configure({"control_config": self._control_doc()})
+        runtime = adapter.control_runtime
+        assert runtime is not None and not runtime.started
+        assert runtime.config.describe()["write_tags"] == 1
+
+        await adapter.start()
+        assert runtime.started and adapter.state == AdapterState.HEALTHY
+        await adapter.stop()
+        assert not runtime.started and adapter.state == AdapterState.STOPPED
+
+    @pytest.mark.asyncio
+    async def test_control_config_path_is_loaded(self, mock_registry, tmp_path):
+        import json
+
+        from forge.modules.ot.control import ControlDependencies
+
+        path = tmp_path / "ot.json"
+        path.write_text(json.dumps(self._control_doc()), encoding="utf-8")
+        adapter = OTModuleAdapter(
+            registry=mock_registry,
+            control=ControlDependencies(write_dispatcher=AsyncMock(), tag_io=self._Plc()),
+        )
+        await adapter.configure({"control_config_path": str(path)})
+        assert adapter.control_runtime is not None
+
+    @pytest.mark.asyncio
+    async def test_standard_tag_writes_go_through_the_write_engine(self, mock_registry):
+        from forge.modules.ot.control import ControlDependencies
+
+        mock_registry.get_definition = AsyncMock(return_value=_make_tag(self.SP))
+        plc = self._Plc()
+        adapter = OTModuleAdapter(
+            registry=mock_registry,
+            control=ControlDependencies(write_dispatcher=AsyncMock(), tag_io=plc),
+        )
+        # No runtime yet: there is no PLC path.
+        assert await adapter.write(self.SP, 150.0) is False
+
+        await adapter.configure({"control_config": self._control_doc()})
+        assert await adapter.write(self.SP, 150.0) is True
+        assert plc.values[self.SP] == 150.0
+        # Out of range: rejected by layer 1, nothing reaches the PLC.
+        assert await adapter.write(self.SP, 500.0) is False
+        assert plc.values[self.SP] == 150.0
+        journal = adapter.control_runtime.engine.get_journal()
+        assert [row["status"] for row in journal] == ["REJECTED_VALIDATION", "CONFIRMED"]
+        assert journal[0]["requestor"] == "forge-ot-module"
+
+    @pytest.mark.asyncio
+    async def test_area_rules_configure_the_area_resolver(self, mock_registry):
+        adapter = OTModuleAdapter(registry=mock_registry)
+        await adapter.configure(
+            {"area_rules": [{"pattern": r"WH/WHK01/Cooker01/.*", "area": "Cookhouse", "site": "WH"}]}
+        )
+        ctx = adapter._enrichment.enrich("WH/WHK01/Cooker01/TIT_2010/SP")
+        assert ctx.area == "Cookhouse" and ctx.site == "WH"

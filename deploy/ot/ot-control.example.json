@@ -1,0 +1,113 @@
+{
+  "site": "whk01",
+  "topic_root": "whk",
+  "requested_by": "forge-ot-module",
+  "mes_adapter_id": "forge-mes",
+  "act_on_retained": false,
+  "audit_log": true,
+  "readback_tolerance": 0.001,
+  "mqtt": {
+    "mode": "local",
+    "host": "0.0.0.0",
+    "port": 1883,
+    "publish_cip_state": true,
+    "publish_audit": true
+  },
+  "write_tags": [
+    {
+      "tag_path": "WH/WHK01/Cooker01/TIT_2010/SP",
+      "data_type": "FLOAT",
+      "min_value": 0,
+      "max_value": 212,
+      "engineering_units": "degF",
+      "description": "Cooker 1 mash temperature setpoint"
+    },
+    {
+      "tag_path": "WH/WHK01/Cooker01/TIT_2010/RampRate",
+      "data_type": "FLOAT",
+      "min_value": 0,
+      "max_value": 10,
+      "engineering_units": "degF/min"
+    },
+    {
+      "tag_path": "WH/WHK01/Cooker01/AGIT_2010/Run",
+      "data_type": "BOOLEAN",
+      "description": "Agitator run request"
+    },
+    {
+      "tag_path": "WH/WHK01/Cooker01/CIP/Start",
+      "data_type": "BOOLEAN",
+      "description": "One-shot: start the cooker CIP sequence"
+    }
+  ],
+  "interlocks": [
+    {
+      "rule_id": "IL-COOKER-CIP",
+      "name": "No cooker setpoint changes while CIP runs",
+      "target_tag_pattern": "WH/WHK01/Cooker01/TIT_2010/*",
+      "check_tag": "WH/WHK01/Cooker01/CIP/State",
+      "condition": "EQUALS",
+      "check_value": "Running",
+      "bypass_min_role": "ADMIN"
+    }
+  ],
+  "permissions": [
+    {
+      "permission_id": "cooker-engineer",
+      "area_pattern": "cooker",
+      "tag_pattern": "WH/WHK01/Cooker01/*",
+      "min_role": "ENGINEER",
+      "description": "Recipe downloads and CIP start on cooker 1"
+    }
+  ],
+  "recipes": [
+    {
+      "equipment_id": "Cooker01",
+      "area": "cooker",
+      "default_role": "ENGINEER",
+      "default_requestor": "forge-ot-module",
+      "mappings": [
+        {
+          "parameter_name": "target_temp",
+          "tag_path": "WH/WHK01/Cooker01/TIT_2010/SP",
+          "data_type": "FLOAT",
+          "engineering_units": "degF"
+        },
+        {
+          "parameter_name": "ramp_rate",
+          "tag_path": "WH/WHK01/Cooker01/TIT_2010/RampRate",
+          "data_type": "FLOAT",
+          "engineering_units": "degF/min"
+        },
+        {
+          "parameter_name": "agitator",
+          "tag_path": "WH/WHK01/Cooker01/AGIT_2010/Run",
+          "data_type": "BOOLEAN"
+        }
+      ]
+    }
+  ],
+  "changeover_areas": [
+    {
+      "area": "cooker",
+      "equipment_id": "Cooker01",
+      "cooker_number": "1",
+      "cip_policy": "runner",
+      "auto_start": false,
+      "cip": {
+        "start_tag": "WH/WHK01/Cooker01/CIP/Start",
+        "state_tag": "WH/WHK01/Cooker01/CIP/State",
+        "start_value": true,
+        "start_data_type": "BOOLEAN",
+        "running_value": "Running",
+        "complete_value": "Complete",
+        "faulted_value": "Faulted",
+        "fault_code_tag": "WH/WHK01/Cooker01/CIP/FaultCode",
+        "fault_message_tag": "WH/WHK01/Cooker01/CIP/FaultText",
+        "poll_interval_seconds": 2,
+        "start_timeout_seconds": 60,
+        "timeout_seconds": 3600
+      }
+    }
+  ]
+}
