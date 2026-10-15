@@ -4,8 +4,8 @@ Every write attempt — whether confirmed, rejected, or failed — is
 recorded in the audit trail.  This module provides:
 
 1. ``WriteAuditLogger`` — a WriteListener that receives every WriteResult
-   and dispatches it to configured audit sinks (contextual records,
-   MQTT, file log, etc.).
+   and dispatches it to configured audit sinks (contextual records into
+   the hub ingest pipeline, MQTT, log).
 2. ``WriteAuditQuery`` — query interface over the write journal for
    recent audit records, filtered by tag, requestor, status, or time.
 
@@ -23,10 +23,27 @@ Design notes:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-from typing import Any, Protocol, runtime_checkable
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
+from forge.core.models.contextual_record import (
+    ContextualRecord,
+    QualityCode,
+    RecordContext,
+    RecordLineage,
+    RecordSource,
+    RecordTimestamp,
+    RecordValue,
+)
 from forge.modules.ot.control.models import WriteResult, WriteStatus
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+OT_ADAPTER_ID = "forge-ot-module"
+OT_ADAPTER_VERSION = "0.1.0"
+OT_SCHEMA_REF = "forge://schemas/ot-module/v0.1.0"
+CONTROL_WRITE_PREFIX = "ot.control.write"
 
 logger = logging.getLogger(__name__)
 
@@ -48,40 +65,137 @@ class AuditSink(Protocol):
 # ---------------------------------------------------------------------------
 
 
-class ContextualRecordAuditSink:
-    """Writes audit records via the contextual record writer.
+def _parse_time(value: Any, default: datetime) -> datetime:
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=UTC)
+    if isinstance(value, str) and value:
+        try:
+            parsed = datetime.fromisoformat(value)
+        except ValueError:
+            return default
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+    return default
 
-    Produces records with ``record_type: "control_write_audit"`` and
-    ``source_module: "ot"``.
+
+def write_result_to_record(
+    record: dict[str, Any],
+    *,
+    adapter_id: str = OT_ADAPTER_ID,
+    adapter_version: str = OT_ADAPTER_VERSION,
+    schema_ref: str = OT_SCHEMA_REF,
+    system: str = "forge-ot",
+    site: str | None = None,
+    now: datetime | None = None,
+) -> ContextualRecord:
+    """Turn a ``WriteResult.to_dict()`` into the ContextualRecord the hub stores.
+
+    Conventions match the changeover orchestrator's audit records: the
+    source tag is ``ot.control.write.<plc tag path>``, the whole decision
+    chain is the raw value, quality follows the outcome (CONFIRMED → GOOD,
+    UNCONFIRMED → UNCERTAIN, anything else → BAD) and ``context.extra``
+    carries ``event_type = "control.write"`` with the status, role, reason,
+    batch and request ids for filtering.
+    """
+    now = now or datetime.now(UTC)
+    status = str(record.get("status") or WriteStatus.PENDING.value)
+    if status == WriteStatus.CONFIRMED.value:
+        quality = QualityCode.GOOD
+    elif status == WriteStatus.UNCONFIRMED.value:
+        quality = QualityCode.UNCERTAIN
+    else:
+        quality = QualityCode.BAD
+    tag_path = str(record.get("tag_path") or "")
+    requested_at = _parse_time(record.get("timestamp"), now)
+    completed_at = _parse_time(record.get("completed_at"), now)
+    extra: dict[str, Any] = {
+        "event_type": "control.write",
+        "entity_type": "ControlWrite",
+        "target_tag_path": tag_path,
+        "write_status": status,
+        "write_role": record.get("role"),
+        "write_reason": record.get("reason"),
+        "write_requested_by": record.get("requestor"),
+        "request_id": record.get("request_id"),
+        "event_timestamp": completed_at.isoformat(),
+    }
+    for key in ("batch_id", "interlock_rule_id"):
+        if record.get(key):
+            extra[key] = record[key]
+    error = (
+        record.get("validation_error")
+        or record.get("interlock_error")
+        or record.get("auth_error")
+        or record.get("write_error")
+        or record.get("readback_error")
+    )
+    if error:
+        extra["error"] = error
+    return ContextualRecord(
+        source=RecordSource(
+            adapter_id=adapter_id,
+            system=system,
+            tag_path=f"{CONTROL_WRITE_PREFIX}.{tag_path}",
+        ),
+        timestamp=RecordTimestamp(source_time=requested_at, server_time=completed_at),
+        value=RecordValue(raw=dict(record), quality=quality, data_type="object"),
+        context=RecordContext(
+            area=record.get("area") or None,
+            equipment_id=record.get("equipment_id") or None,
+            site=site,
+            operator_id=record.get("requestor") or None,
+            extra=extra,
+        ),
+        lineage=RecordLineage(
+            schema_ref=schema_ref,
+            adapter_id=adapter_id,
+            adapter_version=adapter_version,
+            transformation_chain=["ot:control-write-engine"],
+        ),
+    )
+
+
+class ContextualRecordAuditSink:
+    """Hands every write result to a record sink as a ContextualRecord (FB-066).
+
+    ``record_sink`` is anything with ``async write_batch(list[ContextualRecord])``
+    — the hub's ``IngestPipeline`` in production, so control writes land in
+    the same store as the data they changed.
     """
 
-    def __init__(self, writer: Any) -> None:
-        self._writer = writer
+    def __init__(
+        self,
+        record_sink: Any,
+        *,
+        adapter_id: str = OT_ADAPTER_ID,
+        adapter_version: str = OT_ADAPTER_VERSION,
+        schema_ref: str = OT_SCHEMA_REF,
+        system: str = "forge-ot",
+        site: str | None = None,
+        now: Callable[[], datetime] | None = None,
+    ) -> None:
+        self._sink = record_sink
+        self._adapter_id = adapter_id
+        self._adapter_version = adapter_version
+        self._schema_ref = schema_ref
+        self._system = system
+        self._site = site
+        self._now = now or (lambda: datetime.now(UTC))
+        self.records_written = 0
+
+    def to_record(self, record: dict[str, Any]) -> ContextualRecord:
+        return write_result_to_record(
+            record,
+            adapter_id=self._adapter_id,
+            adapter_version=self._adapter_version,
+            schema_ref=self._schema_ref,
+            system=self._system,
+            site=self._site,
+            now=self._now(),
+        )
 
     async def write_audit_record(self, record: dict[str, Any]) -> None:
-        cr_record = {
-            "record_type": "control_write_audit",
-            "source_module": "ot",
-            "request_id": record.get("request_id", ""),
-            "tag_path": record.get("tag_path", ""),
-            "status": record.get("status", ""),
-            "requestor": record.get("requestor", ""),
-            "role": record.get("role", ""),
-            "timestamp": record.get("timestamp", ""),
-            "context": {
-                "requested_value": record.get("requested_value"),
-                "old_value": record.get("old_value"),
-                "new_value": record.get("new_value"),
-                "validation_passed": record.get("validation_passed"),
-                "interlock_passed": record.get("interlock_passed"),
-                "auth_passed": record.get("auth_passed"),
-                "readback_matched": record.get("readback_matched"),
-                "area": record.get("area", ""),
-                "equipment_id": record.get("equipment_id", ""),
-                "reason": record.get("reason", ""),
-            },
-        }
-        await self._writer.write(cr_record)
+        await self._sink.write_batch([self.to_record(record)])
+        self.records_written += 1
 
 
 class MqttAuditSink:

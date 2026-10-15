@@ -9,7 +9,11 @@ from typing import Any
 import pytest
 
 from forge.modules.ot.control import PlcConnectionManager, PlcConnectionSpec, RegistryTagIO
-from forge.modules.ot.control.connections import default_client_factory, default_provider_factory
+from forge.modules.ot.control.connections import (
+    LIVENESS_NODE,
+    default_client_factory,
+    default_provider_factory,
+)
 from forge.modules.ot.opcua_client.types import (
     ConnectionHealth,
     ConnectionState,
@@ -41,6 +45,8 @@ class FakeUaClient:
         self.subscriptions: list[tuple[int, list[str]]] = []
         self.callbacks: dict[int, Any] = {}
         self.reconnect_count = 0
+        self.probe_fail = False
+        self.probed = 0
         self._next = 1
 
     async def connect(self) -> None:
@@ -72,6 +78,11 @@ class FakeUaClient:
         if self.state != ConnectionState.CONNECTED:
             msg = "not connected"
             raise ConnectionError(msg)
+        if list(node_ids) == [LIVENESS_NODE]:
+            self.probed += 1
+            if self.probe_fail:
+                msg = "session timed out"
+                raise TimeoutError(msg)
         return [DataValue(value=self.values.get(n), quality=QualityCode.GOOD) for n in node_ids]
 
     async def write(self, node_id, value, *, data_type=None) -> None:
@@ -109,6 +120,7 @@ class Clock:
 def spec(name: str = "WHK01", **kw: Any) -> PlcConnectionSpec:
     kw.setdefault("endpoint", "opc.tcp://10.0.0.1:4840")
     kw.setdefault("reconnect_interval_ms", 1000)
+    kw.setdefault("liveness_interval_seconds", 0)
     return PlcConnectionSpec(name=name, **kw)
 
 
@@ -317,3 +329,36 @@ def test_spec_validation() -> None:
         spec(security_policy="Basic256Sha256")
     ok = spec(security_policy="Basic256Sha256", certificate_path="c.pem", private_key_path="c.key")
     assert ok.security_policy == "Basic256Sha256" and ok.enabled
+
+
+async def test_liveness_probe_catches_a_silently_dead_session() -> None:
+    """A session that answers nothing is restarted even though its state says CONNECTED (FB-070)."""
+    registry = await registry_with_tags()
+    clock = Clock()
+    manager, clients = make([spec(liveness_interval_seconds=10)], registry, clock=clock)
+    await manager.start()
+    client = clients["WHK01"]
+
+    assert await manager.check() == [] and client.probed == 1  # first pass probes at once
+    clock.advance(5)
+    assert await manager.check() == [] and client.probed == 1  # interval not elapsed
+    clock.advance(5)
+    assert await manager.check() == [] and client.probed == 2
+    conn = manager.status()["connections"]["WHK01"]
+    assert conn["probes"] == 2 and conn["probe_failures"] == 0
+    assert conn["last_probe_at"] == clock.t.isoformat()
+
+    client.probe_fail = True
+    clock.advance(10)
+    actions = await manager.check()
+    assert actions == ["WHK01: reconnected (unresponsive)"]
+    assert client.connects == 2 and client.state is ConnectionState.CONNECTED
+    conn = manager.status()["connections"]["WHK01"]
+    assert conn["probe_failures"] == 1 and conn["restarts"] == 1 and conn["last_error"] is None
+
+    disabled, dclients = make([spec(liveness_interval_seconds=0)], registry, clock=clock)
+    await disabled.start()
+    clock.advance(100)
+    assert await disabled.check() == [] and dclients["WHK01"].probed == 0
+    await disabled.stop()
+    await manager.stop()

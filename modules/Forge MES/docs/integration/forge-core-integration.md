@@ -224,9 +224,13 @@ builds `OTModuleHost` → `OTModuleAdapter(control=ControlDependencies(...))` �
 
 Cross-references are checked at start-up (a recipe mapping or CIP start tag
 that is not in `write_tags`, an area whose equipment has no recipe entry).
-Every control write result is journaled, logged and published on
-`<root>/<site>/<area>/ot/control/audit/<request_id>`; every MES write attempt
-becomes a ContextualRecord in the hub ingest pipeline.
+Every control write result is journaled, logged, published on
+`<root>/<site>/<area>/ot/control/audit/<request_id>` and stored in the hub
+ingest pipeline as a ContextualRecord on `ot.control.write.<tag>` (FB-066);
+every MES write attempt becomes a ContextualRecord on
+`ot.changeover.<area>.<command>`. In `mqtt.mode = external` the runtime owns
+an aiomqtt publisher for cipState and audit (FB-067); PLC sessions are
+probed with a server-clock read every `liveness_interval_seconds` (FB-070).
 
 REST (`/api/v1/ot`): `GET control/status`, `GET control/tags`,
 `GET control/writes?tag_path=&status=&area=&since=`, `GET changeover`,
@@ -335,8 +339,8 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
 | CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 (done) |
 | PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 (done) |
-| Liveness probe for silent PLC link loss | FB-070 |
-| Control write audit records into the hub store | FB-066 |
+| Liveness probe for silent PLC link loss | FB-070 (done) |
+| Control write audit records into the hub store | FB-066 (done) |
 | Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |
 | Dead-letter sink for exhausted batches | FB-056 |

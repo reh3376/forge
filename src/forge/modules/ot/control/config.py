@@ -107,6 +107,9 @@ class PlcConnectionSpec(BaseModel):
     #: Initial restart back-off (doubles up to a minute) when the PLC is unreachable.
     reconnect_interval_ms: int = Field(default=1_000, ge=100)
     max_reconnect_attempts: int = Field(default=0, ge=0)
+    #: Supervisor reads the server clock this often to catch silent link loss (FB-070);
+    #: 0 disables the probe.
+    liveness_interval_seconds: float = Field(default=30.0, ge=0)
     enabled: bool = True
 
     @model_validator(mode="after")

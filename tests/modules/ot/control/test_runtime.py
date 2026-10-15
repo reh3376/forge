@@ -395,12 +395,19 @@ async def test_full_changeover_over_the_embedded_broker() -> None:
             assert body["changeover"]["areas"]["cooker"]["mes_state"] == "PRODUCTION"
             assert body["config"]["recipes"] == {"Cooker01": 2}
 
-        # One audit ContextualRecord per MES write attempt reached the sink.
-        assert [r.source.tag_path for r in sink.records] == [
+        # One audit ContextualRecord per MES write attempt reached the sink ...
+        changeover = [r for r in sink.records if r.source.tag_path.startswith("ot.changeover.")]
+        assert [r.source.tag_path for r in changeover] == [
             "ot.changeover.cooker.cip-complete",
             "ot.changeover.cooker.recipe-loaded",
             "ot.changeover.cooker.start-production",
         ]
+        # ... and one per control write (FB-066), in the order they happened.
+        writes = [r for r in sink.records if r.source.tag_path.startswith("ot.control.write.")]
+        assert [r.context.extra["target_tag_path"] for r in writes] == [CIP_START, SP, RR]
+        assert all(r.context.extra["write_status"] == "CONFIRMED" for r in writes)
+        assert writes[0].context.area == "cooker" and writes[0].context.site == "whk01"
+        assert rt.status()["audit_records"] == 3
     finally:
         await rt.stop()
     assert not rt.started and rt.broker is None and rt.ingress is None
@@ -684,3 +691,49 @@ async def test_connections_need_a_registry_and_absent_connections_report_empty()
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
         assert (await c.get("/api/v1/ot/control/connections")).json()["total"] == 0
         assert (await c.post("/api/v1/ot/control/connections/WHK01/restart")).status_code == 404
+
+
+async def test_external_mode_builds_a_publisher_for_cip_state_and_audit() -> None:
+    """External broker: the runtime owns a publisher for cipState and audit (FB-067)."""
+    published: list[dict[str, Any]] = []
+
+    class FakeExternal:
+        def __init__(self, config) -> None:
+            self.config = config
+            self.connected = False
+
+        async def connect(self) -> None:
+            self.connected = True
+
+        async def disconnect(self) -> None:
+            self.connected = False
+
+        async def publish(self, topic, payload, qos=0, retain=False) -> None:
+            published.append({"topic": topic, "payload": payload, "qos": qos, "retain": retain})
+
+    rt, _mes, _plc, _sink = runtime(
+        document(
+            mqtt={"mode": "external", "host": "broker.local", "port": 8883, "client_id": "ot-x"}
+        ),
+        ingress_factory=lambda settings, subscriber, broker: FakeIngress(),
+        mqtt_client_factory=FakeExternal,
+    )
+    assert rt.publisher is not None and rt.publisher.config.client_id == "ot-x-pub"
+    assert rt.publisher.config.broker_mode == "external"
+    await rt.start()
+    assert rt.status()["publisher"]["connected"] is True
+    assert rt.broker is None  # no embedded broker in external mode
+
+    assert await rt.publish(
+        "whk/whk01/cooker/equipment/cipState", {"state": "Running"}, retain=True
+    )
+    assert published[-1]["topic"].endswith("equipment/cipState") and published[-1]["retain"] is True
+    # A control write's audit record is published through the same client.
+    await rt.engine.execute(
+        WriteRequest(
+            tag_path=SP, value=150.0, requestor="test", role=WriteRole.ENGINEER, area="cooker"
+        )
+    )
+    assert any(p["topic"].startswith("whk/whk01/cooker/ot/control/audit/") for p in published)
+    await rt.stop()
+    assert rt.status()["publisher"]["connected"] is False
