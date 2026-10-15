@@ -53,6 +53,7 @@ class FakeIngest {
 
 class FakeSpoke {
   expected: Array<string | undefined> = [];
+  readonly callbackToken = "tok-1";
   constructor(private readonly url?: string) {}
   whenListening() {
     return Promise.resolve(this.url);
@@ -86,6 +87,7 @@ describe("ForgeHubService", () => {
           graphql_url: "http://mes:3000/graphql",
           transport_mode: "push",
           grpc_callback_url: "mes-backend:50052",
+          grpc_callback_token: "tok-1",
         },
       },
     ]);

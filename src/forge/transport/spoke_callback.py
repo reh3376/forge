@@ -31,6 +31,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from forge.transport.serialization import proto_to_pydantic
+from forge.transport.spoke_client import ChannelTls  # noqa: TC001 — runtime default factory
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
@@ -42,6 +43,10 @@ logger = logging.getLogger(__name__)
 
 #: Configure param a spoke sets to receive hub → spoke RPCs.
 CALLBACK_PARAM = "grpc_callback_url"
+#: Configure param carrying the spoke-minted callback token (FB-063).
+CALLBACK_TOKEN_PARAM = "grpc_callback_token"
+#: gRPC metadata key the hub presents the token in.
+CALLBACK_TOKEN_HEADER = "x-forge-callback-token"
 
 
 class WriteDispatchError(Exception):
@@ -98,12 +103,15 @@ class CallbackTarget:
     last_write_at: datetime | None = None
     last_error: str | None = None
     last_outcome: WriteOutcome | None = None
+    #: Shared secret the spoke advertised (``grpc_callback_token``); sent as metadata.
+    token: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "adapter_id": self.adapter_id,
             "session_id": self.session_id,
             "url": self.url,
+            "token_set": self.token is not None,
             "registered_at": self.registered_at.isoformat(),
             "writes": self.writes,
             "succeeded": self.succeeded,
@@ -207,10 +215,14 @@ class SpokeCallbackClient:
         await self.channel.close()
 
 
-async def _grpc_channel_factory(url: str) -> TransportChannel:
+def _callback_metadata(token: str | None) -> list[tuple[str, str]]:
+    return [(CALLBACK_TOKEN_HEADER, token)] if token else []
+
+
+async def _grpc_channel_factory(url: str, tls: ChannelTls | None = None) -> TransportChannel:
     from forge.transport.grpc_channel import GrpcChannel
 
-    channel = GrpcChannel(url)
+    channel = GrpcChannel(url, tls=tls)
     await channel.connect()
     return channel
 
@@ -232,8 +244,12 @@ class WriteDispatcher:
         *,
         channel_factory: Callable[[str], Awaitable[TransportChannel]] | None = None,
         can_write: Callable[[str], bool | None] | None = None,
+        tls: ChannelTls | None = None,
     ) -> None:
-        self._channel_factory = channel_factory or _grpc_channel_factory
+        self._tls = tls
+        self._channel_factory = channel_factory or (
+            lambda url: _grpc_channel_factory(url, tls=tls)
+        )
         self._can_write = can_write
         self._targets: dict[str, CallbackTarget] = {}
         self._channels: dict[str, TransportChannel] = {}
@@ -254,7 +270,11 @@ class WriteDispatcher:
         previous = self._targets.get(adapter_id)
         if previous is not None and previous.url != url:
             self._drop_channel(adapter_id)
-        target = CallbackTarget(adapter_id=adapter_id, session_id=session_id, url=url)
+        token = (params.get(CALLBACK_TOKEN_PARAM) or "").strip() or None
+        target = CallbackTarget(adapter_id=adapter_id, session_id=session_id, url=url, token=token)
+        channel = self._channels.get(adapter_id)
+        if channel is not None:
+            channel.set_metadata(_callback_metadata(token))
         if previous is not None:
             target.writes, target.succeeded, target.failed = (
                 previous.writes,
@@ -388,6 +408,8 @@ class WriteDispatcher:
     def snapshot(self) -> dict[str, Any]:
         return {
             "callback_param": CALLBACK_PARAM,
+            "token_param": CALLBACK_TOKEN_PARAM,
+            "tls": self._tls.describe() if self._tls is not None else None,
             "targets": [t.to_dict() for t in self._targets.values()],
         }
 
@@ -416,6 +438,7 @@ class WriteDispatcher:
         channel = self._channels.get(target.adapter_id)
         if channel is None:
             channel = await self._channel_factory(target.url)
+            channel.set_metadata(_callback_metadata(target.token))
             self._channels[target.adapter_id] = channel
         return SpokeCallbackClient(channel, target.adapter_id, target.session_id)
 

@@ -49,11 +49,19 @@ class ChangeoverLikeTarget implements ForgeWriteTarget {
   }
 }
 
-type Unary = (req: unknown, cb: (err: grpc.ServiceError | null, res?: any) => void) => void;
+/** Metadata carrying the callback token the hub must present (FB-063). */
+function tokenMetadata(token = "t-1"): grpc.Metadata {
+  const md = new grpc.Metadata();
+  md.set("x-forge-callback-token", token);
+  return md;
+}
+const META = tokenMetadata();
 
-function call<T = any>(client: any, method: string, req: unknown): Promise<T> {
+function call<T = any>(client: any, method: string, req: unknown, md: grpc.Metadata = META): Promise<T> {
   return new Promise((resolve, reject) => {
-    (client[method] as Unary).call(client, req, (err, res) => (err ? reject(err) : resolve(res)));
+    (client[method] as (req: unknown, md: grpc.Metadata, cb: (err: grpc.ServiceError | null, res?: any) => void) => void).call(
+      client, req, md, (err, res) => (err ? reject(err) : resolve(res))
+    );
   });
 }
 
@@ -79,7 +87,7 @@ describe("decodeWriteValue / advertiseHostFor", () => {
 
 describe("ForgeSpokeServer", () => {
   const config = loadForgeConfig((k) =>
-    ({ FORGE_HUB_ENABLED: "true", FORGE_SPOKE_GRPC_BIND: "127.0.0.1:0" })[k]
+    ({ FORGE_HUB_ENABLED: "true", FORGE_SPOKE_GRPC_BIND: "127.0.0.1:0", FORGE_SPOKE_CALLBACK_TOKEN: "t-1" })[k]
   );
   let writes: ForgeWriteService;
   let target: ChangeoverLikeTarget;
@@ -132,6 +140,45 @@ describe("ForgeSpokeServer", () => {
       call(client, "Discover", { adapter_id: "forge-wms", session_id: "sess-1" })
     ).rejects.toMatchObject({ code: grpc.status.PERMISSION_DENIED, details: expect.stringContaining("forge-wms") });
     expect(server.getStatus().deniedCalls).toBe(3);
+  });
+
+  it("requires the advertised callback token in the metadata (FB-063)", async () => {
+    server.setExpectedSession("sess-1");
+    expect(server.callbackToken).toBe("t-1");
+    expect(server.getStatus()).toMatchObject({ callbackTokenSet: true, tlsRequired: false, tls: false });
+    const req = { adapter_id: "forge-mes", session_id: "sess-1" };
+    await expect(call(client, "Discover", req, new grpc.Metadata())).rejects.toMatchObject({
+      code: grpc.status.PERMISSION_DENIED,
+      details: expect.stringContaining("callback token"),
+    });
+    await expect(call(client, "Discover", req, tokenMetadata("wrong"))).rejects.toMatchObject({
+      code: grpc.status.PERMISSION_DENIED,
+    });
+    await expect(call(client, "Discover", req)).resolves.toMatchObject({ tags: expect.any(Array) });
+    expect(server.getStatus().tokenRejections).toBe(2);
+  });
+
+  it("mints a token per process when none is configured and refuses plaintext when TLS is required", async () => {
+    const minted = new ForgeSpokeServer(
+      loadForgeConfig((k) => ({ FORGE_HUB_ENABLED: "true" })[k]),
+      new ForgeWriteService(),
+      ingest as any
+    );
+    expect(minted.callbackToken).toMatch(/^[A-Za-z0-9_-]{20,}$/);
+    expect(minted.callbackToken).not.toBe("t-1");
+
+    const prod = loadForgeConfig((k) => ({ FORGE_HUB_ENABLED: "true", NODE_ENV: "production" })[k]);
+    expect(prod.spoke.requireTls).toBe(true);
+    const strict = new ForgeSpokeServer(prod, new ForgeWriteService(), ingest as any);
+    await expect(strict.start("127.0.0.1:0")).rejects.toThrow("FORGE_SPOKE_REQUIRE_TLS");
+    strict.onModuleInit();
+    expect(await strict.whenListening()).toBeUndefined();
+    expect(strict.getStatus().lastError).toContain("plaintext");
+
+    const relaxed = loadForgeConfig(
+      (k) => ({ FORGE_HUB_ENABLED: "true", NODE_ENV: "production", FORGE_SPOKE_REQUIRE_TLS: "false" })[k]
+    );
+    expect(relaxed.spoke.requireTls).toBe(false);
   });
 
   it("writes a JSON payload with read-back", async () => {
@@ -261,7 +308,7 @@ describe("ForgeSpokeServer", () => {
 
 describe("ForgeSpokeServer pull RPCs", () => {
   const config = loadForgeConfig((k) =>
-    ({ FORGE_HUB_ENABLED: "true", FORGE_SPOKE_GRPC_BIND: "127.0.0.1:0" })[k]
+    ({ FORGE_HUB_ENABLED: "true", FORGE_SPOKE_GRPC_BIND: "127.0.0.1:0", FORGE_SPOKE_CALLBACK_TOKEN: "t-1" })[k]
   );
   type Listener = (record: any) => void;
   const listeners = new Set<Listener>();
@@ -317,21 +364,24 @@ describe("ForgeSpokeServer pull RPCs", () => {
 
   it("streams a backfill for the requested range and denies strangers", async () => {
     await expect(
-      readAll(client.Backfill({ adapter_id: "forge-mes", session_id: "sess-1", tags: [] }))
+      readAll(client.Backfill({ adapter_id: "forge-mes", session_id: "sess-1", tags: [] }, META))
     ).rejects.toMatchObject({ code: grpc.status.PERMISSION_DENIED });
 
     server.setExpectedSession("sess-1");
     const start = new Date("2026-06-01T00:00:00Z");
     const end = new Date("2026-06-02T00:00:00Z");
     const records = await readAll(
-      client.Backfill({
-        adapter_id: "forge-mes",
-        session_id: "sess-1",
-        tags: ["mes.backend"],
-        start_time: { seconds: String(Math.floor(start.getTime() / 1000)), nanos: 0 },
-        end_time: { seconds: String(Math.floor(end.getTime() / 1000)), nanos: 0 },
-        max_records: 2,
-      })
+      client.Backfill(
+        {
+          adapter_id: "forge-mes",
+          session_id: "sess-1",
+          tags: ["mes.backend"],
+          start_time: { seconds: String(Math.floor(start.getTime() / 1000)), nanos: 0 },
+          end_time: { seconds: String(Math.floor(end.getTime() / 1000)), nanos: 0 },
+          max_records: 2,
+        },
+        META
+      )
     );
     expect(records).toHaveLength(2);
     expect(records[0].source.tag_path).toBe("mes.backend.scheduleorder");
@@ -348,7 +398,7 @@ describe("ForgeSpokeServer pull RPCs", () => {
     const Service = getAdapterService();
     const bareClient = new Service(url, grpc.credentials.createInsecure());
     await expect(
-      readAll(bareClient.Backfill({ adapter_id: "forge-mes", session_id: "s", tags: [] }))
+      readAll(bareClient.Backfill({ adapter_id: "forge-mes", session_id: "s", tags: [] }, META))
     ).rejects.toMatchObject({ code: grpc.status.UNIMPLEMENTED, details: expect.stringContaining("backfill source") });
     expect(bare.getStatus().backfill.enabled).toBe(false);
     bareClient.close();
@@ -357,7 +407,7 @@ describe("ForgeSpokeServer pull RPCs", () => {
 
   it("mirrors the ingest queue to a subscriber until Unsubscribe", async () => {
     server.setExpectedSession("sess-1");
-    const stream = client.Subscribe({ adapter_id: "forge-mes", session_id: "sess-1", tags: ["mes.backend.scheduleorder"] });
+    const stream = client.Subscribe({ adapter_id: "forge-mes", session_id: "sess-1", tags: ["mes.backend.scheduleorder"] }, META);
     const subscriptionId: string = await new Promise((resolve) => {
       stream.on("metadata", (md: grpc.Metadata) => resolve(String(md.get("subscription-id")[0])));
     });
@@ -389,7 +439,7 @@ describe("ForgeSpokeServer pull RPCs", () => {
     expect(listeners.size).toBe(0);
 
     // A client-side cancel also releases the listener.
-    const second = client.Subscribe({ adapter_id: "forge-mes", session_id: "sess-1", tags: [] });
+    const second = client.Subscribe({ adapter_id: "forge-mes", session_id: "sess-1", tags: [] }, META);
     await new Promise((resolve) => second.on("metadata", resolve));
     second.on("error", () => undefined);
     second.cancel();

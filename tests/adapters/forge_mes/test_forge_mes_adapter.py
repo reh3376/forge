@@ -69,7 +69,7 @@ class TestManifest:
 
     def test_connection_params_count(self):
         adapter = ForgeMesAdapter()
-        assert len(adapter.manifest.connection_params) == 19
+        assert len(adapter.manifest.connection_params) == 20
 
     def test_required_params(self):
         adapter = ForgeMesAdapter()

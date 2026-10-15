@@ -40,7 +40,7 @@ from forge.transport.proto_bridge import (
     proto_to_health,
     set_typed_value,
 )
-from forge.transport.spoke_client import TransportChannel
+from forge.transport.spoke_client import ChannelTls, TransportChannel
 
 logger = logging.getLogger(__name__)
 
@@ -57,12 +57,15 @@ class GrpcChannel(TransportChannel):
     to/from proto messages at the boundary via proto_bridge.
     """
 
-    def __init__(self, target: str) -> None:
-        """Args: target — gRPC server address (e.g. 'localhost:50051')."""
+    def __init__(self, target: str, *, tls: ChannelTls | None = None) -> None:
+        """Args: target — gRPC server address (e.g. 'localhost:50051');
+        tls — client TLS material (plaintext when None)."""
         self._target = target
+        self._tls = tls
         self._channel: grpc.aio.Channel | None = None
         self._stub: service_grpc.AdapterServiceStub | None = None
         self._closed = False
+        self.metadata = []
 
     @property
     def target(self) -> str:
@@ -70,10 +73,21 @@ class GrpcChannel(TransportChannel):
 
     async def connect(self) -> None:
         """Open the gRPC channel and create the compiled stub."""
-        self._channel = grpc.aio.insecure_channel(self._target)
+        if self._tls is not None:
+            self._channel = grpc.aio.secure_channel(self._target, self._tls.credentials())
+        else:
+            self._channel = grpc.aio.insecure_channel(self._target)
         self._stub = service_grpc.AdapterServiceStub(self._channel)
         self._closed = False
-        logger.info("gRPC channel connected to %s (protobuf binary)", self._target)
+        logger.info(
+            "gRPC channel connected to %s (protobuf binary, %s)",
+            self._target,
+            "TLS" if self._tls is not None else "plaintext",
+        )
+
+    @property
+    def tls(self) -> ChannelTls | None:
+        return self._tls
 
     def _ensure_connected(self) -> service_grpc.AdapterServiceStub:
         """Return the stub, raising if not connected or closed."""
@@ -86,7 +100,9 @@ class GrpcChannel(TransportChannel):
         return self._stub
 
     async def send_unary(
-        self, method: str, request: dict[str, Any],
+        self,
+        method: str,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Send a unary-unary RPC using compiled protobuf messages.
 
@@ -116,7 +132,9 @@ class GrpcChannel(TransportChannel):
         raise ValueError(msg)
 
     async def send_stream(
-        self, method: str, records: AsyncIterator[dict[str, Any]],
+        self,
+        method: str,
+        records: AsyncIterator[dict[str, Any]],
     ) -> None:
         """Send a client-streaming RPC using compiled protobuf messages.
 
@@ -135,7 +153,9 @@ class GrpcChannel(TransportChannel):
             raise ValueError(msg)
 
     async def receive_stream(
-        self, method: str, request: dict[str, Any],
+        self,
+        method: str,
+        request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
         """Server-streaming pull RPCs on the spoke (FB-061).
 
@@ -165,7 +185,9 @@ class GrpcChannel(TransportChannel):
     # ── Typed RPC callers ────────────────────────────────────────────────
 
     async def _call_register(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Register RPC: dict → RegisterRequest → RegisterResponse → dict."""
         from forge.transport.serialization import proto_to_pydantic
@@ -175,7 +197,9 @@ class GrpcChannel(TransportChannel):
         proto_manifest = manifest_to_proto(manifest_model)
 
         proto_request = service_msg.RegisterRequest(manifest=proto_manifest)
-        response: service_msg.RegisterResponse = await stub.Register(proto_request)
+        response: service_msg.RegisterResponse = await stub.Register(
+            proto_request, metadata=self.metadata
+        )
         return {
             "accepted": response.accepted,
             "message": response.message,
@@ -183,7 +207,9 @@ class GrpcChannel(TransportChannel):
         }
 
     async def _call_configure(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Configure RPC: dict → ConfigureRequest → ConfigureResponse → dict."""
         proto_request = service_msg.ConfigureRequest(
@@ -191,22 +217,30 @@ class GrpcChannel(TransportChannel):
             session_id=request.get("session_id", ""),
             params=request.get("params", {}),
         )
-        response: service_msg.ConfigureResponse = await stub.Configure(proto_request)
+        response: service_msg.ConfigureResponse = await stub.Configure(
+            proto_request, metadata=self.metadata
+        )
         return {"success": response.success, "message": response.message}
 
     async def _call_start(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Start RPC: dict → StartRequest → StartResponse → dict."""
         proto_request = service_msg.StartRequest(
             adapter_id=request.get("adapter_id", ""),
             session_id=request.get("session_id", ""),
         )
-        response: service_msg.StartResponse = await stub.Start(proto_request)
+        response: service_msg.StartResponse = await stub.Start(
+            proto_request, metadata=self.metadata
+        )
         return {"success": response.success, "message": response.message}
 
     async def _call_stop(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Stop RPC: dict → StopRequest → StopResponse → dict."""
         proto_request = service_msg.StopRequest(
@@ -214,7 +248,7 @@ class GrpcChannel(TransportChannel):
             session_id=request.get("session_id", ""),
             graceful=request.get("graceful", True),
         )
-        response: service_msg.StopResponse = await stub.Stop(proto_request)
+        response: service_msg.StopResponse = await stub.Stop(proto_request, metadata=self.metadata)
         return {
             "success": response.success,
             "message": response.message,
@@ -222,14 +256,16 @@ class GrpcChannel(TransportChannel):
         }
 
     async def _call_health(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Health RPC: dict → HealthRequest → AdapterHealth → dict."""
         proto_request = service_msg.HealthRequest(
             adapter_id=request.get("adapter_id", ""),
             session_id=request.get("session_id", ""),
         )
-        response = await stub.Health(proto_request)
+        response = await stub.Health(proto_request, metadata=self.metadata)
         # Convert proto AdapterHealth to Pydantic then to dict
         health_model = proto_to_health(response)
         from forge.transport.serialization import pydantic_to_proto
@@ -237,7 +273,9 @@ class GrpcChannel(TransportChannel):
         return pydantic_to_proto(health_model)
 
     async def _call_write(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Write RPC (hub → spoke): dict → WriteRequest → WriteResponse → dict.
 
@@ -252,7 +290,9 @@ class GrpcChannel(TransportChannel):
             confirm=bool(request.get("confirm", False)),
         )
         set_typed_value(proto_request, request.get("value"))
-        response: service_msg.WriteResponse = await stub.Write(proto_request)
+        response: service_msg.WriteResponse = await stub.Write(
+            proto_request, metadata=self.metadata
+        )
         readback: dict[str, Any] | None = None
         if response.HasField("readback"):
             from forge.transport.serialization import pydantic_to_proto
@@ -265,7 +305,9 @@ class GrpcChannel(TransportChannel):
         }
 
     async def _call_discover(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Discover RPC (hub → spoke): DiscoverResponse → {"tags": [...]}."""
         from google.protobuf.json_format import MessageToDict
@@ -274,7 +316,9 @@ class GrpcChannel(TransportChannel):
             adapter_id=request.get("adapter_id", ""),
             session_id=request.get("session_id", ""),
         )
-        response: service_msg.DiscoverResponse = await stub.Discover(proto_request)
+        response: service_msg.DiscoverResponse = await stub.Discover(
+            proto_request, metadata=self.metadata
+        )
         tags = [
             {
                 "tag_path": tag.tag_path,
@@ -288,19 +332,24 @@ class GrpcChannel(TransportChannel):
         return {"tags": tags}
 
     async def _call_unsubscribe(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         response: service_msg.UnsubscribeResponse = await stub.Unsubscribe(
             service_msg.UnsubscribeRequest(
                 adapter_id=request.get("adapter_id", ""),
                 session_id=request.get("session_id", ""),
                 subscription_id=request.get("subscription_id", ""),
-            )
+            ),
+            metadata=self.metadata,
         )
         return {"success": response.success, "message": response.message}
 
     async def _call_backfill(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
         from forge.transport.serialization import pydantic_to_proto
 
@@ -314,11 +363,13 @@ class GrpcChannel(TransportChannel):
             ts = dt_to_timestamp(request.get(field_name))
             if ts is not None:
                 getattr(proto_request, field_name).CopyFrom(ts)
-        async for message in stub.Backfill(proto_request):
+        async for message in stub.Backfill(proto_request, metadata=self.metadata):
             yield pydantic_to_proto(proto_to_contextual_record(message))
 
     async def _call_subscribe(
-        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
         from forge.transport.serialization import pydantic_to_proto
 
@@ -327,7 +378,8 @@ class GrpcChannel(TransportChannel):
                 adapter_id=request.get("adapter_id", ""),
                 session_id=request.get("session_id", ""),
                 tags=[str(t) for t in request.get("tags") or []],
-            )
+            ),
+            metadata=self.metadata,
         )
         metadata = await call.initial_metadata()
         subscription_id = ""
@@ -354,10 +406,9 @@ class GrpcChannel(TransportChannel):
                 pydantic_record = proto_to_pydantic(record_dict, "ContextualRecord")
                 yield contextual_record_to_proto(pydantic_record)
 
-        # Pass metadata for session identification
-        metadata = []
         response: service_msg.IngestResponse = await stub.Ingest(
-            _proto_stream(), metadata=metadata,
+            _proto_stream(),
+            metadata=self.metadata,
         )
         logger.info(
             "Ingest RPC completed: %d records acknowledged",

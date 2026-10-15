@@ -45,6 +45,17 @@ export interface ForgeSpokeServerConfig {
    * bind host (localhost for wildcards) plus the bound port.
    */
   advertiseUrl?: string;
+  /**
+   * Refuse to serve the spoke port in plaintext (FB-063). Defaults to true when
+   * NODE_ENV=production; `FORGE_HUB_TLS_*` then has to carry a cert and key.
+   */
+  requireTls: boolean;
+  /**
+   * Shared secret the hub must present on every callback RPC (metadata
+   * `x-forge-callback-token`), advertised to the hub as `grpc_callback_token`
+   * on Configure. Empty = a random token per process start.
+   */
+  callbackToken: string;
 }
 
 export interface ForgeConfig {
@@ -127,6 +138,12 @@ export function loadForgeConfig(get: Getter): ForgeConfig {
       enabled: bool(get, "FORGE_SPOKE_GRPC_ENABLED", true),
       bind: str(get, "FORGE_SPOKE_GRPC_BIND", "0.0.0.0:50052"),
       advertiseUrl: get("FORGE_SPOKE_GRPC_ADVERTISE_URL") || undefined,
+      requireTls: bool(
+        get,
+        "FORGE_SPOKE_REQUIRE_TLS",
+        str(get, "NODE_ENV", "") === "production"
+      ),
+      callbackToken: str(get, "FORGE_SPOKE_CALLBACK_TOKEN", ""),
     },
     connectionParams: {
       // The hub-side adapter contract lists graphql_url as required; the

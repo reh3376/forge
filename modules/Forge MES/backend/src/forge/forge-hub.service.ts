@@ -42,6 +42,8 @@ export interface HubStatus {
   sessionId?: string;
   /** Spoke-hosted AdapterService address sent to the hub (write-back). */
   callbackUrl?: string;
+  /** A callback token is advertised with the URL (FB-063); never the token itself. */
+  callbackTokenSet?: boolean;
   registeredAt?: string;
   lastHealthAt?: string;
   lastHealth?: HubHealth;
@@ -125,6 +127,7 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
       state: this.state,
       sessionId: this.sessionId,
       callbackUrl: this.spoke.getStatus().advertisedUrl,
+      callbackTokenSet: Boolean(this.spoke.callbackToken),
       registeredAt: this.registeredAt?.toISOString(),
       lastHealthAt: this.lastHealthAt?.toISOString(),
       lastHealth: this.lastHealth,
@@ -168,7 +171,9 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
     const callbackUrl = await this.spoke.whenListening();
     const params: Record<string, string> = {
       ...this.config.connectionParams,
-      ...(callbackUrl ? { grpc_callback_url: callbackUrl } : {}),
+      ...(callbackUrl
+        ? { grpc_callback_url: callbackUrl, grpc_callback_token: this.spoke.callbackToken }
+        : {}),
     };
     if (!callbackUrl) {
       this.logger.warn(

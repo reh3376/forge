@@ -16,8 +16,9 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterable
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from forge.core.models.adapter import AdapterManifest
@@ -27,8 +28,60 @@ from forge.transport.serialization import pydantic_to_proto
 logger = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
+class ChannelTls:
+    """TLS material for a client channel (hub → spoke callbacks, FB-063).
+
+    ``ca_path`` verifies the server; ``cert_path`` + ``key_path`` make it mTLS.
+    Built from ``<prefix>_CA`` / ``_CERT`` / ``_KEY`` by :meth:`from_env`.
+    """
+
+    ca_path: str | None = None
+    cert_path: str | None = None
+    key_path: str | None = None
+
+    @classmethod
+    def from_env(cls, prefix: str = "FORGE_SPOKE_TLS") -> ChannelTls | None:
+        import os
+
+        ca = os.getenv(f"{prefix}_CA", "").strip() or None
+        cert = os.getenv(f"{prefix}_CERT", "").strip() or None
+        key = os.getenv(f"{prefix}_KEY", "").strip() or None
+        if not (ca or cert or key):
+            return None
+        return cls(ca_path=ca, cert_path=cert, key_path=key)
+
+    def credentials(self) -> Any:
+        """``grpc.ChannelCredentials`` for this material (reads the files)."""
+        import grpc
+
+        def read(path: str | None) -> bytes | None:
+            return Path(path).read_bytes() if path else None
+
+        if bool(self.cert_path) != bool(self.key_path):
+            msg = "ChannelTls needs both cert_path and key_path for a client certificate"
+            raise ValueError(msg)
+        return grpc.ssl_channel_credentials(
+            root_certificates=read(self.ca_path),
+            private_key=read(self.key_path),
+            certificate_chain=read(self.cert_path),
+        )
+
+    def describe(self) -> dict[str, Any]:
+        return {
+            "ca": bool(self.ca_path),
+            "client_certificate": bool(self.cert_path and self.key_path),
+        }
+
+
 class TransportChannel(ABC):
     """Abstract transport channel — decouples from real gRPC for testing."""
+
+    #: Metadata sent with every RPC (e.g. the spoke's callback token, FB-063).
+    metadata: list[tuple[str, str]]
+
+    def set_metadata(self, metadata: Iterable[tuple[str, str]]) -> None:
+        self.metadata = [(str(k), str(v)) for k, v in metadata]
 
     @abstractmethod
     async def send_unary(
@@ -198,6 +251,7 @@ class InMemoryChannel(TransportChannel):
         """Args: servicer — an AdapterServiceServicer instance."""
         self._servicer = servicer
         self._closed = False
+        self.metadata = []
 
     async def send_unary(
         self, method: str, request: dict[str, Any],

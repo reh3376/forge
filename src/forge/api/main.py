@@ -26,7 +26,7 @@ from datetime import datetime  # noqa: TC003 — pydantic field type
 from functools import partial
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge.api.health import (
@@ -42,11 +42,15 @@ from forge.api.registry import AdapterRegistry
 from forge.core.models.adapter import (
     AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
 )
+from forge.gateway.auth import auth_config_from_env, configure_auth
+from forge.gateway.models import ForgeUser  # noqa: TC001 — FastAPI dependency type
+from forge.gateway.rbac import require_scope
 from forge.ingest import IngestPipeline, build_pipeline_from_storage
 from forge.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
 from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
+from forge.transport.spoke_client import ChannelTls
 from forge.transport.spoke_pull import SubscriptionManager, backfill_into_pipeline
 
 logger = logging.getLogger(__name__)
@@ -163,11 +167,15 @@ def create_app(
         manifest = registry.get_manifest(adapter_id)
         return None if manifest is None else bool(manifest.capabilities.write)
 
+    # Hub → spoke callbacks: TLS material from FORGE_SPOKE_TLS_CA/_CERT/_KEY (FB-063).
     dispatcher = (
         write_dispatcher
         if write_dispatcher is not None
-        else WriteDispatcher(can_write=_can_write)
+        else WriteDispatcher(can_write=_can_write, tls=ChannelTls.from_env())
     )
+    # Auth kill-switch and credentials from FORGE_AUTH_ENABLED / FORGE_API_KEYS / JWT env;
+    # the endpoints that drive a spoke require the adapters:write scope (FB-063).
+    configure_auth(auth_config_from_env())
     runtime: dict[str, Any] = {}
     start_time = time.monotonic()
     # Spoke subscriptions streaming into the pipeline (FB-061).
@@ -398,7 +406,9 @@ def create_app(
 
     @app.post("/v1/adapters/{adapter_id}/write", response_model=WriteResponseModel)
     async def write_to_adapter(
-        adapter_id: str, request: WriteRequestModel
+        adapter_id: str,
+        request: WriteRequestModel,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
     ) -> WriteResponseModel:
         """Push a value into a spoke's source system through its ``Write`` RPC.
 
@@ -439,7 +449,11 @@ def create_app(
     # ------------------------------------------------------------------
 
     @app.post("/v1/adapters/{adapter_id}/backfill")
-    async def backfill_adapter(adapter_id: str, request: BackfillRequestModel) -> dict[str, Any]:
+    async def backfill_adapter(
+        adapter_id: str,
+        request: BackfillRequestModel,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
         """Replay ``[start_time, end_time]`` from the spoke into the pipeline.
 
         Each batch is ingested like a pushed one and logged under session
@@ -470,7 +484,9 @@ def create_app(
 
     @app.post("/v1/adapters/{adapter_id}/subscriptions")
     async def open_subscription(
-        adapter_id: str, request: SubscribeRequestModel
+        adapter_id: str,
+        request: SubscribeRequestModel,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
     ) -> dict[str, Any]:
         """Subscribe to the spoke's record stream; records flow into the pipeline."""
         if registry.get_manifest(adapter_id) is None:
@@ -486,7 +502,11 @@ def create_app(
         return [h.to_dict() for h in subscriptions.list(adapter_id)]
 
     @app.delete("/v1/adapters/{adapter_id}/subscriptions/{subscription_id}")
-    async def close_subscription(adapter_id: str, subscription_id: str) -> dict[str, Any]:
+    async def close_subscription(
+        adapter_id: str,
+        subscription_id: str,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
         """Unsubscribe at the spoke and stop ingesting; flushes what is buffered."""
         try:
             handle = await subscriptions.stop(adapter_id, subscription_id)
