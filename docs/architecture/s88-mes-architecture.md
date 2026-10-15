@@ -275,12 +275,12 @@ Instead, `RecipePhase.configuration` is a JSON field validated by Zod schemas ke
 
 These appear across nearly every production stage and are the most commonly queried fields for reporting and scheduling. Everything else lives in `configuration`.
 
-#### Zod schemas in `apps/shared/` validate configuration
+#### Zod schemas in `shared/` validate configuration
 
 Per `stage::phaseType` key, a Zod schema defines the expected shape. This gives type safety without schema rigidity:
 
 ```typescript
-// apps/shared/src/phaseConfiguration/mashing.ts
+// shared/src/phaseConfiguration/mashing.ts
 export const MashingHoldConfigSchema = z.object({
   heatEnabled: z.boolean().default(false),
   heatTempSp: z.number().optional(),

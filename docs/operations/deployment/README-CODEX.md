@@ -26,8 +26,8 @@ chmod +x setup-codex.sh
 
 This mono repo contains:
 
-- **Backend API** (NestJS) - `apps/whk-recipe-configuration`
-- **Frontend UI** (Next.js) - `apps/mes-ui`
+- **Backend API** (NestJS) - `backend`
+- **Frontend UI** (Next.js) - `frontend`
 - **Admin Panel** (React) - `apps/whk-recipe-configuration-admin`
 
 ### Services
@@ -63,7 +63,7 @@ docker compose -f docker-compose.codex.yml logs -f frontend
 ### Database Operations
 
 ```bash
-cd apps/whk-recipe-configuration
+cd backend
 
 # Generate Prisma client
 npx prisma generate
@@ -85,11 +85,11 @@ npx prisma studio
 
 ```bash
 # Backend development
-cd apps/whk-recipe-configuration
+cd backend
 npm run start:dev
 
 # Frontend development
-cd apps/mes-ui
+cd frontend
 npm run dev
 
 # Admin panel development
@@ -113,8 +113,8 @@ The `docker-compose.codex.yml` file is specifically optimized for OpenAI Codex e
 
 Each application has a development Dockerfile:
 
-- `apps/whk-recipe-configuration/Dockerfile.dev` - NestJS backend
-- `apps/mes-ui/Dockerfile.dev` - Next.js frontend
+- `backend/Dockerfile.dev` - NestJS backend
+- `frontend/Dockerfile.dev` - Next.js frontend
 - `apps/whk-recipe-configuration-admin/Dockerfile.dev` - React admin
 
 ## 🔐 Environment Configuration
@@ -159,12 +159,12 @@ In Codex environment, services communicate using these URLs:
 
 ```bash
 # Backend tests
-cd apps/whk-recipe-configuration
+cd backend
 npm run test
 npm run test:e2e
 
 # Frontend tests
-cd apps/mes-ui
+cd frontend
 npm run test
 npm run test:e2e
 
@@ -214,12 +214,12 @@ docker compose -f docker-compose.codex.yml logs -f -t backend
 
 ```bash
 # Backend
-cd apps/whk-recipe-configuration
+cd backend
 npm install package-name
 docker compose -f docker-compose.codex.yml restart backend
 
 # Frontend
-cd apps/mes-ui
+cd frontend
 npm install package-name
 docker compose -f docker-compose.codex.yml restart frontend
 ```
@@ -227,7 +227,7 @@ docker compose -f docker-compose.codex.yml restart frontend
 ### Database Schema Changes
 
 ```bash
-cd apps/whk-recipe-configuration
+cd backend
 
 # 1. Modify schema.prisma
 # 2. Generate migration
@@ -244,7 +244,7 @@ docker compose -f docker-compose.codex.yml restart backend
 
 ```bash
 # Generate Prisma client after schema changes
-cd apps/whk-recipe-configuration
+cd backend
 npx prisma generate
 
 # Generate GraphQL types (if applicable)

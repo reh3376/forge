@@ -95,31 +95,31 @@ const FILE_MAPPINGS = {
   'recipe-search-implementation.ts': 'docs/features/recipe-management/search-implementation.md',
   
   // Permission/grants analysis scripts
-  'apps/whk-recipe-configuration/analyze-grants.js': 'scripts/database/analysis/analyze-grants.js',
-  'apps/whk-recipe-configuration/debug-permissions.js': 'scripts/testing/auth/debug-permissions.js',
-  'apps/whk-recipe-configuration/test-permissions-simple.js': 'scripts/testing/auth/test-permissions-simple.js',
-  'apps/whk-recipe-configuration/test-roles-complete.js': 'scripts/testing/auth/test-roles-complete.js',
-  'apps/whk-recipe-configuration/test-all-roles.js': 'scripts/testing/auth/test-all-roles.js',
-  'apps/whk-recipe-configuration/migrate-to-optimized-grants.js': 'scripts/database/migration/migrate-to-optimized-grants.js',
-  'apps/whk-recipe-configuration/verify-grants-system.js': 'scripts/database/analysis/verify-grants-system.js',
-  'apps/whk-recipe-configuration/rollback-grants-system.js': 'scripts/database/migration/rollback-grants-system.js',
-  'apps/whk-recipe-configuration/fix-optimization.js': 'scripts/database/migration/fix-optimization.js',
-  'apps/whk-recipe-configuration/generate-optimized-grants.js': 'scripts/database/analysis/generate-optimized-grants.js',
-  'apps/whk-recipe-configuration/verify-fixed-optimization.js': 'scripts/database/analysis/verify-fixed-optimization.js',
-  'apps/whk-recipe-configuration/verify-optimization.js': 'scripts/database/analysis/verify-optimization.js',
+  'backend/analyze-grants.js': 'scripts/database/analysis/analyze-grants.js',
+  'backend/debug-permissions.js': 'scripts/testing/auth/debug-permissions.js',
+  'backend/test-permissions-simple.js': 'scripts/testing/auth/test-permissions-simple.js',
+  'backend/test-roles-complete.js': 'scripts/testing/auth/test-roles-complete.js',
+  'backend/test-all-roles.js': 'scripts/testing/auth/test-all-roles.js',
+  'backend/migrate-to-optimized-grants.js': 'scripts/database/migration/migrate-to-optimized-grants.js',
+  'backend/verify-grants-system.js': 'scripts/database/analysis/verify-grants-system.js',
+  'backend/rollback-grants-system.js': 'scripts/database/migration/rollback-grants-system.js',
+  'backend/fix-optimization.js': 'scripts/database/migration/fix-optimization.js',
+  'backend/generate-optimized-grants.js': 'scripts/database/analysis/generate-optimized-grants.js',
+  'backend/verify-fixed-optimization.js': 'scripts/database/analysis/verify-fixed-optimization.js',
+  'backend/verify-optimization.js': 'scripts/database/analysis/verify-optimization.js',
   
   // Documentation from apps
-  'apps/whk-recipe-configuration/OPTIMIZED_GRANTS_IMPLEMENTATION.md': 'docs/features/authentication/optimized-grants-implementation.md',
-  'apps/whk-recipe-configuration/IMPLEMENTATION_SUMMARY.md': 'docs/features/authentication/implementation-summary.md',
-  'apps/whk-recipe-configuration/GRANTS_ANALYSIS_SUMMARY.md': 'docs/features/authentication/grants-analysis-summary.md',
-  'apps/whk-recipe-configuration/GRANTS_MIGRATION_GUIDE.md': 'docs/features/authentication/grants-migration-guide.md',
-  'apps/whk-recipe-configuration/AUDIT_RESULTS.md': 'docs/operations/monitoring/audit-results.md',
+  'backend/OPTIMIZED_GRANTS_IMPLEMENTATION.md': 'docs/features/authentication/optimized-grants-implementation.md',
+  'backend/IMPLEMENTATION_SUMMARY.md': 'docs/features/authentication/implementation-summary.md',
+  'backend/GRANTS_ANALYSIS_SUMMARY.md': 'docs/features/authentication/grants-analysis-summary.md',
+  'backend/GRANTS_MIGRATION_GUIDE.md': 'docs/features/authentication/grants-migration-guide.md',
+  'backend/AUDIT_RESULTS.md': 'docs/operations/monitoring/audit-results.md',
   
   // JWT auth test script
-  'apps/mes-ui/scripts/test-jwt-auth.js': 'scripts/testing/auth/test-jwt-auth.js',
+  'frontend/scripts/test-jwt-auth.js': 'scripts/testing/auth/test-jwt-auth.js',
   
   // Deployment scripts
-  'apps/whk-recipe-configuration/deploy.sh': 'scripts/deployment/deploy.sh'
+  'backend/deploy.sh': 'scripts/deployment/deploy.sh'
 };
 
 /**
@@ -283,8 +283,8 @@ Development tools and configurations:
 function updatePackageJsonScripts() {
   const packageJsonPaths = [
     'package.json',
-    'apps/mes-ui/package.json',
-    'apps/whk-recipe-configuration/package.json'
+    'frontend/package.json',
+    'backend/package.json'
   ];
   
   packageJsonPaths.forEach(pkgPath => {

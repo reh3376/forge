@@ -38,7 +38,7 @@ The Railway backend is pre-configured and always available. The frontend automat
 
 ### Backend Configuration in Code
 
-Available backend configurations are defined in `apps/mes-ui/config/backend.ts`:
+Available backend configurations are defined in `frontend/config/backend.ts`:
 
 | Config Name | Description | When to Use |
 |------------|-------------|-------------|
@@ -117,10 +117,10 @@ brew install ngrok
 ngrok config add-authtoken YOUR_AUTHTOKEN_HERE
 
 # Get a static domain from https://dashboard.ngrok.com/cloud-edge/domains
-# Update apps/whk-recipe-configuration/ngrok.yml with your domain
+# Update backend/ngrok.yml with your domain
 ```
 
-Edit `apps/whk-recipe-configuration/ngrok.yml`:
+Edit `backend/ngrok.yml`:
 ```yaml
 tunnels:
   whk-backend-staging:
@@ -134,7 +134,7 @@ tunnels:
 Add your ngrok and Vercel URLs to the backend `.env` file:
 
 ```bash
-# In apps/whk-recipe-configuration/.env
+# In backend/.env
 CORS_ORIGINS=http://localhost:4000,http://localhost:3000,https://your-static-domain.ngrok-free.app,https://mes-ui-staging.vercel.app
 ```
 
@@ -149,8 +149,8 @@ npm install -g vercel
 # Login to Vercel
 vercel login
 
-# Link your project (run from apps/mes-ui directory)
-cd apps/mes-ui
+# Link your project (run from frontend directory)
+cd frontend
 vercel link
 
 # Set environment variables
@@ -168,9 +168,9 @@ vercel env add NEXT_PUBLIC_API_URL
 1. Go to https://vercel.com/dashboard
 2. Import your GitHub repository
 3. Configure project:
-   - **Root Directory**: `apps/mes-ui`
+   - **Root Directory**: `frontend`
    - **Framework Preset**: Next.js
-   - **Build Command**: `cd ../.. && npx turbo build --filter=mes-ui`
+   - **Build Command**: `cd ../.. && npx turbo build --filter=@forge-mes/frontend`
    - **Install Command**: `cd ../.. && npm install`
 
 4. Add Environment Variables:
@@ -198,7 +198,7 @@ For automatic Vercel deployments via GitHub Actions:
    vercel token create "GitHub Actions"
 
    # Get org and project IDs
-   cd apps/mes-ui
+   cd frontend
    vercel project ls
    ```
 
@@ -318,7 +318,7 @@ pm2 restart ngrok-tunnel
 
 **Problem**: Tunnel keeps disconnecting
 - The health monitor should automatically restart ngrok
-- Check health monitor logs: `tail -f apps/whk-recipe-configuration/logs/ngrok-health.log`
+- Check health monitor logs: `tail -f backend/logs/ngrok-health.log`
 - Ensure you're using a paid ngrok plan with static domains
 
 **Problem**: "Failed to bind to port"
@@ -349,7 +349,7 @@ pm2 logs whk-backend-staging | grep -i cors
 docker ps
 
 # Restart PostgreSQL
-docker-compose -f apps/whk-recipe-configuration/docker-compose.dev.yml restart db
+docker-compose -f backend/docker-compose.dev.yml restart db
 
 # Check database is accessible
 nc -zv localhost 5432
@@ -361,7 +361,7 @@ nc -zv localhost 5432
 ```bash
 # Check build logs in Vercel dashboard
 # Or test build locally:
-cd apps/mes-ui
+cd frontend
 npm run build
 
 # Check shared library is built
@@ -399,13 +399,13 @@ If your ngrok URL changes (e.g., switching domains):
 
 1. Update ngrok config:
    ```bash
-   # Edit apps/whk-recipe-configuration/ngrok.yml
+   # Edit backend/ngrok.yml
    # Change domain: your-new-domain.ngrok-free.app
    ```
 
 2. Update backend CORS:
    ```bash
-   # Edit apps/whk-recipe-configuration/.env
+   # Edit backend/.env
    # Update CORS_ORIGINS with new ngrok URL
    ```
 
@@ -529,7 +529,7 @@ pm2 restart ngrok-tunnel
 curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"https://[^"]*"'
 
 # Deploy to Vercel manually
-cd apps/mes-ui && vercel --prod
+cd frontend && vercel --prod
 
 # View Docker services
 docker ps

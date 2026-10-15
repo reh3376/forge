@@ -8,7 +8,7 @@ Successfully integrated Daytona sandboxes into the WhiskeyHouse MES application 
 
 ### Backend (NestJS)
 
-**Location**: `apps/whk-recipe-configuration/src/daytona/`
+**Location**: `backend/src/daytona/`
 
 #### Core Components
 
@@ -39,7 +39,7 @@ Successfully integrated Daytona sandboxes into the WhiskeyHouse MES application 
 
 ### Frontend (Next.js)
 
-**Location**: `apps/mes-ui/app/developer-tools/`
+**Location**: `frontend/app/developer-tools/`
 
 #### UI Components
 
@@ -63,7 +63,7 @@ Successfully integrated Daytona sandboxes into the WhiskeyHouse MES application 
 
 ### Testing
 
-**Location**: `apps/whk-recipe-configuration/src/daytona/__tests__/`
+**Location**: `backend/src/daytona/__tests__/`
 
 - Unit tests for DaytonaService
 - Mock ConfigService for testing
@@ -72,7 +72,7 @@ Successfully integrated Daytona sandboxes into the WhiskeyHouse MES application 
 
 ### Documentation
 
-1. **Module README**: `apps/whk-recipe-configuration/src/daytona/README.md`
+1. **Module README**: `backend/src/daytona/README.md`
    - Complete API documentation
    - Usage examples (frontend & backend)
    - Configuration guide
@@ -84,7 +84,7 @@ Successfully integrated Daytona sandboxes into the WhiskeyHouse MES application 
 ## File Structure
 
 ```
-apps/whk-recipe-configuration/src/daytona/
+backend/src/daytona/
 ├── __tests__/
 │   └── daytona.service.spec.ts
 ├── dto/
@@ -100,10 +100,10 @@ apps/whk-recipe-configuration/src/daytona/
 ├── index.ts
 └── README.md
 
-apps/mes-ui/app/developer-tools/
+frontend/app/developer-tools/
 └── page.tsx
 
-apps/whk-recipe-configuration/
+backend/
 └── .env.example
 ```
 
@@ -113,7 +113,7 @@ apps/whk-recipe-configuration/
 
 ```bash
 # Install dependencies (already done)
-cd apps/whk-recipe-configuration
+cd backend
 npm install @daytonaio/sdk
 
 # Configure environment
@@ -228,8 +228,8 @@ query {
 
 ## Files Modified
 
-- `apps/whk-recipe-configuration/src/app.module.ts` - Added DaytonaModule import
-- `apps/whk-recipe-configuration/package.json` - Added @daytonaio/sdk
+- `backend/src/app.module.ts` - Added DaytonaModule import
+- `backend/package.json` - Added @daytonaio/sdk
 
 ## Integration Points
 
@@ -241,7 +241,7 @@ query {
 ## Support
 
 For issues or questions:
-1. Check module README: `apps/whk-recipe-configuration/src/daytona/README.md`
+1. Check module README: `backend/src/daytona/README.md`
 2. Review Daytona docs: https://www.daytona.io/docs
 3. Check backend logs for errors
 4. Verify environment configuration

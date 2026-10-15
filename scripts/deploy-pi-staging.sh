@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 
 readonly PI_HOST="${PI_HOST:-pi@192.168.0.108}"
 readonly REMOTE_DIR="${REMOTE_DIR:-~/whk-staging}"
-readonly APP_DIR="apps/whk-recipe-configuration"
+readonly APP_DIR="backend"
 
 # Function to print colored output
 print_info() {

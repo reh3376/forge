@@ -86,7 +86,7 @@ This explains why:
 
 #### 1.1 Remove Broken ProductionOrder Form Fields
 
-**File:** `apps/mes-ui/app/scheduling/page.tsx`
+**File:** `frontend/app/scheduling/page.tsx`
 
 **Issue:** Lines ~1976-2135 contain form sections trying to access fields that moved to ScheduleOrder:
 - "Cook & Fermenter Counts" section
@@ -101,7 +101,7 @@ This explains why:
 
 #### 1.2 Fix FutureOrderEditModal
 
-**File:** `apps/mes-ui/components/schedule/FutureOrderEditModal.tsx`
+**File:** `frontend/components/schedule/FutureOrderEditModal.tsx`
 
 **Changes:**
 1. UPDATE_PRODUCTION_ORDER mutation (lines 53-74): Remove execution tracking fields
@@ -115,7 +115,7 @@ This explains why:
 
 #### 1.3 Fix production-order-mutations
 
-**File:** `apps/mes-ui/production-order-mutations.ts`
+**File:** `frontend/production-order-mutations.ts`
 
 **Changes:**
 1. Remove fields from mutations:
@@ -131,9 +131,9 @@ This explains why:
 #### 1.4 Fix AddToSchedule Components
 
 **Files:**
-- `apps/mes-ui/components/schedule/AddToScheduleDialog.tsx`
-- `apps/mes-ui/components/schedule/AddToScheduleButton.tsx`
-- `apps/mes-ui/hooks/useAddToSchedule.ts`
+- `frontend/components/schedule/AddToScheduleDialog.tsx`
+- `frontend/components/schedule/AddToScheduleButton.tsx`
+- `frontend/hooks/useAddToSchedule.ts`
 
 **Changes:**
 - Update TypeScript interfaces to remove execution fields from ProductionOrder
@@ -142,7 +142,7 @@ This explains why:
 
 #### 1.5 Fix schedule-order-creation-workflow
 
-**File:** `apps/mes-ui/components/production/schedule-order-creation-workflow.tsx`
+**File:** `frontend/components/production/schedule-order-creation-workflow.tsx`
 
 **Changes:**
 - Lines 112, 118: Verify accessing `createdScheduleOrder.totalCooks` (should already be correct - at ScheduleOrder level)
@@ -158,7 +158,7 @@ This explains why:
 
 #### Keep Existing ProductionOrder Wizard
 
-**File:** `apps/mes-ui/components/production/production-order-wizard.tsx`
+**File:** `frontend/components/production/production-order-wizard.tsx`
 
 **Modifications:**
 - Remove execution fields from wizard: cooks, fermenters, grain weight, estimates
@@ -171,7 +171,7 @@ This explains why:
 
 #### New Component: Unscheduled Orders Panel
 
-**Create:** `apps/mes-ui/components/production/UnscheduledOrdersPanel.tsx`
+**Create:** `frontend/components/production/UnscheduledOrdersPanel.tsx`
 
 **Purpose:** Shows ProductionOrders where `scheduleOrderId` is null
 
@@ -237,7 +237,7 @@ query GetUnscheduledProductionOrders {
 
 #### Component: AddToScheduleDialog (Enhanced)
 
-**File:** `apps/mes-ui/components/schedule/AddToScheduleDialog.tsx`
+**File:** `frontend/components/schedule/AddToScheduleDialog.tsx`
 
 **Interface:**
 ```typescript
@@ -289,7 +289,7 @@ mutation CreateScheduleOrderFromProductionOrders(
 
 #### Main Scheduling Page Layout
 
-**File:** `apps/mes-ui/app/scheduling/page.tsx`
+**File:** `frontend/app/scheduling/page.tsx`
 
 **New Structure:**
 ```
@@ -594,7 +594,7 @@ interface ProductionOrderAllocationMap {
 #### New File Structure
 
 ```
-apps/mes-ui/components/
+frontend/components/
 ├── production/
 │   ├── production-order-wizard.tsx          # Create PO (specs only)
 │   ├── production-order-form.tsx            # Edit PO specs
@@ -616,7 +616,7 @@ apps/mes-ui/components/
 #### Separate Files by Entity
 
 ```
-apps/mes-ui/lib/api/
+frontend/lib/api/
 ├── production-order-queries.ts
 │   └── GET_UNSCHEDULED_ORDERS
 │   └── CREATE_PRODUCTION_ORDER
@@ -739,21 +739,21 @@ Total Distillate: 1000 PG → Split into 225 barrels
 
 ### Phase 1 (Critical Fixes)
 
-1. `apps/mes-ui/app/scheduling/page.tsx` - Remove broken forms
-2. `apps/mes-ui/components/schedule/FutureOrderEditModal.tsx` - Fix mutations
-3. `apps/mes-ui/production-order-mutations.ts` - Remove moved fields
-4. `apps/mes-ui/hooks/useAddToSchedule.ts` - Update types
-5. `apps/mes-ui/components/schedule/AddToScheduleDialog.tsx` - Fix field access
-6. `apps/mes-ui/components/schedule/AddToScheduleButton.tsx` - Update interface
-7. `apps/mes-ui/components/production/schedule-order-creation-workflow.tsx` - Fix display
+1. `frontend/app/scheduling/page.tsx` - Remove broken forms
+2. `frontend/components/schedule/FutureOrderEditModal.tsx` - Fix mutations
+3. `frontend/production-order-mutations.ts` - Remove moved fields
+4. `frontend/hooks/useAddToSchedule.ts` - Update types
+5. `frontend/components/schedule/AddToScheduleDialog.tsx` - Fix field access
+6. `frontend/components/schedule/AddToScheduleButton.tsx` - Update interface
+7. `frontend/components/production/schedule-order-creation-workflow.tsx` - Fix display
 
 ### Phase 2 (Architecture)
 
-8. `apps/mes-ui/components/production/UnscheduledOrdersPanel.tsx` - **NEW**
-9. `apps/mes-ui/components/schedule/ScheduleOrderForm.tsx` - **NEW**
-10. `apps/mes-ui/app/scheduling/page.tsx` - Refactor layout
-11. `apps/mes-ui/components/production/production-order-wizard.tsx` - Remove execution fields
-12. `apps/mes-ui/components/schedule/AddToScheduleDialog.tsx` - Enhance
+8. `frontend/components/production/UnscheduledOrdersPanel.tsx` - **NEW**
+9. `frontend/components/schedule/ScheduleOrderForm.tsx` - **NEW**
+10. `frontend/app/scheduling/page.tsx` - Refactor layout
+11. `frontend/components/production/production-order-wizard.tsx` - Remove execution fields
+12. `frontend/components/schedule/AddToScheduleDialog.tsx` - Enhance
 
 ### Phase 3 (Organization)
 

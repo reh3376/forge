@@ -18,34 +18,34 @@ Specialized agent for testing, test coverage, building, executing, and fixing te
 
 ### 1. Test Execution & Analysis
 
-**Backend Testing (apps/whk-recipe-configuration)**
+**Backend Testing (backend)**
 ```bash
 # Run all tests
-cd apps/whk-recipe-configuration && npm test
+cd backend && npm test
 
 # Run specific test file
-cd apps/whk-recipe-configuration && npm test -- path/to/test.spec.ts
+cd backend && npm test -- path/to/test.spec.ts
 
 # Run with coverage
-cd apps/whk-recipe-configuration && npm run test:cov
+cd backend && npm run test:cov
 
 # Watch mode
-cd apps/whk-recipe-configuration && npm run test:watch
+cd backend && npm run test:watch
 ```
 
-**Frontend Testing (apps/mes-ui)**
+**Frontend Testing (frontend)**
 ```bash
 # Unit/Integration tests
-cd apps/mes-ui && npm test
+cd frontend && npm test
 
 # E2E tests with Playwright
-cd apps/mes-ui && npm run test:e2e
+cd frontend && npm run test:e2e
 
 # E2E with UI
-cd apps/mes-ui && npm run test:e2e:ui
+cd frontend && npm run test:e2e:ui
 
 # Coverage
-cd apps/mes-ui && npm run test:coverage
+cd frontend && npm run test:coverage
 ```
 
 **Monorepo-wide**
@@ -154,7 +154,7 @@ describe('ProductionOrderWizard', () => {
 
 **E2E Tests (Playwright):**
 ```typescript
-// apps/mes-ui/tests/production-orders.spec.ts
+// frontend/tests/production-orders.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('create production order flow', async ({ page }) => {
@@ -172,7 +172,7 @@ test('create production order flow', async ({ page }) => {
 **Backend Seeding:**
 ```bash
 # Use existing seed infrastructure
-cd apps/whk-recipe-configuration
+cd backend
 
 # Interactive seed (choose what to seed)
 npm run seed:interactive
@@ -260,7 +260,7 @@ const mockMqttClient = {
 ### 7. Test Infrastructure Setup
 
 **Backend Test Config (Jest):**
-- Config in `apps/whk-recipe-configuration/package.json`
+- Config in `backend/package.json`
 - Uses `ts-jest` preset
 - Test environment: `node`
 - Module path mapping for custom validators
@@ -274,7 +274,7 @@ const mockMqttClient = {
 ```bash
 # Watch mode during development
 make dev  # In one terminal
-cd apps/whk-recipe-configuration && npm run test:watch  # In another
+cd backend && npm run test:watch  # In another
 ```
 
 ### 8. Test Coverage Improvement Strategy
@@ -335,17 +335,17 @@ cd apps/whk-recipe-configuration && npm run test:watch  # In another
 ## Key Files & Locations
 
 **Backend Tests:**
-- Test files: `apps/whk-recipe-configuration/src/**/*.spec.ts`
-- E2E tests: `apps/whk-recipe-configuration/test/**/*.e2e-spec.ts`
-- Test utilities: `apps/whk-recipe-configuration/test/utils/`
+- Test files: `backend/src/**/*.spec.ts`
+- E2E tests: `backend/test/**/*.e2e-spec.ts`
+- Test utilities: `backend/test/utils/`
 
 **Frontend Tests:**
-- Component tests: `apps/mes-ui/src/**/*.test.tsx`
-- E2E tests: `apps/mes-ui/tests/**/*.spec.ts`
-- Test setup: `apps/mes-ui/jest.config.js`, `playwright.config.ts`
+- Component tests: `frontend/src/**/*.test.tsx`
+- E2E tests: `frontend/tests/**/*.spec.ts`
+- Test setup: `frontend/jest.config.js`, `playwright.config.ts`
 
 **Shared Tests:**
-- `apps/shared/src/**/*.test.ts`
+- `shared/src/**/*.test.ts`
 
 ## Best Practices
 

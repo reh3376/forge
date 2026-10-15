@@ -28,55 +28,55 @@ dev:            ## Start all applications in development mode with Turbo
 	npx turbo dev
 
 dev-backend:    ## Start only backend (NestJS) in development mode
-	npx turbo dev --filter=whk-recipe-configuration
+	npx turbo dev --filter=@forge-mes/backend
 
 dev-frontend:   ## Start only frontend (Next.js) in development mode
-	npx turbo dev --filter=mes-ui
+	npx turbo dev --filter=@forge-mes/frontend
 
 dev-shared:     ## Start only shared library in development mode
-	npx turbo dev --filter=shared
+	npx turbo dev --filter=@forge-mes/shared
 
 ## Build Commands
 build:          ## Build all applications for production with Turbo
 	npx turbo build
 
 build-backend:  ## Build only backend for production
-	npx turbo build --filter=whk-recipe-configuration
+	npx turbo build --filter=@forge-mes/backend
 
 build-frontend: ## Build only frontend for production
-	npx turbo build --filter=mes-ui
+	npx turbo build --filter=@forge-mes/frontend
 
 build-shared:   ## Build only shared library for production
-	npx turbo build --filter=shared
+	npx turbo build --filter=@forge-mes/shared
 
 ## Production Start Commands
 start:          ## Start all applications in production mode with Turbo
 	npx turbo start
 
 start-backend:  ## Start only backend in production mode
-	npx turbo start --filter=whk-recipe-configuration
+	npx turbo start --filter=@forge-mes/backend
 
 start-frontend: ## Start only frontend in production mode
-	npx turbo start --filter=mes-ui
+	npx turbo start --filter=@forge-mes/frontend
 
 start-shared:   ## Start only shared library in production mode
-	npx turbo start --filter=shared
+	npx turbo start --filter=@forge-mes/shared
 
 ## Testing Commands
 test:           ## Run tests for all applications with Turbo
 	npx turbo test
 
 test-backend:   ## Run backend unit tests
-	npx turbo test --filter=whk-recipe-configuration
+	npx turbo test --filter=@forge-mes/backend
 
 test-frontend:  ## Run frontend tests
-	npx turbo test --filter=mes-ui
+	npx turbo test --filter=@forge-mes/frontend
 
 test-shared:    ## Run shared library tests
-	npx turbo test --filter=shared
+	npx turbo test --filter=@forge-mes/shared
 
 test-e2e:       ## Run frontend E2E tests
-	npx turbo test:e2e --filter=mes-ui
+	npx turbo test:e2e --filter=@forge-mes/frontend
 
 ## Code Quality Commands
 lint:           ## Lint all applications with Turbo
@@ -90,7 +90,7 @@ format:         ## Format code with Prettier in all applications
 
 ## Database Commands
 db-dev:         ## Start development databases (PostgreSQL, Redis, etc.)
-	cd apps/whk-recipe-configuration && docker compose -f docker-compose.dev.yml up -d
+	cd backend && docker compose -f docker-compose.dev.yml up -d
 
 db-init:        ## Initialize database with migrations and seed data
 	npm run db:migrate && npm run db:seed
@@ -108,10 +108,10 @@ db-studio:      ## Open Prisma Studio
 	npm run db:studio
 
 restart-db:     ## Restart development databases
-	cd apps/whk-recipe-configuration && docker compose -f docker-compose.dev.yml down && docker compose -f docker-compose.dev.yml up -d
+	cd backend && docker compose -f docker-compose.dev.yml down && docker compose -f docker-compose.dev.yml up -d
 
 stop-db:        ## Stop development databases
-	cd apps/whk-recipe-configuration && docker compose -f docker-compose.dev.yml down
+	cd backend && docker compose -f docker-compose.dev.yml down
 
 prisma-generate: ## Generate Prisma client
 	npm run prisma:generate
@@ -154,9 +154,9 @@ ports:          ## Check which processes are using our ports
 logs:           ## Show recent logs from applications
 	@echo "Use 'make dev' to start applications with visible logs"
 	@echo "Or check individual app logs:"
-	@echo "  Backend:  turbo dev --filter=whk-recipe-configuration"
-	@echo "  Frontend: turbo dev --filter=mes-ui"
-	@echo "  Shared:   turbo dev --filter=shared"
+	@echo "  Backend:  turbo dev --filter=@forge-mes/backend"
+	@echo "  Frontend: turbo dev --filter=@forge-mes/frontend"
+	@echo "  Shared:   turbo dev --filter=@forge-mes/shared"
 
 ## Turborepo Commands
 turbo-cache:    ## Clear Turborepo cache

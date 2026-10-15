@@ -1,0 +1,53 @@
+# Use Node.js 20 on Alpine Linux
+FROM node:20-alpine
+
+# Install OpenSSL and other required packages for Prisma and native module compilation
+RUN apk add --no-cache \
+    openssl \
+    libc6-compat \
+    curl \
+    python3 \
+    make \
+    g++
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY shared/package*.json ./shared/
+COPY backend/package*.json ./backend/
+
+# Install dependencies
+RUN npm ci --include=dev
+
+# Copy shared package source
+COPY shared/ ./shared/
+
+# Build shared package
+RUN cd shared && npm run build
+
+# Copy backend source
+COPY backend/ ./backend/
+
+# Rebuild native dependencies for Alpine Linux
+RUN cd backend && npm rebuild bcrypt --build-from-source
+
+# Generate Prisma client
+RUN cd backend && npx prisma generate
+
+# Build the application
+RUN cd backend && npm run build
+
+# Set working directory to the app
+WORKDIR /app/backend
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Start the application
+CMD ["npm", "run", "start:dev:debug"] 

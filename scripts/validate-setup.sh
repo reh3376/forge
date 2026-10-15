@@ -61,9 +61,9 @@ fi
 # Project Structure
 echo -e "\n${BLUE}📁 Project Structure${NC}"
 test_check "Root package.json exists" "test -f package.json"
-test_check "Backend directory exists" "test -d apps/whk-recipe-configuration"
-test_check "Frontend directory exists" "test -d apps/mes-ui"
-test_check "Prisma schema exists" "test -f apps/whk-recipe-configuration/prisma/schema.prisma"
+test_check "Backend directory exists" "test -d backend"
+test_check "Frontend directory exists" "test -d frontend"
+test_check "Prisma schema exists" "test -f backend/prisma/schema.prisma"
 
 # Environment Configuration
 echo -e "\n${BLUE}⚙️ Environment Configuration${NC}"
@@ -110,14 +110,14 @@ test_check "RabbitMQ Management" "curl -f http://localhost:15673"
 
 # Database Connectivity
 echo -e "\n${BLUE}🗄️ Database Connectivity${NC}"
-test_check "Prisma client generated" "test -d apps/whk-recipe-configuration/node_modules/.prisma"
-test_check "Database connection" "cd apps/whk-recipe-configuration && npx prisma db execute --stdin <<< 'SELECT 1;'"
+test_check "Prisma client generated" "test -d backend/node_modules/.prisma"
+test_check "Database connection" "cd backend && npx prisma db execute --stdin <<< 'SELECT 1;'"
 
 # Dependencies
 echo -e "\n${BLUE}📚 Dependencies${NC}"
 test_check "Root dependencies installed" "test -d node_modules"
-test_check "Backend dependencies installed" "test -d apps/whk-recipe-configuration/node_modules"
-test_check "Frontend dependencies installed" "test -d apps/mes-ui/node_modules"
+test_check "Backend dependencies installed" "test -d backend/node_modules"
+test_check "Frontend dependencies installed" "test -d frontend/node_modules"
 
 # Development Tools
 echo -e "\n${BLUE}🛠️ Development Tools${NC}"

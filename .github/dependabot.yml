@@ -6,14 +6,14 @@
 version: 2
 updates:
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/apps/whk-recipe-configuration/" # Location of package manifests
+    directory: "/backend/" # Location of package manifests
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
   # Enable version updates for Docker
   - package-ecosystem: "docker"
     # Look for a `Dockerfile` in the `root` directory
-    directory: "/apps/whk-recipe-configuration/"
+    directory: "/backend/"
     # Check for updates once a week
     schedule:
       interval: "weekly"

@@ -19,18 +19,18 @@ whk-recipe-configuration/
 
 This monorepo contains the following workspaces:
 
-1. **Backend (`@whk/backend`)**
-   - Located in `apps/whk-recipe-configuration`
+1. **Backend (`@forge-mes/backend`)**
+   - Located in `backend`
    - NestJS application with GraphQL support
    - Uses Prisma for database access
 
-2. **Frontend (`@whk/frontend`)**
-   - Located in `apps/mes-ui`
+2. **Frontend (`@forge-mes/frontend`)**
+   - Located in `frontend`
    - Next.js application with React
    - Uses Apollo Client for GraphQL
 
-3. **Shared (`@whk/shared`)**
-   - Located in `apps/shared`
+3. **Shared (`@forge-mes/shared`)**
+   - Located in `shared`
    - Contains shared types, utilities, and constants
    - Used by both frontend and backend
 
@@ -110,10 +110,10 @@ To import from the shared package, use the following import syntax:
 
 ```typescript
 // In backend
-import { formatDate, API_ENDPOINTS } from '@whk/shared';
+import { formatDate, API_ENDPOINTS } from '@forge-mes/shared';
 
 // In frontend
-import { formatDate, API_ENDPOINTS } from '@whk/shared';
+import { formatDate, API_ENDPOINTS } from '@forge-mes/shared';
 ```
 
 ### Adding Dependencies
@@ -122,15 +122,15 @@ When adding dependencies, make sure to add them to the correct workspace:
 
 ```bash
 # Add dependency to backend
-cd apps/whk-recipe-configuration
+cd backend
 npm install some-package
 
 # Add dependency to frontend
-cd apps/mes-ui
+cd frontend
 npm install some-package
 
 # Add dependency to shared
-cd apps/shared
+cd shared
 npm install some-package
 ```
 
@@ -152,7 +152,7 @@ The monorepo is configured for CI/CD using GitHub Actions. The workflows are loc
 
 ## Further Documentation
 
-- [Backend Documentation](./apps/whk-recipe-configuration/README.md)
-- [Frontend Documentation](./apps/mes-ui/README.md)
+- [Backend Documentation](./backend/README.md)
+- [Frontend Documentation](./frontend/README.md)
 - [API Documentation](./docs/api/README.md)
 - [Architecture Documentation](./docs/architecture/README.md) 

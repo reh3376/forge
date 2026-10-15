@@ -21,7 +21,7 @@ set -e
 readonly NGROK_API_URL="http://localhost:4040/api/tunnels"
 readonly CHECK_INTERVAL=30  # seconds between health checks
 readonly TIMEOUT=10         # curl timeout in seconds
-readonly LOG_FILE="apps/whk-recipe-configuration/logs/ngrok-health.log"
+readonly LOG_FILE="backend/logs/ngrok-health.log"
 readonly MAX_FAILURES=3     # failures before restart
 readonly BACKOFF_MAX=300    # max backoff time in seconds
 

@@ -33,7 +33,7 @@ jobs:
         run: |
           curl -X PUT \
           "$COMPASS_API_URL" \
-          -F file=@./apps/whk-recipe-configuration/openapi.json \
+          -F file=@./backend/openapi.json \
           --user "$COMPASS_EMAIL:$COMPASS_API_TOKEN"
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -65,8 +65,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
-          context: ./apps/whk-recipe-configuration
-          file: ./apps/whk-recipe-configuration/Dockerfile
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -8,7 +8,7 @@
 
 set -e
 
-cd "$(dirname "$0")/../apps/mes-ui"
+cd "$(dirname "$0")/../frontend"
 
 echo "Setting up Vercel environment variables for staging..."
 

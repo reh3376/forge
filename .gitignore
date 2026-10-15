@@ -91,10 +91,10 @@ node_modules/
 
 # Build artifacts
 dist/
-apps/shared/dist/
+shared/dist/
 
 # Playwright
-apps/mes-ui/test-results/
+frontend/test-results/
 playwright-report/
 playwright/.cache/
 
@@ -107,3 +107,15 @@ playwright/.cache/
 # tasks/ 
 .vercel
 .claude/settings.local.json
+
+# Forge MES module hygiene (added during migration into forge)
+.turbo/
+playwright-report/
+test-results/
+*.dump
+.cache_ggshield
+.setup-complete
+.env.staging
+.env.*.preview
+.vercel/
+.jira/

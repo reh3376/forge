@@ -225,18 +225,18 @@ make test-frontend
 make test-e2e
 
 # Generate coverage
-cd apps/whk-recipe-configuration && npm run test:cov
-cd apps/mes-ui && npm run test:coverage
+cd backend && npm run test:cov
+cd frontend && npm run test:coverage
 
 # Interactive seed for test data
-cd apps/whk-recipe-configuration && npm run seed:interactive
+cd backend && npm run seed:interactive
 ```
 
 ### Architecture Agent Commands
 ```bash
 # Start infrastructure
 make db-dev  # PostgreSQL, Redis
-docker compose -f apps/whk-recipe-configuration/docker-compose.dev.yml up -d
+docker compose -f backend/docker-compose.dev.yml up -d
 
 # View RabbitMQ Management
 # http://localhost:15672 (guest/guest)
@@ -254,14 +254,14 @@ curl http://localhost:3000/health
 make dev-frontend
 
 # Run Storybook (if configured)
-cd apps/mes-ui && npm run storybook
+cd frontend && npm run storybook
 
 # Build for production
 make build-frontend
 
 # Run Playwright tests
 make test-e2e
-cd apps/mes-ui && npm run test:e2e:ui
+cd frontend && npm run test:e2e:ui
 ```
 
 ### Requirements Agent Commands
@@ -273,7 +273,7 @@ npm run docs:generate
 make db-studio
 
 # Generate ERD
-cd apps/whk-recipe-configuration && npm run docs:erd
+cd backend && npm run docs:erd
 ```
 
 ---

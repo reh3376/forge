@@ -40,7 +40,7 @@ NEXT_PUBLIC_AZURE_AUTHORITY = https://login.microsoftonline.com/[tenant-id]
 #### C. Update Build Settings (if needed)
 - **Settings** → **General** → **Build & Development Settings**
 - Framework Preset: **Next.js**
-- Root Directory: `apps/mes-ui`
+- Root Directory: `frontend`
 - Build Command: (leave default or set to `npm run build`)
 - Install Command: (leave default or set to `npm install`)
 
@@ -82,7 +82,7 @@ ngrok config add-authtoken 2gylqYV8cosnj0IWt2P4tmnYlQO_4yzreDKHHggvpVTYiEPMj
 
 #### D. Start ngrok Tunnel
 ```bash
-cd ~/whk-staging/apps/whk-recipe-configuration
+cd ~/whk-staging/backend
 ngrok start whk-backend-staging --config ./ngrok.yml --log stdout
 ```
 
@@ -101,7 +101,7 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/home/pi/whk-staging/apps/whk-recipe-configuration
+WorkingDirectory=/home/pi/whk-staging/backend
 ExecStart=/usr/bin/ngrok start whk-backend-staging --config ./ngrok.yml --log stdout
 Restart=always
 RestartSec=10
@@ -168,7 +168,7 @@ curl https://staging.whiskeyhouse.ngrok.dev/health
 ### Deploy Frontend Updates
 ```bash
 git checkout mes-preview
-# Make changes to apps/mes-ui
+# Make changes to frontend
 git add .
 git commit -m "feat: your changes"
 git push origin mes-preview
