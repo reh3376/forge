@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any
 
 from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
 from forge.modules.ot.control.audit import (
+    ContextualRecordAuditSink,
     LogAuditSink,
     MqttAuditSink,
     WriteAuditLogger,
@@ -45,6 +46,7 @@ from forge.modules.ot.control.recipe_integration import RecipeWriteAdapter
 from forge.modules.ot.control.validation import WriteValidator
 from forge.modules.ot.control.write_engine import ControlWriteEngine
 from forge.modules.ot.mqtt.ingress import ExternalBrokerIngress, LocalBrokerIngress
+from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
 from forge.modules.ot.mqtt.subscriber import MqttSubscriber
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import MemoryTag, StandardTag
@@ -167,6 +169,8 @@ class ControlDependencies:
     plc_provider_factory: Callable[..., Any] | None = None
     #: Test hook: ``ingress_factory(settings, subscriber, broker)`` → ingress or None.
     ingress_factory: Callable[..., Any] | None = None
+    #: Test hook for the external-mode publisher: ``factory(MqttConfig)`` → client.
+    mqtt_client_factory: Callable[..., Any] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -236,6 +240,35 @@ class ControlRuntime:
         self.audit = WriteAuditLogger()
         if config.audit_log:
             self.audit.add_sink(LogAuditSink())
+        # Every control write result becomes a ContextualRecord in the hub store (FB-066).
+        self.record_audit: ContextualRecordAuditSink | None = None
+        if deps.record_sink is not None:
+            self.record_audit = ContextualRecordAuditSink(
+                deps.record_sink, site=config.site, now=deps.now
+            )
+            self.audit.add_sink(self.record_audit)
+        # Own publisher for ``mqtt.mode == "external"`` (FB-067); local mode publishes
+        # straight into the embedded broker.
+        self.publisher: OTMqttPublisher | None = None
+        if deps.publisher is None and config.mqtt.mode == "external":
+            mqtt = config.mqtt
+            self.publisher = OTMqttPublisher(
+                MqttConfig(
+                    host=mqtt.host,
+                    port=mqtt.port,
+                    username=mqtt.username,
+                    password=mqtt.password,
+                    client_id=f"{mqtt.client_id}-pub",
+                    use_tls=mqtt.use_tls,
+                    ca_certs=mqtt.ca_certs,
+                    certfile=mqtt.certfile,
+                    keyfile=mqtt.keyfile,
+                    reconnect_min_delay=mqtt.reconnect_min_delay,
+                    reconnect_max_delay=mqtt.reconnect_max_delay,
+                    broker_mode="external",
+                    _client_factory=deps.mqtt_client_factory,
+                )
+            )
         self.engine.add_listener(self.audit)
         self.audit_query = WriteAuditQuery(self.engine)
 
@@ -314,22 +347,12 @@ class ControlRuntime:
         if self._owns_broker and self._broker is not None and not self._broker.is_started:
             await self._broker.start()
             logger.info("Embedded MQTT broker started for the OT control runtime")
-        if (
-            self._deps.publisher is None
-            and self._broker is not None
-            and self._config.mqtt.publish_audit
-        ):
+        if self.publisher is not None:
+            await self.publisher.start()
+        target = self._publish_target()
+        if target is not None and self._config.mqtt.publish_audit:
             self.audit.add_sink(
-                MqttAuditSink(
-                    self._broker, topic_prefix=f"{self._config.topic_root}/{self._config.site}"
-                )
-            )
-        elif self._deps.publisher is not None and self._config.mqtt.publish_audit:
-            self.audit.add_sink(
-                MqttAuditSink(
-                    self._deps.publisher,
-                    topic_prefix=f"{self._config.topic_root}/{self._config.site}",
-                )
+                MqttAuditSink(target, topic_prefix=f"{self._config.topic_root}/{self._config.site}")
             )
         if self.orchestrator is not None:
             self.ingress = self._build_ingress()
@@ -376,10 +399,19 @@ class ControlRuntime:
             await self._broker.stop()
             self._broker = None
             self._owns_broker = False
+        if self.publisher is not None:
+            await self.publisher.stop()
         if self.connections is not None:
             await self.connections.stop()
 
     # -- feeding and publishing -----------------------------------------------
+
+    def _publish_target(self) -> Any | None:
+        if self._deps.publisher is not None:
+            return self._deps.publisher
+        if self.publisher is not None:
+            return self.publisher
+        return self._broker
 
     async def _on_cip_state(self, area: str, payload: dict[str, Any]) -> None:
         topic = self._config.topic(area, "equipment", "cipState")
@@ -393,8 +425,8 @@ class ControlRuntime:
         qos: int = 1,
         retain: bool = False,
     ) -> bool:
-        """Publish through the injected publisher or the embedded broker."""
-        target = self._deps.publisher if self._deps.publisher is not None else self._broker
+        """Publish through the injected publisher, our external publisher or the broker."""
+        target = self._publish_target()
         if target is None:
             logger.debug("No MQTT publisher; dropping %s", topic)
             return False
@@ -421,6 +453,8 @@ class ControlRuntime:
                 "connected": False,
             },
             "broker": self._broker.get_status() if self._broker is not None else None,
+            "publisher": self.publisher.get_status() if self.publisher is not None else None,
+            "audit_records": self.record_audit.records_written if self.record_audit else 0,
             "subscriber": self.subscriber.get_stats(),
             "engine": self.engine.get_stats(),
             "cip": self.cip_runner.status() if self.cip_runner is not None else {},

@@ -24,6 +24,7 @@
       "request_timeout_ms": 10000,
       "reconnect_interval_ms": 2000,
       "max_reconnect_attempts": 0,
+      "liveness_interval_seconds": 30,
       "enabled": true
     }
   ],

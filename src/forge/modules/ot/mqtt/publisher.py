@@ -23,12 +23,16 @@ Design decisions:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
 from collections import deque
-from dataclasses import dataclass, field
-from typing import Any, Callable
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +76,11 @@ class MqttConfig:
     # Reference to embedded broker (set when broker_mode="local")
     # This is a runtime reference, not a config value.
     _broker: Any = None
+
+    # External mode test hook: ``factory(config)`` → object with
+    # ``connect()``, ``disconnect()`` and ``publish(topic, payload, qos=, retain=)``.
+    # Runtime reference, not a config value (FB-067).
+    _client_factory: Any = None
 
     # Will message (last will and testament)
     will_topic: str = ""
@@ -193,10 +202,8 @@ class OTMqttPublisher:
 
         if self._reconnect_task and not self._reconnect_task.done():
             self._reconnect_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._reconnect_task
-            except asyncio.CancelledError:
-                pass
 
         await self._disconnect()
         logger.info("MQTT publisher stopped")
@@ -410,12 +417,85 @@ class _StubMqttClient:
         })
 
 
+class _AiomqttClient:
+    """External broker transport over ``aiomqtt.Client`` (FB-067).
+
+    aiomqtt connects inside its async context manager, so ``connect`` enters
+    it and ``disconnect`` exits it; the publisher's reconnect loop drives
+    both. ``aiomqtt`` is imported here, not at module load.
+    """
+
+    def __init__(self, config: MqttConfig) -> None:
+        self._config = config
+        self._client: Any = None
+
+    @property
+    def is_connected(self) -> bool:
+        return self._client is not None
+
+    def _build(self) -> Any:
+        try:
+            import aiomqtt
+        except ImportError as exc:
+            msg = "broker_mode='external' needs aiomqtt (pip install 'forge-platform[ot]')"
+            raise RuntimeError(msg) from exc
+        config = self._config
+        kwargs: dict[str, Any] = {
+            "hostname": config.host,
+            "port": config.port,
+            "username": config.username or None,
+            "password": config.password or None,
+            "identifier": config.client_id,
+            "keepalive": config.keepalive,
+        }
+        if config.use_tls:
+            kwargs["tls_params"] = aiomqtt.TLSParameters(
+                ca_certs=config.ca_certs or None,
+                certfile=config.certfile or None,
+                keyfile=config.keyfile or None,
+            )
+        if config.will_topic:
+            kwargs["will"] = aiomqtt.Will(
+                config.will_topic,
+                payload=config.will_payload.encode("utf-8"),
+                qos=config.will_qos,
+                retain=config.will_retain,
+            )
+        return aiomqtt.Client(**kwargs)
+
+    async def connect(self) -> None:
+        if self._client is not None:
+            return
+        client = self._build()
+        await client.__aenter__()
+        self._client = client
+
+    async def disconnect(self) -> None:
+        client, self._client = self._client, None
+        if client is not None:
+            await client.__aexit__(None, None, None)
+
+    async def publish(
+        self,
+        topic: str,
+        payload: bytes,
+        qos: int = 0,
+        retain: bool = False,
+    ) -> None:
+        if self._client is None:
+            raise ConnectionError("Not connected")
+        await self._client.publish(topic, payload, qos=qos, retain=retain)
+
+
 def _create_mqtt_client(config: MqttConfig) -> Any:
     """Create an MQTT client based on broker_mode.
 
     Modes:
         "local"    — uses LocalMqttClient for in-process broker (zero-copy)
-        "external" — uses aiomqtt for TCP connection to external broker
+        "external" — aiomqtt TCP client to an external broker (or the
+                     injected ``_client_factory``); raises when aiomqtt is
+                     missing so the failure is visible instead of publishing
+                     into a stub
         "stub"     — uses in-memory stub for testing
     """
     if config.broker_mode == "local" and config._broker is not None:
@@ -424,14 +504,9 @@ def _create_mqtt_client(config: MqttConfig) -> Any:
         return LocalMqttClient(config._broker, client_id=config.client_id)
 
     if config.broker_mode == "external":
-        try:
-            import aiomqtt  # noqa: F401
-            # Production path — create real aiomqtt client
-            logger.info("aiomqtt available but using stub for initial development")
-            return _StubMqttClient()
-        except ImportError:
-            logger.warning("aiomqtt not installed, falling back to stub MQTT client")
-            return _StubMqttClient()
+        if config._client_factory is not None:
+            return config._client_factory(config)
+        return _AiomqttClient(config)
 
     # Default: stub mode
     logger.debug("Using stub MQTT client (mode=%s)", config.broker_mode)

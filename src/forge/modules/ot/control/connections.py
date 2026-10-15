@@ -50,6 +50,8 @@ ClientFactory = Callable[["PlcConnectionSpec"], Any]
 ProviderFactory = Callable[[str, "TagRegistry", Any, PathNormalizer], Any]
 
 DEFAULT_RETRY_MAX_SECONDS = 60.0
+#: ``Server_ServerStatus_CurrentTime`` — every OPC-UA server has it (FB-070).
+LIVENESS_NODE = "i=2258"
 
 
 def default_client_factory(spec: PlcConnectionSpec) -> Any:
@@ -102,6 +104,9 @@ class _Entry:
     next_retry_at: datetime | None = None
     last_connection_state: ConnectionState | None = None
     resubscribes: int = 0
+    last_probe_at: datetime | None = None
+    probes: int = 0
+    probe_failures: int = 0
 
 
 class PlcConnectionManager:
@@ -255,10 +260,42 @@ class PlcConnectionManager:
                 except Exception as exc:
                     entry.last_error = f"resubscribe failed: {exc}"
                     actions.append(f"{name}: {entry.last_error}")
+            elif (
+                provider.state == ProviderState.RUNNING
+                and state == ConnectionState.CONNECTED
+                and self._probe_due(entry, now)
+            ):
+                probe = await self._probe(entry, now)
+                if probe is not None:
+                    actions.append(probe)
             entry.last_connection_state = self._connection_state(entry)
         for action in actions:
             logger.info("PLC supervisor: %s", action)
         return actions
+
+    def _probe_due(self, entry: _Entry, now: datetime) -> bool:
+        interval = entry.spec.liveness_interval_seconds
+        if interval <= 0:
+            return False
+        if entry.last_probe_at is None:
+            return True
+        return (now - entry.last_probe_at).total_seconds() >= interval
+
+    async def _probe(self, entry: _Entry, now: datetime) -> str | None:
+        """Read the server clock; a failure means the session is dead (FB-070)."""
+        entry.probes += 1
+        entry.last_probe_at = now
+        timeout = max(entry.spec.request_timeout_ms / 1000.0, 0.1)
+        try:
+            await asyncio.wait_for(entry.client.read([LIVENESS_NODE]), timeout=timeout)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            entry.probe_failures += 1
+            entry.last_error = f"liveness probe failed: {type(exc).__name__}: {exc}"
+            logger.warning("PLC %s unresponsive: %s", entry.spec.name, entry.last_error)
+            return await self._restart(entry, reason="unresponsive")
+        return None
 
     async def restart(self, name: str) -> dict[str, Any]:
         """Operator-requested restart of one connection; returns its status."""
@@ -350,6 +387,9 @@ class PlcConnectionManager:
             "restarts": entry.restarts,
             "failures": entry.failures,
             "resubscribes": entry.resubscribes,
+            "probes": entry.probes,
+            "probe_failures": entry.probe_failures,
+            "last_probe_at": entry.last_probe_at.isoformat() if entry.last_probe_at else None,
             "last_error": entry.last_error,
             "next_retry_at": entry.next_retry_at.isoformat() if entry.next_retry_at else None,
         }

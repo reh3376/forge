@@ -10,10 +10,14 @@ Replaces ``InMemoryServicer`` in the hub API. Differences:
 * A malformed or contradictory record is counted and reported, never
   allowed to abort the stream and force the spoke to resend good records.
 * ``Health`` reports rejected and failed counts; ``Stop`` flushes first.
+* Registration and health callbacks may be coroutines (the durable
+  registry persists them, FB-060) and every flushed batch is reported to
+  ``ingest_log`` for ``forge_core.records_log``.
 """
 
 from __future__ import annotations
 
+import inspect
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -34,6 +38,13 @@ if TYPE_CHECKING:
     from forge.transport.spoke_callback import WriteDispatcher
 
 logger = logging.getLogger(__name__)
+
+
+async def _maybe_await(result: Any) -> Any:
+    """Callbacks may be plain functions or coroutine functions."""
+    if inspect.isawaitable(result):
+        return await result
+    return result
 
 
 @dataclass
@@ -63,9 +74,10 @@ class HubIngestServicer(AdapterServiceServicer):
         batch_size: int = 100,
         specs_dir: Path | None = None,
         require_facts: bool = False,
-        on_registered: Callable[[AdapterManifest], None] | None = None,
-        on_health: Callable[[str, AdapterHealth], None] | None = None,
+        on_registered: Callable[[AdapterManifest], Any] | None = None,
+        on_health: Callable[[str, AdapterHealth], Any] | None = None,
         write_dispatcher: WriteDispatcher | None = None,
+        ingest_log: Callable[[str, str, IngestOutcome], Any] | None = None,
     ) -> None:
         super().__init__()
         self.pipeline = pipeline if pipeline is not None else IngestPipeline()
@@ -75,6 +87,7 @@ class HubIngestServicer(AdapterServiceServicer):
         self._require_facts = require_facts
         self._on_registered = on_registered
         self._on_health = on_health
+        self._ingest_log = ingest_log
         self._state: dict[str, SessionIngestState] = {}
 
     # -- control plane --------------------------------------------------------
@@ -93,7 +106,7 @@ class HubIngestServicer(AdapterServiceServicer):
         self._state[session_id] = SessionIngestState(facts=check)
         if self._on_registered is not None:
             try:
-                self._on_registered(manifest)
+                await _maybe_await(self._on_registered(manifest))
             except Exception:  # pragma: no cover - callback is best effort
                 logger.exception("on_registered callback failed for %s", manifest.adapter_id)
         result["message"] = check.summary()
@@ -142,7 +155,7 @@ class HubIngestServicer(AdapterServiceServicer):
         )
         if self._on_health is not None:
             try:
-                self._on_health(adapter_id, health)
+                await _maybe_await(self._on_health(adapter_id, health))
             except Exception:  # pragma: no cover - callback is best effort
                 logger.exception("on_health callback failed for %s", adapter_id)
         return pydantic_to_proto(health)
@@ -207,6 +220,11 @@ class HubIngestServicer(AdapterServiceServicer):
         self._merge_stream(state.stream, outcome)
         if outcome.errors:
             state.last_error = outcome.errors[-1]
+        if self._ingest_log is not None and outcome.received:
+            try:
+                await _maybe_await(self._ingest_log(session.adapter_id, session_id, outcome))
+            except Exception:  # pragma: no cover - the log never blocks ingestion
+                logger.exception("ingest_log callback failed for %s", session.adapter_id)
         return outcome
 
     @staticmethod

@@ -21,6 +21,11 @@ import logging
 
 from forge.curation.lineage import InMemoryLineageStore, LineageStore
 from forge.curation.registry import InMemoryProductStore, ProductStore
+from forge.storage.adapter_registry import (
+    AdapterRegistryStore,
+    InMemoryAdapterRegistryStore,
+    PostgresAdapterRegistryStore,
+)
 from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
 from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
 from forge.storage.engines.redis_engine import RedisSchemaCache, RedisStateCache
@@ -61,6 +66,15 @@ class StorageFactory:
             return PostgresLineageStore(pool)
         logger.info("PostgreSQL unavailable — using InMemoryLineageStore")
         return InMemoryLineageStore()
+
+    def adapter_registry_store(self) -> AdapterRegistryStore:
+        """Return the durable adapter registry (FB-060) if PG pool available, else InMemory."""
+        pool = self._pools.postgres
+        if pool is not None:
+            logger.info("Using PostgresAdapterRegistryStore")
+            return PostgresAdapterRegistryStore(pool)
+        logger.info("PostgreSQL unavailable — using InMemoryAdapterRegistryStore")
+        return InMemoryAdapterRegistryStore()
 
     # ------------------------------------------------------------------
     # TimescaleDB
@@ -131,6 +145,7 @@ class StorageFactory:
         return {
             "product_store": "postgres" if self._pools.postgres else "in_memory",
             "lineage_store": "postgres" if self._pools.postgres else "in_memory",
+            "adapter_registry_store": "postgres" if self._pools.postgres else "in_memory",
             "timescale_writer": "timescale" if self._pools.timescale else "unavailable",
             "graph_writer": "neo4j" if self._pools.neo4j else "unavailable",
             "state_cache": "redis" if self._pools.redis else "unavailable",

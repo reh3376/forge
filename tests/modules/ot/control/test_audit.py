@@ -10,11 +10,20 @@ Covers:
 - WriteAuditQuery stats delegation
 """
 
-import json
 import logging
-import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
+import pytest
+
+from forge.modules.ot.control.audit import (
+    ContextualRecordAuditSink,
+    LogAuditSink,
+    MqttAuditSink,
+    WriteAuditLogger,
+    WriteAuditQuery,
+)
+from forge.modules.ot.control.authorization import WriteAuthorizer
+from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.models import (
     DataType,
     TagWriteConfig,
@@ -24,18 +33,8 @@ from forge.modules.ot.control.models import (
     WriteRole,
     WriteStatus,
 )
-from forge.modules.ot.control.audit import (
-    ContextualRecordAuditSink,
-    LogAuditSink,
-    MqttAuditSink,
-    WriteAuditLogger,
-    WriteAuditQuery,
-)
 from forge.modules.ot.control.validation import WriteValidator
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.authorization import WriteAuthorizer
 from forge.modules.ot.control.write_engine import ControlWriteEngine
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -156,20 +155,53 @@ class TestWriteAuditLogger:
 
 class TestContextualRecordAuditSink:
     @pytest.mark.asyncio
-    async def test_writes_record(self):
-        writer = AsyncMock()
-        sink = ContextualRecordAuditSink(writer)
+    async def test_writes_a_contextual_record_to_the_sink(self):
+        sink_store = AsyncMock()
+        sink = ContextualRecordAuditSink(sink_store, site="whk01")
 
         record = _make_result().to_dict()
         await sink.write_audit_record(record)
 
-        writer.write.assert_called_once()
-        cr = writer.write.call_args[0][0]
-        assert cr["record_type"] == "control_write_audit"
-        assert cr["source_module"] == "ot"
-        assert cr["tag_path"] == "WH/WHK01/Distillery01/TIT_2010/SP"
-        assert "context" in cr
-        assert cr["context"]["area"] == "Distillery01"
+        sink_store.write_batch.assert_called_once()
+        batch = sink_store.write_batch.call_args[0][0]
+        assert len(batch) == 1 and sink.records_written == 1
+        cr = batch[0]
+        assert cr.source.adapter_id == "forge-ot-module" and cr.source.system == "forge-ot"
+        assert cr.source.tag_path == "ot.control.write.WH/WHK01/Distillery01/TIT_2010/SP"
+        assert cr.context.area == "Distillery01" and cr.context.site == "whk01"
+        assert cr.context.operator_id == record["requestor"]
+        assert cr.context.extra["event_type"] == "control.write"
+        assert cr.context.extra["target_tag_path"] == "WH/WHK01/Distillery01/TIT_2010/SP"
+        assert cr.context.extra["write_status"] == record["status"]
+        assert cr.value.raw["requested_value"] == record["requested_value"]
+        assert cr.lineage.schema_ref == "forge://schemas/ot-module/v0.1.0"
+        assert cr.lineage.transformation_chain == ["ot:control-write-engine"]
+        assert cr.timestamp.source_time.isoformat() == record["timestamp"]
+
+    @pytest.mark.asyncio
+    async def test_quality_follows_the_outcome(self):
+        from forge.core.models.contextual_record import QualityCode as CoreQuality
+        from forge.modules.ot.control.audit import write_result_to_record
+
+        base = _make_result().to_dict()
+        confirmed = write_result_to_record({**base, "status": "CONFIRMED"})
+        unconfirmed = write_result_to_record({**base, "status": "UNCONFIRMED"})
+        rejected = write_result_to_record(
+            {
+                **base,
+                "status": "REJECTED_INTERLOCK",
+                "interlock_error": "IL-1 blocked",
+                "interlock_rule_id": "IL-1",
+            }
+        )
+        assert confirmed.value.quality is CoreQuality.GOOD
+        assert unconfirmed.value.quality is CoreQuality.UNCERTAIN
+        assert rejected.value.quality is CoreQuality.BAD
+        assert rejected.context.extra["error"] == "IL-1 blocked"
+        assert rejected.context.extra["interlock_rule_id"] == "IL-1"
+        # Odd timestamps never break the audit path.
+        weird = write_result_to_record({**base, "timestamp": "not-a-date", "completed_at": None})
+        assert weird.timestamp.source_time.tzinfo is not None
 
 
 # ---------------------------------------------------------------------------
