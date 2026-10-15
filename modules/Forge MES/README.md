@@ -243,3 +243,7 @@ Required environment variables include:
 ## Support
 
 For support, please contact the development team or create an issue in the repository.
+
+## Forge core integration
+
+The backend registers with the forge-core hub over gRPC (`forge.v1.AdapterService`) and streams every domain event as a `ContextualRecord`. It is opt-in: set `FORGE_HUB_ENABLED=true` and `FORGE_HUB_GRPC_URL=<hub-host>:50051`. Session state, queue depth and circuit state are exposed at `GET /api/forge/status`. Details, the full environment table and the `mod_mes` persistence plan: [docs/integration/forge-core-integration.md](docs/integration/forge-core-integration.md).

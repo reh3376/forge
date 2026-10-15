@@ -1,9 +1,10 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit, Optional } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { MqttService } from "../providers/mqtt/mqtt.service";
 import { MqttEventPublishRule, EnumPayloadMode } from "@prisma/client";
 import { DomainEventParams } from "./types";
 import { resolveTopicTemplate } from "./topic-template.resolver";
+import { ForgeIngestService } from "../forge/forge-ingest.service";
 
 interface RuleWithBrokers extends MqttEventPublishRule {
   brokers: { id: string }[];
@@ -20,7 +21,9 @@ export class MqttDomainPublisherService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly mqttService: MqttService
+    private readonly mqttService: MqttService,
+    /** Forge hub link; absent when ForgeModule is not loaded (unit tests). */
+    @Optional() private readonly forgeIngest?: ForgeIngestService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -61,6 +64,9 @@ export class MqttDomainPublisherService implements OnModuleInit {
    * Fire-and-forget — errors are logged but never thrown.
    */
   async publishDomainEvent(params: DomainEventParams): Promise<void> {
+    // Every domain event also becomes a forge-core ContextualRecord,
+    // independent of whether an MQTT publish rule matches it.
+    this.forgeIngest?.enqueueDomainEvent(params);
     try {
       await this.ensureFreshCache();
 
