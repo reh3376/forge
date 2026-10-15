@@ -1,6 +1,6 @@
-"""Tests for the whk-mes FACTS spec — validates the second Forge spoke adapter spec.
+"""Tests for the forge-mes FACTS spec — validates the second Forge spoke adapter spec.
 
-These tests verify that whk-mes.facts.json:
+These tests verify that forge-mes.facts.json:
 1. Conforms to facts.schema.json
 2. Has a valid and reproducible integrity hash
 3. Has complete context field coverage (no orphans, no unmapped)
@@ -22,7 +22,7 @@ import pytest
 
 _base = Path(__file__).resolve().parents[3]
 SCHEMA_PATH = _base / "src" / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
-MES_SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "whk-mes.facts.json"
+MES_SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "forge-mes.facts.json"
 WMS_SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
 
 
@@ -79,7 +79,7 @@ class TestAdapterIdentity:
     """MES adapter correctly identifies as a Forge spoke adapter."""
 
     def test_adapter_id(self, spec):
-        assert spec["adapter_identity"]["adapter_id"] == "whk-mes"
+        assert spec["adapter_identity"]["adapter_id"] == "forge-mes"
 
     def test_adapter_id_is_kebab_case(self, spec):
         aid = spec["adapter_identity"]["adapter_id"]
@@ -322,7 +322,7 @@ class TestErrorHandling:
     def test_dead_letter_enabled(self, spec):
         dl = spec["error_handling"]["dead_letter"]
         assert dl["enabled"] is True
-        assert "whk-mes" in dl["topic"]
+        assert "forge-mes" in dl["topic"]
 
     def test_health_degradation_configured(self, spec):
         hd = spec["error_handling"]["health_degradation"]

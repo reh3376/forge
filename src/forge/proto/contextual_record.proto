@@ -20,7 +20,7 @@ option go_package = "github.com/reh3376/forge/proto/v1";
 // ---------------------------------------------------------------------------
 
 message RecordSource {
-  string adapter_id = 1;       // e.g. "whk-wms", "whk-mes"
+  string adapter_id = 1;       // e.g. "whk-wms", "forge-mes"
   string system = 2;           // e.g. "whk-wms-prod", "ignition-prod"
   string tag_path = 3;         // optional: e.g. "Area1/Fermenter3/Temperature"
   string connection_id = 4;    // optional: for connection multiplexing

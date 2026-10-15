@@ -195,13 +195,13 @@ class TestMultiAdapterFlow:
         ).model_dump(mode="json")
 
         mes = AdapterManifest(
-            adapter_id="whk-mes",
-            name="WHK MES",
+            adapter_id="forge-mes",
+            name="Forge MES",
             version="0.1.0",
             protocol="graphql+amqp",
             tier=AdapterTier.MES_MOM,
             data_contract=DataContract(
-                schema_ref="forge://schemas/whk-mes/v0.1.0",
+                schema_ref="forge://schemas/forge-mes/v0.1.0",
             ),
         ).model_dump(mode="json")
 
@@ -211,7 +211,7 @@ class TestMultiAdapterFlow:
         resp = client.get("/v1/adapters")
         ids = {a["adapter_id"] for a in resp.json()}
         assert "whk-wms" in ids
-        assert "whk-mes" in ids
+        assert "forge-mes" in ids
 
     def test_ingestion_isolated_by_adapter(self, client: TestClient):
         """Records ingested for one adapter shouldn't affect another."""

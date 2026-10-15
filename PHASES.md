@@ -20,7 +20,7 @@
 | **F7x** | F70–F79 | Observability & Operations |
 | **F8x** | F80–F89 | Security, Compliance & Hardening |
 | **F9x** | F90–F99 | Production Readiness & Deployment |
-| **FWx** | FW01–FW09 | WHK-Specific Integration (whk-wms, whk-mes) |
+| **FWx** | FW01–FW09 | WHK-Specific Integration (whk-wms, forge-mes) |
 
 ---
 
@@ -188,7 +188,7 @@ Governs adapter behavior. Specs define what adapters must do.
 - [x] `facts.schema.json` — JSON Schema draft 2020-12, 10 top-level properties, 60 schema tests
 - [x] `facts_runner.py` — FACTSRunner with 10 enforced fields, all static checks, cross-field consistency, FHTS governance (72 tests)
 - [x] Data contract tests (output schema, context fields, data source validation, sample record coverage)
-- [x] WHK adapter specs: `whk-wms.facts.json` (48 tests), `whk-mes.facts.json` (64 tests) — serve as example specs
+- [x] WHK adapter specs: `whk-wms.facts.json` (48 tests), `forge-mes.facts.json` (64 tests) — serve as example specs
 - [ ] CI gate (hard-fail for production adapters) — gate infrastructure exists, CLI integration deferred
 - [ ] Live adapter lifecycle tests (connect, health, shutdown) — deferred to Path 3 (requires adapter code)
 
@@ -359,22 +359,23 @@ First production adapter — connects Forge to `whk-wms` (507K LOC TypeScript).
 
 ---
 
-### F33: WHK MES Adapter
+### F33: Forge MES Adapter
 **Effort:** Medium | **Dependencies:** F30, F31 | **Gate:** F32-GATE (parallel with F32)
 
-Second production adapter — connects Forge to `whk-mes`.
+Second production adapter — connects Forge to `forge-mes`.
 
 **Deliverables:**
-- [x] Adapter for `whk-mes` APIs — `WhkMesAdapter` with 5 capability mixins (WritableAdapter, SubscriptionProvider, BackfillProvider, DiscoveryProvider), 18 connection params, protocol `graphql+amqp+mqtt`
+- [x] Adapter for `forge-mes` APIs — `ForgeMesAdapter` with 5 capability mixins (WritableAdapter, SubscriptionProvider, BackfillProvider, DiscoveryProvider), 18 connection params, protocol `graphql+amqp+mqtt`
 - [x] Data sources: 11 mapper functions across 8 modules — production orders, batches, recipes (class/instance pattern), schedule orders, equipment (ISA-88 hierarchy), operational events (step + production), business entities, lots, material items
 - [x] Context mapping: 15 FACTS field mappings (6 mandatory + 10 optional) + 3 enrichment rules (shift from Louisville timezone, event type normalization for 30+ MES domain events, equipment_id from MQTT topic)
-- [x] FACTS spec for whk-mes adapter conformance — `whk-mes.facts.json` (17 data sources, 64 tests, hash-approved, MQTT+write support)
+- [x] FACTS spec for forge-mes adapter conformance — `forge-mes.facts.json` (17 data sources, 64 tests, hash-approved, MQTT+write support)
+- [x] 2026-10-15: whk-mes renamed to forge-mes (adapter package `forge.adapters.forge_mes`, spec re-hashed and approved); whk-mes application migrated into `modules/Forge MES` (backend + frontend) — forge-mes replaces whk-mes
 - [ ] FQTS specs for MES data quality requirements (deferred to live)
-- [ ] Integration test suite against whk-mes staging environment (scaffold ready, requires MES Docker stack)
+- [ ] Integration test suite against forge-mes staging environment (scaffold ready, requires MES Docker stack)
 - [x] Backfill capability for historical data — `BackfillProvider` interface implemented (stub pending live GraphQL)
 - [x] Unit test suite: 188 MES adapter tests (28 adapter + 45 context + 30 record builder + 85 mappers), 650 total project tests passing
 
-**Gate F33-GATE:** 🚪 Adapter connects to whk-mes, collects contextual records, passes FACTS and FQTS specs.
+**Gate F33-GATE:** 🚪 Adapter connects to forge-mes, collects contextual records, passes FACTS and FQTS specs.
 
 ---
 
@@ -401,7 +402,7 @@ transport layer beneath the existing adapter interface.
 - [x] FACTS spec for gRPC transport: `adapter-transport.facts.json` (50 conformance tests, 4 proto files, 11 RPCs, 14 enums)
 - [x] Performance benchmark: Proto dict serialize 1.10x faster than JSON serialize. Real Protobuf binary estimated 50-70% smaller wire size.
 - [x] Unit tests: 73 transport tests (serialization round-trips, hub server lifecycle, spoke client streaming, WMS/MES transport adapter wrapping). 723 total project tests passing.
-- [x] `GrpcTransportAdapter` wrapper: wraps any `AdapterBase` subclass for gRPC streaming with zero adapter code changes. Verified with both WhkWmsAdapter and WhkMesAdapter.
+- [x] `GrpcTransportAdapter` wrapper: wraps any `AdapterBase` subclass for gRPC streaming with zero adapter code changes. Verified with both WhkWmsAdapter and ForgeMesAdapter.
 - [x] **Hardened live gRPC transport:** Compiled protobuf stubs via `grpcio-tools` (no JSON on the wire). `GrpcServer` uses `add_AdapterServiceServicer_to_server` from compiled stubs. `GrpcChannel` uses compiled `AdapterServiceStub`. New `Ingest` RPC (client-streaming) for spoke→hub record push with gRPC metadata headers. `proto_bridge.py` for Pydantic↔Proto message conversion. 10 live gRPC integration tests. 863 total project tests passing.
 - [x] **FTTS governance framework (Forge Transport Test Specification):** Schema (`ftts.schema.json`, 12 required sections), spec instance (`grpc-hardened-transport.ftts.json` — 31 message types, 14 enums, 12 RPCs, 11 type mappings, 3 enum mappings, 5 error code mappings), FTTSRunner (12 enforced fields, cross-field consistency checks, live module inspection mode), 35 runner tests. `adapter-transport.facts.json` updated with FTTS cross-reference. 898 total project tests passing.
 
@@ -648,7 +649,7 @@ The NextJS frontend for human-facing decision workflows.
 Full Forge deployment at WHK connecting production WMS and MES.
 
 **Deliverables:**
-- [ ] Production adapters for whk-wms and whk-mes
+- [ ] Production adapters for whk-wms and forge-mes
 - [ ] WHK-specific data products (production context, inventory linkage, equipment utilization)
 - [ ] WHK-specific FQTS quality specs
 - [ ] Decision support workflows configured for WHK operational processes
@@ -678,7 +679,7 @@ F01 ─┬─► F02 ───────────────────�
      └─► F10 (FxTS core) ──┬─► F11     │     │
                             ├─► F12 ────┼─► F30 (adapter framework) ──┬─► F31 (examples)
                             ├─► F13     │                             ├─► F32 (whk-wms)
-                            ├─► F14     │                             ├─► F33 (whk-mes)
+                            ├─► F14     │                             ├─► F33 (forge-mes)
                             └─► F15     │                             └─► F34 (gRPC transport)
                                         │                                    │
                                         │                    F32-live, F33-live ◄──┘
@@ -766,7 +767,7 @@ F01 ─┬─► F02 ───────────────────�
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| whk-wms/whk-mes API instability during adapter development | High | Medium | Develop against staging, use contract tests (FACTS), circuit breaker pattern |
+| whk-wms/forge-mes API instability during adapter development | High | Medium | Develop against staging, use contract tests (FACTS), circuit breaker pattern |
 | FxTS framework overhead slows development velocity | Medium | Medium | Start with FATS + FACTS only, add others as needed. Spec-first pays off in later phases |
 | Kafka operational complexity | Medium | Low | Start with single-broker, KRaft mode. Upgrade to cluster when traffic warrants |
 | Cross-engine query performance | High | Medium | Start simple (sequential queries), optimize with caching and materialization |

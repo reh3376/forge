@@ -210,7 +210,7 @@ The Access Controller is the permission layer that governs which module can read
 ```python
 class ModulePermission:
     """A database access grant for a Forge module."""
-    module_id: str              # e.g., "whk-wms", "whk-mes"
+    module_id: str              # e.g., "whk-wms", "forge-mes"
     schema_name: str            # e.g., "mod_wms", "forge_canonical"
     engine: StorageEngine       # Which database pod
     access_level: AccessLevel   # READ, WRITE, ADMIN
@@ -261,7 +261,7 @@ The Schema Registry is the single source of truth for what data Forge manages. E
 ```python
 class SchemaEntry:
     schema_id: str              # forge://schemas/<module>/<entity>/v<version>
-    module_id: str              # e.g., "whk-wms", "whk-mes", "forge-core"
+    module_id: str              # e.g., "whk-wms", "forge-mes", "forge-core"
     entity_name: str            # e.g., "Barrel", "Recipe", "Device"
     version: str                # Semantic version: "1.0.0"
     schema_json: dict           # JSON Schema for the entity

@@ -18,7 +18,7 @@ from forge.core.models.manufacturing.material_item import MaterialItem
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-mes"
+_SOURCE_SYSTEM = "forge-mes"
 
 
 def map_item(raw: dict[str, Any]) -> MaterialItem | None:

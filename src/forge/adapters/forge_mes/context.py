@@ -1,7 +1,7 @@
 """MES context mapper -- transforms raw MES events into RecordContext.
 
 Implements the 15 context field mappings and 3 enrichment rules
-defined in the whk-mes FACTS spec (context_mapping section):
+defined in the forge-mes FACTS spec (context_mapping section):
 
 Mandatory context fields (6):
     production_order_id, batch_id, recipe_id,

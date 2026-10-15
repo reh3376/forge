@@ -87,7 +87,7 @@ class ContextFieldRegistry:
             return None
         if system == "whk-wms":
             return ctx_field.wms_provenance
-        if system == "whk-mes":
+        if system == "forge-mes":
             return ctx_field.mes_provenance
         return None
 
@@ -101,7 +101,7 @@ class ContextFieldRegistry:
 def build_default_registry() -> ContextFieldRegistry:
     """Build the default context field registry with WHK fields.
 
-    These fields are derived from the FACTS specs (whk-wms and whk-mes)
+    These fields are derived from the FACTS specs (whk-wms and forge-mes)
     and the cross-spoke consistency analysis from Path 1.
     """
     registry = ContextFieldRegistry()

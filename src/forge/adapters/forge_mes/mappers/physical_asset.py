@@ -28,7 +28,7 @@ from forge.core.models.manufacturing.physical_asset import PhysicalAsset
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-mes"
+_SOURCE_SYSTEM = "forge-mes"
 
 # MES asset type string -> Forge AssetType
 _ASSET_TYPE_MAP: dict[str, AssetType] = {

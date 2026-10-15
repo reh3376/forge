@@ -60,7 +60,7 @@ class SchemaEntry:
 
     Attributes:
         schema_id: Unique URI (forge://schemas/<spoke>/<entity>/v<version>)
-        spoke_id: Source spoke identifier (e.g., "whk-wms", "whk-mes")
+        spoke_id: Source spoke identifier (e.g., "whk-wms", "forge-mes")
         entity_name: Entity type name (e.g., "Barrel", "Recipe", "Device")
         version: Semantic version string
         schema_json: JSON Schema defining the entity structure

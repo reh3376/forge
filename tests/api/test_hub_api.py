@@ -128,7 +128,7 @@ class TestAdapterRegistry:
 
     @pytest.mark.asyncio
     async def test_list_after_register(self, client):
-        manifest = _make_manifest("whk-mes")
+        manifest = _make_manifest("forge-mes")
         await client.post("/v1/adapters/register", json=manifest)
 
         resp = await client.get("/v1/adapters")
@@ -136,7 +136,7 @@ class TestAdapterRegistry:
         adapters = resp.json()
         assert len(adapters) >= 1
         ids = [a["adapter_id"] for a in adapters]
-        assert "whk-mes" in ids
+        assert "forge-mes" in ids
 
     @pytest.mark.asyncio
     async def test_adapter_health_not_found(self, client):
@@ -156,7 +156,7 @@ class TestAdapterRegistry:
 
     @pytest.mark.asyncio
     async def test_register_multiple_adapters(self, client):
-        for aid in ["whk-wms", "whk-mes", "whk-cmms"]:
+        for aid in ["whk-wms", "forge-mes", "whk-cmms"]:
             await client.post("/v1/adapters/register", json=_make_manifest(aid))
 
         resp = await client.get("/v1/adapters")
@@ -223,7 +223,7 @@ class TestPlatformInfo:
     @pytest.mark.asyncio
     async def test_info_reflects_adapter_count(self, client):
         # Register 2 adapters
-        for aid in ["whk-wms", "whk-mes"]:
+        for aid in ["whk-wms", "forge-mes"]:
             await client.post("/v1/adapters/register", json=_make_manifest(aid))
 
         resp = await client.get("/v1/info")

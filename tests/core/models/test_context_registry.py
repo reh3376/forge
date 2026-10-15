@@ -170,7 +170,7 @@ class TestProvenance:
             name="lot_id", field_type="str", description="lot",
             wms_provenance="Lot.id", mes_provenance="Lot.globalId",
         ))
-        assert reg.get_provenance("lot_id", "whk-mes") == "Lot.globalId"
+        assert reg.get_provenance("lot_id", "forge-mes") == "Lot.globalId"
 
     def test_unknown_system_returns_none(self) -> None:
         reg = ContextFieldRegistry()

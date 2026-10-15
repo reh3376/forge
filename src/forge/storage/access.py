@@ -335,7 +335,7 @@ class AccessController:
         """
         defaults = [
             ("whk-wms", "mod_wms"),
-            ("whk-mes", "mod_mes"),
+            ("forge-mes", "mod_mes"),
             ("whk-erpi", "mod_erpi"),
             ("whk-cmms", "mod_cmms"),
             ("whk-nms", "mod_nms"),

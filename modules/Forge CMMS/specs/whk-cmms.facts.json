@@ -394,7 +394,7 @@
       "data_flow": "ERPI item/vendor topics → CMMS RabbitMQ subscriptions"
     },
     {
-      "adapter_id": "whk-mes",
+      "adapter_id": "forge-mes",
       "relationship": "MES must account for CMMS maintenance windows when scheduling production orders",
       "data_flow": "CMMS scheduled maintenance windows → MES production scheduling constraints"
     },

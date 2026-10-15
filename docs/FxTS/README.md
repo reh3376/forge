@@ -187,7 +187,7 @@ src/forge/governance/
 │   └── runners/fats_runner.py
 ├── facts/
 │   ├── schema/facts.schema.json
-│   ├── specs/                 # Adapter conformance specs (whk-wms, whk-mes, etc.)
+│   ├── specs/                 # Adapter conformance specs (whk-wms, forge-mes, etc.)
 │   └── runners/facts_runner.py
 ├── fhts/
 │   ├── schema/                    # (FHTS uses registry, not traditional schema)

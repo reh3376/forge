@@ -1,4 +1,4 @@
-"""WHK MES Adapter — the second Forge adapter (first with write capability).
+"""Forge MES Adapter — the second Forge adapter (first with write capability).
 
 Implements AdapterBase + WritableAdapter + SubscriptionProvider +
 BackfillProvider + DiscoveryProvider (all 5 capabilities per FACTS spec
@@ -27,9 +27,9 @@ from forge.adapters.base.interface import (
     SubscriptionProvider,
     WritableAdapter,
 )
-from forge.adapters.whk_mes.config import WhkMesConfig
-from forge.adapters.whk_mes.context import build_record_context
-from forge.adapters.whk_mes.record_builder import build_contextual_record
+from forge.adapters.forge_mes.config import ForgeMesConfig
+from forge.adapters.forge_mes.context import build_record_context
+from forge.adapters.forge_mes.record_builder import build_contextual_record
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -67,7 +67,7 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class WhkMesAdapter(
+class ForgeMesAdapter(
     AdapterBase,
     WritableAdapter,
     SubscriptionProvider,
@@ -91,7 +91,7 @@ class WhkMesAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: WhkMesConfig | None = None
+        self._config: ForgeMesConfig | None = None
         self._subscriptions: dict[str, Any] = {}
         self._consecutive_failures: int = 0
         self._last_healthy: datetime | None = None
@@ -100,7 +100,7 @@ class WhkMesAdapter(
 
     async def configure(self, params: dict[str, Any]) -> None:
         """Validate and store connection parameters."""
-        self._config = WhkMesConfig(**params)
+        self._config = ForgeMesConfig(**params)
         self._state = AdapterState.REGISTERED
         logger.info(
             "WHK-MES adapter configured: graphql=%s, mqtt=%s:%s",

@@ -103,7 +103,7 @@ src/forge/
 │   │   ├── specs/                 # Per-spoke compliance specs (9 spokes)
 │   │   │   ├── ot-module.facts.json      (v0.5.0 — 21 data sources)
 │   │   │   ├── whk-wms.facts.json
-│   │   │   ├── whk-mes.facts.json
+│   │   │   ├── forge-mes.facts.json
 │   │   │   ├── whk-cmms.facts.json
 │   │   │   ├── bosc-ims.facts.json
 │   │   │   ├── whk-nms.facts.json
@@ -154,6 +154,7 @@ src/forge/
 │           └── security.py        # forge.security — user/role queries
 │
 ├── adapters/                      # Spoke adapters (in-repo)
+│   ├── forge_mes/                 # Forge MES hub-side spoke adapter (manifest, context mapper, 11 mappers) — module itself lives in modules/Forge MES/
 │   └── whk_cmms/                  # CMMS adapter (first spoke, reference impl)
 │       ├── adapter.py
 │       ├── config.py
@@ -224,6 +225,16 @@ src/forge/
         └── scripts/               # OT Module user scripts
 ```
 
+### Module Directories (`modules/`)
+
+First-party modules that ship with both a backend and a frontend live under the repo-level `modules/` directory, alongside the spoke templates copied from external repos:
+
+| Directory | Sections | Status |
+|-----------|----------|--------|
+| `modules/Forge MES/` | `backend/` (NestJS + Prisma, forge-core integration), `frontend/` (Next.js 15), `shared/` | Migrated from `WhiskeyHouse/whk-mes` 2026-10-15; forge-mes replaces whk-mes. Hub-side spoke contract: `src/forge/adapters/forge_mes/` |
+| `modules/Forge CMMS/`, `Forge ERPI/`, `Forge NMS/` | adapter template copies (`src/`, `specs/`, `docs/`, `tests/`) | Templates for the in-repo adapters |
+| `modules/Forge DB Orchestration/` | storage framework copy | Reference |
+
 ## Governance: FxTS (Forge Test Suite)
 
 FxTS is **spec-first governance** — the specs define what must exist and the code conforms to the specs, not the other way around. This is not a testing framework; it's a compliance framework.
@@ -245,7 +256,7 @@ Each spoke has a FACTS spec that declares its identity, capabilities, connection
 |-------|--------|--------|
 | `ot-module` | OPC-UA / MQTT / Alarms / Control Write | v0.5.0 — 21 data sources |
 | `whk-wms` | Warehouse Management (NestJS) | Draft |
-| `whk-mes` | Manufacturing Execution (NestJS) | Draft |
+| `forge-mes` | Manufacturing Execution (Forge MES module, NestJS + Next.js) | v0.1.0 — approved 2026-10-15 (renamed from whk-mes) |
 | `whk-cmms` | Computerized Maintenance (n8n) | Draft |
 | `bosc-ims` | Aerospace Inventory (Go gRPC) | Draft |
 | `whk-nms` | Network Management (FastAPI) | Draft |
@@ -291,7 +302,7 @@ The scripting SDK provides 11 modules that replace Ignition's `system.*` namespa
 | Spoke | Repo | Tech | Role |
 |-------|------|------|------|
 | WHK-WMS | `WhiskeyHouse/whk-wms` | NestJS + Next.js | Warehouse Management |
-| WHK-MES | `WhiskeyHouse/whk-mes` | NestJS + Next.js | Manufacturing Execution |
+| Forge MES | `modules/Forge MES` (in-repo; migrated from `WhiskeyHouse/whk-mes` on 2026-10-15) | NestJS + Next.js 15 | Manufacturing Execution — forge-mes replaces whk-mes |
 | WHK-CMMS | `reh3376/whk-cmms` | n8n + API | Maintenance Management |
 | BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
 | WHK-NMS | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |

@@ -31,7 +31,7 @@ from forge.core.models.contextual_record import (
 logger = logging.getLogger(__name__)
 
 # Schema ref matches the FACTS spec data_contract.schema_ref
-_SCHEMA_REF = "forge://schemas/whk-mes/v0.1.0"
+_SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
 
 
 def build_contextual_record(
@@ -46,7 +46,7 @@ def build_contextual_record(
     Args:
         raw_event: Original raw dict from MES (preserved as the record value).
         context: RecordContext produced by build_record_context().
-        adapter_id: Adapter identity string (e.g. "whk-mes").
+        adapter_id: Adapter identity string (e.g. "forge-mes").
         adapter_version: Adapter version (e.g. "0.1.0").
 
     Returns:
@@ -72,7 +72,7 @@ def build_contextual_record(
     tag_path = _derive_tag_path(raw_event)
     source = RecordSource(
         adapter_id=adapter_id,
-        system="whk-mes",
+        system="forge-mes",
         tag_path=tag_path,
     )
 

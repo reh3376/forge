@@ -23,7 +23,7 @@ from forge.core.models.manufacturing.lot import Lot
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-mes"
+_SOURCE_SYSTEM = "forge-mes"
 
 
 def map_lot(raw: dict[str, Any]) -> Lot | None:

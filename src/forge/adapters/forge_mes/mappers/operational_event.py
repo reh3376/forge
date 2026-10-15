@@ -29,7 +29,7 @@ from forge.core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-mes"
+_SOURCE_SYSTEM = "forge-mes"
 
 # StepExecution status -> Forge EventCategory
 _STEP_STATUS_TO_CATEGORY: dict[str, EventCategory] = {
