@@ -3,10 +3,13 @@
 const fetch = require("node-fetch");
 
 // Configuration
-const GRAPHQL_URL = "http://10.4.8.25:3000/graphql";
-const BEARER_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbHljbnZ5Y2owMDAwNm5pMGEweWlteHJvIiwidXNlcm5hbWUiOiJtZXMiLCJpYXQiOjE3NTM3MTY2MTYsImV4cCI6MTc1MzcyMDIxNn0.YVpyXYz1W5W7pd8sRaTUXdY5zDw2V1rdmaAXUWjah_4";
-const CREATED_BY = "pmannion@whiskeyhouse.com";
+const GRAPHQL_URL = process.env.MES_GRAPHQL_URL || "http://localhost:3000/graphql";
+const BEARER_TOKEN = process.env.MES_BEARER_TOKEN;
+if (!BEARER_TOKEN) {
+  console.error("MES_BEARER_TOKEN environment variable is required");
+  process.exit(1);
+}
+const CREATED_BY = process.env.MES_CREATED_BY || "system";
 
 // GraphQL queries
 const GET_ALL_LOTS_QUERY = `

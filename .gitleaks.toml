@@ -1,0 +1,18 @@
+# gitleaks configuration — extends the default rules with repo-specific allowlists.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test fixtures and placeholders that are not credentials"
+regexTarget = "line"
+paths = [
+  '''tests/adapters/whk_cmms/test_whk_cmms_adapter\.py''',
+  '''modules/Forge CMMS/tests/test_whk_cmms_adapter\.py''',
+]
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.test''',
+  '''your_[a-z_]+_key_here''',
+  '''YOUR_[A-Z_]+''',
+  '''Bearer (?:your|YOUR)[-_A-Za-z]*(?:token|TOKEN)''',
+  '''your[-_]?jwt[-_]?token''',
+]

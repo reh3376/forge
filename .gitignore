@@ -44,3 +44,10 @@ gen/
 # Reports (generated artifacts)
 reports/*.html
 reports/*.json
+
+# Local tool settings and env files must never be committed (any depth)
+**/.claude/settings.local.json
+.env.*
+!.env.example
+!.env.*.example
+!.env.vault

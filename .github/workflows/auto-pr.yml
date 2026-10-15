@@ -1,12 +1,16 @@
 # Auto-open a pull request to main whenever a non-main branch is pushed and no
-# open PR exists for it yet. Idempotent: reruns on later pushes are no-ops.
+# open PR exists for it yet. Idempotent: later pushes to the same branch are no-ops.
 #
-# Notes
-# - Uses the built-in GITHUB_TOKEN. PRs opened with that token do NOT trigger
-#   other `pull_request` workflows (GitHub limitation). If that matters, switch
-#   to a fine-grained PAT stored as a repo secret and use it as GH_TOKEN.
-# - The body is a placeholder; replace it with the sprint summary (repo rule:
-#   detailed sprint summaries go in the PR body, not in comments).
+# Author identity
+# - If the repo secret MODEL_PR_TOKEN is set (a fine-grained PAT for the model's
+#   machine account, e.g. "reh3376-claude", with Contents: read and Pull
+#   requests: write on this repo), the PR is opened AS that account and
+#   pull_request workflows fire normally.
+# - Otherwise it is opened with GITHUB_TOKEN as github-actions[bot]; such PRs do
+#   not trigger other pull_request workflows (CI still runs on the push).
+# In both cases the body names the model detected from the commits'
+# Co-Authored-By trailers and the human who pushed, and the pusher is requested
+# as reviewer so they can approve.
 name: Auto PR to main
 
 on:
@@ -17,6 +21,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 concurrency:
   group: auto-pr-${{ github.ref_name }}
@@ -32,9 +37,11 @@ jobs:
 
       - name: Open PR if none is open for this branch
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.MODEL_PR_TOKEN || secrets.GITHUB_TOKEN }}
+          USING_MODEL_TOKEN: ${{ secrets.MODEL_PR_TOKEN != '' }}
           BRANCH: ${{ github.ref_name }}
           BASE: main
+          PUSHER: ${{ github.actor }}
         run: |
           set -euo pipefail
           open_count=$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq 'length')
@@ -46,6 +53,26 @@ jobs:
             echo "$BRANCH has no commits beyond $BASE; nothing to open."
             exit 0
           fi
+
+          # Model attribution from Co-Authored-By trailers on the new commits.
+          model=$(git log "origin/$BASE..$GITHUB_SHA" --format='%(trailers:key=Co-Authored-By,valueonly)' \
+            | grep -iE 'claude|gpt|gemini|copilot|codex|llama|mistral' | head -1 | sed -E 's/ *<.*//' || true)
+          [ -z "$model" ] && model="unknown model"
+          slug=$(printf '%s' "$model" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9\n' '-' | sed -E 's/-+/-/g; s/^-|-$//g')
+
+          if [ "$USING_MODEL_TOKEN" = "true" ]; then
+            identity="the model's account (MODEL_PR_TOKEN)"
+          else
+            identity="github-actions[bot] (set repo secret MODEL_PR_TOKEN to open PRs as the model's account)"
+          fi
+
           title=$(git log -1 --pretty=%s "$GITHUB_SHA")
-          body=$(printf 'Auto-opened on push to `%s`.\n\nReplace this body with the sprint summary before review.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' "$BRANCH")
-          gh pr create --base "$BASE" --head "$BRANCH" --title "$title" --body "$body"
+          body=$(printf '**Opened by:** %s · **pushed by:** @%s · **PR identity:** %s\n\nAuto-opened on push to `%s`. Replace this body with the sprint summary before review.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' "$model" "$PUSHER" "$identity" "$BRANCH")
+
+          gh label create "model:$slug" --color 5319E7 --description "PR authored with $model" --force >/dev/null 2>&1 || true
+          args=(--base "$BASE" --head "$BRANCH" --title "$title" --body "$body" --label "model:$slug")
+          # Request the pusher as reviewer unless they would be the PR author.
+          if [ "$USING_MODEL_TOKEN" = "true" ] || [ "$PUSHER" != "$(gh api user --jq .login 2>/dev/null || echo '')" ]; then
+            args+=(--reviewer "$PUSHER")
+          fi
+          gh pr create "${args[@]}" || gh pr create --base "$BASE" --head "$BRANCH" --title "$title" --body "$body"
