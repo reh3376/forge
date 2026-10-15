@@ -81,7 +81,9 @@ jobs:
         run: npx tsc --noEmit -p tsconfig.json
         working-directory: modules/Forge MES/backend
       - name: backend unit tests (advisory until BACKLOG FB-036 is verified)
-        run: npx jest --ci --passWithNoTests
+        # --forceExit: Jest finishes in ~5 min but open Prisma/RabbitMQ handles from the DB-less
+        # suites (FB-036) kept the process alive ~15 min more (BACKLOG FB-052).
+        run: npx jest --ci --passWithNoTests --forceExit
         working-directory: modules/Forge MES/backend
         continue-on-error: true
       - name: frontend type-check (advisory until BACKLOG FB-028 is fixed)
