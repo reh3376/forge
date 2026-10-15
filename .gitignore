@@ -119,3 +119,6 @@ test-results/
 .env.*.preview
 .vercel/
 .jira/
+
+# TypeScript incremental build info
+*.tsbuildinfo
