@@ -197,3 +197,26 @@ image either, so it was not run.
 **Suggested fix:** have `init` install the CLI from the same build as the image it pins in
 `docker-compose.yml`, and compare the banner against the running image's build id rather than
 the newest edge build.
+
+---
+
+## Bug 8: the destructive-command guard has no path to run a command the user has confirmed
+
+**MDEMG version:** 0.11.0-beta.1 (`.claude/hooks/pre-bash-check.py`)
+**Discovered:** 2026-10-15 in the `forge` repo, during the credential history purge
+
+The guard denies any Bash command matching its destructive patterns (force-push, recursive
+forced delete, ...) with "You MUST ask the user for explicit confirmation before running this."
+The assistant asked, the user confirmed, and the same command was still denied: the hook is
+deterministic and has no confirmation channel (no env flag, J17 ticket, or RetireCode is
+consulted in `main()`), so a confirmed destructive action can only be executed by the user
+themselves. The match is textual, so even a documentation edit whose heredoc *mentions* a
+pattern is denied. A chained command (relax branch protection, push, restore protection) is
+rejected as a whole, which is the right outcome but leaves no sanctioned route for the
+assistant to complete a confirmed purge.
+
+**Suggested fix:** let the J17 protocol issue a one-shot confirmation ticket keyed to
+(SessionID, command hash) that the user approves, and have the guard honour it once; match
+patterns against the command's parsed argv rather than the raw text. Until then the model
+hands the exact command to the user to run with the `!` prefix.
+
