@@ -249,7 +249,7 @@ Every adapter declares its capabilities via a JSON manifest (adapted from MDEMG'
 | Tier | Systems | Primary Protocols | Data Characteristics |
 |------|---------|-------------------|----------------------|
 | **OT** | PLC, SCADA, HMI, DCS, RTU | OPC UA, MQTT Sparkplug B, Modbus TCP, EtherNet/IP, PROFINET | High-frequency (ms-sec), time-series, real-time, deterministic |
-| **MES/MOM** | MES (e.g. whk-mes), QMS, WMS (e.g. whk-wms), LIMS, CMMS, EBR | REST, GraphQL, JDBC/ODBC, OData, Kafka topics | Transaction-oriented, batch/lot context, quality records |
+| **MES/MOM** | MES (e.g. forge-mes), QMS, WMS (e.g. whk-wms), LIMS, CMMS, EBR | REST, GraphQL, JDBC/ODBC, OData, Kafka topics | Transaction-oriented, batch/lot context, quality records |
 | **ERP/Business** | ERP, SCM, CRM, PLM, BI, HRM | REST, OData, RFC/BAPI (SAP), JDBC, GraphQL | Master data, financial transactions, planning, low-frequency |
 | **Historian** | OSIsoft PI, AVEVA, Honeywell PHD, Canary, InfluxDB | Proprietary APIs, REST, ODBC, bulk export | Time-series archive, high-volume backfill, compression |
 | **Document** | SharePoint, file shares, DMS, email | WebDAV, Graph API, IMAP, filesystem | Unstructured, metadata extraction, OCR, classification |
@@ -884,7 +884,7 @@ How we will know Forge is working:
 
 Forge is not:
 
-- **A replacement for MES, ERP, or QMS.** Those systems continue to operate — WHK already has production WMS (`whk-wms`, 507K LOC TypeScript) and MES (`whk-mes`) instances. Forge connects them, governs the data flows between them, and makes their combined context available for better decisions. These existing systems are the first spoke integration targets.
+- **A replacement for ERP or QMS.** Those systems continue to operate — WHK already has a production WMS (`whk-wms`, 507K LOC TypeScript), and such existing systems are the first spoke integration targets. Forge connects them, governs the data flows between them, and makes their combined context available for better decisions. The MES is the one exception: on 2026-10-15 `whk-mes` was migrated into Forge as the first-party **forge-mes** module (`modules/Forge MES`, backend + frontend). Forge therefore does ship an MES, but it is built as a spoke of the hub, not as a hub capability.
 - **A dashboard platform.** Dashboards are consuming applications that sit on top of Forge. Forge provides the governed data products they need; it does not compete with BI tools.
 - **An AI/ML platform.** AI and ML models are consuming applications that access Forge's data products via APIs. Forge provides the context-rich, governed training data they need; it does not manage model lifecycle.
 - **A data lake.** Forge is a governed data platform with strict schema, quality, and lineage requirements. It is the opposite of "dump everything into a lake and figure it out later."

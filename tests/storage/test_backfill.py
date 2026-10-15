@@ -218,14 +218,14 @@ class TestBackfillEngine:
         engine.add_table_plan(self._make_plan(spoke_id="whk-wms"))
         engine.add_table_plan(
             self._make_plan(
-                spoke_id="whk-mes",
+                spoke_id="forge-mes",
                 source_table="public.Recipe",
                 target_schema="mod_mes",
                 target_table="recipes",
             )
         )
         assert engine.total_tables_planned == 2
-        assert set(engine.list_spokes()) == {"whk-wms", "whk-mes"}
+        assert set(engine.list_spokes()) == {"whk-wms", "forge-mes"}
 
     def test_plan_spoke_summary(self):
         engine = BackfillEngine()
@@ -253,7 +253,7 @@ class TestBackfillEngine:
         engine.add_table_plan(self._make_plan(spoke_id="whk-wms"))
         engine.add_table_plan(
             self._make_plan(
-                spoke_id="whk-mes",
+                spoke_id="forge-mes",
                 source_table="public.Recipe",
                 target_schema="mod_mes",
                 target_table="recipes",
@@ -261,7 +261,7 @@ class TestBackfillEngine:
         )
         spokes = engine.list_spokes()
         assert "whk-wms" in spokes
-        assert "whk-mes" in spokes
+        assert "forge-mes" in spokes
 
     def test_get_progress_table(self):
         engine = BackfillEngine()

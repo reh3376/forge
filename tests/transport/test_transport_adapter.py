@@ -27,7 +27,7 @@ except ImportError:
     HAS_WMS = False
 
 try:
-    from forge.adapters.whk_mes.adapter import WhkMesAdapter
+    from forge.adapters.forge_mes.adapter import ForgeMesAdapter
 
     HAS_MES = True
 except ImportError:
@@ -112,16 +112,16 @@ class TestWmsTransportAdapter:
 @pytest.mark.skipif(not HAS_MES, reason="MES adapter not available")
 class TestMesTransportAdapter:
     async def test_register_mes(self, servicer: InMemoryServicer) -> None:
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         session_id = await transport.register()
-        assert session_id.startswith("session-whk-mes-")
-        assert transport.adapter_id == "whk-mes"
+        assert session_id.startswith("session-forge-mes-")
+        assert transport.adapter_id == "forge-mes"
 
     async def test_full_lifecycle_mes(self, servicer: InMemoryServicer) -> None:
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
@@ -147,7 +147,7 @@ class TestMesTransportAdapter:
         assert isinstance(flushed, int)
 
     async def test_close_mes(self, servicer: InMemoryServicer) -> None:
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 

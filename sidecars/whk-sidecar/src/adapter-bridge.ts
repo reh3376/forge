@@ -48,7 +48,7 @@ function nowTimestamp(): ProtoTimestamp {
 export interface AdapterBridgeConfig {
   /** GraphQL endpoint URL */
   graphqlUrl: string;
-  /** Adapter ID (e.g. "whk-wms", "whk-mes") */
+  /** Adapter ID (e.g. "whk-wms", "forge-mes") */
   adapterId: string;
   /** Adapter version */
   adapterVersion: string;

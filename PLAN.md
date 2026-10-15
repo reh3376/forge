@@ -40,7 +40,7 @@ Each Forge module evolves from (or replaces) an existing WHK production system. 
 | 3 | **OT UI Builder** | Future | TBD | User-built HMI screens, dashboards, P&ID graphics. Replaces Ignition Perspective. |
 | 4 | **CMMS** | `reh3376/whk-cmms` | NestJS 10, Prisma, PostgreSQL | PM scheduling, work orders, asset registry, inventory. |
 | 5 | **WMS** | `WhiskeyHouse/whk-wms` | TypeScript, NestJS+Next.js | Barrel tracking, ownership, transfers, lot management. 507K LOC. |
-| 6 | **MES** | `WhiskeyHouse/whk-mes` | NestJS+Next.js 15, Turborepo | Production orders, recipes, scheduling, quality, ERP sync. 50+ models. |
+| 6 | **Forge MES** | `modules/Forge MES` (first-party module; migrated from `WhiskeyHouse/whk-mes` 2026-10-15) | NestJS+Next.js 15, Turborepo | Production orders, recipes, scheduling, quality, ERP sync. 84 Prisma models. forge-mes replaces whk-mes; backend + frontend sections. |
 | 7 | **IMS** | `reh3376/bosc_ims` | Go+gRPC, Python sidecar | Aerospace supply chain inventory. Compliance-enforcing spoke. |
 | 8 | **QMS** | New build (reference repos) | TBD | Document control, CAPA, audits, GRC. Replaces Intellect QMS ($19k/yr). |
 | 9 | **ERP Connector** | `WhiskeyHouse/whk-erpi` | NestJS 11, TypeScript | Bidirectional NetSuite sync. 38 RabbitMQ topics, outbox pattern. |
@@ -402,7 +402,7 @@ If context is lost (compaction, new session, crash):
 | # | Module | Adapter Status | FACTS Spec | FTTS Compliant | Priority |
 |---|--------|---------------|------------|----------------|----------|
 | 5 | WMS | **Complete** (Path 3) | whk-wms.facts.json (48 tests) | Yes | — (done) |
-| 6 | MES | **Complete** (Path 4) | whk-mes.facts.json (64 tests) | Yes | — (done) |
+| 6 | Forge MES | **Adapter complete** (Path 4, renamed forge-mes); **module migrated** into `modules/Forge MES` (backend + frontend), build-out in progress | forge-mes.facts.json (64 tests, re-approved 2026-10-15) | Yes | P0 — active |
 | 9 | ERP Connector | **Adapter complete** (98 tests passing) | **FACTS-compliant** (whk-erpi.facts.json, hash verified) | Yes | P1 — done |
 | 4 | CMMS | **Adapter complete** (157 tests passing, 4 skipped) | **FACTS-compliant** (whk-cmms.facts.json, hash verified) | Yes | P2 — done |
 | 10 | NMS | **Adapter complete** (77 tests passing) | **FACTS-compliant** (whk-nms.facts.json, hash verified) | Yes | P3 — done |

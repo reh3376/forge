@@ -1,0 +1,447 @@
+---
+description: Mandatory 6-step development workflow with TaskMaster + Graphiti MCP integration
+alwaysApply: true
+---
+
+# 🚀 Development Workflow - TaskMaster + Memory + Context Framework
+
+## **🎯 MANDATORY DEVELOPMENT PATTERN**
+
+### **Every Development Session MUST Follow This 6-Step Flow:**
+
+```typescript
+// 1. TASK CONTEXT: Get current task and search existing knowledge
+const currentTask = mcp_taskmaster-ai_next_task()
+const relatedNodes = mcp_graphiti-memory_search_memory_nodes(currentTask.title)
+const relatedFacts = mcp_graphiti-memory_search_memory_facts(currentTask.description)
+const similarPatterns = mcp_qdrant_qdrant-find(`similar to ${currentTask.description}`)
+
+// 2. SYSTEM CONTEXT: Query current system state
+const systemState = mcp_neo4j-cypher_execute_query("MATCH (n) RETURN n LIMIT 10")
+const currentData = postgres-mes-local.query("SELECT * FROM relevant_table LIMIT 10")
+
+// 3. IMPLEMENTATION: Code the solution
+// ... your implementation work ...
+
+// 4. MEMORY UPDATE: Document in knowledge graph (MANDATORY)
+mcp_graphiti-memory_add_memory({
+  name: `Implementation: ${currentTask.title}`,
+  episode_body: `
+    Task: ${currentTask.title}
+    Approach: [specific technical approach]
+    Files modified: [list of files]
+    Key decisions: [architectural choices]
+    Integration points: [systems connected]
+    Patterns established: [reusable patterns]
+  `,
+  source: "text"
+})
+
+// 5. VECTOR STORAGE: Store searchable patterns
+mcp_qdrant_qdrant-store({
+  information: `Solution: ${currentTask.title} implemented using [approach] with [key patterns]`,
+  metadata: { 
+    task_id: currentTask.id,
+    type: "implementation",
+    component: "ComponentName"
+  }
+})
+
+// 6. TASK COMPLETION: Update task status
+mcp_taskmaster-ai_set_task_status({
+  id: currentTask.id,
+  status: "done"
+})
+```
+
+## **📋 Development Workflow Phases**
+
+### **Phase 1: Session Initialization (MANDATORY)**
+
+```typescript
+// A. Get Current Task Context
+const nextTask = mcp_taskmaster-ai_next_task()
+// OR: const tasks = mcp_taskmaster-ai_get_tasks({status: "pending"})
+
+// B. Search Knowledge Graph for Related Entities
+const relatedEntities = mcp_graphiti-memory_search_memory_nodes(nextTask.title)
+const relatedFacts = mcp_graphiti-memory_search_memory_facts(nextTask.description)
+
+// C. Find Similar Patterns in Vector Database
+const similarPatterns = mcp_qdrant_qdrant-find(`implementation patterns for ${nextTask.description}`)
+
+// D. Query Current System State
+const systemSchema = mcp_neo4j-cypher_execute_query("MATCH (n:Table) RETURN n.name")
+const currentData = postgres-mes-local.query("SELECT * FROM relevant_table LIMIT 10")
+
+// E. Check Infrastructure Status (Optional)
+const containerStatus = mcp_MCP_DOCKER.listContainers()
+```
+
+### **Phase 2: Task Analysis & Planning**
+
+```typescript
+// A. Analyze Task Complexity
+const complexityAnalysis = mcp_taskmaster-ai_analyze_project_complexity({
+  ids: nextTask.id,
+  research: true
+})
+
+// B. Expand Complex Tasks if Needed
+if (complexityAnalysis.score > 5) {
+  mcp_taskmaster-ai_expand_task({
+    id: nextTask.id,
+    research: true,
+    force: true
+  })
+}
+
+// C. Document Planning Phase
+mcp_graphiti-memory_add_memory({
+  name: `Planning: ${nextTask.title}`,
+  episode_body: `
+    Task analysis: [complexity findings]
+    Implementation strategy: [planned approach]
+    Dependencies identified: [system dependencies]
+    Risk assessment: [potential challenges]
+  `,
+  source: "text"
+})
+```
+
+### **Phase 3: Implementation (CONTINUOUS DOCUMENTATION)**
+
+```typescript
+// A. Start Implementation
+mcp_taskmaster-ai_set_task_status({
+  id: nextTask.id,
+  status: "in-progress"
+})
+
+// B. Code Implementation
+// ... your actual coding work ...
+
+// C. Document Progress (DO THIS FREQUENTLY)
+mcp_taskmaster-ai_update_task({
+  id: nextTask.id,
+  prompt: `
+    Progress update: [current status]
+    Discoveries: [new findings]
+    Challenges: [obstacles encountered]
+    Solutions: [approaches taken]
+    Next steps: [planned actions]
+  `
+})
+
+// D. Update Knowledge Graph During Implementation
+mcp_graphiti-memory_add_memory({
+  name: `${nextTask.title} - Implementation Progress`,
+  episode_body: `
+    Phase: Implementation
+    Files modified: [specific files]
+    Architectural decisions: [key choices made]
+    Integration points: [systems connected]
+    Performance considerations: [optimization notes]
+    Testing approach: [validation strategy]
+  `,
+  source: "text"
+})
+```
+
+### **Phase 4: Cross-System Integration Documentation**
+
+```typescript
+// A. Document System Integration Points
+mcp_graphiti-memory_add_memory({
+  name: "System Integration Point",
+  episode_body: JSON.stringify({
+    component: "ComponentName",
+    database_tables: ["table1", "table2"],
+    api_endpoints: ["/api/endpoint"],
+    business_process: "ProcessName",
+    implementation_details: "specific technical approach",
+    related_tasks: [nextTask.id],
+    integration_type: "database|api|ui|business_logic"
+  }),
+  source: "json"
+})
+
+// B. Store Reusable Patterns
+mcp_qdrant_qdrant-store({
+  information: `Integration pattern: ${component} connects to [systems] via [method] for [purpose]`,
+  metadata: {
+    type: "integration_pattern",
+    component: "ComponentName",
+    systems: ["database", "api", "ui"],
+    task_id: nextTask.id
+  }
+})
+```
+
+### **Phase 5: Testing & Validation**
+
+```typescript
+// A. UI Testing with Playwright (when applicable)
+playwright.goto("http://localhost:3000/feature-url")
+playwright.click("[data-testid='feature-button']")
+playwright.waitForSelector("[data-testid='success-indicator']")
+
+// B. Validate Database Changes
+const validationResult = postgres-mes-local.query(`
+  SELECT * FROM ${affectedTable} 
+  WHERE ${validationCondition}
+`)
+
+// C. Document Testing Results
+mcp_graphiti-memory_add_memory({
+  name: `Testing: ${nextTask.title}`,
+  episode_body: `
+    Test scenarios: [what was tested]
+    UI validation: [user interface testing]
+    Database validation: [data integrity checks]
+    Integration testing: [cross-system validation]
+    Performance testing: [performance metrics]
+    Edge cases: [boundary conditions tested]
+  `,
+  source: "text"
+})
+```
+
+### **Phase 6: Completion & Knowledge Consolidation**
+
+```typescript
+// A. Final Implementation Documentation
+mcp_graphiti-memory_add_memory({
+  name: `Feature Complete: ${nextTask.title}`,
+  episode_body: JSON.stringify({
+    feature: nextTask.title,
+    implementation_approach: "detailed technical approach",
+    components_created: ["Component1", "Component2"],
+    apis_integrated: ["/api/endpoint1", "/api/endpoint2"],
+    database_changes: ["table1", "table2"],
+    business_value: "specific business outcome",
+    testing_strategy: "how feature was validated",
+    deployment_notes: "deployment considerations",
+    lessons_learned: "key insights for future work"
+  }),
+  source: "json"
+})
+
+// B. Store Final Patterns for Future Use
+mcp_qdrant_qdrant-store({
+  information: `Complete solution: ${nextTask.title} - [summary of approach and key patterns]`,
+  metadata: {
+    type: "complete_solution",
+    feature: nextTask.title,
+    complexity: complexityAnalysis.score,
+    patterns: ["pattern1", "pattern2"],
+    task_id: nextTask.id
+  }
+})
+
+// C. Update Task Status
+mcp_taskmaster-ai_set_task_status({
+  id: nextTask.id,
+  status: "done"
+})
+
+// D. Generate Task Files (if needed)
+mcp_taskmaster-ai_generate()
+```
+
+## **🔄 Specialized Workflow Patterns**
+
+### **Bug Investigation Pattern**
+
+```typescript
+// 1. Context Gathering
+const bugKnowledge = mcp_graphiti-memory_search_memory_facts("error symptoms")
+const similarBugs = mcp_qdrant_qdrant-find("similar error patterns")
+const systemLogs = postgres-mes-local.query("SELECT * FROM logs WHERE level = 'ERROR'")
+
+// 2. Investigation Documentation
+mcp_graphiti-memory_add_memory({
+  name: "Bug Investigation: [Bug Title]",
+  episode_body: `
+    Symptoms: [observed behavior]
+    Investigation steps: [what was checked]
+    Root cause: [technical explanation]
+    Fix applied: [solution implemented]
+    Prevention: [how to avoid in future]
+  `
+})
+
+// 3. Solution Storage
+mcp_qdrant_qdrant-store({
+  information: "Bug fix: [problem] caused by [root cause] fixed by [solution]",
+  metadata: { 
+    type: "bug_fix",
+    severity: "high|medium|low",
+    component: "affected_component"
+  }
+})
+```
+
+### **Feature Development Pattern**
+
+```typescript
+// 1. Feature Planning
+const featureContext = mcp_graphiti-memory_search_memory_nodes("related features")
+const architecturalPatterns = mcp_qdrant_qdrant-find("similar feature implementations")
+
+// 2. Implementation Tracking
+mcp_taskmaster-ai_expand_task({
+  id: featureTaskId,
+  research: true,
+  num: "auto" // Based on complexity
+})
+
+// 3. Progressive Documentation
+// Document each subtask completion with:
+mcp_graphiti-memory_add_memory({
+  name: `Subtask Complete: ${subtaskTitle}`,
+  episode_body: "Implementation details and integration notes"
+})
+```
+
+### **Manufacturing-Specific Patterns**
+
+```typescript
+// Recipe Management Implementation
+mcp_graphiti-memory_add_memory({
+  name: "Recipe Management Implementation",
+  episode_body: JSON.stringify({
+    recipe_type: "IPA|Lager|Wheat",
+    components_affected: ["RecipeEditor", "IngredientManager"],
+    database_tables: ["recipes", "ingredients", "recipe_steps"],
+    business_process: "recipe creation and validation",
+    quality_controls: "validation rules implemented",
+    integration_points: ["ERP", "production_orders", "inventory"],
+    mqtt_topics: ["recipe/created", "recipe/updated"],
+    real_time_updates: "WebSocket integration for live updates"
+  }),
+  source: "json"
+})
+
+// Production Order Workflow
+mcp_graphiti-memory_add_memory({
+  name: "Production Order Implementation",
+  episode_body: JSON.stringify({
+    production_type: "batch|continuous",
+    components_affected: ["ProductionScheduler", "BatchTracker"],
+    database_tables: ["production_orders", "batch_actual", "equipment_phases"],
+    business_process: "production planning and execution",
+    real_time_integration: "MQTT topics and data flow",
+    quality_controls: "batch validation and quality checks",
+    operator_interface: "UI components for shop floor"
+  }),
+  source: "json"
+})
+```
+
+## **📊 Quality Assurance Checklist**
+
+### **Before Task Completion:**
+- [ ] Task context retrieved and analyzed
+- [ ] Existing knowledge searched and incorporated
+- [ ] System state queried and validated
+- [ ] Implementation approach documented
+- [ ] Cross-system integration points recorded
+- [ ] Testing strategy executed and documented
+- [ ] Knowledge graph updated with findings
+- [ ] Vector database populated with patterns
+- [ ] Task status updated to "done"
+
+### **Knowledge Quality Validation:**
+- [ ] Implementation approach is searchable by relevant terms
+- [ ] Architectural decisions are clearly documented
+- [ ] Integration points are properly mapped
+- [ ] Business value is articulated
+- [ ] Reusable patterns are identified and stored
+- [ ] Future considerations are noted
+
+### **Cross-System Consistency:**
+- [ ] Database changes are reflected in knowledge graph
+- [ ] API modifications are documented with examples
+- [ ] UI changes are linked to business processes
+- [ ] Performance implications are noted
+- [ ] Security considerations are addressed
+
+## **🎯 Manufacturing Context Integration**
+
+### **Brewery-Specific Workflow Enhancements**
+
+```typescript
+// Enzyme Dosing Implementation
+mcp_graphiti-memory_add_memory({
+  name: "Enzyme Dosing Implementation",
+  episode_body: JSON.stringify({
+    enzyme_types: ["alpha_amylase", "beta_glucanase"],
+    components_affected: ["EnzymeDosingPanel", "DosingCalculator"],
+    database_tables: ["enzyme_configurations", "additive_actual"],
+    business_process: "enzyme dosing and tracking",
+    calculation_logic: "dosing algorithms and formulas",
+    safety_controls: "dosing limits and validation",
+    real_time_monitoring: "MQTT integration for live dosing data",
+    quality_assurance: "batch tracking and validation"
+  }),
+  source: "json"
+})
+
+// Quality Control Integration
+mcp_graphiti-memory_add_memory({
+  name: "Quality Control Implementation",
+  episode_body: JSON.stringify({
+    quality_parameters: ["temperature", "pH", "specific_gravity"],
+    monitoring_systems: ["sensors", "manual_entry", "lab_results"],
+    database_tables: ["quality_measurements", "batch_parameters"],
+    business_process: "quality monitoring and control",
+    alert_systems: "threshold monitoring and notifications",
+    reporting: "quality reports and trend analysis"
+  }),
+  source: "json"
+})
+```
+
+## **⚡ Quick Reference Commands**
+
+### **Session Start:**
+```bash
+# Get next task
+mcp_taskmaster-ai_next_task()
+
+# Search existing knowledge
+mcp_graphiti-memory_search_memory_nodes("task topic")
+
+# Find similar patterns
+mcp_qdrant_qdrant-find("similar implementation")
+```
+
+### **During Implementation:**
+```bash
+# Update task progress
+mcp_taskmaster-ai_update_task({id: "X", prompt: "progress details"})
+
+# Document discoveries
+mcp_graphiti-memory_add_memory({name: "Discovery", episode_body: "details"})
+
+# Store patterns
+mcp_qdrant_qdrant-store({information: "pattern", metadata: {type: "solution"}})
+```
+
+### **Task Completion:**
+```bash
+# Mark task complete
+mcp_taskmaster-ai_set_task_status({id: "X", status: "done"})
+
+# Generate task files
+mcp_taskmaster-ai_generate()
+```
+
+---
+
+**Remember**: This workflow is mandatory. Every development action must contribute to the persistent knowledge graph and vector database. This ensures that all implementation decisions, patterns, and insights are preserved for future development sessions and team knowledge sharing.
+
+For comprehensive tool documentation, see @taskmaster-detailed.mdc.
+For MCP server selection guidance, see @mcp_servers.mdc.
+For UI-specific patterns, see @nextjs-tailwind.mdc.

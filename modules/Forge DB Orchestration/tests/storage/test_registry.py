@@ -120,7 +120,7 @@ class TestSchemaRegistry:
         registry = SchemaRegistry()
         registry.register(self._make_entry("whk-wms", "Barrel"))
         registry.register(self._make_entry("whk-wms", "Lot"))
-        registry.register(self._make_entry("whk-mes", "Recipe"))
+        registry.register(self._make_entry("forge-mes", "Recipe"))
         wms_entries = registry.list_by_spoke("whk-wms")
         assert len(wms_entries) == 2
 
@@ -186,7 +186,7 @@ class TestSchemaRegistry:
     def test_spoke_count(self):
         registry = SchemaRegistry()
         registry.register(self._make_entry("whk-wms", "Barrel"))
-        registry.register(self._make_entry("whk-mes", "Recipe"))
+        registry.register(self._make_entry("forge-mes", "Recipe"))
         registry.register(self._make_entry("whk-cmms", "Asset"))
         assert registry.spoke_count == 3
 

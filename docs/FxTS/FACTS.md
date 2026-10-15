@@ -37,7 +37,7 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 | Spec | Status | Tests | Data Sources | Context Mappings | Capabilities |
 |------|--------|-------|--------------|------------------|-------------|
 | `whk-wms.facts.json` | ✅ Sprint 2 complete | 48/48 | 14 | 11 + 3 enrichment | read, subscribe, backfill, discover |
-| `whk-mes.facts.json` | ✅ Sprint 3 complete | 64/64 | 17 | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover |
+| `forge-mes.facts.json` | ✅ Sprint 3 complete | 64/64 | 17 | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover |
 
 **Cross-spoke consistency:** 6 shared context fields (`lot_id`, `shift_id`, `operator_id`, `event_timestamp`, `event_type`, `work_order_id`). Identical shift definitions (America/Kentucky/Louisville, day/night). Shared RabbitMQ exchange topology (`wh.whk01.distillery01.*`). Both MES_MOM tier.
 
@@ -171,9 +171,9 @@ Data sources:
 
 Context fields: `manufacturing_unit_id` (barrel), `lot_id`, `physical_asset_id` (storage location), `business_entity_id` (customer), `event_timestamp`, `event_type`
 
-### whk-mes (Whiskey House Manufacturing Execution System)
+### forge-mes (Forge Manufacturing Execution System)
 
-**Spec File:** `src/forge/governance/facts/specs/whk-mes.facts.json`
+**Spec File:** `src/forge/governance/facts/specs/forge-mes.facts.json`
 **Tier:** MES_MOM
 **Protocol:** graphql+amqp+mqtt
 **Capabilities:** read, write, subscribe, backfill, discover

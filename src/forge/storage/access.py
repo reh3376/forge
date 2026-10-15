@@ -17,8 +17,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from forge._compat import StrEnum
 
@@ -51,7 +50,7 @@ class ModulePermission:
     schema_name: str
     access_level: AccessLevel
     granted_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
+        default_factory=lambda: datetime.now(tz=UTC)
     )
     granted_by: str = "forge-core"
     expires_at: datetime | None = None
@@ -61,7 +60,7 @@ class ModulePermission:
     def is_expired(self) -> bool:
         if self.expires_at is None:
             return False
-        return datetime.now(tz=timezone.utc) > self.expires_at
+        return datetime.now(tz=UTC) > self.expires_at
 
     @property
     def is_effective(self) -> bool:
@@ -77,7 +76,7 @@ class ConnectionGrant:
     schemas_accessible: list[str]
     access_level: AccessLevel
     issued_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
+        default_factory=lambda: datetime.now(tz=UTC)
     )
 
 
@@ -91,7 +90,7 @@ class AccessAuditEntry:
     access_level: AccessLevel | None = None
     reason: str = ""
     timestamp: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
+        default_factory=lambda: datetime.now(tz=UTC)
     )
 
 
@@ -167,7 +166,7 @@ class AccessController:
                 and perm.active
             ):
                 perm.access_level = access_level
-                perm.granted_at = datetime.now(tz=timezone.utc)
+                perm.granted_at = datetime.now(tz=UTC)
                 perm.granted_by = granted_by
                 perm.expires_at = expires_at
                 self._audit(
@@ -241,9 +240,9 @@ class AccessController:
                 perm.module_id == module_id
                 and perm.schema_name == schema_name
                 and perm.is_effective
+                and level_hierarchy[perm.access_level] >= level_hierarchy[required_level]
             ):
-                if level_hierarchy[perm.access_level] >= level_hierarchy[required_level]:
-                    return True
+                return True
         return False
 
     def list_grants(self, module_id: str | None = None) -> list[ModulePermission]:
@@ -298,7 +297,8 @@ class AccessController:
         }[g.access_level])
 
         # Role name derived from module_id
-        role = f"{module_id.replace('-', '_')}_{'rw' if max_level.access_level != AccessLevel.READ else 'ro'}"
+        suffix = "ro" if max_level.access_level == AccessLevel.READ else "rw"
+        role = f"{module_id.replace('-', '_')}_{suffix}"
         search_path = ",".join(schemas)
 
         conn_str = (
@@ -335,7 +335,7 @@ class AccessController:
         """
         defaults = [
             ("whk-wms", "mod_wms"),
-            ("whk-mes", "mod_mes"),
+            ("forge-mes", "mod_mes"),
             ("whk-erpi", "mod_erpi"),
             ("whk-cmms", "mod_cmms"),
             ("whk-nms", "mod_nms"),

@@ -1,5 +1,7 @@
 # P7 OT Module — Research Summary
 
+> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `modules/Forge MES` (backend + frontend). References to whk-mes below are historical and left unchanged.
+
 **Date:** 2026-04-08
 **Status:** Research complete, tag engine and scripting engine designed, sprint plan updated
 **Author:** Forge platform team

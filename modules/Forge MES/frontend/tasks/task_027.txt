@@ -1,0 +1,103 @@
+# Task ID: 27
+# Title: Implement Production Order Creation Wizard
+# Status: done
+# Dependencies: 9
+# Priority: high
+# Description: Create a multi-step wizard interface for creating production orders with recipe selection, basic info/parameters, BOM configuration, and tank configuration steps, integrated with the existing production scheduling interface.
+# Details:
+1. Extend the existing three-step Production Order Creation Wizard from Task 9 to a more comprehensive multi-step wizard with the following steps:
+
+   a. Recipe Selection:
+      - Implement a searchable and filterable recipe catalog
+      - Display recipe details including process parameters, expected yield, and quality metrics
+      - Add preview functionality to show recipe components and process flow
+      - Include version control indicators for recipes
+
+   b. Basic Information & Parameters:
+      - Create form fields for order name, batch ID, production date, quantity, priority
+      - Implement dynamic form validation using React Hook Form and Zod
+      - Add conditional fields based on recipe type selected
+      - Include production notes and special instructions fields
+
+   c. Bill of Materials (BOM) Configuration:
+      - Display the default BOM from the selected recipe
+      - Allow quantity adjustments with validation against inventory
+      - Implement material substitution functionality with compatibility checks
+      - Add lot/batch selection for raw materials with expiration date warnings
+      - Include cost calculation and variance from standard
+
+   d. Tank/Equipment Configuration:
+      - Create an interactive tank/equipment selection interface
+      - Implement availability checking against the production schedule
+      - Add capacity validation based on batch size
+      - Include cleaning status indicators and CIP scheduling
+      - Implement equipment-specific parameter configuration
+
+2. Integration Components:
+   - Connect wizard to the production scheduling interface from Task 9
+   - Implement state persistence between wizard steps using Zustand
+   - Create data validation at each step with clear error messaging
+   - Add a summary review step before final submission
+   - Implement draft saving functionality for incomplete orders
+
+3. UX Enhancements:
+   - Add progress indicator showing all steps and current position
+   - Implement keyboard navigation and shortcuts
+   - Create responsive design for all device sizes
+   - Add contextual help tooltips for complex fields
+   - Implement confirmation dialogs for potentially destructive actions
+
+4. Backend Integration:
+   - Connect to API endpoints for recipe data, inventory, equipment availability
+   - Implement real-time validation of selections against current system state
+   - Create proper error handling for API failures
+   - Add optimistic updates with rollback capability
+   - Implement WebSocket updates for collaborative editing
+
+5. Performance Considerations:
+   - Implement lazy loading of wizard steps
+   - Add caching for recipe and equipment data
+   - Optimize form rendering to prevent unnecessary re-renders
+   - Implement debounced validation for resource-intensive checks
+
+# Test Strategy:
+1. Unit Testing:
+   - Write Jest tests for all wizard components
+   - Test form validation logic for each step
+   - Verify state management between steps
+   - Test conditional rendering based on user selections
+   - Validate error handling for API failures
+
+2. Integration Testing:
+   - Test the complete wizard flow from start to finish
+   - Verify data persistence between steps
+   - Test integration with the production scheduling interface
+   - Validate that created orders appear correctly in the schedule
+   - Test draft saving and resuming functionality
+
+3. User Acceptance Testing:
+   - Create test scenarios covering different recipe types
+   - Test with production planners to validate workflow efficiency
+   - Verify that all required production information is captured
+   - Test edge cases like large BOMs and complex equipment configurations
+   - Validate that the wizard handles real-world production scenarios
+
+4. Performance Testing:
+   - Measure load times for each wizard step
+   - Test with large datasets (many recipes, extensive BOMs)
+   - Verify responsive behavior on different devices
+   - Test concurrent usage scenarios
+
+5. Accessibility Testing:
+   - Verify keyboard navigation throughout the wizard
+   - Test screen reader compatibility
+   - Check color contrast and text readability
+   - Validate that error messages are properly announced
+
+6. Cross-browser Testing:
+   - Test on Chrome, Firefox, Safari, and Edge
+   - Verify mobile functionality on iOS and Android devices
+
+7. Regression Testing:
+   - Verify that existing production scheduling functionality works correctly
+   - Test that other parts of the system are not affected by the new wizard

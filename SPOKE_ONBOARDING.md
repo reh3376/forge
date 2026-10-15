@@ -42,7 +42,7 @@ Each spoke is scored across 5 factors (1-5 scale, 5 = highest priority):
 | # | Module | Score | Status | Notes |
 |---|--------|-------|--------|-------|
 | 5 | **WMS** | — | **COMPLETE** | Path 3. 9 mappers, FACTS spec (48 tests), FTTS compliant. |
-| 6 | **MES** | — | **COMPLETE** | Path 4. 11 mappers, FACTS spec (64 tests), FTTS compliant. |
+| 6 | **MES → forge-mes** | — | **ADAPTER COMPLETE / MODULE IN BUILD-OUT** | Path 4 adapter (11 mappers, FACTS spec 64 tests, FTTS compliant), renamed forge-mes. whk-mes app migrated into `modules/Forge MES` (backend + frontend) on 2026-10-15; forge-mes replaces whk-mes. |
 
 ---
 

@@ -1,0 +1,114 @@
+version: "3"
+services:
+  server:
+    build:
+      context: .
+      args:
+        NPM_LOG_LEVEL: notice
+    ports:
+      - ${PORT}:3000
+    environment:
+      BCRYPT_SALT: ${BCRYPT_SALT}
+      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      LOG_LEVEL: ${LOG_LEVEL}
+      SERVICE_NAME: ${SERVICE_NAME}
+      JAEGER_AGENT_HOST: ${JAEGER_AGENT_HOST}
+      JAEGER_AGENT_PORT: ${JAEGER_AGENT_PORT}
+      OTEL_COLLECTOR_HOST: ${OTEL_COLLECTOR_HOST}
+      OTEL_COLLECTOR_PORT_GRPC: ${OTEL_COLLECTOR_PORT_GRPC}
+      OTEL_COLLECTOR_PORT_HTTP: ${OTEL_COLLECTOR_PORT_HTTP}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      RABBITMQ_URLS: ${RABBITMQ_URLS}
+      RABBITMQ_SUBSCRIBE_GROUP: ${RABBITMQ_SUBSCRIBE_GROUP}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      NEW_RELIC_NO_CONFIG_FILE: ${NEW_RELIC_NO_CONFIG_FILE}
+      NEW_RELIC_DISTRIBUTED_TRACING_ENABLED: ${NEW_RELIC_DISTRIBUTED_TRACING_ENABLED}
+      NEW_RELIC_LOG: ${NEW_RELIC_LOG}
+      NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+      NEW_RELIC_SECURITY_ENABLED: ${NEW_RELIC_SECURITY_ENABLED}
+      NEW_RELIC_SECURITY_AGENT_ENABLED: ${NEW_RELIC_SECURITY_AGENT_ENABLED}
+      AZURE_VAULT_NAME: ${AZURE_VAULT_NAME}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID}
+    depends_on:
+      - redis
+    restart: on-failure
+  migrate:
+    build:
+      context: .
+      args:
+        NPM_LOG_LEVEL: notice
+    command: >
+      /bin/sh -c "npm run db:prod:deploy && npm run prod:seed"
+    working_dir: /app/server
+    environment:
+      BCRYPT_SALT: ${BCRYPT_SALT}
+      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      MES_USER: ${MES_USER}
+      MES_PASSWORD: ${MES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:12
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 45s
+      interval: 10s
+      retries: 10
+  redis:
+    container_name: ${REDIS_HOST}
+    image: redis:7
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis:/data
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - ${JAEGER_AGENT_PORT}:${JAEGER_AGENT_PORT}
+      - 14268:14268
+      - 14250:4317
+  opentelemetry:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - ${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}
+      - ${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}
+      - 1888:1888
+      - 13133:13133
+      - 55670:55679
+    volumes:
+      - ./otel-config.yml:/etc/otel-config.yml
+    command:
+      - --config=/etc/otel-config.yml
+    depends_on:
+      - jaeger
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - 5672:5672
+      - 15672:15672
+volumes:
+  postgres: ~
+  redis:
+    driver: local
