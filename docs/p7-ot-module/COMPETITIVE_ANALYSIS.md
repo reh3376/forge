@@ -1,5 +1,7 @@
 # Forge OT Module — Competitive Analysis & Capability Mapping
 
+> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `modules/Forge MES` (backend + frontend). References to whk-mes below are historical and left unchanged.
+
 **Date:** 2026-04-08
 **Purpose:** Map Ignition's full capability set and define where Forge matches, exceeds, or delegates each capability.
 
