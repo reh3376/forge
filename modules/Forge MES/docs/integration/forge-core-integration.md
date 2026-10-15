@@ -182,6 +182,49 @@ curl -X POST http://localhost:8000/v1/adapters/forge-mes/write \
        "confirm":true}'
 ```
 
+### OT module orchestration
+
+BACKLOG FB-062. `forge.modules.ot.control.ChangeoverOrchestrator` closes the
+loop: it subscribes to the two MES topics and answers through the write-back
+path, so the sequence Ignition used to complete over REST now runs inside
+Forge.
+
+| MES publishes (retained) | Orchestrator does | MES write |
+|---|---|---|
+| `changeover/state` = AWAITING_CHANGEOVER | per `CipPolicy`: `EXTERNAL` wait, `RUNNER` run the `CipRunner`, `SKIP` report at once | `cip-complete` with the CIP times |
+| `recipe/next` (+ state CIP_COMPLETE / RECIPE_LOADING) | `RecipeWriteAdapter.execute_recipe_write` with `recipeParameters` mapped to PLC tags; only when **every** parameter reads back CONFIRMED | `recipe-loaded` with `scheduleOrderRecipeInstanceId`, `sourceUpdatedAt`, `cookerNumber` |
+| `changeover/state` = READY_TO_START | `confirm_start(area, operator)` or `auto_start` | `start-production` |
+| `changeover/state` = PRODUCTION | clears the pending/loaded recipe | |
+
+Rules: a recipe is loaded only when its `scheduleOrderId` is the area's
+`nextSOId` (a recipe that arrives before the state echo is parked); retained
+messages only synchronise state unless `act_on_retained=True`, and
+`resume(area)` acts on the current state after a restart; a partial recipe
+download leaves the MES in RECIPE_LOADING for `retry_recipe(area)`; every MES
+write attempt (delivered, refused or undeliverable) becomes a
+`ContextualRecord` on `ot.changeover.<area>.<command>` handed to the
+`record_sink` for the audit trail (FB-060).
+
+```python
+from forge.modules.ot.control import (
+    AreaChangeoverConfig, ChangeoverOrchestrator, CipPolicy, MesChangeoverClient,
+)
+
+orchestrator = ChangeoverOrchestrator(
+    MesChangeoverClient(app.state.write_dispatcher),
+    recipe_write_adapter,                      # RecipeWriteAdapter with per-equipment mappings
+    areas=[
+        AreaChangeoverConfig("cooker", equipment_id="Distillery01/COOKER_01",
+                             cooker_number="1", cip_policy=CipPolicy.RUNNER),
+        AreaChangeoverConfig("barreling", equipment_id="Barreling/LINE_01",
+                             cooker_number="B1", cip_policy=CipPolicy.SKIP, auto_start=True),
+    ],
+    cip_runner=plc_cip_sequence,               # async run(area, config) -> CipResult
+    record_sink=app.state.ingest_pipeline,     # anything with write_batch(records)
+)
+orchestrator.bind(mqtt_subscriber)             # whk/+/+/changeover/state, whk/+/+/recipe/next
+```
+
 ## Configuration
 
 | Variable | Default | Purpose |
@@ -238,7 +281,9 @@ is configured). `GET /v1/ingest/stats` on the hub shows per-session counters.
 
 Hub side: `tests/transport/test_spoke_callback.py` (dispatcher, servicer wiring,
 live gRPC against a spoke stub), `tests/api/test_write_api.py`,
-`tests/modules/ot/control/test_mes_changeover.py`.
+`tests/modules/ot/control/test_mes_changeover.py`,
+`tests/modules/ot/control/test_changeover_orchestrator.py` (full sequence
+against a fake MES, CIP policies, retained replay, partial downloads, outages).
 
 ## Persistence plan: `mod_mes`
 
@@ -276,7 +321,8 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Durable adapter registry and ingest audit log on the hub | FB-060 |
 | Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
 | Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 |
-| OT module drives the changeover sequence through `MesChangeoverClient` | FB-062 |
+| OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
+| CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 |
 | Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |
 | Dead-letter sink for exhausted batches | FB-056 |
