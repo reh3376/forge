@@ -1,0 +1,305 @@
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { ItemReceiptServiceBase } from "./base/itemReceipt.service.base";
+import { Prisma } from "@prisma/client";
+import { WhMessageBrokerTopics } from "../rabbitmq/topics";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { RabbitMQProducerService } from "../rabbitmq/rabbitmq.producer.service";
+import { Decimal } from "decimal.js";
+import { InventorySiloTrackingService } from "../inventory/inventory.silotracking.service";
+import { MessageQueueService } from "../rabbitmq/message-queue.service";
+
+@Injectable()
+export class ItemReceiptService extends ItemReceiptServiceBase {
+  constructor(
+    protected readonly prisma: PrismaService,
+    protected readonly rabbitProducer: RabbitMQProducerService,
+    protected readonly siloTrackingService: InventorySiloTrackingService,
+    protected readonly messageQueueService: MessageQueueService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger
+  ) {
+    super(prisma);
+  }
+
+  async createItemReceipt<T extends Prisma.ItemReceiptCreateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.ItemReceiptCreateArgs>
+  ): Promise<import(".prisma/client").ItemReceipt> {
+    // Extract the item ID correctly from the input data
+    let itemId: string | undefined;
+
+    if ((args.data as any).itemId) {
+      // Direct itemId property
+      itemId = (args.data as any).itemId;
+    } else if ((args.data as any).item?.connect?.id) {
+      // Prisma relation format
+      itemId = (args.data as any).item.connect.id;
+    } else {
+      throw new Error("Item ID is required when creating an ItemReceipt");
+    }
+
+    // Get the item with its itemGroup
+    const item = await this.prisma.item.findUnique({
+      where: { id: itemId },
+      select: {
+        id: true,
+        itemGroup: true,
+      },
+    });
+
+    if (!item) {
+      throw new Error("Item not found");
+    }
+
+    // Get both group-specific and common test parameter class definitions
+    const grainTests = await this.prisma.testParameter.findMany({
+      where: {
+        active: true,
+        isClassDef: true,
+        OR: [
+          { itemGroup: item.itemGroup }, // Group-specific tests
+          { itemGroup: null }, // Common tests that apply to all groups
+        ],
+      },
+    });
+
+    const itemReceipt = await this.prisma.$transaction(async (prisma) => {
+      const createdItemReceipt = await super.createItemReceipt({
+        data: args.data,
+        include: {
+          item: true,
+          purchaseOrder: true,
+        },
+      });
+
+      // create the grain test instances
+      for (const test of grainTests) {
+        await prisma.testParameter.create({
+          data: {
+            testParamUnits: test.testParamUnits,
+            name: test.name,
+            description: test.description,
+            createdBy: args.data.createdBy,
+            testSetpointType: test.testSetpointType,
+            testParamRevision: test.testParamRevision,
+            testSetpointBooleanValue: test.testSetpointBooleanValue,
+            testSetpointLowerLimit: test.testSetpointLowerLimit,
+            testSetpointUpperLimit: test.testSetpointUpperLimit,
+            testSetpointValue: test.testSetpointValue,
+            itemGroup: test.itemGroup,
+            active: true,
+            isClassDef: false,
+            classId: { connect: { id: test.id } },
+            itemReceipt: { connect: { id: createdItemReceipt.id } },
+            required: test.required,
+          },
+        });
+      }
+      return createdItemReceipt;
+    });
+
+    // Queue a create notification if needed
+    await this.messageQueueService.queueMessage(
+      itemReceipt.id,
+      "ItemReceipt",
+      WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
+      {
+        event_type: "create",
+        data: itemReceipt,
+        recordName: "ItemReceipt",
+      },
+      itemReceipt.createdBy
+    );
+
+    this.logger.log(
+      `Created and queued notification for ItemReceipt: ${itemReceipt.id}`
+    );
+
+    return itemReceipt;
+  }
+
+  async updateItemReceipt<T extends Prisma.ItemReceiptUpdateArgs>(
+    args: Prisma.SelectSubset<T, Prisma.ItemReceiptUpdateArgs>
+  ): Promise<import(".prisma/client").ItemReceipt> {
+    const itemReceipt = await super.updateItemReceipt(args);
+
+    // use the id from the update to get the record in the form we want for the message publishing
+    const itemReceiptPayload = await this.prisma.itemReceipt.findUnique({
+      where: { id: itemReceipt.id },
+      include: {
+        purchaseOrder: {
+          include: {
+            vendor: true,
+            item: true,
+          },
+        },
+        item: true,
+      },
+    });
+    const quantityInPounds = args.data.quantity;
+    this.logger.debug(`Quantity in the args: ${quantityInPounds}`);
+    // Check if quantity is in the args and over 10k
+    if (
+      quantityInPounds &&
+      typeof quantityInPounds === "number" &&
+      quantityInPounds > 10000
+    ) {
+      // Convert quantity to pounds based on grain type
+      this.logger.debug(
+        `Purchase order for the itemReceipt: ${itemReceiptPayload?.purchaseOrder}`
+      );
+
+      /* 
+      PATRICK MANNION - WHISKEY HOUSE OF KENTUCKY
+      2024-07-17
+
+      ERP BUDDIES PLACED LOGIC TO DO THIS CONVERSION. LEAVING THIS IN, IN CASE FUTURE NEED ARISES
+      */
+
+      if (
+        itemReceiptPayload?.purchaseOrder?.transactionGroup?.startsWith(
+          "RM-GR-"
+        )
+      ) {
+        const item = itemReceiptPayload?.item;
+        this.logger.debug(`Item for the itemReceipt: ${item}`);
+        if (item) {
+          // Map transaction group to unitLookup record name
+          const toUnitMap = {
+            "RM-GR-MLT": "bsc-mlt",
+            "RM-GR-WHT": "bsc-wht",
+            "RM-GR-COR": "bsc-cor",
+            "RM-GR-RYE": "Rye Bushel",
+          };
+        }
+      }
+
+      // Use the message queue service instead of direct rabbit producer
+      const messagePayload = {
+        event_type: "large_quantity_update",
+        data: itemReceiptPayload,
+        recordName: "ItemReceipt",
+      };
+
+      await this.messageQueueService.queueMessage(
+        itemReceipt.id,
+        "ItemReceipt",
+        WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
+        messagePayload,
+        itemReceipt.createdBy
+      );
+
+      this.logger.log(
+        `Queued large quantity update for ItemReceipt: ${itemReceipt.id}`
+      );
+
+      this.logger.debug(
+        `Updating inventory for itemReceipt: ${itemReceipt.id}`
+      );
+      const item = itemReceiptPayload?.item;
+      if (!item) {
+        throw new Error("Item not found");
+      }
+
+      // Map silo number to the silos and look up in the asset model
+      if (itemReceiptPayload.siloNumber) {
+        // Look up the asset based on the silo number
+        const siloNumberAssetNameMapping = {
+          1: "SIL-025",
+          2: "SIL-030",
+          3: "SIL-035",
+          4: "SIL-040",
+          5: "SIL-045",
+        };
+
+        const asset = await this.prisma.asset.findFirst({
+          where: {
+            name: {
+              contains:
+                siloNumberAssetNameMapping[
+                  itemReceiptPayload.siloNumber as keyof typeof siloNumberAssetNameMapping
+                ],
+              mode: "insensitive",
+            },
+            assetType: "UNIT",
+          },
+        });
+
+        if (asset) {
+          // If asset is found, use its ID for inventory tracking
+          try {
+            const currentInventory = await this.prisma.inventory.findFirst({
+              where: {
+                assetId: asset.id,
+                itemId: item.id,
+              },
+            });
+
+            const inventory = await this.siloTrackingService.addLotToAsset(
+              itemReceiptPayload.supplierLot as string,
+              asset.id,
+              itemReceiptPayload.quantity,
+              item.id,
+              itemReceipt.createdBy,
+              itemReceipt.id
+            );
+            this.logger.log(
+              `Added lot ${itemReceiptPayload.supplierLot} to asset ${asset.id} (Silo ${itemReceiptPayload.siloNumber})`
+            );
+          } catch (error) {
+            this.logger.error(`Error adding lot to asset: ${error}`);
+          }
+        } else {
+          this.logger.warn(
+            `Asset not found for Silo ${itemReceiptPayload.siloNumber}`
+          );
+        }
+      } else {
+        this.logger.warn("No silo number found for itemReceipt");
+      }
+    } else {
+      // For regular updates that don't involve large quantities, still queue a standard update message
+      await this.messageQueueService.queueMessage(
+        itemReceipt.id,
+        "ItemReceipt",
+        WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
+        {
+          event_type: "UPDATE",
+          data: itemReceiptPayload,
+          recordName: "ItemReceipt",
+        },
+        itemReceipt.updatedBy || itemReceipt.createdBy
+      );
+
+      this.logger.log(
+        `Queued update notification for ItemReceipt: ${itemReceipt.id}`
+      );
+    }
+
+    return itemReceipt;
+  }
+
+  async deleteItemReceipt<T extends Prisma.ItemReceiptDeleteArgs>(
+    args: Prisma.SelectSubset<T, Prisma.ItemReceiptDeleteArgs>
+  ): Promise<import(".prisma/client").ItemReceipt> {
+    const itemReceipt = await super.deleteItemReceipt(args);
+
+    // Use the message queue service for delete messages too
+    const messagePayload = {
+      event_type: "delete",
+      data: itemReceipt,
+      recordName: "ItemReceipt",
+    };
+
+    await this.messageQueueService.queueMessage(
+      itemReceipt.id,
+      "ItemReceipt",
+      WhMessageBrokerTopics.WhWhk01Distillery01Itemreceipt,
+      messagePayload,
+      itemReceipt.createdBy
+    );
+
+    this.logger.log(`Queued delete event for ItemReceipt: ${itemReceipt.id}`);
+
+    return itemReceipt;
+  }
+}

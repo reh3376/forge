@@ -1,0 +1,114 @@
+# Task ID: 4
+# Title: Set Up State Management and Data Fetching
+# Status: in-progress
+# Dependencies: 1, 3
+# Priority: high
+# Description: Implement Zustand for state management and TanStack Query for data fetching from REST and GraphQL endpoints, with real-time updates via WebSockets.
+# Details:
+1. ✅ Install and configure Zustand for state management with comprehensive production store architecture
+2. ✅ Set up TanStack Query with manufacturing-appropriate caching, retry logic, and refresh intervals
+3. ✅ Create API client for REST endpoints with Axios, including error handling and interceptors
+4. ✅ Set up GraphQL client with Apollo for MES/WMS endpoints
+5. ✅ Implement WebSocket connection for real-time data updates
+6. ✅ Create custom hooks for common data operations (CRUD for all entities)
+7. ✅ Implement caching strategies and query provider with devtools integration
+8. ✅ Set up error handling, retry logic, and authentication context
+9. ✅ Complete data fetching demo component
+10. ✅ Fix TypeScript type mismatches in demo components
+11. ✅ Document TypeScript fixes for future reference and team onboarding
+12. Performance testing and optimization deferred for later in development cycle
+
+# Test Strategy:
+Test state management with various production-specific actions. Verify data fetching from mock MES/WMS endpoints. Test WebSocket connections with simulated real-time manufacturing updates. Validate error handling and retry mechanisms. Perform performance testing with realistic manufacturing data volumes.
+
+# Subtasks:
+## 4.1. Zustand Store Architecture Implementation [completed]
+### Dependencies: None
+### Description: Implement comprehensive production store with recipes, production orders, batches, and equipment management
+### Details:
+
+
+## 4.2. TanStack Query Configuration [completed]
+### Dependencies: None
+### Description: Configure TanStack Query with manufacturing-appropriate caching, retry logic, and real-time refresh intervals
+### Details:
+
+
+## 4.3. REST API Client Implementation [completed]
+### Dependencies: None
+### Description: Create Axios-based client with proper error handling, request/response interceptors, and retry mechanisms
+### Details:
+
+
+## 4.4. GraphQL Integration [completed]
+### Dependencies: None
+### Description: Set up Apollo client for MES/WMS GraphQL endpoints with auth and error handling
+### Details:
+
+
+## 4.5. Custom Data Operation Hooks [completed]
+### Dependencies: None
+### Description: Develop React Query hooks for production data operations (CRUD operations for all entities)
+### Details:
+
+
+## 4.6. Authentication Context [completed]
+### Dependencies: None
+### Description: Implement authentication state management with token handling and user management
+### Details:
+
+
+## 4.7. Query Provider Implementation [completed]
+### Dependencies: None
+### Description: Create React Query provider component with devtools integration
+### Details:
+
+
+## 4.8. WebSocket Integration [completed]
+### Dependencies: None
+### Description: Implement WebSocket connection for real-time manufacturing data updates
+### Details:
+
+
+## 4.9. Data Fetching Demo Component [completed]
+### Dependencies: None
+### Description: Complete interactive demo component showcasing data fetching capabilities
+### Details:
+
+
+## 4.11. Performance Testing and Optimization [deferred]
+### Dependencies: None
+### Description: Conduct performance testing with realistic manufacturing data volumes and optimize as needed
+### Details:
+
+
+## 4.12. WebSocket Development Server [completed]
+### Dependencies: None
+### Description: Create and document development WebSocket server for simulating manufacturing equipment, batch quality metrics, and production alerts
+### Details:
+
+
+## 4.13. WebSocket Demo Component [completed]
+### Dependencies: None
+### Description: Create comprehensive WebSocket demo component with real-time manufacturing data simulation, visual indicators, and interactive message simulation
+### Details:
+
+
+## 4.14. WebSocket Environment Configuration [completed]
+### Dependencies: None
+### Description: Add WebSocket URL environment variable to env.template and update README with setup instructions
+### Details:
+
+
+## 4.15. Fix TypeScript Type Mismatches [completed]
+### Dependencies: None
+### Description: Resolve any remaining TypeScript type mismatches in demo components
+### Details:
+
+
+## 4.16. TypeScript Fixes Documentation [completed]
+### Dependencies: None
+### Description: Document all TypeScript fixes implemented across the 9 files for future reference and onboarding
+### Details:
+
+

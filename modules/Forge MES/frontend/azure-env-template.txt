@@ -1,0 +1,24 @@
+# Azure Entra ID Configuration Template
+# Copy these variables to your .env.local file and fill in your actual values
+
+# Frontend/Client-Side Variables (sent to browser)
+NEXT_PUBLIC_AZURE_CLIENT_ID=your-frontend-client-id
+NEXT_PUBLIC_AZURE_TENANT_ID=your-tenant-id
+NEXT_PUBLIC_AZURE_REDIRECT_URI=http://localhost:3000/dashboard
+NEXT_PUBLIC_AZURE_LOGOUT_URI=http://localhost:3000/
+
+# Optional: Override the authority URL (defaults to login.microsoftonline.com/{tenant-id})
+# NEXT_PUBLIC_AZURE_AUTHORITY=https://login.microsoftonline.com/your-tenant-id
+
+# Development Mode Controls
+# Set to 'true' to disable development mode and force Azure authentication
+NEXT_PUBLIC_DISABLE_DEV_MODE=false
+
+# Set to 'true' to enable demo user functionality for testing
+NEXT_PUBLIC_ENABLE_DEMO_USER=true
+
+# Example values (replace with your actual Azure AD app registration details):
+# NEXT_PUBLIC_AZURE_CLIENT_ID=12345678-1234-1234-1234-123456789012
+# NEXT_PUBLIC_AZURE_TENANT_ID=87654321-4321-4321-4321-210987654321
+# NEXT_PUBLIC_AZURE_REDIRECT_URI=https://yourdomain.com/dashboard
+# NEXT_PUBLIC_AZURE_LOGOUT_URI=https://yourdomain.com/ 

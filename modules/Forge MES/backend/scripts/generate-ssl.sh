@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Generate a self-signed certificate for the server to be used in development over HTTPS for local testing.
+# !!! DO NOT USE THIS IN PRODUCTION !!!
+
+# Allow overriding output directory via CERTS_DIR env var or first script arg
+certificates_dir="${CERTS_DIR:-${1:-./.certs}}"
+certificates_file="server.crt"
+key_file="server.key"
+ca_key_file="ca.key"
+ca_cert_file="ca.crt"
+
+# Create the certificates directory if it doesn't exist
+if [ ! -d "$certificates_dir" ]; then
+  mkdir -p "$certificates_dir"
+fi
+
+# Ensure directory is owned by current user and has safe permissions
+chmod 700 "$certificates_dir" 2>/dev/null || true
+
+# Generate the CA key and certificate
+openssl genrsa -out "$certificates_dir/$ca_key_file" 2048
+# Restrict private key permissions to user-only
+chmod 600 "$certificates_dir/$ca_key_file" 2>/dev/null || true
+openssl req -x509 -new -nodes -key "$certificates_dir/$ca_key_file" -sha256 -days 1825 -out "$certificates_dir/$ca_cert_file" <<END
+IN
+Odisha
+Rourkela
+Amplication
+Software
+localhost
+ca-ashish@amplication.com
+END
+
+# Generate the certificate and key files for localhost with the CA key and certificate
+openssl req -new -nodes -newkey rsa:2048 -keyout "$certificates_dir/$key_file" -out "$certificates_dir/server.csr" <<END
+IN
+Odisha
+Rourkela
+Amplication
+Software
+localhost
+ashishpadhy@amplication.com
+password
+Plugin
+END
+
+openssl x509 -req -sha256 -days 1825 -in "$certificates_dir/server.csr" -CA "$certificates_dir/$ca_cert_file" -CAkey "$certificates_dir/$ca_key_file" -CAcreateserial -out "$certificates_dir/$certificates_file"
+
+# Restrict server key permissions and relax cert read permissions
+chmod 600 "$certificates_dir/$key_file" 2>/dev/null || true
+chmod 644 "$certificates_dir/$certificates_file" 2>/dev/null || true
+chmod 644 "$certificates_dir/$ca_cert_file" 2>/dev/null || true
+
+# Remove the certificate signing request
+rm "$certificates_dir/server.csr"
+
+# Remove the CA serial file
+# Get the CA serial file name from the CA certificate file name by replacing the extension with .srl
+ca_serial_file="${ca_cert_file%.*}.srl"
+rm "$certificates_dir/$ca_serial_file"

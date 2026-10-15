@@ -1,0 +1,502 @@
+---
+description: Comprehensive guide for Next.js and TailwindCSS development
+alwaysApply: false
+---
+# Next.js & TailwindCSS Development Guide
+
+## **Core Architecture Patterns**
+
+- **App Router Structure**: Use Next.js 15+ app directory with proper route groups
+- **Server Components**: Default to server components, use client components only when needed
+- **TypeScript**: Strict mode enabled, proper type definitions for all props and APIs
+- **Tailwind CSS**: Utility-first styling with custom design system
+- **Shadcn UI**: Consistent component library with proper theming
+
+## **Component Development Standards**
+
+### **Manufacturing UI Components**
+```typescript
+// ✅ DO: Manufacturing-specific component structure
+interface ProductionLineStatusProps {
+  lineId: string;
+  status: 'running' | 'stopped' | 'maintenance';
+  currentBatch?: BatchData;
+  telemetryData: TelemetryReading[];
+}
+
+export function ProductionLineStatus({ 
+  lineId, 
+  status, 
+  currentBatch, 
+  telemetryData 
+}: ProductionLineStatusProps) {
+  return (
+    <Card className="border-l-4 border-l-production-active data-[status=stopped]:border-l-production-stopped">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <StatusIndicator status={status} />
+          Line {lineId}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Real-time telemetry display */}
+        <TelemetryChart data={telemetryData} />
+        {currentBatch && <BatchProgress batch={currentBatch} />}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### **Form Patterns with React Hook Form + Zod**
+```typescript
+// ✅ DO: Manufacturing form validation
+const recipeSchema = z.object({
+  name: z.string().min(1, "Recipe name required"),
+  batchSize: z.number().min(1).max(10000),
+  enzymeConfigurations: z.array(z.object({
+    enzymeId: z.string(),
+    dosageAmount: z.number().min(0),
+    dosageUnit: z.enum(['ml', 'g', 'kg']),
+    temperatureRange: z.object({
+      min: z.number().min(0).max(100),
+      max: z.number().min(0).max(100)
+    })
+  }))
+});
+
+export function RecipeForm() {
+  const form = useForm<z.infer<typeof recipeSchema>>({
+    resolver: zodResolver(recipeSchema),
+    defaultValues: {
+      name: '',
+      batchSize: 1000,
+      enzymeConfigurations: []
+    }
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Recipe Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter recipe name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* Additional fields */}
+      </form>
+    </Form>
+  );
+}
+```
+
+### **Real-time Data Integration**
+```typescript
+// ✅ DO: MQTT/WebSocket integration patterns
+export function useRealTimeTemperature(equipmentId: string) {
+  const [temperature, setTemperature] = useState<number | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    const mqtt = new MQTTClient({
+      url: process.env.NEXT_PUBLIC_MQTT_URL!,
+      topics: [`equipment/${equipmentId}/temperature`]
+    });
+
+    mqtt.on('connect', () => setIsConnected(true));
+    mqtt.on('message', (topic, payload) => {
+      const data = JSON.parse(payload.toString());
+      setTemperature(data.value);
+    });
+
+    return () => mqtt.disconnect();
+  }, [equipmentId]);
+
+  return { temperature, isConnected };
+}
+```
+
+## **State Management with Zustand**
+
+### **Production Store Pattern**
+```typescript
+// ✅ DO: Domain-specific Zustand stores
+interface ProductionState {
+  activeOrders: ProductionOrder[];
+  currentBatches: BatchData[];
+  equipmentStatus: Record<string, EquipmentStatus>;
+  // Actions
+  updateBatchStatus: (batchId: string, status: BatchStatus) => void;
+  addProductionOrder: (order: ProductionOrder) => void;
+  updateEquipmentStatus: (equipmentId: string, status: EquipmentStatus) => void;
+}
+
+export const useProductionStore = create<ProductionState>((set, get) => ({
+  activeOrders: [],
+  currentBatches: [],
+  equipmentStatus: {},
+  
+  updateBatchStatus: (batchId, status) => set(state => ({
+    currentBatches: state.currentBatches.map(batch =>
+      batch.id === batchId ? { ...batch, status } : batch
+    )
+  })),
+  
+  addProductionOrder: (order) => set(state => ({
+    activeOrders: [...state.activeOrders, order]
+  })),
+  
+  updateEquipmentStatus: (equipmentId, status) => set(state => ({
+    equipmentStatus: { ...state.equipmentStatus, [equipmentId]: status }
+  }))
+}));
+```
+
+## **Data Fetching with React Query**
+
+### **Manufacturing API Patterns**
+```typescript
+// ✅ DO: React Query for manufacturing data
+export function useRecipes(filters?: RecipeFilters) {
+  return useQuery({
+    queryKey: ['recipes', filters],
+    queryFn: () => api.recipes.getAll(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds for live data
+  });
+}
+
+export function useBatchTelemetry(batchId: string) {
+  return useQuery({
+    queryKey: ['batch-telemetry', batchId],
+    queryFn: () => api.batches.getTelemetry(batchId),
+    refetchInterval: 1000, // Real-time updates
+    enabled: !!batchId,
+  });
+}
+
+export function useCreateRecipe() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (recipe: CreateRecipeInput) => api.recipes.create(recipe),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recipes'] });
+      toast.success('Recipe created successfully');
+    },
+    onError: (error) => {
+      toast.error(`Failed to create recipe: ${error.message}`);
+    }
+  });
+}
+```
+
+## **Styling and Design System**
+
+### **Manufacturing-Specific Tailwind Classes**
+```typescript
+// ✅ DO: Semantic CSS classes for manufacturing
+const statusClasses = {
+  running: 'bg-green-500 text-white',
+  stopped: 'bg-red-500 text-white',
+  maintenance: 'bg-yellow-500 text-black',
+  idle: 'bg-gray-500 text-white'
+};
+
+const priorityClasses = {
+  high: 'border-l-4 border-l-red-500',
+  medium: 'border-l-4 border-l-yellow-500',
+  low: 'border-l-4 border-l-green-500'
+};
+
+// ✅ DO: Responsive manufacturing layouts
+<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+  <ProductionLineCard />
+  <EquipmentStatusCard />
+  <BatchProgressCard />
+</div>
+```
+
+### **Custom Shadcn Component Extensions**
+```typescript
+// ✅ DO: Manufacturing-specific component variants
+const alertVariants = cva(
+  "relative w-full rounded-lg border p-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-background text-foreground",
+        production: "border-green-200 bg-green-50 text-green-800",
+        maintenance: "border-yellow-200 bg-yellow-50 text-yellow-800",
+        alarm: "border-red-200 bg-red-50 text-red-800"
+      }
+    },
+    defaultVariants: {
+      variant: "default"
+    }
+  }
+);
+```
+
+## **Authentication Integration**
+
+### **Azure MSAL Integration**
+```typescript
+// ✅ DO: Manufacturing role-based access
+export function useManufacturingAuth() {
+  const { user, isAuthenticated } = useAuth();
+  
+  const hasRole = useCallback((role: ManufacturingRole) => {
+    return user?.roles?.includes(role) ?? false;
+  }, [user]);
+  
+  const canAccessEquipment = useCallback((equipmentId: string) => {
+    return hasRole('PRODUCTION_MANAGER') || 
+           hasRole('OPERATOR') || 
+           user?.assignedEquipment?.includes(equipmentId);
+  }, [user, hasRole]);
+  
+  return { hasRole, canAccessEquipment, user, isAuthenticated };
+}
+```
+
+## **Performance Optimization**
+
+### **Manufacturing Data Optimization**
+```typescript
+// ✅ DO: Optimize for real-time manufacturing data
+export const ProductionDashboard = memo(function ProductionDashboard() {
+  const { data: telemetry } = useBatchTelemetry(batchId);
+  
+  // Throttle real-time updates to prevent UI lag
+  const throttledTelemetry = useThrottle(telemetry, 1000);
+  
+  return (
+    <div className="grid gap-4">
+      <Suspense fallback={<ChartSkeleton />}>
+        <TelemetryChart data={throttledTelemetry} />
+      </Suspense>
+      <Suspense fallback={<TableSkeleton />}>
+        <BatchDataTable />
+      </Suspense>
+    </div>
+  );
+});
+
+// ✅ DO: Virtualization for large datasets
+export function RecipeDataTable({ recipes }: { recipes: Recipe[] }) {
+  const virtualizer = useVirtualizer({
+    count: recipes.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 50,
+  });
+  
+  return (
+    <div ref={parentRef} className="h-[400px] overflow-auto">
+      <div style={{ height: `${virtualizer.getTotalSize()}px` }}>
+        {virtualizer.getVirtualItems().map((virtualItem) => (
+          <RecipeRow
+            key={virtualItem.key}
+            recipe={recipes[virtualItem.index]}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: `${virtualItem.size}px`,
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## **Error Handling and Loading States**
+
+### **Manufacturing-Specific Error Boundaries**
+```typescript
+// ✅ DO: Production-aware error handling
+export function ProductionErrorBoundary({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary
+      fallback={({ error, resetError }) => (
+        <Alert variant="alarm">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Production System Error</AlertTitle>
+          <AlertDescription>
+            {error.message}
+            <Button onClick={resetError} className="mt-2">
+              Reset System
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+```
+
+## **Testing Patterns**
+
+### **Manufacturing Component Testing**
+```typescript
+// ✅ DO: Test manufacturing-specific behavior
+describe('ProductionLineStatus', () => {
+  it('should display alarm state for high temperature', () => {
+    const telemetryData = [
+      { timestamp: Date.now(), temperature: 95, pressure: 2.5 }
+    ];
+    
+    render(
+      <ProductionLineStatus
+        lineId="LINE-001"
+        status="running"
+        telemetryData={telemetryData}
+      />
+    );
+    
+    expect(screen.getByRole('alert')).toHaveClass('border-l-red-500');
+    expect(screen.getByText(/high temperature/i)).toBeInTheDocument();
+  });
+});
+```
+
+### **Playwright E2E Testing for Manufacturing**
+```typescript
+// ✅ DO: Test complete manufacturing workflows
+import { test, expect } from '@playwright/test';
+
+test.describe('Recipe Management Workflow', () => {
+  test('should create and validate new recipe', async ({ page }) => {
+    // Navigate to recipe management
+    await page.goto('/recipe-management');
+    
+    // Create new recipe
+    await page.click('[data-testid="create-recipe-button"]');
+    await page.fill('[data-testid="recipe-name"]', 'Test IPA Recipe');
+    await page.selectOption('[data-testid="recipe-type"]', 'IPA');
+    
+    // Add ingredients with validation
+    await page.click('[data-testid="add-ingredient"]');
+    await page.fill('[data-testid="ingredient-name-0"]', 'Pale Malt');
+    await page.fill('[data-testid="ingredient-amount-0"]', '10');
+    
+    // Save and verify
+    await page.click('[data-testid="save-recipe"]');
+    await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
+    
+    // Verify recipe appears in list
+    await expect(page.locator('text=Test IPA Recipe')).toBeVisible();
+  });
+  
+  test('should handle enzyme dosing workflow', async ({ page }) => {
+    await page.goto('/production/batch/123');
+    
+    // Test enzyme dosing interface
+    await page.click('[data-testid="enzyme-dosing-tab"]');
+    await page.fill('[data-testid="enzyme-amount"]', '2.5');
+    await page.click('[data-testid="dose-enzyme-button"]');
+    
+    // Verify real-time updates
+    await expect(page.locator('[data-testid="dosing-status"]')).toHaveText('Dosing Complete');
+    
+    // Verify database consistency
+    const response = await page.request.get('/api/additive-actual?batchId=123');
+    const data = await response.json();
+    expect(data[0].amount).toBe(2.5);
+  });
+});
+
+// ✅ DO: Test real-time data integration
+test.describe('Real-time Manufacturing Data', () => {
+  test('should update dashboard with live telemetry', async ({ page }) => {
+    await page.goto('/production/dashboard');
+    
+    // Mock MQTT data stream
+    await page.route('**/api/telemetry/stream', async route => {
+      await route.fulfill({
+        status: 200,
+        body: JSON.stringify({
+          temperature: 82.5,
+          pressure: 2.1,
+          timestamp: Date.now()
+        })
+      });
+    });
+    
+    // Verify live data updates
+    await expect(page.locator('[data-testid="temperature-reading"]')).toHaveText('82.5°C');
+    await expect(page.locator('[data-testid="pressure-reading"]')).toHaveText('2.1 PSI');
+  });
+});
+
+// ✅ DO: Test accessibility for manufacturing interfaces
+test.describe('Manufacturing UI Accessibility', () => {
+  test('should be keyboard navigable for operators', async ({ page }) => {
+    await page.goto('/production/control-panel');
+    
+    // Test keyboard navigation through critical controls
+    await page.keyboard.press('Tab');
+    await expect(page.locator('[data-testid="start-batch-button"]')).toBeFocused();
+    
+    await page.keyboard.press('Tab');
+    await expect(page.locator('[data-testid="stop-batch-button"]')).toBeFocused();
+    
+    // Test emergency stop accessibility
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-testid="emergency-stop-modal"]')).toBeVisible();
+  });
+});
+```
+
+## **Common Anti-Patterns**
+
+### **❌ DON'T: Avoid These Manufacturing UI Mistakes**
+```typescript
+// ❌ DON'T: Block UI with synchronous operations
+function BadProductionDashboard() {
+  const [data, setData] = useState();
+  
+  // This blocks the UI during data fetching
+  useEffect(() => {
+    const result = fetchProductionDataSync(); // Blocking call
+    setData(result);
+  }, []);
+}
+
+// ❌ DON'T: Ignore real-time data performance
+function BadTelemetryChart({ data }: { data: TelemetryPoint[] }) {
+  // This re-renders on every data point
+  return data.map(point => <DataPoint key={Math.random()} {...point} />);
+}
+
+// ❌ DON'T: Hardcode manufacturing values
+const TEMPERATURE_THRESHOLD = 85; // Should be configurable
+const BATCH_SIZE_LIMIT = 5000; // Should come from configuration
+```
+
+## **References**
+
+- [Next.js 15 Documentation](https://nextjs.org/docs)
+- [Shadcn UI Components](https://ui.shadcn.com/)
+- [React Hook Form](https://react-hook-form.com/)
+- [Zod Validation](https://zod.dev/)
+- [TanStack Query](https://tanstack.com/query/latest)
+- [Zustand State Management](https://zustand-demo.pmnd.rs/)
+description:
+globs:
+alwaysApply: false
+---
