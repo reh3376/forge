@@ -8,9 +8,10 @@ the hub hosts it. ``create_app`` builds an :class:`OTModuleHost` when
     FORGE_OT_CONTROL_CONFIG   OTControlConfig JSON (see control/config.py)
     FORGE_OT_TAGS_DIR         optional directory of ``*.tags.json`` definitions
 
-The host owns the tag registry and the adapter, starts them in the app
-lifespan, registers the adapter's manifest with the hub registry and
-mounts the control and i3X routers under ``/api/v1/ot``.
+The host owns the tag registry, the acquisition engine the PLC providers
+register on (FB-069) and the adapter, starts them in the app lifespan,
+registers the adapter's manifest with the hub registry and mounts the
+control and i3X routers under ``/api/v1/ot``.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ from typing import TYPE_CHECKING, Any
 from forge.modules.ot.adapter import OTModuleAdapter
 from forge.modules.ot.control.api import create_control_router
 from forge.modules.ot.control.runtime import ControlDependencies
+from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
 from forge.modules.ot.tag_engine.registry import TagRegistry
 
 if TYPE_CHECKING:
@@ -52,6 +54,8 @@ class OTModuleHost:
         self.config_path = Path(config_path)
         self.tags_dir = Path(tags_dir) if tags_dir else None
         self.registry = registry or TagRegistry()
+        # Shared by the PLC providers (FB-069) and the i3X namespace listing.
+        self.acquisition = AcquisitionEngine()
         self.adapter = OTModuleAdapter(
             self.registry,
             control=ControlDependencies(
@@ -59,6 +63,7 @@ class OTModuleHost:
                 record_sink=record_sink,
                 broker=broker,
                 publisher=publisher,
+                acquisition=self.acquisition,
             ),
         )
         self.tags_loaded = 0
@@ -99,7 +104,7 @@ class OTModuleHost:
                 create_i3x_router(
                     registry=self.registry,
                     template_registry=create_builtin_registry(),
-                    acquisition_engine=None,
+                    acquisition_engine=self.acquisition,
                 )
             )
         except Exception:  # pragma: no cover — browse API is optional

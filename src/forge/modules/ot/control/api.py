@@ -92,6 +92,31 @@ def create_control_router(runtime: RuntimeSource, *, prefix: str = "/api/v1/ot")
             since=since,
         )
 
+    # -- PLC connections (FB-069) ---------------------------------------------
+
+    @router.get("/control/connections")
+    async def control_connections() -> dict[str, Any]:
+        current = _runtime()
+        if current.connections is None:
+            return {
+                "started": False,
+                "supervisor": None,
+                "total": 0,
+                "connected": 0,
+                "connections": {},
+            }
+        return current.connections.status()
+
+    @router.post("/control/connections/{name}/restart")
+    async def restart_connection(name: str) -> dict[str, Any]:
+        current = _runtime()
+        if current.connections is None:
+            raise HTTPException(404, "no PLC connections are configured")
+        try:
+            return await current.connections.restart(name)
+        except KeyError as exc:
+            raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
+
     # -- changeover -----------------------------------------------------------
 
     @router.get("/changeover")

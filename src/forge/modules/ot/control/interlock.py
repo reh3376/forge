@@ -32,7 +32,6 @@ from forge.modules.ot.control.models import (
     WriteStatus,
 )
 
-
 # ---------------------------------------------------------------------------
 # Tag reader protocol
 # ---------------------------------------------------------------------------
@@ -175,8 +174,20 @@ class InterlockEngine:
             if not rule.enabled:
                 continue
 
-            # Read the check tag's live value
-            check_value = await self._reader.read_tag(rule.check_tag)
+            # Read the check tag's live value. A value of None is fail-open (see
+            # _evaluate_condition); a *failed read* is fail-closed — when the
+            # guard cannot be evaluated at all, the write is not safe (FB-069).
+            try:
+                check_value = await self._reader.read_tag(rule.check_tag)
+            except Exception as exc:
+                result.interlock_passed = False
+                result.interlock_error = (
+                    f"Interlock [{rule.rule_id}] {rule.name}: cannot read check tag "
+                    f"{rule.check_tag} ({type(exc).__name__}: {exc})"
+                )
+                result.interlock_rule_id = rule.rule_id
+                result.status = WriteStatus.REJECTED_INTERLOCK
+                return result
 
             blocked = _evaluate_condition(
                 actual=check_value,

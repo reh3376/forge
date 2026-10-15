@@ -59,9 +59,11 @@ from forge.modules.ot.control.config import (
     ConfigError,
     MqttIngressSettings,
     OTControlConfig,
+    PlcConnectionSpec,
     load_control_config,
     parse_control_config,
 )
+from forge.modules.ot.control.connections import PlcConnectionManager
 from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.mes_changeover import (
     CHANGEOVER_AREAS,
@@ -119,6 +121,8 @@ __all__ = [
     "OrchestrationEvent",
     "PlcCipRunner",
     "PlcCipSpec",
+    "PlcConnectionManager",
+    "PlcConnectionSpec",
     "RecipeParameterMapping",
     "RecipeSnapshot",
     "RecipeWriteAdapter",

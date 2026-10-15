@@ -430,3 +430,39 @@ class TestEdgeCases:
         req = _make_request("any/tag")
         result = await engine.check(req, WriteResult(request=req))
         assert result.interlock_passed is True
+
+
+class TestUnreadableCheckTag:
+    """A guard that cannot be evaluated blocks the write (fail-closed, FB-069)."""
+
+    @pytest.mark.asyncio
+    async def test_reader_exception_rejects_the_write(self):
+        from forge.modules.ot.control.models import (
+            InterlockCondition,
+            InterlockRule,
+            WriteRequest,
+            WriteResult,
+            WriteStatus,
+        )
+
+        class Unreadable:
+            async def read_tag(self, tag_path):
+                raise LookupError(f"unknown tag '{tag_path}'")
+
+        engine = InterlockEngine(tag_reader=Unreadable())
+        engine.add_rule(
+            InterlockRule(
+                rule_id="IL-X",
+                name="Pump guard",
+                target_tag_pattern="WH/*/Valve",
+                check_tag="WH/Pump/Running",
+                condition=InterlockCondition.IS_TRUE,
+            )
+        )
+        request = WriteRequest(tag_path="WH/P1/Valve", value=True)
+        result = await engine.check(request, WriteResult(request=request))
+        assert result.interlock_passed is False
+        assert result.status == WriteStatus.REJECTED_INTERLOCK
+        assert result.interlock_rule_id == "IL-X"
+        assert "cannot read check tag WH/Pump/Running" in result.interlock_error
+        assert "LookupError" in result.interlock_error

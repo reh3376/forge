@@ -38,6 +38,7 @@ from forge.modules.ot.control.audit import (
 from forge.modules.ot.control.authorization import WriteAuthorizer
 from forge.modules.ot.control.changeover_orchestrator import ChangeoverOrchestrator
 from forge.modules.ot.control.cip_runner import PlcCipRunner
+from forge.modules.ot.control.connections import PlcConnectionManager
 from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.mes_changeover import MesChangeoverClient
 from forge.modules.ot.control.recipe_integration import RecipeWriteAdapter
@@ -158,6 +159,12 @@ class ControlDependencies:
     publisher: Any | None = None
     now: Callable[[], datetime] | None = None
     sleep: Callable[[float], Awaitable[None]] | None = None
+    #: Shared ``AcquisitionEngine`` the PLC providers register on (the host hands
+    #: the i3X browse API the same one); created privately when absent.
+    acquisition: Any | None = None
+    #: Test hooks for :class:`~forge.modules.ot.control.connections.PlcConnectionManager`.
+    plc_client_factory: Callable[..., Any] | None = None
+    plc_provider_factory: Callable[..., Any] | None = None
     #: Test hook: ``ingress_factory(settings, subscriber, broker)`` → ingress or None.
     ingress_factory: Callable[..., Any] | None = None
 
@@ -185,7 +192,29 @@ class ControlRuntime:
         self._started = False
         self._owns_broker = False
         self._broker = deps.broker
-        self.tag_io = deps.tag_io if deps.tag_io is not None else RegistryTagIO(registry)  # type: ignore[arg-type]
+
+        # PLC connections (FB-069): one OpcUaProvider per configured PLC.
+        self.connections: PlcConnectionManager | None = None
+        if config.connections:
+            if registry is None:
+                msg = "PLC connections need a TagRegistry (their providers push values into it)"
+                raise ValueError(msg)
+            self.connections = PlcConnectionManager(
+                config.connections,
+                registry,
+                engine=deps.acquisition,
+                site_prefix=config.site_prefix,
+                client_factory=deps.plc_client_factory,
+                provider_factory=deps.plc_provider_factory,
+                poll_interval=config.connection_poll_seconds,
+                now=deps.now,
+            )
+        acquisition = self.connections.engine if self.connections is not None else deps.acquisition
+        self.tag_io = (
+            deps.tag_io
+            if deps.tag_io is not None
+            else RegistryTagIO(registry, acquisition=acquisition)  # type: ignore[arg-type]
+        )
 
         # Layers 1-3 + the engine.
         self.validator = WriteValidator()
@@ -266,6 +295,9 @@ class ControlRuntime:
     async def start(self) -> None:
         if self._started:
             return
+        # PLCs first, so tags are live before the first MES message is acted on.
+        if self.connections is not None:
+            await self.connections.start()
         settings = self._config.mqtt
         if settings.mode == "local" and self._broker is None:
             self._broker = ForgeMqttBroker(
@@ -344,6 +376,8 @@ class ControlRuntime:
             await self._broker.stop()
             self._broker = None
             self._owns_broker = False
+        if self.connections is not None:
+            await self.connections.stop()
 
     # -- feeding and publishing -----------------------------------------------
 
@@ -390,5 +424,6 @@ class ControlRuntime:
             "subscriber": self.subscriber.get_stats(),
             "engine": self.engine.get_stats(),
             "cip": self.cip_runner.status() if self.cip_runner is not None else {},
+            "connections": (self.connections.status() if self.connections is not None else None),
             "changeover": self.orchestrator.snapshot() if self.orchestrator is not None else None,
         }

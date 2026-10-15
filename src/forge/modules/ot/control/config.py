@@ -82,6 +82,50 @@ class MqttIngressSettings(BaseModel):
     publish_audit: bool = True
 
 
+class PlcConnectionSpec(BaseModel):
+    """One OPC-UA server (PLC) the module connects to (FB-069).
+
+    ``name`` is what Standard tags carry in ``connection_name``; the
+    provider built for this spec subscribes to those tags and serves
+    their reads and writes.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1)
+    #: ``opc.tcp://host:4840``
+    endpoint: str
+    #: OPC-UA namespace index of the PLC's tag tree (``PathNormalizer``).
+    namespace_index: int = Field(default=2, ge=0)
+    security_policy: Literal["None", "Basic256Sha256"] = "None"
+    certificate_path: str | None = None
+    private_key_path: str | None = None
+    trust_dir: str | None = None
+    server_certificate_path: str | None = None
+    session_timeout_ms: int = Field(default=60_000, ge=1_000)
+    request_timeout_ms: int = Field(default=10_000, ge=100)
+    #: Initial restart back-off (doubles up to a minute) when the PLC is unreachable.
+    reconnect_interval_ms: int = Field(default=1_000, ge=100)
+    max_reconnect_attempts: int = Field(default=0, ge=0)
+    enabled: bool = True
+
+    @model_validator(mode="after")
+    def _check(self) -> PlcConnectionSpec:
+        if not self.endpoint.startswith("opc.tcp://"):
+            msg = (
+                f"connection '{self.name}': endpoint must start with opc.tcp://, "
+                f"got {self.endpoint!r}"
+            )
+            raise ValueError(msg)
+        if self.security_policy != "None" and not (self.certificate_path and self.private_key_path):
+            msg = (
+                f"connection '{self.name}': security_policy {self.security_policy} needs "
+                "certificate_path and private_key_path"
+            )
+            raise ValueError(msg)
+        return self
+
+
 class ChangeoverAreaSpec(BaseModel):
     """One MES changeover area and the PLC CIP sequence behind it."""
 
@@ -120,6 +164,8 @@ class OTControlConfig(BaseModel):
 
     site: str = "whk01"
     topic_root: str = "whk"
+    #: First segment of Forge tag paths (``WH/WHK01/...``), for the path normaliser.
+    site_prefix: str = "WH"
     #: Identity recorded on MES writes, PLC writes and audit records.
     requested_by: str = OT_ADAPTER_ID
     #: Adapter id of the MES spoke the changeover commands are written to.
@@ -128,6 +174,10 @@ class OTControlConfig(BaseModel):
     audit_log: bool = True
     readback_tolerance: float = Field(default=0.001, ge=0)
     mqtt: MqttIngressSettings = Field(default_factory=MqttIngressSettings)
+    #: PLC connections (FB-069); empty means Standard tags have no live path.
+    connections: list[PlcConnectionSpec] = Field(default_factory=list)
+    #: Supervisor period for restarting dropped PLC connections; 0 disables it.
+    connection_poll_seconds: float = Field(default=5.0, ge=0)
     write_tags: list[TagWriteConfig] = Field(default_factory=list)
     interlocks: list[InterlockRule] = Field(default_factory=list)
     permissions: list[WritePermission] = Field(default_factory=list)
@@ -164,6 +214,7 @@ class OTControlConfig(BaseModel):
         )
         problems += _duplicates("recipes.equipment_id", [r.equipment_id for r in self.recipes])
         problems += _duplicates("changeover_areas.area", [a.area for a in self.changeover_areas])
+        problems += _duplicates("connections.name", [c.name for c in self.connections])
 
         known = set(tag_paths)
         for recipe in self.recipes:
@@ -206,6 +257,7 @@ class OTControlConfig(BaseModel):
             "topic_root": self.topic_root,
             "mes_adapter_id": self.mes_adapter_id,
             "mqtt_mode": self.mqtt.mode,
+            "connections": {c.name: c.endpoint for c in self.connections if c.enabled},
             "write_tags": len(self.write_tags),
             "interlocks": len(self.interlocks),
             "permissions": len(self.permissions),
