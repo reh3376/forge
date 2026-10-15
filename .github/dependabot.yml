@@ -3,6 +3,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule: { interval: "weekly" }
+    groups:
+      github-actions:
+        patterns: ["*"]
   - package-ecosystem: "pip"
     directory: "/"
     schedule: { interval: "weekly" }
@@ -12,6 +15,10 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/go"
     schedule: { interval: "weekly" }
+    groups:
+      go-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
   - package-ecosystem: "npm"
     directory: "/modules/Forge MES"
     schedule: { interval: "weekly" }
