@@ -29,9 +29,11 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
-      # setup-uv already created and activated .venv for the requested Python.
+      # Create .venv explicitly (setup-uv v5 pre-created it, v6 does not); --clear makes it idempotent.
       - name: Install (dev + ot extras)
-        run: uv pip install -e ".[dev,ot]"
+        run: |
+          uv venv --clear .venv
+          uv pip install --python .venv/bin/python -e ".[dev,ot]"
       - name: ruff (advisory until BACKLOG FB-022 is cleared)
         run: .venv/bin/ruff check . --output-format github
         continue-on-error: true
