@@ -1,0 +1,580 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://governance/fvts/v0.1.0",
+  "title": "Forge View Test Specification (FVTS)",
+  "description": "Governs the contract between Forge modules and forge-display. A module never renders UI; it declares what can be shown (data bindings, history, alarms), what can be done (actions, settings) and on which surfaces and render profiles. forge-display renderers (desktop HMI, desktop app, web, mobile) consume this contract. One FVTS spec per module.",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "view_identity",
+    "scope",
+    "data_bindings",
+    "live_updates",
+    "history",
+    "alarms",
+    "actions",
+    "settings",
+    "render_profiles",
+    "surfaces",
+    "design_system",
+    "conformance_tests"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.1.0",
+      "description": "FVTS schema version this spec conforms to. Must match exactly."
+    },
+    "view_identity": {
+      "type": "object",
+      "description": "Identifies the module's view contract.",
+      "required": ["view_id", "name", "version", "owner_module"],
+      "additionalProperties": false,
+      "properties": {
+        "view_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "Unique view-contract identifier (kebab-case)."
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semver version of this view contract. A breaking change to any binding, action or surface requires a major bump."
+        },
+        "owner_module": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "module/adapter_id of the module that owns this contract (matches its FACTS adapter_identity.adapter_id)."
+        },
+        "facts_spec_ref": {
+          "type": "string",
+          "description": "Path or forge:// URI of the owning module's FACTS spec. Data sources bound here must be declared there."
+        },
+        "description": { "type": "string" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "description": "Where in the plant hierarchy this contract's views apply, and which RecordContext fields every view must carry.",
+      "required": ["isa95_levels", "required_context_fields"],
+      "additionalProperties": false,
+      "properties": {
+        "isa95_levels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/isa95Level" },
+          "description": "ISA-95 hierarchy levels a view can be scoped to."
+        },
+        "required_context_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/contextField" },
+          "description": "RecordContext fields that must be present on every bound value (e.g. site, area, equipment_id)."
+        },
+        "multi_site": {
+          "type": "boolean",
+          "default": false,
+          "description": "True if a single view may aggregate data across sites. Cross-site views are read-only (runner check fvts:cross-site-read-only)."
+        }
+      }
+    },
+    "data_bindings": {
+      "type": "object",
+      "description": "Every value a renderer may display. Renderers may only bind to points declared here.",
+      "required": ["points"],
+      "additionalProperties": false,
+      "properties": {
+        "points": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/point" }
+        }
+      }
+    },
+    "live_updates": {
+      "type": "object",
+      "description": "Subscription contract for live values.",
+      "required": ["transport", "max_update_rate_hz", "heartbeat_ms", "on_disconnect", "coalescing"],
+      "additionalProperties": false,
+      "properties": {
+        "transport": {
+          "type": "string",
+          "enum": ["grpc_stream", "websocket", "sse"],
+          "description": "Wire mechanism from forge-core to the renderer. grpc_stream rides the FTTS-governed transport."
+        },
+        "max_update_rate_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 20,
+          "description": "Upper bound on per-point update rate delivered to any renderer. Profiles may lower it, never raise it."
+        },
+        "coalescing": {
+          "type": "string",
+          "const": "latest_wins",
+          "description": "When updates exceed the rate, only the most recent value per point is delivered."
+        },
+        "heartbeat_ms": {
+          "type": "integer",
+          "minimum": 250,
+          "maximum": 30000,
+          "description": "Max interval between messages on an idle subscription; missing heartbeats trigger on_disconnect."
+        },
+        "on_disconnect": {
+          "type": "string",
+          "const": "mark_all_stale",
+          "description": "On loss of the subscription every displayed value must be visibly marked stale. Never silently freeze."
+        },
+        "reconnect": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "initial_backoff_ms": { "type": "integer", "minimum": 100 },
+            "max_backoff_ms": { "type": "integer", "minimum": 1000 }
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "object",
+      "description": "Trend/history query contract.",
+      "required": ["enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "decimation": {
+          "type": "object",
+          "required": ["location", "algorithm"],
+          "additionalProperties": false,
+          "properties": {
+            "location": {
+              "type": "string",
+              "const": "server",
+              "description": "Decimation always happens server-side; renderers never receive raw full-resolution series."
+            },
+            "algorithm": {
+              "type": "string",
+              "enum": ["min_max_per_bucket", "lttb", "average_per_bucket"],
+              "description": "min_max_per_bucket preserves spikes and is the default for process trends."
+            }
+          }
+        },
+        "max_points_per_series": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 20000,
+          "description": "Hard cap on points returned per series per query."
+        },
+        "max_range_days": { "type": "integer", "minimum": 1 },
+        "as_of_queries": {
+          "type": "boolean",
+          "description": "Supports bitemporal as-of queries (what was known at transaction time T)."
+        },
+        "timestamp_basis": { "$ref": "#/$defs/timestampBasis" }
+      },
+      "if": { "properties": { "enabled": { "const": true } } },
+      "then": { "required": ["decimation", "max_points_per_series", "max_range_days", "timestamp_basis"] }
+    },
+    "alarms": {
+      "type": "object",
+      "description": "Alarm presentation and operator-operation contract. Alarm logic lives in the owning module (ISA-18.2 state machine); this governs how it is shown and operated.",
+      "required": ["enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "states": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 7,
+          "items": { "$ref": "#/$defs/alarmState" },
+          "description": "Must cover every AlarmState so no state is unrenderable."
+        },
+        "priorities": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/alarmPriority" }
+        },
+        "priority_tokens": {
+          "type": "object",
+          "description": "Design-system token for each priority. Alarm tokens are reserved: they may not be used for non-alarm content.",
+          "propertyNames": { "$ref": "#/$defs/alarmPriority" },
+          "additionalProperties": { "type": "string", "pattern": "^alarm\\.[a-z0-9.-]+$" }
+        },
+        "audible_annunciation": {
+          "type": "boolean",
+          "description": "Whether renderers that support sound must annunciate new ACTIVE_UNACK alarms."
+        }
+      },
+      "if": { "properties": { "enabled": { "const": true } } },
+      "then": { "required": ["states", "priorities", "priority_tokens", "audible_annunciation"] }
+    },
+    "actions": {
+      "type": "array",
+      "description": "Everything a user can do from a view. Safety behaviour (role, confirmation, interlocks, audit) is declared here and enforced in forge-core, never only in the UI.",
+      "items": { "$ref": "#/$defs/action" }
+    },
+    "settings": {
+      "type": "object",
+      "description": "Module configuration exposed for editing. Forms are generated from the referenced JSON Schema.",
+      "required": ["exposed"],
+      "additionalProperties": false,
+      "properties": {
+        "exposed": { "type": "boolean" },
+        "schema_ref": { "type": "string", "description": "forge:// URI or path to the JSON Schema of the module's settings." },
+        "required_role": { "$ref": "#/$defs/role" },
+        "apply_mode": {
+          "type": "string",
+          "enum": ["immediate", "staged_with_review"],
+          "description": "staged_with_review: edits are saved as a pending change set that a second authorized user applies."
+        },
+        "allowed_profiles": { "$ref": "#/$defs/profileList" }
+      },
+      "if": { "properties": { "exposed": { "const": true } } },
+      "then": { "required": ["schema_ref", "required_role", "apply_mode", "allowed_profiles"] }
+    },
+    "render_profiles": {
+      "type": "object",
+      "description": "Which forge-display render profiles this module supports, and any tightening of the platform baseline (see FVTS.md). Specs may tighten a baseline, never loosen it.",
+      "required": ["supported"],
+      "additionalProperties": false,
+      "properties": {
+        "supported": {
+          "$ref": "#/$defs/profileList"
+        },
+        "overrides": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/profile" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "max_update_rate_hz": { "type": "number", "exclusiveMinimum": 0 },
+              "writes_permitted": { "type": "boolean" },
+              "alarm_operations_permitted": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The screens/views this module offers. Configured surfaces are data authored per site; coded surfaces are application code. Both may only use declared points and actions.",
+      "items": { "$ref": "#/$defs/surface" }
+    },
+    "design_system": {
+      "type": "object",
+      "required": ["tokens_ref", "isa101_high_performance"],
+      "additionalProperties": false,
+      "properties": {
+        "tokens_ref": {
+          "type": "string",
+          "description": "forge:// URI of the platform design-token set this contract's surfaces use."
+        },
+        "isa101_high_performance": {
+          "type": "boolean",
+          "description": "True: surfaces follow ISA-101 high-performance HMI style (neutral base, colour reserved for abnormal states). Required true when any surface is an hmi_screen."
+        }
+      }
+    },
+    "conformance_tests": {
+      "type": "object",
+      "description": "Declares the test suite that validates this contract.",
+      "required": ["suite_path"],
+      "additionalProperties": false,
+      "properties": {
+        "suite_path": { "type": "string" },
+        "golden_messages_path": {
+          "type": "string",
+          "description": "Directory of golden contract messages (subscription, history, alarm, action result) every renderer must accept."
+        },
+        "renderers_under_test": { "$ref": "#/$defs/profileList" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Free-form metadata (no schema validation)."
+    },
+    "integrity": {
+      "type": "object",
+      "description": "FHTS Layer 1 integrity block — hash governance.",
+      "properties": {
+        "hash_method": { "type": "string" },
+        "spec_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "hash_state": {
+          "type": "string",
+          "enum": ["approved", "modified", "pending_review", "reverted", "unknown"]
+        },
+        "previous_hash": { "type": ["string", "null"] },
+        "approved_by": { "type": ["string", "null"] },
+        "approved_at": { "type": ["string", "null"] },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["previous_hash", "new_hash", "changed_at"],
+            "properties": {
+              "previous_hash": { "type": "string" },
+              "new_hash": { "type": "string" },
+              "changed_at": { "type": "string" },
+              "source": { "type": "string" },
+              "changed_by": { "type": "string" },
+              "change_type": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "isa95Level": {
+      "type": "string",
+      "enum": ["enterprise", "site", "area", "line", "cell", "equipment"]
+    },
+    "contextField": {
+      "type": "string",
+      "description": "Mirrors forge.core.models.contextual_record.RecordContext.",
+      "enum": ["site", "area", "equipment_id", "batch_id", "lot_id", "recipe_id", "operating_mode", "shift", "operator_id"]
+    },
+    "timestampBasis": {
+      "type": "string",
+      "description": "Which RecordTimestamp field a renderer displays and trends against.",
+      "enum": ["source_time", "server_time", "ingestion_time"]
+    },
+    "qualityCode": {
+      "type": "string",
+      "description": "Mirrors forge.core.models.contextual_record.QualityCode.",
+      "enum": ["GOOD", "UNCERTAIN", "BAD", "NOT_AVAILABLE"]
+    },
+    "alarmState": {
+      "type": "string",
+      "description": "Mirrors forge.modules.ot.alarming.models.AlarmState.",
+      "enum": ["NORMAL", "ACTIVE_UNACK", "ACTIVE_ACK", "CLEAR_UNACK", "SUPPRESSED", "SHELVED", "OUT_OF_SERVICE"]
+    },
+    "alarmPriority": {
+      "type": "string",
+      "description": "Mirrors forge.modules.ot.alarming.models.AlarmPriority.",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "DIAGNOSTIC"]
+    },
+    "alarmOperation": {
+      "type": "string",
+      "description": "Operator-initiated subset of AlarmAction. System actions (TRIGGER, CLEAR, SUPPRESS, UNSUPPRESS) are never exposed as UI actions.",
+      "enum": ["ACKNOWLEDGE", "SHELVE", "UNSHELVE", "DISABLE", "ENABLE", "RESET"]
+    },
+    "role": {
+      "type": "string",
+      "description": "Mirrors forge.modules.ot.control.models.WriteRole (hierarchy ADMIN > ENGINEER > OPERATOR), plus VIEWER for read-only access.",
+      "enum": ["VIEWER", "OPERATOR", "ENGINEER", "ADMIN"]
+    },
+    "writeStatus": {
+      "type": "string",
+      "description": "Mirrors forge.modules.ot.control.models.WriteStatus.",
+      "enum": ["CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION", "REJECTED_INTERLOCK", "REJECTED_AUTH", "FAILED_WRITE", "FAILED_READBACK", "PENDING"]
+    },
+    "profile": {
+      "type": "string",
+      "description": "forge-display render profile. Baseline constraints per profile are defined normatively in FVTS.md.",
+      "enum": ["desktop_hmi", "desktop_app", "web", "mobile"]
+    },
+    "profileList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/profile" }
+    },
+    "point": {
+      "type": "object",
+      "required": ["point_id", "label", "source", "data_type", "timestamp_basis", "quality_handling"],
+      "additionalProperties": false,
+      "properties": {
+        "point_id": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]*$", "maxLength": 128 },
+        "label": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "object",
+          "required": ["adapter_id", "tag_path"],
+          "additionalProperties": false,
+          "properties": {
+            "adapter_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+            "tag_path": {
+              "type": "string",
+              "description": "RecordSource.tag_path. May contain {placeholders} resolved from scope context (e.g. {area}/{equipment_id}/Temperature)."
+            }
+          }
+        },
+        "data_type": {
+          "type": "string",
+          "enum": ["BOOLEAN", "INT", "FLOAT", "DOUBLE", "STRING", "DATETIME", "ENUM"]
+        },
+        "engineering_units": { "type": "string" },
+        "display_precision": { "type": "integer", "minimum": 0, "maximum": 9 },
+        "range": {
+          "type": "object",
+          "required": ["lo", "hi"],
+          "additionalProperties": false,
+          "properties": { "lo": { "type": "number" }, "hi": { "type": "number" } },
+          "description": "Normal display/scale range. Not an interlock — interlocks live in the owning module."
+        },
+        "enum_labels": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Required when data_type is ENUM: raw value -> display label."
+        },
+        "timestamp_basis": { "$ref": "#/$defs/timestampBasis" },
+        "quality_handling": {
+          "type": "object",
+          "required": ["stale_after_ms", "on_bad", "on_uncertain"],
+          "additionalProperties": false,
+          "properties": {
+            "stale_after_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "A value older than this (by timestamp_basis) is displayed as stale."
+            },
+            "on_bad": {
+              "type": "string",
+              "enum": ["blank_with_marker", "last_value_with_marker"],
+              "description": "BAD and NOT_AVAILABLE presentation. A bad value is never shown without a marker."
+            },
+            "on_uncertain": {
+              "type": "string",
+              "enum": ["value_with_marker"],
+              "description": "UNCERTAIN is always shown with a marker."
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "data_type": { "const": "ENUM" } } },
+          "then": { "required": ["enum_labels"] }
+        },
+        {
+          "if": { "properties": { "data_type": { "enum": ["INT", "FLOAT", "DOUBLE"] } } },
+          "then": { "required": ["engineering_units", "display_precision"] }
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "required": ["action_id", "label", "kind", "required_role", "confirmation", "audit", "allowed_profiles"],
+      "additionalProperties": false,
+      "properties": {
+        "action_id": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]*$", "maxLength": 128 },
+        "label": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": ["tag_write", "alarm_operation", "module_command"]
+        },
+        "target_point": {
+          "type": "string",
+          "description": "point_id written by a tag_write action."
+        },
+        "alarm_operation": { "$ref": "#/$defs/alarmOperation" },
+        "command": {
+          "type": "string",
+          "description": "Module command name for module_command actions (must exist in the module's FATS/FACTS contract)."
+        },
+        "parameters_schema_ref": {
+          "type": "string",
+          "description": "JSON Schema for command parameters; renderers generate the input form from it."
+        },
+        "required_role": { "$ref": "#/$defs/role" },
+        "confirmation": {
+          "type": "string",
+          "enum": ["none", "confirm", "two_step_with_review"],
+          "description": "two_step_with_review: user enters value, then reviews old vs new value and confirms. Enforced by forge-core, not only drawn by the UI."
+        },
+        "reason_code_required": { "type": "boolean", "default": false },
+        "interlock_feedback": {
+          "type": "boolean",
+          "description": "Renderer must display interlock rejections (REJECTED_INTERLOCK) with the blocking condition."
+        },
+        "handled_statuses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/writeStatus" },
+          "description": "For tag_write: every WriteStatus the renderer must present distinctly."
+        },
+        "timeout_ms": { "type": "integer", "minimum": 100 },
+        "audit": {
+          "type": "boolean",
+          "const": true,
+          "description": "Every UI action is audited (who, what, old/new value, reason, profile, site)."
+        },
+        "allowed_profiles": { "$ref": "#/$defs/profileList" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "tag_write" } } },
+          "then": {
+            "required": ["target_point", "interlock_feedback", "handled_statuses", "timeout_ms"],
+            "properties": {
+              "required_role": { "enum": ["OPERATOR", "ENGINEER", "ADMIN"] },
+              "confirmation": { "enum": ["confirm", "two_step_with_review"] },
+              "interlock_feedback": { "const": true },
+              "handled_statuses": { "minItems": 8 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "alarm_operation" } } },
+          "then": { "required": ["alarm_operation"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "module_command" } } },
+          "then": { "required": ["command", "timeout_ms"] }
+        },
+        {
+          "if": { "properties": { "alarm_operation": { "enum": ["SHELVE", "DISABLE", "RESET"] } }, "required": ["alarm_operation"] },
+          "then": { "properties": { "reason_code_required": { "const": true } }, "required": ["reason_code_required"] }
+        }
+      ]
+    },
+    "surface": {
+      "type": "object",
+      "required": ["surface_id", "title", "kind", "authoring", "allowed_profiles", "points", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "surface_id": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]*$", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": ["hmi_screen", "dashboard", "trend", "alarm_summary", "form", "app_view", "settings"]
+        },
+        "authoring": {
+          "type": "string",
+          "enum": ["configured", "coded"],
+          "description": "configured: layout is versioned data authored per site; coded: application code driven by this contract."
+        },
+        "scope_level": { "$ref": "#/$defs/isa95Level" },
+        "allowed_profiles": { "$ref": "#/$defs/profileList" },
+        "points": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "point_ids this surface may bind. Must exist in data_bindings."
+        },
+        "actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "action_ids this surface may invoke. Must exist in actions."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "hmi_screen" } } },
+          "then": { "properties": { "authoring": { "const": "configured" } } }
+        }
+      ]
+    }
+  }
+}

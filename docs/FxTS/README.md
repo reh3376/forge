@@ -164,6 +164,7 @@ Every FxTS framework follows the same structure:
 | [FOTS](FOTS.md) | Forge Observability Test Specification | Pipeline health and SLOs | Soft-fail | Planned |
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
+| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail (once runner lands) | Draft — schema + reference spec |
 
 ## Shared Infrastructure
 
@@ -217,5 +218,6 @@ src/forge/governance/
 | UBTS | FPTS | Manufacturing throughput patterns (burst, sustained) |
 | (new) | FQTS | No UxTS analog — new for manufacturing data quality |
 | (new) | FLTS | No UxTS analog — new for lineage/provenance chains |
+| (new) | FVTS | No UxTS analog — new for forge-display view contracts |
 | (new) | FOTS | Adapted from UOBS — observability SLOs |
 | UNTS | FHTS | Cross-cutting hash registry, AI agent governance, change history |
