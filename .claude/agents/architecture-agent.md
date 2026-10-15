@@ -72,7 +72,7 @@ Specialized agent for software architecture, sync/async services, on-premises sy
 **GraphQL API (Client ↔ Backend)**
 ```typescript
 // Frontend queries backend via Apollo Client
-// Location: apps/mes-ui/src/lib/apollo-client.ts
+// Location: frontend/src/lib/apollo-client.ts
 const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
   cache: new InMemoryCache(),
@@ -86,7 +86,7 @@ const { data } = await client.query({
 
 **REST API (NetSuite Sync)**
 ```typescript
-// Location: apps/whk-recipe-configuration/src/sync/
+// Location: backend/src/sync/
 // Synchronous HTTP calls to NetSuite REST API
 const response = await axios.post(netsuiteEndpoint, {
   headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +104,7 @@ const response = await axios.post(netsuiteEndpoint, {
 
 **A. RabbitMQ Message Queue**
 
-**Location**: `apps/whk-recipe-configuration/src/rabbitmq/`
+**Location**: `backend/src/rabbitmq/`
 
 **Architecture:**
 ```typescript
@@ -151,7 +151,7 @@ async handleProductionOrderCreated(msg: ProductionOrderCreatedEvent) {
 
 **B. MQTT for Equipment Integration**
 
-**Location**: `apps/whk-recipe-configuration/src/providers/mqtt/`
+**Location**: `backend/src/providers/mqtt/`
 
 **Architecture:**
 ```typescript
@@ -212,7 +212,7 @@ brewery/
 
 **C. WebSockets (Real-Time Updates)**
 
-**Location**: `apps/whk-recipe-configuration/src/` (WebSocket Gateway)
+**Location**: `backend/src/` (WebSocket Gateway)
 
 ```typescript
 // WebSocket Gateway
@@ -226,7 +226,7 @@ export class ProductionGateway {
   }
 }
 
-// Frontend Client (apps/mes-ui)
+// Frontend Client (frontend)
 const socket = io('http://localhost:3000');
 socket.on('order:123:update', (update) => {
   // Update UI in real-time
@@ -243,7 +243,7 @@ socket.on('order:123:update', (update) => {
 
 #### NetSuite ERP Integration
 
-**Module**: `apps/whk-recipe-configuration/src/sync/`
+**Module**: `backend/src/sync/`
 
 **Sync Architecture:**
 ```
@@ -669,7 +669,7 @@ async processOrder(orderId: string) {
 
 **Health Checks:**
 ```typescript
-// Location: apps/whk-recipe-configuration/src/health/
+// Location: backend/src/health/
 @Controller('health')
 export class HealthController {
   @Get()
@@ -736,16 +736,16 @@ When invoked for architecture tasks:
 ## Key Files & Locations
 
 **Integration Services:**
-- RabbitMQ: `apps/whk-recipe-configuration/src/rabbitmq/`
-- MQTT: `apps/whk-recipe-configuration/src/providers/mqtt/`
-- NetSuite Sync: `apps/whk-recipe-configuration/src/sync/`
-- WebSockets: `apps/whk-recipe-configuration/src/*/gateways/`
+- RabbitMQ: `backend/src/rabbitmq/`
+- MQTT: `backend/src/providers/mqtt/`
+- NetSuite Sync: `backend/src/sync/`
+- WebSockets: `backend/src/*/gateways/`
 
 **Infrastructure:**
-- App Module: `apps/whk-recipe-configuration/src/app.module.ts`
-- Health Checks: `apps/whk-recipe-configuration/src/health/`
-- Audit System: `apps/whk-recipe-configuration/src/audit/`
+- App Module: `backend/src/app.module.ts`
+- Health Checks: `backend/src/health/`
+- Audit System: `backend/src/audit/`
 
 **Configuration:**
-- Docker Compose: `apps/whk-recipe-configuration/docker-compose.dev.yml`
+- Docker Compose: `backend/docker-compose.dev.yml`
 - Environment: `.env` (via dotenv-vault)

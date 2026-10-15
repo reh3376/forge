@@ -233,9 +233,9 @@ There is a database primary key (PK - `id`) and unique global identified (`globa
 - New revisions of legacy recipes should use the new format
 
 ### Code References
-- Recipe generation: `apps/whk-recipe-configuration/src/recipe/recipe.generation.ts`
+- Recipe generation: `backend/src/recipe/recipe.generation.ts`
 - Mash bill parsing: `getNormalizedMashBillValues()` method
-- Database schema: `apps/whk-recipe-configuration/prisma/schema.prisma`
+- Database schema: `backend/prisma/schema.prisma`
 
 ## Benefits of New Format
 

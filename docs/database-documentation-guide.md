@@ -12,7 +12,7 @@ This folder contains comprehensive database documentation designed for both tech
 - **Contents**: Business entity explanations, data flow, compliance features
 - **Best for**: Understanding business value and regulatory compliance
 
-### 2. **Visual ERD (SVG)** - `../apps/whk-recipe-configuration/prisma/ERD.svg`
+### 2. **Visual ERD (SVG)** - `../backend/prisma/ERD.svg`
 - **Audience**: Technical stakeholders, developers, architects
 - **Purpose**: Complete visual representation of all database relationships
 - **Contents**: All tables, relationships, and constraints
@@ -24,7 +24,7 @@ This folder contains comprehensive database documentation designed for both tech
 - **Contents**: Interactive SVG with zoom controls and fullscreen mode
 - **Best for**: Presentations and collaborative reviews
 
-### 4. **Technical ERD (Markdown)** - `../apps/whk-recipe-configuration/prisma/ERD.md`
+### 4. **Technical ERD (Markdown)** - `../backend/prisma/ERD.md`
 - **Audience**: Developers and technical documentation
 - **Purpose**: Text-based diagram for version control and documentation
 - **Contents**: Mermaid diagram syntax with all entities

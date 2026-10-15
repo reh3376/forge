@@ -19,7 +19,7 @@ set -e
 # Configuration
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-readonly BACKEND_DIR="$PROJECT_ROOT/apps/whk-recipe-configuration"
+readonly BACKEND_DIR="$PROJECT_ROOT/backend"
 
 # Options
 KEEP_DOCKER=true
@@ -129,7 +129,7 @@ stop_docker_services() {
     print_info "Stopping PostgreSQL, Redis, and RabbitMQ..."
 
     # Stop containers using make command
-    docker-compose -f apps/whk-recipe-configuration/docker-compose.dev.yml down 2>/dev/null || true
+    docker-compose -f backend/docker-compose.dev.yml down 2>/dev/null || true
 
     print_success "Docker services stopped"
 }

@@ -12,8 +12,8 @@ const path = require('path');
 
 const DOCS_DIR = path.join(process.cwd(), 'docs');
 const STAKEHOLDER_DOC = path.join(DOCS_DIR, 'stakeholder-database-overview.md');
-const ERD_SVG = path.join(process.cwd(), 'apps/whk-recipe-configuration/prisma/ERD.svg');
-const ERD_MD = path.join(process.cwd(), 'apps/whk-recipe-configuration/prisma/ERD.md');
+const ERD_SVG = path.join(process.cwd(), 'backend/prisma/ERD.svg');
+const ERD_MD = path.join(process.cwd(), 'backend/prisma/ERD.md');
 
 async function updateStakeholderDoc() {
   try {

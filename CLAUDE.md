@@ -92,7 +92,7 @@ make turbo-cache           # Clear Turborepo cache
 
 ### Backend (NestJS)
 
-**Location**: `apps/whk-recipe-configuration/`
+**Location**: `backend/`
 
 **Tech Stack**: NestJS, Prisma ORM, GraphQL (Apollo), PostgreSQL, Redis, RabbitMQ
 
@@ -110,7 +110,7 @@ make turbo-cache           # Clear Turborepo cache
 - **Auth**: `auth`, `acl` - JWT + Role-based access control
 - **Audit**: `audit` - Comprehensive audit logging with `AuditContextInterceptor`
 
-**Database Schema**: 50+ Prisma models in `apps/whk-recipe-configuration/prisma/schema.prisma`
+**Database Schema**: 50+ Prisma models in `backend/prisma/schema.prisma`
 
 **Important Patterns**:
 - Prisma generates base resolvers/services - extend them in module files
@@ -121,7 +121,7 @@ make turbo-cache           # Clear Turborepo cache
 
 ### Frontend (Next.js)
 
-**Location**: `apps/mes-ui/`
+**Location**: `frontend/`
 
 **Tech Stack**: Next.js 15 (App Router), React 19, TypeScript, TailwindCSS, shadcn/ui, Apollo Client, Zustand
 
@@ -140,11 +140,11 @@ make turbo-cache           # Clear Turborepo cache
 
 ### Shared Library
 
-**Location**: `apps/shared/`
+**Location**: `shared/`
 
 **Purpose**: TypeScript types, Zod schemas, utilities shared between frontend and backend
 
-**Build**: TypeScript watch mode compiles to `dist/` - both apps import from `@whk/shared`
+**Build**: TypeScript watch mode compiles to `dist/` - both apps import from `@forge-mes/shared`
 
 ## Development Workflow
 
@@ -165,10 +165,10 @@ make dev                   # Start all apps
 
 ### Making Database Changes
 
-1. Edit `apps/whk-recipe-configuration/prisma/schema.prisma`
+1. Edit `backend/prisma/schema.prisma`
 2. Run `make prisma-generate` to update Prisma client
-3. Create migration: `cd apps/whk-recipe-configuration && npm run db:dev:migrate-save -- --name "description"`
-4. Migration files in `apps/whk-recipe-configuration/prisma/migrations/`
+3. Create migration: `cd backend && npm run db:dev:migrate-save -- --name "description"`
+4. Migration files in `backend/prisma/migrations/`
 
 **IMPORTANT**: Prisma generates base classes in `base/` directories - **never edit these directly**. Extend them in module-level files.
 
@@ -176,11 +176,11 @@ make dev                   # Start all apps
 
 ```bash
 # Backend
-cd apps/whk-recipe-configuration
+cd backend
 npm test -- path/to/test.spec.ts
 
 # Frontend
-cd apps/mes-ui
+cd frontend
 npm test -- path/to/test.spec.tsx
 npm run test:e2e -- tests/specific-test.spec.ts
 ```
@@ -199,7 +199,7 @@ npm run test:e2e -- tests/specific-test.spec.ts
 
 ### RabbitMQ
 - Message broker for system events
-- Module: `apps/whk-recipe-configuration/src/rabbitmq/`
+- Module: `backend/src/rabbitmq/`
 - Used for ERP sync, real-time updates
 
 ## Key Business Logic
@@ -242,8 +242,8 @@ Setup: `npx dotenv-vault pull`
 
 - **Backend**: Jest unit tests, supertest for E2E
 - **Frontend**: Jest + React Testing Library for components, Playwright for E2E
-- **Test Data**: Seeding scripts in `apps/whk-recipe-configuration/scripts/seed/`
-- **E2E**: Playwright tests in `apps/mes-ui/tests/`
+- **Test Data**: Seeding scripts in `backend/scripts/seed/`
+- **E2E**: Playwright tests in `frontend/tests/`
 
 ## Turborepo Specifics
 
@@ -279,7 +279,7 @@ Setup: `npx dotenv-vault pull`
 
 ## Submodules
 
-**Note**: The repository contains a submodule at `apps/whk-recipe-configuration/submodules/whk-script-library` (currently shown as modified in git status). Coordinate with team on submodule updates.
+**Note**: The repository contains a submodule at `backend/submodules/whk-script-library` (currently shown as modified in git status). Coordinate with team on submodule updates.
 
 ## Documentation
 
@@ -290,4 +290,4 @@ Extensive docs in `docs/` directory:
 - `docs/architecture/mes-data-model.md` - Database design
 - `docs/integration/` - Integration patterns
 
-**ERD**: Generated at `apps/whk-recipe-configuration/prisma/ERD.svg` via `npm run docs:erd`
+**ERD**: Generated at `backend/prisma/ERD.svg` via `npm run docs:erd`

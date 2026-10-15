@@ -7,7 +7,7 @@ app = 'whk-mes-staging'
 primary_region = 'ord'
 
 [build]
-  dockerfile = 'apps/whk-recipe-configuration/Dockerfile'
+  dockerfile = 'backend/Dockerfile'
   build-target = 'production'
   [build.args]
     NODE_VERSION = '18.20.8'

@@ -291,7 +291,7 @@ interface UpdateBomConsumptionInput {
 
 ### Service Layer
 
-**File:** `apps/whk-recipe-configuration/src/recipeBomActual/recipeBomActual.service.ts`
+**File:** `backend/src/recipeBomActual/recipeBomActual.service.ts`
 
 #### Key Methods
 
@@ -581,7 +581,7 @@ const isValid = quantityNum > 0 && !exceedsAvailable;
 
 **Backend:** Jest + Supertest
 
-**Location:** `apps/whk-recipe-configuration/src/**/*.spec.ts`
+**Location:** `backend/src/**/*.spec.ts`
 
 **Coverage:**
 - Service methods (lot lookup, FIFO detection, validation)
@@ -618,7 +618,7 @@ describe('RecipeBomActualService', () => {
 
 **Running Tests:**
 ```bash
-cd apps/whk-recipe-configuration
+cd backend
 npm test recipeBomActual.service.spec.ts
 ```
 
@@ -626,7 +626,7 @@ npm test recipeBomActual.service.spec.ts
 
 **Framework:** Playwright
 
-**Location:** `apps/mes-ui/e2e/bom-consumption.spec.ts`
+**Location:** `frontend/e2e/bom-consumption.spec.ts`
 
 **Coverage:**
 - Page navigation and loading
@@ -670,7 +670,7 @@ test('should complete full consumption recording flow', async ({ page }) => {
 
 **Running Tests:**
 ```bash
-cd apps/mes-ui
+cd frontend
 npm run test:e2e
 npm run test:e2e:ui  # Interactive mode
 ```
@@ -679,7 +679,7 @@ npm run test:e2e:ui  # Interactive mode
 
 **Scope:** Full GraphQL API tests with test database
 
-**Location:** `apps/whk-recipe-configuration/test/` (not yet implemented)
+**Location:** `backend/test/` (not yet implemented)
 
 **Future Enhancement:** Test complete workflows end-to-end with real database
 
@@ -799,14 +799,14 @@ NEXT_PUBLIC_WS_URL=ws://localhost:3000/graphql
 
 **Backend:**
 ```bash
-cd apps/whk-recipe-configuration
+cd backend
 npm run build
 npm run start:prod
 ```
 
 **Frontend:**
 ```bash
-cd apps/mes-ui
+cd frontend
 npm run build
 npm run start
 ```
@@ -815,7 +815,7 @@ npm run start
 
 **Create Migration:**
 ```bash
-cd apps/whk-recipe-configuration
+cd backend
 npx prisma migrate dev --name add-bom-consumption
 ```
 

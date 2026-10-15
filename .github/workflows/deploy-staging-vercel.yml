@@ -6,8 +6,8 @@ on:
       - staging
       - main  # Also deploy main to staging for testing
     paths:
-      - 'apps/mes-ui/**'
-      - 'apps/shared/**'
+      - 'frontend/**'
+      - 'shared/**'
       - 'package.json'
       - 'package-lock.json'
       - 'turbo.json'
@@ -40,17 +40,17 @@ jobs:
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: ./apps/mes-ui
+        working-directory: ./frontend
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build shared library
-        run: npx turbo build --filter=@whk/shared
+        run: npx turbo build --filter=@forge-mes/shared
 
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: ./apps/mes-ui
+        working-directory: ./frontend
         env:
           # Build-time environment variables
           NEXT_PUBLIC_GRAPHQL_URL: ${{ secrets.STAGING_NGROK_URL }}/graphql
@@ -72,7 +72,7 @@ jobs:
           url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
           echo "Deployed to: $url"
-        working-directory: ./apps/mes-ui
+        working-directory: ./frontend
 
       - name: Comment Deployment URL on PR
         if: github.event_name == 'pull_request'

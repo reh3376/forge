@@ -16,13 +16,13 @@ repos:
   hooks:
     - id: eslint
       name: eslint
-      entry: bash -c 'cd apps/whk-recipe-configuration && npm run lint:dev:fix'
+      entry: bash -c 'cd backend && npm run lint:dev:fix'
       language: system
-      files: apps/whk-recipe-configuration/src/.*\.ts$
+      files: backend/src/.*\.ts$
       pass_filenames: false
     - id: prettier
       name: prettier
-      entry: bash -c 'cd apps/whk-recipe-configuration && npm run format:dev'
+      entry: bash -c 'cd backend && npm run format:dev'
       language: system
-      files: apps/whk-recipe-configuration/.*\.(ts|js|json|md|yml|yaml)$
+      files: backend/.*\.(ts|js|json|md|yml|yaml)$
       pass_filenames: false

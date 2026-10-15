@@ -17,7 +17,7 @@ Specialized agent for frontend design, UI/UX implementation, component developme
 
 ## Tech Stack Overview
 
-**Location**: `apps/mes-ui/`
+**Location**: `frontend/`
 
 **Core Technologies:**
 - **Framework**: Next.js 15 (App Router)
@@ -40,7 +40,7 @@ Specialized agent for frontend design, UI/UX implementation, component developme
 
 **shadcn/ui Components** (Radix UI + Tailwind):
 ```
-apps/mes-ui/src/components/
+frontend/src/components/
 ├── ui/                    # Base shadcn/ui components
 │   ├── button.tsx
 │   ├── dialog.tsx
@@ -185,7 +185,7 @@ const typography = {
 ### 1. Production Order Wizard (Multi-step Form)
 
 ```typescript
-// apps/mes-ui/src/components/production/ProductionOrderWizard.tsx
+// frontend/src/components/production/ProductionOrderWizard.tsx
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -666,7 +666,7 @@ useEffect(() => {
 ### Zustand Store Structure
 
 ```typescript
-// apps/mes-ui/src/stores/productionStore.ts
+// frontend/src/stores/productionStore.ts
 import { create } from 'zustand'
 
 interface ProductionState {
@@ -713,7 +713,7 @@ function OrderList() {
 ### GraphQL Integration with Apollo Client
 
 ```typescript
-// apps/mes-ui/src/lib/apollo-client.ts
+// frontend/src/lib/apollo-client.ts
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'
 
 export const client = new ApolloClient({
@@ -946,7 +946,7 @@ function OrderList({ orders }: { orders: ProductionOrder[] }) {
 ### Component Tests (Jest + React Testing Library)
 
 ```typescript
-// apps/mes-ui/src/components/production/__tests__/OrderCard.test.tsx
+// frontend/src/components/production/__tests__/OrderCard.test.tsx
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { OrderCard } from '../OrderCard'
@@ -979,7 +979,7 @@ describe('OrderCard', () => {
 ### E2E Tests (Playwright)
 
 ```typescript
-// apps/mes-ui/tests/production-orders.spec.ts
+// frontend/tests/production-orders.spec.ts
 import { test, expect } from '@playwright/test'
 
 test.describe('Production Orders', () => {
@@ -1031,10 +1031,10 @@ When invoked for frontend/UI tasks:
 
 ## Key Files & Locations
 
-**Components**: `apps/mes-ui/src/components/`
-**Pages**: `apps/mes-ui/src/app/` (App Router)
-**Hooks**: `apps/mes-ui/src/hooks/`
-**Stores**: `apps/mes-ui/src/stores/`
-**Utils**: `apps/mes-ui/src/lib/`
-**Styles**: `apps/mes-ui/src/styles/globals.css`
-**Config**: `apps/mes-ui/tailwind.config.js`
+**Components**: `frontend/src/components/`
+**Pages**: `frontend/src/app/` (App Router)
+**Hooks**: `frontend/src/hooks/`
+**Stores**: `frontend/src/stores/`
+**Utils**: `frontend/src/lib/`
+**Styles**: `frontend/src/styles/globals.css`
+**Config**: `frontend/tailwind.config.js`

@@ -2,10 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@whk/shared": ["apps/shared/src"],
-      "@whk/shared/*": ["apps/shared/src/*"],
-      "@whk/backend/*": ["apps/whk-recipe-configuration/src/*"],
-      "@whk/frontend/*": ["apps/mes-ui/*"]
+      "@forge-mes/shared": ["shared/src"],
+      "@forge-mes/shared/*": ["shared/src/*"],
+      "@forge-mes/backend/*": ["backend/src/*"],
+      "@forge-mes/frontend/*": ["frontend/*"]
     },
     "target": "es2020",
     "module": "commonjs",
@@ -16,9 +16,9 @@
     "strict": true
   },
   "references": [
-    { "path": "./apps/shared" },
-    { "path": "./apps/whk-recipe-configuration" },
-    { "path": "./apps/mes-ui" }
+    { "path": "./shared" },
+    { "path": "./backend" },
+    { "path": "./frontend" }
   ],
   "files": [],
   "exclude": ["node_modules"]

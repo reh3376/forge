@@ -138,8 +138,8 @@ The database maintains complete forward and backward traceability:
 ## Visual Database Diagram
 
 The complete Entity Relationship Diagram (ERD) is available in the following formats:
-- **Interactive SVG**: [`prisma/ERD.svg`](../apps/whk-recipe-configuration/prisma/ERD.svg) - Full visual diagram with all relationships
-- **Markdown Format**: [`prisma/ERD.md`](../apps/whk-recipe-configuration/prisma/ERD.md) - Text-based diagram for documentation
+- **Interactive SVG**: [`prisma/ERD.svg`](../backend/prisma/ERD.svg) - Full visual diagram with all relationships
+- **Markdown Format**: [`prisma/ERD.md`](../backend/prisma/ERD.md) - Text-based diagram for documentation
 
 ## Support & Questions
 

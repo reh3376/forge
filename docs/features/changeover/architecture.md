@@ -1,7 +1,7 @@
 # Changeover System: Architecture
 
 > **Status**: Implemented
-> **Module**: `apps/whk-recipe-configuration/src/changeover/`
+> **Module**: `backend/src/changeover/`
 > **Last Updated**: 2026-02-20
 
 ---

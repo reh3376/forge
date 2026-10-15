@@ -12,8 +12,8 @@
 
 **Fix Applied:**
 - Removed the unused `redirectTo: '/'` property from RouteGuard configurations in:
-  - `apps/mes-ui/app/configuration/page.tsx`
-  - `apps/mes-ui/app/configuration/mqtt-brokers/page.tsx`
+  - `frontend/app/configuration/page.tsx`
+  - `frontend/app/configuration/mqtt-brokers/page.tsx`
 - This cleanup removes confusion and aligns with the current RouteGuard behavior
 
 **Permission Requirements:**
@@ -31,7 +31,7 @@
 - Available API endpoints were not being used
 
 **Fix Applied:**
-- Updated `apps/mes-ui/app/configuration/page.tsx` to fetch real MQTT data
+- Updated `frontend/app/configuration/page.tsx` to fetch real MQTT data
 - Added state management for MQTT broker data with loading and error states
 - Implemented API calls using existing endpoints:
   - `restApi.mqttBrokers.getAll()` - to get broker list and count
@@ -96,13 +96,13 @@ ManufacturingRole.ET_ADMIN // Only role with SYSTEM_SETTINGS
 
 ## Files Modified
 
-1. `apps/mes-ui/app/configuration/page.tsx`
+1. `frontend/app/configuration/page.tsx`
    - Added real MQTT data fetching
    - Added loading and error states
    - Removed unused `redirectTo` property
    - Fixed import path for PageContainer
 
-2. `apps/mes-ui/app/configuration/mqtt-brokers/page.tsx`
+2. `frontend/app/configuration/mqtt-brokers/page.tsx`
    - Removed unused `redirectTo` property
 
 ## Next Steps

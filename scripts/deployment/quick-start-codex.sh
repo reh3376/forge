@@ -44,7 +44,7 @@ else
 fi
 
 echo -e "${BLUE}🗄️  Setting up database...${NC}"
-cd apps/whk-recipe-configuration
+cd backend
 
 # Generate Prisma client
 npx prisma generate

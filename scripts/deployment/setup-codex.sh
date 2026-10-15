@@ -135,7 +135,7 @@ install_dependencies() {
     
     # Install backend dependencies
     log_info "Installing backend dependencies..."
-    cd apps/whk-recipe-configuration
+    cd backend
     if [[ -f "package.json" ]]; then
         npm install
         log_success "Backend dependencies installed"
@@ -147,7 +147,7 @@ install_dependencies() {
     
     # Install frontend dependencies
     log_info "Installing frontend dependencies..."
-    cd apps/mes-ui
+    cd frontend
     if [[ -f "package.json" ]]; then
         npm install
         log_success "Frontend dependencies installed"
@@ -173,7 +173,7 @@ install_dependencies() {
 setup_prisma() {
     log_info "Setting up Prisma..."
     
-    cd apps/whk-recipe-configuration
+    cd backend
     
     # Generate Prisma client
     if [[ -f "prisma/schema.prisma" ]]; then
@@ -228,7 +228,7 @@ setup_docker() {
 setup_database() {
     log_info "Setting up database..."
     
-    cd apps/whk-recipe-configuration
+    cd backend
     
     # Run database migrations
     if [[ "$HAS_DOCKER" == "true" ]]; then
@@ -249,14 +249,14 @@ build_applications() {
     
     # Build backend
     log_info "Building backend..."
-    cd apps/whk-recipe-configuration
+    cd backend
     npm run build
     log_success "Backend built successfully"
     cd ../..
     
     # Build frontend (optional for development)
     log_info "Building frontend..."
-    cd apps/mes-ui
+    cd frontend
     npm run build
     log_success "Frontend built successfully"
     cd ../..

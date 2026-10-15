@@ -131,7 +131,7 @@ sync_files() {
         --exclude='logs' \
         --exclude='.next' \
         --exclude='.git' \
-        apps/whk-recipe-configuration \
+        backend \
         docker-compose.staging.yml \
         .env.staging || {
         print_error "Failed to create archive"

@@ -14,12 +14,12 @@ fi
 case "${1:-both}" in
   backend)
     echo "🚀 Starting backend with Railway database..."
-    cd apps/whk-recipe-configuration
+    cd backend
     DB_URL="$RAILWAY_DB_URL" npm run dev
     ;;
   frontend)
     echo "🎨 Starting frontend..."
-    cd apps/mes-ui
+    cd frontend
     npm run dev
     ;;
   both)

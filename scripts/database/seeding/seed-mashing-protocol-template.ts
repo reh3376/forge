@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../../apps/whk-recipe-configuration/node_modules/@prisma/client';
+import { PrismaClient } from '../../../backend/node_modules/@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();

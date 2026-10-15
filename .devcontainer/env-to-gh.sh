@@ -8,4 +8,4 @@ do
     value=$(echo $value | sed -e 's/^"//' -e 's/"$//')
     echo "gh secret set $key -b\"$value\" -a codespaces"
   fi
-done < ../apps/whk-recipe-configuration/.env
+done < ../backend/.env

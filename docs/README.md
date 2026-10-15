@@ -13,8 +13,8 @@ This directory contains all project documentation organized by category:
 - **[Documentation Guide](database-documentation-guide.md)** - How to use and share database documentation
 
 ### For Developers
-- **[Visual ERD (SVG)](../apps/whk-recipe-configuration/prisma/ERD.svg)** - Complete database relationship diagram
-- **[Technical ERD (Markdown)](../apps/whk-recipe-configuration/prisma/ERD.md)** - Version-controlled diagram in Mermaid format
+- **[Visual ERD (SVG)](../backend/prisma/ERD.svg)** - Complete database relationship diagram
+- **[Technical ERD (Markdown)](../backend/prisma/ERD.md)** - Version-controlled diagram in Mermaid format
 
 ### Quick Commands
 ```bash
