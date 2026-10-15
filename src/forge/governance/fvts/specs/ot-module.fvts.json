@@ -1,0 +1,337 @@
+{
+  "spec_version": "0.1.0",
+  "view_identity": {
+    "view_id": "ot-module-views",
+    "name": "Forge OT/SCADA Module — Operator Views",
+    "version": "0.1.0",
+    "owner_module": "ot-module",
+    "facts_spec_ref": "src/forge/governance/facts/specs/ot-module.facts.json",
+    "description": "Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's four-layer write engine."
+  },
+  "scope": {
+    "isa95_levels": [
+      "site",
+      "area",
+      "equipment"
+    ],
+    "required_context_fields": [
+      "site",
+      "area",
+      "equipment_id",
+      "operating_mode"
+    ],
+    "multi_site": false
+  },
+  "data_bindings": {
+    "points": [
+      {
+        "point_id": "ferm.temperature",
+        "label": "Fermenter temperature",
+        "source": {
+          "adapter_id": "ot-module",
+          "tag_path": "{area}/{equipment_id}/Temperature"
+        },
+        "data_type": "FLOAT",
+        "engineering_units": "°F",
+        "display_precision": 1,
+        "range": {
+          "lo": 32,
+          "hi": 212
+        },
+        "timestamp_basis": "source_time",
+        "quality_handling": {
+          "stale_after_ms": 5000,
+          "on_bad": "blank_with_marker",
+          "on_uncertain": "value_with_marker"
+        }
+      },
+      {
+        "point_id": "ferm.temperature_sp",
+        "label": "Temperature setpoint",
+        "source": {
+          "adapter_id": "ot-module",
+          "tag_path": "{area}/{equipment_id}/TemperatureSP"
+        },
+        "data_type": "FLOAT",
+        "engineering_units": "°F",
+        "display_precision": 1,
+        "range": {
+          "lo": 32,
+          "hi": 212
+        },
+        "timestamp_basis": "source_time",
+        "quality_handling": {
+          "stale_after_ms": 5000,
+          "on_bad": "last_value_with_marker",
+          "on_uncertain": "value_with_marker"
+        }
+      },
+      {
+        "point_id": "ferm.agitator_running",
+        "label": "Agitator running",
+        "source": {
+          "adapter_id": "ot-module",
+          "tag_path": "{area}/{equipment_id}/Agitator/Running"
+        },
+        "data_type": "BOOLEAN",
+        "timestamp_basis": "source_time",
+        "quality_handling": {
+          "stale_after_ms": 5000,
+          "on_bad": "blank_with_marker",
+          "on_uncertain": "value_with_marker"
+        }
+      },
+      {
+        "point_id": "ferm.mode",
+        "label": "Operating mode",
+        "source": {
+          "adapter_id": "ot-module",
+          "tag_path": "{area}/{equipment_id}/Mode"
+        },
+        "data_type": "ENUM",
+        "enum_labels": {
+          "0": "Idle",
+          "1": "Startup",
+          "2": "Production",
+          "3": "CIP"
+        },
+        "timestamp_basis": "source_time",
+        "quality_handling": {
+          "stale_after_ms": 5000,
+          "on_bad": "blank_with_marker",
+          "on_uncertain": "value_with_marker"
+        }
+      }
+    ]
+  },
+  "live_updates": {
+    "transport": "grpc_stream",
+    "max_update_rate_hz": 4,
+    "coalescing": "latest_wins",
+    "heartbeat_ms": 2000,
+    "on_disconnect": "mark_all_stale",
+    "reconnect": {
+      "initial_backoff_ms": 500,
+      "max_backoff_ms": 15000
+    }
+  },
+  "history": {
+    "enabled": true,
+    "decimation": {
+      "location": "server",
+      "algorithm": "min_max_per_bucket"
+    },
+    "max_points_per_series": 4000,
+    "max_range_days": 90,
+    "as_of_queries": true,
+    "timestamp_basis": "source_time"
+  },
+  "alarms": {
+    "enabled": true,
+    "states": [
+      "NORMAL",
+      "ACTIVE_UNACK",
+      "ACTIVE_ACK",
+      "CLEAR_UNACK",
+      "SUPPRESSED",
+      "SHELVED",
+      "OUT_OF_SERVICE"
+    ],
+    "priorities": [
+      "CRITICAL",
+      "HIGH",
+      "MEDIUM",
+      "LOW",
+      "DIAGNOSTIC"
+    ],
+    "priority_tokens": {
+      "CRITICAL": "alarm.critical",
+      "HIGH": "alarm.high",
+      "MEDIUM": "alarm.medium",
+      "LOW": "alarm.low",
+      "DIAGNOSTIC": "alarm.diagnostic"
+    },
+    "audible_annunciation": true
+  },
+  "actions": [
+    {
+      "action_id": "ferm.write_temperature_sp",
+      "label": "Change temperature setpoint",
+      "kind": "tag_write",
+      "target_point": "ferm.temperature_sp",
+      "required_role": "OPERATOR",
+      "confirmation": "two_step_with_review",
+      "reason_code_required": false,
+      "interlock_feedback": true,
+      "handled_statuses": [
+        "CONFIRMED",
+        "UNCONFIRMED",
+        "REJECTED_VALIDATION",
+        "REJECTED_INTERLOCK",
+        "REJECTED_AUTH",
+        "FAILED_WRITE",
+        "FAILED_READBACK",
+        "PENDING"
+      ],
+      "timeout_ms": 5000,
+      "audit": true,
+      "allowed_profiles": [
+        "desktop_hmi"
+      ]
+    },
+    {
+      "action_id": "alarm.acknowledge",
+      "label": "Acknowledge alarm",
+      "kind": "alarm_operation",
+      "alarm_operation": "ACKNOWLEDGE",
+      "required_role": "OPERATOR",
+      "confirmation": "none",
+      "audit": true,
+      "allowed_profiles": [
+        "desktop_hmi",
+        "web",
+        "mobile"
+      ]
+    },
+    {
+      "action_id": "alarm.shelve",
+      "label": "Shelve alarm",
+      "kind": "alarm_operation",
+      "alarm_operation": "SHELVE",
+      "required_role": "ENGINEER",
+      "confirmation": "confirm",
+      "reason_code_required": true,
+      "audit": true,
+      "allowed_profiles": [
+        "desktop_hmi"
+      ]
+    }
+  ],
+  "settings": {
+    "exposed": true,
+    "schema_ref": "forge://schemas/ot-module/settings/v1",
+    "required_role": "ENGINEER",
+    "apply_mode": "staged_with_review",
+    "allowed_profiles": [
+      "desktop_app"
+    ]
+  },
+  "render_profiles": {
+    "supported": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ],
+    "overrides": {
+      "mobile": {
+        "max_update_rate_hz": 1
+      }
+    }
+  },
+  "surfaces": [
+    {
+      "surface_id": "ferm.overview",
+      "title": "Fermenter overview",
+      "kind": "hmi_screen",
+      "authoring": "configured",
+      "scope_level": "equipment",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "web"
+      ],
+      "points": [
+        "ferm.temperature",
+        "ferm.temperature_sp",
+        "ferm.agitator_running",
+        "ferm.mode"
+      ],
+      "actions": [
+        "ferm.write_temperature_sp",
+        "alarm.acknowledge",
+        "alarm.shelve"
+      ]
+    },
+    {
+      "surface_id": "ferm.trend",
+      "title": "Fermenter temperature trend",
+      "kind": "trend",
+      "authoring": "configured",
+      "scope_level": "equipment",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "desktop_app",
+        "web",
+        "mobile"
+      ],
+      "points": [
+        "ferm.temperature",
+        "ferm.temperature_sp"
+      ],
+      "actions": []
+    },
+    {
+      "surface_id": "area.alarm_summary",
+      "title": "Area alarm summary",
+      "kind": "alarm_summary",
+      "authoring": "coded",
+      "scope_level": "area",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "web",
+        "mobile"
+      ],
+      "points": [],
+      "actions": [
+        "alarm.acknowledge",
+        "alarm.shelve"
+      ]
+    },
+    {
+      "surface_id": "ot.settings",
+      "title": "OT module settings",
+      "kind": "settings",
+      "authoring": "coded",
+      "allowed_profiles": [
+        "desktop_app"
+      ],
+      "points": [],
+      "actions": []
+    }
+  ],
+  "design_system": {
+    "tokens_ref": "forge://design/tokens/v1",
+    "isa101_high_performance": true
+  },
+  "conformance_tests": {
+    "suite_path": "tests/governance/fvts/test_ot_module_views.py",
+    "golden_messages_path": "tests/governance/fvts/golden/ot-module/",
+    "renderers_under_test": [
+      "desktop_hmi",
+      "web"
+    ]
+  },
+  "metadata": {
+    "status": "draft",
+    "notes": "Reference spec for FVTS v0.1.0. Point paths follow the ContextualRecord example (Area1/Fermenter3/Temperature, FERM-003). Surfaces may list actions the active profile forbids; renderers hide them (fvts:profile-action-filter)."
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "change_history": [
+      {
+        "previous_hash": "",
+        "new_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
+        "changed_at": "2026-10-15T21:45:00Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "initial",
+        "reason": "Initial FVTS v0.1.0 reference spec for forge-display contract; awaiting approval by reh3376."
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
+    "approved_by": null,
+    "approved_at": null
+  }
+}
