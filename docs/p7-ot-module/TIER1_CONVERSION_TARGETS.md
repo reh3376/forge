@@ -1,5 +1,7 @@
 # Tier 1 Script Conversion Targets
 
+> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `modules/Forge MES` (backend + frontend). References to whk-mes below are historical and left unchanged.
+
 **Phase**: P7 OT Module — Phase 6.1 (Epic 6.1.2: Identify Migration Scope)
 **Date**: 2026-04-09
 **Total Tier 1 files**: 82 (of 430 hand-written; 1,109 auto-generated excluded)

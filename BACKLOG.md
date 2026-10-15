@@ -1,0 +1,76 @@
+# Forge Backlog
+
+Problems found during work that were not fixed in the same change. Rule (2026-10-15): every finding is either fixed or recorded here; nothing is skipped. Entries are grouped by area; IDs are stable. Remove an entry when it is fixed and mention the commit.
+
+Severity: **High** blocks a planned capability or risks data loss/security; **Med** causes drift, wrong behaviour in edge cases, or significant debt; **Low** cosmetic, cleanup, or documentation.
+
+## Hub wiring (forge-core)
+
+| ID | Sev | Problem | Where | Suggested fix |
+|----|-----|---------|-------|---------------|
+| FB-001 | High | The deployed hub app mounts only `/curation`; the Context Engine (F21) and Schema Registry (F20) FastAPI apps are never mounted or imported. | `src/forge/api/main.py:285-304`, `src/forge/context/service.py:201`, `src/forge/registry/service.py:170` | Mount both in `create_app()` under `/v1/context` and `/v1/schemas`; add FATS specs for their routes. |
+| FB-002 | High | gRPC `InMemoryServicer.on_record_received` / `on_adapter_registered` are no-ops, so spoke records are queued but never routed, stored or curated. | `src/forge/transport/hub_server.py:202-231` | Add a production servicer that validates the manifest against FACTS, routes via `DataRouter`, writes via `StorageFactory`, and feeds curation. |
+| FB-003 | High | `AccessController` is in-memory only; `PostgresAccessController` is referenced but not implemented, so module DB grants do not persist. | `src/forge/storage/access.py`, `src/forge/storage/engines/postgres.py:8` | Implement the Postgres-backed controller on `forge_core.module_permissions` / `access_audit_log` (tables exist in migration 001). |
+| FB-004 | Med | Schema naming disagrees: migration 002 creates `mod_<x>` schemas and `forge_mod_<x>` roles, `DataRouter` falls back to `spoke_<id>`, and `issue_connection` derives `<module>_rw/ro` roles. | `migrations/versions/002_spoke_schemas.py:17-24`, `storage/router.py:98-107`, `storage/access.py:264-320` | Pick `mod_<x>` + `forge_mod_<x>` everywhere; add a test asserting router, access and migration agree. |
+| FB-005 | Med | `forge_core.registry_schemas`, `registry_versions` and `equipment_registry` have Postgres stores but no Alembic migration. | `src/forge/registry/postgres_store.py`, `src/forge/context/equipment.py:86-130` | Add migration 006 creating the three tables. |
+| FB-006 | Med | `check_rabbitmq` and `check_minio` exist but are never registered with the health orchestrator. | `src/forge/api/main.py`, `src/forge/api/health.py:246,266` | Register them in the lifespan; include in `/readyz`. |
+| FB-007 | Med | Auth is off by default, no route uses `require_scope`/`require_role`, and role scopes are hardcoded so a module namespace such as `mes:*` cannot be granted except via JWT claims. | `src/forge/gateway/auth.py:31-36,76-85`, `src/forge/gateway/rbac.py` | Add a scope registry that modules populate from their manifest; protect hub routes; default auth on outside dev compose. |
+| FB-008 | Low | Two "schema registries" with different id formats (`forge://schemas/<spoke>/<Entity>` vs `.../<entity>/v<version>`). | `src/forge/registry/models.py:73`, `src/forge/storage/registry.py:58-112` | Unify on one id scheme or document the split (contract registry vs storage routing registry). |
+| FB-009 | Low | `/curation/curate` runs a fixed pipeline (5-min bucket, AVG by `equipment_id`) into an in-memory dict; nothing connects ingested records to curation automatically. | `src/forge/curation/service.py:146-170` | Make the pipeline per data product and trigger it from the ingestion path (FB-002). |
+
+## Core data model (MES readiness)
+
+| ID | Sev | Problem | Where | Suggested fix |
+|----|-----|---------|-------|---------------|
+| FB-010 | High | `Lot` has no `item_id`; nothing links a lot to its `MaterialItem` (no material class/instance typing). | `src/forge/core/models/manufacturing/lot.py` | Add `item_id` (and the Go field); backfill via mappers. |
+| FB-011 | High | Entities an MES needs are missing from the canonical model: step/phase execution records, electronic batch record, genealogy/consumption (material in/out per lot), OEE/downtime reason codes, personnel/labor, nonconformance/deviation (BatchDeviation explicitly deferred), spec-limit master data, e-signatures, inventory transactions, UoM conversion. | `src/forge/core/models/manufacturing/`, `docs/core/manufacturing-entity-catalog.md:50-54` | Design these with the forge-mes backend's Prisma schema (84 models) as the source; add FDTS specs before implementing. |
+| FB-012 | Med | ISA-88 procedural hierarchy is untyped: `ProcessStep.step_type` is free text, no recipe-level enum, no equipment binding, no general/site/master/control recipe split. | `src/forge/core/models/manufacturing/process_definition.py` | Add `RecipeLevel`/`StepLevel` enums and `equipment_id` on steps. |
+| FB-013 | Med | `RecordContext` disagrees with the context field registry: registry defines `shift_id`, `event_timestamp`, `event_type`, `work_order_id`; `RecordContext` (and the proto) has `shift` and no slots for the other three, which end up in `extra`. | `src/forge/core/registry/context_fields.py:101-227`, `src/forge/core/models/contextual_record.py:50-66`, `go/proto/forge/v1/contextual_record.proto` | Reserve proto fields 10-13 for the three missing fields, rename `shift` → `shift_id` with a compat alias, regenerate stubs. |
+| FB-014 | Low | `ManufacturingModelBase.captured_at` uses naive `datetime.utcnow`; Go `NewBase` is UTC-aware. The test suite emits ~400 `utcnow()` deprecation warnings (e.g. `adapters/whk_wms/adapter.py:113`). | `src/forge/core/models/manufacturing/base.py`, suite-wide | Switch to `datetime.now(UTC)`; add a ruff rule (DTZ) to keep it out. |
+| FB-015 | Low | `AssetOperationalState` and `EventCategory` are not exported from `manufacturing/__init__.py`. | `src/forge/core/models/manufacturing/__init__.py:48-72` | Add to `__all__`. |
+| FB-016 | Med | Go models drop Python defaults (`Lot.status` "CREATED", `is_active` True, status enums) and enforce no required fields; `work_order.go` is not gofmt-aligned. | `go/internal/models/manufacturing/` | Add `New*` constructors with defaults, a `Validate()` per entity, and a parity test against Python JSON fixtures; run `gofmt`. |
+
+## Spoke framework, SDK and OT ↔ MES
+
+| ID | Sev | Problem | Where | Suggested fix |
+|----|-----|---------|-------|---------------|
+| FB-017 | Med | `forge module init` only generates an adapter-style, backend-only template, and its FACTS output does not match hand-written specs (`connection_params` at top level, `context_mapping` nested under `data_contract`, `hash_state: draft`). | `src/forge/sdk/module_builder/scaffolder.py:182-237`, `generators.py:693-779` | Add a module template with `backend/` + `frontend/` sections (module rule) and emit the canonical FACTS layout. |
+| FB-018 | Low | OT module `manifest.json` uses tier `OT_SCADA` and `output_format: tag_value`, which the manifest builder does not accept; the adapter class uses `AdapterTier.OT`. | `src/forge/modules/ot/manifest.json`, `sdk/module_builder/manifest_builder.py:194-211` | Align manifest.json with the class. |
+| FB-019 | Low | Duplicate copies drift: `sdk/module_builder/` vs `src/forge/sdk/module_builder/`; `modules/Forge {CMMS,ERPI,NMS,DB Orchestration}/` duplicate in-repo code (ruff reports identical findings in both). | repo root, `modules/` | Make the `modules/` shells import from `src/` (or delete the copies) and remove `sdk/`. |
+| FB-020 | Low | OT ↔ MES hooks are defined but unwired: `RecipeWriteAdapter`, `BatchContextResolver.set_active_batch`, the `recipe/next` subscriber example. | `src/forge/modules/ot/control/recipe_integration.py`, `src/forge/modules/ot/context/resolvers.py:198-239` | Wire to forge-mes events (FB-034). |
+| FB-021 | Low | FACTS approval has no CLI; approving means hand-editing the integrity block. | `src/forge/cli/main.py` | Add `forge governance approve <spec> --by <user>` that recomputes the hash and appends `change_history`. |
+
+## Lint, tests and docs
+
+| ID | Sev | Problem | Where | Suggested fix |
+|----|-----|---------|-------|---------------|
+| FB-022 | Med | `ruff check .` reports 1,148 findings (710 auto-fixable). Largest sources: generated `proto_gen/*_pb2*.py`, MDEMG-generated `.claude/hooks/*.py`, the OT module, the whk_nms adapter and its `modules/Forge NMS` copy, `tests/modules/ot`. `storage/access.py` was fixed on 2026-10-15. | repo-wide | Exclude generated dirs in `[tool.ruff]`; land a `ruff check --fix` PR; then a manual pass for B905/F601/N818/SIM115/UP036. |
+| FB-023 | Low | `RuntimeWarning: coroutine never awaited` in the Neo4j engine test (async mock misuse). | `tests/storage/engines/test_neo4j_engine.py`, `src/forge/storage/engines/neo4j_engine.py:163` | Use an async iterator mock for `result`. |
+| FB-024 | Low | README says 3,275 tests (suite is 3,823 passed / 5 skipped), still contains the placeholder row "<Add Go package management…>", and says "Language Core: Go" while PLAN K2 says Python polyglot; no document states the language policy for modules (forge-mes is TypeScript, OT is Python, Go hub is at G1 of G15). | `README.md`, `PLAN.md:331` | Fix counts, remove placeholder, add a "Module language policy" paragraph. |
+| FB-025 | Low | Phase numbering collides (commit "Sprint P8 — Hub Infrastructure" vs PLAN.md P8 = QMS); the Go migration phase list G0–G15 exists only in PR #5/#6 bodies. | `PLAN.md`, `PHASES.md` | Add a G-phase section to PHASES.md; renumber or annotate P8. |
+| FB-026 | Low | Python 3.10 compatibility shims remain while the target is 3.12. | `src/forge/_compat.py`, `modules/*/src/_compat.py`, OT `opcua_client/_compat.py` | Remove once CI enforces 3.12. |
+| FB-027 | Low | Stale generated report `reports/facts-whk-mes.json` (gitignored). | `reports/` | Regenerate with `forge governance run facts` as forge-mes. |
+
+## Forge MES module (`modules/Forge MES`)
+
+| ID | Sev | Problem | Where | Suggested fix |
+|----|-----|---------|-------|---------------|
+| FB-028 | High | Frontend `tsc --noEmit` reports 22 errors under `exactOptionalPropertyTypes` (pre-existing in whk-mes; the files were only moved). Backend `tsc` is clean. | `frontend/lib/recipe-utils.ts`, `frontend/lib/scheduling/aggregate-calculator.ts`, `frontend/lib/scheduling/grouping-validation.ts`, `frontend/lib/security/audit-logger.ts`, `frontend/playwright-standalone.config.ts` | Fix the undefined-narrowing bugs (they are real) rather than relaxing the flag. |
+| FB-029 | High | Secrets live in whk-mes git history, which the subtree import carries into forge: `.env.staging` (JWT secret, DB and RabbitMQ passwords) and `.env.vercel.preview` (Vercel OIDC token). Both files were removed from the migration branch. | forge history, `reh3376/whk-mes` history | Rotate the JWT secret and Vercel token now; decide on a history rewrite before any public push. |
+| FB-030 | Med | References to a non-existent `apps/whk-recipe-configuration-admin` app. | `docker-compose.codex.yml:134-144`, `docs/app-overview/overview.md`, `docs/operations/deployment/README-CODEX.md` | Remove the admin service and doc mentions, or restore the admin app. |
+| FB-031 | Med | The module's `.github/workflows` are inert inside forge (GitHub only runs root workflows). | `modules/Forge MES/.github/workflows/*` | Port `ci-whk-mes`, `ci-e2e`, `ci-releases` into root workflows with `paths:` filters, then delete the nested copies. |
+| FB-032 | Med | Cloud resource names still say `whk-recipe-configuration` / `mes-ui` (fly.toml app, Vercel project, New Relic app, pm2 `ecosystem.config.js`, workflow names). Not changed by the migration on purpose. | `modules/Forge MES/fly.toml`, workflows, `backend/ecosystem.config.js` | Rename when the infrastructure is re-pointed to forge-mes. |
+| FB-033 | Med | The `whk-script-library` submodule (uninitialized) was deregistered during migration. | formerly `apps/whk-recipe-configuration/submodules/whk-script-library` → `WhiskeyHouse/whk-script-library` | Re-add under `modules/Forge MES/backend/submodules/` if the backend needs it. |
+| FB-034 | High | forge-core integration is not implemented in the backend: no gRPC `AdapterService` client (the TS sidecar is a skeleton), the Python spoke adapter only ingests injected records, and write-back is stubbed. | `modules/Forge MES/backend`, `sidecars/whk-sidecar`, `src/forge/adapters/forge_mes/adapter.py` | Define the backend ↔ hub contract (Register/Health + `Ingest` stream), emit `ContextualRecord`s from the backend's existing RabbitMQ/MQTT publishers, and plan `mod_mes` persistence per `docs/DB_ORCHESTRATION_FRAMEWORK.md`. |
+| FB-035 | Low | Nested tooling configs came with the app (`.claude/`, `.cursor/`, `.roo/`, `.windsurf*`, `.taskmaster*`, `.devcontainer/`, `flake.nix`, `.mcp.json`, `sonar-project.properties`, `depot.json`). | `modules/Forge MES/` | Review which still apply inside forge; delete the rest. |
+| FB-036 | Low | `npm run dev/build/test` end-to-end not yet verified after the restructure (verified: `npm install`, shared build, backend `tsc`). Old turbo filters used directory names that never matched package names. | `modules/Forge MES/package.json` | Run the full turbo pipeline and the backend/frontend test suites. |
+| FB-037 | Low | forge's `.gitignore` ignores `gen/` globally; any generated dir named `gen/` inside the module would be silently ignored. | `.gitignore`, `modules/Forge MES` | Scope the rule to `/gen/` at root, or add `!modules/**/gen/`. |
+
+## MDEMG tooling (details in `docs/MDEMG-INIT-BUGS.md`)
+
+| ID | Sev | Problem | Where | Suggested fix |
+|----|-----|---------|-------|---------------|
+| FB-038 | Med | `mdemg init` does not verify the LLM runtime, keeps a stale compose file, and overwrites `llm`/`embedding`/`jiminy` config (Bug 3). | MDEMG 0.11.0-beta.1 | See Bug 3. |
+| FB-039 | Low | `mdemg init` writes `.claude/mcp.json`, but Claude Code loads project MCP servers from `.mcp.json` at the repo root, so the mdemg MCP server is never registered (Bug 4). | `.claude/mcp.json` | Write `.mcp.json` at the root. |
+| FB-040 | Low | The prompt hook's alert banner reads the global `~/.mdemg/alerts/current.json`, so 44 stale alerts from the `~/mdemg` instance appear in forge sessions (Bug 5). | `.claude/hooks/prompt-context.sh` | Make alerts per-instance. |
+| FB-041 | Open | Embeddings still use `EMBEDDING_PROVIDER=openai` (text-embedding-3-large, 3072 dims) as in `~/mdemg/.env`, while the user does not use OpenAI models for LLM work. | `.env` (forge MDEMG) | Confirm whether embeddings should move to a local embedder; that requires re-embedding the `forge` space. |
