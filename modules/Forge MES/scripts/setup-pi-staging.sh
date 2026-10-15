@@ -99,7 +99,7 @@ main() {
     # Step 9: Configure ngrok authtoken
     print_header "Configuring ngrok"
     print_info "Setting authtoken..."
-    ssh "$PI_HOST" "ngrok config add-authtoken ***REMOVED***"
+    ssh "$PI_HOST" "ngrok config add-authtoken YOUR_NGROK_AUTHTOKEN"
     print_success "ngrok configured"
 
     print_header "Setup Complete!"
