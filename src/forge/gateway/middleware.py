@@ -16,7 +16,6 @@ from typing import Any
 from fastapi import FastAPI, Request  # noqa: TC002
 from fastapi.responses import JSONResponse  # noqa: TC002
 
-from forge.api.main import create_app
 from forge.gateway.auth import auth_config_from_env, configure_auth
 from forge.gateway.errors import install_error_handlers, problem_response
 from forge.gateway.rate_limit import (
@@ -52,6 +51,10 @@ def create_gateway_app(
         5. RBAC (via FastAPI Depends)
         6. Core API routes
     """
+    # Imported here, not at module level: forge.api.main imports the gateway's
+    # auth/rbac dependencies (FB-063), so a top-level import would be circular.
+    from forge.api.main import create_app
+
     # Build the core API
     app = create_app(storage_config=storage_config)
 

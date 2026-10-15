@@ -4,9 +4,12 @@
  * `Health`. Its address is advertised to the hub as the `grpc_callback_url`
  * Configure param by ForgeHubService.
  *
- * Every inbound call must carry the adapter id this backend registered with
- * and the session id the hub issued on Register; anything else is
- * PERMISSION_DENIED.
+ * Every inbound call must carry the adapter id this backend registered with,
+ * the session id the hub issued on Register and, in the metadata
+ * `x-forge-callback-token`, the per-spoke callback token this server
+ * advertised on Configure (FB-063); anything else is PERMISSION_DENIED. With
+ * `FORGE_SPOKE_REQUIRE_TLS` (the default in production) the port refuses to
+ * come up without TLS material.
  *
  * Pull RPCs (BACKLOG FB-061): `Backfill` replays the audit log for a time
  * range (ForgeBackfillService) as a server stream; `Subscribe` mirrors the
@@ -15,6 +18,7 @@
  * cancels. `Collect` and the hub-hosted half stay UNIMPLEMENTED.
  */
 import * as grpc from "@grpc/grpc-js";
+import * as crypto from "crypto";
 import * as fs from "fs";
 import {
   Inject,
@@ -47,6 +51,11 @@ export interface SpokeServerStatus {
   port?: number;
   advertisedUrl?: string;
   expectedSession?: string;
+  /** Never the token itself. */
+  callbackTokenSet: boolean;
+  tokenRejections: number;
+  tlsRequired: boolean;
+  tls: boolean;
   writes: WriteStats;
   deniedCalls: number;
   unimplementedCalls: number;
@@ -74,6 +83,16 @@ export type WriteValueKind =
 
 /** Identity recorded on writes the hub performs (the hub has no requester field). */
 export const HUB_REQUESTER = "forge-hub";
+/** Configure param carrying the callback token to the hub (FB-063). */
+export const CALLBACK_TOKEN_PARAM = "grpc_callback_token";
+/** gRPC metadata key the hub presents the token in. */
+export const CALLBACK_TOKEN_HEADER = "x-forge-callback-token";
+
+function safeEqual(a: string, b: string): boolean {
+  const left = Buffer.from(a);
+  const right = Buffer.from(b);
+  return left.length === right.length && crypto.timingSafeEqual(left, right);
+}
 
 /** RPCs this server does not implement (the hub-hosted half and Collect). */
 const UNSERVED_RPCS = [
@@ -173,9 +192,12 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
   private listening?: Promise<string | undefined>;
   private expectedSession?: string;
   private deniedCalls = 0;
+  private tokenRejections = 0;
   private unimplementedCalls = 0;
   private lastError?: string;
   private readonly startedAt = Date.now();
+  /** Shared secret the hub must present on every callback (FB-063). */
+  readonly callbackToken: string;
   private backfillStreams = 0;
   private backfillRecords = 0;
   private subscriptionSeq = 0;
@@ -186,7 +208,10 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     private readonly writes: ForgeWriteService,
     private readonly ingest: ForgeIngestService,
     @Optional() private readonly backfill?: ForgeBackfillSource & { getStatus(): BackfillStatus }
-  ) {}
+  ) {
+    this.callbackToken =
+      config.spoke.callbackToken || crypto.randomBytes(24).toString("base64url");
+  }
 
   get enabled(): boolean {
     return this.config.enabled && this.config.spoke.enabled;
@@ -217,6 +242,13 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
   /** Bind and serve; resolves to the URL the hub should dial. Idempotent. */
   async start(bind: string = this.config.spoke.bind): Promise<string> {
     if (this.server && this.advertisedUrl) return this.advertisedUrl;
+    if (this.config.spoke.requireTls && !this.config.tls.enabled) {
+      throw new Error(
+        "FORGE_SPOKE_REQUIRE_TLS is on (default in production) but FORGE_HUB_TLS_ENABLED is not: " +
+          "the spoke port will not serve plaintext; configure FORGE_HUB_TLS_CERT/_KEY or set " +
+          "FORGE_SPOKE_REQUIRE_TLS=false outside production"
+      );
+    }
     const Service = getAdapterService();
     const server = new grpc.Server();
     server.addService(Service.service, this.handlers());
@@ -273,6 +305,10 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       port: this.port,
       advertisedUrl: this.advertisedUrl,
       expectedSession: this.expectedSession,
+      callbackTokenSet: Boolean(this.callbackToken),
+      tokenRejections: this.tokenRejections,
+      tlsRequired: this.config.spoke.requireTls,
+      tls: this.config.tls.enabled,
       writes: this.writes.getStats(),
       deniedCalls: this.deniedCalls,
       unimplementedCalls: this.unimplementedCalls,
@@ -300,21 +336,21 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
 
   private handlers(): grpc.UntypedServiceImplementation {
     const unary =
-      (fn: (req: Record<string, unknown>) => Promise<unknown>) =>
+      (fn: (req: Record<string, unknown>, metadata: grpc.Metadata) => Promise<unknown>) =>
       (
         call: grpc.ServerUnaryCall<Record<string, unknown>, unknown>,
         cb: grpc.sendUnaryData<unknown>
       ) => {
-        fn(call.request).then(
+        fn(call.request, call.metadata).then(
           (res) => cb(null, res),
           (err: unknown) => cb(this.toServiceError(err))
         );
       };
     const impl: grpc.UntypedServiceImplementation = {
-      Write: unary((req) => this.handleWrite(req as WriteRequestWire)),
-      Discover: unary((req) => this.handleDiscover(req)),
-      Health: unary((req) => this.handleHealth(req)),
-      Unsubscribe: unary((req) => this.handleUnsubscribe(req)),
+      Write: unary((req, md) => this.handleWrite(req as WriteRequestWire, md)),
+      Discover: unary((req, md) => this.handleDiscover(req, md)),
+      Health: unary((req, md) => this.handleHealth(req, md)),
+      Unsubscribe: unary((req, md) => this.handleUnsubscribe(req, md)),
       Backfill: (call: grpc.ServerWritableStream<BackfillRequestWire, unknown>) => {
         void this.handleBackfill(call);
       },
@@ -336,8 +372,11 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     return impl;
   }
 
-  private async handleWrite(req: WriteRequestWire): Promise<Record<string, unknown>> {
-    this.assertSession(req);
+  private async handleWrite(
+    req: WriteRequestWire,
+    metadata: grpc.Metadata
+  ): Promise<Record<string, unknown>> {
+    this.assertSession(req, metadata);
     let decoded: { value: unknown; kind: WriteValueKind };
     try {
       decoded = decodeWriteValue(req);
@@ -359,8 +398,11 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private async handleDiscover(req: Record<string, unknown>): Promise<Record<string, unknown>> {
-    this.assertSession(req);
+  private async handleDiscover(
+    req: Record<string, unknown>,
+    metadata: grpc.Metadata
+  ): Promise<Record<string, unknown>> {
+    this.assertSession(req, metadata);
     return {
       tags: this.writes.describe().map((t) => ({
         tag_path: t.tag_path,
@@ -372,8 +414,11 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private async handleHealth(req: Record<string, unknown>): Promise<Record<string, unknown>> {
-    this.assertSession(req);
+  private async handleHealth(
+    req: Record<string, unknown>,
+    metadata: grpc.Metadata
+  ): Promise<Record<string, unknown>> {
+    this.assertSession(req, metadata);
     const ingest = this.ingest.getStatus();
     return {
       adapter_id: this.config.adapterId,
@@ -398,7 +443,7 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
   ): Promise<void> {
     let sent = 0;
     try {
-      this.assertSession(call.request);
+      this.assertSession(call.request, call.metadata);
       if (!this.backfill) {
         throw {
           code: grpc.status.UNIMPLEMENTED,
@@ -429,7 +474,7 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     call: grpc.ServerWritableStream<SubscribeRequestWire, unknown>
   ): void {
     try {
-      this.assertSession(call.request);
+      this.assertSession(call.request, call.metadata);
     } catch (err) {
       call.emit("error", this.toServiceError(err));
       return;
@@ -463,8 +508,11 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     this.logger.log(`Subscription ${id} opened by the hub (tags=${tags.join(",") || "*"})`);
   }
 
-  private async handleUnsubscribe(req: Record<string, unknown>): Promise<Record<string, unknown>> {
-    this.assertSession(req);
+  private async handleUnsubscribe(
+    req: Record<string, unknown>,
+    metadata: grpc.Metadata
+  ): Promise<Record<string, unknown>> {
+    this.assertSession(req, metadata);
     const id = String(req.subscription_id ?? "");
     const entry = this.subscriptions.get(id);
     if (!entry) return { success: false, message: `unknown subscription '${id}'` };
@@ -472,17 +520,27 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
     return { success: true, message: `subscription '${id}' ended after ${entry.delivered} record(s)` };
   }
 
-  private assertSession(req: { adapter_id?: unknown; session_id?: unknown }): void {
+  private assertSession(
+    req: { adapter_id?: unknown; session_id?: unknown },
+    metadata?: grpc.Metadata
+  ): void {
     const adapterOk = req.adapter_id === this.config.adapterId;
     const sessionOk =
       Boolean(this.expectedSession) && req.session_id === this.expectedSession;
-    if (adapterOk && sessionOk) return;
+    const presented = metadata?.get(CALLBACK_TOKEN_HEADER)?.[0];
+    const token =
+      typeof presented === "string" ? presented : presented ? presented.toString() : "";
+    const tokenOk = token.length > 0 && safeEqual(token, this.callbackToken);
+    if (adapterOk && sessionOk && tokenOk) return;
     this.deniedCalls++;
+    if (adapterOk && sessionOk) this.tokenRejections++;
     const detail = !adapterOk
       ? `adapter '${String(req.adapter_id)}' is not served here (this is '${this.config.adapterId}')`
-      : this.expectedSession
-        ? "session id does not match the hub-issued session"
-        : "no hub session is active";
+      : !this.expectedSession
+        ? "no hub session is active"
+        : !sessionOk
+          ? "session id does not match the hub-issued session"
+          : `callback token missing or invalid (metadata ${CALLBACK_TOKEN_HEADER})`;
     throw { code: grpc.status.PERMISSION_DENIED, details: detail } as grpc.ServiceError;
   }
 

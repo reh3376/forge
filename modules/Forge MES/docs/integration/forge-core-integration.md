@@ -152,12 +152,24 @@ accepted states and REST equivalent, so the OT module can introspect them.
 
 ### Authorisation
 
-Every inbound call must carry `adapter_id` = this backend's `FORGE_ADAPTER_ID`
-and `session_id` = the session the hub issued on `Register`; anything else is
-`PERMISSION_DENIED` and counted in `deniedCalls`. The session id is only ever
-exchanged over the hub link, so it acts as the bearer for callbacks; in
-production put both directions behind TLS (`FORGE_HUB_TLS_*` also serves the
-spoke port, and a CA makes it mTLS). Hardening beyond that is FB-063.
+Every inbound call must carry three things, or it is `PERMISSION_DENIED`
+and counted in `deniedCalls` (FB-054, FB-063):
+
+| Check | Where it comes from |
+|---|---|
+| `adapter_id` = this backend's `FORGE_ADAPTER_ID` | request field |
+| `session_id` = the session the hub issued on `Register` | request field; only ever exchanged over the hub link |
+| metadata `x-forge-callback-token` = the spoke's callback token | `FORGE_SPOKE_CALLBACK_TOKEN`, or a random token minted per process start; advertised to the hub as the secret Configure param `grpc_callback_token`, so a hub only has it after a successful handshake (`tokenRejections` counts misses) |
+
+Transport: `FORGE_HUB_TLS_*` also serves the spoke port (cert + key required,
+a CA makes it mTLS), and `FORGE_SPOKE_REQUIRE_TLS` — on by default when
+`NODE_ENV=production` — makes the server refuse to come up in plaintext. On
+the hub, `FORGE_SPOKE_TLS_CA` (and `_CERT`/`_KEY` for mTLS) give the callback
+channel its trust material; the hub endpoints that drive a spoke
+(`POST /v1/adapters/{id}/write`, `/backfill`, the subscription endpoints)
+require the `adapters:write` scope once `FORGE_AUTH_ENABLED=true`
+(`FORGE_API_KEYS=key:user:operator,...` or a JWT). The spoke → hub direction
+is still plaintext on the hub side (FB-072).
 
 ### Hub side
 
@@ -267,6 +279,8 @@ reports `spoke.backfill` (runs, rows scanned, records streamed) and
 | `FORGE_SPOKE_GRPC_ENABLED` | `true` | Host the spoke half of `AdapterService` for hub write-back (only when `FORGE_HUB_ENABLED` is true). |
 | `FORGE_SPOKE_GRPC_BIND` | `0.0.0.0:50052` | Bind address of the spoke gRPC server. |
 | `FORGE_SPOKE_GRPC_ADVERTISE_URL` | bind host (`localhost` for wildcards) + bound port | What the hub dials; set it to the service name in Compose/Kubernetes, e.g. `mes-backend:50052`. |
+| `FORGE_SPOKE_REQUIRE_TLS` | `true` when `NODE_ENV=production`, else `false` | Refuse to serve the spoke port without `FORGE_HUB_TLS_ENABLED` + cert/key (FB-063). |
+| `FORGE_SPOKE_CALLBACK_TOKEN` | random per process start | Shared secret the hub must present on every callback RPC; set it explicitly when the spoke runs as more than one replica. |
 | `FORGE_ADAPTER_ID` | `forge-mes` | Adapter identity (override per environment, e.g. `forge-mes-staging`). |
 | `FORGE_SITE` / `FORGE_AREA` | `whk01` / `distillery01` | Default ISA-95 context (matches the UNS `wh.whk01.distillery01.*`). |
 | `FORGE_INGEST_BATCH_SIZE` | `100` | Records per Ingest stream. |
@@ -359,7 +373,8 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 (done) |
 | Liveness probe for silent PLC link loss | FB-070 (done) |
 | Control write audit records into the hub store | FB-066 (done) |
-| Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 |
+| Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 (done) |
+| Hub gRPC server TLS (spoke → hub direction) | FB-072 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |
 | Dead-letter sink for exhausted batches | FB-056 |
 | `mod_mes` persistence cut-over | FB-057 |
