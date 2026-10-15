@@ -220,6 +220,7 @@ builds `OTModuleHost` → `OTModuleAdapter(control=ControlDependencies(...))` �
 | `changeover_areas[].cip` | `PlcCipRunner`: start tag written through the write engine, state tag polled until Complete/Faulted, `equipment/cipState` published (retained) |
 | `changeover_areas` | `ChangeoverOrchestrator` + `MesChangeoverClient(app.state.write_dispatcher)` |
 | `mqtt.mode` | `local` (embedded Forge broker, replays retained state on start), `external` (aiomqtt with reconnect) or `none` |
+| `connections` | `PlcConnectionManager` (FB-069): one `OpcUaClient` + `OpcUaProvider` per PLC on the host's `AcquisitionEngine`, supervised restarts with back-off, `GET/POST /api/v1/ot/control/connections[/{name}/restart]` |
 
 Cross-references are checked at start-up (a recipe mapping or CIP start tag
 that is not in `write_tags`, an area whose equipment has no recipe entry).
@@ -333,7 +334,8 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 |
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
 | CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 (done) |
-| PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 |
+| PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 (done) |
+| Liveness probe for silent PLC link loss | FB-070 |
 | Control write audit records into the hub store | FB-066 |
 | Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |

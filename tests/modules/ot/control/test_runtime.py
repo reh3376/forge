@@ -23,12 +23,20 @@ from forge.modules.ot.control import (
     ControlDependencies,
     ControlRuntime,
     RegistryTagIO,
+    WriteRequest,
+    WriteRole,
+    WriteStatus,
     parse_control_config,
 )
 from forge.modules.ot.control.api import create_control_router
 from forge.modules.ot.mqtt.ingress import ExternalBrokerIngress
+from forge.modules.ot.opcua_client.types import ConnectionHealth as UaConnectionHealth
+from forge.modules.ot.opcua_client.types import ConnectionState as UaConnectionState
 from forge.modules.ot.opcua_client.types import DataType as UaDataType
+from forge.modules.ot.opcua_client.types import DataValue as UaDataValue
+from forge.modules.ot.opcua_client.types import QualityCode as UaQuality
 from forge.modules.ot.tag_engine.models import ExpressionTag, MemoryTag, StandardTag
+from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
 from forge.modules.ot.tag_engine.registry import TagRegistry
 from forge.transport.spoke_callback import WriteDispatchError, WriteOutcome
 
@@ -557,3 +565,122 @@ async def test_registry_tag_io_routes_memory_and_standard_tags() -> None:
     via_engine = RegistryTagIO(registry, acquisition=Acquisition())
     await via_engine.write_tag(SP, 7.0)
     assert provider.plc[SP] == 7.0
+
+
+# ---------------------------------------------------------------------------
+# PLC connections (FB-069)
+# ---------------------------------------------------------------------------
+
+
+class FakeUaClient:
+    """Enough of OpcUaClient for OpcUaProvider: connect/subscribe/read/write/health."""
+
+    def __init__(self, spec) -> None:
+        self.spec = spec
+        self.state = UaConnectionState.DISCONNECTED
+        self.values: dict[str, Any] = {}
+        self.connects = 0
+
+    async def connect(self) -> None:
+        self.connects += 1
+        self.state = UaConnectionState.CONNECTED
+
+    async def disconnect(self) -> None:
+        self.state = UaConnectionState.DISCONNECTED
+
+    async def subscribe(self, node_ids, callback, *, interval_ms=500.0, queue_size=10) -> int:
+        return 1
+
+    async def unsubscribe(self, sid: int) -> None:
+        pass
+
+    async def read(self, node_ids, *, max_age_ms=0):
+        return [UaDataValue(value=self.values.get(n), quality=UaQuality.GOOD) for n in node_ids]
+
+    async def write(self, node_id, value, *, data_type=None) -> None:
+        self.values[node_id] = value
+
+    def health(self) -> UaConnectionHealth:
+        return UaConnectionHealth(
+            endpoint_url=self.spec.endpoint, connection_name=self.spec.name, state=self.state
+        )
+
+
+SP_NODE = "ns=2;s=Cooker01.TIT_2010.SP"
+
+
+async def test_connections_are_composed_started_and_served_over_rest() -> None:
+    registry = TagRegistry()
+    await registry.register(
+        StandardTag(
+            path=SP, data_type=UaDataType.FLOAT, opcua_node_id=SP_NODE, connection_name="WHK01"
+        )
+    )
+    await registry.register(  # interlock IL-1 reads this one from the PLC
+        StandardTag(
+            path=CIP_STATE,
+            data_type=UaDataType.STRING,
+            opcua_node_id="ns=2;s=Cooker01.CIP.State",
+            connection_name="WHK01",
+        )
+    )
+    clients: dict[str, FakeUaClient] = {}
+
+    def factory(spec):
+        clients[spec.name] = FakeUaClient(spec)
+        return clients[spec.name]
+
+    doc = document(mqtt={"mode": "none"}, areas=False)
+    doc["connections"] = [{"name": "WHK01", "endpoint": "opc.tcp://10.0.0.1:4840"}]
+    doc["connection_poll_seconds"] = 0
+    shared = AcquisitionEngine()
+    rt = ControlRuntime(
+        parse_control_config(doc),
+        ControlDependencies(
+            write_dispatcher=FakeMes(), acquisition=shared, plc_client_factory=factory
+        ),
+        registry=registry,
+    )
+    assert rt.connections is not None and rt.connections.engine is shared
+    assert isinstance(rt.tag_io, RegistryTagIO)
+
+    await rt.start()
+    client = clients["WHK01"]
+    assert client.connects == 1 and rt.status()["connections"]["connected"] == 1
+
+    # A control write reaches the PLC through the provider and reads back CONFIRMED.
+    result = await rt.engine.execute(
+        WriteRequest(tag_path=SP, value=150.0, requestor="test", role=WriteRole.ENGINEER)
+    )
+    assert result.status is WriteStatus.CONFIRMED and client.values[SP_NODE] == 150.0
+
+    app = FastAPI()
+    app.include_router(create_control_router(rt))
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
+        r = await c.get("/api/v1/ot/control/connections")
+        assert r.status_code == 200 and r.json()["connections"]["WHK01"]["connected"] is True
+        r = await c.post("/api/v1/ot/control/connections/WHK01/restart")
+        assert r.status_code == 200 and r.json()["restarts"] == 1 and client.connects == 2
+        assert (await c.post("/api/v1/ot/control/connections/nope/restart")).status_code == 404
+        assert (await c.get("/api/v1/ot/control/status")).json()["connections"]["total"] == 1
+
+    await rt.stop()
+    assert client.state is UaConnectionState.DISCONNECTED and not rt.connections.started
+
+
+async def test_connections_need_a_registry_and_absent_connections_report_empty() -> None:
+    doc = document(mqtt={"mode": "none"}, areas=False)
+    doc["connections"] = [{"name": "WHK01", "endpoint": "opc.tcp://10.0.0.1:4840"}]
+    with pytest.raises(ValueError, match="TagRegistry"):
+        ControlRuntime(
+            parse_control_config(doc),
+            ControlDependencies(write_dispatcher=FakeMes(), tag_io=FakePlc()),
+        )
+
+    rt, _mes, _plc, _sink = runtime(document(mqtt={"mode": "none"}, areas=False))
+    assert rt.connections is None and rt.status()["connections"] is None
+    app = FastAPI()
+    app.include_router(create_control_router(rt))
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
+        assert (await c.get("/api/v1/ot/control/connections")).json()["total"] == 0
+        assert (await c.post("/api/v1/ot/control/connections/WHK01/restart")).status_code == 404

@@ -123,3 +123,40 @@ def test_invalid_config_fails_startup(tmp_path, monkeypatch, no_grpc) -> None:
     app = create_app()
     with pytest.raises(ConfigError), TestClient(app):
         pass
+
+
+def test_hosted_module_with_unreachable_plc_is_fault_isolated(
+    tmp_path, monkeypatch, no_grpc
+) -> None:
+    """A PLC that refuses connections leaves its provider FAILED; the hub still serves (FB-069)."""
+    config = json.loads(write_config(tmp_path).read_text(encoding="utf-8"))
+    config["connections"] = [
+        {"name": "WHK01", "endpoint": "opc.tcp://127.0.0.1:1", "request_timeout_ms": 500}
+    ]
+    config["connection_poll_seconds"] = 0
+    path = tmp_path / "ot-control-plc.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+    monkeypatch.setenv("FORGE_OT_CONTROL_CONFIG", str(path))
+    monkeypatch.setenv("FORGE_OT_TAGS_DIR", str(write_tags(tmp_path)))
+    app = create_app()
+    host = app.state.ot_module
+
+    with TestClient(app) as client:
+        assert host.started
+        runtime = host.control_runtime
+        assert runtime is not None and runtime.connections is not None
+        assert runtime.connections.engine is host.acquisition
+
+        body = client.get("/api/v1/ot/control/connections").json()
+        assert body["total"] == 1 and body["connected"] == 0
+        conn = body["connections"]["WHK01"]
+        assert conn["provider_state"] == "failed" and conn["last_error"]
+        assert conn["next_retry_at"] is not None
+
+        retry = client.post("/api/v1/ot/control/connections/WHK01/restart")
+        assert retry.status_code == 200 and retry.json()["failures"] == 2
+        assert client.get("/api/v1/ot/namespaces").status_code == 200
+        # The Standard tag has a provider now, but no live link: the engine reports the failure.
+        assert client.get("/api/v1/ot/control/status").json()["connections"]["total"] == 1
+
+    assert not host.started

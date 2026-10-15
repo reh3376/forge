@@ -13,6 +13,21 @@
     "publish_cip_state": true,
     "publish_audit": true
   },
+  "site_prefix": "WH",
+  "connections": [
+    {
+      "name": "WHK01",
+      "endpoint": "opc.tcp://10.4.2.10:4840",
+      "namespace_index": 2,
+      "security_policy": "None",
+      "session_timeout_ms": 60000,
+      "request_timeout_ms": 10000,
+      "reconnect_interval_ms": 2000,
+      "max_reconnect_attempts": 0,
+      "enabled": true
+    }
+  ],
+  "connection_poll_seconds": 5,
   "write_tags": [
     {
       "tag_path": "WH/WHK01/Cooker01/TIT_2010/SP",

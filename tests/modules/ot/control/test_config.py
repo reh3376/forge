@@ -210,3 +210,54 @@ def test_load_from_file(tmp_path) -> None:
     path.write_text(json.dumps(document(site=1)), encoding="utf-8")
     with pytest.raises(ConfigError, match=str(path)):
         load_control_config(path)
+
+
+def test_connections_parse_and_cross_check() -> None:
+    cfg = parse_control_config(
+        document(
+            site_prefix="WH",
+            connections=[
+                {"name": "WHK01", "endpoint": "opc.tcp://10.4.2.10:4840", "namespace_index": 2},
+                {
+                    "name": "WHK02",
+                    "endpoint": "opc.tcp://10.4.2.11:4840",
+                    "security_policy": "Basic256Sha256",
+                    "certificate_path": "/etc/forge/client.pem",
+                    "private_key_path": "/etc/forge/client.key",
+                    "reconnect_interval_ms": 500,
+                    "enabled": False,
+                },
+            ],
+            connection_poll_seconds=2,
+        )
+    )
+    assert [c.name for c in cfg.connections] == ["WHK01", "WHK02"]
+    assert cfg.connections[1].security_policy == "Basic256Sha256" and not cfg.connections[1].enabled
+    assert cfg.connection_poll_seconds == 2 and cfg.site_prefix == "WH"
+    assert cfg.describe()["connections"] == {"WHK01": "opc.tcp://10.4.2.10:4840"}
+
+    with pytest.raises(ConfigError, match=r"duplicate connections\.name"):
+        parse_control_config(
+            document(
+                connections=[
+                    {"name": "WHK01", "endpoint": "opc.tcp://a:4840"},
+                    {"name": "WHK01", "endpoint": "opc.tcp://b:4840"},
+                ]
+            )
+        )
+    with pytest.raises(ConfigError, match=r"opc\.tcp"):
+        parse_control_config(document(connections=[{"name": "WHK01", "endpoint": "tcp://a:4840"}]))
+    with pytest.raises(ConfigError, match="certificate_path"):
+        parse_control_config(
+            document(
+                connections=[
+                    {
+                        "name": "WHK01",
+                        "endpoint": "opc.tcp://a:4840",
+                        "security_policy": "Basic256Sha256",
+                    }
+                ]
+            )
+        )
+    with pytest.raises(ConfigError, match="connection_poll_seconds"):
+        parse_control_config(document(connection_poll_seconds=-1))
