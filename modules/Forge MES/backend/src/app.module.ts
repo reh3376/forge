@@ -110,6 +110,7 @@ import { BatchDeviationModule } from "./batchDeviation/batchDeviation.module";
 import { StepExecutionModule } from "./stepExecution/stepExecution.module";
 import { MashingExecutionModule } from "./mashingExecution/mashingExecution.module";
 import { MqttDomainPublisherModule } from "./mqttDomainPublisher/mqttDomainPublisher.module";
+import { ForgeModule } from "./forge/forge.module";
 import { MqttEventPublishRuleModule } from "./mqttEventPublishRule/mqttEventPublishRule.module";
 import { ProductionMetricModule } from "./productionMetric/productionMetric.module";
 import { YieldEstimationModule } from "./yieldEstimation/yieldEstimation.module";
@@ -227,6 +228,7 @@ import { EquipmentStateModule } from "./equipmentState/equipmentState.module";
     StepExecutionModule,
     MashingExecutionModule,
     MqttDomainPublisherModule,
+    ForgeModule,
     MqttEventPublishRuleModule,
     ProductionMetricModule,
     YieldEstimationModule,

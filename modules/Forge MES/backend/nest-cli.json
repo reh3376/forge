@@ -4,8 +4,13 @@
     "assets": [
       {
         "include": "swagger/**/*"
+      },
+      {
+        "include": "forge/proto/**/*.proto"
       }
     ],
-    "plugins": ["@nestjs/swagger/plugin"]
+    "plugins": [
+      "@nestjs/swagger/plugin"
+    ]
   }
 }
