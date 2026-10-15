@@ -35,7 +35,9 @@ from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
 from forge.transport.proto_bridge import (
     contextual_record_to_proto,
     manifest_to_proto,
+    proto_to_contextual_record,
     proto_to_health,
+    set_typed_value,
 )
 from forge.transport.spoke_client import TransportChannel
 
@@ -102,6 +104,10 @@ class GrpcChannel(TransportChannel):
             return await self._call_stop(stub, request)
         if method == "Health":
             return await self._call_health(stub, request)
+        if method == "Write":
+            return await self._call_write(stub, request)
+        if method == "Discover":
+            return await self._call_discover(stub, request)
 
         msg = f"Unknown unary RPC method: {method}"
         raise ValueError(msg)
@@ -206,6 +212,57 @@ class GrpcChannel(TransportChannel):
         from forge.transport.serialization import pydantic_to_proto
 
         return pydantic_to_proto(health_model)
+
+    async def _call_write(
+        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Write RPC (hub → spoke): dict → WriteRequest → WriteResponse → dict.
+
+        ``request["value"]`` is a plain Python value; it lands in the same
+        ``typed_value`` oneof a RecordValue uses. A read-back record, when
+        the spoke returns one, comes back as a proto-compatible dict.
+        """
+        proto_request = service_msg.WriteRequest(
+            adapter_id=request.get("adapter_id", ""),
+            session_id=request.get("session_id", ""),
+            tag_path=request.get("tag_path", ""),
+            confirm=bool(request.get("confirm", False)),
+        )
+        set_typed_value(proto_request, request.get("value"))
+        response: service_msg.WriteResponse = await stub.Write(proto_request)
+        readback: dict[str, Any] | None = None
+        if response.HasField("readback"):
+            from forge.transport.serialization import pydantic_to_proto
+
+            readback = pydantic_to_proto(proto_to_contextual_record(response.readback))
+        return {
+            "success": response.success,
+            "message": response.message,
+            "readback": readback,
+        }
+
+    async def _call_discover(
+        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Discover RPC (hub → spoke): DiscoverResponse → {"tags": [...]}."""
+        from google.protobuf.json_format import MessageToDict
+
+        proto_request = service_msg.DiscoverRequest(
+            adapter_id=request.get("adapter_id", ""),
+            session_id=request.get("session_id", ""),
+        )
+        response: service_msg.DiscoverResponse = await stub.Discover(proto_request)
+        tags = [
+            {
+                "tag_path": tag.tag_path,
+                "data_type": tag.data_type,
+                "description": tag.description,
+                "engineering_units": tag.engineering_units,
+                "metadata": MessageToDict(tag.metadata) if tag.HasField("metadata") else {},
+            }
+            for tag in response.tags
+        ]
+        return {"tags": tags}
 
     async def _call_ingest(
         self,

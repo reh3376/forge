@@ -5,6 +5,8 @@ This is the main application that ``docker compose`` runs.  It provides:
     /v1/health          — Aggregated infrastructure health
     /v1/adapters        — Adapter registry and lifecycle
     /v1/records         — Record ingestion (REST passthrough)
+    /v1/adapters/{id}/write — Hub → spoke write-back (FB-054)
+    /v1/writes          — Write-back targets and counters
     /curation/...       — Curation sub-app (products, lineage, quality)
 
 The gRPC server for spoke communication runs on a separate port
@@ -36,6 +38,7 @@ from forge.core.models.adapter import AdapterHealth, AdapterManifest, AdapterSta
 from forge.ingest import IngestPipeline, build_pipeline_from_storage
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
+from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +69,31 @@ class AdapterListItem(BaseModel):
     name: str
     state: str
     records_collected: int = 0
+
+
+class WriteRequestModel(BaseModel):
+    """One hub → spoke write: a tag path and the value to put there."""
+
+    tag_path: str
+    value: Any = None
+    confirm: bool = False
+
+
+class WriteResponseModel(BaseModel):
+    adapter_id: str
+    tag_path: str
+    success: bool
+    message: str = ""
+    readback: dict[str, Any] | None = None
+
+
+# HTTP status per WriteDispatchError code.
+_WRITE_HTTP_STATUS = {
+    "unknown_adapter": 404,
+    "no_callback": 409,
+    "not_writable": 403,
+    "transport": 502,
+}
 
 
 # ---------------------------------------------------------------------------
@@ -124,6 +152,7 @@ def create_app(
     storage_config: StorageConfig | None = None,
     storage_factory: StorageFactory | None = None,
     ingest_pipeline: IngestPipeline | None = None,
+    write_dispatcher: WriteDispatcher | None = None,
 ) -> FastAPI:
     """Create the Forge Hub API application.
 
@@ -134,6 +163,9 @@ def create_app(
             When provided, the curation sub-app uses real stores.
         ingest_pipeline: Override for the record ingest pipeline. Defaults to
             one built from ``storage_factory`` (or in-memory sinks).
+        write_dispatcher: Override for the hub → spoke write dispatcher.
+            Defaults to one that dials each spoke's ``grpc_callback_url``
+            and consults the registry for ``capabilities.write``.
     """
     config = storage_config or StorageConfig.from_env()
     registry = _AdapterRegistry()
@@ -144,6 +176,16 @@ def create_app(
         pipeline = build_pipeline_from_storage(storage_factory)
     else:
         pipeline = IngestPipeline()
+
+    def _can_write(adapter_id: str) -> bool | None:
+        manifest = registry.get_manifest(adapter_id)
+        return None if manifest is None else bool(manifest.capabilities.write)
+
+    dispatcher = (
+        write_dispatcher
+        if write_dispatcher is not None
+        else WriteDispatcher(can_write=_can_write)
+    )
     runtime: dict[str, Any] = {}
     start_time = time.monotonic()
 
@@ -180,6 +222,7 @@ def create_app(
                     pipeline,
                     on_registered=registry.register,
                     on_health=registry.update_health,
+                    write_dispatcher=dispatcher,
                 )
                 runtime["servicer"] = servicer
                 grpc_server = GrpcServer(servicer, port=grpc_port)
@@ -202,6 +245,7 @@ def create_app(
                 logger.info("Flushed %d buffered records before shutdown", flushed)
             await grpc_server.stop()
             logger.info("gRPC server stopped")
+        await dispatcher.close()
 
         logger.info("Forge Hub API shut down")
 
@@ -213,6 +257,7 @@ def create_app(
     )
     app.state.ingest_pipeline = pipeline
     app.state.adapter_registry = registry
+    app.state.write_dispatcher = dispatcher
 
     # ------------------------------------------------------------------
     # Health endpoints
@@ -307,6 +352,48 @@ def create_app(
             "pipeline": pipeline.describe(),
             "grpc": servicer.snapshot() if servicer is not None else None,
         }
+
+    # ------------------------------------------------------------------
+    # Write-back (hub → spoke, FB-054)
+    # ------------------------------------------------------------------
+
+    @app.post("/v1/adapters/{adapter_id}/write", response_model=WriteResponseModel)
+    async def write_to_adapter(
+        adapter_id: str, request: WriteRequestModel
+    ) -> WriteResponseModel:
+        """Push a value into a spoke's source system through its ``Write`` RPC.
+
+        The spoke must have registered with ``capabilities.write`` and
+        advertised ``grpc_callback_url`` on Configure. With ``confirm`` the
+        spoke's read-back record is returned.
+        """
+        try:
+            outcome = await dispatcher.write(
+                adapter_id, request.tag_path, request.value, confirm=request.confirm
+            )
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return WriteResponseModel(
+            adapter_id=adapter_id,
+            tag_path=request.tag_path,
+            success=outcome.success,
+            message=outcome.message,
+            readback=outcome.readback.model_dump(mode="json") if outcome.readback else None,
+        )
+
+    @app.get("/v1/adapters/{adapter_id}/tags")
+    async def discover_adapter_tags(adapter_id: str) -> dict[str, Any]:
+        """Tags the spoke exposes to the hub (its ``Discover`` RPC)."""
+        try:
+            tags = await dispatcher.discover(adapter_id)
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return {"adapter_id": adapter_id, "tags": tags}
+
+    @app.get("/v1/writes")
+    async def write_stats() -> dict[str, Any]:
+        """Write-back callbacks known to the hub, with per-adapter counters."""
+        return dispatcher.snapshot()
 
     # ------------------------------------------------------------------
     # Platform info

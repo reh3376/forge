@@ -69,7 +69,7 @@ class TestManifest:
 
     def test_connection_params_count(self):
         adapter = ForgeMesAdapter()
-        assert len(adapter.manifest.connection_params) == 18
+        assert len(adapter.manifest.connection_params) == 19
 
     def test_required_params(self):
         adapter = ForgeMesAdapter()
@@ -265,13 +265,43 @@ class TestDiscovery:
 
 
 class TestWrite:
-    """Test the WritableAdapter mixin (stub mode)."""
+    """Test the WritableAdapter mixin (refused without a dispatcher, FB-054 with one)."""
 
     @pytest.mark.asyncio
     async def test_write_stub_returns_false(self):
         adapter = ForgeMesAdapter()
         result = await adapter.write("mes.graphql.step_execution", {"action": "start"})
         assert result is False
+
+    @pytest.mark.asyncio
+    async def test_write_goes_through_the_attached_dispatcher(self):
+        class FakeOutcome:
+            def __init__(self, success):
+                self.success = success
+
+        class FakeDispatcher:
+            def __init__(self):
+                self.calls = []
+
+            async def write(self, adapter_id, tag_path, value, *, confirm=False):
+                self.calls.append((adapter_id, tag_path, value, confirm))
+                return FakeOutcome(success=tag_path.endswith("cip-complete"))
+
+        adapter = ForgeMesAdapter()
+        dispatcher = FakeDispatcher()
+        adapter.attach_write_dispatcher(dispatcher)
+        ok = await adapter.write(
+            "mes.changeover.cooker.cip-complete", {"cipStartTime": "a", "cipEndTime": "b"}
+        )
+        refused = await adapter.write("mes.changeover.cooker.request", {}, confirm=False)
+        assert ok is True and refused is False
+        assert dispatcher.calls[0] == (
+            "forge-mes",
+            "mes.changeover.cooker.cip-complete",
+            {"cipStartTime": "a", "cipEndTime": "b"},
+            True,
+        )
+        assert dispatcher.calls[1][3] is False
 
     @pytest.mark.asyncio
     async def test_write_with_confirm(self):

@@ -24,12 +24,14 @@ from forge.ingest.facts_check import FactsCheckResult, check_manifest_against_fa
 from forge.ingest.pipeline import IngestOutcome, IngestPipeline, IngestStats
 from forge.transport.hub_server import AdapterServiceServicer, AdapterSession
 from forge.transport.serialization import proto_to_pydantic, pydantic_to_proto
+from forge.transport.spoke_callback import CALLBACK_PARAM
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
     from forge.core.models.contextual_record import ContextualRecord
+    from forge.transport.spoke_callback import WriteDispatcher
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +47,7 @@ class SessionIngestState:
     facts: FactsCheckResult | None = None
     registered_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     last_error: str | None = None
+    callback_url: str | None = None
 
     def reset_stream(self) -> None:
         self.stream = IngestOutcome()
@@ -62,9 +65,11 @@ class HubIngestServicer(AdapterServiceServicer):
         require_facts: bool = False,
         on_registered: Callable[[AdapterManifest], None] | None = None,
         on_health: Callable[[str, AdapterHealth], None] | None = None,
+        write_dispatcher: WriteDispatcher | None = None,
     ) -> None:
         super().__init__()
         self.pipeline = pipeline if pipeline is not None else IngestPipeline()
+        self.write_dispatcher = write_dispatcher
         self._batch_size = max(1, batch_size)
         self._specs_dir = specs_dir
         self._require_facts = require_facts
@@ -94,6 +99,18 @@ class HubIngestServicer(AdapterServiceServicer):
         result["message"] = check.summary()
         return result
 
+    async def configure(
+        self, adapter_id: str, session_id: str, params: dict[str, str]
+    ) -> dict[str, Any]:
+        result = await super().configure(adapter_id, session_id, params)
+        url = (params.get(CALLBACK_PARAM) or "").strip() or None
+        state = self._state.get(session_id)
+        if state is not None:
+            state.callback_url = url
+        if self.write_dispatcher is not None:
+            self.write_dispatcher.register_callback(adapter_id, session_id, params)
+        return result
+
     async def stop(
         self, adapter_id: str, session_id: str, graceful: bool = True
     ) -> dict[str, Any]:
@@ -103,6 +120,8 @@ class HubIngestServicer(AdapterServiceServicer):
             flushed = outcome.persisted if outcome else 0
         result = await super().stop(adapter_id, session_id, graceful)
         result["records_flushed"] = flushed
+        if self.write_dispatcher is not None:
+            self.write_dispatcher.forget(session_id)
         return result
 
     async def health(self, adapter_id: str, session_id: str) -> dict[str, Any]:
@@ -231,6 +250,7 @@ class HubIngestServicer(AdapterServiceServicer):
                     "stats": state.stats.to_dict() if state else None,
                     "facts": state.facts.to_dict() if state and state.facts else None,
                     "last_error": state.last_error if state else None,
+                    "callback_url": state.callback_url if state else None,
                 }
             )
         return {

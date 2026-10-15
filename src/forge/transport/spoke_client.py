@@ -215,6 +215,22 @@ class InMemoryChannel(TransportChannel):
             return await self._servicer.health(
                 request["adapter_id"], request["session_id"],
             )
+        if method in ("Write", "Discover"):
+            # Spoke-hosted RPCs (FB-054): dispatched to a servicer that
+            # plays the spoke, i.e. exposes write()/discover().
+            handler = getattr(self._servicer, method.lower(), None)
+            if handler is None:
+                msg = f"Servicer does not serve {method}"
+                raise ValueError(msg)
+            if method == "Write":
+                return await handler(
+                    request["adapter_id"],
+                    request["session_id"],
+                    request["tag_path"],
+                    request.get("value"),
+                    request.get("confirm", False),
+                )
+            return await handler(request["adapter_id"], request["session_id"])
         msg = f"Unknown RPC method: {method}"
         raise ValueError(msg)
 
