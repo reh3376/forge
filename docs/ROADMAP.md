@@ -13,7 +13,7 @@ The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). Thi
 | # | Decision | Date | Source |
 |---|---|---|---|
 | A-1 | **Hub and spoke.** forge-core is the hub; every system is a spoke speaking `forge.v1.AdapterService` over gRPC. The contract is FxTS-governed (FACTS per adapter, FTTS for transport). | 2026-10 | repo, `docs/FxTS` |
-| A-2 | **Modules are written in Go.** Speed and native gRPC. forge-mes, imported as NestJS + Next.js, is a bridge and will be rewritten (FB-076). The hub is Python today; whether the core moves to Rust is parked (D-5). | 2026-10-16 | owner |
+| A-2 | **Formal `forge-<management service>` modules share one language and structure: Go**, generated from the module SDK template (A-5). Speed and native gRPC. forge-mes, imported as NestJS + Next.js, is a bridge and will be rewritten (FB-076); forge-cmms, forge-whs and later modules start in Go. Open: whether the hub-hosted Python OT module and the Python ingestion adapters follow (D-7). The hub is Python today; a Rust core is parked (D-5). | 2026-10-16 | owner |
 | A-3 | **All user interfaces come from forge-display.** Modules describe (FVTS spec); forge-display renders on desktop HMI, desktop app, web and mobile profiles. No module ships its own UI. | 2026-10-16 | owner, FVTS draft |
 | A-4 | **HMI/SCADA is optional and pluggable.** Forge is a stand-alone enterprise management framework whose own management modules (forge-mes, forge-whs, forge-cmms, forge-hmi-scada, …) are not mandatory. A site keeps third-party software (e.g. Ignition) through an integration module (forge-ignition). forge-hmi-scada is activated per site. | 2026-10-16 | owner |
 | A-5 | **A module SDK is required** so management and integration modules are built the same way (Go scaffold, manifest, FACTS spec, tests). | 2026-10-16 | owner |
@@ -62,7 +62,7 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 | Item | Status | Notes |
 |---|---|---|
 | FB-007 hub API auth on all routes, scope registry from manifests | Not started | FB-063 gated the write path only (`adapters:write`). |
-| FB-075 one platform role model (gateway `Role` + `ENGINEER`; bind OT `WriteRole` and FVTS to it) | **Decision needed** (D-1) | |
+| FB-075 scoped role model (platform-wide, site-scoped) | **In dialogue** (D-1) | Owner decided 2026-10-16: roles will be scoped; design worked through before code. |
 | FB-001 mount Context Engine and Schema Registry apps | Not started | High. |
 | FB-003 Postgres-backed `AccessController` | Not started | High; needed for module DB grants (A-6). |
 | FB-004 schema naming (`mod_<x>` everywhere) · FB-005 migration for registry tables · FB-059 migration 004 table | Not started | Pair with FB-057. |
@@ -102,8 +102,8 @@ FVTS v0.1.0 is in `main` (schema, OT reference spec with invented points, framew
 | Step | Status | Notes |
 |---|---|---|
 | Resolve the FVTS open decisions (D-4) | Decision needed | Name, roles (FB-075), write authority per profile, mobile acknowledgement, rate ceilings, wire encoding/browser transport, configured-layout format, server-side enforcement (FB-074). |
-| `fvts_runner.py` with the 12 planned checks; golden-message conformance tests under `tests/governance/fvts` | Not started | Schema-runner parity rule: gate off until every field is enforced. |
-| Replace the invented fermenter points with real OT tags; owner approves the hash | Blocked (on the runner and D-4) | |
+| FB-077 `fvts_runner.py` with the 12 planned checks; golden-message conformance tests under `tests/governance/fvts` | Not started — **decided 2026-10-16** | Schema-runner parity rule: gate off until every field is enforced. |
+| FB-078 replace the invented fermenter points with real OT tags; owner approves the hash | Not started — **decided 2026-10-16** (OT stays the reference spec) | After FB-077 and FB-075. |
 | Design-token set (`forge://design/tokens/v1`) with reserved `alarm.*` namespace (ISA-101) | Not started | |
 | Renderer spike: one slice rendered in two renderers (candidates per the Rust research: Slint or egui for operator HMI, Dioxus for desktop apps) + Slint licence check | Not started | |
 | forge-display module scaffold (Go-hosted contract services, renderer packaging) | Not started | After the spike. |
@@ -162,7 +162,7 @@ Security/ops items (WS-9) run alongside and are gated by GitHub Support, not by 
 
 ## 5. Decision queue (owner input needed)
 
-**D-1 · Platform role model (FB-075).** Two role enums exist today and neither covers the other:
+**D-1 · Platform role model (FB-075).** *2026-10-16: the owner decided roles will be scoped; the model is being designed in dialogue before any code (see `docs/decisions/roles.md` once drafted).* Two role enums exist today and neither covers the other:
 
 | Model | Values | Used by |
 |---|---|---|
@@ -171,7 +171,7 @@ Security/ops items (WS-9) run alongside and are gated by GitHub Support, not by 
 
 FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). The question is whether Forge has one security role model for people (hub API, UI actions, PLC writes) with `ENGINEER` added to the gateway and `WriteRole` mapped onto it, or keeps the OT write roles separate from platform access roles. Recommendation: one model (`viewer < operator < engineer < admin`), scopes derived from it, OT keeps its per-tag permissions but reads the role from the platform identity.
 
-**D-2 · FVTS runner and golden tests (not forge-mes).** This concerns the FVTS governance framework itself: `src/forge/governance/fvts/` has a schema and a reference spec for the **OT module** (`ot-module.fvts.json`, with invented fermenter tags), but no `fvts_runner.py` and no conformance tests, so nothing enforces the contract and the spec's hash cannot be approved. The questions: should the OT module stay the reference spec (replace the invented points with real OT tags), and is the runner wanted before forge-display work starts? Recommendation: yes to both; the runner is small and the golden messages become forge-display's first test fixtures.
+**D-2 · FVTS runner and golden tests (not forge-mes).** *Decided 2026-10-16: yes to both — FB-077, FB-078.* This concerns the FVTS governance framework itself: `src/forge/governance/fvts/` has a schema and a reference spec for the **OT module** (`ot-module.fvts.json`, with invented fermenter tags), but no `fvts_runner.py` and no conformance tests, so nothing enforces the contract and the spec's hash cannot be approved. The questions: should the OT module stay the reference spec (replace the invented points with real OT tags), and is the runner wanted before forge-display work starts? Recommendation: yes to both; the runner is small and the golden messages become forge-display's first test fixtures.
 
 **D-3 · forge-mes Go rewrite design (FB-076).** What the Go module must carry on day one (hub link, changeover state machine, MQTT publishing, recipe/production-order queries), what stays in the NestJS bridge until cut-over, how Prisma data moves into `mod_mes`, and whether GraphQL survives or the hub API replaces it. Needs a short design doc for sign-off.
 
@@ -180,6 +180,8 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 **D-5 · Core language (Python vs Rust) for the hub.** Parked; not required by anything in section 4.
 
 **D-6 · Public flip timing.** When GitHub Support confirms GC.
+
+**D-7 · Scope of the Go standard.** A-2 covers the formal management-service modules. Still to decide: whether the hub-hosted Python OT module (`src/forge/modules/ot`) and the Python ingestion adapters (`src/forge/adapters/*`) move to Go over time or stay Python inside the hub, and whether integration modules (forge-ignition) follow the Go template.
 
 ---
 
