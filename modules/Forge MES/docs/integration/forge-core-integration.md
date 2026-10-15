@@ -240,6 +240,23 @@ REST (`/api/v1/ot`): `GET control/status`, `GET control/tags`,
 (409 when the area's MES state does not allow the action, 404 unknown area,
 503 before the runtime exists). `GET /v1/info` reports the hosted module.
 
+### Pull: backfill and subscriptions (hub ← spoke)
+
+BACKLOG FB-061. The spoke-hosted `AdapterService` also serves the pull RPCs,
+so the hub can replay history and mirror the live queue without the
+Python adapter's GraphQL path:
+
+| RPC | Spoke | Hub |
+|---|---|---|
+| `Backfill(start, end, tags, max_records)` → stream | `ForgeBackfillService.replay()`: `AuditLog` rows in the range, mapped like live events (`audit.create` / `audit.update` / `audit.delete`, `extra.replay = backfill`, `extra.audit_log_id`), cursor-paged, tag filter on `source.tag_path` | `POST /v1/adapters/{id}/backfill {start_time, end_time, tags, max_records, batch_size}` → batches into the ingest pipeline, one `records_log` row per batch (session `backfill`) |
+| `Subscribe(tags)` → stream | `ForgeIngestService.onRecord` mirror; subscription id in the initial metadata `subscription-id`; ends on `Unsubscribe` or cancel | `POST /v1/adapters/{id}/subscriptions {tags}` → background task feeding the pipeline (`subscription:<id>` log rows); `GET` lists, `DELETE .../{sid}` unsubscribes and flushes; `GET /v1/subscriptions` |
+| `Unsubscribe(subscription_id)` | ends the stream | used by `DELETE` |
+| `Collect` | UNIMPLEMENTED (FB-071) | `send_stream("Collect")` still maps to Ingest |
+
+Both carry the hub-issued session id like `Write`; `GET /api/forge/status`
+reports `spoke.backfill` (runs, rows scanned, records streamed) and
+`spoke.subscriptions`.
+
 ## Configuration
 
 | Variable | Default | Purpose |
@@ -335,7 +352,8 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Hub persists ingested records (replace `InMemoryServicer`) | FB-053 (done) |
 | Durable adapter registry and ingest audit log on the hub | FB-060 (done) |
 | Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
-| Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 |
+| Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 (done) |
+| Collect snapshot, FACTS entry for the replay source, tag filter pushed into the query | FB-071 |
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
 | CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 (done) |
 | PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 (done) |

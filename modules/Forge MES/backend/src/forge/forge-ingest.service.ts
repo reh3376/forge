@@ -30,6 +30,8 @@ export interface IngestStatus {
   recordsDroppedQueueFull: number;
   recordsDeadLettered: number;
   consecutiveFailures: number;
+  /** Active Subscribe listeners (FB-061). */
+  subscribers: number;
   lastError?: string;
   lastFlushAt?: string;
 }
@@ -55,6 +57,8 @@ export class ForgeIngestService {
   private inFlightPromise?: Promise<number>;
   private inFlightRecords = 0;
   private stopped = false;
+  /** Live mirrors of the queue (spoke-hosted Subscribe streams, FB-061). */
+  private readonly listeners = new Set<(record: ContextualRecordMessage) => void>();
 
   // metrics / breaker state
   private recordsSent = 0;
@@ -107,9 +111,31 @@ export class ForgeIngestService {
     this.enqueue(record);
   }
 
+  /**
+   * Observe every record that enters the queue (the hub's Subscribe RPC is
+   * served from this). Returns the function that removes the listener.
+   */
+  onRecord(listener: (record: ContextualRecordMessage) => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  get subscriberCount(): number {
+    return this.listeners.size;
+  }
+
   /** Queue an already-built record (used by tests and future producers). */
   enqueue(record: ContextualRecordMessage): void {
     if (!this.config.enabled || this.stopped) return;
+    for (const listener of this.listeners) {
+      try {
+        listener(record);
+      } catch (err) {
+        this.logger.warn(`Record listener failed: ${err}`);
+      }
+    }
     this.queue.push(record);
     while (this.queue.length > this.config.ingest.maxQueue) {
       this.queue.shift();
@@ -183,6 +209,7 @@ export class ForgeIngestService {
       recordsDroppedQueueFull: this.droppedQueueFull,
       recordsDeadLettered: this.deadLettered,
       consecutiveFailures: this.consecutiveFailures,
+      subscribers: this.listeners.size,
       lastError: this.lastError,
       lastFlushAt: this.lastFlushAt
         ? new Date(this.lastFlushAt).toISOString()

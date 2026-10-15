@@ -7,6 +7,7 @@ This is the main application that ``docker compose`` runs.  It provides:
     /v1/ingest/log      — Ingest log (one row per batch, forge_core.records_log)
     /v1/records         — Record ingestion (REST passthrough)
     /v1/adapters/{id}/write — Hub → spoke write-back (FB-054)
+    /v1/adapters/{id}/backfill, /subscriptions — pull from the spoke (FB-061)
     /v1/writes          — Write-back targets and counters
     /api/v1/ot/...      — OT module control + i3X browse (FORGE_OT_CONTROL_CONFIG, FB-065)
     /curation/...       — Curation sub-app (products, lineage, quality)
@@ -21,6 +22,7 @@ import logging
 import os
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime  # noqa: TC003 — pydantic field type
 from functools import partial
 from typing import Any
 
@@ -45,6 +47,7 @@ from forge.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
 from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
+from forge.transport.spoke_pull import SubscriptionManager, backfill_into_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +87,22 @@ class WriteResponseModel(BaseModel):
     success: bool
     message: str = ""
     readback: dict[str, Any] | None = None
+
+
+class BackfillRequestModel(BaseModel):
+    """Replay a time range from a spoke into the ingest pipeline (FB-061)."""
+
+    start_time: datetime
+    end_time: datetime
+    tags: list[str] = Field(default_factory=list)
+    max_records: int = Field(default=0, ge=0)
+    batch_size: int = Field(default=100, ge=1, le=10_000)
+
+
+class SubscribeRequestModel(BaseModel):
+    """Open a spoke subscription that streams into the ingest pipeline (FB-061)."""
+
+    tags: list[str] = Field(default_factory=list)
 
 
 # HTTP status per WriteDispatchError code.
@@ -151,6 +170,10 @@ def create_app(
     )
     runtime: dict[str, Any] = {}
     start_time = time.monotonic()
+    # Spoke subscriptions streaming into the pipeline (FB-061).
+    subscriptions = SubscriptionManager(
+        dispatcher, pipeline, manifest_for=registry.get_manifest, on_batch=registry.log_batch
+    )
 
     # OT module hosted in-process (FB-065) when a control config is named.
     ot_host = None
@@ -237,6 +260,7 @@ def create_app(
                 logger.info("Flushed %d buffered records before shutdown", flushed)
             await grpc_server.stop()
             logger.info("gRPC server stopped")
+        await subscriptions.close()
         await dispatcher.close()
         await registry.flush()
 
@@ -251,6 +275,7 @@ def create_app(
     app.state.ingest_pipeline = pipeline
     app.state.adapter_registry = registry
     app.state.write_dispatcher = dispatcher
+    app.state.subscriptions = subscriptions
     app.state.ot_module = None
     if ot_host is not None:
         ot_host.mount(app)
@@ -408,6 +433,70 @@ def create_app(
     async def write_stats() -> dict[str, Any]:
         """Write-back callbacks known to the hub, with per-adapter counters."""
         return dispatcher.snapshot()
+
+    # ------------------------------------------------------------------
+    # Pull RPCs on the spoke: backfill + subscriptions (FB-061)
+    # ------------------------------------------------------------------
+
+    @app.post("/v1/adapters/{adapter_id}/backfill")
+    async def backfill_adapter(adapter_id: str, request: BackfillRequestModel) -> dict[str, Any]:
+        """Replay ``[start_time, end_time]`` from the spoke into the pipeline.
+
+        Each batch is ingested like a pushed one and logged under session
+        ``backfill``. Returns the totals; records already ingested stay
+        ingested when the stream fails part-way.
+        """
+        manifest = registry.get_manifest(adapter_id)
+        if manifest is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not registered")
+        if request.end_time < request.start_time:
+            raise HTTPException(422, "end_time must not be before start_time")
+        try:
+            outcome = await backfill_into_pipeline(
+                dispatcher,
+                pipeline,
+                adapter_id=adapter_id,
+                start=request.start_time,
+                end=request.end_time,
+                tags=request.tags,
+                max_records=request.max_records,
+                manifest=manifest,
+                batch_size=request.batch_size,
+                on_batch=registry.log_batch,
+            )
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return outcome.to_dict()
+
+    @app.post("/v1/adapters/{adapter_id}/subscriptions")
+    async def open_subscription(
+        adapter_id: str, request: SubscribeRequestModel
+    ) -> dict[str, Any]:
+        """Subscribe to the spoke's record stream; records flow into the pipeline."""
+        if registry.get_manifest(adapter_id) is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not registered")
+        try:
+            handle = await subscriptions.start(adapter_id, request.tags)
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return handle.to_dict()
+
+    @app.get("/v1/adapters/{adapter_id}/subscriptions")
+    async def list_subscriptions(adapter_id: str) -> list[dict[str, Any]]:
+        return [h.to_dict() for h in subscriptions.list(adapter_id)]
+
+    @app.delete("/v1/adapters/{adapter_id}/subscriptions/{subscription_id}")
+    async def close_subscription(adapter_id: str, subscription_id: str) -> dict[str, Any]:
+        """Unsubscribe at the spoke and stop ingesting; flushes what is buffered."""
+        try:
+            handle = await subscriptions.stop(adapter_id, subscription_id)
+        except KeyError as exc:
+            raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
+        return handle.to_dict()
+
+    @app.get("/v1/subscriptions")
+    async def all_subscriptions() -> dict[str, Any]:
+        return subscriptions.snapshot()
 
     # ------------------------------------------------------------------
     # Platform info

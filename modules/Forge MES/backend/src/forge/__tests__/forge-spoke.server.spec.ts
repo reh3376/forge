@@ -254,3 +254,147 @@ describe("ForgeSpokeServer", () => {
     await expect(tls.start("127.0.0.1:0")).rejects.toThrow("FORGE_HUB_TLS_CERT");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Pull RPCs: Backfill, Subscribe, Unsubscribe (FB-061)
+// ---------------------------------------------------------------------------
+
+describe("ForgeSpokeServer pull RPCs", () => {
+  const config = loadForgeConfig((k) =>
+    ({ FORGE_HUB_ENABLED: "true", FORGE_SPOKE_GRPC_BIND: "127.0.0.1:0" })[k]
+  );
+  type Listener = (record: any) => void;
+  const listeners = new Set<Listener>();
+  const ingest = {
+    getStatus: () => ({ sessionId: "sess-1", recordsSent: 0, recordsDeadLettered: 0, recordsDroppedQueueFull: 0 }),
+    onRecord(listener: Listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    emit(record: any) {
+      for (const l of listeners) l(record);
+    },
+  };
+  const opts = { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01" };
+  const replayed = [1, 2, 3].map((i) =>
+    mapDomainEventToRecord(
+      { entityType: "ScheduleOrder", eventType: "audit_update", data: { id: `so-${i}`, status: "Active" } },
+      opts
+    )
+  );
+  const backfill = {
+    ranges: [] as any[],
+    async *replay(range: any) {
+      backfill.ranges.push(range);
+      for (const r of replayed.slice(0, range.maxRecords || replayed.length)) yield r;
+    },
+    getStatus: () => ({ enabled: true, runs: backfill.ranges.length, recordsReplayed: 0, rowsScanned: 0 }),
+  };
+  let server: ForgeSpokeServer;
+  let client: any;
+
+  beforeAll(async () => {
+    server = new ForgeSpokeServer(config, new ForgeWriteService(), ingest as any, backfill as any);
+    server.onModuleInit();
+    const url = await server.whenListening();
+    const Service = getAdapterService();
+    client = new Service(url!, grpc.credentials.createInsecure());
+  });
+
+  afterAll(async () => {
+    client.close();
+    await server.onModuleDestroy();
+  });
+
+  function readAll(stream: any): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const out: any[] = [];
+      stream.on("data", (r: any) => out.push(r));
+      stream.on("end", () => resolve(out));
+      stream.on("error", reject);
+    });
+  }
+
+  it("streams a backfill for the requested range and denies strangers", async () => {
+    await expect(
+      readAll(client.Backfill({ adapter_id: "forge-mes", session_id: "sess-1", tags: [] }))
+    ).rejects.toMatchObject({ code: grpc.status.PERMISSION_DENIED });
+
+    server.setExpectedSession("sess-1");
+    const start = new Date("2026-06-01T00:00:00Z");
+    const end = new Date("2026-06-02T00:00:00Z");
+    const records = await readAll(
+      client.Backfill({
+        adapter_id: "forge-mes",
+        session_id: "sess-1",
+        tags: ["mes.backend"],
+        start_time: { seconds: String(Math.floor(start.getTime() / 1000)), nanos: 0 },
+        end_time: { seconds: String(Math.floor(end.getTime() / 1000)), nanos: 0 },
+        max_records: 2,
+      })
+    );
+    expect(records).toHaveLength(2);
+    expect(records[0].source.tag_path).toBe("mes.backend.scheduleorder");
+    expect(JSON.parse(records[0].value.json_value)).toMatchObject({ id: "so-1" });
+    expect(records[0].value.typed_value).toBe("json_value");
+    expect(backfill.ranges[0]).toMatchObject({ start, end, tags: ["mes.backend"], maxRecords: 2 });
+    expect(server.getStatus().backfill).toMatchObject({ enabled: true, streams: 1, recordsStreamed: 2 });
+  });
+
+  it("answers Backfill with UNIMPLEMENTED when no source is wired", async () => {
+    const bare = new ForgeSpokeServer(config, new ForgeWriteService(), ingest as any);
+    bare.setExpectedSession("s");
+    const url = await bare.start("127.0.0.1:0");
+    const Service = getAdapterService();
+    const bareClient = new Service(url, grpc.credentials.createInsecure());
+    await expect(
+      readAll(bareClient.Backfill({ adapter_id: "forge-mes", session_id: "s", tags: [] }))
+    ).rejects.toMatchObject({ code: grpc.status.UNIMPLEMENTED, details: expect.stringContaining("backfill source") });
+    expect(bare.getStatus().backfill.enabled).toBe(false);
+    bareClient.close();
+    await bare.stop();
+  });
+
+  it("mirrors the ingest queue to a subscriber until Unsubscribe", async () => {
+    server.setExpectedSession("sess-1");
+    const stream = client.Subscribe({ adapter_id: "forge-mes", session_id: "sess-1", tags: ["mes.backend.scheduleorder"] });
+    const subscriptionId: string = await new Promise((resolve) => {
+      stream.on("metadata", (md: grpc.Metadata) => resolve(String(md.get("subscription-id")[0])));
+    });
+    expect(subscriptionId).toBe("sub-1");
+    const received: any[] = [];
+    stream.on("data", (r: any) => received.push(r));
+    const ended = new Promise<void>((resolve) => stream.on("end", resolve));
+
+    await new Promise((r) => setTimeout(r, 20));
+    expect(server.getStatus().subscriptions).toEqual([
+      expect.objectContaining({ id: "sub-1", tags: ["mes.backend.scheduleorder"], delivered: 0 }),
+    ]);
+    ingest.emit(replayed[0]);
+    ingest.emit(
+      mapDomainEventToRecord({ entityType: "Batch", eventType: "batch_started", data: { id: "b-1" } }, opts)
+    ); // filtered out by the tag
+    ingest.emit(replayed[1]);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(received.map((r: any) => JSON.parse(r.value.json_value).id)).toEqual(["so-1", "so-2"]);
+    expect(server.getStatus().subscriptions[0].delivered).toBe(2);
+
+    const unknown = await call(client, "Unsubscribe", { adapter_id: "forge-mes", session_id: "sess-1", subscription_id: "sub-x" });
+    expect(unknown.success).toBe(false);
+    const done = await call(client, "Unsubscribe", { adapter_id: "forge-mes", session_id: "sess-1", subscription_id: subscriptionId });
+    expect(done.success).toBe(true);
+    expect(done.message).toContain("2 record(s)");
+    await ended;
+    expect(server.getStatus().subscriptions).toEqual([]);
+    expect(listeners.size).toBe(0);
+
+    // A client-side cancel also releases the listener.
+    const second = client.Subscribe({ adapter_id: "forge-mes", session_id: "sess-1", tags: [] });
+    await new Promise((resolve) => second.on("metadata", resolve));
+    second.on("error", () => undefined);
+    second.cancel();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(server.getStatus().subscriptions).toEqual([]);
+    expect(listeners.size).toBe(0);
+  });
+});

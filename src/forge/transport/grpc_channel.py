@@ -34,6 +34,7 @@ from forge.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
 from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
 from forge.transport.proto_bridge import (
     contextual_record_to_proto,
+    dt_to_timestamp,
     manifest_to_proto,
     proto_to_contextual_record,
     proto_to_health,
@@ -108,6 +109,8 @@ class GrpcChannel(TransportChannel):
             return await self._call_write(stub, request)
         if method == "Discover":
             return await self._call_discover(stub, request)
+        if method == "Unsubscribe":
+            return await self._call_unsubscribe(stub, request)
 
         msg = f"Unknown unary RPC method: {method}"
         raise ValueError(msg)
@@ -129,6 +132,26 @@ class GrpcChannel(TransportChannel):
             await self._call_ingest(stub, records)
         else:
             msg = f"Streaming not implemented for method: {method}"
+            raise ValueError(msg)
+
+    async def receive_stream(
+        self, method: str, request: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Server-streaming pull RPCs on the spoke (FB-061).
+
+        ``Backfill`` yields record dicts; ``Subscribe`` yields the control dict
+        ``{"subscription_id": ...}`` (from the initial metadata) and then
+        record dicts until the spoke ends the stream.
+        """
+        stub = self._ensure_connected()
+        if method == "Backfill":
+            async for item in self._call_backfill(stub, request):
+                yield item
+        elif method == "Subscribe":
+            async for item in self._call_subscribe(stub, request):
+                yield item
+        else:
+            msg = f"Server streaming not implemented for method: {method}"
             raise ValueError(msg)
 
     async def close(self) -> None:
@@ -263,6 +286,57 @@ class GrpcChannel(TransportChannel):
             for tag in response.tags
         ]
         return {"tags": tags}
+
+    async def _call_unsubscribe(
+        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+    ) -> dict[str, Any]:
+        response: service_msg.UnsubscribeResponse = await stub.Unsubscribe(
+            service_msg.UnsubscribeRequest(
+                adapter_id=request.get("adapter_id", ""),
+                session_id=request.get("session_id", ""),
+                subscription_id=request.get("subscription_id", ""),
+            )
+        )
+        return {"success": response.success, "message": response.message}
+
+    async def _call_backfill(
+        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        from forge.transport.serialization import pydantic_to_proto
+
+        proto_request = service_msg.BackfillRequest(
+            adapter_id=request.get("adapter_id", ""),
+            session_id=request.get("session_id", ""),
+            tags=[str(t) for t in request.get("tags") or []],
+            max_records=int(request.get("max_records") or 0),
+        )
+        for field_name in ("start_time", "end_time"):
+            ts = dt_to_timestamp(request.get(field_name))
+            if ts is not None:
+                getattr(proto_request, field_name).CopyFrom(ts)
+        async for message in stub.Backfill(proto_request):
+            yield pydantic_to_proto(proto_to_contextual_record(message))
+
+    async def _call_subscribe(
+        self, stub: service_grpc.AdapterServiceStub, request: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        from forge.transport.serialization import pydantic_to_proto
+
+        call = stub.Subscribe(
+            service_msg.SubscribeRequest(
+                adapter_id=request.get("adapter_id", ""),
+                session_id=request.get("session_id", ""),
+                tags=[str(t) for t in request.get("tags") or []],
+            )
+        )
+        metadata = await call.initial_metadata()
+        subscription_id = ""
+        for key, value in metadata:
+            if key == "subscription-id":
+                subscription_id = value if isinstance(value, str) else value.decode()
+        yield {"subscription_id": subscription_id}
+        async for message in call:
+            yield pydantic_to_proto(proto_to_contextual_record(message))
 
     async def _call_ingest(
         self,
