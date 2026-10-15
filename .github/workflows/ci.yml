@@ -25,19 +25,18 @@ jobs:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
+      # setup-uv already created and activated .venv for the requested Python.
       - name: Install (dev + ot extras)
-        run: |
-          uv venv
-          uv pip install -e ".[dev,ot]"
+        run: uv pip install -e ".[dev,ot]"
       - name: ruff (advisory until BACKLOG FB-022 is cleared)
-        run: uv run --no-project ruff check . --output-format github
+        run: .venv/bin/ruff check . --output-format github
         continue-on-error: true
       - name: pytest
-        run: uv run --no-project pytest tests -q --no-header -p no:cacheprovider
+        run: .venv/bin/pytest tests -q --no-header -p no:cacheprovider
 
   hub-go:
     name: hub-go
@@ -47,8 +46,8 @@ jobs:
       run:
         working-directory: go
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go/go.mod
           cache-dependency-path: go/go.sum
@@ -64,8 +63,8 @@ jobs:
       run:
         working-directory: modules/Forge MES
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
           cache: npm
@@ -93,7 +92,7 @@ jobs:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: gitleaks on the pushed commits
