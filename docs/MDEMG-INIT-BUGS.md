@@ -148,3 +148,29 @@ to the `~/mdemg` instance, not to the freshly created forge instance.
 
 **Suggested fix:** key the alert file by instance id (`MDEMG_INSTANCE_ID` from `.env`) or by
 server port, and have the hooks resolve the instance-specific file.
+
+---
+
+## Bug 6: `ingest --incremental` drops most added files after its change filter
+
+**MDEMG version:** 0.11.0-beta.1
+**Discovered:** 2026-10-15 in the `forge` repo, after `git subtree add --prefix="modules/Forge MES"`
+
+```
+mdemg ingest --path /Users/reh3376/forge --space-id forge --include-tests --incremental --since e3cb42d
+INFO changed files detected added=3846 modified=75 deleted=1 renamed=22
+INFO filtered to changed files only before=8545 after=287
+INFO === Ingestion Complete === total=287 ingested=287
+```
+
+Git reported 3,846 added files, discovery found 8,545 elements, but the "changed files only"
+filter kept 287. The 3,800 files under `modules/Forge MES/` (a path containing a space, added
+in a subtree merge commit) were not ingested; a full non-incremental run was required.
+
+**Likely causes to check:** path comparison between `git diff --name-status` output (which
+quotes paths containing spaces, e.g. `"modules/Forge MES/..."`) and the discovered element
+paths; or the filter only matching `modified`/`renamed` entries and not `added`.
+
+**Suggested fix:** unquote git paths (`git -c core.quotePath=false diff ...`) before matching,
+include `added` files in the filter, and log the count of changed files that matched zero
+discovered elements so the gap is visible.
