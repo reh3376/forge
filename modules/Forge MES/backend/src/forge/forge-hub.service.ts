@@ -3,21 +3,27 @@
  *   Register(manifest) -> Configure(params) -> Start -> Health heartbeat
  * and, on shutdown, drain the ingest queue -> Stop(graceful).
  *
- * Startup never blocks the MES: the handshake runs in the background and
- * retries with exponential backoff until the hub answers. Health failures
- * degrade and eventually reset the session per FACTS health_degradation.
+ * Startup never blocks the MES: the handshake runs in the background (after
+ * application bootstrap, so write targets are registered) and retries with
+ * exponential backoff until the hub answers. Health failures degrade and
+ * eventually reset the session per FACTS health_degradation.
+ *
+ * Configure carries `grpc_callback_url`, the address of the spoke-hosted
+ * AdapterService (ForgeSpokeServer) the hub dials for write-back (FB-054);
+ * the hub-issued session id is what that server expects on inbound calls.
  */
 import {
   Inject,
   Injectable,
   Logger,
+  OnApplicationBootstrap,
   OnModuleDestroy,
-  OnModuleInit,
 } from "@nestjs/common";
 import { FORGE_CONFIG, ForgeConfig } from "./forge.config";
 import { ForgeHubClient, HubHealth } from "./forge-hub.client";
 import { ForgeIngestService } from "./forge-ingest.service";
 import { FORGE_MES_MANIFEST, toProtoManifest } from "./forge-manifest";
+import { ForgeSpokeServer } from "./forge-spoke.server";
 
 export type HubSessionState =
   | "disabled"
@@ -34,6 +40,8 @@ export interface HubStatus {
   adapterVersion: string;
   state: HubSessionState;
   sessionId?: string;
+  /** Spoke-hosted AdapterService address sent to the hub (write-back). */
+  callbackUrl?: string;
   registeredAt?: string;
   lastHealthAt?: string;
   lastHealth?: HubHealth;
@@ -43,7 +51,7 @@ export interface HubStatus {
 }
 
 @Injectable()
-export class ForgeHubService implements OnModuleInit, OnModuleDestroy {
+export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy {
   private readonly logger = new Logger(ForgeHubService.name);
   private state: HubSessionState = "disabled";
   private sessionId?: string;
@@ -60,10 +68,11 @@ export class ForgeHubService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(FORGE_CONFIG) private readonly config: ForgeConfig,
     private readonly client: ForgeHubClient,
-    private readonly ingest: ForgeIngestService
+    private readonly ingest: ForgeIngestService,
+    private readonly spoke: ForgeSpokeServer
   ) {}
 
-  onModuleInit(): void {
+  onApplicationBootstrap(): void {
     if (!this.config.enabled) {
       this.logger.log("Forge hub integration disabled (FORGE_HUB_ENABLED != true)");
       return;
@@ -96,6 +105,7 @@ export class ForgeHubService implements OnModuleInit, OnModuleDestroy {
         this.logger.warn(`Hub Stop failed on shutdown: ${err}`);
       }
     }
+    this.spoke.setExpectedSession(undefined);
     this.ingest.stop();
     this.client.close();
     this.state = this.config.enabled ? "stopped" : "disabled";
@@ -114,6 +124,7 @@ export class ForgeHubService implements OnModuleInit, OnModuleDestroy {
       adapterVersion: FORGE_MES_MANIFEST.version,
       state: this.state,
       sessionId: this.sessionId,
+      callbackUrl: this.spoke.getStatus().advertisedUrl,
       registeredAt: this.registeredAt?.toISOString(),
       lastHealthAt: this.lastHealthAt?.toISOString(),
       lastHealth: this.lastHealth,
@@ -154,16 +165,27 @@ export class ForgeHubService implements OnModuleInit, OnModuleDestroy {
     if (!reg.accepted || !reg.session_id) {
       throw new Error(`hub rejected registration: ${reg.message || "no reason"}`);
     }
+    const callbackUrl = await this.spoke.whenListening();
+    const params: Record<string, string> = {
+      ...this.config.connectionParams,
+      ...(callbackUrl ? { grpc_callback_url: callbackUrl } : {}),
+    };
+    if (!callbackUrl) {
+      this.logger.warn(
+        "Spoke gRPC server is not listening; registering without grpc_callback_url (hub write-back unavailable)"
+      );
+    }
     const cfg = await this.client.configure(
       this.config.adapterId,
       reg.session_id,
-      this.config.connectionParams
+      params
     );
     if (!cfg.success) throw new Error(`hub Configure failed: ${cfg.message}`);
     const started = await this.client.start(this.config.adapterId, reg.session_id);
     if (!started.success) throw new Error(`hub Start failed: ${started.message}`);
 
     this.sessionId = reg.session_id;
+    this.spoke.setExpectedSession(reg.session_id);
     this.registeredAt = new Date();
     this.healthFailures = 0;
     this.lastError = undefined;
@@ -226,6 +248,7 @@ export class ForgeHubService implements OnModuleInit, OnModuleDestroy {
     this.stopHeartbeat();
     this.sessionId = undefined;
     this.ingest.setSession(undefined);
+    this.spoke.setExpectedSession(undefined);
   }
 }
 

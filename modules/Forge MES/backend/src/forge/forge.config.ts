@@ -35,6 +35,18 @@ export interface ForgeIngestConfig {
   circuitSuccessThreshold: number;
 }
 
+export interface ForgeSpokeServerConfig {
+  /** Host the hub -> spoke half of AdapterService (Write/Discover/Health). */
+  enabled: boolean;
+  /** Bind address of the spoke gRPC server. */
+  bind: string;
+  /**
+   * Address the hub dials, advertised as `grpc_callback_url`. Defaults to the
+   * bind host (localhost for wildcards) plus the bound port.
+   */
+  advertiseUrl?: string;
+}
+
 export interface ForgeConfig {
   enabled: boolean;
   /** host:port of the hub gRPC server (FORGE_GRPC_PORT on the hub, default 50051). */
@@ -54,6 +66,8 @@ export interface ForgeConfig {
   rpcTimeoutMs: number;
   /** Non-secret parameters sent to the hub on Configure. */
   connectionParams: Record<string, string>;
+  /** The spoke-hosted gRPC server the hub calls back into (FB-054). */
+  spoke: ForgeSpokeServerConfig;
 }
 
 type Getter = (key: string) => string | undefined;
@@ -109,6 +123,11 @@ export function loadForgeConfig(get: Getter): ForgeConfig {
     degradedAfterFailures: 3,
     failedAfterFailures: 8,
     rpcTimeoutMs: int(get, "FORGE_RPC_TIMEOUT_MS", 10_000),
+    spoke: {
+      enabled: bool(get, "FORGE_SPOKE_GRPC_ENABLED", true),
+      bind: str(get, "FORGE_SPOKE_GRPC_BIND", "0.0.0.0:50052"),
+      advertiseUrl: get("FORGE_SPOKE_GRPC_ADVERTISE_URL") || undefined,
+    },
     connectionParams: {
       // The hub-side adapter contract lists graphql_url as required; the
       // backend advertises its own endpoint. Secrets are never sent here.

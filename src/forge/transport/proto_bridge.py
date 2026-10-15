@@ -157,6 +157,20 @@ def _get_typed_value(msg: record_msg.RecordValue) -> Any:
     return None
 
 
+def set_typed_value(msg: Any, raw: Any) -> None:
+    """Set the ``typed_value`` oneof on any message that carries it.
+
+    ``RecordValue`` and ``WriteRequest`` share the same oneof layout
+    (number/string/bool/bytes/json/integer), so one setter serves both.
+    """
+    _set_typed_value(msg, raw)
+
+
+def get_typed_value(msg: Any) -> Any:
+    """Read the ``typed_value`` oneof from any message that carries it."""
+    return _get_typed_value(msg)
+
+
 # ---------------------------------------------------------------------------
 # Pydantic → Proto message converters
 # ---------------------------------------------------------------------------

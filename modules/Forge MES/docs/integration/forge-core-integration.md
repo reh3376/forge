@@ -1,9 +1,10 @@
 # forge-core integration (backend)
 
 The Forge MES backend is a **spoke** of the forge-core **hub**. This document
-describes the backend side of that link (BACKLOG FB-034): how the backend
-registers with the hub, how domain events become `ContextualRecord`s, how
-failures are handled, and how `mod_mes` persistence is planned.
+describes the backend side of that link (BACKLOG FB-034, FB-054): how the
+backend registers with the hub, how domain events become `ContextualRecord`s,
+how the hub writes back into the MES, how failures are handled, and how
+`mod_mes` persistence is planned.
 
 Code: `backend/src/forge/`. Hub counterpart: `src/forge/transport/` and
 `src/forge/adapters/forge_mes/` in the forge repository root.
@@ -14,17 +15,24 @@ Code: `backend/src/forge/`. Hub counterpart: `src/forge/transport/` and
 MES backend (NestJS)                                forge-core hub (Python)
 ┌───────────────────────────────┐   gRPC forge.v1.AdapterService   ┌─────────────────────────┐
 │ domain services               │ ──Register/Configure/Start────▶ │ GrpcServer (:50051)     │
-│   └─ MqttDomainPublisherService│ ──Ingest(stream ContextualRecord)▶│   └─ AdapterServiceServicer│
-│        └─ ForgeIngestService   │ ──Health (heartbeat)───────────▶ │        └─ context engine… │
+│   └─ MqttDomainPublisherService│ ──Ingest(stream ContextualRecord)▶│   └─ HubIngestServicer    │
+│        └─ ForgeIngestService   │ ──Health (heartbeat)───────────▶ │        └─ IngestPipeline  │
 │ ForgeHubService (session)      │ ──Stop(graceful) on shutdown───▶ │                          │
-└───────────────────────────────┘                                   └─────────────────────────┘
+│                               │                                   │ WriteDispatcher          │
+│ ForgeSpokeServer (:50052)      │ ◀──Write / Discover / Health──── │   ◀─ REST, OT module     │
+│   └─ ForgeWriteService         │        (grpc_callback_url)        │                          │
+│        └─ ChangeoverForgeWriteTarget                                └─────────────────────────┘
+└───────────────────────────────┘
 ```
 
 * **Push model.** The backend dials the hub and streams records. The hub's
   gRPC server implements the spoke-to-hub half of `AdapterService`
-  (`Register`, `Configure`, `Start`, `Stop`, `Health`, `Ingest`); the
-  hub-to-spoke RPCs (`Collect`, `Subscribe`, `Write`, `Backfill`, `Discover`)
-  are not served by either side yet (FB-054).
+  (`Register`, `Configure`, `Start`, `Stop`, `Health`, `Ingest`).
+* **Write-back.** The backend also hosts the spoke half (`Write`, `Discover`,
+  `Health`) on its own port and tells the hub where in `Configure`
+  (`grpc_callback_url`); see [Write-back](#write-back-hub--spoke). The pull
+  RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) are not served
+  (FB-061).
 * The hub-side Python adapter (`forge.adapters.forge_mes`) keeps the pull
   contract (GraphQL + RabbitMQ + MQTT) and the same FACTS spec; both paths
   produce identical record shapes.
@@ -37,15 +45,18 @@ MES backend (NestJS)                                forge-core hub (Python)
 | Manifest | `backend/src/forge/forge-mes.manifest.json` | Copy of the hub's `adapters/forge_mes/manifest.json`; same parity test. Sent on `Register`. |
 | FACTS spec | `specs/forge-mes.facts.json` | Source of the context fields, enrichment rules, retry/circuit/dead-letter policy and lifecycle timings mirrored in code. |
 | Routing metadata | `x-forge-adapter-id`, `x-forge-session-id` | Attached to every `Ingest` stream; the hub reads them to find the session. |
+| Callback address | `grpc_callback_url` Configure param | `host:port` of `ForgeSpokeServer`; the hub's `WriteDispatcher` dials it for `Write`/`Discover`/`Health`. Listed in the manifest as an optional, non-secret connection param. |
 | Schema ref | `forge://schemas/forge-mes/v0.1.0` | `lineage.schema_ref` on every record. |
 
 ## Flow
 
-1. **Startup.** `ForgeHubService.onModuleInit` returns immediately. If
-   `FORGE_HUB_ENABLED=true` it runs the handshake in the background with
+1. **Startup.** `ForgeSpokeServer.onModuleInit` binds the spoke gRPC port;
+   `ForgeHubService.onApplicationBootstrap` (after every module has
+   registered its write targets) runs the handshake in the background with
    exponential backoff (1 s → 30 s) until the hub answers:
-   `Register(manifest)` → session id → `Configure(connection params)` →
-   `Start` → state `healthy`.
+   `Register(manifest)` → session id → `Configure(connection params +
+   grpc_callback_url)` → `Start` → state `healthy`. The hub-issued session id
+   becomes the credential inbound write-back calls must present.
 2. **Heartbeat.** `Health` every `FORGE_HEALTH_INTERVAL_MS` (15 s). Three
    consecutive failures mark the session `degraded`, eight mark it `failed`
    and trigger a fresh handshake (FACTS `health_degradation`).
@@ -66,7 +77,8 @@ MES backend (NestJS)                                forge-core hub (Python)
 6. **Shutdown.** `onModuleDestroy` drains the queue, calls `Stop(graceful)`
    and closes the channel.
 7. **Observability.** `GET /api/forge/status` (authenticated) returns the
-   session state, last hub health, queue depth, circuit state and counters.
+   session state, last hub health, queue depth, circuit state, write-back
+   server state and counters; `GET /api/forge/tags` lists the writable tags.
 
 ## Record mapping
 
@@ -93,13 +105,93 @@ serialises them.
 | quality | GOOD when an id and a time exist, UNCERTAIN for one, NOT_AVAILABLE for none, BAD on `error` | `value.quality` |
 | tag path | `mes.backend.<entitytype>` | `source.tag_path` |
 
+## Write-back (hub → spoke)
+
+BACKLOG FB-054. Direction chosen: the backend **hosts the spoke half of
+`AdapterService`** rather than consuming hub commands from RabbitMQ, because
+`Write` is synchronous, carries a read-back (`confirm`) and reuses the
+contract, session and TLS material the ingest path already has. The hub
+learns the address from `grpc_callback_url` on `Configure`.
+
+```
+OT module / operator / REST                hub                               MES backend
+MesChangeoverClient.cip_complete() ─▶ WriteDispatcher.write("forge-mes",    ForgeSpokeServer.Write
+POST /v1/adapters/forge-mes/write        "mes.changeover.cooker.cip-complete", ─▶ session check
+                                         {...}, confirm=True)                 ─▶ ForgeWriteService → ChangeoverForgeWriteTarget
+                                              ◀── WriteResponse{success, message,   ─▶ ChangeoverService.cipComplete()
+                                                   readback: mes.changeover.cooker.state}   (publishes recipe/next on MQTT)
+```
+
+### Writable tags
+
+`ForgeWriteService` is a registry: a domain module registers a
+`ForgeWriteTarget` for a tag prefix and the server routes by longest prefix.
+The changeover module owns `mes.changeover` (both `.` and `/` separators are
+accepted):
+
+| Tag | Payload (same DTO as the REST endpoint) | Accepted states | Effect |
+|---|---|---|---|
+| `mes.changeover.<area>.request` | `ChangeoverRequestDto` `{requestedBy, force?, reason?, notes?}` | PRODUCTION, COOK_COMPLETE | → AWAITING_CHANGEOVER |
+| `mes.changeover.<area>.cip-complete` | `CipCompleteDto` `{cipStartTime, cipEndTime, cipDurationSeconds?, reportedBy?}` | CIP_IN_PROGRESS, AWAITING_CHANGEOVER | → CIP_COMPLETE → RECIPE_LOADING; publishes `recipe/next` |
+| `mes.changeover.<area>.recipe-loaded` | `RecipeLoadedDto` `{scheduleOrderRecipeInstanceId, sourceUpdatedAt, cookerNumber, loadedBy?}` | RECIPE_LOADING, CIP_COMPLETE | → RECIPE_LOADED → READY_TO_START (409-style `conflict` on a stale `sourceUpdatedAt`) |
+| `mes.changeover.<area>.start-production` | `StartProductionDto` `{startedBy, notes?}` | READY_TO_START | → PRODUCTION; advances the queue |
+| `mes.changeover.<area>.reset` | `ResetErrorDto` `{targetState, resetBy, reason?}` | ERROR | → AWAITING_CHANGEOVER or CIP_COMPLETE |
+| `mes.changeover.<area>.state` | read-only | | returned as the read-back of a confirmed command |
+
+`<area>` is `cooker`, `fermentation` or `barreling`. The value travels as
+`json_value`; payloads are validated with the same class-validator DTOs
+(unknown fields are refused). A refusal (`invalid_tag`, `invalid_payload`,
+`invalid_state`, `conflict`, `not_found`) comes back as `success=false` with
+the reason in `message`, never as a gRPC error, so the hub can tell "the MES
+said no" from "the MES is down". With `confirm=true` the response carries a
+`ContextualRecord` on `mes.changeover.<area>.state` whose `json_value` is the
+area state plus the `transition` result (`event_type` = `changeover.<command>`).
+
+`Discover` (and `GET /api/forge/tags`) lists every tag with its payload DTO,
+accepted states and REST equivalent, so the OT module can introspect them.
+
+### Authorisation
+
+Every inbound call must carry `adapter_id` = this backend's `FORGE_ADAPTER_ID`
+and `session_id` = the session the hub issued on `Register`; anything else is
+`PERMISSION_DENIED` and counted in `deniedCalls`. The session id is only ever
+exchanged over the hub link, so it acts as the bearer for callbacks; in
+production put both directions behind TLS (`FORGE_HUB_TLS_*` also serves the
+spoke port, and a CA makes it mTLS). Hardening beyond that is FB-063.
+
+### Hub side
+
+| Hub API | Purpose |
+|---|---|
+| `POST /v1/adapters/forge-mes/write` `{tag_path, value, confirm?}` | Dispatch one write; 404 unknown adapter, 409 no callback advertised, 403 adapter registered without `capabilities.write`, 502 spoke unreachable or RPC error. |
+| `GET /v1/adapters/forge-mes/tags` | The spoke's `Discover`. |
+| `GET /v1/writes` | Callback per adapter with write/success/failure counters and the last outcome. |
+
+In Python, `forge.transport.spoke_callback.WriteDispatcher` is the entry
+point (`app.state.write_dispatcher`); the OT module gets a typed wrapper,
+`forge.modules.ot.control.MesChangeoverClient` (`request`, `cip_complete`,
+`recipe_loaded`, `start_production`, `reset`), and the hub-side
+`ForgeMesAdapter.write()` routes through the same dispatcher once
+`attach_write_dispatcher()` is called.
+
+```bash
+curl -X POST http://localhost:8000/v1/adapters/forge-mes/write \
+  -H 'content-type: application/json' \
+  -d '{"tag_path":"mes.changeover.cooker.cip-complete",
+       "value":{"cipStartTime":"2026-06-01T08:00:00Z","cipEndTime":"2026-06-01T09:00:00Z","reportedBy":"ot"},
+       "confirm":true}'
+```
+
 ## Configuration
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `FORGE_HUB_ENABLED` | `false` | Master switch. Nothing is dialled when false. |
 | `FORGE_HUB_GRPC_URL` | `localhost:50051` | Hub gRPC address (`FORGE_GRPC_PORT` on the hub). |
-| `FORGE_HUB_TLS_ENABLED` / `_CA` / `_CERT` / `_KEY` | off | PEM paths for a TLS/mTLS channel. |
+| `FORGE_HUB_TLS_ENABLED` / `_CA` / `_CERT` / `_KEY` | off | PEM paths for a TLS/mTLS channel. The same material serves the spoke port: with TLS on, `_CERT` and `_KEY` are required for the server and a `_CA` makes it require a client certificate from the hub. |
+| `FORGE_SPOKE_GRPC_ENABLED` | `true` | Host the spoke half of `AdapterService` for hub write-back (only when `FORGE_HUB_ENABLED` is true). |
+| `FORGE_SPOKE_GRPC_BIND` | `0.0.0.0:50052` | Bind address of the spoke gRPC server. |
+| `FORGE_SPOKE_GRPC_ADVERTISE_URL` | bind host (`localhost` for wildcards) + bound port | What the hub dials; set it to the service name in Compose/Kubernetes, e.g. `mes-backend:50052`. |
 | `FORGE_ADAPTER_ID` | `forge-mes` | Adapter identity (override per environment, e.g. `forge-mes-staging`). |
 | `FORGE_SITE` / `FORGE_AREA` | `whk01` / `distillery01` | Default ISA-95 context (matches the UNS `wh.whk01.distillery01.*`). |
 | `FORGE_INGEST_BATCH_SIZE` | `100` | Records per Ingest stream. |
@@ -118,9 +210,12 @@ the FACTS spec (`error_handling`) and are not environment-tunable on purpose.
 # hub (repo root): REST on 8000, gRPC on 50051
 FORGE_GRPC_ENABLED=true FORGE_GRPC_PORT=50051 uvicorn forge.api.main:app --port 8000
 
-# backend (modules/Forge MES/backend)
+# backend (modules/Forge MES/backend): spoke server on 50052, advertised as localhost:50052
 FORGE_HUB_ENABLED=true FORGE_HUB_GRPC_URL=localhost:50051 npm run start
 curl -H "Authorization: Bearer <token>" http://localhost:3000/api/forge/status
+
+# write-back through the hub (see Write-back above)
+curl http://localhost:8000/v1/adapters/forge-mes/tags
 ```
 
 The hub's gRPC server runs `HubIngestServicer` (FB-053): `Register` is checked
@@ -136,6 +231,14 @@ is configured). `GET /v1/ingest/stats` on the hub shows per-session counters.
 * `forge-ingest.service.spec.ts` — batching, bounded queue, retry/backoff, circuit, dead-letter, concurrency.
 * `forge-hub.client.spec.ts` — a real gRPC round trip against an in-process `AdapterService` built from the vendored protos (Register → Configure → Start → Ingest → Health → Stop).
 * `forge-parity.spec.ts` — proto and manifest parity with the hub tree (skipped outside the monorepo).
+* `forge-write.service.spec.ts` — write-target registry: prefix routing, refusals vs failures, stats.
+* `forge-spoke.server.spec.ts` — the spoke-hosted `AdapterService` over a real socket: session checks, typed values, read-back, `Discover`, `Health`, `UNIMPLEMENTED` for the pull RPCs, TLS/bind failures.
+* `forge-hub.service.spec.ts` — handshake carries `grpc_callback_url` and hands the session id to the spoke server.
+* `../changeover/__tests__/changeover.forge-write.spec.ts` — tag parsing, DTO validation, command → service mapping, exception → reject codes, read-back record.
+
+Hub side: `tests/transport/test_spoke_callback.py` (dispatcher, servicer wiring,
+live gRPC against a spoke stub), `tests/api/test_write_api.py`,
+`tests/modules/ot/control/test_mes_changeover.py`.
 
 ## Persistence plan: `mod_mes`
 
@@ -171,7 +274,10 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 |---|---|
 | Hub persists ingested records (replace `InMemoryServicer`) | FB-053 (done) |
 | Durable adapter registry and ingest audit log on the hub | FB-060 |
-| Hub → spoke write-back (`Write`, OT `recipe/next` → changeover) | FB-054 |
+| Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
+| Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 |
+| OT module drives the changeover sequence through `MesChangeoverClient` | FB-062 |
+| Callback authorisation beyond the session id (per-spoke token / mTLS required in prod) | FB-063 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |
 | Dead-letter sink for exhausted batches | FB-056 |
 | `mod_mes` persistence cut-over | FB-057 |

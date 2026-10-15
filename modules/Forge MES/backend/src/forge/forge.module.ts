@@ -2,7 +2,8 @@
  * ForgeModule: the backend's link to forge-core (the hub).
  *
  * Global so MqttDomainPublisherService can take ForgeIngestService as an
- * optional dependency without every domain module importing this one.
+ * optional dependency, and domain modules can register ForgeWriteTargets
+ * with ForgeWriteService, without every module importing this one.
  */
 import { Global, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -11,6 +12,8 @@ import { ForgeController } from "./forge.controller";
 import { ForgeHubClient } from "./forge-hub.client";
 import { ForgeHubService } from "./forge-hub.service";
 import { ForgeIngestService } from "./forge-ingest.service";
+import { ForgeSpokeServer } from "./forge-spoke.server";
+import { ForgeWriteService } from "./forge-write.service";
 
 @Global()
 @Module({
@@ -34,8 +37,17 @@ import { ForgeIngestService } from "./forge-ingest.service";
         }),
     },
     ForgeIngestService,
+    ForgeWriteService,
+    ForgeSpokeServer,
     ForgeHubService,
   ],
-  exports: [FORGE_CONFIG, ForgeHubClient, ForgeIngestService, ForgeHubService],
+  exports: [
+    FORGE_CONFIG,
+    ForgeHubClient,
+    ForgeIngestService,
+    ForgeWriteService,
+    ForgeSpokeServer,
+    ForgeHubService,
+  ],
 })
 export class ForgeModule {}

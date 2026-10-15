@@ -8,8 +8,10 @@ Data flow:
     MES GraphQL/RabbitMQ/MQTT -> raw dicts -> entity mappers -> Forge core
     models -> context mapper -> ContextualRecord -> governance pipeline
 
-Write flow (deferred to F34 gRPC transport):
-    Forge decision -> unmap_* -> MES GraphQL mutation -> source system
+Write flow (BACKLOG FB-054):
+    Forge decision -> write(tag_path, value) -> hub WriteDispatcher
+    -> spoke-hosted AdapterService.Write (MES backend, gRPC callback)
+    -> MES domain service (e.g. changeover state machine) -> read-back
 """
 
 from __future__ import annotations
@@ -95,6 +97,15 @@ class ForgeMesAdapter(
         self._subscriptions: dict[str, Any] = {}
         self._consecutive_failures: int = 0
         self._last_healthy: datetime | None = None
+        self._write_dispatcher: Any = None
+
+    def attach_write_dispatcher(self, dispatcher: Any) -> None:
+        """Route :meth:`write` through the hub's ``WriteDispatcher`` (FB-054).
+
+        The dispatcher dials the MES backend's advertised callback and
+        returns a ``WriteOutcome``; without one, writes are refused.
+        """
+        self._write_dispatcher = dispatcher
 
     # -- Lifecycle (AdapterBase) -----------------------------------------
 
@@ -192,31 +203,33 @@ class ForgeMesAdapter(
         *,
         confirm: bool = True,
     ) -> bool:
-        """Write a value back to the MES via GraphQL mutation.
+        """Write a value back to the MES through the hub's write-back path.
 
-        This is the first Forge adapter with write capability. In
-        production this sends GraphQL mutations to update production
-        order state, step execution control, recipe parameter
-        adjustments, etc.
-
-        Deferred to F34 (gRPC transport layer) for full implementation.
-        The write path uses unmap_* functions (reverse of map_*) to
-        translate Forge canonical models back to MES-native shapes.
+        The MES backend hosts the spoke half of ``AdapterService``; the
+        hub's ``WriteDispatcher`` (attached with
+        :meth:`attach_write_dispatcher`) dials it and the backend maps the
+        tag path to a domain command, e.g.
+        ``mes.changeover.cooker.cip-complete`` with a JSON payload.
 
         Args:
-            tag_path: MES entity path (e.g. 'mes.graphql.step_execution').
-            value: The value/mutation payload to write.
-            confirm: If True, read back after write to confirm.
+            tag_path: Writable MES tag (see the backend's ``Discover``).
+            value: Payload for the tag (dict for command tags).
+            confirm: If True, the backend returns a read-back record.
 
         Returns:
-            True if the write succeeded (always False in stub mode).
+            True if the spoke accepted the write; False when refused or
+            when no dispatcher is attached.
         """
-        # TODO(F34): Implement via gRPC transport + GraphQL mutations
-        logger.warning(
-            "WHK-MES write() stub called: tag_path=%s (F34 required)",
-            tag_path,
+        if self._write_dispatcher is None:
+            logger.warning(
+                "forge-mes write() refused: no WriteDispatcher attached (tag_path=%s)",
+                tag_path,
+            )
+            return False
+        outcome = await self._write_dispatcher.write(
+            self.adapter_id, tag_path, value, confirm=confirm
         )
-        return False
+        return bool(outcome.success)
 
     # -- SubscriptionProvider --------------------------------------------
 

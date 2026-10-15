@@ -34,26 +34,31 @@ Architecture::
                           ❌ REJECT            ❌ FAIL      ✅/⚠️ CONFIRM
 """
 
-from forge.modules.ot.control.models import (
-    WriteRequest,
-    WriteResult,
-    WriteStatus,
-    WriteRole,
-    InterlockRule,
-    InterlockCondition,
-    WritePermission,
-    TagWriteConfig,
-)
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.validation import WriteValidator
-from forge.modules.ot.control.write_engine import ControlWriteEngine
 from forge.modules.ot.control.audit import (
+    ContextualRecordAuditSink,
+    LogAuditSink,
+    MqttAuditSink,
     WriteAuditLogger,
     WriteAuditQuery,
-    ContextualRecordAuditSink,
-    MqttAuditSink,
-    LogAuditSink,
+)
+from forge.modules.ot.control.authorization import WriteAuthorizer
+from forge.modules.ot.control.interlock import InterlockEngine
+from forge.modules.ot.control.mes_changeover import (
+    CHANGEOVER_AREAS,
+    CHANGEOVER_COMMANDS,
+    MesChangeoverClient,
+    changeover_tag,
+    transition_from,
+)
+from forge.modules.ot.control.models import (
+    InterlockCondition,
+    InterlockRule,
+    TagWriteConfig,
+    WritePermission,
+    WriteRequest,
+    WriteResult,
+    WriteRole,
+    WriteStatus,
 )
 from forge.modules.ot.control.recipe_integration import (
     RecipeParameterMapping,
@@ -61,14 +66,19 @@ from forge.modules.ot.control.recipe_integration import (
     RecipeWriteConfig,
     RecipeWriteResult,
 )
+from forge.modules.ot.control.validation import WriteValidator
+from forge.modules.ot.control.write_engine import ControlWriteEngine
 
 __all__ = [
+    "CHANGEOVER_AREAS",
+    "CHANGEOVER_COMMANDS",
     "ContextualRecordAuditSink",
     "ControlWriteEngine",
     "InterlockCondition",
     "InterlockEngine",
     "InterlockRule",
     "LogAuditSink",
+    "MesChangeoverClient",
     "MqttAuditSink",
     "RecipeParameterMapping",
     "RecipeWriteAdapter",
@@ -84,4 +94,6 @@ __all__ = [
     "WriteRole",
     "WriteStatus",
     "WriteValidator",
+    "changeover_tag",
+    "transition_from",
 ]
