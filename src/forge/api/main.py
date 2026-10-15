@@ -33,6 +33,7 @@ from forge.api.health import (
     check_timescaledb,
 )
 from forge.core.models.adapter import AdapterHealth, AdapterManifest, AdapterState
+from forge.ingest import IngestPipeline, build_pipeline_from_storage
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
 
@@ -56,6 +57,7 @@ class IngestResponse(BaseModel):
 
     accepted: int
     rejected: int = 0
+    persisted: int = 0
     errors: list[str] = Field(default_factory=list)
 
 
@@ -121,6 +123,7 @@ class _AdapterRegistry:
 def create_app(
     storage_config: StorageConfig | None = None,
     storage_factory: StorageFactory | None = None,
+    ingest_pipeline: IngestPipeline | None = None,
 ) -> FastAPI:
     """Create the Forge Hub API application.
 
@@ -129,9 +132,19 @@ def create_app(
             Defaults to ``StorageConfig.from_env()``.
         storage_factory: Optional StorageFactory for real backends.
             When provided, the curation sub-app uses real stores.
+        ingest_pipeline: Override for the record ingest pipeline. Defaults to
+            one built from ``storage_factory`` (or in-memory sinks).
     """
     config = storage_config or StorageConfig.from_env()
     registry = _AdapterRegistry()
+    # One ingest pipeline serves both transports (gRPC Ingest and REST /v1/records).
+    if ingest_pipeline is not None:
+        pipeline = ingest_pipeline
+    elif storage_factory is not None:
+        pipeline = build_pipeline_from_storage(storage_factory)
+    else:
+        pipeline = IngestPipeline()
+    runtime: dict[str, Any] = {}
     start_time = time.monotonic()
 
     # Build health orchestrator with all infrastructure checks
@@ -161,9 +174,14 @@ def create_app(
         if grpc_enabled:
             try:
                 from forge.transport.grpc_server import GrpcServer
-                from forge.transport.hub_server import InMemoryServicer
+                from forge.transport.hub_ingest import HubIngestServicer
 
-                servicer = InMemoryServicer()
+                servicer = HubIngestServicer(
+                    pipeline,
+                    on_registered=registry.register,
+                    on_health=registry.update_health,
+                )
+                runtime["servicer"] = servicer
                 grpc_server = GrpcServer(servicer, port=grpc_port)
                 actual_port = await grpc_server.start()
                 logger.info("gRPC server started on port %d", actual_port)
@@ -178,6 +196,10 @@ def create_app(
 
         # Shutdown
         if grpc_server is not None:
+            servicer = runtime.get("servicer")
+            if servicer is not None:
+                flushed = await servicer.flush_all()
+                logger.info("Flushed %d buffered records before shutdown", flushed)
             await grpc_server.stop()
             logger.info("gRPC server stopped")
 
@@ -189,6 +211,8 @@ def create_app(
         version="0.1.0",
         lifespan=lifespan,
     )
+    app.state.ingest_pipeline = pipeline
+    app.state.adapter_registry = registry
 
     # ------------------------------------------------------------------
     # Health endpoints
@@ -253,15 +277,36 @@ def create_app(
         if manifest is None:
             raise HTTPException(404, f"Adapter '{request.adapter_id}' not registered")
 
-        # In F04, records are accepted and queued for curation.
-        # Full pipeline: validate → route → shadow write → curate
-        accepted = len(request.records)
-        logger.info(
-            "Ingested %d records from adapter '%s'",
-            accepted,
-            request.adapter_id,
+        records = []
+        parse_errors: list[str] = []
+        for index, raw in enumerate(request.records):
+            try:
+                records.append(
+                    IngestPipeline.coerce(raw, adapter_id=request.adapter_id, manifest=manifest)
+                )
+            except Exception as exc:
+                parse_errors.append(f"record {index}: {exc}")
+        outcome = await pipeline.ingest(
+            records, adapter_id=request.adapter_id, manifest=manifest
         )
-        return IngestResponse(accepted=accepted)
+        logger.info(
+            "REST ingest from adapter '%s': %s", request.adapter_id, outcome.summary()
+        )
+        return IngestResponse(
+            accepted=outcome.accepted,
+            rejected=outcome.rejected + len(parse_errors),
+            persisted=outcome.persisted,
+            errors=parse_errors + outcome.errors,
+        )
+
+    @app.get("/v1/ingest/stats")
+    async def ingest_stats() -> dict[str, Any]:
+        """Pipeline counters plus, when the gRPC server runs, per-session state."""
+        servicer = runtime.get("servicer")
+        return {
+            "pipeline": pipeline.describe(),
+            "grpc": servicer.snapshot() if servicer is not None else None,
+        }
 
     # ------------------------------------------------------------------
     # Platform info

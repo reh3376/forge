@@ -214,12 +214,16 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 await self._servicer.receive_record(session_id, record_dict)
                 count += 1
 
+            message = "OK"
+            end_hook = getattr(self._servicer, "end_of_stream", None)
+            if callable(end_hook):
+                message = str(await end_hook(session_id))
             logger.info(
-                "Ingest stream completed: %d records from session %s",
-                count, session_id,
+                "Ingest stream completed: %d records from session %s (%s)",
+                count, session_id, message,
             )
             return service_msg.IngestResponse(
-                records_received=count, success=True, message="OK",
+                records_received=count, success=True, message=message,
             )
         except Exception as exc:
             logger.exception("Ingest RPC failed after %d records", count)
