@@ -1,8 +1,8 @@
 {
   "spec_version": "0.1.0",
   "adapter_identity": {
-    "adapter_id": "whk-mes",
-    "name": "Whiskey House Manufacturing Execution System Adapter",
+    "adapter_id": "forge-mes",
+    "name": "Forge Manufacturing Execution System Adapter",
     "version": "0.1.0",
     "type": "INGESTION",
     "tier": "MES_MOM",
@@ -24,7 +24,7 @@
       {
         "from": "REGISTERED",
         "to": "CONNECTING",
-        "trigger": "start() called — initiates GraphQL, AMQP, and MQTT broker connections"
+        "trigger": "start() called \u2014 initiates GraphQL, AMQP, and MQTT broker connections"
       },
       {
         "from": "CONNECTING",
@@ -34,12 +34,12 @@
       {
         "from": "CONNECTING",
         "to": "DEGRADED",
-        "trigger": "GraphQL + RabbitMQ connected but MQTT broker(s) unreachable — partial data collection possible"
+        "trigger": "GraphQL + RabbitMQ connected but MQTT broker(s) unreachable \u2014 partial data collection possible"
       },
       {
         "from": "CONNECTING",
         "to": "FAILED",
-        "trigger": "startup_timeout_ms exceeded (45s) — GraphQL or RabbitMQ unreachable"
+        "trigger": "startup_timeout_ms exceeded (45s) \u2014 GraphQL or RabbitMQ unreachable"
       },
       {
         "from": "HEALTHY",
@@ -49,7 +49,7 @@
       {
         "from": "DEGRADED",
         "to": "HEALTHY",
-        "trigger": "All protocol health checks pass — includes MQTT broker reconnection"
+        "trigger": "All protocol health checks pass \u2014 includes MQTT broker reconnection"
       },
       {
         "from": "DEGRADED",
@@ -64,17 +64,17 @@
       {
         "from": "HEALTHY",
         "to": "STOPPED",
-        "trigger": "stop() called — graceful MQTT unsubscribe, AMQP channel close, buffer flush"
+        "trigger": "stop() called \u2014 graceful MQTT unsubscribe, AMQP channel close, buffer flush"
       },
       {
         "from": "DEGRADED",
         "to": "STOPPED",
-        "trigger": "stop() called — flush buffered MQTT messages, then graceful shutdown"
+        "trigger": "stop() called \u2014 flush buffered MQTT messages, then graceful shutdown"
       },
       {
         "from": "FAILED",
         "to": "STOPPED",
-        "trigger": "stop() called — forced shutdown, discard in-flight MQTT buffer"
+        "trigger": "stop() called \u2014 forced shutdown, discard in-flight MQTT buffer"
       }
     ]
   },
@@ -121,7 +121,7 @@
         "type": "string",
         "required": false,
         "secret": false,
-        "description": "Primary MQTT broker host. Dynamic brokers loaded from UNS config at runtime — this is the bootstrap broker for initial connection."
+        "description": "Primary MQTT broker host. Dynamic brokers loaded from UNS config at runtime \u2014 this is the bootstrap broker for initial connection."
       },
       {
         "name": "mqtt_port",
@@ -203,7 +203,7 @@
         "type": "url",
         "required": false,
         "secret": false,
-        "description": "Redis connection URL (e.g., redis://localhost:6379). Used for cache coordination — not required for core data collection.",
+        "description": "Redis connection URL (e.g., redis://localhost:6379). Used for cache coordination \u2014 not required for core data collection.",
         "validation": {
           "pattern": "^rediss?://.+"
         }
@@ -240,7 +240,7 @@
     ]
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/whk-mes/v0.1.0",
+    "schema_ref": "forge://schemas/forge-mes/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "production_order_id",
@@ -336,7 +336,7 @@
       {
         "source_type": "graphql_query",
         "endpoint": "/graphql",
-        "description": "Equipment and operations hierarchy. ISA-88 procedural model: Procedure → Unit Procedure → Operation → Equipment Phase → Phase Parameter. Includes instructions and test parameters.",
+        "description": "Equipment and operations hierarchy. ISA-88 procedural model: Procedure \u2192 Unit Procedure \u2192 Operation \u2192 Equipment Phase \u2192 Phase Parameter. Includes instructions and test parameters.",
         "entities": [
           "Procedure",
           "UnitProcedure",
@@ -514,8 +514,8 @@
       }
     ],
     "sample_record": {
-      "record_id": "whk-mes:batch:evt-20260406-001",
-      "source_adapter": "whk-mes",
+      "record_id": "forge-mes:batch:evt-20260406-001",
+      "source_adapter": "forge-mes",
       "collected_at": "2026-04-06T15:00:00Z",
       "context": {
         "production_order_id": "PRO-2026-WB-0042",
@@ -554,7 +554,7 @@
       {
         "source_field": "productionOrder.id",
         "context_field": "production_order_id",
-        "description": "Production order — the primary unit of work in MES. Drives the entire manufacturing execution from recipe selection through batch completion."
+        "description": "Production order \u2014 the primary unit of work in MES. Drives the entire manufacturing execution from recipe selection through batch completion."
       },
       {
         "source_field": "batch.id",
@@ -569,7 +569,7 @@
       {
         "source_field": "equipmentPhase.equipment.id",
         "context_field": "equipment_id",
-        "description": "Equipment performing the current operation. ISA-88 hierarchy: Equipment → Phase → Operation → Procedure."
+        "description": "Equipment performing the current operation. ISA-88 hierarchy: Equipment \u2192 Phase \u2192 Operation \u2192 Procedure."
       },
       {
         "source_field": "event.timestamp",
@@ -584,7 +584,7 @@
       {
         "source_field": "lot.id",
         "context_field": "lot_id",
-        "description": "Lot traceability. Shared field name with WMS spec — enables cross-spoke lot tracking from production (MES) through storage (WMS)."
+        "description": "Lot traceability. Shared field name with WMS spec \u2014 enables cross-spoke lot tracking from production (MES) through storage (WMS)."
       },
       {
         "source_field": "event.user.id",
@@ -683,7 +683,7 @@
     },
     "dead_letter": {
       "enabled": true,
-      "topic": "forge.dead-letter.whk-mes",
+      "topic": "forge.dead-letter.forge-mes",
       "max_age_hours": 168
     },
     "health_degradation": {
@@ -694,14 +694,14 @@
   "metadata": {
     "spoke": "mes",
     "hub_module": "forge-adapters",
-    "source_repo": "https://github.com/WhiskeyHouse/whk-mes",
+    "source_repo": "https://github.com/reh3376/forge/tree/main/modules/Forge%20MES",
     "source_language": "TypeScript",
     "source_framework": "NestJS + Next.js 15",
     "source_database": "PostgreSQL (Prisma ORM, 96 models)",
     "source_messaging": "RabbitMQ (34 entity exchanges) + MQTT (UNS multi-broker, dynamic topics)",
     "erp_integration": "NetSuite (via RabbitMQ sync topics, shared with WMS)",
-    "equipment_integration": "MQTT via UNS (Unified Namespace) — dynamic broker configs, TLS/mTLS, topic ACLs",
-    "isa_88_compliance": "Procedural model: Procedure → Unit Procedure → Operation → Equipment Phase → Phase Parameter",
+    "equipment_integration": "MQTT via UNS (Unified Namespace) \u2014 dynamic broker configs, TLS/mTLS, topic ACLs",
+    "isa_88_compliance": "Procedural model: Procedure \u2192 Unit Procedure \u2192 Operation \u2192 Equipment Phase \u2192 Phase Parameter",
     "cross_spoke_fields": [
       "lot_id",
       "shift_id",
@@ -712,15 +712,15 @@
     ],
     "mqtt_features": "Multi-broker, hot-reload (30s), cert rotation, topic ACL, message buffering (60s), domain event publish rules",
     "deployment": "Docker Compose (server + migrate + db + redis + rabbitmq + mosquitto + jaeger + OTEL)",
-    "notes": "Second Forge spoke adapter. MES has write capability — Forge may push decisions back into production order lifecycle. MQTT equipment data is real-time and high-volume; buffering and circuit breaking are critical."
+    "notes": "Second Forge spoke adapter. MES has write capability \u2014 Forge may push decisions back into production order lifecycle. MQTT equipment data is real-time and high-volume; buffering and circuit breaking are critical."
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "567b2ae2cfb03d9e012479c7528335392d365606aa9c70783e3e454c7ac68e5c",
+    "spec_hash": "f93ddd4a6442c26aa352cb001675240d07e69465634ecf130fe88becf4bca789",
     "hash_state": "approved",
-    "previous_hash": null,
+    "previous_hash": "567b2ae2cfb03d9e012479c7528335392d365606aa9c70783e3e454c7ac68e5c",
     "approved_by": "reh3376",
-    "approved_at": "2026-04-06T10:25:51Z",
+    "approved_at": "2026-10-15T07:32:26Z",
     "change_history": [
       {
         "previous_hash": "968a178c29f1f4d9ca59fe57a2c30019631252abe14f4e592f142dff0dbdc443",
@@ -729,7 +729,16 @@
         "source": "manual",
         "changed_by": "reh3376",
         "change_type": "structural",
-        "reason": "Initial MES FACTS spec — Sprint 3 of FACTS development plan"
+        "reason": "Initial MES FACTS spec \u2014 Sprint 3 of FACTS development plan"
+      },
+      {
+        "previous_hash": "567b2ae2cfb03d9e012479c7528335392d365606aa9c70783e3e454c7ac68e5c",
+        "new_hash": "f93ddd4a6442c26aa352cb001675240d07e69465634ecf130fe88becf4bca789",
+        "changed_at": "2026-10-15T07:32:26Z",
+        "source": "manual",
+        "changed_by": "reh3376",
+        "change_type": "structural",
+        "reason": "Rename whk-mes -> forge-mes: forge-mes replaces whk-mes as the Forge-native MES module (owner decision 2026-10-15). Identity, schema_ref, metadata and dead-letter topic renamed; data contract unchanged. Approved by owner in-session."
       }
     ]
   }

@@ -31,7 +31,7 @@ const (
 
 type RecordSource struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AdapterId     string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`          // e.g. "whk-wms", "whk-mes"
+	AdapterId     string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`          // e.g. "whk-wms", "forge-mes"
 	System        string                 `protobuf:"bytes,2,opt,name=system,proto3" json:"system,omitempty"`                                 // e.g. "whk-wms-prod", "ignition-prod"
 	TagPath       string                 `protobuf:"bytes,3,opt,name=tag_path,json=tagPath,proto3" json:"tag_path,omitempty"`                // optional: e.g. "Area1/Fermenter3/Temperature"
 	ConnectionId  string                 `protobuf:"bytes,4,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"` // optional: for connection multiplexing

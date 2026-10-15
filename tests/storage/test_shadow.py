@@ -84,10 +84,10 @@ class TestShadowWriter:
     async def test_write_tracks_by_spoke(self):
         writer = _make_writer()
         await writer.write(_make_record(system="whk-wms"))
-        await writer.write(_make_record(system="whk-mes"))
+        await writer.write(_make_record(system="forge-mes"))
         await writer.write(_make_record(system="whk-wms"))
         assert writer.metrics.by_spoke["whk-wms"] == 2
-        assert writer.metrics.by_spoke["whk-mes"] == 1
+        assert writer.metrics.by_spoke["forge-mes"] == 1
 
     @pytest.mark.asyncio
     async def test_write_tracks_by_engine(self):

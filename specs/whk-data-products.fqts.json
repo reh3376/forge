@@ -10,7 +10,7 @@
       "product_id": "production-context",
       "name": "Production Context Dataset",
       "description": "Batch/lot records with process parameters, material genealogy, equipment state, quality results — all normalized and time-aligned",
-      "source_adapters": ["whk-wms", "whk-mes"],
+      "source_adapters": ["whk-wms", "forge-mes"],
       "quality_rules": [
         {
           "rule": "completeness",
@@ -65,7 +65,7 @@
       "product_id": "inventory-production-linkage",
       "name": "Inventory-Production Linkage",
       "description": "WMS inventory movements linked to MES production orders with material genealogy",
-      "source_adapters": ["whk-wms", "whk-mes"],
+      "source_adapters": ["whk-wms", "forge-mes"],
       "quality_rules": [
         {
           "rule": "completeness",
@@ -100,7 +100,7 @@
       "product_id": "equipment-utilization",
       "name": "Equipment Utilization Dataset",
       "description": "Equipment state timeline with batch context, shift context, maintenance windows",
-      "source_adapters": ["whk-mes"],
+      "source_adapters": ["forge-mes"],
       "quality_rules": [
         {
           "rule": "completeness",

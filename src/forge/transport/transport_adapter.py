@@ -3,7 +3,7 @@
 
 This is the bridge between the existing adapter interface (collect(),
 subscribe(), write(), etc.) and the gRPC transport layer. Existing
-adapter classes (WhkWmsAdapter, WhkMesAdapter) require ZERO code changes
+adapter classes (WhkWmsAdapter, ForgeMesAdapter) require ZERO code changes
 to work with gRPC — they just get wrapped in this adapter.
 
 Usage:

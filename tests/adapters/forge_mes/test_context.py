@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from forge.adapters.whk_mes.context import (
+from forge.adapters.forge_mes.context import (
     build_record_context,
     derive_shift,
     extract_equipment_from_topic,

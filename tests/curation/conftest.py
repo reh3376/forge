@@ -87,8 +87,8 @@ def mes_record() -> ContextualRecord:
     return ContextualRecord(
         record_id=UUID("abcdef01-2345-6789-abcd-ef0123456789"),
         source=RecordSource(
-            adapter_id="whk-mes",
-            system="whk-mes-prod",
+            adapter_id="forge-mes",
+            system="forge-mes-prod",
             tag_path="Area1/Fermenter3/Temperature",
         ),
         timestamp=RecordTimestamp(
@@ -110,8 +110,8 @@ def mes_record() -> ContextualRecord:
             operating_mode="PRODUCTION",
         ),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/whk-mes/v0.1.0",
-            adapter_id="whk-mes",
+            schema_ref="forge://schemas/forge-mes/v0.1.0",
+            adapter_id="forge-mes",
             adapter_version="0.1.0",
             transformation_chain=["collect"],
         ),

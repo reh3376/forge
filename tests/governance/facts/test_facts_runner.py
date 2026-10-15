@@ -2,7 +2,7 @@
 
 Test categories:
 1. Unit tests for each _check_* method (pass and fail cases)
-2. Integration tests: run against whk-wms.facts.json and whk-mes.facts.json
+2. Integration tests: run against whk-wms.facts.json and forge-mes.facts.json
 3. Schema-runner parity: implemented_fields() matches facts.schema.json
 4. FHTS governance: integrity hash verification
 5. Cross-field consistency: capability/data-source alignment
@@ -25,7 +25,7 @@ import pytest
 SRC_ROOT = Path(__file__).resolve().parents[3] / "src"
 SCHEMA_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
 WMS_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
-MES_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-mes.facts.json"
+MES_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "forge-mes.facts.json"
 
 
 # ---------------------------------------------------------------------------
@@ -822,7 +822,7 @@ class TestIntegrationWMS:
 
 
 # =========================================================================
-# 16. Integration Test — Full run against whk-mes.facts.json
+# 16. Integration Test — Full run against forge-mes.facts.json
 # =========================================================================
 
 
@@ -830,7 +830,7 @@ class TestIntegrationMES:
     """Run FACTSRunner against the real MES spec — zero failures expected."""
 
     def test_mes_full_run(self, runner, mes_spec, verdict_status):
-        report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        report = _run(runner.run(target="forge-mes", spec=mes_spec))
         fails = [v for v in report.verdicts if v.status == verdict_status.FAIL]
         errors = [v for v in report.verdicts if v.status == verdict_status.ERROR]
         not_impl = [v for v in report.verdicts if v.status == verdict_status.NOT_IMPLEMENTED]
@@ -843,19 +843,19 @@ class TestIntegrationMES:
         assert report.passed is True
 
     def test_mes_hash_verified(self, runner, mes_spec):
-        report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert report.hash_verified is True, f"Hash mismatch: {report.hash_message}"
 
     def test_mes_has_write_cross_check(self, runner, mes_spec, verdict_status):
         """MES has write=true — cross-field check should validate write sources exist."""
-        report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        report = _run(runner.run(target="forge-mes", spec=mes_spec))
         write_checks = [v for v in report.verdicts if "cross-write" in v.check_id]
         assert len(write_checks) >= 1
         assert all(v.status == verdict_status.PASS for v in write_checks)
 
     def test_mes_verdict_count(self, runner, mes_spec):
         """MES should produce more verdicts than WMS (more capabilities, MQTT, etc.)."""
-        report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert report.total >= 25
 
 
@@ -869,17 +869,17 @@ class TestCrossSpecConsistency:
 
     def test_both_specs_pass(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
-        mes_report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert wms_report.passed is True
         assert mes_report.passed is True
 
     def test_both_hashes_verified(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
-        mes_report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert wms_report.hash_verified is True
         assert mes_report.hash_verified is True
 
     def test_runner_version_consistent(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
-        mes_report = _run(runner.run(target="whk-mes", spec=mes_spec))
+        mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert wms_report.runner_version == mes_report.runner_version == "0.1.0"

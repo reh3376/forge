@@ -1,10 +1,10 @@
-"""Tests for the WHK MES adapter -- manifest, lifecycle, collect, subscribe, discover, write."""
+"""Tests for the Forge MES adapter -- manifest, lifecycle, collect, subscribe, discover, write."""
 
 from __future__ import annotations
 
 import pytest
 
-from forge.adapters.whk_mes.adapter import WhkMesAdapter
+from forge.adapters.forge_mes.adapter import ForgeMesAdapter
 from forge.core.models.adapter import AdapterState, AdapterTier
 
 # ---------------------------------------------------------------------------
@@ -24,78 +24,78 @@ class TestManifest:
     """Verify the MES adapter manifest matches the FACTS spec."""
 
     def test_adapter_id(self):
-        adapter = WhkMesAdapter()
-        assert adapter.manifest.adapter_id == "whk-mes"
+        adapter = ForgeMesAdapter()
+        assert adapter.manifest.adapter_id == "forge-mes"
 
     def test_adapter_name(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert "Manufacturing Execution" in adapter.manifest.name
 
     def test_version(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.version == "0.1.0"
 
     def test_type(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.type == "INGESTION"
 
     def test_protocol(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.protocol == "graphql+amqp+mqtt"
 
     def test_tier(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.tier == AdapterTier.MES_MOM
 
     def test_capabilities_read(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.capabilities.read is True
 
     def test_capabilities_write(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.capabilities.write is True
 
     def test_capabilities_subscribe(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.capabilities.subscribe is True
 
     def test_capabilities_backfill(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.capabilities.backfill is True
 
     def test_capabilities_discover(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.capabilities.discover is True
 
     def test_connection_params_count(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert len(adapter.manifest.connection_params) == 18
 
     def test_required_params(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         required = [p.name for p in adapter.manifest.connection_params if p.required]
         assert "graphql_url" in required
         assert "rabbitmq_url" in required
         assert "azure_tenant_id" in required
 
     def test_auth_methods(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert "azure_entra_id" in adapter.manifest.auth_methods
         assert "certificate" in adapter.manifest.auth_methods
 
     def test_data_contract_schema_ref(self):
-        adapter = WhkMesAdapter()
-        assert adapter.manifest.data_contract.schema_ref == "forge://schemas/whk-mes/v0.1.0"
+        adapter = ForgeMesAdapter()
+        assert adapter.manifest.data_contract.schema_ref == "forge://schemas/forge-mes/v0.1.0"
 
     def test_data_contract_context_fields(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         fields = adapter.manifest.data_contract.context_fields
         assert "production_order_id" in fields
         assert "batch_id" in fields
         assert "equipment_id" in fields
 
     def test_health_check_interval(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.manifest.health_check_interval_ms == 15_000
 
 
@@ -104,31 +104,31 @@ class TestLifecycle:
 
     @pytest.mark.asyncio
     async def test_initial_state(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio
     async def test_configure(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio
     async def test_start(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         assert adapter.state == AdapterState.HEALTHY
 
     @pytest.mark.asyncio
     async def test_start_without_configure_raises(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         with pytest.raises(RuntimeError, match="not configured"):
             await adapter.start()
 
     @pytest.mark.asyncio
     async def test_stop(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         await adapter.stop()
@@ -136,16 +136,16 @@ class TestLifecycle:
 
     @pytest.mark.asyncio
     async def test_health(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         health = await adapter.health()
-        assert health.adapter_id == "whk-mes"
+        assert health.adapter_id == "forge-mes"
         assert health.state == AdapterState.HEALTHY
 
     @pytest.mark.asyncio
     async def test_health_tracks_records(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([{
@@ -166,13 +166,13 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_empty_collect(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         records = [r async for r in adapter.collect()]
         assert records == []
 
     @pytest.mark.asyncio
     async def test_yields_records(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([
@@ -196,7 +196,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_increments_counter(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([{
@@ -216,7 +216,7 @@ class TestSubscription:
 
     @pytest.mark.asyncio
     async def test_subscribe_returns_id(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         sub_id = await adapter.subscribe(
             ["wh.whk01.distillery01.batch"],
             lambda x: None,
@@ -226,7 +226,7 @@ class TestSubscription:
 
     @pytest.mark.asyncio
     async def test_unsubscribe_removes(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         sub_id = await adapter.subscribe(["test"], lambda x: None)
         await adapter.unsubscribe(sub_id)
         assert sub_id not in adapter._subscriptions
@@ -237,13 +237,13 @@ class TestDiscovery:
 
     @pytest.mark.asyncio
     async def test_returns_sources(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         sources = await adapter.discover()
         assert len(sources) >= 8
 
     @pytest.mark.asyncio
     async def test_sources_have_tag_path(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         sources = await adapter.discover()
         for source in sources:
             assert "tag_path" in source
@@ -251,14 +251,14 @@ class TestDiscovery:
 
     @pytest.mark.asyncio
     async def test_includes_batch(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         sources = await adapter.discover()
         tag_paths = [s["tag_path"] for s in sources]
         assert "mes.graphql.batch" in tag_paths
 
     @pytest.mark.asyncio
     async def test_includes_mqtt(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         sources = await adapter.discover()
         tag_paths = [s["tag_path"] for s in sources]
         assert any("mqtt" in t for t in tag_paths)
@@ -269,13 +269,13 @@ class TestWrite:
 
     @pytest.mark.asyncio
     async def test_write_stub_returns_false(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         result = await adapter.write("mes.graphql.step_execution", {"action": "start"})
         assert result is False
 
     @pytest.mark.asyncio
     async def test_write_with_confirm(self):
-        adapter = WhkMesAdapter()
+        adapter = ForgeMesAdapter()
         result = await adapter.write(
             "mes.graphql.batch",
             {"status": "COMPLETED"},

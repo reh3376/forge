@@ -35,7 +35,7 @@ from forge.core.models.manufacturing.process_definition import (
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-mes"
+_SOURCE_SYSTEM = "forge-mes"
 
 
 def map_recipe(raw: dict[str, Any]) -> ProcessDefinition | None:

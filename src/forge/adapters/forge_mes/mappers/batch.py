@@ -23,7 +23,7 @@ from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-mes"
+_SOURCE_SYSTEM = "forge-mes"
 
 # MES batch status -> Forge UnitStatus
 _STATUS_TO_UNIT_STATUS: dict[str, UnitStatus] = {

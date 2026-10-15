@@ -1,4 +1,4 @@
-"""Typed configuration for the WHK MES adapter.
+"""Typed configuration for the Forge MES adapter.
 
 Connection parameters are declared in the FACTS spec and validated
 by the hub before being passed to configure(). This module provides
@@ -14,10 +14,10 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class WhkMesConfig(BaseModel):
-    """Connection parameters for the WHK MES adapter.
+class ForgeMesConfig(BaseModel):
+    """Connection parameters for the Forge MES adapter.
 
-    Maps directly to the 18 connection_params in whk-mes.facts.json.
+    Maps directly to the 18 connection_params in forge-mes.facts.json.
     Required params have no default; optional params have sensible defaults.
     """
 

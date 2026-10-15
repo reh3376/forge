@@ -21,7 +21,7 @@ func TestDataProductConstruction(t *testing.T) {
 			Version:           "2.0.0",
 			CompatibilityMode: "BACKWARD",
 		},
-		SourceAdapters: []string{"whk-wms", "whk-mes"},
+		SourceAdapters: []string{"whk-wms", "forge-mes"},
 		QualitySLOs: []models.QualitySLO{
 			{Metric: "completeness", Target: 99.5, Measurement: "non-null required fields", Window: "1h"},
 		},

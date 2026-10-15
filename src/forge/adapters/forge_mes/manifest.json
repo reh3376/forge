@@ -1,6 +1,6 @@
 {
-  "adapter_id": "whk-mes",
-  "name": "Whiskey House Manufacturing Execution System Adapter",
+  "adapter_id": "forge-mes",
+  "name": "Forge Manufacturing Execution System Adapter",
   "version": "0.1.0",
   "type": "INGESTION",
   "protocol": "graphql+amqp+mqtt",
@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/whk-mes/v0.1.0",
+    "schema_ref": "forge://schemas/forge-mes/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "production_order_id",
@@ -47,9 +47,9 @@
   ],
   "auth_methods": ["azure_entra_id", "bearer_token", "certificate"],
   "metadata": {
-    "spoke": "whk-mes",
-    "hub_module": "forge.adapters.whk_mes",
-    "source_repo": "https://github.com/WhiskeyHouse/whk-mes",
+    "spoke": "forge-mes",
+    "hub_module": "forge.adapters.forge_mes",
+    "source_repo": "https://github.com/reh3376/forge/tree/main/modules/Forge%20MES",
     "source_framework": "NestJS + Next.js 15",
     "isa_88_compliance": "Procedure > Unit Procedure > Operation > Equipment Phase > Phase Parameter"
   }
