@@ -2,7 +2,7 @@
 # Requires ngrok account with static domain ($8/mo plan)
 
 version: "2"
-authtoken: ***REMOVED***
+authtoken: YOUR_NGROK_AUTHTOKEN
 
 tunnels:
   whk-backend-staging:

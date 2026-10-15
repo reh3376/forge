@@ -77,7 +77,7 @@ echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/
 sudo apt update && sudo apt install ngrok
 
 # Configure with your authtoken
-ngrok config add-authtoken ***REMOVED***
+ngrok config add-authtoken YOUR_NGROK_AUTHTOKEN
 ```
 
 #### D. Start ngrok Tunnel

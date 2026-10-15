@@ -1,0 +1,7 @@
+# Default owner for everything in the repo. Required reviewer on protected branches.
+*                       @reh3376
+
+# Governance specs and the hub-side spoke contracts need the owner's approval.
+/src/forge/governance/  @reh3376
+/specs/                 @reh3376
+/modules/Forge\ MES/    @reh3376
