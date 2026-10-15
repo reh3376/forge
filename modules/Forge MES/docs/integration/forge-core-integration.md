@@ -123,8 +123,10 @@ FORGE_HUB_ENABLED=true FORGE_HUB_GRPC_URL=localhost:50051 npm run start
 curl -H "Authorization: Bearer <token>" http://localhost:3000/api/forge/status
 ```
 
-Note that the hub currently wires `InMemoryServicer`, which accepts sessions
-and counts records but persists nothing (FB-053).
+The hub's gRPC server runs `HubIngestServicer` (FB-053): `Register` is checked
+against the adapter's FACTS spec, and streamed records are validated, routed and
+written to `forge_ts.contextual_records` (or an in-memory sink when no database
+is configured). `GET /v1/ingest/stats` on the hub shows per-session counters.
 
 ## Tests
 
@@ -167,7 +169,8 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 
 | Item | Backlog |
 |---|---|
-| Hub persists ingested records (replace `InMemoryServicer`) | FB-053 |
+| Hub persists ingested records (replace `InMemoryServicer`) | FB-053 (done) |
+| Durable adapter registry and ingest audit log on the hub | FB-060 |
 | Hub → spoke write-back (`Write`, OT `recipe/next` → changeover) | FB-054 |
 | Cross-language contract test in CI (Python hub ↔ TS client) | FB-055 |
 | Dead-letter sink for exhausted batches | FB-056 |

@@ -89,6 +89,7 @@ class AdapterServiceServicer(ABC):
         )
         self._sessions[session_id] = session
         self._record_queues[session_id] = asyncio.Queue()
+        await self.on_adapter_registered(session)
 
         logger.info(
             "Adapter registered: %s (session: %s)", manifest.adapter_id, session_id,
@@ -175,6 +176,7 @@ class AdapterServiceServicer(ABC):
         await q.put(record)
         session = self._sessions[session_id]
         session.records_received += 1
+        await self.on_record_received(record)
 
     async def drain_records(
         self, session_id: str, max_records: int = 0,
