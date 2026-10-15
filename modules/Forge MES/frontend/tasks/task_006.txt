@@ -1,0 +1,127 @@
+# Task ID: 6
+# Title: Develop Recipe Creation and Editing Interface
+# Status: done
+# Dependencies: 2, 4, 5
+# Priority: high
+# Description: Build the master recipe creation and editing interface with ingredient specifications for whiskey production, incorporating a step-by-step wizard pattern for creation and modal-based editing interfaces with improved information hierarchy and organization.
+# Details:
+1. Implement dual interface approach:
+   a. Wizard pattern for recipe creation
+   b. Modal-based editing for existing recipes
+
+2. Create Recipe Creation Wizard with:
+   a. Left sidebar progress tracker (Recipe Details → Parameters → BOM → Mashing Protocol)
+   b. Sequential navigation with Next/Cancel buttons
+   c. Save Recipe option available at any step
+   d. Component reuse between creation and editing interfaces
+
+3. Develop Recipe Details step (initial wizard step):
+   a. Recipe Name input with intelligent defaults
+   b. Active Status toggle checkbox (default: checked)
+   c. Whiskey Type dropdown selection (RyeBourbon, WheatBourbon, etc.)
+   d. Revision field (auto-populated as "1" for new recipes)
+   e. Customer Name dropdown selection
+   f. Cooks Per Fermenter numeric input (default: 4)
+   g. Mashing Protocol template selection dropdown
+   h. Auto-timestamp creation (Created on [date] by [user])
+
+4. Implement three-tab recipe structure for both wizard steps and editing modals:
+   a. Bill of Materials tab - Comprehensive ingredient management
+   b. Parameters tab - Process control settings for production
+   c. Mashing Protocol tab - Step-by-step production instructions
+
+5. Develop Bill of Materials interface with:
+   a. Multiple ingredient category support (Water, Backset Water, Grains, etc.)
+   b. Chemical additives management (Citric Acid, etc.)
+   c. Biological components tracking (Yeast, Enzymes)
+   d. Precise quantity tracking with appropriate units
+   e. Ingredient code standardization system
+   f. Real-time BOM calculations and validation
+   g. Cost estimation during creation
+
+6. Implement Parameters tab with:
+   a. Proof control settings (HighWineProof, LowWineProof)
+   b. Process settings (BaseLoss, BeerFeedTray, CooksPerFerm)
+   c. Operational parameters (TopOffFrequency, MashRatio, RatioByFerm)
+   d. Quality controls (StarterSweetoH, IsFourGrain)
+   e. Validation before proceeding to next step
+
+7. Create Mashing Protocol interface with:
+   a. Sequential process step management (LiquidAdd, Hold, AdditiveAdd, etc.)
+   b. Process control fields (Index, Step Type, Hold Type, Temp SP, Time)
+   c. Temperature management (Heat and Cool hold types with specific timing)
+   d. Step validation and sequencing logic
+   e. Process validation and sequencing
+
+8. Implement wizard UX features:
+   a. Progressive disclosure: Only show relevant fields for current step
+   b. Draft saving: Save Recipe button available at any step for incomplete recipes
+   c. Validation gating: Prevent progression to next step if current step invalid
+   d. Step navigation: Allow jumping between completed steps
+   e. Wizard state management: Maintain form data across steps
+   f. Template integration: Allow starting from existing recipe templates or protocols
+
+9. Implement ingredient selection that supports mash bill patterns (e.g., 75-21-00-04)
+
+10. Add recipe parameter validation with constraints for different whiskey types
+
+11. Implement recipe cost calculation and yield prediction
+
+12. Add recipe scaling calculations for different batch sizes
+
+13. Create form validation for required fields and business rules
+
+14. Implement save, submit, and cancel functionality with revision tracking (R01, R02, etc.)
+
+15. Design improved recipe card layout with better information hierarchy for Recipe ID, Type, Revision, Customer, Item Number, Created date/email
+
+16. Implement responsive grid layout that adapts to different screen sizes
+
+17. Create advanced filtering system for recipes by mash bill, whiskey type, revision, and customer
+
+18. Add grouping options for recipes (by customer, recipe type, mash bill)
+
+19. Implement enhanced sorting options beyond "Newest First"
+
+20. Support Recipe ID format: [CUSTOMER]-[MASH_BILL]-R[REVISION] (e.g., JBM-75-21-00-04-R01)
+
+# Test Strategy:
+Test both recipe creation wizard and editing interfaces. Verify wizard progression through all steps (Recipe Details → Parameters → BOM → Mashing Protocol) with validation at each step. Test navigation between steps and ability to save drafts at any point. Verify component reuse between creation and editing interfaces. Test recipe creation with valid and invalid data across all steps. Verify validation rules are enforced for each tab. Test Bill of Materials with various ingredient categories, chemical additives, and biological components. Validate Parameters tab with different proof control, process settings, and quality controls. Test Mashing Protocol with sequential process steps and temperature management. Test template integration for starting from existing recipes. Validate cost calculations and scaling functionality. Test draft saving and form submission. Test responsive design across different screen sizes. Verify advanced filtering, grouping, and sorting functionality. Ensure proper display of recipe cards with improved information hierarchy. Test with sample data from all supported customers. Validate proper revision tracking and Recipe ID formatting. Test ingredient code standardization system and precise quantity tracking with appropriate units.
+
+# Subtasks:
+## 1. Design Recipe Creation Wizard Structure [done]
+### Dependencies: None
+### Description: Define and implement the step-by-step wizard interface for new whiskey recipe creation, including sidebar progress tracking, sequential navigation, and draft saving capabilities.
+### Details:
+Establish the wizard's multi-step flow (Recipe Details, Parameters, BOM, Mashing Protocol), sidebar progress tracker, and navigation logic. Ensure Save Recipe is available at any step and that the wizard supports starting from templates.
+<info added on 2025-05-27T04:11:14.084Z>
+Implemented the core Recipe Creation Wizard structure with a multi-step flow and sidebar progress tracker. The wizard includes sequential navigation (Next/Previous buttons), save draft functionality at any step, progress visualization, and responsive layout. Created TypeScript interfaces for wizard steps and established component reusability architecture. The structure is now ready for individual step components to be integrated. Some minor TypeScript linter warnings exist but don't affect functionality and can be addressed in future cleanup. The wizard successfully supports template integration and draft saving as specified in requirements.
+</info added on 2025-05-27T04:11:14.084Z>
+
+## 2. Develop Recipe Details Step UI and Logic [done]
+### Dependencies: 6.1
+### Description: Implement the initial wizard step for entering core recipe metadata, including intelligent defaults, dropdowns, auto-populated fields, and timestamping.
+### Details:
+Build form fields for Recipe Name, Active Status, Whiskey Type, Revision, Customer Name, Cooks Per Fermenter, Mashing Protocol template, and auto-timestamp. Ensure validation and business rules are enforced.
+
+## 3. Implement Bill of Materials (BOM) and Parameters Tabs [done]
+### Dependencies: 6.2
+### Description: Create comprehensive ingredient management and process parameter interfaces, supporting multiple ingredient categories, real-time calculations, and validation.
+### Details:
+Develop BOM tab for ingredient entry, quantity tracking, code standardization, and cost estimation. Build Parameters tab for proof control, process settings, operational parameters, and quality controls. Integrate validation and constraint logic for whiskey types.
+
+## 4. Build Mashing Protocol Step and Sequencing Logic [done]
+### Dependencies: 6.3
+### Description: Develop the interface for defining sequential mashing protocol steps, including process control fields, temperature management, and step validation.
+### Details:
+Enable users to add, edit, and reorder protocol steps with fields for step type, hold type, temperature, and timing. Implement sequencing and validation logic to ensure process integrity.
+
+## 5. Create Modal-Based Editing Interface with Information Hierarchy [done]
+### Dependencies: 6.4
+### Description: Develop modal interfaces for editing existing recipes, reusing wizard components, and enhancing information hierarchy and organization.
+### Details:
+Integrate wizard step components into modal dialogs for editing, ensuring responsive layout, improved recipe card design, and revision tracking. Support advanced filtering, grouping, and sorting options.
+<info added on 2025-05-27T14:47:34.667Z>
+Implementation of modal-based editing interface integration in progress. The RecipeEditModal component with tabs for Details, BOM, Parameters, and Mashing Protocol is being integrated into the recipe management page. Adding click handlers to recipe cards to open the modal, transforming API data to the modal's expected format, implementing save operations for recipe updates, and ensuring styling consistency with the existing design. The modal effectively reuses wizard step components for UI consistency across the application.
+</info added on 2025-05-27T14:47:34.667Z>
+

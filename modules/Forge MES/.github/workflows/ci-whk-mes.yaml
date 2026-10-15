@@ -1,0 +1,121 @@
+name: continuous integration - whk-recipe-routing
+
+concurrency:
+  group: whk-recipe-routing
+  cancel-in-progress: false
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  continuous-integration:
+    name: continuous integration
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: "~/.npm"
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: install dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Check code formatting
+        id: prettier_check
+        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" > prettier_report.txt 2>&1 || (cat prettier_report.txt && exit 1)
+        working-directory: ./backend
+
+      - name: Upload Prettier Report
+        if: steps.prettier_check.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: prettier-report
+          path: ./backend/prettier_report.txt
+
+      - name: Comment PR with Prettier Results
+        if: github.event_name == 'pull_request' && steps.prettier_check.outcome == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const prettierReport = fs.readFileSync('./backend/prettier_report.txt', 'utf8');
+            const comment = `
+            ❌ Prettier found formatting issues:
+
+            \`\`\`
+            ${prettierReport}
+            \`\`\`
+
+            Please run Prettier (e.g., npm run format) and commit the changes.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+      - name: Run ESLint
+        id: eslint_check
+        run: |
+          npm run lint > eslint_report.txt || (cat eslint_report.txt && exit 1)
+        working-directory: ./backend
+
+      - name: Upload ESLint Report
+        if: steps.eslint_check.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: ./backend/eslint_report.txt
+
+      - name: Comment PR with ESLint Results
+        if: github.event_name == 'pull_request' && steps.eslint_check.outcome == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const eslintReport = fs.readFileSync('./backend/eslint_report.txt', 'utf8');
+            const comment = `
+            ❌ ESLint found some issues:
+
+            \`\`\`
+            ${eslintReport}
+            \`\`\`
+
+            Please fix these issues before merging.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+      - name: build
+        run: npm run build
+        working-directory: ./backend
+
+      - name: Run tests
+        run: |
+          npx jest --coverage | tee ./coverage.txt && exit ${PIPESTATUS[0]}
+        working-directory: ./backend

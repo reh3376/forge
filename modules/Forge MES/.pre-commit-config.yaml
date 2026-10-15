@@ -1,0 +1,28 @@
+repos:
+- hooks:
+  - id: commitizen
+  - id: commitizen-branch
+    stages:
+    - pre-push
+  repo: https://github.com/commitizen-tools/commitizen
+  rev: v3.25.0
+- repo: https://github.com/gitguardian/ggshield
+  rev: v1.27.0
+  hooks:
+    - id: ggshield
+      language_version: python3
+      stages: [ pre-commit ]
+- repo: local
+  hooks:
+    - id: eslint
+      name: eslint
+      entry: bash -c 'cd backend && npm run lint:dev:fix'
+      language: system
+      files: backend/src/.*\.ts$
+      pass_filenames: false
+    - id: prettier
+      name: prettier
+      entry: bash -c 'cd backend && npm run format:dev'
+      language: system
+      files: backend/.*\.(ts|js|json|md|yml|yaml)$
+      pass_filenames: false

@@ -1,0 +1,121 @@
+.devcontainer/set-secrets.sh
+*.log
+.direnv/
+.corepack/
+result
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Claude settings (keep local settings out of git)
+.claude/settings.local.json
+# Python cache artifacts
+__pycache__/
+*.py[cod]
+
+# Large SQL backups
+whk-mes-backup.sql
+*.sql
+
+# Node modules and large binaries
+node_modules/
+**/node_modules/
+*.node
+
+# Added by Claude Task Master
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+.env
+.env.*
+!.env.*.example
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+.DS_Store
+
+# Next.js build outputs
+**/.next/
+**/next/
+.next/
+
+# Build artifacts
+dist/
+shared/dist/
+
+# Playwright
+frontend/test-results/
+playwright-report/
+playwright/.cache/
+
+
+# Turborepo cache and build files
+.turbo/
+
+# Task files
+# tasks.json
+# tasks/ 
+.vercel
+.claude/settings.local.json
+
+# Forge MES module hygiene (added during migration into forge)
+.turbo/
+playwright-report/
+test-results/
+*.dump
+.cache_ggshield
+.setup-complete
+.env.staging
+.env.*.preview
+.vercel/
+.jira/

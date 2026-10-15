@@ -1,0 +1,177 @@
+# Manufacturing Execution System (MES) Frontend - Product Requirements Document
+
+## Project Overview
+A comprehensive Manufacturing Execution System (MES) frontend built with NextJS, designed specifically for custom whiskey manufacturing operations. The system integrates with existing Ignition Perspective assets and connects to a full backend with REST API and GraphQL endpoints containing real production data.
+
+## Core Mission
+Create an intuitive, AI-powered MES interface that enables manufacturing operations to efficiently manage recipes, schedules, and production workflows while providing real-time visibility into production status and comprehensive reporting capabilities.
+
+## Target Users
+- Production Managers
+- Manufacturing Engineers
+- Quality Control Specialists
+- Production Operators
+- Plant Supervisors
+- Operations Directors
+
+## Core Features & Requirements
+
+### 1. Recipe Management System
+**Objective**: Comprehensive master recipe configuration system for custom whiskey production
+
+**Key Requirements**:
+- Master recipe creation and editing interface with ingredient specifications
+- Recipe versioning and approval workflow management
+- Recipe template library with categorization by whiskey types
+- Recipe parameter validation and constraint management
+- Recipe cost calculation and yield prediction
+- Recipe scaling calculations for different batch sizes
+- Integration with quality control specifications
+- Recipe search and filtering capabilities
+- Recipe comparison tools for optimization
+- Import/export functionality for recipe data
+- Recipe audit trail and change history
+- Multi-stage production recipe support (mashing, fermentation, distillation, aging)
+
+### 2. Production Scheduling System
+**Objective**: Intelligent scheduling system integrated with ERP and recipe management
+
+**Key Requirements**:
+- ERP-driven order integration and synchronization
+- Recipe-based scheduling with capacity planning
+- Resource allocation and optimization
+- Equipment availability tracking and scheduling
+- Production timeline visualization (Gantt charts)
+- Schedule conflict detection and resolution
+- Batch scheduling with dependency management
+- Real-time schedule adjustments and notifications
+- Preventive maintenance scheduling integration
+- Labor scheduling and shift management
+- Production bottleneck identification
+- Schedule optimization using AI algorithms
+
+### 3. Live Production Monitoring
+**Objective**: Real-time visibility into current production status and order progress
+
+**Key Requirements**:
+- Live production dashboard with real-time data
+- Order tracking through production stages
+- Equipment status monitoring and alerts
+- Production KPI tracking and visualization
+- Quality metrics monitoring in real-time
+- Batch progress tracking with stage completion
+- Exception handling and alert management
+- Production variance tracking against schedule
+- Equipment efficiency monitoring
+- Production bottleneck alerts
+- Integration with IoT sensors and PLCs
+
+### 4. Dashboarding & Reporting System
+**Objective**: Customizable analytics and reporting platform for operational insights
+
+**Key Requirements**:
+- Drag-and-drop dashboard builder for custom layouts
+- Pre-built dashboard templates for different roles
+- Real-time KPI widgets and metrics display
+- Historical trend analysis and reporting
+- Production efficiency reports and analytics
+- Quality control reports and compliance tracking
+- Equipment utilization and OEE reporting
+- Cost analysis and profitability reports
+- Custom report builder with scheduling
+- Data export capabilities (PDF, Excel, CSV)
+- Interactive charts and visualization tools
+- Alert and notification configuration
+- Mobile-responsive dashboard design
+
+### 5. AI Integration & Chat System
+**Objective**: Comprehensive AI-powered assistance throughout the manufacturing process
+
+**Key Requirements**:
+- Contextual AI chat assistant for production queries
+- Recipe optimization recommendations using machine learning
+- Predictive maintenance alerts and suggestions
+- Production anomaly detection and recommendations
+- Intelligent scheduling optimization suggestions
+- Quality prediction models and alerts
+- Natural language querying of production data
+- AI-powered troubleshooting assistance
+- Automated report generation and insights
+- Voice-activated commands for hands-free operation
+- AI-driven production forecasting
+- Intelligent alert prioritization and routing
+
+## Technical Requirements
+
+### Frontend Architecture
+- NextJS 15+ with App Router
+- TypeScript for type safety
+- TailwindCSS for styling
+- Shadcn UI component library
+- React Query/TanStack Query for data fetching
+- Zustand or Redux Toolkit for state management
+- Recharts or D3.js for data visualization
+- React Hook Form with Zod validation
+
+### Backend Integration
+- REST API integration for CRUD operations
+- GraphQL integration for complex queries
+- Real-time WebSocket connections for live data
+- Authentication and authorization integration
+- File upload/download capabilities
+- Caching strategies for performance
+
+### Performance Requirements
+- Page load time < 2 seconds
+- Real-time data updates with < 1 second latency
+- Responsive design for desktop, tablet, and mobile
+- Offline capability for critical functions
+- Scalable to handle 100+ concurrent users
+
+### Security Requirements
+- Role-based access control (RBAC)
+- Secure API communication (HTTPS/WSS)
+- Data encryption at rest and in transit
+- Audit logging for all user actions
+- Session management and timeout
+- Input validation and sanitization
+
+## User Experience Requirements
+- Intuitive navigation with breadcrumb support
+- Context-sensitive help and tooltips
+- Keyboard shortcuts for power users
+- Accessibility compliance (WCAG 2.1 AA)
+- Dark/light theme support
+- Customizable workspace layouts
+- Multi-language support capability
+
+## Integration Requirements
+- Ignition Perspective asset migration and integration
+- ERP system integration (SAP, Oracle, etc.)
+- SCADA/PLC data integration
+- Quality management system integration
+- Maintenance management system integration
+
+## Success Metrics
+- Reduced production planning time by 40%
+- Improved schedule adherence by 25%
+- Decreased quality incidents by 30%
+- Increased operator efficiency by 20%
+- Reduced manual reporting time by 60%
+- User adoption rate > 90% within 3 months
+
+## Project Phases
+1. **Foundation Phase**: Core architecture, authentication, and basic UI
+2. **Recipe Management Phase**: Complete recipe system implementation
+3. **Scheduling Phase**: Production scheduling and optimization
+4. **Monitoring Phase**: Real-time production tracking
+5. **Analytics Phase**: Dashboarding and reporting system
+6. **AI Integration Phase**: AI assistants and intelligent features
+7. **Optimization Phase**: Performance tuning and advanced features
+
+## Constraints
+- Must integrate with existing backend systems
+- Phased rollout to minimize production disruption
+- Maintain compatibility with existing Ignition assets
+- Comply with food/beverage industry regulations
+- Support existing hardware and device infrastructure 

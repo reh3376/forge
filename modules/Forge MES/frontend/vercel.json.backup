@@ -1,0 +1,46 @@
+{
+  "framework": "nextjs",
+
+  "build": {
+    "env": {
+      "TURBO_TELEMETRY_DISABLED": "1",
+      "NEXT_TELEMETRY_DISABLED": "1",
+      "SKIP_PREFLIGHT_CHECK": "true",
+      "CI": "false"
+    }
+  },
+
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+
+  "rewrites": [
+    {
+      "source": "/api/graphql-proxy",
+      "destination": "/api/graphql-proxy"
+    }
+  ],
+
+  "regions": ["iad1"],
+
+  "github": {
+    "silent": false,
+    "autoJobCancelation": true
+  }
+}

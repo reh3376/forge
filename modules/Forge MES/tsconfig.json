@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@forge-mes/shared": ["shared/src"],
+      "@forge-mes/shared/*": ["shared/src/*"],
+      "@forge-mes/backend/*": ["backend/src/*"],
+      "@forge-mes/frontend/*": ["frontend/*"]
+    },
+    "target": "es2020",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "strict": true
+  },
+  "references": [
+    { "path": "./shared" },
+    { "path": "./backend" },
+    { "path": "./frontend" }
+  ],
+  "files": [],
+  "exclude": ["node_modules"]
+}

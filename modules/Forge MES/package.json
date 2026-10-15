@@ -1,0 +1,102 @@
+{
+  "name": "forge-mes",
+  "version": "1.0.0",
+  "description": "Forge MES — Manufacturing Execution System module for the Forge platform (backend + frontend + shared)",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "npx turbo dev",
+    "dev:backend": "npx turbo dev --filter=@forge-mes/backend",
+    "dev:backend:debug": "cd backend && npm run start:dev:debug",
+    "dev:frontend": "npx turbo dev --filter=@forge-mes/frontend",
+    "dev:shared": "npx turbo dev --filter=@forge-mes/shared",
+    "build": "npx turbo build",
+    "build:backend": "npx turbo build --filter=@forge-mes/backend",
+    "build:frontend": "npx turbo build --filter=@forge-mes/frontend",
+    "build:shared": "npx turbo build --filter=@forge-mes/shared",
+    "start": "npx turbo start",
+    "start:backend": "npx turbo start --filter=@forge-mes/backend",
+    "start:frontend": "npx turbo start --filter=@forge-mes/frontend",
+    "start:shared": "npx turbo start --filter=@forge-mes/shared",
+    "test": "npx turbo test",
+    "test:backend": "npx turbo test --filter=@forge-mes/backend",
+    "test:frontend": "npx turbo test --filter=@forge-mes/frontend",
+    "test:shared": "npx turbo test --filter=@forge-mes/shared",
+    "test:frontend:e2e": "npx turbo test:e2e --filter=@forge-mes/frontend",
+    "test:frontend:e2e:ui": "cd frontend && npm run test:e2e:ui",
+    "lint": "npx turbo lint",
+    "lint:backend": "turbo lint --filter=@forge-mes/backend",
+    "lint:frontend": "turbo lint --filter=@forge-mes/frontend",
+    "lint:shared": "turbo lint --filter=@forge-mes/shared",
+    "lint:fix": "npx turbo lint:fix",
+    "format": "npx turbo format",
+    "clean": "npx turbo clean && rm -rf .turbo",
+    "dev:legacy": "concurrently \"npm run dev:shared:legacy\" \"npm run dev:backend:legacy\" \"npm run dev:frontend:legacy\"",
+    "dev:backend:legacy": "cd backend && npm run start:dev:watch",
+    "dev:frontend:legacy": "cd frontend && npm run dev",
+    "dev:shared:legacy": "cd shared && npm run dev",
+    "build:legacy": "npm run build:shared:legacy && npm run build:backend:legacy && npm run build:frontend:legacy",
+    "build:backend:legacy": "cd backend && npm run build",
+    "build:frontend:legacy": "cd frontend && npm run build",
+    "build:shared:legacy": "cd shared && npm run build",
+    "validate": "./scripts/validate-setup.sh",
+    "docker:up": "docker compose -f docker-compose.codex.yml up -d",
+    "docker:down": "docker compose -f docker-compose.codex.yml down",
+    "docker:logs": "docker compose -f docker-compose.codex.yml logs -f",
+    "db:init": "npm run db:migrate && npm run db:seed",
+    "db:seed": "cd backend && npm run db:seed",
+    "db:migrate": "cd backend && npm run db:migrate:dev",
+    "db:deploy": "cd backend && npm run db:prod:deploy",
+    "db:studio": "cd backend && npm run db:studio",
+    "prisma:generate": "cd backend && npm run prisma:generate",
+    "install:all": "npm install --include=dev --workspaces",
+    "docs:erd": "cd backend && npm run prisma:generate",
+    "docs:stakeholder": "node scripts/generate-stakeholder-docs.js",
+    "docs:stakeholder:html": "node scripts/generate-stakeholder-docs.js --html",
+    "docs:generate": "npm run docs:erd && npm run docs:stakeholder"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "syncpack": "^11.2.1",
+    "turbo": "^2.3.1"
+  },
+  "packageManager": "npm@10.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reh3376/forge.git",
+    "directory": "modules/Forge MES"
+  },
+  "keywords": [
+    "manufacturing",
+    "mes",
+    "recipe-management",
+    "nestjs",
+    "nextjs",
+    "react",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "WHK Development Team",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "graphql": "^16.12.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0"
+  }
+}

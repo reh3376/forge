@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  redis:
+    container_name: ${REDIS_HOST}
+    image: redis:7
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis:/data
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - ${JAEGER_AGENT_PORT}:${JAEGER_AGENT_PORT}
+      - 14268:14268
+      - 14250:4317
+  opentelemetry:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - ${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}
+      - ${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}
+      - 1888:1888
+      - 13133:13133
+      - 55670:55679
+    volumes:
+      - ./otel-config.yml:/etc/otel-config.yml
+    command:
+      - --config=/etc/otel-config.yml
+    depends_on:
+      - jaeger
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - 5672:5672
+      - 15672:15672
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: whk-mqtt-broker
+    ports:
+      - 1885:1883  # Alternative port to avoid conflicts
+      - 9003:9001  # WebSocket port (9002 often in use)
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
+volumes:
+  postgres: ~
+  redis:
+    driver: local
+  mosquitto-data:
+    driver: local
+  mosquitto-log:
+    driver: local

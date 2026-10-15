@@ -1,0 +1,168 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "prisma:generate"],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "NEXT_PUBLIC_AZURE_AD_CLIENT_ID",
+        "NEXT_PUBLIC_AZURE_AD_TENANT_ID",
+        "NEXT_PUBLIC_AZURE_AUTHORITY",
+        "NEXT_PUBLIC_AZURE_REDIRECT_URI",
+        "NEXT_PUBLIC_AZURE_LOGOUT_URI",
+        "NEXT_PUBLIC_DISABLE_DEV_MODE",
+        "NEXT_PUBLIC_ENABLE_DEMO_USER",
+        "DATABASE_URL",
+        "DB_URL",
+        "BASE_URL",
+        "NEW_RELIC_LICENSE_KEY",
+        "ENTRA_BACKEND_CLIENT_SECRET",
+        "ENTRA_BACKEND_CLIENT_ID",
+        "ENTRA_TENANT_ID",
+        "APP_JWT_SECRET",
+        "APP_JWT_REQUIRE",
+        "APP_ENFORCE_SAME_ORIGIN",
+        "APP_ALLOWED_ORIGINS",
+        "SONAR_TOKEN",
+        "SONAR_PROJECT"
+      ]
+    },
+    "dev": {
+      "dependsOn": ["prisma:generate"],
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "NEXT_PUBLIC_AZURE_AD_CLIENT_ID",
+        "NEXT_PUBLIC_AZURE_AD_TENANT_ID",
+        "NEXT_PUBLIC_AZURE_AUTHORITY",
+        "NEXT_PUBLIC_AZURE_REDIRECT_URI",
+        "NEXT_PUBLIC_AZURE_LOGOUT_URI",
+        "NEXT_PUBLIC_DISABLE_DEV_MODE",
+        "NEXT_PUBLIC_ENABLE_DEMO_USER",
+        "DATABASE_URL",
+        "DB_URL",
+        "PORT",
+        "BACKEND_PORT",
+        "FRONTEND_PORT",
+        "BASE_URL",
+        "NEW_RELIC_LICENSE_KEY",
+        "ENTRA_BACKEND_CLIENT_SECRET",
+        "ENTRA_BACKEND_CLIENT_ID",
+        "ENTRA_TENANT_ID",
+        "APP_JWT_SECRET",
+        "APP_JWT_REQUIRE",
+        "APP_ENFORCE_SAME_ORIGIN",
+        "APP_ALLOWED_ORIGINS",
+        "SONAR_TOKEN",
+        "SONAR_PROJECT"
+      ]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "NEXT_PUBLIC_AZURE_AD_CLIENT_ID",
+        "NEXT_PUBLIC_AZURE_AD_TENANT_ID",
+        "NEXT_PUBLIC_AZURE_AUTHORITY",
+        "NEXT_PUBLIC_AZURE_REDIRECT_URI",
+        "NEXT_PUBLIC_AZURE_LOGOUT_URI",
+        "NEXT_PUBLIC_DISABLE_DEV_MODE",
+        "NEXT_PUBLIC_ENABLE_DEMO_USER",
+        "DATABASE_URL",
+        "DB_URL",
+        "PORT",
+        "BASE_URL",
+        "NEW_RELIC_LICENSE_KEY",
+        "ENTRA_BACKEND_CLIENT_SECRET",
+        "ENTRA_BACKEND_CLIENT_ID",
+        "ENTRA_TENANT_ID",
+        "APP_JWT_SECRET",
+        "APP_JWT_REQUIRE",
+        "APP_ENFORCE_SAME_ORIGIN",
+        "APP_ALLOWED_ORIGINS",
+        "SONAR_TOKEN",
+        "SONAR_PROJECT"
+      ]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "DB_URL"
+      ]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": [
+        "test-results/**",
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "DB_URL"
+      ]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "lint:fix": {
+      "cache": false,
+      "outputs": []
+    },
+    "format": {
+      "cache": false,
+      "outputs": []
+    },
+    "prisma:generate": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "DB_URL"
+      ]
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalEnv": [
+    "NODE_ENV",
+    "CI",
+    "DATABASE_URL",
+    "DB_URL"
+  ],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "NEXT_PUBLIC_AZURE_AD_CLIENT_ID",
+    "NEXT_PUBLIC_AZURE_AD_TENANT_ID",
+    "NEXT_PUBLIC_AZURE_AUTHORITY",
+    "NEXT_PUBLIC_AZURE_REDIRECT_URI",
+    "NEXT_PUBLIC_AZURE_LOGOUT_URI",
+    "NEXT_PUBLIC_DISABLE_DEV_MODE",
+    "NEXT_PUBLIC_ENABLE_DEMO_USER",
+    "NEXT_PUBLIC_MES_GRAPHQL_URL",
+    "NEXT_PUBLIC_MES_API_URL",
+    "NEXT_PUBLIC_SOCKET_URL",
+    "NEXT_PUBLIC_WS_URL"
+  ]
+}
