@@ -42,6 +42,17 @@ from forge.modules.ot.control.audit import (
     WriteAuditQuery,
 )
 from forge.modules.ot.control.authorization import WriteAuthorizer
+from forge.modules.ot.control.changeover_orchestrator import (
+    AreaChangeoverConfig,
+    ChangeoverOrchestrator,
+    ChangeoverSequenceError,
+    CipPolicy,
+    CipResult,
+    CipRunner,
+    OrchestrationEvent,
+    RecipeSnapshot,
+    parse_recipe_payload,
+)
 from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.mes_changeover import (
     CHANGEOVER_AREAS,
@@ -72,6 +83,12 @@ from forge.modules.ot.control.write_engine import ControlWriteEngine
 __all__ = [
     "CHANGEOVER_AREAS",
     "CHANGEOVER_COMMANDS",
+    "AreaChangeoverConfig",
+    "ChangeoverOrchestrator",
+    "ChangeoverSequenceError",
+    "CipPolicy",
+    "CipResult",
+    "CipRunner",
     "ContextualRecordAuditSink",
     "ControlWriteEngine",
     "InterlockCondition",
@@ -80,7 +97,9 @@ __all__ = [
     "LogAuditSink",
     "MesChangeoverClient",
     "MqttAuditSink",
+    "OrchestrationEvent",
     "RecipeParameterMapping",
+    "RecipeSnapshot",
     "RecipeWriteAdapter",
     "RecipeWriteConfig",
     "RecipeWriteResult",
@@ -95,5 +114,6 @@ __all__ = [
     "WriteStatus",
     "WriteValidator",
     "changeover_tag",
+    "parse_recipe_payload",
     "transition_from",
 ]
