@@ -1,3 +1,21 @@
+# Forge MES — Manufacturing Execution System module
+
+> **Forge module** · spoke of the Forge hub (forge-core) · adapter id `forge-mes` · FACTS spec `specs/forge-mes.facts.json`
+>
+> This directory is the Forge MES module. It was migrated from `WhiskeyHouse/whk-mes` on 2026-10-15; forge-mes replaces whk-mes. Every Forge module has two main sections, a backend and a frontend:
+>
+> | Section | Path | Stack | Role |
+> |---|---|---|---|
+> | **backend** | `backend/` | NestJS 10, Prisma (84 models), GraphQL, RabbitMQ, MQTT | MES domain logic plus the integration with forge-core. The hub-side spoke contract lives in the forge repo at `src/forge/adapters/forge_mes/` (manifest, context mapping, entity mappers) and transport is the gRPC `AdapterService`. |
+> | **frontend** | `frontend/` | Next.js 15, React 18, Apollo Client | Operator and planner UI. |
+> | shared | `shared/` | TypeScript | Types shared by backend and frontend, published in-workspace as `@forge-mes/shared`. |
+>
+> Hub relationship: forge-mes connects only to the hub, never to other spokes. Data leaves as `ContextualRecord`s over gRPC, domain events go to the Forge broker and to the UNS topics the OT module consumes (`recipe/next`, `changeover/state`, `queue/*`), and persistence targets the hub-owned `mod_mes` schema. Governance (FACTS, FxTS) is documented in the forge repo root.
+>
+> Workspace commands: `npm install`, then `npm run dev:backend`, `npm run dev:frontend`, `npm run build`, `npm test`.
+
+---
+
 # WhiskeyHouse Manufacturing Execution System (MES)
 
 A comprehensive manufacturing execution system for whiskey production built with NestJS, Prisma ORM, and GraphQL. This system provides end-to-end production management from raw material receipt through finished goods, with complete traceability and ERP integration.
