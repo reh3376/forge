@@ -10,15 +10,18 @@
  * `audit.create` / `audit.update` / `audit.delete`, so a replayed record
  * sits next to the live ones with one extra marker: `extra.replay = backfill`.
  *
- * Rows are paged by cursor in `createdAt, id` order; tag filtering happens
- * after mapping (the entity -> tag path mapping is a function of the entity
- * type, so a narrow tag filter still scans the range). `maxRecords` caps
- * what is emitted, not what is scanned.
+ * Rows are paged by cursor in `createdAt, id` order. A tag filter is pushed
+ * into the query (FB-071): the tag path is a function of the entity type
+ * (`mes.backend.<entity type>`), so `entityTypesForTags` inverts the filter
+ * into an `entityType IN (...)` predicate and a narrow filter no longer scans
+ * the whole range; the post-mapping `matchesTagFilter` stays as the safety
+ * net. `maxRecords` caps what is emitted, not what is scanned.
  */
 import { Inject, Injectable, Logger, Optional } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import {
   ContextualRecordMessage,
+  TAG_PATH_PREFIX,
   mapDomainEventToRecord,
 } from "./contextual-record.mapper";
 import { FORGE_CONFIG, ForgeConfig } from "./forge.config";
@@ -63,6 +66,25 @@ export function matchesTagFilter(tagPath: string | undefined, tags: readonly str
   if (!tags.length) return true;
   if (!tagPath) return false;
   return tags.some((t) => tagPath === t || tagPath.startsWith(`${t}.`));
+}
+
+/**
+ * Invert a tag filter into the AuditLog `entityType` values that can satisfy
+ * it (FB-071). `undefined` = no predicate (everything matches); `[]` = nothing
+ * in the audit log can match, so the query is skipped. Lower-cased, matched
+ * case-insensitively, because `deriveTagPath` lower-cases the entity type.
+ */
+export function entityTypesForTags(tags: readonly string[]): string[] | undefined {
+  if (!tags.length) return undefined;
+  const types: string[] = [];
+  for (const tag of tags) {
+    if (tag === TAG_PATH_PREFIX || TAG_PATH_PREFIX.startsWith(`${tag}.`)) return undefined;
+    if (!tag.startsWith(`${TAG_PATH_PREFIX}.`)) continue; // another tag tree: no audit row
+    const rest = tag.slice(TAG_PATH_PREFIX.length + 1).toLowerCase();
+    if (!rest || rest.includes(".")) continue; // deeper than deriveTagPath ever emits
+    if (!types.includes(rest)) types.push(rest);
+  }
+  return types;
 }
 
 function asObject(value: unknown): Record<string, unknown> {
@@ -142,6 +164,8 @@ export class ForgeBackfillService implements ForgeBackfillSource {
     }
     this.runs++;
     this.lastRunAt = Date.now();
+    const entityTypes = entityTypesForTags(range.tags);
+    if (entityTypes && entityTypes.length === 0) return; // no audit row can carry those tags
     const where = {
       ...((range.start || range.end) && {
         createdAt: {
@@ -149,6 +173,7 @@ export class ForgeBackfillService implements ForgeBackfillSource {
           ...(range.end && { lte: range.end }),
         },
       }),
+      ...(entityTypes && { entityType: { in: entityTypes, mode: "insensitive" as const } }),
     };
     let cursor: string | undefined;
     let emitted = 0;

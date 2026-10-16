@@ -7,12 +7,15 @@ on top of that:
 * :func:`backfill_into_pipeline` — ``Backfill`` for a time range, streamed
   into the :class:`~forge.ingest.pipeline.IngestPipeline` in batches, with
   one ingest-log row per batch (session ``backfill``).
+* :func:`collect_into_pipeline` — ``Collect`` (FB-071): a one-shot pull of
+  what the spoke has queued for push, each record delivered once (session
+  ``collect``).
 * :class:`SubscriptionManager` — ``Subscribe`` as a background task per
   subscription: records arrive as the spoke queues them for its own push
   path and are ingested in small batches; ``Unsubscribe`` ends the stream.
 
-Both are driven from the hub REST API (``/v1/adapters/{id}/backfill`` and
-``/v1/adapters/{id}/subscriptions``).
+All are driven from the hub REST API (``/v1/adapters/{id}/backfill``,
+``/v1/adapters/{id}/collect`` and ``/v1/adapters/{id}/subscriptions``).
 """
 
 from __future__ import annotations
@@ -36,6 +39,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 BACKFILL_SESSION = "backfill"
+COLLECT_SESSION = "collect"
 
 
 async def _maybe_await(result: Any) -> Any:
@@ -90,6 +94,52 @@ class PullOutcome:
         }
 
 
+async def _pump(
+    stream: AsyncIterator[ContextualRecord],
+    pipeline: IngestPipeline,
+    outcome: PullOutcome,
+    *,
+    session: str,
+    manifest: AdapterManifest | None,
+    batch_size: int,
+    on_batch: Callable[[str, str, IngestOutcome], Any] | None,
+) -> PullOutcome:
+    """Ingest ``stream`` in batches, logging each batch under ``session``."""
+    batch: list[ContextualRecord] = []
+
+    async def flush() -> None:
+        if not batch:
+            return
+        result = await pipeline.ingest(
+            list(batch), adapter_id=outcome.adapter_id, manifest=manifest
+        )
+        batch.clear()
+        outcome.add(result)
+        if on_batch is not None:
+            try:
+                await _maybe_await(on_batch(outcome.adapter_id, session, result))
+            except Exception:  # pragma: no cover - logging never blocks the pull
+                logger.exception("%s on_batch callback failed for %s", session, outcome.adapter_id)
+
+    try:
+        async for record in stream:
+            batch.append(record)
+            if len(batch) >= max(batch_size, 1):
+                await flush()
+    finally:
+        await flush()
+        outcome.completed_at = datetime.now(UTC)
+    logger.info(
+        "%s from %s: %d received, %d persisted in %d batches",
+        session.capitalize(),
+        outcome.adapter_id,
+        outcome.received,
+        outcome.persisted,
+        outcome.batches,
+    )
+    return outcome
+
+
 async def backfill_into_pipeline(
     dispatcher: WriteDispatcher,
     pipeline: IngestPipeline,
@@ -108,38 +158,44 @@ async def backfill_into_pipeline(
     Raises :class:`~forge.transport.spoke_callback.WriteDispatchError` when
     the spoke cannot be reached; records already ingested stay ingested.
     """
-    outcome = PullOutcome(adapter_id=adapter_id, mode="backfill")
-    batch: list[ContextualRecord] = []
-
-    async def flush() -> None:
-        if not batch:
-            return
-        result = await pipeline.ingest(list(batch), adapter_id=adapter_id, manifest=manifest)
-        batch.clear()
-        outcome.add(result)
-        if on_batch is not None:
-            try:
-                await _maybe_await(on_batch(adapter_id, BACKFILL_SESSION, result))
-            except Exception:  # pragma: no cover - logging never blocks the replay
-                logger.exception("backfill on_batch callback failed for %s", adapter_id)
-
     stream = dispatcher.backfill(adapter_id, start, end, tags=list(tags), max_records=max_records)
-    try:
-        async for record in stream:
-            batch.append(record)
-            if len(batch) >= max(batch_size, 1):
-                await flush()
-    finally:
-        await flush()
-        outcome.completed_at = datetime.now(UTC)
-    logger.info(
-        "Backfill from %s: %d received, %d persisted in %d batches",
-        adapter_id,
-        outcome.received,
-        outcome.persisted,
-        outcome.batches,
+    return await _pump(
+        stream,
+        pipeline,
+        PullOutcome(adapter_id=adapter_id, mode="backfill"),
+        session=BACKFILL_SESSION,
+        manifest=manifest,
+        batch_size=batch_size,
+        on_batch=on_batch,
     )
-    return outcome
+
+
+async def collect_into_pipeline(
+    dispatcher: WriteDispatcher,
+    pipeline: IngestPipeline,
+    *,
+    adapter_id: str,
+    max_records: int = 0,
+    manifest: AdapterManifest | None = None,
+    batch_size: int = 100,
+    on_batch: Callable[[str, str, IngestOutcome], Any] | None = None,
+) -> PullOutcome:
+    """Pull what the spoke has queued for push (``Collect``, FB-071).
+
+    The spoke hands each record over once (it leaves the spoke's push queue),
+    so this is the pull-model counterpart of the push ``Ingest`` stream.
+    Batches are logged under session ``collect``; ``max_records`` 0 = all.
+    """
+    stream = dispatcher.collect(adapter_id, max_records=max_records)
+    return await _pump(
+        stream,
+        pipeline,
+        PullOutcome(adapter_id=adapter_id, mode="collect"),
+        session=COLLECT_SESSION,
+        manifest=manifest,
+        batch_size=batch_size,
+        on_batch=on_batch,
+    )
 
 
 # ---------------------------------------------------------------------------

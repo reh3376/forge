@@ -153,6 +153,31 @@ describe("ForgeIngestService", () => {
 });
 
 describe("ForgeIngestService.onRecord (FB-061)", () => {
+  it("hands the queue to Collect once and restores what was not streamed", () => {
+    const svc = new ForgeIngestService(
+      makeConfig(),
+      new FakeClient() as unknown as ForgeHubClient,
+      new FakeClock()
+    );
+    [1, 2, 3, 4].forEach((i) => svc.enqueueDomainEvent(event(i)));
+    expect(svc.getStatus().queued).toBe(4);
+
+    const first = svc.take(2);
+    expect(first.map((r: any) => r.context.extra.entity_id)).toEqual(["s1", "s2"]);
+    expect(svc.getStatus().queued).toBe(2);
+
+    svc.restore(first); // the stream failed part-way: back at the head, order kept
+    const all = svc.take();
+    expect(all.map((r: any) => r.context.extra.entity_id)).toEqual(["s1", "s2", "s3", "s4"]);
+    expect(svc.getStatus()).toMatchObject({ queued: 0, recordsCollected: 6, recordsRestored: 2 });
+
+    svc.enqueueDomainEvent(event(5));
+    svc.restore(all); // 5 = maxQueue: nothing dropped
+    expect(svc.getStatus().queued).toBe(5);
+    svc.restore([all[0]]); // 6 > maxQueue: the overflow policy still drops the oldest
+    expect(svc.getStatus()).toMatchObject({ queued: 5, recordsDroppedQueueFull: 1, recordsRestored: 7 });
+  });
+
   it("hands every queued record to listeners, isolates listener failures", () => {
     const svc = new ForgeIngestService(
       makeConfig(),

@@ -3,7 +3,12 @@
  */
 import { deriveTagPath } from "../contextual-record.mapper";
 import { loadForgeConfig } from "../forge.config";
-import { AuditLogRowLike, ForgeBackfillService, matchesTagFilter } from "../forge-backfill.service";
+import {
+  AuditLogRowLike,
+  ForgeBackfillService,
+  entityTypesForTags,
+  matchesTagFilter,
+} from "../forge-backfill.service";
 
 const config = loadForgeConfig((k) => ({ FORGE_HUB_ENABLED: "true" })[k]);
 
@@ -27,8 +32,13 @@ function fakePrisma(rows: AuditLogRowLike[], opts: { fail?: boolean } = {}) {
     if (opts.fail) throw new Error("db unavailable");
     const gte: Date | undefined = args.where?.createdAt?.gte;
     const lte: Date | undefined = args.where?.createdAt?.lte;
+    const types: string[] | undefined = args.where?.entityType?.in;
+    if (types && args.where.entityType.mode !== "insensitive") {
+      throw new Error("entityType predicate must be case-insensitive");
+    }
     let list = rows
       .filter((r) => (!gte || r.createdAt >= gte) && (!lte || r.createdAt <= lte))
+      .filter((r) => !types || types.includes(r.entityType.toLowerCase()))
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime() || a.id.localeCompare(b.id));
     if (args.cursor) {
       const idx = list.findIndex((r) => r.id === args.cursor.id);
@@ -118,14 +128,26 @@ describe("ForgeBackfillService", () => {
       svc.replay({ tags: [deriveTagPath("Batch")], maxRecords: 0 })
     );
     expect(batches.map((r) => r.context.extra.entity_id)).toEqual(["b-1"]);
+    // The tag filter became an entityType predicate: one row scanned, not the whole range.
+    expect(prisma.auditLog.findMany.mock.calls[4][0].where.entityType).toEqual({
+      in: ["batch"],
+      mode: "insensitive",
+    });
+    expect(svc.getStatus().rowsScanned).toBe(7);
 
     const capped = await collect(
       svc.replay({ tags: ["mes.backend"], maxRecords: 3 })
     );
     expect(capped).toHaveLength(3);
     expect(svc.getStatus()).toMatchObject({ enabled: true, runs: 3, recordsReplayed: 10 });
-    expect(svc.getStatus().rowsScanned).toBeGreaterThanOrEqual(13);
+    expect(svc.getStatus().rowsScanned).toBe(10);
     expect(svc.getStatus().lastRunAt).toBeDefined();
+
+    // A tag tree the audit log can never carry is answered without a query.
+    const elsewhere = await collect(svc.replay({ tags: ["mes.changeover"], maxRecords: 0 }));
+    expect(elsewhere).toEqual([]);
+    expect(prisma.auditLog.findMany).toHaveBeenCalledTimes(7);
+    expect(svc.getStatus()).toMatchObject({ runs: 4, recordsReplayed: 10, rowsScanned: 10 });
   });
 
   it("fails loudly without Prisma and records database errors", async () => {
@@ -135,5 +157,20 @@ describe("ForgeBackfillService", () => {
     const broken = new ForgeBackfillService(config, fakePrisma([], { fail: true }) as any);
     await expect(collect(broken.replay({ tags: [], maxRecords: 0 }))).rejects.toThrow("db unavailable");
     expect(broken.getStatus().lastError).toBe("db unavailable");
+  });
+});
+
+describe("entityTypesForTags", () => {
+  it("inverts a tag filter into the entity types that can carry it", () => {
+    expect(entityTypesForTags([])).toBeUndefined();
+    expect(entityTypesForTags(["mes"])).toBeUndefined();
+    expect(entityTypesForTags(["mes.backend"])).toBeUndefined();
+    expect(entityTypesForTags(["mes.backend.batch", "mes"])).toBeUndefined();
+    expect(
+      entityTypesForTags(["mes.backend.ScheduleOrder", "mes.backend.batch", "mes.backend.Batch"])
+    ).toEqual(["scheduleorder", "batch"]);
+    expect(entityTypesForTags(["mes.backend.batch", "mes.changeover"])).toEqual(["batch"]);
+    expect(entityTypesForTags(["mes.changeover"])).toEqual([]);
+    expect(entityTypesForTags(["mes.backend.batch.status"])).toEqual([]);
   });
 });

@@ -61,11 +61,19 @@ class FakeSpoke:
         self.calls: list[dict[str, Any]] = []
         self.queues: dict[str, asyncio.Queue[ContextualRecord | None]] = {}
         self.seq = 0
+        self.queued = [record(i) for i in range(4)]
 
     async def backfill(self, adapter_id, session_id, tags, start, end, max_records):
         self.calls.append({"tags": tags, "start": start, "end": end, "max_records": max_records})
         for i in range(max_records or 7):
             yield pydantic_to_proto(record(i))
+
+    async def collect(self, adapter_id, session_id, max_batch_size):
+        self.calls.append({"collect": max_batch_size})
+        n = max_batch_size or len(self.queued)
+        taken, self.queued = self.queued[:n], self.queued[n:]
+        for rec in taken:
+            yield pydantic_to_proto(rec)
 
     async def subscribe(self, adapter_id, session_id, tags):
         self.seq += 1
@@ -155,6 +163,29 @@ async def test_backfill_endpoint_replays_and_logs(client, app, spoke) -> None:
     app.state.write_dispatcher.forget("sess-1")
     resp = await client.post("/v1/adapters/forge-mes/backfill", json=body)
     assert resp.status_code == 409 and CALLBACK_PARAM in resp.json()["detail"]
+
+
+async def test_collect_endpoint_pulls_the_spoke_queue(client, app, spoke) -> None:
+    assert (await client.post("/v1/adapters/forge-mes/collect", json={})).status_code == 404
+    await _register(client, app)
+
+    resp = await client.post(
+        "/v1/adapters/forge-mes/collect", json={"max_records": 3, "batch_size": 2}
+    )
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert (data["received"], data["persisted"], data["batches"]) == (3, 3, 2)
+    assert data["mode"] == "collect" and data["completed_at"]
+    assert spoke.calls[0] == {"collect": 3} and len(spoke.queued) == 1
+    log = (await client.get("/v1/adapters/forge-mes/ingest-log")).json()
+    assert [row["session_id"] for row in log] == ["collect"] * 2
+
+    rest = (await client.post("/v1/adapters/forge-mes/collect", json={})).json()
+    assert rest["received"] == 1 and spoke.queued == []
+    assert len(app.state.ingest_pipeline.fallback_sink) == 4
+
+    app.state.write_dispatcher.forget("sess-1")
+    assert (await client.post("/v1/adapters/forge-mes/collect", json={})).status_code == 409
 
 
 async def test_subscription_endpoints_stream_into_the_pipeline(client, app, spoke) -> None:

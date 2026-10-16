@@ -32,6 +32,10 @@ export interface IngestStatus {
   consecutiveFailures: number;
   /** Active Subscribe listeners (FB-061). */
   subscribers: number;
+  /** Records handed to the hub over the spoke-hosted Collect RPC (FB-071). */
+  recordsCollected: number;
+  /** Records put back after a Collect stream could not deliver them. */
+  recordsRestored: number;
   lastError?: string;
   lastFlushAt?: string;
 }
@@ -65,6 +69,8 @@ export class ForgeIngestService {
   private batchesSent = 0;
   private droppedQueueFull = 0;
   private deadLettered = 0;
+  private collected = 0;
+  private restored = 0;
   private consecutiveFailures = 0;
   private circuit: CircuitState = "closed";
   private circuitOpenedAt = 0;
@@ -145,6 +151,30 @@ export class ForgeIngestService {
   }
 
   /**
+   * Hand over what is queued for push (the spoke-hosted `Collect` RPC,
+   * FB-071). The records leave the queue, so the hub receives each one exactly
+   * once: over this Collect stream or over the next push, never both.
+   * `limit` 0 = everything. Records already in flight are not included.
+   */
+  take(limit = 0): ContextualRecordMessage[] {
+    const count = limit > 0 ? Math.min(limit, this.queue.length) : this.queue.length;
+    const taken = this.queue.splice(0, count);
+    this.collected += taken.length;
+    return taken;
+  }
+
+  /** Put records a Collect stream could not deliver back at the head of the queue. */
+  restore(records: ContextualRecordMessage[]): void {
+    if (!records.length) return;
+    this.queue.unshift(...records);
+    this.restored += records.length;
+    while (this.queue.length > this.config.ingest.maxQueue) {
+      this.queue.shift();
+      this.droppedQueueFull++;
+    }
+  }
+
+  /**
    * Send up to one batch. Serialised: a second call while a flush is in
    * flight returns immediately. Returns the number of records delivered.
    */
@@ -210,6 +240,8 @@ export class ForgeIngestService {
       recordsDeadLettered: this.deadLettered,
       consecutiveFailures: this.consecutiveFailures,
       subscribers: this.listeners.size,
+      recordsCollected: this.collected,
+      recordsRestored: this.restored,
       lastError: this.lastError,
       lastFlushAt: this.lastFlushAt
         ? new Date(this.lastFlushAt).toISOString()

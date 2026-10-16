@@ -146,7 +146,8 @@ class GrpcChannel(TransportChannel):
         if method == "Ingest":
             await self._call_ingest(stub, records)
         elif method == "Collect":
-            # Legacy compatibility: map Collect to Ingest for spoke→hub push
+            # Legacy alias for the spoke→hub push; the hub-side pull is
+            # ``receive_stream("Collect")`` (FB-071).
             await self._call_ingest(stub, records)
         else:
             msg = f"Streaming not implemented for method: {method}"
@@ -157,11 +158,11 @@ class GrpcChannel(TransportChannel):
         method: str,
         request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
-        """Server-streaming pull RPCs on the spoke (FB-061).
+        """Server-streaming pull RPCs on the spoke (FB-061, FB-071).
 
-        ``Backfill`` yields record dicts; ``Subscribe`` yields the control dict
-        ``{"subscription_id": ...}`` (from the initial metadata) and then
-        record dicts until the spoke ends the stream.
+        ``Backfill`` and ``Collect`` yield record dicts; ``Subscribe`` yields
+        the control dict ``{"subscription_id": ...}`` (from the initial
+        metadata) and then record dicts until the spoke ends the stream.
         """
         stub = self._ensure_connected()
         if method == "Backfill":
@@ -169,6 +170,9 @@ class GrpcChannel(TransportChannel):
                 yield item
         elif method == "Subscribe":
             async for item in self._call_subscribe(stub, request):
+                yield item
+        elif method == "Collect":
+            async for item in self._call_collect(stub, request):
                 yield item
         else:
             msg = f"Server streaming not implemented for method: {method}"
@@ -364,6 +368,21 @@ class GrpcChannel(TransportChannel):
             if ts is not None:
                 getattr(proto_request, field_name).CopyFrom(ts)
         async for message in stub.Backfill(proto_request, metadata=self.metadata):
+            yield pydantic_to_proto(proto_to_contextual_record(message))
+
+    async def _call_collect(
+        self,
+        stub: service_grpc.AdapterServiceStub,
+        request: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        from forge.transport.serialization import pydantic_to_proto
+
+        proto_request = service_msg.CollectRequest(
+            adapter_id=request.get("adapter_id", ""),
+            session_id=request.get("session_id", ""),
+            max_batch_size=int(request.get("max_batch_size") or 0),
+        )
+        async for message in stub.Collect(proto_request, metadata=self.metadata):
             yield pydantic_to_proto(proto_to_contextual_record(message))
 
     async def _call_subscribe(

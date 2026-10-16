@@ -252,8 +252,11 @@ export function encodeRawValue(raw: Raw): string {
 }
 
 /** Tag path convention shared with the Python adapter: mes.<source>.<entity>. */
+/** Every record this backend emits sits under this tag tree (`mes.backend.<entity type>`). */
+export const TAG_PATH_PREFIX = "mes.backend";
+
 export function deriveTagPath(entityType: string | undefined): string {
-  return `mes.backend.${(entityType || "event").toLowerCase()}`;
+  return `${TAG_PATH_PREFIX}.${(entityType || "event").toLowerCase()}`;
 }
 
 function defined(obj: Record<string, string | undefined>): Record<string, string> {
