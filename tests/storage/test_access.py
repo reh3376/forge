@@ -1,17 +1,15 @@
 """Tests for the Forge Access Controller."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from forge.storage.access import (
-    AccessAuditEntry,
     AccessController,
     AccessLevel,
     ConnectionGrant,
     ModulePermission,
 )
-
 
 # ── ModulePermission ───────────────────────────────────────────
 
@@ -45,13 +43,13 @@ class TestModulePermission:
         assert perm.is_effective is False
 
     def test_is_expired_when_past_expiry(self):
-        past = datetime.now(tz=timezone.utc) - timedelta(hours=1)
+        past = datetime.now(tz=UTC) - timedelta(hours=1)
         perm = self._make_perm(expires_at=past)
         assert perm.is_expired is True
         assert perm.is_effective is False
 
     def test_not_expired_when_future_expiry(self):
-        future = datetime.now(tz=timezone.utc) + timedelta(hours=1)
+        future = datetime.now(tz=UTC) + timedelta(hours=1)
         perm = self._make_perm(expires_at=future)
         assert perm.is_expired is False
         assert perm.is_effective is True
@@ -129,7 +127,7 @@ class TestAccessControllerGrant:
 
     def test_grant_with_expiry(self):
         ac = AccessController()
-        future = datetime.now(tz=timezone.utc) + timedelta(hours=24)
+        future = datetime.now(tz=UTC) + timedelta(hours=24)
         perm = ac.grant(
             "whk-wms", "mod_wms", AccessLevel.WRITE, expires_at=future
         )
@@ -198,7 +196,7 @@ class TestAccessControllerCheck:
 
     def test_check_expired_grant(self):
         ac = AccessController()
-        past = datetime.now(tz=timezone.utc) - timedelta(hours=1)
+        past = datetime.now(tz=UTC) - timedelta(hours=1)
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE, expires_at=past)
         assert ac.check("whk-wms", "mod_wms", AccessLevel.WRITE) is False
 
@@ -245,7 +243,7 @@ class TestAccessControllerListGrants:
 
     def test_list_grants_excludes_expired(self):
         ac = AccessController()
-        past = datetime.now(tz=timezone.utc) - timedelta(hours=1)
+        past = datetime.now(tz=UTC) - timedelta(hours=1)
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE, expires_at=past)
         grants = ac.list_grants("whk-wms")
         assert len(grants) == 0
@@ -299,13 +297,15 @@ class TestAccessControllerIssueConnection:
         ac = AccessController()
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
         conn = ac.issue_connection("whk-wms")
-        assert "whk_wms_rw" in conn.connection_string
+        assert conn.role == "forge_mod_wms"  # the role migration 002 creates
+        assert "forge_mod_wms" in conn.connection_string
 
     def test_issue_connection_ro_role_for_read_only(self):
         ac = AccessController()
         ac.grant("whk-wms", "forge_canonical", AccessLevel.READ)
         conn = ac.issue_connection("whk-wms")
-        assert "whk_wms_ro" in conn.connection_string
+        assert conn.role == "forge_whk_wms_ro"
+        assert "forge_whk_wms_ro" in conn.connection_string
 
     def test_issue_connection_no_grants_raises(self):
         ac = AccessController()

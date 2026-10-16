@@ -8,6 +8,8 @@ Subcommands:
   forge version     — Show version info
   forge adapter     — Adapter management (list, register, status)
   forge governance  — Run FxTS spec governance checks
+  forge migrate     — Database migrations
+  forge db access   — Module schema grants and Forge-issued credentials (FB-057)
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from typing import Annotated
 import typer
 
 import forge
+from forge.cli.db_access import access_app
 
 # ---------------------------------------------------------------------------
 # Root app
@@ -264,6 +267,19 @@ migrate_app = typer.Typer(
     no_args_is_help=True,
 )
 app.add_typer(migrate_app, name="migrate")
+
+
+# ---------------------------------------------------------------------------
+# Database ownership subcommand group (BACKLOG FB-057, roadmap A-6)
+# ---------------------------------------------------------------------------
+
+db_app = typer.Typer(
+    name="db",
+    help="Database ownership: module schema grants and Forge-issued credentials.",
+    no_args_is_help=True,
+)
+db_app.add_typer(access_app, name="access")
+app.add_typer(db_app, name="db")
 
 
 @migrate_app.command("up")

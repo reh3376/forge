@@ -18,7 +18,7 @@ class TestMigrationStructure:
         assert VERSIONS_DIR.is_dir()
 
     def test_all_versions_present(self):
-        expected = ["001", "002", "003", "004", "005"]
+        expected = ["001", "002", "003", "004", "005", "006", "007", "008"]
         files = sorted(f.name for f in VERSIONS_DIR.glob("*.py") if f.name != "__init__.py")
         for version in expected:
             assert any(f.startswith(version) for f in files), f"Missing migration {version}"
@@ -96,3 +96,23 @@ class TestAlembicConfig:
 
     def test_env_py_exists(self):
         assert (MIGRATIONS_DIR / "env.py").is_file()
+
+
+class TestMigration008:
+    """008 persists ModulePermission rows and the access audit (FB-057)."""
+
+    def test_008_permission_columns_match_model(self):
+        import dataclasses
+        import re
+
+        from forge.storage.access import AccessAuditEntry, ModulePermission
+
+        source = (VERSIONS_DIR / "008_module_permissions.py").read_text()
+        tables = dict(
+            re.findall(r'op\.create_table\(\s*"(\w+)",(.*?)schema="forge_core"', source, re.S)
+        )
+        assert set(tables) == {"module_permissions", "access_audit"}
+        permission_columns = set(re.findall(r'sa\.Column\("(\w+)"', tables["module_permissions"]))
+        assert permission_columns == {f.name for f in dataclasses.fields(ModulePermission)}
+        audit_columns = set(re.findall(r'sa\.Column\("(\w+)"', tables["access_audit"]))
+        assert audit_columns == {f.name for f in dataclasses.fields(AccessAuditEntry)} | {"id"}
