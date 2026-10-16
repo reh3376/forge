@@ -380,7 +380,7 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Durable adapter registry and ingest audit log on the hub | FB-060 (done) |
 | Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
 | Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 (done) |
-| Collect hand-over, FACTS entry for the replay source, tag filter pushed into the query | FB-071 (code done; FACTS entry awaiting owner approval) |
+| Collect hand-over, FACTS entry for the replay source, tag filter pushed into the query | FB-071 (done) |
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
 | CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 (done) |
 | PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 (done) |

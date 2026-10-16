@@ -511,6 +511,31 @@
           "MqttConnectionStatus"
         ],
         "collection_mode": "poll"
+      },
+      {
+        "source_type": "database",
+        "endpoint": "AuditLog (PostgreSQL via Prisma)",
+        "description": "Audit-log replay served by the spoke-hosted Backfill RPC (FB-061): every CREATE/UPDATE/DELETE on a domain entity is one row, replayed as audit.create / audit.update / audit.delete with extra.replay = backfill and extra.audit_log_id, cursor-paged in createdAt order; a tag filter is pushed into the entityType predicate (FB-071).",
+        "entities": [
+          "Batch",
+          "BatchDeviation",
+          "Changeover",
+          "CustomEntity",
+          "EnzymeConfiguration",
+          "Lot",
+          "MashingExecution",
+          "ProductionEvent",
+          "ProductionOrder",
+          "RecipeBomActual",
+          "RecipeParameter",
+          "ScheduleOrder",
+          "ScheduleOrderQueue",
+          "ScheduleOrderRecipeInstance",
+          "ScheduleOrderRecipeInstanceComponents",
+          "StepExecution",
+          "SystemConfiguration"
+        ],
+        "collection_mode": "backfill"
       }
     ],
     "sample_record": {
@@ -716,11 +741,11 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "f93ddd4a6442c26aa352cb001675240d07e69465634ecf130fe88becf4bca789",
+    "spec_hash": "95ca14f6c9a444571059071e21298ccb3b95e62c333c8c6d25a43b4c20a8a3d8",
     "hash_state": "approved",
-    "previous_hash": "567b2ae2cfb03d9e012479c7528335392d365606aa9c70783e3e454c7ac68e5c",
+    "previous_hash": "f93ddd4a6442c26aa352cb001675240d07e69465634ecf130fe88becf4bca789",
     "approved_by": "reh3376",
-    "approved_at": "2026-10-15T07:32:26Z",
+    "approved_at": "2026-10-16T03:29:19Z",
     "change_history": [
       {
         "previous_hash": "968a178c29f1f4d9ca59fe57a2c30019631252abe14f4e592f142dff0dbdc443",
@@ -739,6 +764,15 @@
         "changed_by": "reh3376",
         "change_type": "structural",
         "reason": "Rename whk-mes -> forge-mes: forge-mes replaces whk-mes as the Forge-native MES module (owner decision 2026-10-15). Identity, schema_ref, metadata and dead-letter topic renamed; data contract unchanged. Approved by owner in-session."
+      },
+      {
+        "previous_hash": "f93ddd4a6442c26aa352cb001675240d07e69465634ecf130fe88becf4bca789",
+        "new_hash": "95ca14f6c9a444571059071e21298ccb3b95e62c333c8c6d25a43b4c20a8a3d8",
+        "changed_at": "2026-10-16T03:17:37Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "content",
+        "reason": "FB-071: declare the AuditLog replay behind the spoke-hosted Backfill RPC as a data source (database, collection_mode backfill, 17 entities). Approved by the owner in-session on 2026-10-16 (\"approve the FACTS change\")."
       }
     ]
   }
