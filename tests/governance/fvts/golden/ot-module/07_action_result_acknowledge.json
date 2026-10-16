@@ -1,0 +1,6 @@
+{
+  "message_type": "action_result",
+  "action_id": "alarm.acknowledge",
+  "status": "CONFIRMED",
+  "alarm_id": "FERM-003-TEMP-HI"
+}

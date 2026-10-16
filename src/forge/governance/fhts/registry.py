@@ -77,7 +77,7 @@ class TrackedFileRecord(BaseModel):
     """
 
     path: str  # Repository-relative path
-    framework: str  # fats | facts | fqts | fsts | flts | fnts | fots | fpts | fdts
+    framework: str  # fats | facts | fqts | fsts | flts | fnts | fots | fpts | fdts | ftts | fvts
     current_hash: str  # SHA-256 hex
     status: str = UNKNOWN  # verified | mismatch | unknown | reverted
     updated_at: str = ""  # ISO8601

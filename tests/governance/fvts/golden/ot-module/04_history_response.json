@@ -1,0 +1,14 @@
+{
+  "message_type": "history_response",
+  "point_id": "ferm.temperature",
+  "timestamp_basis": "source_time",
+  "decimation": {"location": "server", "algorithm": "min_max_per_bucket"},
+  "series": [
+    {"t": "2026-10-16T11:00:00Z", "v": 148.9, "q": "GOOD"},
+    {"t": "2026-10-16T11:00:00Z", "v": 151.4, "q": "GOOD"},
+    {"t": "2026-10-16T11:15:00Z", "v": 149.2, "q": "GOOD"},
+    {"t": "2026-10-16T11:15:00Z", "v": 150.8, "q": "UNCERTAIN"},
+    {"t": "2026-10-16T11:30:00Z", "v": 150.0, "q": "GOOD"},
+    {"t": "2026-10-16T11:30:00Z", "v": 150.6, "q": "GOOD"}
+  ]
+}

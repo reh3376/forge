@@ -1,0 +1,35 @@
+{
+  "message_type": "subscription_update",
+  "now": "2026-10-16T12:00:00Z",
+  "rate_hz": 4,
+  "updates": [
+    {
+      "point_id": "ferm.temperature",
+      "value": {"raw": 150.27, "quality": "GOOD", "data_type": "FLOAT"},
+      "timestamp": {
+        "source_time": "2026-10-16T11:59:59.500Z",
+        "server_time": "2026-10-16T11:59:59.600Z",
+        "ingestion_time": "2026-10-16T11:59:59.700Z"
+      },
+      "context": {"site": "whk01", "area": "Area1", "equipment_id": "Fermenter3", "operating_mode": "Production"}
+    },
+    {
+      "point_id": "ferm.temperature_sp",
+      "value": {"raw": 152.0, "quality": "UNCERTAIN", "data_type": "FLOAT"},
+      "timestamp": {"source_time": "2026-10-16T11:59:59.500Z", "ingestion_time": "2026-10-16T11:59:59.700Z"},
+      "context": {"site": "whk01", "area": "Area1", "equipment_id": "Fermenter3", "operating_mode": "Production"}
+    },
+    {
+      "point_id": "ferm.agitator_running",
+      "value": {"raw": null, "quality": "BAD", "data_type": "BOOLEAN"},
+      "timestamp": {"source_time": "2026-10-16T11:59:59.500Z", "ingestion_time": "2026-10-16T11:59:59.700Z"},
+      "context": {"site": "whk01", "area": "Area1", "equipment_id": "Fermenter3", "operating_mode": "Production"}
+    },
+    {
+      "point_id": "ferm.mode",
+      "value": {"raw": 2, "quality": "GOOD", "data_type": "ENUM"},
+      "timestamp": {"source_time": "2026-10-16T11:59:59.500Z", "ingestion_time": "2026-10-16T11:59:59.700Z"},
+      "context": {"site": "whk01", "area": "Area1", "equipment_id": "Fermenter3", "operating_mode": "Production"}
+    }
+  ]
+}

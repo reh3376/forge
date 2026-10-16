@@ -97,12 +97,12 @@ The NestJS backend and Next.js frontend stay as the bridge that keeps the hub �
 
 ### WS-6 · forge-display and the FVTS contract
 
-FVTS v0.1.0 is in `main` (schema, OT reference spec with invented points, framework doc) with `hash_state: pending_review`, no runner and no tests, so its CI gate must stay off.
+FVTS v0.1.0 is in `main`: schema, runner (19 checks, schema-runner parity), render-profile baseline, reference renderer, golden set and gate suite (FB-077, 2026-10-16). The OT reference spec still binds invented points and is `pending_review`; the gate allows only `fvts:hash-approved` to fail until FB-078.
 
 | Step | Status | Notes |
 |---|---|---|
 | Resolve the FVTS open decisions (D-4) | Decision needed | Name, roles (FB-075), write authority per profile, mobile acknowledgement, rate ceilings, wire encoding/browser transport, configured-layout format, server-side enforcement (FB-074). |
-| FB-077 `fvts_runner.py` with the 12 planned checks; golden-message conformance tests under `tests/governance/fvts` | Not started — **decided 2026-10-16** | Schema-runner parity rule: gate off until every field is enforced. |
+| FB-077 `fvts_runner.py` with the 12 planned checks; golden-message conformance tests under `tests/governance/fvts` | **Done 2026-10-16** | 19 checks, parity asserted by test; gate on via `test_ot_module_views.py`. |
 | FB-078 replace the invented fermenter points with real OT tags; owner approves the hash | Not started — **decided 2026-10-16** (OT stays the reference spec) | After FB-077 and FB-075. |
 | Design-token set (`forge://design/tokens/v1`) with reserved `alarm.*` namespace (ISA-101) | Not started | |
 | Renderer spike: one slice rendered in two renderers (candidates per the Rust research: Slint or egui for operator HMI, Dioxus for desktop apps) + Slint licence check | Not started | |
@@ -122,7 +122,7 @@ Needed before FB-076, forge-ignition and forge-hmi-scada can start the same way.
 
 ### WS-8 · Governance (FxTS)
 
-FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FVTS runner (WS-6). FB-073 (OT FACTS hash). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
+FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-073 (OT FACTS hash). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
 
 ### WS-9 · Security and repository operations
 

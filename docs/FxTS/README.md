@@ -164,7 +164,7 @@ Every FxTS framework follows the same structure:
 | [FOTS](FOTS.md) | Forge Observability Test Specification | Pipeline health and SLOs | Soft-fail | Planned |
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
-| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail (once runner lands) | Draft — schema + reference spec |
+| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail | Schema + Runner + reference renderer implemented; reference spec awaits owner approval (FB-078) |
 
 ## Shared Infrastructure
 
