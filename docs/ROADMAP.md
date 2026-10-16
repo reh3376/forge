@@ -91,7 +91,7 @@ The NestJS backend and Next.js frontend stay as the bridge that keeps the hub �
 | Item | Status | Notes |
 |---|---|---|
 | FB-076 rewrite forge-mes in Go; UI through forge-display | Not started — **Decision needed** (D-3) on the design | Suggested order: design doc → SDK scaffold under `go/` → hub link (Register/Configure/Ingest, write-back server, pull RPCs) against `go/gen/forge/v1` → changeover state machine + MQTT publishing → `mod_mes` (FB-057) → parity tests (FB-055) → cut-over → retire NestJS. |
-| FB-057 `mod_mes` schema in the hub (data ownership per A-6) | Not started | Do it once, for the Go module, not for the bridge. |
+| FB-057 `mod_mes` schema in the hub (data ownership per A-6) | Step 1 done 2026-10-16: Forge-issued credentials (`forge db access`, migration 008) | Steps 2–5 once, for the Go module (D-3). |
 | Bridge debt that still matters while the bridge runs: FB-050 Dependabot alerts (High), FB-036 jest failures in CI, FB-052 CI exit hang, FB-031 inert nested workflows, FB-045 committed env vaults, FB-043 privacy hygiene | Not started | Triage against the bridge's remaining life; do not invest beyond safety. |
 | Bridge debt that the rewrite retires: FB-028 frontend strict-mode errors, FB-030 stale admin-app refs, FB-032 cloud resource names, FB-033 submodule, FB-035 nested tooling configs, FB-064 eslint resolution | Not started | Close with FB-076 unless needed sooner. |
 

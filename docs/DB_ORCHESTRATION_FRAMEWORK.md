@@ -243,8 +243,8 @@ class ModulePermission:
 When a module requests database access, the Access Controller:
 
 1. Validates the module's identity against the Schema Registry.
-2. Creates a PostgreSQL role with grants matching the module's permission set.
-3. Issues a connection string: `postgresql://mod_wms_rw:<token>@forge-pg:5432/forge?search_path=mod_wms,forge_canonical`
+2. Provisions the PostgreSQL role migration 002 names for the module's own schema (`forge_mod_wms`), rotating its password, with grants matching the permission set (`forge db access issue`, FB-057 step 1).
+3. Issues a connection string: `postgresql://forge_mod_wms:<secret>@forge-pg:5432/forge?schema=mod_wms`; the `search_path` (`mod_wms,forge_canonical`) is reported alongside for clients that set it themselves. The secret is printed once and never stored.
 4. Logs the grant to the audit trail.
 5. Optionally sets a TTL for credential rotation.
 
@@ -435,6 +435,7 @@ forge db audit                         # Generate compliance report of all schem
 forge db access grant wms mod_wms WRITE  # Grant WMS module write access to mod_wms schema
 forge db access revoke wms mod_mes     # Revoke WMS access to MES schema
 forge db access list                   # Show all module permission grants
+forge db access issue wms --host forge-pg  # Provision the role, print the connection string once
 ```
 
 ---

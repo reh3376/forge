@@ -353,10 +353,21 @@ already creates the schema; `storage/access.py` grants `forge-mes` read/write on
 
 Target state and the steps to get there (FB-057):
 
-1. **Connection string from Forge.** `forge db access grant forge-mes mod_mes rw`
-   issues credentials scoped to `mod_mes.*` plus `SELECT` on `forge_canonical.*`.
-   The backend receives it as `DATABASE_URL` with `?schema=mod_mes`; no query
-   code changes.
+1. **Connection string from Forge** (done 2026-10-16, FB-057 step 1).
+   `forge db access grant forge-mes mod_mes admin` records the grant in
+   `forge_core.module_permissions` (migration 008); `forge db access issue
+   forge-mes --host <pg-host>` provisions the `forge_mod_mes` role that
+   migration 002 names (`ALTER ROLE … PASSWORD`, so every issue rotates the
+   secret), applies the grants (`mod_mes` plus `SELECT` on `forge_canonical`)
+   and prints `DATABASE_URL=postgresql://forge_mod_mes:<secret>@<host>:5432/forge?schema=mod_mes`
+   once; the secret is never stored. The backend reads it as `DB_URL`
+   (`prisma/schema.prisma`), and `?schema=mod_mes` makes Prisma create and use
+   its tables inside `mod_mes`. `admin` (CREATE on the schema) is needed only
+   while Prisma runs the DDL; the Go module gets `write`. `--dry-run` prints
+   the SQL and a masked URL without touching anything. Dev wiring: hub stack
+   up, `forge migrate up`, grant + issue with `--host localhost` (or
+   `host.docker.internal` for a containerised backend), export `DB_URL`, then
+   `npm run db:prod:deploy`.
 2. **Baseline the schema.** `prisma migrate diff` from the current database to
    an empty `mod_mes` produces the baseline migration; apply it through the
    hub's migration runner (`forge migrate up`) so the hub owns DDL ordering.
