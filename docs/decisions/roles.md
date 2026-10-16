@@ -1,6 +1,6 @@
 # Forge authorization model — decision record
 
-**Status:** draft, round 3 of the owner dialogue (2026-10-16) · **Backlog:** FB-075 · **Roadmap:** D-1
+**Status:** draft, round 4 of the owner dialogue (2026-10-16) · **Backlog:** FB-075 · **Roadmap:** D-1
 **Participants:** reh3376 (owner, decides), Claude (drafts, challenges)
 
 This record accumulates the decisions and the open questions about how Forge decides what a person, a spoke or a module may do. It is edited in place as the dialogue proceeds; every statement is tagged **[OWNER]** (decided by the owner), **[PROPOSED]** (Claude's proposal, not yet approved) or **[OPEN]** (question outstanding). Nothing here is implemented until the status line says `approved`.
@@ -30,6 +30,9 @@ This record accumulates the decisions and the open questions about how Forge dec
 | R-10 | Identity methods ship in the order OIDC + local accounts + service identities, then LDAP / Active Directory, then SAML. | [OWNER] |
 | R-11 | Assignments constrain **reads as well as actions**: a subject without a domain's read scope sees none of that domain's data (e.g. ERP data hidden from distillery operators). Details in §10. | [OWNER] |
 | R-12 | Shipped roles are **per module** (each module ships its domain roles as data). A cross-module "universal ladder" is at most an optional overlay. Details in §11. | [OWNER, overlay question open] |
+| R-13 | **Each hub owns what is attached directly to it**: its spokes (the enterprise hub has spokes of its own), its child hubs and the subjects whose credentials are associated with it. A subject reaches any other hub **hop by hop along the tree** (area → site → enterprise → site → area); each hop grants access. Details in §8. | [OWNER] |
+| R-14 | **Each hub collects, governs, stores, curates and serves** the data of its directly attached spokes and hubs. Hubs on the same side of the enterprise hub (one site subtree) request data from one another directly; across the enterprise hub they ask the enterprise hub, which handles it. The same structure applies one level down. Details in §8. | [OWNER] |
+| R-15 | Access-token lifetime is an installation choice within the floor and ceiling of §7; the **default is 1 hour**. | [OWNER] |
 
 ## 3. Design consequence of R-3, R-4 and R-5
 
@@ -82,12 +85,12 @@ Put multi-party and reason rules **in the model**, as policy rules the hub evalu
 
 **[OWNER]** Offline verification: a spoke, module or forge-display backend checks the token's signature against the issuing hub's public key and reads the scopes and constraints from the token; there is no call to the hub per request. The administrator sets the token lifetime, which is exactly how long a revoked subject can keep working. Forge enforces a floor, so clients cannot be configured to refresh so often that the hub is congested, and a ceiling.
 
-**[PROPOSED] Numbers and mechanics** (owner to confirm the numbers, Q16):
+**Numbers and mechanics** (range confirmed by the owner in round 3, default set to 1 h; the mechanics remain [PROPOSED]):
 
 | Setting | Proposed | Why |
 |---|---|---|
 | access-token lifetime floor | 5 min | below this every client refreshes constantly; a thousand HMI sessions at 1 min is ~17 refreshes/s on a site hub |
-| access-token lifetime default | 15 min | the revocation latency most enterprises accept for routine actions |
+| access-token lifetime default | **1 h** [OWNER] | the owner's call; an installation may set anything between the floor and the ceiling |
 | access-token lifetime ceiling | 12 h | one long shift; longer and a token outlives a shift change |
 | refresh-token lifetime | administrator-set, default 8 h, absolute maximum 30 d | sliding, revocable, only ever presented to the hub |
 
@@ -101,29 +104,34 @@ Put multi-party and reason rules **in the model**, as policy rules the hub evalu
 
 **[OWNER]** The enterprise hub is a hub of hubs. One enterprise hub is required; one site hub per site is recommended; area hubs are possible. Levels follow ISA-95 Part 2 (enterprise → site → area → work centre → process).
 
-Owner's worked example: Whiskey House is one 179-acre site. The Distillery area (7 processes) and the Bottling area (5 processes) each run their own hub; the warehouse serves both.
+Owner's worked example: Whiskey House is one 179-acre site. The Distillery area (7 processes) and the Bottling area (5 processes) each run their own hub; the warehouse serves both. The enterprise hub has spokes of its own (ERP, corporate systems).
 
 ```
 enterprise hub (required)       trust root; identity providers; enterprise directory of subjects,
   │                              roles and assignments; cross-site reporting; complete audit ledger
-  └─ site hub: Whiskey House    issues tokens for the site; replica of the site's assignments;
-       │                         keeps working through a WAN outage; store-and-forward upward
+  ├─ enterprise spokes          ERP, corporate systems; governed by the enterprise hub itself
+  └─ site hub: Whiskey House    home hub of the site's subjects; owns the site's spokes and area hubs;
+       │                         governs and serves the site's data; never waits on the WAN for local work
        ├─ area hub: Distillery  7 processes; its OT, Ignition and MES spokes register here
        ├─ area hub: Bottling    5 processes
        └─ warehouse             shared by both areas (Q14)
 ```
 
-**[PROPOSED] Rules that follow:**
+**[OWNER, round 3]** Each hub (area, site or enterprise) controls the spokes attached directly to it. A user's credentials are associated with one hub; to reach a hub that is not theirs, the user goes through the next-hop hub: an area-hub user reaches another area hub in the same site through the site hub, a site-hub user reaches another site through the enterprise hub. Each hub collects, governs, stores, curates and serves the data of the spokes and hubs attached to it, and serves it to them. Hubs on the same side of the enterprise hub may request data from any hub on that side directly; they cannot reach a hub on the other side directly and must ask the enterprise hub, which handles it. The same structure applies to a one-site, two-area set-up. WAN-outage grace therefore only matters when a user reaches for a hub that is not local to them.
+
+**[PROPOSED] Claude's restatement, for the owner to confirm (Q17–Q19):**
 
 | Concern | Rule |
 |---|---|
-| Trust | one chain: enterprise CA → site intermediate → area-hub and spoke certificates. FB-072 (hub gRPC TLS, done) and FB-063 (callback TLS) take a CA on both ends already; Q11 decides who runs the CA. |
-| Where a decision is made | at the **nearest hub** to the resource (an area hub decides for its processes) against its own replica; an operator action never waits on the enterprise hub. |
-| Where assignments live | authored at the hub whose constraint covers the author (§5 delegation), stored once, replicated **downward** to every hub whose subtree they touch; Q13 covers conflicts and edits made during an outage. |
-| Identity providers | integrated at the enterprise hub; site hubs cache what their subjects need. Local break-glass accounts may exist at a site hub. |
-| Outage | a site hub keeps verifying (offline) and keeps refreshing against its replica for a grace period (Q12); audit and records queue upward (store-and-forward, already a requirement). |
-| Audit | every decision record is written where it was made and forwarded upward: the site hub has it immediately, the enterprise hub eventually and completely. |
-| Shared resources | an ISA-95 node has exactly one owning hub; Q14 picks the pattern for the warehouse. |
+| Trust (PKI) | The hub tree **is** the certificate tree. The enterprise hub holds the root CA and issues an intermediate CA to each site hub; a site hub issues an intermediate to each area hub; every hub issues leaf certificates to its own spokes. Hub-to-hub and spoke-to-hub links are mTLS verified against the enterprise root (FB-063 and FB-072 take a CA on both ends already). Each hub's token-signing key is certified by its parent, so any hub verifies any other hub's tokens offline (R-8) by walking the chain, never by calling the issuer. |
+| Home hub | Every subject has exactly one home hub: where its credentials are associated, where its subject record and sign-in live, and which signs its tokens. Corporate users signing in through OIDC at the enterprise hub are homed there; site users at the site hub; area users at the area hub. |
+| Cross-hub access | Along the tree path, hop by hop, each hop authorizing: the next hop verifies the home-hub token against the chain, checks what the subject may do at the target, and either proxies the session or issues a visitor token for the target hub (Q17). |
+| Where assignments live | At the hub whose resources they cover, stored and governed there like every other datum of that hub. A subject may hold assignments at hubs other than its home hub; they are granted at that hub by a holder of `iam:assignment:grant` there, possibly through the brokered path (Q18). |
+| Where a decision is made | At the hub that owns the resource, against its own store. A local operation never waits on another hub. |
+| Data requests | Direct between hubs in the same site subtree (area ↔ area, area ↔ site); through the enterprise hub across sites; the same rule one level down. A hub answers with what it governs, filtered by the requesting subject's read scopes (R-11). |
+| Outage (resolves Q12) | Local work never depends on the WAN, so there is no grace period to design for it. A non-local hub is simply unreachable while the next hop is down; local break-glass accounts cover administration meanwhile. |
+| Shared resources (resolves Q14) | A resource is attached to exactly one hub: the warehouse to whichever hub it is wired into (the site hub, or one of the area hubs). The other area hub requests its data from the owning hub, which is direct within the site. |
+| Audit | Every decision record is written at the hub that made it. Whether audit and records also flow upward on a schedule, or are only requested on demand, is Q19. |
 
 ## 9. Identity methods for v1 (R-10)
 
@@ -142,7 +150,7 @@ enterprise hub (required)       trust root; identity providers; enterprise direc
 
 ## 11. Presets (A10, clarified): per-module roles are the default (R-12)
 
-"Presets" in Q10 meant only **the role bundles Forge ships**. The owner's reading, that roles are determined per module, is the default: each module ships its domain roles as data (forge-mes: `mes-operator`, `mes-supervisor`, `mes-planner`, `mes-admin`; the OT module: `ot-operator`, `ot-engineer`, `ot-admin`; the hub: `hub-admin`, `hub-auditor`). The "universal ladder" (`viewer < operator < engineer < admin` across all modules) would be an **optional overlay**: four enterprise-wide roles that inherit each module's role of the same rank, for installations that want one simple ladder. Whether the overlay ships in v1 is Q15.
+"Presets" in Q10 meant only **the role bundles Forge ships**. The owner's reading, that roles are determined per module, is the default: each module ships its domain roles as data (forge-mes: `mes-operator`, `mes-supervisor`, `mes-planner`, `mes-admin`; the OT module: `ot-operator`, `ot-engineer`, `ot-admin`; the hub: `hub-admin`, `hub-auditor`). The "universal ladder" (`viewer < operator < engineer < admin` across all modules) would be an **optional overlay**: four enterprise-wide roles that inherit each module's role of the same rank, for installations that want one simple ladder. Whether the overlay ships in v1 is Q20 (Q15 re-asked with context).
 
 ## 12. Migration from today
 
@@ -154,11 +162,11 @@ enterprise hub (required)       trust root; identity providers; enterprise direc
 | spoke session id + callback token | unchanged (channel authentication); acting subject added to requests |
 | hub-issued JWT (`FORGE_JWT_*`) | the access token of §7, now carrying constraints and `iss`/`kid`; verified offline by spokes |
 
-## 13. Open questions (round 3)
+## 13. Open questions (round 4)
 
-- **[OPEN] Q11 PKI:** should Forge run its own certificate authority (the enterprise hub issues and rotates site, area and spoke certificates; no manual PEM handling), or only consume customer-supplied certificates from a corporate PKI? Recommendation: Forge-managed by default, with import of a customer CA or intermediate as an option. FB-072 and FB-063 accept any CA already.
-- **[OPEN] Q12 WAN-outage grace:** how long may a site hub keep refreshing tokens from its replica while the enterprise hub is unreachable? Recommendation: administrator-set, default 72 h; beyond that only local break-glass accounts work, and forge-display shows a "degraded trust" banner throughout.
-- **[OPEN] Q13 assignment storage and conflicts:** (a) a single system of record at the enterprise hub with site hubs forwarding writes (simple, but a site administrator cannot grant during an outage), or (b) writes accepted at any hub within the author's constraint, queued upward, with the enterprise hub resolving conflicts. The site-autonomy requirement points to (b). Recommendation: (b), conflict rule "latest grant wins", both grants audited.
-- **[OPEN] Q14 a resource in two areas:** the warehouse serves Distillery and Bottling. Options: (a) a site-level node owned by the site hub that both area hubs read; (b) an area of its own with its own hub; (c) two nodes, one per area, sharing equipment identity. Recommendation: (a), unless warehouse operations need autonomy from the site hub, then (b).
-- **[OPEN] Q15 ladder overlay:** ship the universal-ladder overlay of §11 in v1, or leave it to custom roles?
-- **[OPEN] Q16 token lifetimes:** confirm the floor, default and ceiling proposed in §7.
+Resolved in round 3: Q11 (the PKI follows the hub tree, restated in §8), Q12 (no WAN grace for local work; a non-local hub needs the next hop), Q13 (each hub stores and governs its own; direct within a site, through the enterprise hub across sites), Q14 (one owning hub per resource; the other hub requests), Q16 (lifetime range confirmed, default 1 h).
+
+- **[OPEN] Q17 cross-hub access, proxy or exchange:** when a site-hub user reaches another site through the enterprise hub, is the enterprise hub in the data path for the whole session (**proxy**: simple, one choke point, a WAN blip drops the session), or does it only authorize and issue a visitor token for the target hub, after which the client talks to that hub directly (**exchange**: the hop leaves the data path once the grant is made)? Recommendation: exchange, with the visitor token living as long as an access token and re-issued through the same hop.
+- **[OPEN] Q18 assignments away from home:** confirm that a subject may hold assignments at hubs other than its home hub, stored at those hubs and granted there by a holder of `iam:assignment:grant` at that hub (an enterprise administrator reaches a site hub through the brokered path to grant). If instead every assignment had to live at the home hub, the home hub would need to know every other hub's resources, which contradicts "each hub governs its own".
+- **[OPEN] Q19 request versus replicate:** does the enterprise hub only *request* site data when asked (federation on demand), or do audit records and selected data sets also flow upward on a schedule (store-and-forward), so that enterprise reporting and the complete audit ledger survive a site being offline? Recommendation: audit records always flow upward; everything else on demand unless a site opts a data set into replication.
+- **[OPEN] Q20 ladder overlay (Q15 with context):** "shipping the ladder" means Forge ships four generic roles (`viewer`, `operator`, `engineer`, `admin`) that inherit every installed module's role of the same rank, so a small site assigns one role per person instead of one per module; the cost is coarse grants (an `operator` gets MES, OT and CMMS operator rights at once). "Custom" means each installation composes its own cross-module roles from the per-module ones (§11). Recommendation: ship the ladder as an optional preset, off by default, chosen at setup; it is data, so there is no engine cost either way.
