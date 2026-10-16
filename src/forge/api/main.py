@@ -49,6 +49,7 @@ from forge.ingest import IngestPipeline, build_pipeline_from_storage
 from forge.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
+from forge.transport.grpc_server import ServerTls
 from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
 from forge.transport.spoke_client import ChannelTls
 from forge.transport.spoke_pull import SubscriptionManager, backfill_into_pipeline
@@ -208,9 +209,13 @@ def create_app(
     health_orch.register("redis", partial(check_redis, config.redis.url))
     health_orch.register("kafka", partial(check_kafka, config.kafka.bootstrap_servers))
 
-    # gRPC server (lazy start — only if spoke transport is enabled)
+    # gRPC server (lazy start — only if spoke transport is enabled). TLS for the
+    # spoke → hub direction comes from FORGE_GRPC_TLS_CERT/_KEY (+ _CA for mTLS);
+    # FORGE_GRPC_REQUIRE_TLS refuses plaintext (FB-072).
     grpc_server = None
     grpc_port = int(os.getenv("FORGE_GRPC_PORT", "50051"))
+    grpc_tls = ServerTls.from_env()
+    grpc_require_tls = os.getenv("FORGE_GRPC_REQUIRE_TLS", "false").lower() == "true"
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -242,9 +247,16 @@ def create_app(
                     ingest_log=registry.log_batch,
                 )
                 runtime["servicer"] = servicer
-                grpc_server = GrpcServer(servicer, port=grpc_port)
+                grpc_server = GrpcServer(
+                    servicer, port=grpc_port, tls=grpc_tls, require_tls=grpc_require_tls
+                )
                 actual_port = await grpc_server.start()
+                app.state.grpc_server = grpc_server
                 logger.info("gRPC server started on port %d", actual_port)
+            except RuntimeError:
+                # A TLS requirement that cannot be met is a configuration error:
+                # fail the start-up instead of silently running without spokes.
+                raise
             except Exception:
                 logger.exception("Failed to start gRPC server — spoke transport disabled")
                 grpc_server = None
@@ -284,6 +296,7 @@ def create_app(
     app.state.adapter_registry = registry
     app.state.write_dispatcher = dispatcher
     app.state.subscriptions = subscriptions
+    app.state.grpc_server = None
     app.state.ot_module = None
     if ot_host is not None:
         ot_host.mount(app)
@@ -530,6 +543,10 @@ def create_app(
             "version": "0.1.0",
             "grpc_port": grpc_port,
             "grpc_enabled": os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true",
+            "grpc_tls": {
+                **(grpc_tls.describe() if grpc_tls is not None else {"enabled": False}),
+                "required": grpc_require_tls,
+            },
             "adapters_registered": len(registry.list_all()),
             "adapter_registry": registry.describe(),
             "ot_module": ot_host.status() if ot_host is not None else None,

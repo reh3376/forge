@@ -20,7 +20,10 @@ Serialization: Compiled stubs via grpcio-tools (not hand-rolled JSON)
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -40,6 +43,55 @@ from forge.transport.proto_bridge import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class ServerTls:
+    """TLS material for the hub's gRPC listener (spoke → hub direction, FB-072).
+
+    ``cert_path`` + ``key_path`` serve the port; ``ca_path`` makes the hub
+    require a client certificate signed by that CA (mTLS) unless
+    ``require_client_cert`` says otherwise. Built from ``<prefix>_CERT`` /
+    ``_KEY`` / ``_CA`` by :meth:`from_env`. Pairs with the spoke side's
+    ``FORGE_HUB_TLS_*`` (NestJS backend) and ``ChannelTls`` (Python spokes).
+    """
+
+    cert_path: str
+    key_path: str
+    ca_path: str | None = None
+    require_client_cert: bool | None = None
+
+    @classmethod
+    def from_env(cls, prefix: str = "FORGE_GRPC_TLS") -> ServerTls | None:
+        cert = os.getenv(f"{prefix}_CERT", "").strip() or None
+        key = os.getenv(f"{prefix}_KEY", "").strip() or None
+        ca = os.getenv(f"{prefix}_CA", "").strip() or None
+        if cert is None and key is None:
+            return None
+        if cert is None or key is None:
+            msg = f"{prefix}_CERT and {prefix}_KEY must both be set for a TLS gRPC server"
+            raise ValueError(msg)
+        raw = os.getenv(f"{prefix}_REQUIRE_CLIENT_CERT", "").strip().lower()
+        require = None if raw == "" else raw in ("1", "true", "yes", "on")
+        return cls(cert_path=cert, key_path=key, ca_path=ca, require_client_cert=require)
+
+    @property
+    def mtls(self) -> bool:
+        return bool(self.ca_path) if self.require_client_cert is None else self.require_client_cert
+
+    def credentials(self) -> grpc.ServerCredentials:
+        if self.mtls and not self.ca_path:
+            msg = "require_client_cert needs ca_path to verify client certificates against"
+            raise ValueError(msg)
+        cert = Path(self.cert_path).read_bytes()
+        key = Path(self.key_path).read_bytes()
+        ca = Path(self.ca_path).read_bytes() if self.ca_path else None
+        return grpc.ssl_server_credentials(
+            [(key, cert)], root_certificates=ca, require_client_auth=self.mtls
+        )
+
+    def describe(self) -> dict[str, Any]:
+        return {"enabled": True, "mtls": self.mtls, "ca": bool(self.ca_path)}
 
 
 class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
@@ -80,7 +132,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(exc))
             return service_msg.RegisterResponse(
-                accepted=False, message=str(exc),
+                accepted=False,
+                message=str(exc),
             )
 
     async def Configure(
@@ -92,7 +145,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         try:
             params = dict(request.params)
             result = await self._servicer.configure(
-                request.adapter_id, request.session_id, params,
+                request.adapter_id,
+                request.session_id,
+                params,
             )
             return service_msg.ConfigureResponse(
                 success=result.get("success", False),
@@ -103,7 +158,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(exc))
             return service_msg.ConfigureResponse(
-                success=False, message=str(exc),
+                success=False,
+                message=str(exc),
             )
 
     async def Start(
@@ -114,7 +170,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         """Start an adapter."""
         try:
             result = await self._servicer.start(
-                request.adapter_id, request.session_id,
+                request.adapter_id,
+                request.session_id,
             )
             return service_msg.StartResponse(
                 success=result.get("success", False),
@@ -125,7 +182,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(exc))
             return service_msg.StartResponse(
-                success=False, message=str(exc),
+                success=False,
+                message=str(exc),
             )
 
     async def Stop(
@@ -136,7 +194,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         """Stop an adapter."""
         try:
             result = await self._servicer.stop(
-                request.adapter_id, request.session_id, request.graceful,
+                request.adapter_id,
+                request.session_id,
+                request.graceful,
             )
             return service_msg.StopResponse(
                 success=result.get("success", False),
@@ -148,7 +208,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(exc))
             return service_msg.StopResponse(
-                success=False, message=str(exc),
+                success=False,
+                message=str(exc),
             )
 
     async def Health(
@@ -159,7 +220,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         """Return adapter health status."""
         try:
             result_dict = await self._servicer.health(
-                request.adapter_id, request.session_id,
+                request.adapter_id,
+                request.session_id,
             )
             # result_dict is already a proto-compatible dict from hub_server
             # Convert it to a proper proto message via the Pydantic model
@@ -199,7 +261,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
                 context.set_details("No active sessions")
                 return service_msg.IngestResponse(
-                    records_received=0, success=False,
+                    records_received=0,
+                    success=False,
                     message="No active sessions",
                 )
 
@@ -220,17 +283,23 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 message = str(await end_hook(session_id))
             logger.info(
                 "Ingest stream completed: %d records from session %s (%s)",
-                count, session_id, message,
+                count,
+                session_id,
+                message,
             )
             return service_msg.IngestResponse(
-                records_received=count, success=True, message=message,
+                records_received=count,
+                success=True,
+                message=message,
             )
         except Exception as exc:
             logger.exception("Ingest RPC failed after %d records", count)
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(exc))
             return service_msg.IngestResponse(
-                records_received=count, success=False, message=str(exc),
+                records_received=count,
+                success=False,
+                message=str(exc),
             )
 
 
@@ -254,12 +323,30 @@ class GrpcServer:
         servicer: AdapterServiceServicer,
         port: int = 50051,
         host: str = "[::]",
+        *,
+        tls: ServerTls | None = None,
+        require_tls: bool = False,
     ) -> None:
+        """Args: tls — serve the port with TLS/mTLS (plaintext when None);
+        require_tls — refuse to start in plaintext (production guard)."""
         self._servicer = servicer
         self._port = port
         self._host = host
+        self._tls = tls
+        self._require_tls = require_tls
         self._server: grpc.aio.Server | None = None
         self._proto_servicer = ForgeAdapterServiceServicer(servicer)
+
+    @property
+    def tls(self) -> ServerTls | None:
+        return self._tls
+
+    def describe(self) -> dict[str, Any]:
+        return {
+            "address": self.address,
+            "require_tls": self._require_tls,
+            "tls": self._tls.describe() if self._tls is not None else {"enabled": False},
+        }
 
     @property
     def port(self) -> int:
@@ -274,15 +361,38 @@ class GrpcServer:
 
         If port=0, the OS assigns a free port (useful for testing).
         """
+        if self._tls is None and self._require_tls:
+            msg = (
+                "gRPC server refuses to start in plaintext: FORGE_GRPC_REQUIRE_TLS is on but "
+                "FORGE_GRPC_TLS_CERT/_KEY are not set"
+            )
+            raise RuntimeError(msg)
         self._server = grpc.aio.server()
         # Use compiled stub registration — proper protobuf serializers
         service_grpc.add_AdapterServiceServicer_to_server(
-            self._proto_servicer, self._server,
+            self._proto_servicer,
+            self._server,
         )
-        actual_port = self._server.add_insecure_port(f"{self._host}:{self._port}")
+        address = f"{self._host}:{self._port}"
+        if self._tls is not None:
+            actual_port = self._server.add_secure_port(address, self._tls.credentials())
+        else:
+            actual_port = self._server.add_insecure_port(address)
+            logger.warning(
+                "gRPC server on %s is plaintext; set FORGE_GRPC_TLS_CERT/_KEY (and _CA for mTLS)",
+                address,
+            )
         self._port = actual_port
         await self._server.start()
-        logger.info("gRPC server started on port %d (protobuf binary)", actual_port)
+        logger.info(
+            "gRPC server started on port %d (protobuf binary, %s)",
+            actual_port,
+            "mTLS"
+            if self._tls is not None and self._tls.mtls
+            else "TLS"
+            if self._tls
+            else "plaintext",
+        )
         return actual_port
 
     async def stop(self, grace: float = 5.0) -> None:

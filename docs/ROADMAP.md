@@ -51,7 +51,7 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 
 | Item | Status | Notes |
 |---|---|---|
-| FB-072 hub gRPC server TLS (spoke → hub direction) | Not started — **next up** | Pairs with the backend's existing `FORGE_HUB_TLS_*` client config. |
+| FB-072 hub gRPC server TLS (spoke → hub direction) | Done 2026-10-16 | `FORGE_GRPC_TLS_*`, `FORGE_GRPC_REQUIRE_TLS`; both gRPC directions can now be mTLS under one CA. |
 | FB-071 `Collect` snapshot, FACTS entry for the audit-log replay, tag filter pushed into the query | Not started | Low. |
 | FB-055 cross-language contract test (real Python hub ↔ real NestJS/Go spoke in CI) | Not started | Becomes the acceptance test for the Go rewrite. |
 | FB-056 dead-letter sink for exhausted ingest batches | Not started | FACTS names it; today it is a counter + log. |
@@ -145,7 +145,7 @@ FB-024 README counts and placeholder row, FB-025 phase numbering, FB-027 stale r
 
 ## 4. Proposed sequence
 
-1. Merge the backlog PR; land **FB-072** (hub gRPC TLS) — closes the transport security story on both directions.
+1. ~~Merge the backlog PR; land **FB-072**~~ — done 2026-10-16; both gRPC directions can be mTLS.
 2. Decision session (section 5): role model, FVTS questions, forge-mes Go design, module SDK shape.
 3. **FB-076 design doc** (scope, data ownership, hub link, what the bridge keeps doing meanwhile); owner sign-off.
 4. **Module SDK Go scaffold** (WS-7) — the first consumer is the Go forge-mes.

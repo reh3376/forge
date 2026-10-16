@@ -293,6 +293,19 @@ reports `spoke.backfill` (runs, rows scanned, records streamed) and
 Retry, circuit-breaker and degradation thresholds are constants taken from
 the FACTS spec (`error_handling`) and are not environment-tunable on purpose.
 
+### Hub side (forge-core)
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `FORGE_GRPC_TLS_CERT` / `_KEY` | unset (plaintext) | Serve the hub's gRPC port (spoke → hub: Register/Configure/Ingest/Health) with TLS (FB-072). Pair with the spoke's `FORGE_HUB_TLS_CA`. |
+| `FORGE_GRPC_TLS_CA` | unset | Trust root for client certificates; when set the hub requires a client certificate (mTLS) from every spoke (`FORGE_HUB_TLS_CERT/_KEY` on the spoke). `FORGE_GRPC_TLS_REQUIRE_CLIENT_CERT=false` keeps the CA for verification only. |
+| `FORGE_GRPC_REQUIRE_TLS` | `false` | Refuse to start the gRPC listener in plaintext (production guard; start-up fails loudly). |
+| `FORGE_SPOKE_TLS_CA` / `_CERT` / `_KEY` | unset | The hub → spoke callback channel (FB-063): trust the spoke's certificate, present a client certificate for mTLS. |
+| `FORGE_AUTH_ENABLED`, `FORGE_API_KEYS`, `FORGE_JWT_*` | off | Hub REST auth; the write/backfill/subscription endpoints need `adapters:write` once enabled. |
+
+With a per-site PKI (roadmap A-7 hubs) the same CA signs the hub's and every
+spoke's certificate, so both directions are mTLS under one trust root.
+
 ## Running against a local hub
 
 ```bash

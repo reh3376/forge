@@ -231,6 +231,11 @@ services:
       FORGE_API_PORT: "8000"
       FORGE_GRPC_PORT: "50051"
       FORGE_GRPC_ENABLED: "true"
+      # TLS for the gRPC listener (FB-072): mount PEM files and set these; add _CA for mTLS.
+      # FORGE_GRPC_TLS_CERT: /run/secrets/forge-hub.pem
+      # FORGE_GRPC_TLS_KEY: /run/secrets/forge-hub.key
+      # FORGE_GRPC_TLS_CA: /run/secrets/forge-ca.pem
+      # FORGE_GRPC_REQUIRE_TLS: "true"
       # Features
       FORGE_AUTH_ENABLED: "false"
       FORGE_JWT_SECRET: "${FORGE_JWT_SECRET:-forge-dev-secret-do-not-use-in-prod}"
