@@ -52,7 +52,11 @@ from forge.storage.factory import StorageFactory  # noqa: TC001
 from forge.transport.grpc_server import ServerTls
 from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
 from forge.transport.spoke_client import ChannelTls
-from forge.transport.spoke_pull import SubscriptionManager, backfill_into_pipeline
+from forge.transport.spoke_pull import (
+    SubscriptionManager,
+    backfill_into_pipeline,
+    collect_into_pipeline,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +104,13 @@ class BackfillRequestModel(BaseModel):
     start_time: datetime
     end_time: datetime
     tags: list[str] = Field(default_factory=list)
+    max_records: int = Field(default=0, ge=0)
+    batch_size: int = Field(default=100, ge=1, le=10_000)
+
+
+class CollectRequestModel(BaseModel):
+    """Pull what a spoke has queued for push into the ingest pipeline (FB-071)."""
+
     max_records: int = Field(default=0, ge=0)
     batch_size: int = Field(default=100, ge=1, le=10_000)
 
@@ -489,6 +500,35 @@ def create_app(
                 max_records=request.max_records,
                 manifest=manifest,
                 batch_size=request.batch_size,
+                on_batch=registry.log_batch,
+            )
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return outcome.to_dict()
+
+    @app.post("/v1/adapters/{adapter_id}/collect")
+    async def collect_adapter(
+        adapter_id: str,
+        request: CollectRequestModel | None = None,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
+        """Pull the records the spoke has queued for push (``Collect``, FB-071).
+
+        The spoke hands each record over once; batches are ingested like
+        pushed ones and logged under session ``collect``.
+        """
+        manifest = registry.get_manifest(adapter_id)
+        if manifest is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not registered")
+        options = request or CollectRequestModel()
+        try:
+            outcome = await collect_into_pipeline(
+                dispatcher,
+                pipeline,
+                adapter_id=adapter_id,
+                max_records=options.max_records,
+                manifest=manifest,
+                batch_size=options.batch_size,
                 on_batch=registry.log_batch,
             )
         except WriteDispatchError as exc:

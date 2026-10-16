@@ -15,7 +15,8 @@
  * range (ForgeBackfillService) as a server stream; `Subscribe` mirrors the
  * ingest queue to the hub as a server stream (the subscription id travels in
  * the initial metadata `subscription-id`) until `Unsubscribe` or the hub
- * cancels. `Collect` and the hub-hosted half stay UNIMPLEMENTED.
+ * cancels. `Collect` (FB-071) hands the hub what is queued for push, once,
+ * and removes it from the queue; only the hub-hosted half stays UNIMPLEMENTED.
  */
 import * as grpc from "@grpc/grpc-js";
 import * as crypto from "crypto";
@@ -62,6 +63,8 @@ export interface SpokeServerStatus {
   lastError?: string;
   /** Pull RPCs (FB-061). */
   backfill: BackfillStatus & { streams: number; recordsStreamed: number };
+  /** One-shot hand-over of the push queue (FB-071). */
+  collect: { streams: number; recordsStreamed: number };
   subscriptions: SubscriptionStatus[];
 }
 
@@ -94,15 +97,8 @@ function safeEqual(a: string, b: string): boolean {
   return left.length === right.length && crypto.timingSafeEqual(left, right);
 }
 
-/** RPCs this server does not implement (the hub-hosted half and Collect). */
-const UNSERVED_RPCS = [
-  "Register",
-  "Configure",
-  "Start",
-  "Stop",
-  "Ingest",
-  "Collect",
-] as const;
+/** RPCs this server does not implement (the hub-hosted half). */
+const UNSERVED_RPCS = ["Register", "Configure", "Start", "Stop", "Ingest"] as const;
 
 type BackfillRequestWire = {
   adapter_id?: string;
@@ -117,6 +113,12 @@ type SubscribeRequestWire = {
   adapter_id?: string;
   session_id?: string;
   tags?: string[];
+};
+
+type CollectRequestWire = {
+  adapter_id?: string;
+  session_id?: string;
+  max_batch_size?: number | string;
 };
 
 interface LiveSubscription {
@@ -200,6 +202,8 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
   readonly callbackToken: string;
   private backfillStreams = 0;
   private backfillRecords = 0;
+  private collectStreams = 0;
+  private collectRecords = 0;
   private subscriptionSeq = 0;
   private readonly subscriptions = new Map<string, LiveSubscription>();
 
@@ -323,6 +327,7 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
         streams: this.backfillStreams,
         recordsStreamed: this.backfillRecords,
       },
+      collect: { streams: this.collectStreams, recordsStreamed: this.collectRecords },
       subscriptions: [...this.subscriptions.values()].map((s) => ({
         id: s.id,
         tags: [...s.tags],
@@ -356,6 +361,9 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       },
       Subscribe: (call: grpc.ServerWritableStream<SubscribeRequestWire, unknown>) => {
         this.handleSubscribe(call);
+      },
+      Collect: (call: grpc.ServerWritableStream<CollectRequestWire, unknown>) => {
+        this.handleCollect(call);
       },
     };
     for (const name of UNSERVED_RPCS) {
@@ -466,6 +474,34 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       call.end();
     } catch (err) {
       this.backfillRecords += sent;
+      call.emit("error", this.toServiceError(err));
+    }
+  }
+
+  /**
+   * `Collect` (FB-071): a one-shot hand-over of everything queued for push,
+   * capped by `max_batch_size`. Records leave the push queue when taken, so
+   * the hub sees each one once; whatever the stream could not deliver goes
+   * back to the head of the queue.
+   */
+  private handleCollect(call: grpc.ServerWritableStream<CollectRequestWire, unknown>): void {
+    let pending: ContextualRecordMessage[] = [];
+    let sent = 0;
+    try {
+      this.assertSession(call.request, call.metadata);
+      this.collectStreams++;
+      pending = this.ingest.take(Number(call.request.max_batch_size ?? 0) || 0);
+      while (pending.length && !call.cancelled) {
+        call.write(pending[0]);
+        pending.shift();
+        sent++;
+      }
+      this.collectRecords += sent;
+      this.ingest.restore(pending);
+      call.end();
+    } catch (err) {
+      this.collectRecords += sent;
+      this.ingest.restore(pending);
       call.emit("error", this.toServiceError(err));
     }
   }

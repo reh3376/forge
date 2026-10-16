@@ -31,8 +31,8 @@ MES backend (NestJS)                                forge-core hub (Python)
 * **Write-back.** The backend also hosts the spoke half (`Write`, `Discover`,
   `Health`) on its own port and tells the hub where in `Configure`
   (`grpc_callback_url`); see [Write-back](#write-back-hub--spoke). The pull
-  RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) are not served
-  (FB-061).
+  RPCs (`Backfill`, `Subscribe`, `Unsubscribe`, `Collect`) are served on the
+  same port (FB-061, FB-071).
 * The hub-side Python adapter (`forge.adapters.forge_mes`) keeps the pull
   contract (GraphQL + RabbitMQ + MQTT) and the same FACTS spec; both paths
   produce identical record shapes.
@@ -260,10 +260,10 @@ Python adapter's GraphQL path:
 
 | RPC | Spoke | Hub |
 |---|---|---|
-| `Backfill(start, end, tags, max_records)` → stream | `ForgeBackfillService.replay()`: `AuditLog` rows in the range, mapped like live events (`audit.create` / `audit.update` / `audit.delete`, `extra.replay = backfill`, `extra.audit_log_id`), cursor-paged, tag filter on `source.tag_path` | `POST /v1/adapters/{id}/backfill {start_time, end_time, tags, max_records, batch_size}` → batches into the ingest pipeline, one `records_log` row per batch (session `backfill`) |
+| `Backfill(start, end, tags, max_records)` → stream | `ForgeBackfillService.replay()`: `AuditLog` rows in the range, mapped like live events (`audit.create` / `audit.update` / `audit.delete`, `extra.replay = backfill`, `extra.audit_log_id`), cursor-paged, tag filter pushed into the `entityType` predicate (FB-071) and re-checked on `source.tag_path` | `POST /v1/adapters/{id}/backfill {start_time, end_time, tags, max_records, batch_size}` → batches into the ingest pipeline, one `records_log` row per batch (session `backfill`) |
 | `Subscribe(tags)` → stream | `ForgeIngestService.onRecord` mirror; subscription id in the initial metadata `subscription-id`; ends on `Unsubscribe` or cancel | `POST /v1/adapters/{id}/subscriptions {tags}` → background task feeding the pipeline (`subscription:<id>` log rows); `GET` lists, `DELETE .../{sid}` unsubscribes and flushes; `GET /v1/subscriptions` |
 | `Unsubscribe(subscription_id)` | ends the stream | used by `DELETE` |
-| `Collect` | UNIMPLEMENTED (FB-071) | `send_stream("Collect")` still maps to Ingest |
+| `Collect(max_batch_size)` → stream | one-shot hand-over of the push queue (FB-071): records leave `ForgeIngestService`'s queue as they are streamed, so each reaches the hub once (Collect or the next push, never both); whatever a failed stream did not deliver goes back to the head of the queue | `POST /v1/adapters/{id}/collect {max_records, batch_size}` → batches into the pipeline (session `collect`); the spoke → hub `send_stream("Collect")` alias still maps to Ingest |
 
 Both carry the hub-issued session id like `Write`; `GET /api/forge/status`
 reports `spoke.backfill` (runs, rows scanned, records streamed) and
@@ -380,7 +380,7 @@ security on shared tables, and the 2026 Q4 timing in the framework roadmap.
 | Durable adapter registry and ingest audit log on the hub | FB-060 (done) |
 | Hub → spoke write-back (`Write`/`Discover`/`Health` served by the backend; changeover commands as tags) | FB-054 (done) |
 | Pull RPCs (`Collect`, `Subscribe`, `Unsubscribe`, `Backfill`) on the spoke | FB-061 (done) |
-| Collect snapshot, FACTS entry for the replay source, tag filter pushed into the query | FB-071 |
+| Collect hand-over, FACTS entry for the replay source, tag filter pushed into the query | FB-071 (code done; FACTS entry awaiting owner approval) |
 | OT module drives the changeover sequence (`ChangeoverOrchestrator`) | FB-062 (done) |
 | CIP runner + OT composition root (orchestrator wired into the OT adapter lifecycle) | FB-065 (done) |
 | PLC connections for the hosted OT module (OPC-UA providers behind `RegistryTagIO`) | FB-069 (done) |

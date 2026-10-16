@@ -102,8 +102,8 @@ class TransportChannel(ABC):
     def receive_stream(
         self, method: str, request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
-        """Open a server-streaming RPC (``Backfill``, ``Subscribe``) and yield
-        response dicts (FB-061).
+        """Open a server-streaming RPC (``Backfill``, ``Subscribe``, ``Collect``)
+        and yield response dicts (FB-061, FB-071).
 
         For ``Subscribe`` the first item is a control dict
         ``{"subscription_id": ...}``; every later item is a record dict.
@@ -333,8 +333,8 @@ class InMemoryChannel(TransportChannel):
     async def receive_stream(
         self, method: str, request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
-        """Backfill / Subscribe against a fake spoke exposing ``backfill()`` /
-        ``subscribe()`` async generators (FB-061)."""
+        """Backfill / Subscribe / Collect against a fake spoke exposing
+        ``backfill()`` / ``subscribe()`` / ``collect()`` async generators."""
         if self._closed:
             msg = "Channel is closed"
             raise RuntimeError(msg)
@@ -358,6 +358,16 @@ class InMemoryChannel(TransportChannel):
                 raise ValueError(msg)
             stream = handler(
                 request["adapter_id"], request["session_id"], list(request.get("tags") or [])
+            )
+        elif method == "Collect":
+            handler = getattr(self._servicer, "collect", None)
+            if handler is None:
+                msg = "Servicer does not serve Collect"
+                raise ValueError(msg)
+            stream = handler(
+                request["adapter_id"],
+                request["session_id"],
+                int(request.get("max_batch_size") or 0),
             )
         else:
             msg = f"Server streaming not implemented for method: {method}"

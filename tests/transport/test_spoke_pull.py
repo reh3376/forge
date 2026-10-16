@@ -31,9 +31,11 @@ from forge.transport.spoke_callback import CALLBACK_PARAM, WriteDispatcher, Writ
 from forge.transport.spoke_client import InMemoryChannel
 from forge.transport.spoke_pull import (
     BACKFILL_SESSION,
+    COLLECT_SESSION,
     PullOutcome,
     SubscriptionManager,
     backfill_into_pipeline,
+    collect_into_pipeline,
 )
 
 MANIFEST_PATH = (
@@ -85,6 +87,7 @@ class FakeSpoke:
         self.down = False
         self.explode_mid_stream = False
         self.seq = 0
+        self.queued: list[ContextualRecord] = []
 
     async def backfill(self, adapter_id, session_id, tags, start, end, max_records):
         if self.down:
@@ -105,6 +108,18 @@ class FakeSpoke:
                 msg = "database went away"
                 raise RuntimeError(msg)
             yield pydantic_to_proto(record(i))
+
+    async def collect(self, adapter_id, session_id, max_batch_size):
+        if self.down:
+            msg = "spoke down"
+            raise ConnectionError(msg)
+        self.calls.append(
+            {"collect": True, "session_id": session_id, "max_batch_size": max_batch_size}
+        )
+        n = max_batch_size or len(self.queued)
+        taken, self.queued = self.queued[:n], self.queued[n:]
+        for rec in taken:
+            yield pydantic_to_proto(rec)
 
     async def subscribe(self, adapter_id, session_id, tags):
         if self.down:
@@ -187,6 +202,46 @@ async def test_backfill_streams_batches_into_the_pipeline() -> None:
     assert call["session_id"] == "sess-1" and call["tags"] == ["mes.backend"]
     assert call["start"] == T0 and call["max_records"] == 5
     assert outcome.to_dict()["errors"] == []
+
+
+async def test_collect_pulls_the_spoke_queue_once() -> None:
+    spoke = FakeSpoke()
+    spoke.queued = [record(i) for i in range(5)]
+    dispatcher = dispatcher_for(spoke)
+    sink = InMemoryRecordSink()
+    pipeline = IngestPipeline(fallback_sink=sink)
+    logged: list[str] = []
+
+    async def on_batch(adapter_id, session, outcome):
+        logged.append(session)
+
+    outcome = await collect_into_pipeline(
+        dispatcher,
+        pipeline,
+        adapter_id="forge-mes",
+        max_records=3,
+        manifest=MANIFEST,
+        batch_size=2,
+        on_batch=on_batch,
+    )
+    assert (outcome.received, outcome.persisted, outcome.batches) == (3, 3, 2)
+    assert outcome.mode == "collect" and outcome.completed_at is not None
+    assert logged == [COLLECT_SESSION] * 2 and len(sink) == 3
+    assert spoke.calls[0] == {"collect": True, "session_id": "sess-1", "max_batch_size": 3}
+    assert len(spoke.queued) == 2  # handed over once: the spoke no longer holds them
+
+    rest = await collect_into_pipeline(
+        dispatcher, pipeline, adapter_id="forge-mes", manifest=MANIFEST
+    )
+    assert rest.received == 2 and spoke.queued == [] and len(sink) == 5
+    empty = await collect_into_pipeline(
+        dispatcher, pipeline, adapter_id="forge-mes", manifest=MANIFEST
+    )
+    assert (empty.received, empty.batches) == (0, 0) and empty.completed_at is not None
+
+    spoke.down = True
+    with pytest.raises(WriteDispatchError):
+        await collect_into_pipeline(dispatcher, pipeline, adapter_id="forge-mes", manifest=MANIFEST)
 
 
 async def test_backfill_failures_surface_but_keep_what_landed() -> None:
@@ -303,6 +358,7 @@ def test_pull_outcome_accumulates() -> None:
 class PullStub(service_grpc.AdapterServiceServicer):
     def __init__(self) -> None:
         self.backfill_requests: list[service_msg.BackfillRequest] = []
+        self.collect_requests: list[service_msg.CollectRequest] = []
         self.queue: asyncio.Queue[ContextualRecord | None] = asyncio.Queue()
         self.unsubscribed: list[str] = []
 
@@ -310,6 +366,11 @@ class PullStub(service_grpc.AdapterServiceServicer):
         self.backfill_requests.append(request)
         for i in range(request.max_records or 3):
             yield contextual_record_to_proto(record(i))
+
+    async def Collect(self, request, context):  # noqa: N802
+        self.collect_requests.append(request)
+        for i in range(request.max_batch_size or 2):
+            yield contextual_record_to_proto(record(10 + i))
 
     async def Subscribe(self, request, context):  # noqa: N802
         await context.send_initial_metadata((("subscription-id", "sub-7"),))
@@ -362,4 +423,9 @@ async def test_live_backfill_and_subscription(pull_server) -> None:
     assert (await dispatcher.unsubscribe("forge-mes", sid))["success"] is True
     assert stub.unsubscribed == ["sub-7"]
     assert await anext(stream, None) is None  # the spoke ended the stream
+
+    pulled = [r async for r in dispatcher.collect("forge-mes", max_records=3)]
+    assert [r.value.raw["i"] for r in pulled] == [10, 11, 12]
+    req = stub.collect_requests[0]
+    assert req.max_batch_size == 3 and req.session_id == "expected"
     await dispatcher.close()

@@ -249,18 +249,16 @@ describe("ForgeSpokeServer", () => {
     expect(Number(health.last_healthy.seconds)).toBe(Math.floor(Date.parse("2026-06-01T12:00:00Z") / 1000));
   });
 
-  it("answers the hub-hosted and pull RPCs with UNIMPLEMENTED", async () => {
+  it("answers the hub-hosted RPCs with UNIMPLEMENTED", async () => {
     await expect(call(client, "Register", { manifest: {} })).rejects.toMatchObject({
       code: grpc.status.UNIMPLEMENTED,
       details: "forge-mes spoke does not serve Register",
     });
-    await new Promise<void>((resolve, reject) => {
-      const stream = client.Collect({ adapter_id: "forge-mes", session_id: "sess-1" });
-      stream.on("data", () => reject(new Error("unexpected data")));
-      stream.on("error", (err: grpc.ServiceError) => {
-        expect(err.code).toBe(grpc.status.UNIMPLEMENTED);
-        resolve();
-      });
+    await expect(
+      call(client, "Stop", { adapter_id: "forge-mes", session_id: "sess-1" })
+    ).rejects.toMatchObject({
+      code: grpc.status.UNIMPLEMENTED,
+      details: "forge-mes spoke does not serve Stop",
     });
     expect(server.getStatus().unimplementedCalls).toBe(2);
     expect(server.getStatus()).toMatchObject({ enabled: true, listening: true, bind: "127.0.0.1:0", expectedSession: "sess-1" });
@@ -313,6 +311,7 @@ describe("ForgeSpokeServer pull RPCs", () => {
   type Listener = (record: any) => void;
   const listeners = new Set<Listener>();
   const ingest = {
+    queue: [] as any[],
     getStatus: () => ({ sessionId: "sess-1", recordsSent: 0, recordsDeadLettered: 0, recordsDroppedQueueFull: 0 }),
     onRecord(listener: Listener) {
       listeners.add(listener);
@@ -320,6 +319,12 @@ describe("ForgeSpokeServer pull RPCs", () => {
     },
     emit(record: any) {
       for (const l of listeners) l(record);
+    },
+    take(limit: number) {
+      return ingest.queue.splice(0, limit > 0 ? limit : ingest.queue.length);
+    },
+    restore(records: any[]) {
+      ingest.queue.unshift(...records);
     },
   };
   const opts = { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01" };
@@ -389,6 +394,28 @@ describe("ForgeSpokeServer pull RPCs", () => {
     expect(records[0].value.typed_value).toBe("json_value");
     expect(backfill.ranges[0]).toMatchObject({ start, end, tags: ["mes.backend"], maxRecords: 2 });
     expect(server.getStatus().backfill).toMatchObject({ enabled: true, streams: 1, recordsStreamed: 2 });
+  });
+
+  it("serves Collect as a one-shot hand-over of the push queue", async () => {
+    server.setExpectedSession("sess-1");
+    ingest.queue.push(...replayed);
+    await expect(
+      readAll(client.Collect({ adapter_id: "forge-mes", session_id: "nope" }, META))
+    ).rejects.toMatchObject({ code: grpc.status.PERMISSION_DENIED });
+    expect(ingest.queue).toHaveLength(3); // a stranger drains nothing
+
+    const first = await readAll(
+      client.Collect({ adapter_id: "forge-mes", session_id: "sess-1", max_batch_size: 2 }, META)
+    );
+    expect(first.map((r: any) => JSON.parse(r.value.json_value).id)).toEqual(["so-1", "so-2"]);
+    expect(first[0].source.tag_path).toBe("mes.backend.scheduleorder");
+    expect(ingest.queue).toHaveLength(1); // handed over once: no longer queued for push
+
+    const rest = await readAll(client.Collect({ adapter_id: "forge-mes", session_id: "sess-1" }, META));
+    expect(rest.map((r: any) => JSON.parse(r.value.json_value).id)).toEqual(["so-3"]);
+    expect(ingest.queue).toHaveLength(0);
+    expect(await readAll(client.Collect({ adapter_id: "forge-mes", session_id: "sess-1" }, META))).toEqual([]);
+    expect(server.getStatus().collect).toEqual({ streams: 3, recordsStreamed: 3 });
   });
 
   it("answers Backfill with UNIMPLEMENTED when no source is wired", async () => {

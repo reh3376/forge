@@ -183,6 +183,19 @@ class SpokeCallbackClient:
         async for item in stream:
             yield proto_to_pydantic(item, "ContextualRecord")
 
+    async def collect(self, *, max_records: int = 0) -> AsyncIterator[ContextualRecord]:
+        """``Collect`` RPC (FB-071): the spoke hands over what it has queued for push."""
+        stream = self.channel.receive_stream(
+            "Collect",
+            {
+                "adapter_id": self.adapter_id,
+                "session_id": self.session_id,
+                "max_batch_size": int(max_records),
+            },
+        )
+        async for item in stream:
+            yield proto_to_pydantic(item, "ContextualRecord")
+
     async def subscribe(
         self, tags: Iterable[str] = ()
     ) -> tuple[str, AsyncIterator[ContextualRecord]]:
@@ -370,6 +383,22 @@ class WriteDispatcher:
         try:
             client = await self._client(target)
             async for record in client.backfill(start, end, tags=tags, max_records=max_records):
+                yield record
+        except WriteDispatchError:
+            raise
+        except Exception as exc:
+            target.last_error = f"{type(exc).__name__}: {exc}"
+            self._drop_channel(adapter_id)
+            raise WriteDispatchError("transport", target.last_error) from exc
+
+    async def collect(
+        self, adapter_id: str, *, max_records: int = 0
+    ) -> AsyncIterator[ContextualRecord]:
+        """Pull what the spoke has queued (``Collect``, FB-071); each record once."""
+        target = self._resolve(adapter_id, require_write=False)
+        try:
+            client = await self._client(target)
+            async for record in client.collect(max_records=max_records):
                 yield record
         except WriteDispatchError:
             raise
