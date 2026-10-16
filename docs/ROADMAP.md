@@ -52,7 +52,7 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 | Item | Status | Notes |
 |---|---|---|
 | FB-072 hub gRPC server TLS (spoke → hub direction) | Done 2026-10-16 | `FORGE_GRPC_TLS_*`, `FORGE_GRPC_REQUIRE_TLS`; both gRPC directions can now be mTLS under one CA. |
-| FB-071 `Collect` hand-over, FACTS entry for the audit-log replay, tag filter pushed into the query | Code done 2026-10-16; FACTS entry awaiting owner approval | Only the owner may set the FACTS `hash_state` to `approved`. |
+| FB-071 `Collect` hand-over, FACTS entry for the audit-log replay, tag filter pushed into the query | Done 2026-10-16 | FACTS change approved by the owner in-session. |
 | FB-055 cross-language contract test (real Python hub ↔ real NestJS/Go spoke in CI) | Not started | Becomes the acceptance test for the Go rewrite. |
 | FB-056 dead-letter sink for exhausted ingest batches | Not started | FACTS names it; today it is a counter + log. |
 | FB-002 servicer no-ops | Superseded by FB-053 (`HubIngestServicer`) | Close in the backlog. |
