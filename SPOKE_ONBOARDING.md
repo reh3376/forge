@@ -1,5 +1,7 @@
 # Forge — Spoke Onboarding Priority Plan
 
+> **Historical planning record** (last revised 2026-10-15). The current statement of direction is [docs/WHERE-WE-ARE-GOING.md](docs/WHERE-WE-ARE-GOING.md), the target system is [docs/VISION.md](docs/VISION.md), the current state is [docs/WHERE-WE-ARE.md](docs/WHERE-WE-ARE.md) and open work is [BACKLOG.md](BACKLOG.md). Where this file disagrees with them, they win (BACKLOG FB-081).
+
 **Version:** 1.0 — April 2026
 **Depends on:** WHK Digital Strategy v4r0, PLAN.md, PHASES.md
 **Approval required:** Each spoke compliance plan needs explicit owner approval before implementation begins.

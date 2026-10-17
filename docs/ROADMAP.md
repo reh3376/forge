@@ -2,7 +2,7 @@
 
 **Status date:** 2026-10-16 · **Owner:** reh3376 · **Companion:** [`BACKLOG.md`](../BACKLOG.md)
 
-The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). This document is the map above it: what the platform is becoming, which decisions are in force, how the open work groups into workstreams, the order to take it in, and the questions only the owner can answer. Update it whenever an item changes state, a decision is made, or a workstream is added.
+The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). This document is the map above it: what the platform is becoming, which decisions are in force, how the open work groups into workstreams, the order to take it in, and the questions only the owner can answer. Update it whenever an item changes state, a decision is made, or a workstream is added. The destination is [`VISION.md`](VISION.md), the short statement of direction is [`WHERE-WE-ARE-GOING.md`](WHERE-WE-ARE-GOING.md), and the component-by-component snapshot is [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md).
 
 **Status vocabulary:** `Not started` · `In progress` · `Done` · `Blocked (on X)` · `Decision needed`.
 
@@ -27,7 +27,7 @@ The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). Thi
 
 ## 2. Where things stand
 
-Delivered 2026-10-15/16 on the hub ↔ MES ↔ OT path (all merged):
+Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered 2026-10-15/16 on the hub ↔ MES ↔ OT path (all merged):
 
 | Capability | Items |
 |---|---|
@@ -143,7 +143,7 @@ FB-038, FB-039, FB-040, FB-041, FB-042 — local tooling; details in `docs/MDEMG
 
 ### WS-11 · Documentation
 
-FB-024 README counts and placeholder row, FB-025 phase numbering, FB-027 stale report. `docs/personal/*` (FVTS context, FVTS review package, Rust frontend research) need a refresh once D-1/D-3 are answered: committed status (PR 26), branch name (`reh3376_dev01`), governance suite (407 passed), the gateway role model, modules-in-Go, Next.js frontend retired. `modules/Forge MES/CLAUDE.md` claims Next 15 / React 19; the code is Next 14.2 / React 18.
+FB-024 README counts and placeholder row, FB-025 phase numbering, FB-027 stale report. `docs/personal/*` (FVTS context, FVTS review package, Rust frontend research) need a refresh once D-1/D-3 are answered: committed status (PR 26), branch name (`reh3376_dev01`), governance suite (407 passed), the gateway role model, modules-in-Go, Next.js frontend retired. `modules/Forge MES/CLAUDE.md` claims Next 15 / React 19; the code is Next 14.2 / React 18. FB-081: the top-level legacy planning documents (`ARCHITECTURE.md`, `PHASES.md`, `PLAN.md`, `RESEARCH_NOTES.md`, `ROADMAP-ADAPTER-INTEGRATION.md`, `SPOKE_ONBOARDING.md`, `SPRINT-PLAN-*.md`) are banner-marked historical since 2026-10-16; fold what is still true into `docs/VISION.md` / `docs/WHERE-WE-ARE.md` and retire them.
 
 ---
 
