@@ -20,7 +20,7 @@ The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). Thi
 | A-6 | **The hub owns the databases.** Modules do not own database connections (MDEMG is the one exception). MES data moves into the hub's `mod_mes` schema (FB-057). | earlier | owner notes |
 | A-7 | **Safety stays in the core.** Role checks, interlocks, confirmation and audit for writes are enforced in forge-core/OT, never only in a UI. | 2026-10 | OT control design, FVTS D-9 |
 | A-8 | **Workflow.** Develop on `reh3376_dev01`, one backlog item per PR, the auto-PR workflow opens the PR, the owner merges on green CI. Never push the next item onto a branch with an open PR. | 2026-10-16 | owner |
-| A-9 | **Security posture.** Repository stays private until GitHub Support confirms garbage collection of the purged history (ticket #4862642); then re-enable secret scanning, push protection, CodeQL, private vulnerability reporting and fork-PR approval (FB-044). Nothing is imported without a gitleaks history scan. | 2026-10-15 | incident runbook |
+| A-9 | **Security posture.** Public again since 2026-10-17 by the owner's decision, ahead of GitHub Support's garbage collection of the purged history (ticket #4862642, still open); secret scanning, push protection, CodeQL, Dependabot, private vulnerability reporting and fork-PR approval are on (FB-044). Nothing is imported without a gitleaks history scan. | 2026-10-15, revised 2026-10-17 | incident runbook |
 | A-10 | **Local models only** for MDEMG/Jiminy tooling (llama-server `mdemg-llm-v1`); no OpenAI cloud models. | earlier | owner |
 
 ---
@@ -43,6 +43,8 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | FVTS runner (19 checks), render-profile baseline, reference renderer, golden set; CI gate on | FB-077 (PR 36) |
 | Forge-issued module database credentials (`forge db access`) | FB-057 step 1 (PR 34) |
 | OT FACTS spec hash verifiable again (`pending_review`, owner approval open) | FB-073 |
+| FACTS runner validates against the schema (`facts:schema-valid` first), enums read from the schema, vocabulary extended for gRPC/push/mTLS; 8 of 9 specs validate, 5 re-stamped `pending_review` | FB-080 |
+| Repository public again; secret scanning, push protection, CodeQL, Dependabot, private vulnerability reporting, fork-PR approval re-enabled | FB-044 (owner's flip, 2026-10-17) |
 
 ---
 
@@ -126,7 +128,7 @@ Needed before FB-076, forge-ignition and forge-hmi-scada can start the same way.
 
 ### WS-8 · Governance (FxTS)
 
-FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 (the FACTS runner has no schema-valid check; 7 of 9 specs fail schema validation). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
+FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 done 2026-10-17 (`facts:schema-valid`, enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8; five re-stamped specs await the owner's approval). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
 
 ### WS-9 · Security and repository operations
 
@@ -183,9 +185,9 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 
 **D-5 · Core language (Python vs Rust) for the hub.** Parked; not required by anything in section 4.
 
-**D-6 · Public flip timing.** When GitHub Support confirms GC.
+**D-6 · Public flip timing.** *Decided 2026-10-17 by the owner: flipped public ahead of Support's GC. FB-044 features re-enabled the same day; the purged commits stay reachable through `refs/pull/4..8` until GC (ticket #4862642).*
 
-**D-8 · FACTS vocabulary for OT adapters (FB-079).** The FACTS v0.1.0 schema speaks the IT integration vocabulary of the first spokes (GraphQL, REST, RabbitMQ, MQTT, WebSocket, file, database; `REGISTERED…STOPPED` lifecycle; `none/basic/certificate…` auth). The OT module's spec uses OPC-UA terms (`opcua_read/subscribe/write/history/browse`, `on_demand`, `DISCONNECTED/CONNECTED/RECONNECTING`, `anonymous/username_password`, `enum`/`object` params, `tag_value`) and fails 8 runner checks, so its hash can be verified (FB-073) but should not be approved as-is. Options: (a) extend the schema with an OT vocabulary and keep the spec's meaning; (b) translate the spec into the existing vocabulary and lose the OPC-UA specifics; (c) a FACTS v0.2.0 with a per-tier vocabulary. Recommendation: (a) — the gRPC spokes (bosc-ims, scanner-gateway) already stretch the enum the same way (FB-080), so the schema is the thing to grow. The same item reconciles the adapter's three identities (`forge-ot-module` in code, `ot-module` in manifest.json and the spec) to one.
+**D-8 · FACTS vocabulary for OT adapters (FB-079).** The FACTS v0.1.0 schema speaks the IT integration vocabulary of the first spokes (GraphQL, REST, RabbitMQ, MQTT, WebSocket, file, database; `REGISTERED…STOPPED` lifecycle; `none/basic/certificate…` auth). The OT module's spec uses OPC-UA terms (`opcua_read/subscribe/write/history/browse`, `on_demand`, `DISCONNECTED/CONNECTED/RECONNECTING`, `anonymous/username_password`, `enum`/`object` params, `tag_value`) and fails 9 runner checks (`facts:schema-valid` with 66 violations plus 8 vocabulary checks), so its hash can be verified (FB-073) but should not be approved as-is. Options: (a) extend the schema with an OT vocabulary and keep the spec's meaning; (b) translate the spec into the existing vocabulary and lose the OPC-UA specifics; (c) a FACTS v0.2.0 with a per-tier vocabulary. Recommendation: (a) — the gRPC spokes (bosc-ims, scanner-gateway) already stretch the enum the same way (FB-080), so the schema is the thing to grow. The same item reconciles the adapter's three identities (`forge-ot-module` in code, `ot-module` in manifest.json and the spec) to one. FB-080 narrowed the decision to the enums: `metadata` is free-form, so `opcua_specifics` and the two OT sample records can move there without a schema change, and `jitter` is already in the schema.
 
 **D-7 · Scope of the Go standard.** A-2 covers the formal management-service modules. Still to decide: whether the hub-hosted Python OT module (`src/forge/modules/ot`) and the Python ingestion adapters (`src/forge/adapters/*`) move to Go over time or stay Python inside the hub, and whether integration modules (forge-ignition) follow the Go template.
 
@@ -202,7 +204,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019, FB-021 | |
-| WS-8 governance | — | FB-022, FB-048, FB-080 | FB-014 | FTTS doc has no id yet |
-| WS-9 security/ops | FB-029, FB-044, FB-046 | FB-043, FB-047 | FB-049 | public flip blocked on Support |
+| WS-8 governance | — | FB-022, FB-048 | FB-014 | FB-080 done; FTTS doc has no id yet |
+| WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
 | WS-11 docs | — | FB-025 | FB-024, FB-027 | personal docs refresh |
