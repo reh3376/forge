@@ -332,8 +332,8 @@
     },
     "dead_letter": {
       "enabled": true,
-      "destination": "forge://dead-letter/next-trend",
-      "retention_days": 30,
+      "topic": "forge://dead-letter/next-trend",
+      "max_age_hours": 720,
       "description": "Tag values that fail translation or have unmappable data types are sent to dead letter for manual review."
     },
     "health_degradation": {
@@ -353,18 +353,31 @@
     "api_port": 3011,
     "tag_path_format": "slash-separated (WH/WHK01/Distillery01/Tag)",
     "quality_standard": "OPC UA (192=GOOD, 64=UNCERTAIN, 0=BAD)",
-    "supported_aggregations": ["sample_by (1m/5m/1h/1d)", "LTTB downsampling", "fill (linear/null/prev/none)"],
-    "notes": "First HISTORIAN-tier Forge adapter. Cross-language spoke: Python adapter wraps Rust REST API. 4-crate workspace (core, storage, api, ingest). Replaces Canary/OSIsoft PI. ~14K tags imported from Canary, live ingest via MQTT/SparkplugB/OPC UA."
+    "supported_aggregations": [
+      "sample_by (1m/5m/1h/1d)",
+      "LTTB downsampling",
+      "fill (linear/null/prev/none)"
+    ],
+    "notes": "First HISTORIAN-tier Forge adapter. Cross-language spoke: Python adapter wraps Rust REST API. 4-crate workspace (core, storage, api, ingest). Replaces Canary/OSIsoft PI. ~14K tags imported from Canary, live ingest via MQTT/SparkplugB/OPC UA.",
+    "spec_created_at": "2026-04-07",
+    "spec_author": "forge-platform",
+    "spec_notes": "Phase 1 scaffold. REST+SSE adapter for time-series tag data. First historian-tier spoke and first cross-language (Python↔Rust) adapter. Backfill supported via history endpoint time-range queries."
   },
   "integrity": {
-    "state": "draft",
-    "created_at": "2026-04-07",
-    "spec_author": "forge-platform",
-    "notes": "Phase 1 scaffold. REST+SSE adapter for time-series tag data. First historian-tier spoke and first cross-language (Python↔Rust) adapter. Backfill supported via history endpoint time-range queries.",
-    "hash_state": "approved",
-    "previous_hash": null,
-    "change_history": [],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "13c01d4a7583093b1ffabfdb2a848a39f6a96d5dbcf965e2385c7b46ec48e75b"
+    "spec_hash": "4b79ac4f978f08c04d30be05fbc81f94b215b7412fc0da8c92271495c227e758",
+    "hash_state": "pending_review",
+    "previous_hash": "13c01d4a7583093b1ffabfdb2a848a39f6a96d5dbcf965e2385c7b46ec48e75b",
+    "change_history": [
+      {
+        "previous_hash": "13c01d4a7583093b1ffabfdb2a848a39f6a96d5dbcf965e2385c7b46ec48e75b",
+        "new_hash": "4b79ac4f978f08c04d30be05fbc81f94b215b7412fc0da8c92271495c227e758",
+        "changed_at": "2026-10-17T04:48:26Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-080: schema conformance. error_handling.dead_letter fields renamed to the schema's (destination→topic, retention_days→max_age_hours = days×24); draft-era integrity notes (state 'draft', created_at, spec_author, notes) moved to metadata.spec_*. Adapter behaviour unchanged. Awaiting owner approval."
+      }
+    ]
   }
 }

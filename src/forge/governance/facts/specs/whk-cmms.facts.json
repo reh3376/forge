@@ -136,8 +136,8 @@
         "description": "GraphQL polling interval for work orders, assets, maintenance requests (10-3600 seconds).",
         "default": 60,
         "validation": {
-          "minimum": 10,
-          "maximum": 3600
+          "min": 10,
+          "max": 3600
         }
       }
     ],
@@ -239,34 +239,6 @@
           "ScheduleOrder"
         ],
         "collection_mode": "subscribe"
-      }
-    ],
-    "cross_module_data_flows": [
-      {
-        "flow_name": "erpi_master_data_to_cmms",
-        "direction": "ERPI \u2192 CMMS",
-        "entities": [
-          "Item",
-          "Vendor",
-          "PurchaseOrder"
-        ],
-        "description": "ERP-originated master data enriches maintenance cost tracking with item pricing, vendor information, and purchase order references."
-      },
-      {
-        "flow_name": "cmms_maintenance_windows_to_mes",
-        "direction": "CMMS \u2192 MES",
-        "entities": [
-          "WorkOrder"
-        ],
-        "description": "Scheduled maintenance windows (from WorkOrder.scheduledStart/End) must be communicated to MES for production scheduling constraints."
-      },
-      {
-        "flow_name": "cmms_inventory_to_wms",
-        "direction": "CMMS \u2192 WMS",
-        "entities": [
-          "InventoryInvestigation"
-        ],
-        "description": "Inventory audit reconciliation coordinates with warehouse operations for physical count verification."
       }
     ],
     "sample_record": {
@@ -462,16 +434,36 @@
     "erp_integration": "NetSuite (indirect, via ERPI for item/vendor sync)",
     "deployment": "Docker Compose",
     "cross_module_dependencies": "ERPI (master data), MES (maintenance window scheduling), WMS (inventory reconciliation)",
-    "notes": "Smallest spoke codebase. Equipment context from CMMS enriches every other module \u2014 assets, work orders, and maintenance status are cross-cutting operational data. Dual-approval governance (maintenance supervisor + operations supervisor) is a key business rule. Phase 1 adapter is read-only via GraphQL polling."
-  },
-  "integrity": {
-    "hash_method": "sha256-c14n-v1",
-    "spec_hash": "1706dcabe56a70480a26f3d302d9f3866f1504e5f8164ff0ef16271d7ed36c0f",
-    "hash_state": "approved",
-    "previous_hash": null,
-    "approved_by": "reh3376",
-    "approved_at": "2026-04-08T00:00:00Z",
-    "change_history": [
+    "notes": "Smallest spoke codebase. Equipment context from CMMS enriches every other module \u2014 assets, work orders, and maintenance status are cross-cutting operational data. Dual-approval governance (maintenance supervisor + operations supervisor) is a key business rule. Phase 1 adapter is read-only via GraphQL polling.",
+    "cross_module_data_flows": [
+      {
+        "flow_name": "erpi_master_data_to_cmms",
+        "direction": "ERPI \u2192 CMMS",
+        "entities": [
+          "Item",
+          "Vendor",
+          "PurchaseOrder"
+        ],
+        "description": "ERP-originated master data enriches maintenance cost tracking with item pricing, vendor information, and purchase order references."
+      },
+      {
+        "flow_name": "cmms_maintenance_windows_to_mes",
+        "direction": "CMMS \u2192 MES",
+        "entities": [
+          "WorkOrder"
+        ],
+        "description": "Scheduled maintenance windows (from WorkOrder.scheduledStart/End) must be communicated to MES for production scheduling constraints."
+      },
+      {
+        "flow_name": "cmms_inventory_to_wms",
+        "direction": "CMMS \u2192 WMS",
+        "entities": [
+          "InventoryInvestigation"
+        ],
+        "description": "Inventory audit reconciliation coordinates with warehouse operations for physical count verification."
+      }
+    ],
+    "spec_history": [
       {
         "previous_hash": null,
         "new_hash": null,
@@ -489,6 +481,25 @@
         "changed_by": "claude-opus",
         "change_type": "structural",
         "reason": "D3.8 FTTS compliance: restructured from non-standard format to FACTS-compliant 10-section schema. Added context_mapping (18 field mappings), error_handling (retry+circuit breaker+dead letter), metadata (deployment details), integrity (hash tracking). Migrated domain_mappings, governance, known_patterns, phase_1_limitations, and related_adapters into standard FACTS sections."
+      }
+    ]
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "3c2312c0fef72f56451a9914de9ce95a013776cab1a6b0bebdefef5af615dffa",
+    "hash_state": "pending_review",
+    "previous_hash": "1706dcabe56a70480a26f3d302d9f3866f1504e5f8164ff0ef16271d7ed36c0f",
+    "approved_by": "reh3376",
+    "approved_at": "2026-04-08T00:00:00Z",
+    "change_history": [
+      {
+        "previous_hash": "1706dcabe56a70480a26f3d302d9f3866f1504e5f8164ff0ef16271d7ed36c0f",
+        "new_hash": "3c2312c0fef72f56451a9914de9ce95a013776cab1a6b0bebdefef5af615dffa",
+        "changed_at": "2026-10-17T04:48:26Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-080: schema conformance. data_contract.cross_module_data_flows moved to metadata; poll_interval_seconds validation keys renamed minimum/maximum\u2192min/max; the two pre-FHTS change_history entries (null hashes, sources discovery/compliance) moved to metadata.spec_history. Adapter behaviour unchanged. Awaiting owner approval."
       }
     ]
   }

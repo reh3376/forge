@@ -123,8 +123,9 @@ List every parameter the adapter needs to connect to the source system:
 
 Rules:
 - Param `name` must be snake_case (`^[a-z][a-z0-9_]*$`)
-- Param `type` must be one of: `string`, `integer`, `boolean`, `url`, `path`
-- At least one auth method required from: `none`, `bearer_token`, `api_key`, `basic`, `oauth2`, `certificate`, `azure_entra_id`
+- Param `type` must be one of: `string`, `integer`, `boolean`, `url`, `path`; a `default` is typed to match (`60`, not `"60"`)
+- `validation` keys are `pattern`, `min`, `max`, `enum`
+- At least one auth method required from: `none`, `bearer_token`, `api_key`, `basic`, `oauth2`, `certificate`, `azure_entra_id`, `mtls`, `device_token`
 
 ### Step 4: Enumerate Data Sources
 
@@ -146,13 +147,12 @@ This is the most important section. Every data source the adapter can read from 
         "collection_mode": "poll"
       },
       {
+        "name": "entity_events",
         "source_type": "rabbitmq",
-        "endpoint": "amqp://rabbitmq:5672",
-        "description": "Real-time entity events",
+        "endpoint": "forge.events/entity.#",
+        "description": "Real-time entity events (exchange forge.events, routing key entity.#)",
         "entities": ["EntityEvent"],
-        "collection_mode": "subscribe",
-        "exchange": "forge.events",
-        "routing_key": "entity.#"
+        "collection_mode": "subscribe"
       }
     ],
     "sample_record": {
@@ -174,8 +174,9 @@ Rules:
 - `schema_ref` must start with `forge://`
 - `output_format` must be `contextual_record` or `raw`
 - `context_fields` must not be empty — these are the fields every record must contain
-- `source_type` must be one of: `graphql_query`, `graphql_mutation`, `graphql_subscription`, `rest_get`, `rest_post`, `rabbitmq`, `mqtt`, `websocket`, `file`, `database`
-- `collection_mode` must be one of: `poll`, `subscribe`, `backfill`, `write`
+- `source_type` must be one of: `graphql_query`, `graphql_mutation`, `graphql_subscription`, `rest_get`, `rest_post`, `rabbitmq`, `mqtt`, `websocket`, `file`, `database`, `grpc_unary`, `grpc_stream`, `grpc_server_unary`, `grpc_server_stream`
+- `collection_mode` must be one of: `poll`, `subscribe`, `backfill`, `write`, `push` (`push`: the source delivers to an endpoint the adapter serves)
+- A data source may carry a short `name`; nothing else — every section except `metadata` rejects unknown keys (`facts:schema-valid`). Exchange names, routing rules and other adapter-specific detail go into `endpoint`/`description` or under `metadata`
 - Every data source must have at least one entity
 - The `sample_record.context` must include all fields listed in `context_fields`
 
@@ -218,7 +219,7 @@ Every required context field must have a mapping (from source data) or enrichmen
 Rules:
 - Every field in `context_fields` must be covered by a mapping or enrichment rule
 - Mappings should not target fields that aren't in `context_fields` or `optional_context_fields` (orphan check)
-- Enrichment `rule_type` must be one of: `timestamp_to_shift`, `location_to_area`, `lookup`, `computed`, `static`
+- Enrichment `rule_type` must be one of: `timestamp_to_shift`, `location_to_area`, `lookup`, `computed`, `static`, `enum_normalize`, `composite`
 
 ### Step 6: Configure Error Handling
 
@@ -329,9 +330,7 @@ The resulting block looks like:
 import asyncio, json
 from forge.governance.facts.runners.facts_runner import FACTSRunner
 
-runner = FACTSRunner(
-    schema_path="src/forge/governance/facts/schema/facts.schema.json"
-)
+runner = FACTSRunner()  # the packaged facts.schema.json is the default
 
 with open("src/forge/governance/facts/specs/my-system.facts.json") as f:
     spec = json.load(f)
@@ -346,7 +345,11 @@ if not report.passed:
     for v in report.verdicts:
         if v.status.value == "FAIL":
             print(f"  FAIL: {v.check_id} — {v.message}")
+            for violation in v.violations:  # facts:schema-valid lists one per JSON path
+                print(f"        {violation.field}: {violation.message}")
 ```
+
+The first verdict is always `facts:schema-valid`. The enums the other checks use are read from the schema file (`runner.vocabulary`), so there is no second list to keep in step.
 
 ### Tests (pytest)
 
@@ -364,6 +367,10 @@ pytest tests/governance/facts/test_whk_wms_spec.py -v
 ---
 
 ## Common Failures and How to Fix Them
+
+### `facts:schema-valid` — FAIL
+**Cause:** The spec does not validate against `facts.schema.json`: an enum value outside the vocabulary, a key the section does not allow, a value of the wrong type (a string default on an integer param, a null hash in `change_history`). Each violation names the JSON path.
+**Fix:** Use the schema's vocabulary (the lists in Steps 3–5), move adapter-specific material under `metadata`, type defaults to match `type`, and keep `change_history` to real hash transitions (`add_spec_hash()` writes them). If the vocabulary genuinely lacks a term a live adapter needs, extend the schema in the same change (FB-080 did this for gRPC, `push`, `mtls`/`device_token`) — the runner picks it up without code.
 
 ### `facts:capabilities-read` — FAIL
 **Cause:** `capabilities.read` is not `true`. Every adapter must be able to read.

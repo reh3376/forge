@@ -192,8 +192,8 @@
                 "description": "Human-readable parameter description."
               },
               "default": {
-                "type": "string",
-                "description": "Default value if not provided."
+                "type": ["string", "integer", "number", "boolean"],
+                "description": "Default value if not provided; typed to match `type`."
               },
               "validation": {
                 "type": "object",
@@ -228,7 +228,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["none", "bearer_token", "api_key", "basic", "oauth2", "certificate", "azure_entra_id"]
+            "enum": ["none", "bearer_token", "api_key", "basic", "oauth2", "certificate", "azure_entra_id", "mtls", "device_token"]
           },
           "minItems": 1,
           "description": "Authentication methods the adapter supports."
@@ -268,16 +268,24 @@
           "default": [],
           "description": "Context fields the adapter MAY populate when available."
         },
+        "external_contract_ref": {
+          "type": "string",
+          "description": "URI of an external contract this data contract derives from (e.g. an AsyncAPI document)."
+        },
         "data_sources": {
           "type": "array",
           "items": {
             "type": "object",
             "required": ["source_type", "description", "entities"],
             "properties": {
+              "name": {
+                "type": "string",
+                "description": "Short identifier for this source, for reports and cross-references."
+              },
               "source_type": {
                 "type": "string",
-                "enum": ["graphql_query", "graphql_mutation", "graphql_subscription", "rest_get", "rest_post", "rabbitmq", "mqtt", "websocket", "file", "database"],
-                "description": "Type of data source."
+                "enum": ["graphql_query", "graphql_mutation", "graphql_subscription", "rest_get", "rest_post", "rabbitmq", "mqtt", "websocket", "file", "database", "grpc_unary", "grpc_stream", "grpc_server_unary", "grpc_server_stream"],
+                "description": "Type of data source. grpc_unary/grpc_stream: calls the adapter makes to a gRPC service; grpc_server_unary/grpc_server_stream: calls devices make to a gRPC service the adapter serves."
               },
               "endpoint": {
                 "type": "string",
@@ -295,8 +303,8 @@
               },
               "collection_mode": {
                 "type": "string",
-                "enum": ["poll", "subscribe", "backfill", "write"],
-                "description": "How the adapter interacts with this source."
+                "enum": ["poll", "subscribe", "backfill", "write", "push"],
+                "description": "How the adapter interacts with this source. push: the source delivers to an endpoint the adapter serves (gRPC server streams, webhooks)."
               }
             },
             "additionalProperties": false
@@ -356,8 +364,8 @@
               },
               "rule_type": {
                 "type": "string",
-                "enum": ["timestamp_to_shift", "location_to_area", "lookup", "computed", "static"],
-                "description": "Type of enrichment rule."
+                "enum": ["timestamp_to_shift", "location_to_area", "lookup", "computed", "static", "enum_normalize", "composite"],
+                "description": "Type of enrichment rule. enum_normalize: rewrite a source enum into the Forge form; composite: combine several source fields into one context value."
               },
               "config": {
                 "type": "object",
@@ -406,6 +414,15 @@
               "type": "integer",
               "minimum": 1000,
               "description": "Maximum delay between retries (caps exponential growth)."
+            },
+            "jitter": {
+              "type": "boolean",
+              "description": "Whether random jitter is added to each delay."
+            },
+            "retryable_errors": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Error classes that are retried; anything else fails immediately."
             }
           },
           "additionalProperties": false
@@ -449,6 +466,10 @@
               "type": "integer",
               "minimum": 1,
               "description": "How long dead letter records are retained."
+            },
+            "description": {
+              "type": "string",
+              "description": "What ends up in the dead letter queue and what happens to it."
             }
           },
           "additionalProperties": false,
