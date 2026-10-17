@@ -1,0 +1,17 @@
+[
+  {
+    "message_type": "action_result",
+    "profiles": ["desktop_hmi"],
+    "action_id": "ferm.write_temperature_sp",
+    "status": "CONFIRMED",
+    "old_value": 150.0,
+    "new_value": 152.0
+  },
+  {
+    "message_type": "action_result",
+    "profiles": ["desktop_hmi"],
+    "action_id": "ferm.write_temperature_sp",
+    "status": "REJECTED_INTERLOCK",
+    "interlock": {"rule_id": "IL-FERM-CIP", "message": "No setpoint changes while CIP runs"}
+  }
+]

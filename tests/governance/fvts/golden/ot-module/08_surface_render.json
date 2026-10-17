@@ -1,0 +1,5 @@
+[
+  {"message_type": "surface_render", "surface_id": "ferm.overview"},
+  {"message_type": "surface_render", "surface_id": "ferm.trend"},
+  {"message_type": "surface_render", "surface_id": "area.alarm_summary"}
+]

@@ -1,0 +1,4 @@
+[
+  {"message_type": "subscription_status", "state": "disconnected"},
+  {"message_type": "subscription_status", "state": "connected"}
+]

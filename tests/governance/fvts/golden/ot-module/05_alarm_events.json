@@ -1,0 +1,10 @@
+{
+  "message_type": "alarm_event",
+  "events": [
+    {"alarm_id": "FERM-003-TEMP-HI", "state": "ACTIVE_UNACK", "priority": "HIGH", "timestamp": "2026-10-16T11:58:00Z"},
+    {"alarm_id": "FERM-003-TEMP-HI", "state": "ACTIVE_ACK", "priority": "HIGH", "timestamp": "2026-10-16T11:58:30Z"},
+    {"alarm_id": "FERM-003-AGIT-FAULT", "state": "SHELVED", "priority": "MEDIUM", "timestamp": "2026-10-16T11:59:00Z"},
+    {"alarm_id": "FERM-003-TEMP-HI", "state": "CLEAR_UNACK", "priority": "HIGH", "timestamp": "2026-10-16T11:59:40Z"},
+    {"alarm_id": "FERM-003-TEMP-HI", "state": "NORMAL", "priority": "HIGH", "timestamp": "2026-10-16T11:59:50Z"}
+  ]
+}

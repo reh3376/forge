@@ -1,0 +1,19 @@
+{
+  "message_type": "subscription_update",
+  "now": "2026-10-16T12:00:30Z",
+  "rate_hz": 4,
+  "updates": [
+    {
+      "point_id": "ferm.temperature",
+      "value": {"raw": 150.3, "quality": "GOOD", "data_type": "FLOAT"},
+      "timestamp": {"source_time": "2026-10-16T12:00:00Z", "ingestion_time": "2026-10-16T12:00:00.100Z"},
+      "context": {"site": "whk01", "area": "Area1", "equipment_id": "Fermenter3", "operating_mode": "Production"}
+    },
+    {
+      "point_id": "ferm.temperature_sp",
+      "value": {"raw": null, "quality": "NOT_AVAILABLE", "data_type": "FLOAT"},
+      "timestamp": {"source_time": "2026-10-16T12:00:29.900Z", "ingestion_time": "2026-10-16T12:00:29.950Z"},
+      "context": {"site": "whk01", "area": "Area1", "equipment_id": "Fermenter3", "operating_mode": "Production"}
+    }
+  ]
+}

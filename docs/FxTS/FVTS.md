@@ -2,8 +2,8 @@
 
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
-**CI Gate:** Hard-fail (merge-blocking) once the runner lands
-**Status:** v0.1.0 DRAFT — Schema + reference spec (`ot-module.fvts.json`); runner not yet implemented
+**CI Gate:** Hard-fail (merge-blocking) — `tests/governance/fvts/` runs in the `hub-python` job
+**Status:** v0.1.0 — Schema, runner (`fvts_runner.py`, 19 checks), reference renderer, golden set and reference spec (`ot-module.fvts.json`, `pending_review` until FB-078)
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
@@ -42,7 +42,7 @@ Renderers — whatever framework implements them (Slint, egui, Dioxus, a browser
 
 ## Binding to existing Forge models
 
-FVTS does not invent parallel vocabularies. Its enums mirror the models already in the codebase, and the runner (planned check `fvts:enum-parity`) will fail if they drift:
+FVTS does not invent parallel vocabularies. Its enums mirror the models already in the codebase, and the runner check `fvts:enum-parity` fails if they drift:
 
 | FVTS `$def` | Mirrors |
 |-------------|---------|
@@ -58,7 +58,7 @@ Live updates with `transport: grpc_stream` ride the FTTS-governed gRPC transport
 
 ## Render profiles — normative baseline
 
-Specs may **tighten** these (via `render_profiles.overrides`), never loosen them. Runner check `fvts:profile-baseline`.
+Specs may **tighten** these (via `render_profiles.overrides`), never loosen them. Runner check `fvts:profile-baseline`. The table is code: `src/forge/governance/fvts/profiles.py` (`PROFILE_BASELINE`, `effective_profile()`, `action_permitted()`).
 
 | Profile | Intended renderer | Max update rate | Tag writes | Alarm operations | Kiosk / fullscreen | Notes |
 |---------|-------------------|-----------------|------------|------------------|--------------------|-------|
@@ -120,30 +120,58 @@ fvts.schema.json
 - `hmi_screen` surfaces are `configured` (versioned layout data), never hand-coded.
 - Alarm priority tokens must live in the reserved `alarm.*` token namespace.
 
-### Runner checks (beyond JSON Schema) — planned
+### Runner checks — `src/forge/governance/fvts/runners/fvts_runner.py`
+
+`FVTSRunner(FxTSRunner)` produces one verdict per check (19 for the reference spec). `fvts:schema-valid` applies the schema itself, so every schema-encoded rule above is enforced; the other checks add what JSON Schema cannot express.
 
 | Check ID | Rule |
 |----------|------|
-| `fvts:schema-valid` | Spec validates against `fvts.schema.json` |
-| `fvts:hash-verified` | FHTS integrity hash matches (shared) |
-| `fvts:enum-parity` | Mirrored enums match the Python models listed above |
-| `fvts:owner-in-facts` | `owner_module` has a FACTS spec; bound `adapter_id`s are declared there |
+| `fvts:schema-valid` | Spec validates against `fvts.schema.json`; each violation names its JSON path |
+| `fvts:identity-match` | `view_identity.view_id` equals the run target |
+| `fvts:hash-verified` | FHTS integrity block present and `spec_hash` matches the content |
+| `fvts:hash-approved` | `hash_state: approved` with an `approved_by` (warning severity until the owner approves) |
+| `fvts:enum-parity` | Schema `$defs` match the Python models listed above (and the baseline's alarm operations match `AlarmAction`) |
+| `fvts:owner-in-facts` | `owner_module` has a FACTS spec, `facts_spec_ref` exists, every bound `adapter_id` has a FACTS spec |
+| `fvts:unique-ids` | Point, action and surface ids are unique |
 | `fvts:surface-refs` | Every surface point/action ID exists |
-| `fvts:action-target` | `tag_write.target_point` exists and is writable in the owner's FACTS / OT write config |
+| `fvts:action-target` | `tag_write.target_point` exists, is bound to the owner, the owner's FACTS has `capabilities.write`; alarm operations need `alarms.enabled`; with an OT write config (`write_config=`), the tag path must match a `write_tags` entry that is writable, type-compatible and at least as wide as the display range |
 | `fvts:action-profile-permitted` | Action profiles ⊆ supported profiles ∩ baseline-permitted profiles |
-| `fvts:profile-baseline` | Overrides only tighten the baseline |
+| `fvts:profile-supported` | Surface, settings, override and renderer profiles ⊆ `render_profiles.supported` |
+| `fvts:profile-baseline` | Overrides only tighten the baseline; evidence lists the effective limits per profile |
+| `fvts:profile-action-filter` | Every surface action is visible on at least one of the surface's profiles; evidence lists the visible/hidden split per surface and profile |
 | `fvts:cross-site-read-only` | If `multi_site`, no `tag_write` actions are reachable from surfaces |
 | `fvts:isa101-required` | `isa101_high_performance: true` when any surface is `hmi_screen` |
 | `fvts:range-sane` | `range.lo < range.hi`; `reconnect.initial_backoff_ms ≤ max_backoff_ms` |
-| `fvts:golden-messages` | Each `renderers_under_test` profile renders the golden message set without error |
+| `fvts:conformance-paths` | `suite_path` and `golden_messages_path` exist in the checkout |
+| `fvts:golden-messages` | Each `renderers_under_test` profile renders the golden message set through the reference renderer without error; a spec without renderers or messages fails |
+| `fvts:metadata` | Free-form object |
 
-Per FxTS principle 2 (schema-runner parity), the CI gate stays off until every schema field above is enforced by `fvts_runner.py`.
+Schema-runner parity holds: `implemented_fields()` lists every top-level property and every `$defs` property (`$.point_id`, `$.handled_statuses`, …), and `tests/governance/fvts/test_fvts_runner.py` asserts the set equals what the schema declares, so a schema change without a runner change fails CI.
+
+### Golden messages and the reference renderer
+
+`src/forge/governance/fvts/renderer.py` is the smallest faithful model of what any forge-display renderer must do with the contract; it is not a UI. `ReferenceRenderer(spec, profile)` renders six message types and raises `GoldenRenderError` on any contract breach:
+
+| Message | What the renderer enforces |
+|---------|----------------------------|
+| `subscription_update` | Points are declared; `required_context_fields` present; quality is a `QualityCode`; the point's `timestamp_basis` is present; stale by `stale_after_ms`; BAD/NOT_AVAILABLE per `on_bad` (blank or last good value, always with a marker); UNCERTAIN marked; numerics formatted with `display_precision` and `engineering_units`; ENUM raw → `enum_labels`; `rate_hz` ≤ the profile's effective ceiling |
+| `subscription_status` | `disconnected` marks every point stale (`mark_all_stale`) |
+| `history_response` | History enabled; decimation server-side with the contract's algorithm; `timestamp_basis` matches; series ≤ `max_points_per_series` |
+| `alarm_event` | Alarms enabled; state/priority in the contract; a `priority_tokens` entry exists; annunciate on `ACTIVE_UNACK` when audible |
+| `action_result` | Action declared and permitted on this profile; status is a `writeStatus`, handled by `tag_write` actions; `REJECTED_INTERLOCK` carries the blocking rule and message |
+| `surface_render` | Surface offered on the profile; points declared; actions split into visible/hidden per `fvts:profile-action-filter` |
+
+A golden message may carry `"profiles": [...]` to apply to some renderers only (the setpoint write results apply to `desktop_hmi`). The OT reference set lives in `tests/governance/fvts/golden/ot-module/` (twelve messages in eight files, rendered in name order; the renderer keeps the last good value per point across files).
+
+### CI gate
+
+`tests/governance/fvts/test_ot_module_views.py` is the suite the reference spec declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`, until the owner approves the hash under FB-078. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
 
 ## Specs
 
 | Spec | Status | Notes |
 |------|--------|-------|
-| `ot-module.fvts.json` | Draft — `hash_state: pending_review` | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review |
+| `ot-module.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
 
 ## Relationship to other FxTS frameworks
 
